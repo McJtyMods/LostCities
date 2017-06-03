@@ -1,0 +1,16 @@
+[
+{
+  "modid": "lostcities",
+  "name": "The Lost Cities",
+  "description": "The Lost Cities World Generator",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["McJty"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
