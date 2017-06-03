@@ -49,54 +49,11 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
     private MapGenBase caveGenerator = new MapGenCaves();
 
 
-    private MapGenStronghold strongholdGenerator = new MapGenStronghold() {
-        @Override
-        protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ) {
-            return canSpawnStructureIgnoringBiomes(chunkX, chunkZ, 10387313);
-        }
-    };
-    private StructureOceanMonument oceanMonumentGenerator = new StructureOceanMonument() {
-        @Override
-        protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ) {
-            return canSpawnStructureIgnoringBiomes(chunkX, chunkZ, 10387313);
-        }
-    };
-    private MapGenVillage villageGenerator = new MapGenVillage() {
-        @Override
-        protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ) {
-            return canSpawnStructureIgnoringBiomes(chunkX, chunkZ, 10387312);
-        }
-    };
+    private MapGenStronghold strongholdGenerator = new MapGenStronghold();
+    private StructureOceanMonument oceanMonumentGenerator = new StructureOceanMonument();
+    private MapGenVillage villageGenerator = new MapGenVillage();
     private MapGenMineshaft mineshaftGenerator = new MapGenMineshaft();
-    private MapGenScatteredFeature scatteredFeatureGenerator = new MapGenScatteredFeature() {
-        @Override
-        protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ) {
-            return canSpawnStructureIgnoringBiomes(chunkX, chunkZ, 14357617);
-        }
-
-        @Override
-        protected StructureStart getStructureStart(int chunkX, int chunkZ) {
-            StructureStart start = super.getStructureStart(chunkX, chunkZ);
-            if (start.getComponents().isEmpty()) {
-                switch (super.rand.nextInt(4)) {
-                    case 0:
-                        start.getComponents().add(new ComponentScatteredFeaturePieces.SwampHut(super.rand, chunkX * 16, chunkZ * 16));
-                        break;
-                    case 1:
-                        start.getComponents().add(new ComponentScatteredFeaturePieces.Igloo(super.rand, chunkX * 16, chunkZ * 16));
-                        break;
-                    case 2:
-                        start.getComponents().add(new ComponentScatteredFeaturePieces.DesertPyramid(super.rand, chunkX * 16, chunkZ * 16));
-                        break;
-                    case 3:
-                        start.getComponents().add(new ComponentScatteredFeaturePieces.JunglePyramid(super.rand, chunkX * 16, chunkZ * 16));
-                        break;
-                }
-                start.updateBoundingBox();
-            }
-            return start;
-        }
-    };
+    private MapGenScatteredFeature scatteredFeatureGenerator = new MapGenScatteredFeature();
 
     public ChunkProviderSettings getSettings() {
         if (settings == null) {
@@ -105,37 +62,6 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         }
         return settings;
     }
-
-    private boolean canSpawnStructureIgnoringBiomes(int chunkX, int chunkZ, int randseed) {
-        int i = chunkX;
-        int j = chunkZ;
-
-        int distance = 16;
-        int seperation = 8;
-
-        if (chunkX < 0) {
-            chunkX -= distance - 1;
-        }
-
-        if (chunkZ < 0) {
-            chunkZ -= distance - 1;
-        }
-
-        int k = chunkX / distance;
-        int l = chunkZ / distance;
-        Random random = this.worldObj.setRandomSeed(k, l, randseed);
-        k = k * distance;
-        l = l * distance;
-        k = k + random.nextInt(distance - seperation);
-        l = l + random.nextInt(distance - seperation);
-
-        if (i == k && j == l) {
-            return true;
-        }
-
-        return false;
-    }
-
 
     // Holds ravine generator
     private MapGenBase ravineGenerator = new MapGenRavine();
