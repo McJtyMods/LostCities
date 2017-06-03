@@ -4,6 +4,7 @@ import mcjty.lib.compat.CompatChunkGenerator;
 import mcjty.lib.compat.CompatMapGenStructure;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.terrain.BaseTerrainGenerator;
+import mcjty.lostcities.dimensions.world.terrain.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.terrain.lost.LostCitiesTerrainGenerator;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.entity.EnumCreatureType;
@@ -51,7 +52,21 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     private MapGenStronghold strongholdGenerator = new MapGenStronghold();
     private StructureOceanMonument oceanMonumentGenerator = new StructureOceanMonument();
-    private MapGenVillage villageGenerator = new MapGenVillage();
+    private MapGenVillage villageGenerator = new MapGenVillage() {
+        @Override
+        protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ) {
+            boolean b = super.canSpawnStructureAtCoords(chunkX, chunkZ);
+            if (!b) {
+                return false;
+            }
+            if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
+                if (BuildingInfo.isCity(chunkX, chunkZ, world.getSeed())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    };
     private MapGenMineshaft mineshaftGenerator = new MapGenMineshaft();
     private MapGenScatteredFeature scatteredFeatureGenerator = new MapGenScatteredFeature();
 

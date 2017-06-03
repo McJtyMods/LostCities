@@ -62,6 +62,7 @@ public class LostCityConfiguration {
     public static boolean GENERATE_SCATTERED = true;
     public static boolean GENERATE_OCEANMONUMENTS = true;
 
+    public static boolean PREVENT_VILLAGES_IN_CITIES = true;
 
 
     public static void init(Configuration cfg) {
@@ -79,7 +80,7 @@ public class LostCityConfiguration {
                 "blocks that are connected. The number of connections divided by the total number of blocks in a connected section is compared with this number. " +
                 "If it is smaller then the section of blocks is destroyed or moved down with gravity");
         DESTROY_OR_MOVE_CHANCE = cfg.getFloat("destroyOrMoveChance", CATEGORY_LOSTCITY, DESTROY_OR_MOVE_CHANCE, 0.0f, 1.0f, "When a section of blocks is to be moved or destroyed " +
-                "this chance gives the chance of remval (as opposed to moving with gravity)");
+                "this chance gives the chance of removal (as opposed to moving with gravity)");
         DESTROY_SMALL_SECTIONS_SIZE = cfg.getInt("destroySmallSectionsSize", CATEGORY_LOSTCITY, DESTROY_SMALL_SECTIONS_SIZE, 1, 5000, "A section of blocks that is about to be moved or destroyed " +
                 "is always destroyed if it is smaller then this size");
 
@@ -135,5 +136,9 @@ public class LostCityConfiguration {
         GENERATE_CAVES = cfg.get(CATEGORY_LOSTCITY, "generateCaves", GENERATE_CAVES, "Generate caves").getBoolean();
         GENERATE_RAVINES = cfg.get(CATEGORY_LOSTCITY, "generateRavines", GENERATE_RAVINES, "Generate ravines").getBoolean();
         GENERATE_MINESHAFTS = cfg.get(CATEGORY_LOSTCITY, "generateMineshafts", GENERATE_MINESHAFTS, "Generate mineshafts").getBoolean();
+
+        PREVENT_VILLAGES_IN_CITIES = cfg.get(CATEGORY_LOSTCITY, "preventVillagesInCities", PREVENT_VILLAGES_IN_CITIES, "If true then an attempt will be made to prevent villages in cities. " +
+                "Note that enabling this option will likely require a low city " +
+                "density in order to actually get a reasonable chance for villages.").getBoolean();
     }
 }

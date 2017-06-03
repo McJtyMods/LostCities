@@ -276,7 +276,7 @@ public class BuildingInfo {
         return buildingType;
     }
 
-    private static boolean isCity(int chunkX, int chunkZ, long seed) {
+    public static boolean isCity(int chunkX, int chunkZ, long seed) {
         float cityFactor = City.getCityFactor(seed, chunkX, chunkZ);
         return cityFactor > LostCityConfiguration.CITY_THRESSHOLD;
     }
