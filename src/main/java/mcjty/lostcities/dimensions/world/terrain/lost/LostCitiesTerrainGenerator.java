@@ -2,7 +2,6 @@ package mcjty.lostcities.dimensions.world.terrain.lost;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
-import mcjty.lostcities.config.WorldgenConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.terrain.BaseTerrainGenerator;
 import mcjty.lostcities.dimensions.world.terrain.NormalTerrainGenerator;
@@ -495,12 +494,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int z = 0; z < 16; ++z) {
 
                 int height = 0;
-                while (height < WorldgenConfiguration.bedrockLayer) {
+                while (height < LostCityConfiguration.BEDROCK_LAYER) {
                     BaseTerrainGenerator.setBlockState(primer, index++, bedrock);
                     height++;
                 }
 
-                while (height < WorldgenConfiguration.bedrockLayer + 30 + rand.nextInt(3)) {
+                while (height < LostCityConfiguration.BEDROCK_LAYER + 30 + rand.nextInt(3)) {
                     BaseTerrainGenerator.setBlockState(primer, index++, baseBlock);
                     height++;
                 }

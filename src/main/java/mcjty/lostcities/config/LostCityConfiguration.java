@@ -52,6 +52,8 @@ public class LostCityConfiguration {
     public static float FOUNTAIN_CHANCE = .05f;
     public static float BUILDING2X2_CHANCE = .03f;
 
+    public static int BEDROCK_LAYER = 1;
+
 
     public static void init(Configuration cfg) {
         STYLE_CHANCE_CRACKED = cfg.getFloat("styleChanceCracked", CATEGORY_LOSTCITY, STYLE_CHANCE_CRACKED, 0.0f, 1.0f, "The chance that a brick will be cracked");
@@ -113,5 +115,9 @@ public class LostCityConfiguration {
                 "There actually being a bridge also depends on the presence of adjacent bridges and other conditions");
 
         FOUNTAIN_CHANCE = cfg.getFloat("fountainChance", CATEGORY_LOSTCITY, FOUNTAIN_CHANCE, 0.0f, 1.0f, "The chance that a street section contains a fountain");
+
+        BEDROCK_LAYER = cfg.get(CATEGORY_LOSTCITY, "bedrockLayer", BEDROCK_LAYER,
+                "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation").getInt();
+
     }
 }
