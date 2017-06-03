@@ -29,10 +29,10 @@ public class LostCityWorldGenerator implements IWorldGenerator {
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-//        if (information.getTerrainType() == TerrainType.TERRAIN_LOSTCITIES) {
+        if (chunkGenerator instanceof LostCityChunkGenerator) {
             generateLootSpawners(random, chunkX, chunkZ, world);
             generateVines(random, chunkX, chunkZ, world);
-//        }
+        }
     }
 
     private void generateVines(Random random, int chunkX, int chunkZ, World world) {
