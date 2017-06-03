@@ -54,6 +54,15 @@ public class LostCityConfiguration {
 
     public static int BEDROCK_LAYER = 1;
 
+    public static boolean GENERATE_VILLAGES = true;
+    public static boolean GENERATE_CAVES = true;
+    public static boolean GENERATE_RAVINES = true;
+    public static boolean GENERATE_MINESHAFTS = true;
+    public static boolean GENERATE_STRONGHOLDS = true;
+    public static boolean GENERATE_SCATTERED = true;
+    public static boolean GENERATE_OCEANMONUMENTS = true;
+
+
 
     public static void init(Configuration cfg) {
         STYLE_CHANCE_CRACKED = cfg.getFloat("styleChanceCracked", CATEGORY_LOSTCITY, STYLE_CHANCE_CRACKED, 0.0f, 1.0f, "The chance that a brick will be cracked");
@@ -116,8 +125,15 @@ public class LostCityConfiguration {
 
         FOUNTAIN_CHANCE = cfg.getFloat("fountainChance", CATEGORY_LOSTCITY, FOUNTAIN_CHANCE, 0.0f, 1.0f, "The chance that a street section contains a fountain");
 
-        BEDROCK_LAYER = cfg.get(CATEGORY_LOSTCITY, "bedrockLayer", BEDROCK_LAYER,
-                "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation").getInt();
+        BEDROCK_LAYER = cfg.getInt("bedrockLayer", CATEGORY_LOSTCITY, BEDROCK_LAYER, 0, 10,
+                "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");
 
+        GENERATE_OCEANMONUMENTS = cfg.get(CATEGORY_LOSTCITY, "generateOceanMonuments", GENERATE_OCEANMONUMENTS, "Generate ocean monuments").getBoolean();
+        GENERATE_SCATTERED = cfg.get(CATEGORY_LOSTCITY, "generateScattered", GENERATE_SCATTERED, "Generate scattered features (swamphunts, desert temples, ...)").getBoolean();
+        GENERATE_STRONGHOLDS = cfg.get(CATEGORY_LOSTCITY, "generateStrongholds", GENERATE_STRONGHOLDS, "Generate strongholds").getBoolean();
+        GENERATE_VILLAGES = cfg.get(CATEGORY_LOSTCITY, "generateVillages", GENERATE_VILLAGES, "Generate villages").getBoolean();
+        GENERATE_CAVES = cfg.get(CATEGORY_LOSTCITY, "generateCaves", GENERATE_CAVES, "Generate caves").getBoolean();
+        GENERATE_RAVINES = cfg.get(CATEGORY_LOSTCITY, "generateRavines", GENERATE_RAVINES, "Generate ravines").getBoolean();
+        GENERATE_MINESHAFTS = cfg.get(CATEGORY_LOSTCITY, "generateMineshafts", GENERATE_MINESHAFTS, "Generate mineshafts").getBoolean();
     }
 }

@@ -109,46 +109,32 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
         terrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, chunkprimer, this.biomesForGeneration);
 
-//        if (dimensionInformation.hasFeatureType(FeatureType.FEATURE_CAVES)) {
+        if (LostCityConfiguration.GENERATE_CAVES) {
             this.caveGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasFeatureType(FeatureType.FEATURE_DENSE_CAVES)) {
-//            this.denseCaveGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasFeatureType(FeatureType.FEATURE_RAVINES)) {
+        }
+        if (LostCityConfiguration.GENERATE_RAVINES) {
             this.ravineGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
+        }
 
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_MINESHAFT)) {
+        if (LostCityConfiguration.GENERATE_MINESHAFTS) {
             this.mineshaftGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_VILLAGE)) {
-//            this.villageGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_STRONGHOLD)) {
+        }
+
+        if (LostCityConfiguration.GENERATE_VILLAGES) {
+            this.villageGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
+        }
+
+        if (LostCityConfiguration.GENERATE_STRONGHOLDS) {
             this.strongholdGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_FORTRESS)) {
-//            this.genNetherBridge.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_SCATTERED)) {
-//            this.scatteredFeatureGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_SWAMPHUT)) {
-//            this.genSwampHut.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_DESERTTEMPLE)) {
-//            this.genDesertTemple.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_JUNGLETEMPLE)) {
-//            this.genJungleTemple.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_IGLOO)) {
-//            this.genIgloo.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_OCEAN_MONUMENT)) {
+        }
+
+        if (LostCityConfiguration.GENERATE_SCATTERED) {
+            this.scatteredFeatureGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
+        }
+
+        if (LostCityConfiguration.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
-//        }
+        }
 
         Chunk chunk = new Chunk(this.worldObj, chunkprimer, chunkX, chunkZ);
         byte[] abyte = chunk.getBiomeArray();
@@ -178,36 +164,21 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         ChunkPos cp = new ChunkPos(chunkX, chunkZ);
 
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_MINESHAFT)) {
+        if (LostCityConfiguration.GENERATE_MINESHAFTS) {
             this.mineshaftGenerator.generateStructure(w, this.rand, cp);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_VILLAGE)) {
-//            flag = this.villageGenerator.generateStructure(w, this.rand, cp);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_STRONGHOLD)) {
+        }
+        if (LostCityConfiguration.GENERATE_VILLAGES) {
+            flag = this.villageGenerator.generateStructure(w, this.rand, cp);
+        }
+        if (LostCityConfiguration.GENERATE_STRONGHOLDS) {
             this.strongholdGenerator.generateStructure(w, this.rand, cp);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_FORTRESS)) {
-//            this.genNetherBridge.generateStructure(w, this.rand, cp);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_SCATTERED)) {
+        }
+        if (LostCityConfiguration.GENERATE_SCATTERED) {
             this.scatteredFeatureGenerator.generateStructure(w, this.rand, cp);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_SWAMPHUT)) {
-//            this.genSwampHut.generateStructure(w, this.rand, cp);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_DESERTTEMPLE)) {
-//            this.genDesertTemple.generateStructure(w, this.rand, cp);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_JUNGLETEMPLE)) {
-//            this.genJungleTemple.generateStructure(w, this.rand, cp);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_IGLOO)) {
-//            this.genIgloo.generateStructure(w, this.rand, cp);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_OCEAN_MONUMENT)) {
+        }
+        if (LostCityConfiguration.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generateStructure(w, this.rand, cp);
-//        }
+        }
 
         int k1;
         int l1;
@@ -309,41 +280,24 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     @Override
     public void recreateStructures(Chunk chunkIn, int x, int z) {
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_FORTRESS)) {
-//            this.genNetherBridge.generate(this.worldObj, x, z, null);
-//        }
-
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_MINESHAFT)) {
+        if (LostCityConfiguration.GENERATE_MINESHAFTS) {
             this.mineshaftGenerator.generate(this.worldObj, x, z, null);
-//        }
+        }
 
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_VILLAGE)) {
-//            this.villageGenerator.generate(this.worldObj, x, z, null);
-//        }
+        if (LostCityConfiguration.GENERATE_VILLAGES) {
+            this.villageGenerator.generate(this.worldObj, x, z, null);
+        }
 
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_STRONGHOLD)) {
+        if (LostCityConfiguration.GENERATE_STRONGHOLDS) {
             this.strongholdGenerator.generate(this.worldObj, x, z, null);
-//        }
+        }
 
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_SCATTERED)) {
+        if (LostCityConfiguration.GENERATE_SCATTERED) {
             this.scatteredFeatureGenerator.generate(this.worldObj, x, z, null);
-//        }
+        }
 
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_SWAMPHUT)) {
-//            this.genSwampHut.generate(this.worldObj, x, z, null);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_DESERTTEMPLE)) {
-//            this.genDesertTemple.generate(this.worldObj, x, z, null);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_JUNGLETEMPLE)) {
-//            this.genJungleTemple.generate(this.worldObj, x, z, null);
-//        }
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_IGLOO)) {
-//            this.genIgloo.generate(this.worldObj, x, z, null);
-//        }
-
-//        if (dimensionInformation.hasStructureType(StructureType.STRUCTURE_OCEAN_MONUMENT)) {
+        if (LostCityConfiguration.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generate(this.worldObj, x, z, null);
-//        }
+        }
     }
 }
