@@ -924,7 +924,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
         int lowestLevel = groundLevel - info.floorsBelowGround * 6;
-        int buildingtop = 69 + info.floors * 6;
+        int buildingtop = LostCityConfiguration.GROUNDLEVEL + 6 + info.floors * 6;
         boolean corridor;
         if (isSide(x, z)) {
             BuildingInfo adjacent = info.getAdjacent(x, z);
@@ -1082,11 +1082,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     public static int getFloor(int height) {
-        return (height - 3) % 6;        // -3 instead of -groundLevel because we can also go below the floor
+        return (height - LostCityConfiguration.GROUNDLEVEL + 600) % 6;
     }
 
     public static int getLevel(int height) {
-        return ((height - 3) / 6) - 10;
+        return ((height - LostCityConfiguration.GROUNDLEVEL + 600) / 6) - 100;
     }
 
     private boolean isCorner(int x, int z) {

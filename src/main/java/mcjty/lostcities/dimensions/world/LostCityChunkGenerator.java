@@ -301,7 +301,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
             l1 = this.rand.nextInt(this.rand.nextInt(248) + 8);
             i2 = z + this.rand.nextInt(16) + 8;
 
-            if (l1 < LostCityConfiguration.GROUNDLEVEL || this.rand.nextInt(10) == 0) {
+            if (l1 < (LostCityConfiguration.GROUNDLEVEL - LostCityConfiguration.WATERLEVEL_OFFSET) || this.rand.nextInt(10) == 0) {
                 (new WorldGenLakes(Blocks.LAVA)).generate(w, this.rand, new BlockPos(k1, l1, i2));
             }
         }

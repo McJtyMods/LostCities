@@ -40,12 +40,12 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         int cz = chunkZ * 16;
         BuildingInfo info = new BuildingInfo(chunkX, chunkZ, world.getSeed());
 
-        int bottom = Math.max(66, info.hasBuilding ? (69 + info.floors * 6) : 66);
+        int bottom = Math.max(LostCityConfiguration.GROUNDLEVEL + 3, info.hasBuilding ? (LostCityConfiguration.GROUNDLEVEL + 6 + info.floors * 6) : (LostCityConfiguration.GROUNDLEVEL + 3));
 
         if (info.getXmin().hasBuilding) {
             if (info.getXmin().getDamageArea().getDamageFactor() < .4f) {
                 for (int z = 0; z < 15; z++) {
-                    for (int y = bottom; y < (63 + info.getXmin().floors * 6); y++) {
+                    for (int y = bottom; y < (LostCityConfiguration.GROUNDLEVEL + info.getXmin().floors * 6); y++) {
                         if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
                             createVineStrip(random, world, bottom, y, BlockVine.WEST, cx + 0, cz + z);
                         }
@@ -56,7 +56,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         if (info.getXmax().hasBuilding) {
             if (info.getXmax().getDamageArea().getDamageFactor() < .4f) {
                 for (int z = 0; z < 15; z++) {
-                    for (int y = bottom; y < (63 + info.getXmax().floors * 6); y++) {
+                    for (int y = bottom; y < (LostCityConfiguration.GROUNDLEVEL + info.getXmax().floors * 6); y++) {
                         if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
                             createVineStrip(random, world, bottom, y, BlockVine.EAST, cx + 15, cz + z);
                         }
@@ -67,7 +67,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         if (info.getZmin().hasBuilding) {
             if (info.getZmin().getDamageArea().getDamageFactor() < .4f) {
                 for (int x = 0; x < 15; x++) {
-                    for (int y = bottom; y < (63 + info.getZmin().floors * 6); y++) {
+                    for (int y = bottom; y < (LostCityConfiguration.GROUNDLEVEL + info.getZmin().floors * 6); y++) {
                         if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
                             createVineStrip(random, world, bottom, y, BlockVine.NORTH, cx + x, cz + 0);
                         }
@@ -78,7 +78,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         if (info.getZmax().hasBuilding) {
             if (info.getZmax().getDamageArea().getDamageFactor() < .4f) {
                 for (int x = 0; x < 15; x++) {
-                    for (int y = bottom; y < (63 + info.getZmax().floors * 6); y++) {
+                    for (int y = bottom; y < (LostCityConfiguration.GROUNDLEVEL + info.getZmax().floors * 6); y++) {
                         if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
                             createVineStrip(random, world, bottom, y, BlockVine.SOUTH, cx + x, cz + 15);
                         }
@@ -103,10 +103,10 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         int buildingtop = 0;
         boolean building = info.hasBuilding;
         if (building) {
-            buildingtop = 69 + info.floors * 6;
+            buildingtop = LostCityConfiguration.GROUNDLEVEL + 6 + info.floors * 6;
         }
 
-        int height = 63 - info.floorsBelowGround * 6;
+        int height = LostCityConfiguration.GROUNDLEVEL - info.floorsBelowGround * 6;
 
 
         while (height < buildingtop) {
@@ -227,10 +227,10 @@ public class LostCityWorldGenerator implements IWorldGenerator {
                     ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_VILLAGE_BLACKSMITH, random.nextLong());
                     break;
                 case 3:
-                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_WOODLAND_MANSION, random.nextLong());
+                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_ABANDONED_MINESHAFT, random.nextLong());
                     break;
                 case 4:
-                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_WOODLAND_MANSION, random.nextLong());
+                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_NETHER_BRIDGE, random.nextLong());
                     break;
                 default:
                     ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_SIMPLE_DUNGEON, random.nextLong());

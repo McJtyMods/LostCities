@@ -9,20 +9,6 @@
       "entries": [
         {
           "type": "item",
-          "name": "rftools:dimensional_shard",
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 10,
-                "max": 30
-              }
-            }
-          ],
-          "weight": 15
-        },
-        {
-          "type": "item",
           "name": "minecraft:diamond",
           "functions": [
             {

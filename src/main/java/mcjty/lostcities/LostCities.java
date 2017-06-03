@@ -1,11 +1,13 @@
 package mcjty.lostcities;
 
-import mcjty.lostcities.dimensions.ModDimensions;
 import mcjty.lostcities.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 
 @Mod(modid = LostCities.MODID, name="RFTools Dimensions",
         dependencies =
@@ -13,6 +15,7 @@ import net.minecraftforge.fml.common.event.*;
                         "after:Forge@[" + LostCities.MIN_FORGE10_VER + ",);" +
                         "after:forge@[" + LostCities.MIN_FORGE11_VER + ",)",
         version = LostCities.VERSION,
+        acceptableRemoteVersions = "*",
         acceptedMinecraftVersions = "[1.10,1.12)")
 public class LostCities {
     public static final String MODID = "lostcities";

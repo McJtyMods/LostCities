@@ -19,8 +19,8 @@ public class LostCityConfiguration {
     public static float EXPLOSION_CHANCE = .005f;
     public static int EXPLOSION_MINRADIUS = 17;
     public static int EXPLOSION_MAXRADIUS = 80;
-    public static int EXPLOSION_MINHEIGHT = 70;
-    public static int EXPLOSION_MAXHEIGHT = 120;
+    public static int EXPLOSION_MINHEIGHT = 78;
+    public static int EXPLOSION_MAXHEIGHT = 128;
 
     public static float MINI_EXPLOSION_CHANCE = .07f;
     public static int MINI_EXPLOSION_MINRADIUS = 5;
