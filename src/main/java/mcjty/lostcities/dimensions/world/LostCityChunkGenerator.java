@@ -52,21 +52,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     private MapGenStronghold strongholdGenerator = new MapGenStronghold();
     private StructureOceanMonument oceanMonumentGenerator = new StructureOceanMonument();
-    private MapGenVillage villageGenerator = new MapGenVillage() {
-        @Override
-        protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ) {
-            boolean b = super.canSpawnStructureAtCoords(chunkX, chunkZ);
-            if (!b) {
-                return false;
-            }
-            if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
-                if (BuildingInfo.isCity(chunkX, chunkZ, world.getSeed())) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    };
+    private MapGenVillage villageGenerator = new MapGenVillage();
     private MapGenMineshaft mineshaftGenerator = new MapGenMineshaft();
     private MapGenScatteredFeature scatteredFeatureGenerator = new MapGenScatteredFeature();
 
@@ -85,16 +71,13 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         {
             caveGenerator = TerrainGen.getModdedMapGen(caveGenerator, CAVE);
-//        tendrilGenerator = TerrainGen.getModdedMapGen(tendrilGenerator, CAVE);
-//        canyonGenerator = TerrainGen.getModdedMapGen(canyonGenerator, RAVINE);
-//        sphereGenerator = TerrainGen.getModdedMapGen(sphereGenerator, RAVINE);
             strongholdGenerator = (MapGenStronghold) TerrainGen.getModdedMapGen(strongholdGenerator, STRONGHOLD);
 
             villageGenerator = (MapGenVillage) TerrainGen.getModdedMapGen(villageGenerator, VILLAGE);
             mineshaftGenerator = (MapGenMineshaft) TerrainGen.getModdedMapGen(mineshaftGenerator, MINESHAFT);
             scatteredFeatureGenerator = (MapGenScatteredFeature) TerrainGen.getModdedMapGen(scatteredFeatureGenerator, SCATTERED_FEATURE);
             ravineGenerator = TerrainGen.getModdedMapGen(ravineGenerator, RAVINE);
-            oceanMonumentGenerator = (StructureOceanMonument) net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(oceanMonumentGenerator, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.OCEAN_MONUMENT);
+            oceanMonumentGenerator = (StructureOceanMonument) TerrainGen.getModdedMapGen(oceanMonumentGenerator, OCEAN_MONUMENT);
         }
 
 
@@ -136,7 +119,13 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         }
 
         if (LostCityConfiguration.GENERATE_VILLAGES) {
-            this.villageGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
+            if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
+                if (!BuildingInfo.isCity(chunkX, chunkZ, seed)) {
+                    this.villageGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
+                }
+            } else {
+                this.villageGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
+            }
         }
 
         if (LostCityConfiguration.GENERATE_STRONGHOLDS) {
@@ -183,7 +172,13 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
             this.mineshaftGenerator.generateStructure(w, this.rand, cp);
         }
         if (LostCityConfiguration.GENERATE_VILLAGES) {
-            flag = this.villageGenerator.generateStructure(w, this.rand, cp);
+            if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
+                if (!BuildingInfo.isCity(chunkX, chunkZ, seed)) {
+                    flag = this.villageGenerator.generateStructure(w, this.rand, cp);
+                }
+            } else {
+                flag = this.villageGenerator.generateStructure(w, this.rand, cp);
+            }
         }
         if (LostCityConfiguration.GENERATE_STRONGHOLDS) {
             this.strongholdGenerator.generateStructure(w, this.rand, cp);
@@ -300,7 +295,13 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         }
 
         if (LostCityConfiguration.GENERATE_VILLAGES) {
-            this.villageGenerator.generate(this.worldObj, x, z, null);
+            if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
+                if (!BuildingInfo.isCity(x, z, seed)) {
+                    this.villageGenerator.generate(this.worldObj, x, z, null);
+                }
+            } else {
+                this.villageGenerator.generate(this.worldObj, x, z, null);
+            }
         }
 
         if (LostCityConfiguration.GENERATE_STRONGHOLDS) {
