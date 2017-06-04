@@ -5,6 +5,7 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.BaseTerrainGenerator;
 import mcjty.lostcities.dimensions.world.NormalTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.Palette;
 import mcjty.lostcities.dimensions.world.lost.data.*;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.*;
@@ -27,7 +28,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private final byte groundLevel;
     private final byte waterLevel;
     private static IBlockState bedrock;
-    private static IBlockState air;
+    public static IBlockState air;
     private IBlockState baseBlock;
     private IBlockState baseLiquid;
 
@@ -43,10 +44,63 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
 
     private static Map<Character, Function<BuildingInfo, IBlockState>> mapping = null;
+    private static Palette palette = null;
     private static Map<Pair<Integer,Integer>,GenInfo> genInfos = null;  // Pair is: <buildingType,floorType>
 
     // Use this random when it doesn't really matter i fit is generated the same every time
-    private static Random globalRandom = new Random();
+    public static Random globalRandom = new Random();
+
+    public static Palette getPalette() {
+        if (palette == null) {
+            palette = new Palette();
+            palette.addMapping(' ', air);
+            palette.addMapping('l', Blocks.LADDER);
+            palette.addMapping('*', Blocks.FLOWER_POT);
+            palette.addMapping('Q', Blocks.QUARTZ_BLOCK);
+            palette.addMapping('L', Blocks.BOOKSHELF);
+            palette.addMapping('W', Blocks.WATER);
+            palette.addMapping('w', Blocks.COBBLESTONE_WALL);
+            palette.addMapping('S', Blocks.DOUBLE_STONE_SLAB);
+            palette.addMapping('_', Blocks.STONE_SLAB);
+            palette.addMapping('.', Blocks.OAK_FENCE);
+            palette.addMapping('-', Blocks.WOODEN_PRESSURE_PLATE);
+            palette.addMapping('<', Blocks.QUARTZ_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.NORTH));
+            palette.addMapping('>', Blocks.QUARTZ_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.SOUTH));
+            palette.addMapping('$', "bricks_variant");
+            palette.addMapping('X', "bricks_monster");
+            palette.addMapping('=', "glass");
+            palette.addMapping('+', "glass_full");
+            palette.addMapping('@', "glass_or_brick");
+            palette.addMapping(':', Blocks.IRON_BARS);
+            palette.addMapping('D', Blocks.DIRT);
+            palette.addMapping('G', Blocks.GRASS);
+            palette.addMapping('1', Blocks.PLANKS);
+            palette.addMapping('2', Blocks.PLANKS);
+            palette.addMapping('3', Blocks.PLANKS);
+            palette.addMapping('4', Blocks.PLANKS);
+            palette.addMapping('C', Blocks.PLANKS);     // Chest
+            palette.addMapping('F', Blocks.PLANKS);     // Feature
+            palette.addMappingViaStyle('#',
+                    Pair.of(LostCityConfiguration.STYLE_CHANCE_CRACKED, "bricks_cracked"),
+                    Pair.of(LostCityConfiguration.STYLE_CHANCE_MOSSY, "bricks_mossy"),
+                    Pair.of(2.0f, "bricks"));
+            palette.addMappingViaStyle('x', Pair.of(LostCityConfiguration.STYLE_CHANCE_CRACKED, "bricks_cracked"),
+                    Pair.of(LostCityConfiguration.STYLE_CHANCE_MOSSY, "bricks_mossy"),
+                    Pair.of(2.0f, "bricks"));
+            palette.addMappingViaState('p',
+                    Pair.of(.3f, Blocks.RED_FLOWER.getDefaultState()),
+                    Pair.of(.3f, Blocks.YELLOW_FLOWER.getDefaultState()),
+                    Pair.of(.1f, Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA)),
+                    Pair.of(.1f, Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH)),
+                    Pair.of(.1f, Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK)),
+                    Pair.of(2.0f, Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE)));
+            palette.addMappingViaState('%',
+                    Pair.of(.3f, Blocks.WEB.getDefaultState()),
+                    Pair.of(2.0f, air));
+
+        }
+        return palette;
+    }
 
     public static Map<Character, Function<BuildingInfo, IBlockState>> getMapping() {
         if (mapping == null) {

@@ -555,7 +555,7 @@ public class LibraryData {
                                     "  xxxxxxxxxx   =" +
                                     "  xxxC C xxxF  #" +
                                     "  xxx    xxxL  =" +
-                                    "  xxx  M xxxL  =" +
+                                    "  xxx  C xxxL  =" +
                                     "         xxxL  =" +
                                     "  xxx   CxxxF  =" +
                                     "  xxxxxxxxxx   #" +
@@ -572,7 +572,7 @@ public class LibraryData {
                                     "  xxxxxxxxxx   =" +
                                     "  xxx    xxx   #" +
                                     "  xxx    xxxL  =" +
-                                    "  xxx  M xxxL  =" +
+                                    "  xxx    xxxL  =" +
                                     "         xxxL  =" +
                                     "  xxx    xxx   =" +
                                     "  xxxxxxxxxx   #" +

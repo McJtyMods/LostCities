@@ -77,11 +77,18 @@ public class BuildingInfo {
             style.bricks_variant = Blocks.DOUBLE_STONE_SLAB.getDefaultState();
             style.bricks_cracked = Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CRACKED);
             style.bricks_mossy = Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.MOSSY);
+            style.register("bricks", style.bricks);
+            style.register("bricks_cracked", style.bricks_cracked);
+            style.register("bricks_mossy", style.bricks_mossy);
+            style.register("bricks_variant", style.bricks_variant);
+            style.register("bricks_monster", style.bricks);
             return style;
         }
 
         style.street = Blocks.DOUBLE_STONE_SLAB.getDefaultState();
         style.street2 = Blocks.BRICK_BLOCK.getDefaultState();
+        style.register("street", Blocks.DOUBLE_STONE_SLAB.getDefaultState());
+        style.register("street2", Blocks.BRICK_BLOCK.getDefaultState());
 
         switch (glassColor) {
             case 0:
@@ -127,7 +134,6 @@ public class BuildingInfo {
         }
 
         style.quartz = Blocks.QUARTZ_BLOCK.getDefaultState();
-
         switch (buildingStyle) {
             case 0:
                 style.bricks = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.CYAN);
@@ -158,6 +164,34 @@ public class BuildingInfo {
                 style.bricks_monster = Blocks.MONSTER_EGG.getDefaultState().withProperty(BlockSilverfish.VARIANT, BlockSilverfish.EnumType.STONEBRICK);
                 break;
         }
+
+        style.register("glass", style.glass);
+        style.register("glass_full", style.glass_full);
+        style.register("bricks", style.bricks);
+        style.register("bricks_cracked", style.bricks_cracked);
+        style.register("bricks_mossy", style.bricks_mossy);
+        style.register("bricks_variant", style.bricks_variant);
+        style.register("bricks_monster", style.bricks_monster);
+
+        switch (glassType) {
+            case 0:
+                style.register("glass_or_brick", style.glass);
+                break;
+            case 1:
+                style.register("glass_or_brick", style.street);
+                break;
+            case 2:
+                style.register("glass_or_brick", style.street);
+                break;
+            case 3:
+                style.register("glass_or_brick", style.quartz);
+                break;
+            default:
+                style.register("glass_or_brick", style.glass);
+                break;
+        }
+
+
         return style;
     }
 

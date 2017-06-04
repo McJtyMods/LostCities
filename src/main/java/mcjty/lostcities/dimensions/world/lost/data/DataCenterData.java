@@ -569,13 +569,13 @@ public class DataCenterData {
                                     "              = " +
                                     "              = " +
                                     "  xxx   xxx   ##" +
-                                    "  +x+   +R+    =" +
+                                    "  +x+   +x+    =" +
                                     "  :x:   :x:    =" +
-                                    "  +R+   +R+    =" +
+                                    "  +x+   +x+    =" +
                                     "  :x:   :x:    =" +
-                                    "  +x+   +R+   ##" +
+                                    "  +x+   +x+   ##" +
                                     "  :x:   :x:   = " +
-                                    "  +R+   +x+   = " +
+                                    "  +x+   +x+   = " +
                                     "  :x:   :x:   = " +
                                     "  +x+   +x+   ##" +
                                     "  xxx   xxx   ##",
@@ -656,10 +656,10 @@ public class DataCenterData {
                                     "              = " +
                                     "              = " +
                                     "   xxxxxxxx   ##" +
-                                    "   ++++4MMx    =" +
+                                    "   ++++4CCx    =" +
                                     "          x    =" +
                                     "          x    =" +
-                                    "   ++++4MMx    =" +
+                                    "   ++++4CCx    =" +
                                     "   xxxxxxxx   ##" +
                                     "              = " +
                                     "              = " +
@@ -880,15 +880,15 @@ public class DataCenterData {
                             "" +
                                     "##              " +
                                     "##    x+:+:+:+x " +
-                                    " =    xRxxxRxxx " +
+                                    " =    xxxxxxxxx " +
                                     " =    x+:+:+:+x " +
                                     " =              " +
                                     "##    x+:+:+:+x " +
-                                    "=     xxxRxRxRx " +
+                                    "=     xxxxxxxxx " +
                                     "=     x+:+:+:+x " +
                                     "=               " +
                                     "=     x+:+:+:+x " +
-                                    "##    xRxxxRxxx " +
+                                    "##    xxxxxxxxx " +
                                     " =    x+:+:+:+x " +
                                     " =              " +
                                     " =              " +
