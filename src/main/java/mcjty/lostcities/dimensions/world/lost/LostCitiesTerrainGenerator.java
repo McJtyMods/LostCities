@@ -203,7 +203,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         baseBlock = Blocks.STONE.getDefaultState(); // @todo provider.dimensionInformation.getBaseBlockForTerrain();
         baseLiquid = Blocks.WATER.getDefaultState(); // @todo provider.dimensionInformation.getFluidForTerrain().getDefaultState();
 
-        BuildingInfo info = new BuildingInfo(chunkX, chunkZ, provider.seed);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider.seed, provider);
         air = Blocks.AIR.getDefaultState();
         bedrock = Blocks.BEDROCK.getDefaultState();
 
@@ -411,7 +411,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 if (x != 0 || z != 0) {
                     int ccx = chunkX + x;
                     int ccz = chunkZ + z;
-                    BuildingInfo info2 = new BuildingInfo(ccx, ccz, provider.seed);
+                    BuildingInfo info2 = BuildingInfo.getBuildingInfo(ccx, ccz, provider.seed, provider);
                     if (info2.isCity) {
                         boxes.add(new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15));
                     }

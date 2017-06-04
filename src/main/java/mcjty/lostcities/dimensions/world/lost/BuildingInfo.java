@@ -6,13 +6,17 @@ import mcjty.lostcities.dimensions.world.lost.data.*;
 import net.minecraft.block.*;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class BuildingInfo {
     public final int chunkX;
     public final int chunkZ;
     public final long seed;
+    public final LostCityChunkGenerator provider;
 
     public final boolean isCity;
     public final boolean hasBuilding;
@@ -50,6 +54,10 @@ public class BuildingInfo {
     private BuildingInfo zmax = null;
     private DamageArea damageArea = null;
     private Style style = null;
+
+
+    // BuildingInfo cache
+    private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
 
     public DamageArea getDamageArea() {
         if (damageArea == null) {
@@ -170,28 +178,28 @@ public class BuildingInfo {
 
     public BuildingInfo getXmin() {
         if (xmin == null) {
-            xmin = new BuildingInfo(chunkX - 1, chunkZ, seed);
+            xmin = getBuildingInfo(chunkX - 1, chunkZ, seed, provider);
         }
         return xmin;
     }
 
     public BuildingInfo getXmax() {
         if (xmax == null) {
-            xmax = new BuildingInfo(chunkX + 1, chunkZ, seed);
+            xmax = getBuildingInfo(chunkX + 1, chunkZ, seed, provider);
         }
         return xmax;
     }
 
     public BuildingInfo getZmin() {
         if (zmin == null) {
-            zmin = new BuildingInfo(chunkX, chunkZ - 1, seed);
+            zmin = getBuildingInfo(chunkX, chunkZ - 1, seed, provider);
         }
         return zmin;
     }
 
     public BuildingInfo getZmax() {
         if (zmax == null) {
-            zmax = new BuildingInfo(chunkX, chunkZ + 1, seed);
+            zmax = getBuildingInfo(chunkX, chunkZ + 1, seed, provider);
         }
         return zmax;
     }
@@ -276,17 +284,21 @@ public class BuildingInfo {
         return buildingType;
     }
 
-    public static boolean isCity(int chunkX, int chunkZ, long seed) {
-        float cityFactor = City.getCityFactor(seed, chunkX, chunkZ);
-        return cityFactor > LostCityConfiguration.CITY_THRESSHOLD;
+    public static boolean isCity(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
+        if (buildingInfoMap.containsKey(Pair.of(chunkX, chunkZ))) {
+            return buildingInfoMap.get(Pair.of(chunkX, chunkZ)).isCity;
+        } else {
+            float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
+            return cityFactor > LostCityConfiguration.CITY_THRESSHOLD;
+        }
     }
 
-    private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, long seed) {
+    private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
         if (chunkX == 0 && chunkZ == 0) {
             return false;
         }
-        float cityFactor = City.getCityFactor(seed, chunkX, chunkZ);
-        if (cityFactor > LostCityConfiguration.CITY_THRESSHOLD) {
+        boolean isCity = isCity(chunkX, chunkZ, seed, provider);
+        if (isCity) {
             Random rand = getBuildingRandom(chunkX, chunkZ, seed);
             return rand.nextFloat() < LostCityConfiguration.BUILDING2X2_CHANCE;
         } else {
@@ -294,38 +306,50 @@ public class BuildingInfo {
         }
     }
 
-    private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, long seed) {
-        if (isCandidateForTopLeftOf2x2Building(chunkX, chunkZ, seed) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ, seed) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, seed) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ - 1, seed) &&
+    private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
+        if (isCandidateForTopLeftOf2x2Building(chunkX, chunkZ, seed, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ, seed, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, seed, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ - 1, seed, provider) &&
 
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ - 1, seed) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ, seed) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ + 1, seed) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, seed) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, seed)
+                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ - 1, seed, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ, seed, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ + 1, seed, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, seed, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, seed, provider)
                 ) {
-            return isCity(chunkX + 1, chunkZ, seed) && isCity(chunkX + 1, chunkZ + 1, seed) && isCity(chunkX, chunkZ + 1, seed);
+            return isCity(chunkX + 1, chunkZ, seed, provider) && isCity(chunkX + 1, chunkZ + 1, seed, provider) && isCity(chunkX, chunkZ + 1, seed, provider);
         } else {
             return false;
         }
     }
 
-    public BuildingInfo(int chunkX, int chunkZ, long seed) {
+
+    public static BuildingInfo getBuildingInfo(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
+        Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
+        if (buildingInfoMap.containsKey(key)) {
+            return buildingInfoMap.get(key);
+        }
+        BuildingInfo info = new BuildingInfo(chunkX, chunkZ, seed, provider);
+        buildingInfoMap.put(key, info);
+        return info;
+    }
+
+    private BuildingInfo(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
+        this.provider = provider;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         this.seed = seed;
-        float cityFactor = City.getCityFactor(seed, chunkX, chunkZ);
+        float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
         isCity = cityFactor > LostCityConfiguration.CITY_THRESSHOLD;
 
-        if (isTopLeftOf2x2Building(chunkX, chunkZ, seed)) {
+        if (isTopLeftOf2x2Building(chunkX, chunkZ, seed, provider)) {
             building2x2Section = 0;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ, seed)) {
+        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ, seed, provider)) {
             building2x2Section = 1;
-        } else if (isTopLeftOf2x2Building(chunkX, chunkZ - 1, seed)) {
+        } else if (isTopLeftOf2x2Building(chunkX, chunkZ - 1, seed, provider)) {
             building2x2Section = 2;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, seed)) {
+        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, seed, provider)) {
             building2x2Section = 3;
         } else {
             building2x2Section = -1;
@@ -442,8 +466,8 @@ public class BuildingInfo {
         connectionAtZ = new boolean[floors + floorsBelowGround + 2];
         for (int i = 0; i <= floors + floorsBelowGround + 1; i++) {
             floorTypes[i] = rand.nextInt(getFloorData().length);
-            connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
-            connectionAtZ[i] = isCity(chunkX, chunkZ - 1, seed) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
+            connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed, provider) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
+            connectionAtZ[i] = isCity(chunkX, chunkZ - 1, seed, provider) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
         }
 
         if (hasBuilding && floorsBelowGround > 0) {

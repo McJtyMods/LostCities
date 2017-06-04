@@ -30,15 +30,15 @@ public class LostCityWorldGenerator implements IWorldGenerator {
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
         if (chunkGenerator instanceof LostCityChunkGenerator) {
-            generateLootSpawners(random, chunkX, chunkZ, world);
-            generateVines(random, chunkX, chunkZ, world);
+            generateLootSpawners(random, chunkX, chunkZ, world, (LostCityChunkGenerator) chunkGenerator);
+            generateVines(random, chunkX, chunkZ, world, (LostCityChunkGenerator) chunkGenerator);
         }
     }
 
-    private void generateVines(Random random, int chunkX, int chunkZ, World world) {
+    private void generateVines(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator chunkGenerator) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
-        BuildingInfo info = new BuildingInfo(chunkX, chunkZ, world.getSeed());
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, world.getSeed(), chunkGenerator);
 
         int bottom = Math.max(LostCityConfiguration.GROUNDLEVEL + 3, info.hasBuilding ? (LostCityConfiguration.GROUNDLEVEL + 6 + info.floors * 6) : (LostCityConfiguration.GROUNDLEVEL + 3));
 
@@ -97,8 +97,8 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         }
     }
 
-    private void generateLootSpawners(Random random, int chunkX, int chunkZ, World world) {
-        BuildingInfo info = new BuildingInfo(chunkX, chunkZ, world.getSeed());
+    private void generateLootSpawners(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator chunkGenerator) {
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, world.getSeed(), chunkGenerator);
 
         int buildingtop = 0;
         boolean building = info.hasBuilding;

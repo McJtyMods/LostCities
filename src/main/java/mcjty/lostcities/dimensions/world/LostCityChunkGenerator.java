@@ -119,7 +119,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         if (LostCityConfiguration.GENERATE_VILLAGES) {
             if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
-                if (!BuildingInfo.isCity(chunkX, chunkZ, seed)) {
+                if (!BuildingInfo.isCity(chunkX, chunkZ, seed, this)) {
                     this.villageGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
                 }
             } else {
@@ -172,7 +172,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         }
         if (LostCityConfiguration.GENERATE_VILLAGES) {
             if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
-                if (!BuildingInfo.isCity(chunkX, chunkZ, seed)) {
+                if (!BuildingInfo.isCity(chunkX, chunkZ, seed, this)) {
                     flag = this.villageGenerator.generateStructure(w, this.rand, cp);
                 }
             } else {
@@ -295,7 +295,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         if (LostCityConfiguration.GENERATE_VILLAGES) {
             if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
-                if (!BuildingInfo.isCity(x, z, seed)) {
+                if (!BuildingInfo.isCity(x, z, seed, this)) {
                     this.villageGenerator.generate(this.worldObj, x, z, null);
                 }
             } else {

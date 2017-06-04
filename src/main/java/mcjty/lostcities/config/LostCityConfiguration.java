@@ -1,12 +1,19 @@
 package mcjty.lostcities.config;
 
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.config.Configuration;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LostCityConfiguration {
 
     public static final String CATEGORY_LOSTCITY = "lostcity";
     public static final String CATEGORY_STRUCTURES = "structures";
     public static final String CATEGORY_EXPLOSIONS = "explosions";
+    public static final String CATEGORY_CITIES = "cities";
 
 
 
@@ -41,6 +48,9 @@ public class LostCityConfiguration {
     public static int CITY_MAXRADIUS = 128;
     public static float CITY_THRESSHOLD = .2f;
 
+    public static String[] CITY_BIOME_FACTORS = new String[] { "river=0", "frozen_river=0", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.4" };
+    public static Map<String, Float> biomeFactorMap = null;
+
     public static float BUILDING_CHANCE = .3f;
     public static int BUILDING_MINFLOORS = 0;
     public static int BUILDING_MAXFLOORS = 9;
@@ -69,15 +79,33 @@ public class LostCityConfiguration {
 
     public static boolean PREVENT_VILLAGES_IN_CITIES = true;
 
+    public static Map<String, Float> getBiomeFactorMap() {
+        if (biomeFactorMap == null) {
+            biomeFactorMap = new HashMap<>();
+            for (String s : CITY_BIOME_FACTORS) {
+                String[] split = StringUtils.split(s, '=');
+                float f = Float.parseFloat(split[1]);
+                String biomeId = split[0];
+                Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
+                if (biome != null) {
+                    biomeFactorMap.put(Biome.REGISTRY.getNameForObject(biome).toString(), f);
+                }
+            }
+        }
+        return biomeFactorMap;
+    }
+
 
     public static void init(Configuration cfg) {
         cfg.addCustomCategoryComment(CATEGORY_LOSTCITY, "Settings related to the Lost City");
         cfg.addCustomCategoryComment(CATEGORY_STRUCTURES, "Settings related to structure generation");
         cfg.addCustomCategoryComment(CATEGORY_EXPLOSIONS, "Settings related to explosions and damage");
+        cfg.addCustomCategoryComment(CATEGORY_CITIES, "Settings related to city generation");
 
         initLostcity(cfg);
         initExplosions(cfg);
         initStructures(cfg);
+        initCities(cfg);
     }
 
     private static void initLostcity(Configuration cfg) {
@@ -88,13 +116,6 @@ public class LostCityConfiguration {
 
         GROUNDLEVEL = cfg.getInt("groundLevel", CATEGORY_LOSTCITY, GROUNDLEVEL, 2, 256, "Ground level");
         WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", CATEGORY_LOSTCITY, WATERLEVEL_OFFSET, 1, 30, "How much lower the water level is compared to the ground level (63)");
-
-        CITY_CHANCE = cfg.getFloat("cityChance", CATEGORY_LOSTCITY, CITY_CHANCE, 0.0f, 1.0f, "The chance this chunk will be the center of a city");
-        CITY_MINRADIUS = cfg.getInt("cityMinRadius", CATEGORY_LOSTCITY, CITY_MINRADIUS, 1, 1000, "The minimum radius of a city");
-        CITY_MAXRADIUS = cfg.getInt("cityMaxRadius", CATEGORY_LOSTCITY, CITY_MAXRADIUS, 1, 2000, "The maximum radius of a city");
-        CITY_THRESSHOLD = cfg.getFloat("cityThresshold", CATEGORY_LOSTCITY, CITY_THRESSHOLD, 0.0f, 1.0f, "The center and radius of a city define a sphere. " +
-                "This thresshold indicates from which point a city is considered a city. " +
-                "This is important for calculating where cities are based on overlapping city circles (where the city thressholds are added)");
 
         BUILDING_CHANCE = cfg.getFloat("buildingChance", CATEGORY_LOSTCITY, BUILDING_CHANCE, 0.0f, 1.0f, "The chance that a chunk in a city will have a building. Otherwise it will be a street");
         BUILDING_MINFLOORS = cfg.getInt("buildingMinFloors", CATEGORY_LOSTCITY, BUILDING_MINFLOORS, 0, 30, "The minimum number of floors (above ground) for a building (0 means the first floor only)");
@@ -121,6 +142,16 @@ public class LostCityConfiguration {
 
         BEDROCK_LAYER = cfg.getInt("bedrockLayer", CATEGORY_LOSTCITY, BEDROCK_LAYER, 0, 10,
                 "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");
+    }
+
+    private static void initCities(Configuration cfg) {
+        CITY_CHANCE = cfg.getFloat("cityChance", CATEGORY_CITIES, CITY_CHANCE, 0.0f, 1.0f, "The chance this chunk will be the center of a city");
+        CITY_MINRADIUS = cfg.getInt("cityMinRadius", CATEGORY_CITIES, CITY_MINRADIUS, 1, 1000, "The minimum radius of a city");
+        CITY_MAXRADIUS = cfg.getInt("cityMaxRadius", CATEGORY_CITIES, CITY_MAXRADIUS, 1, 2000, "The maximum radius of a city");
+        CITY_THRESSHOLD = cfg.getFloat("cityThresshold", CATEGORY_CITIES, CITY_THRESSHOLD, 0.0f, 1.0f, "The center and radius of a city define a sphere. " +
+                "This thresshold indicates from which point a city is considered a city. " +
+                "This is important for calculating where cities are based on overlapping city circles (where the city thressholds are added)");
+        CITY_BIOME_FACTORS = cfg.getStringList("cityBiomeFactors", CATEGORY_CITIES, CITY_BIOME_FACTORS, "List of biomes with a factor to affect the city factor in that biome. Using the value 0 you can disable city generation in biomes");
     }
 
     private static void initExplosions(Configuration cfg) {

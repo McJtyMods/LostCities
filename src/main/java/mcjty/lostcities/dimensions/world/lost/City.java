@@ -1,7 +1,11 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -23,7 +27,7 @@ public class City {
         return LostCityConfiguration.CITY_MINRADIUS + rand.nextInt(LostCityConfiguration.CITY_MAXRADIUS - LostCityConfiguration.CITY_MINRADIUS);
     }
 
-    public static float getCityFactor(long seed, int chunkX, int chunkZ) {
+    public static float getCityFactor(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         float factor = 0;
         int offset = (LostCityConfiguration.CITY_MAXRADIUS+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
@@ -37,6 +41,23 @@ public class City {
                     }
                 }
             }
+        }
+
+        Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        for (Biome biome : biomes) {
+            Map<String, Float> map = LostCityConfiguration.getBiomeFactorMap();
+            ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
+            Float f = map.get(object.toString());
+            if (f != null) {
+                factor = factor * f;
+                break;
+            }
+        }
+
+        if (factor < 0) {
+            return 0;
+        } else if (factor > 1) {
+            return 1;
         }
         return factor;
     }
