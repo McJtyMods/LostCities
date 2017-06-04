@@ -1,11 +1,11 @@
-package mcjty.lostcities.dimensions.world.terrain.lost;
+package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.terrain.BaseTerrainGenerator;
-import mcjty.lostcities.dimensions.world.terrain.NormalTerrainGenerator;
-import mcjty.lostcities.dimensions.world.terrain.lost.data.*;
+import mcjty.lostcities.dimensions.world.BaseTerrainGenerator;
+import mcjty.lostcities.dimensions.world.NormalTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.data.*;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;

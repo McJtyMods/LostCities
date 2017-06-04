@@ -1,6 +1,6 @@
 package mcjty.lostcities.varia;
 
-import mcjty.lostcities.dimensions.world.terrain.lost.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 

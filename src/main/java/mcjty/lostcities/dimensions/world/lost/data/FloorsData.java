@@ -1,4 +1,4 @@
-package mcjty.lostcities.dimensions.world.terrain.lost.data;
+package mcjty.lostcities.dimensions.world.lost.data;
 
 public class FloorsData {
 

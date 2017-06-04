@@ -1,8 +1,8 @@
-package mcjty.lostcities.dimensions.world.terrain.lost;
+package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.terrain.lost.data.*;
+import mcjty.lostcities.dimensions.world.lost.data.*;
 import net.minecraft.block.*;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;

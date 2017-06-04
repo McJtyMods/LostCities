@@ -1,4 +1,4 @@
-package mcjty.lostcities.dimensions.world.terrain;
+package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import net.minecraft.block.Block;

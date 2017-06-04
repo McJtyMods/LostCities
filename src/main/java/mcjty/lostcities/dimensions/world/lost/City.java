@@ -1,4 +1,4 @@
-package mcjty.lostcities.dimensions.world.terrain.lost;
+package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 

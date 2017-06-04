@@ -1,7 +1,7 @@
-package mcjty.lostcities.dimensions.world.terrain.lost.data;
+package mcjty.lostcities.dimensions.world.lost.data;
 
-import mcjty.lostcities.dimensions.world.terrain.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.terrain.lost.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
 import net.minecraft.block.state.IBlockState;
 
 public class Level {

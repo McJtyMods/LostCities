@@ -2,9 +2,9 @@ package mcjty.lostcities.dimensions.world;
 
 import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.config.LostCityConfiguration;
-import mcjty.lostcities.dimensions.world.terrain.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.terrain.lost.GenInfo;
-import mcjty.lostcities.dimensions.world.terrain.lost.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.GenInfo;
+import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.properties.PropertyBool;

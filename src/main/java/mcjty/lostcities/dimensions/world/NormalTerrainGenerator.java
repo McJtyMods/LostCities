@@ -1,7 +1,6 @@
-package mcjty.lostcities.dimensions.world.terrain;
+package mcjty.lostcities.dimensions.world;
 
 import mcjty.lib.tools.MathTools;
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -229,12 +228,6 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
                                 index += maxheight;
                                 if ((d15 += d16) > 0.0D) {
                                     BaseTerrainGenerator.setBlockState(primer, index, baseBlock);
-                                    // @todo find a way to support this 127 feature
-//                                    if (baseMeta == 127) {
-//                                        realMeta = (byte)((height/2 + x/2 + z/2) & 0xf);
-//                                    } else {
-//                                        realMeta = baseMeta;
-//                                    }
                                 } else if (height < waterLevel) {
                                     BaseTerrainGenerator.setBlockState(primer, index, baseLiquid.getDefaultState());
                                 }
