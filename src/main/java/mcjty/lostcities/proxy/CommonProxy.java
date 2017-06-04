@@ -33,8 +33,6 @@ public abstract class CommonProxy {
         Configuration cfg = mainConfig;
         try {
             cfg.load();
-            cfg.addCustomCategoryComment(LostCityConfiguration.CATEGORY_LOSTCITY, "Settings related to the Lost City dimlet");
-
             LostCityConfiguration.init(cfg);
         } catch (Exception e1) {
             FMLLog.log(Level.ERROR, e1, "Problem loading config file!");

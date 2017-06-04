@@ -5,6 +5,11 @@ import net.minecraftforge.common.config.Configuration;
 public class LostCityConfiguration {
 
     public static final String CATEGORY_LOSTCITY = "lostcity";
+    public static final String CATEGORY_STRUCTURES = "structures";
+    public static final String CATEGORY_EXPLOSIONS = "explosions";
+
+
+
     public static int DEBRIS_TO_NEARBYCHUNK_FACTOR = 200;
 
     public static float VINE_CHANCE = 0.009f;
@@ -66,6 +71,16 @@ public class LostCityConfiguration {
 
 
     public static void init(Configuration cfg) {
+        cfg.addCustomCategoryComment(CATEGORY_LOSTCITY, "Settings related to the Lost City");
+        cfg.addCustomCategoryComment(CATEGORY_STRUCTURES, "Settings related to structure generation");
+        cfg.addCustomCategoryComment(CATEGORY_EXPLOSIONS, "Settings related to explosions and damage");
+
+        initLostcity(cfg);
+        initExplosions(cfg);
+        initStructures(cfg);
+    }
+
+    private static void initLostcity(Configuration cfg) {
         STYLE_CHANCE_CRACKED = cfg.getFloat("styleChanceCracked", CATEGORY_LOSTCITY, STYLE_CHANCE_CRACKED, 0.0f, 1.0f, "The chance that a brick will be cracked");
         STYLE_CHANCE_MOSSY = cfg.getFloat("styleChanceMossy", CATEGORY_LOSTCITY, STYLE_CHANCE_MOSSY, 0.0f, 1.0f, "The chance that a brick will be mossy");
 
@@ -73,28 +88,6 @@ public class LostCityConfiguration {
 
         GROUNDLEVEL = cfg.getInt("groundLevel", CATEGORY_LOSTCITY, GROUNDLEVEL, 2, 256, "Ground level");
         WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", CATEGORY_LOSTCITY, WATERLEVEL_OFFSET, 1, 30, "How much lower the water level is compared to the ground level (63)");
-
-        DEBRIS_TO_NEARBYCHUNK_FACTOR = cfg.getInt("debrisToNearbyChunkFactor", CATEGORY_LOSTCITY, DEBRIS_TO_NEARBYCHUNK_FACTOR, 1, 10000, "A factor that determines how much debris will overflow from nearby damaged chunks. Bigger numbers mean less debris");
-
-        DESTROY_LONE_BLOCKS_FACTOR = cfg.getFloat("destroyLoneBlocksFactor", CATEGORY_LOSTCITY, DESTROY_LONE_BLOCKS_FACTOR, 0.0f, 1.0f, "When a section of blocks in in an explosion the generator will count the number of " +
-                "blocks that are connected. The number of connections divided by the total number of blocks in a connected section is compared with this number. " +
-                "If it is smaller then the section of blocks is destroyed or moved down with gravity");
-        DESTROY_OR_MOVE_CHANCE = cfg.getFloat("destroyOrMoveChance", CATEGORY_LOSTCITY, DESTROY_OR_MOVE_CHANCE, 0.0f, 1.0f, "When a section of blocks is to be moved or destroyed " +
-                "this chance gives the chance of removal (as opposed to moving with gravity)");
-        DESTROY_SMALL_SECTIONS_SIZE = cfg.getInt("destroySmallSectionsSize", CATEGORY_LOSTCITY, DESTROY_SMALL_SECTIONS_SIZE, 1, 5000, "A section of blocks that is about to be moved or destroyed " +
-                "is always destroyed if it is smaller then this size");
-
-        EXPLOSION_CHANCE = cfg.getFloat("explosionChance", CATEGORY_LOSTCITY, EXPLOSION_CHANCE, 0.0f, 1.0f, "The chance that a chunk will contain an explosion");
-        EXPLOSION_MINRADIUS = cfg.getInt("explosionMinRadius", CATEGORY_LOSTCITY, EXPLOSION_MINRADIUS, 1, 1000, "The minimum radius of an explosion");
-        EXPLOSION_MAXRADIUS = cfg.getInt("explosionMaxRadius", CATEGORY_LOSTCITY, EXPLOSION_MAXRADIUS, 1, 3000, "The maximum radius of an explosion");
-        EXPLOSION_MINHEIGHT = cfg.getInt("explosionMinHeight", CATEGORY_LOSTCITY, EXPLOSION_MINHEIGHT, 1, 256, "The minimum height of an explosion");
-        EXPLOSION_MAXHEIGHT = cfg.getInt("explosionMaxHeight", CATEGORY_LOSTCITY, EXPLOSION_MAXHEIGHT, 1, 256, "The maximum height of an explosion");
-
-        MINI_EXPLOSION_CHANCE = cfg.getFloat("miniExplosionChance", CATEGORY_LOSTCITY, MINI_EXPLOSION_CHANCE, 0.0f, 1.0f, "The chance that a chunk will contain a mini explosion");
-        MINI_EXPLOSION_MINRADIUS = cfg.getInt("miniExplosionMinRadius", CATEGORY_LOSTCITY, MINI_EXPLOSION_MINRADIUS, 1, 1000, "The minimum radius of a mini explosion");
-        MINI_EXPLOSION_MAXRADIUS = cfg.getInt("miniExplosionMaxRadius", CATEGORY_LOSTCITY, MINI_EXPLOSION_MAXRADIUS, 1, 3000, "The maximum radius of a mini explosion");
-        MINI_EXPLOSION_MINHEIGHT = cfg.getInt("miniExplosionMinHeight", CATEGORY_LOSTCITY, MINI_EXPLOSION_MINHEIGHT, 1, 256, "The minimum height of a mini explosion");
-        MINI_EXPLOSION_MAXHEIGHT = cfg.getInt("miniExplosionMaxHeight", CATEGORY_LOSTCITY, MINI_EXPLOSION_MAXHEIGHT, 1, 256, "The maximum height of a mini explosion");
 
         CITY_CHANCE = cfg.getFloat("cityChance", CATEGORY_LOSTCITY, CITY_CHANCE, 0.0f, 1.0f, "The chance this chunk will be the center of a city");
         CITY_MINRADIUS = cfg.getInt("cityMinRadius", CATEGORY_LOSTCITY, CITY_MINRADIUS, 1, 1000, "The minimum radius of a city");
@@ -128,16 +121,42 @@ public class LostCityConfiguration {
 
         BEDROCK_LAYER = cfg.getInt("bedrockLayer", CATEGORY_LOSTCITY, BEDROCK_LAYER, 0, 10,
                 "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");
+    }
 
-        GENERATE_OCEANMONUMENTS = cfg.get(CATEGORY_LOSTCITY, "generateOceanMonuments", GENERATE_OCEANMONUMENTS, "Generate ocean monuments").getBoolean();
-        GENERATE_SCATTERED = cfg.get(CATEGORY_LOSTCITY, "generateScattered", GENERATE_SCATTERED, "Generate scattered features (swamphunts, desert temples, ...)").getBoolean();
-        GENERATE_STRONGHOLDS = cfg.get(CATEGORY_LOSTCITY, "generateStrongholds", GENERATE_STRONGHOLDS, "Generate strongholds").getBoolean();
-        GENERATE_VILLAGES = cfg.get(CATEGORY_LOSTCITY, "generateVillages", GENERATE_VILLAGES, "Generate villages").getBoolean();
-        GENERATE_CAVES = cfg.get(CATEGORY_LOSTCITY, "generateCaves", GENERATE_CAVES, "Generate caves").getBoolean();
-        GENERATE_RAVINES = cfg.get(CATEGORY_LOSTCITY, "generateRavines", GENERATE_RAVINES, "Generate ravines").getBoolean();
-        GENERATE_MINESHAFTS = cfg.get(CATEGORY_LOSTCITY, "generateMineshafts", GENERATE_MINESHAFTS, "Generate mineshafts").getBoolean();
+    private static void initExplosions(Configuration cfg) {
+        DEBRIS_TO_NEARBYCHUNK_FACTOR = cfg.getInt("debrisToNearbyChunkFactor", CATEGORY_EXPLOSIONS, DEBRIS_TO_NEARBYCHUNK_FACTOR, 1, 10000, "A factor that determines how much debris will overflow from nearby damaged chunks. Bigger numbers mean less debris");
 
-        PREVENT_VILLAGES_IN_CITIES = cfg.get(CATEGORY_LOSTCITY, "preventVillagesInCities", PREVENT_VILLAGES_IN_CITIES, "If true then an attempt will be made to prevent villages in cities. " +
+        DESTROY_LONE_BLOCKS_FACTOR = cfg.getFloat("destroyLoneBlocksFactor", CATEGORY_EXPLOSIONS, DESTROY_LONE_BLOCKS_FACTOR, 0.0f, 1.0f, "When a section of blocks in in an explosion the generator will count the number of " +
+                "blocks that are connected. The number of connections divided by the total number of blocks in a connected section is compared with this number. " +
+                "If it is smaller then the section of blocks is destroyed or moved down with gravity");
+        DESTROY_OR_MOVE_CHANCE = cfg.getFloat("destroyOrMoveChance", CATEGORY_EXPLOSIONS, DESTROY_OR_MOVE_CHANCE, 0.0f, 1.0f, "When a section of blocks is to be moved or destroyed " +
+                "this chance gives the chance of removal (as opposed to moving with gravity)");
+        DESTROY_SMALL_SECTIONS_SIZE = cfg.getInt("destroySmallSectionsSize", CATEGORY_EXPLOSIONS, DESTROY_SMALL_SECTIONS_SIZE, 1, 5000, "A section of blocks that is about to be moved or destroyed " +
+                "is always destroyed if it is smaller then this size");
+
+        EXPLOSION_CHANCE = cfg.getFloat("explosionChance", CATEGORY_EXPLOSIONS, EXPLOSION_CHANCE, 0.0f, 1.0f, "The chance that a chunk will contain an explosion");
+        EXPLOSION_MINRADIUS = cfg.getInt("explosionMinRadius", CATEGORY_EXPLOSIONS, EXPLOSION_MINRADIUS, 1, 1000, "The minimum radius of an explosion");
+        EXPLOSION_MAXRADIUS = cfg.getInt("explosionMaxRadius", CATEGORY_EXPLOSIONS, EXPLOSION_MAXRADIUS, 1, 3000, "The maximum radius of an explosion");
+        EXPLOSION_MINHEIGHT = cfg.getInt("explosionMinHeight", CATEGORY_EXPLOSIONS, EXPLOSION_MINHEIGHT, 1, 256, "The minimum height of an explosion");
+        EXPLOSION_MAXHEIGHT = cfg.getInt("explosionMaxHeight", CATEGORY_EXPLOSIONS, EXPLOSION_MAXHEIGHT, 1, 256, "The maximum height of an explosion");
+
+        MINI_EXPLOSION_CHANCE = cfg.getFloat("miniExplosionChance", CATEGORY_EXPLOSIONS, MINI_EXPLOSION_CHANCE, 0.0f, 1.0f, "The chance that a chunk will contain a mini explosion");
+        MINI_EXPLOSION_MINRADIUS = cfg.getInt("miniExplosionMinRadius", CATEGORY_EXPLOSIONS, MINI_EXPLOSION_MINRADIUS, 1, 1000, "The minimum radius of a mini explosion");
+        MINI_EXPLOSION_MAXRADIUS = cfg.getInt("miniExplosionMaxRadius", CATEGORY_EXPLOSIONS, MINI_EXPLOSION_MAXRADIUS, 1, 3000, "The maximum radius of a mini explosion");
+        MINI_EXPLOSION_MINHEIGHT = cfg.getInt("miniExplosionMinHeight", CATEGORY_EXPLOSIONS, MINI_EXPLOSION_MINHEIGHT, 1, 256, "The minimum height of a mini explosion");
+        MINI_EXPLOSION_MAXHEIGHT = cfg.getInt("miniExplosionMaxHeight", CATEGORY_EXPLOSIONS, MINI_EXPLOSION_MAXHEIGHT, 1, 256, "The maximum height of a mini explosion");
+    }
+
+    private static void initStructures(Configuration cfg) {
+        GENERATE_OCEANMONUMENTS = cfg.get(CATEGORY_STRUCTURES, "generateOceanMonuments", GENERATE_OCEANMONUMENTS, "Generate ocean monuments").getBoolean();
+        GENERATE_SCATTERED = cfg.get(CATEGORY_STRUCTURES, "generateScattered", GENERATE_SCATTERED, "Generate scattered features (swamphunts, desert temples, ...)").getBoolean();
+        GENERATE_STRONGHOLDS = cfg.get(CATEGORY_STRUCTURES, "generateStrongholds", GENERATE_STRONGHOLDS, "Generate strongholds").getBoolean();
+        GENERATE_VILLAGES = cfg.get(CATEGORY_STRUCTURES, "generateVillages", GENERATE_VILLAGES, "Generate villages").getBoolean();
+        GENERATE_CAVES = cfg.get(CATEGORY_STRUCTURES, "generateCaves", GENERATE_CAVES, "Generate caves").getBoolean();
+        GENERATE_RAVINES = cfg.get(CATEGORY_STRUCTURES, "generateRavines", GENERATE_RAVINES, "Generate ravines").getBoolean();
+        GENERATE_MINESHAFTS = cfg.get(CATEGORY_STRUCTURES, "generateMineshafts", GENERATE_MINESHAFTS, "Generate mineshafts").getBoolean();
+
+        PREVENT_VILLAGES_IN_CITIES = cfg.get(CATEGORY_STRUCTURES, "preventVillagesInCities", PREVENT_VILLAGES_IN_CITIES, "If true then an attempt will be made to prevent villages in cities. " +
                 "Note that enabling this option will likely require a low city " +
                 "density in order to actually get a reasonable chance for villages.").getBoolean();
     }
