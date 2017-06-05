@@ -49,8 +49,11 @@ public class DamageArea {
         }
     }
 
-    public IBlockState damageBlock(IBlockState b, IBlockState replacement, Random rand, int x, int y, int z, int index, Style style) {
+    public IBlockState damageBlock(IBlockState b, IBlockState replacement, Random rand, int x, int y, int z, Style style) {
         float damage = getDamage(x, y, z);
+        if (damage < 0.001) {
+            return b;
+        }
         if (style.isEasyToDestroy(b)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }

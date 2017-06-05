@@ -205,7 +205,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             for (int z = 0; z < 4; ++z) {
                                 index += maxheight;
                                 if ((d15 += d16) > 0.0D) {
-                                    IBlockState b = info.getDamageArea().damageBlock(baseBlock, height < waterLevel ? baseLiquid : air, provider.rand, cx + (x4 * 4) + x, height, cz + (z4 * 4) + z, index, info.getStyle());
+                                    IBlockState b = info.getDamageArea().damageBlock(baseBlock, height < waterLevel ? baseLiquid : air, provider.rand, cx + (x4 * 4) + x, height, cz + (z4 * 4) + z, info.getStyle());
                                     BaseTerrainGenerator.setBlockState(primer, index, b);
                                     // @todo find a way to support this 127 feature
 //                                    if (baseMeta == 127) {
@@ -250,7 +250,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int l = 0;
                     while (l < level.getFloor().length) {
                         IBlockState b = level.get(info, x, l, z);
-                        b = damageArea.damageBlock(b, air, provider.rand, cx + x, height, cz + z, index, style);
+                        b = damageArea.damageBlock(b, air, provider.rand, cx + x, height, cz + z, style);
                         BaseTerrainGenerator.setBlockState(primer, index++, b);
                         height++;
                         l++;
@@ -271,7 +271,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 int x = 0;
                 for (int z = 6 ; z <= 9 ; z++) {
                     int index = (x << 12) | (z << 8) + groundLevel;
-                    IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, groundLevel, cz + z, index, style);
+                    IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, groundLevel, cz + z, style);
                     BaseTerrainGenerator.setBlockState(primer, index, b);
                 }
             }
@@ -280,7 +280,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 int x = 15;
                 for (int z = 6 ; z <= 9 ; z++) {
                     int index = (x << 12) | (z << 8) + groundLevel;
-                    IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, groundLevel, cz + z, index, style);
+                    IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, groundLevel, cz + z, style);
                     BaseTerrainGenerator.setBlockState(primer, index, b);
                 }
             }
@@ -299,7 +299,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         int l = 0;
                         while (l < level.getFloor().length) {
                             IBlockState b = level.get(info, z, l, x);       // Swap x/z
-                            b = damageArea.damageBlock(b, air, provider.rand, cx + x, height, cz + z, index, style);
+                            b = damageArea.damageBlock(b, air, provider.rand, cx + x, height, cz + z, style);
                             BaseTerrainGenerator.setBlockState(primer, index++, b);
                             height++;
                             l++;
@@ -320,7 +320,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int z = 0;
                     for (int x = 6 ; x <= 9 ; x++) {
                         int index = (x << 12) | (z << 8) + groundLevel;
-                        IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, groundLevel, cz + z, index, style);
+                        IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, groundLevel, cz + z, style);
                         BaseTerrainGenerator.setBlockState(primer, index, b);
                     }
                 }
@@ -329,7 +329,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int z = 15;
                     for (int x = 6 ; x <= 9 ; x++) {
                         int index = (x << 12) | (z << 8) + groundLevel;
-                        IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, groundLevel, cz + z, index, style);
+                        IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, groundLevel, cz + z, style);
                         BaseTerrainGenerator.setBlockState(primer, index, b);
                     }
                 }
@@ -339,7 +339,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void setBridgeSupport(ChunkPrimer primer, int cx, int cz, DamageArea damageArea, Style style, int x, int y, int z) {
         int index = (x << 12) | (z << 8) + y;
-        IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, y, cz + z, index, style);
+        IBlockState b = damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, provider.rand, cx + x, y, cz + z, style);
         BaseTerrainGenerator.setBlockState(primer, index, b);
     }
 
@@ -413,7 +413,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             IBlockState b = BaseTerrainGenerator.getBlockState(primer, index);
             if (b != bedrock) {
                 if (b != baseBlock) {
-                    b = info.getDamageArea().damageBlock(baseBlock, y < waterLevel ? baseLiquid : air, provider.rand, cx + x, y, cz + z, index, info.getStyle());
+                    b = info.getDamageArea().damageBlock(baseBlock, y < waterLevel ? baseLiquid : air, provider.rand, cx + x, y, cz + z, info.getStyle());
                     BaseTerrainGenerator.setBlockState(primer, index, b);
                 }
             }
@@ -662,7 +662,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
 //            BaseTerrainGenerator.setBlockState(primer, index++, height < waterLevel ? baseLiquid : damageArea.damageBlock(b, height < waterLevel ? baseLiquid : air, rand, cx + x, height, cz + z, index, style));
-            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, height < waterLevel ? baseLiquid : air, rand, cx + x, height, cz + z, index, style));
+            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, height < waterLevel ? baseLiquid : air, rand, cx + x, height, cz + z, style));
             height++;
         }
 
@@ -672,7 +672,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         boolean elevated = info.isElevatedParkSection();
         if (elevated) {
             streetType = BuildingInfo.StreetType.PARK;
-            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, rand, cx + x, height, cz + z, index, style));
+            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), air, rand, cx + x, height, cz + z, style));
             height++;
         }
 
@@ -758,7 +758,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (doOceanBorder) {
             b = Blocks.STONEBRICK.getDefaultState();
         }
-        BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, air, rand, cx + x, height, cz + z, index, style));
+        BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, air, rand, cx + x, height, cz + z, style));
         height++;
 
         if (streetType == BuildingInfo.StreetType.PARK || info.fountainType >= 0) {
@@ -770,14 +770,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 } else {
                     b = level.get(info, x, l, z);
                 }
-                b = damageArea.damageBlock(b, air, rand, cx + x, height, cz + z, index, style);
+                b = damageArea.damageBlock(b, air, rand, cx + x, height, cz + z, style);
                 BaseTerrainGenerator.setBlockState(primer, index++, b);
                 height++;
                 l++;
             }
         } else if (doOceanBorder) {
             b = Blocks.COBBLESTONE_WALL.getDefaultState();
-            b = damageArea.damageBlock(b, air, rand, cx + x, height, cz + z, index, style);
+            b = damageArea.damageBlock(b, air, rand, cx + x, height, cz + z, style);
             BaseTerrainGenerator.setBlockState(primer, index++, b);
             height++;
         }
@@ -882,7 +882,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         while (height < lowestLevel) {
 //            BaseTerrainGenerator.setBlockState(primer, index++, height < waterLevel ? baseLiquid : damageArea.damageBlock(baseBlock, air, rand, cx + x, height, cz + z, index, style));
-            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(baseBlock, height < waterLevel ? baseLiquid : air, rand, cx + x, height, cz + z, index, style));
+            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(baseBlock, height < waterLevel ? baseLiquid : air, rand, cx + x, height, cz + z, style));
             height++;
         }
         while (height < buildingtop + 6) {
@@ -893,7 +893,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 b = air;
             } else {
                 b = getBlockForLevel(info, x, z, height);
-                b = damageArea.damageBlock(b, height < waterLevel ? baseLiquid : air, rand, cx + x, height, cz + z, index, style);
+                b = damageArea.damageBlock(b, height < waterLevel ? baseLiquid : air, rand, cx + x, height, cz + z, style);
             }
 
             BaseTerrainGenerator.setBlockState(primer, index++, b);
