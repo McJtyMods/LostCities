@@ -43,7 +43,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
 
-    private static Map<Character, Function<BuildingInfo, IBlockState>> mapping = null;
     private static Palette palette = null;
     private static Map<Pair<Integer,Integer>,GenInfo> genInfos = null;  // Pair is: <buildingType,floorType>
 
@@ -100,106 +99,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         }
         return palette;
-    }
-
-    public static Map<Character, Function<BuildingInfo, IBlockState>> getMapping() {
-        if (mapping == null) {
-            mapping = new HashMap<>();
-            mapping.put('#', info -> {
-                        if (globalRandom.nextFloat() < LostCityConfiguration.STYLE_CHANCE_CRACKED) {
-                            return info.getStyle().bricks_cracked;
-                        } else if (globalRandom.nextFloat() < LostCityConfiguration.STYLE_CHANCE_MOSSY) {
-                            return info.getStyle().bricks_mossy;
-                        } else {
-                            return info.getStyle().bricks;
-                        }
-                    }
-            );
-            mapping.put('x', info -> {
-                        if (globalRandom.nextFloat() < LostCityConfiguration.STYLE_CHANCE_CRACKED) {
-                            return info.getStyle().bricks_cracked;
-                        } else if (globalRandom.nextFloat() < LostCityConfiguration.STYLE_CHANCE_MOSSY) {
-                            return info.getStyle().bricks_mossy;
-                        } else {
-                            return info.getStyle().bricks;
-                        }
-                    }
-            );
-            mapping.put('$', info -> info.getStyle().bricks_variant);
-            mapping.put('=', info -> info.getStyle().glass);
-            mapping.put('+', info -> info.getStyle().glass_full);
-            mapping.put('@', info -> {
-                        switch (info.glassType) {
-                            case 0:
-                                return info.getStyle().glass;
-                            case 1:
-                                return info.getStyle().street;
-                            case 2:
-                                return info.getStyle().bricks;
-                            case 3:
-                                return info.getStyle().quartz;
-                            default:
-                                return info.getStyle().glass;
-                        }
-                    }
-            );
-            mapping.put(' ', info -> Blocks.AIR.getDefaultState());
-            mapping.put('l', info -> Blocks.LADDER.getDefaultState());
-            mapping.put('1', info -> Blocks.PLANKS.getDefaultState());      // Monster spawner 1
-            mapping.put('2', info -> Blocks.PLANKS.getDefaultState());      // Monster spawner 2
-            mapping.put('3', info -> Blocks.PLANKS.getDefaultState());      // Monster spawner 3
-            mapping.put('4', info -> Blocks.PLANKS.getDefaultState());      // Monster spawner 4
-            mapping.put('C', info -> Blocks.PLANKS.getDefaultState());      // Chest
-            mapping.put('M', info -> Blocks.PLANKS.getDefaultState());      // Modular storage
-            mapping.put('F', info -> Blocks.PLANKS.getDefaultState());      // Random feature
-            mapping.put('R', info -> Blocks.PLANKS.getDefaultState());      // Random rftools machine
-            mapping.put(':', info -> Blocks.IRON_BARS.getDefaultState());
-            mapping.put('D', info -> Blocks.DIRT.getDefaultState());
-            mapping.put('G', info -> Blocks.GRASS.getDefaultState());
-            mapping.put('p', info -> {
-                        switch (globalRandom.nextInt(11)) {
-                            case 0:
-                            case 1:
-                            case 2:
-                                return Blocks.RED_FLOWER.getDefaultState();
-                            case 3:
-                            case 4:
-                            case 5:
-                                return Blocks.YELLOW_FLOWER.getDefaultState();
-                            case 6:
-                                return Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA);
-                            case 7:
-                                return Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH);
-                            case 8:
-                                return Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK);
-                            case 9:
-                                return Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE);
-                            default:
-                                return air;
-                        }
-                    }
-            );
-            mapping.put('*', info -> Blocks.FLOWER_POT.getDefaultState());
-            mapping.put('X', info -> info.getStyle().bricks_monster);
-            mapping.put('Q', info -> Blocks.QUARTZ_BLOCK.getDefaultState());
-            mapping.put('L', info -> Blocks.BOOKSHELF.getDefaultState());
-            mapping.put('W', info -> Blocks.WATER.getDefaultState());
-            mapping.put('w', info -> Blocks.COBBLESTONE_WALL.getDefaultState());
-            mapping.put('S', info -> Blocks.DOUBLE_STONE_SLAB.getDefaultState());
-            mapping.put('<', info -> Blocks.QUARTZ_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.NORTH));
-            mapping.put('>', info -> Blocks.QUARTZ_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.SOUTH));
-            mapping.put('_', info -> Blocks.STONE_SLAB.getDefaultState());
-            mapping.put('.', info -> Blocks.OAK_FENCE.getDefaultState());
-            mapping.put('-', info -> Blocks.WOODEN_PRESSURE_PLATE.getDefaultState());
-            mapping.put('%', info -> {
-                if (globalRandom.nextFloat() < .3f) {
-                    return Blocks.WEB.getDefaultState();
-                } else {
-                    return air;
-                }
-            });
-        }
-        return mapping;
     }
 
     public static Map<Pair<Integer, Integer>, GenInfo> getGenInfos() {
