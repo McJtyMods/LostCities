@@ -41,12 +41,12 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         int cz = chunkZ * 16;
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, world.getSeed(), chunkGenerator);
 
-        int bottom = Math.max(LostCityConfiguration.GROUNDLEVEL + 3, info.hasBuilding ? (LostCityConfiguration.GROUNDLEVEL + 6 + info.floors * 6) : (LostCityConfiguration.GROUNDLEVEL + 3));
+        int bottom = Math.max(LostCityConfiguration.GROUNDLEVEL + 3, info.hasBuilding ? info.getMaxHeight() : (LostCityConfiguration.GROUNDLEVEL + 3));
 
         if (info.getXmin().hasBuilding) {
             if (info.getXmin().getDamageArea().getDamageFactor() < .4f) {
                 for (int z = 0; z < 15; z++) {
-                    for (int y = bottom; y < (LostCityConfiguration.GROUNDLEVEL + info.getXmin().floors * 6); y++) {
+                    for (int y = bottom; y < (info.getXmin().getMaxHeight()-6); y++) {
                         if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
                             createVineStrip(random, world, bottom, y, BlockVine.WEST, cx + 0, cz + z);
                         }
@@ -57,7 +57,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         if (info.getXmax().hasBuilding) {
             if (info.getXmax().getDamageArea().getDamageFactor() < .4f) {
                 for (int z = 0; z < 15; z++) {
-                    for (int y = bottom; y < (LostCityConfiguration.GROUNDLEVEL + info.getXmax().floors * 6); y++) {
+                    for (int y = bottom; y < (info.getXmax().getMaxHeight()-6); y++) {
                         if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
                             createVineStrip(random, world, bottom, y, BlockVine.EAST, cx + 15, cz + z);
                         }
@@ -68,7 +68,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         if (info.getZmin().hasBuilding) {
             if (info.getZmin().getDamageArea().getDamageFactor() < .4f) {
                 for (int x = 0; x < 15; x++) {
-                    for (int y = bottom; y < (LostCityConfiguration.GROUNDLEVEL + info.getZmin().floors * 6); y++) {
+                    for (int y = bottom; y < (info.getZmin().getMaxHeight()-6); y++) {
                         if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
                             createVineStrip(random, world, bottom, y, BlockVine.NORTH, cx + x, cz + 0);
                         }
@@ -79,7 +79,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         if (info.getZmax().hasBuilding) {
             if (info.getZmax().getDamageArea().getDamageFactor() < .4f) {
                 for (int x = 0; x < 15; x++) {
-                    for (int y = bottom; y < (LostCityConfiguration.GROUNDLEVEL + info.getZmax().floors * 6); y++) {
+                    for (int y = bottom; y < (info.getMaxHeight()-6); y++) {
                         if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
                             createVineStrip(random, world, bottom, y, BlockVine.SOUTH, cx + x, cz + 15);
                         }
@@ -104,7 +104,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         int buildingtop = 0;
         boolean building = info.hasBuilding;
         if (building) {
-            buildingtop = LostCityConfiguration.GROUNDLEVEL + 6 + info.floors * 6;
+            buildingtop = info.getMaxHeight();
         }
 
         int height = LostCityConfiguration.GROUNDLEVEL - info.floorsBelowGround * 6;

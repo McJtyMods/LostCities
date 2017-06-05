@@ -566,7 +566,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     /// Fix floating blocks after an explosion
     private void fixAfterExplosion(ChunkPrimer primer, BuildingInfo info, Random rand) {
         int start = groundLevel - info.floorsBelowGround * 6;
-        int end = groundLevel + (info.floors+2) * 6;
+        int end = info.getMaxHeight() + 6;
         char air = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
         char liquid = (char) Block.BLOCK_STATE_IDS.get(water);
 
@@ -805,7 +805,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             float damageFactor = adjacentInfo.getDamageArea().getDamageFactor();
             if (damageFactor > .5f) {
                 // An estimate of the amount of blocks
-                int blocks = (1 + adjacentInfo.floors) * 1000;
+                int blocks = (1 + adjacentInfo.getNumFloors()) * 1000;
                 float damage = Math.max(1.0f, damageFactor * DamageArea.BLOCK_DAMAGE_CHANCE);
                 int destroyedBlocks = (int) (blocks * damage);
                 // How many go this direction (approx, based on cardinal directions from building as well as number that simply fall down)
@@ -870,7 +870,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
         int lowestLevel = groundLevel - info.floorsBelowGround * 6;
-        int buildingtop = LostCityConfiguration.GROUNDLEVEL + 6 + info.floors * 6;
+        int buildingtop = info.getMaxHeight();
         boolean corridor;
         if (isSide(x, z)) {
             BuildingInfo adjacent = info.getAdjacent(x, z);
@@ -906,7 +906,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private IBlockState getBlockForLevel(BuildingInfo info, int x, int z, int height) {
         int f = getFloor(height);
         int l = getLevel(height);
-        boolean isTop = l == info.floors + 1;   // The top does not need generated doors
+        boolean isTop = l == info.getNumFloors();   // The top does not need generated doors
 
         BuildingPart part = info.getPart(l);
         if (f >= part.getSliceCount()) { // @todo avoid this?
@@ -936,13 +936,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (!isTop) {
             if (x == 0 && (z >= 6 && z <= 9) && f >= 1 && f <= 3 && info.hasConnectionAtX(l + info.floorsBelowGround)) {
                 BuildingInfo info2 = info.getXmin();
-                if (info2.hasBuilding && ((l >= 0 && l <= info2.floors) || (l < 0 && (-l) <= info2.floorsBelowGround))) {
+                if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround))) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = style.bricks;
                     } else {
                         b = air;
                     }
-                } else if ((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.floors + 1)) {
+                } else if ((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = style.bricks;
                     } else {
@@ -954,13 +954,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             } else if (x == 15 && (z >= 6 && z <= 9) && f >= 1 && f <= 3) {
                 BuildingInfo info2 = info.getXmax();
-                if (info2.hasBuilding && ((l >= 0 && l <= info2.floors) || (l < 0 && (-l) <= info2.floorsBelowGround)) && info2.hasConnectionAtX(l + info2.floorsBelowGround)) {
+                if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround)) && info2.hasConnectionAtX(l + info2.floorsBelowGround)) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = style.bricks;
                     } else {
                         b = air;
                     }
-                } else if (((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.floors + 1)) && info2.hasConnectionAtX(l + info2.floorsBelowGround)) {
+                } else if (((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) && info2.hasConnectionAtX(l + info2.floorsBelowGround)) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = style.bricks;
                     } else {
@@ -973,13 +973,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
             if (z == 0 && (x >= 6 && x <= 9) && f >= 1 && f <= 3 && info.hasConnectionAtZ(l + info.floorsBelowGround)) {
                 BuildingInfo info2 = info.getZmin();
-                if (info2.hasBuilding && ((l >= 0 && l <= info2.floors) || (l < 0 && (-l) <= info2.floorsBelowGround))) {
+                if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround))) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = style.bricks;
                     } else {
                         b = air;
                     }
-                } else if ((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.floors+1)) {
+                } else if ((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = style.bricks;
                     } else {
@@ -991,13 +991,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             } else if (z == 15 && (x >= 6 && x <= 9) && f >= 1 && f <= 3) {
                 BuildingInfo info2 = info.getZmax();
-                if (info2.hasBuilding && ((l >= 0 && l <= info2.floors) || (l < 0 && (-l) <= info2.floorsBelowGround)) && info2.hasConnectionAtZ(l + info2.floorsBelowGround)) {
+                if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround)) && info2.hasConnectionAtZ(l + info2.floorsBelowGround)) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = style.bricks;
                     } else {
                         b = air;
                     }
-                } else if (((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.floors+1)) && info2.hasConnectionAtZ(l + info2.floorsBelowGround)) {
+                } else if (((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) && info2.hasConnectionAtZ(l + info2.floorsBelowGround)) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = style.bricks;
                     } else {

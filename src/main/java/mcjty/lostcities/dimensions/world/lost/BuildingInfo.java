@@ -28,7 +28,7 @@ public class BuildingInfo {
     public final int parkType;
     public final int bridgeType;
     public final StreetType streetType;
-    public final int floors;
+    private final int floors;
     public final int floorsBelowGround;
     public final BuildingPart[] floorTypes;
     public final boolean[] connectionAtX;
@@ -247,8 +247,13 @@ public class BuildingInfo {
     }
 
     public int getMaxHeight() {
-        return hasBuilding ? (LostCityConfiguration.GROUNDLEVEL + 6 + floors * 6) : LostCityConfiguration.GROUNDLEVEL;
+        return hasBuilding ? (LostCityConfiguration.GROUNDLEVEL + floors * 6) : LostCityConfiguration.GROUNDLEVEL;
     }
+
+    public int getNumFloors() {
+        return floors;
+    }
+
 
     public BuildingPart getPart(int l) {
         return floorTypes[l + floorsBelowGround];
@@ -452,7 +457,7 @@ public class BuildingInfo {
             if (f > LostCityConfiguration.BUILDING_MAXFLOORS) {
                 f = LostCityConfiguration.BUILDING_MAXFLOORS;
             }
-            floors = f;
+            floors = f + 1;
             floorsBelowGround = LostCityConfiguration.BUILDING_MINCELLARS + (LostCityConfiguration.BUILDING_MAXCELLARS <= 0 ? 0 : rand.nextInt(LostCityConfiguration.BUILDING_MAXCELLARS));
             glassType = rand.nextInt(4);
             glassColor = rand.nextInt(5 + 5);
@@ -461,43 +466,11 @@ public class BuildingInfo {
             bridgeType = rand.nextInt(BridgeData.BRIDGES.length);
         }
 
-//        if (isLibrary) {
-//            switch (building2x2Section) {
-//                case 0:
-//                    topType = rand.nextInt(LibraryData.TOPS_LIBRARY00.length);
-//                    break;
-//                case 1:
-//                case 2:
-//                case 3:
-//                    topType = rand.nextInt(LibraryData.TOPS_LIBRARY.length);
-//                    break;
-//                default:
-//                    topType = rand.nextInt(RoofTopsData.TOPS.length);
-//            }
-//        } else if (isDataCenter) {
-//            switch (building2x2Section) {
-//                case 0:
-//                    topType = rand.nextInt(DataCenterData.TOPS_CENTER00.length);
-//                    break;
-//                case 1:
-//                case 2:
-//                case 3:
-//                    topType = rand.nextInt(DataCenterData.TOPS_CENTER.length);
-//                    break;
-//                default:
-//                    topType = rand.nextInt(RoofTopsData.TOPS.length);
-//            }
-//
-//        } else {
-//            topType = rand.nextInt(RoofTopsData.TOPS.length);
-//        }
-
-        floorTypes = new BuildingPart[floors + floorsBelowGround + 2];
-        connectionAtX = new boolean[floors + floorsBelowGround + 2];
-        connectionAtZ = new boolean[floors + floorsBelowGround + 2];
+        floorTypes = new BuildingPart[floors + floorsBelowGround + 1];
+        connectionAtX = new boolean[floors + floorsBelowGround + 1];
+        connectionAtZ = new boolean[floors + floorsBelowGround + 1];
         Building building = getBuilding();
-        for (int i = 0; i <= floors + floorsBelowGround + 1; i++) {
-//            floorTypes[i] = rand.nextInt(getLevelCount());
+        for (int i = 0; i <= floors + floorsBelowGround; i++) {
             String randomPart = building.getRandomPart(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));
             floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
             connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed, provider) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;

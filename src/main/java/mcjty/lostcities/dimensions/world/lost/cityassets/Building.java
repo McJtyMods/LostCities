@@ -52,9 +52,9 @@ public class Building {
 
     public static class LevelInfo {
         private final int level;        // Global level in world with 0 being to lowest possible level where a building section can be
-        private final int floor;        // Level of the building with 0 being the ground floor. floor == floorsAboveGround+1 means the top of the building section
+        private final int floor;        // Level of the building with 0 being the ground floor. floor == floorsAboveGround means the top of the building section
         private final int floorsBelowGround;    // 0 means nothing below ground
-        private final int floorsAboveGround;    // 0 means 1 floor above ground
+        private final int floorsAboveGround;    // 1 means 1 floor above ground
 
         public LevelInfo(int level, int floor, int floorsBelowGround, int floorsAboveGround) {
             this.level = level;
@@ -84,7 +84,7 @@ public class Building {
         }
 
         public boolean isTopOfBuilding() {
-            return floor >= floorsAboveGround+1;
+            return floor >= floorsAboveGround;
         }
     }
 }
