@@ -239,7 +239,7 @@ public class BuildingInfo {
     }
 
     public int getMaxHeight() {
-        return hasBuilding ? (69 + floors * 6) : 63;
+        return hasBuilding ? (LostCityConfiguration.GROUNDLEVEL + 6 + floors * 6) : LostCityConfiguration.GROUNDLEVEL;
     }
 
     public Level[] getFloorData() {
