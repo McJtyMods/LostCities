@@ -48,6 +48,7 @@ public class LostCityConfiguration {
     public static int CITY_MAXRADIUS = 128;
     public static float CITY_THRESSHOLD = .2f;
 
+    public static Float CITY_DEFAULT_BIOME_FACTOR = 1.0f;
     public static String[] CITY_BIOME_FACTORS = new String[] { "river=0", "frozen_river=0", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.4" };
     public static Map<String, Float> biomeFactorMap = null;
 
@@ -152,6 +153,7 @@ public class LostCityConfiguration {
                 "This thresshold indicates from which point a city is considered a city. " +
                 "This is important for calculating where cities are based on overlapping city circles (where the city thressholds are added)");
         CITY_BIOME_FACTORS = cfg.getStringList("cityBiomeFactors", CATEGORY_CITIES, CITY_BIOME_FACTORS, "List of biomes with a factor to affect the city factor in that biome. Using the value 0 you can disable city generation in biomes");
+        CITY_DEFAULT_BIOME_FACTOR = cfg.getFloat("cityBiomeFactorDefault", CATEGORY_CITIES, CITY_DEFAULT_BIOME_FACTOR, 0.0f, 1.0f, "The default biome factor which is used if your biome is not specified in 'cityBiomeFactors'");
     }
 
     private static void initExplosions(Configuration cfg) {

@@ -43,17 +43,23 @@ public class City {
             }
         }
 
+        Float foundFactor = null;
         Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
         for (Biome biome : biomes) {
             Map<String, Float> map = LostCityConfiguration.getBiomeFactorMap();
             ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
             Float f = map.get(object.toString());
             if (f != null) {
-                factor = factor * f;
+                foundFactor = f;
                 break;
             }
         }
 
+        if (foundFactor == null) {
+            factor = factor * LostCityConfiguration.CITY_DEFAULT_BIOME_FACTOR;
+        } else {
+            factor = factor * foundFactor;
+        }
         if (factor < 0) {
             return 0;
         } else if (factor > 1) {
