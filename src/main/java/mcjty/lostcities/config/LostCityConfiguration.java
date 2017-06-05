@@ -27,6 +27,7 @@ public class LostCityConfiguration {
     public static float DESTROY_LONE_BLOCKS_FACTOR = .05f;
     public static float DESTROY_OR_MOVE_CHANCE = .4f;
     public static int DESTROY_SMALL_SECTIONS_SIZE = 50;
+    public static boolean EXPLOSIONS_IN_CITIES_ONLY = true;
 
     public static float EXPLOSION_CHANCE = .005f;
     public static int EXPLOSION_MINRADIUS = 17;
@@ -178,6 +179,9 @@ public class LostCityConfiguration {
         MINI_EXPLOSION_MAXRADIUS = cfg.getInt("miniExplosionMaxRadius", CATEGORY_EXPLOSIONS, MINI_EXPLOSION_MAXRADIUS, 1, 3000, "The maximum radius of a mini explosion");
         MINI_EXPLOSION_MINHEIGHT = cfg.getInt("miniExplosionMinHeight", CATEGORY_EXPLOSIONS, MINI_EXPLOSION_MINHEIGHT, 1, 256, "The minimum height of a mini explosion");
         MINI_EXPLOSION_MAXHEIGHT = cfg.getInt("miniExplosionMaxHeight", CATEGORY_EXPLOSIONS, MINI_EXPLOSION_MAXHEIGHT, 1, 256, "The maximum height of a mini explosion");
+
+        EXPLOSIONS_IN_CITIES_ONLY = cfg.getBoolean("explosionsInCitiesOnly", CATEGORY_EXPLOSIONS, EXPLOSIONS_IN_CITIES_ONLY,
+                "If this is true the center of an explosion can only be in a city (the blast can still affect non-city chunks)");
     }
 
     private static void initStructures(Configuration cfg) {

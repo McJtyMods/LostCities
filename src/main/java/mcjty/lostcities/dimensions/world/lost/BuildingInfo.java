@@ -64,7 +64,7 @@ public class BuildingInfo {
 
     public DamageArea getDamageArea() {
         if (damageArea == null) {
-            damageArea = new DamageArea(seed, chunkX, chunkZ);
+            damageArea = new DamageArea(seed, chunkX, chunkZ, provider);
         }
         return damageArea;
     }

@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -21,7 +22,7 @@ public class DamageArea {
     private final List<Explosion> explosions = new ArrayList<>();
     private final AxisAlignedBB chunkBox;
 
-    public DamageArea(long seed, int chunkX, int chunkZ) {
+    public DamageArea(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         this.seed = seed;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
@@ -30,16 +31,18 @@ public class DamageArea {
         int offset = (LostCityConfiguration.EXPLOSION_MAXRADIUS+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                Explosion explosion = getExplosionAt(cx, cz);
-                if (explosion != null) {
-                    if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
-                        explosions.add(explosion);
+                if ((!LostCityConfiguration.EXPLOSIONS_IN_CITIES_ONLY) || BuildingInfo.isCity(cx, cz, seed, provider)) {
+                    Explosion explosion = getExplosionAt(cx, cz);
+                    if (explosion != null) {
+                        if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
+                            explosions.add(explosion);
+                        }
                     }
-                }
-                explosion = getMiniExplosionAt(cx, cz);
-                if (explosion != null) {
-                    if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
-                        explosions.add(explosion);
+                    explosion = getMiniExplosionAt(cx, cz);
+                    if (explosion != null) {
+                        if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
+                            explosions.add(explosion);
+                        }
                     }
                 }
             }
