@@ -245,10 +245,8 @@ public class BuildingInfo {
         return hasBuilding ? (LostCityConfiguration.GROUNDLEVEL + 6 + floors * 6) : LostCityConfiguration.GROUNDLEVEL;
     }
 
-    public Level getLevel(int l) {
-        BuildingPart part = floorTypes[l + floorsBelowGround];
-        // @todo temporary
-        return new Level(part);
+    public BuildingPart getPart(int l) {
+        return floorTypes[l + floorsBelowGround];
     }
 
     private Building getBuilding() {
@@ -308,17 +306,6 @@ public class BuildingInfo {
 //        }
 //    }
 
-
-    // @todo not ideal
-    public int getGenInfoIndex() {
-        if (isLibrary) {
-            return building2x2Section + 10;
-        }
-        if (isDataCenter) {
-            return building2x2Section + 20;
-        }
-        return buildingType;
-    }
 
     public static boolean isCity(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
         if (buildingInfoMap.containsKey(Pair.of(chunkX, chunkZ))) {
@@ -432,7 +419,8 @@ public class BuildingInfo {
 //                    bt = rand.nextInt(3);
 //                }
 //            }
-            int bt = rand.nextInt(AssetRegistries.BUILDINGS.getBuildingCount());
+//            int bt = rand.nextInt(AssetRegistries.BUILDINGS.getBuildingCount());
+            int bt = rand.nextInt(3);   // @todo !!!
             buildingType = bt;
             if (building2x2Section == 0) {
                 isLibrary = rand.nextFloat() < LostCityConfiguration.LIBRARY_CHANCE;
@@ -502,7 +490,7 @@ public class BuildingInfo {
         floorTypes = new BuildingPart[floors + floorsBelowGround + 2];
         connectionAtX = new boolean[floors + floorsBelowGround + 2];
         connectionAtZ = new boolean[floors + floorsBelowGround + 2];
-        Building building = AssetRegistries.BUILDINGS.get(buildingType);
+        Building building = getBuilding();
         for (int i = 0; i <= floors + floorsBelowGround + 1; i++) {
 //            floorTypes[i] = rand.nextInt(getLevelCount());
             String randomPart = building.getRandomPart(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));

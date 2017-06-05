@@ -40,6 +40,9 @@ public class CommandDebug implements CompatCommand {
             BlockPos position = player.getPosition();
             ChunkProviderServer chunkProvider = ((WorldServer) player.getEntityWorld()).getChunkProvider();
             BuildingInfo info = BuildingInfo.getBuildingInfo(position.getX() >> 4, position.getZ() >> 4, player.getEntityWorld().getSeed(), (LostCityChunkGenerator) chunkProvider.chunkGenerator);
+            System.out.println("info.buildingType = " + info.buildingType);
+            System.out.println("info.isDataCenter = " + info.isDataCenter);
+            System.out.println("info.isLibrary = " + info.isLibrary);
             System.out.println("info.floors = " + info.floors);
             System.out.println("info.floorsBelowGround = " + info.floorsBelowGround);
         }

@@ -1,5 +1,9 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
+import net.minecraft.block.state.IBlockState;
+
 /**
  * A section of a building. Can be either a complete floor or part of a floor.
  */
@@ -43,6 +47,10 @@ public class BuildingPart {
 
     public int getZSize() {
         return zSize;
+    }
+
+    public IBlockState get(BuildingInfo info, int x, int y, int z) {
+        return LostCitiesTerrainGenerator.getPalette().get(slices[y].charAt(z * 16 + x), info);
     }
 
     public Character getC(int x, int y, int z) {
