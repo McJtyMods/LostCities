@@ -899,17 +899,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             BaseTerrainGenerator.setBlockState(primer, index++, b);
             height++;
         }
-//        while (height < buildingtop + 6) {
-//            int f = getFloor(height);
-//            Level level = info.getTopData(info.topType);
-//            if (f >= level.getFloor().length) {
-//                break;
-//            }
-//            IBlockState b = level.get(info, x, f, z);
-//            b = damageArea.damageBlock(b, air, rand, cx + x, height, cz + z, index, style);
-//            BaseTerrainGenerator.setBlockState(primer, index++, b);
-//            height++;
-//        }
         int blocks = 256 - height;
         BaseTerrainGenerator.setBlockStateRange(primer, index, index + blocks, air);
         index += blocks;
@@ -930,8 +919,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         // If we are underground, the block is glass, we are on the side and the chunk next to
         // us doesn't have a building or floor there we replace the glass with a solid block
-        // Gravel will later be replaced with either glass or solid block so we have to count that too
-//        if (isFull && (b == Blocks.GLASS.getDefaultState() || style.isGlass(b)) && isSide(x, z) && (!info.getAdjacent(x, z).hasBuilding || info.getAdjacent(x, z).floorsBelowGround == 0)) {
         if (l < 0 && (b == Blocks.GLASS.getDefaultState() || b == style.glass) && isSide(x, z) && (!info.getAdjacent(x, z).hasBuilding || info.getAdjacent(x, z).floorsBelowGround < -l)) {
             b = style.bricks;
         }

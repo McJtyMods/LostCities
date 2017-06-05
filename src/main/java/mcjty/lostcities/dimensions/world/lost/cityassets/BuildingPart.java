@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
 import net.minecraft.block.state.IBlockState;
 
 /**
@@ -50,7 +49,7 @@ public class BuildingPart {
     }
 
     public IBlockState get(BuildingInfo info, int x, int y, int z) {
-        return LostCitiesTerrainGenerator.getPalette().get(slices[y].charAt(z * 16 + x), info);
+        return info.getCompiledPalette().get(slices[y].charAt(z * 16 + x), info);
     }
 
     public Character getC(int x, int y, int z) {

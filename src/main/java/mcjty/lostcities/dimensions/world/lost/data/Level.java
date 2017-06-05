@@ -22,8 +22,7 @@ public class Level {
     }
 
     public IBlockState get(BuildingInfo info, int x, int y, int z) {
-//        return LostCitiesTerrainGenerator.getMapping().get(floor[y].charAt(z * 16 + x)).apply(info);
-        return LostCitiesTerrainGenerator.getPalette().get(floor[y].charAt(z * 16 + x), info);
+        return info.getCompiledPalette().get(floor[y].charAt(z * 16 + x), info);
     }
 
     public Character getC(int x, int y, int z) {

@@ -17,41 +17,27 @@ import java.util.function.Function;
  */
 public class Palette {
 
-    private final Map<Character, Function<BuildingInfo, IBlockState>> palette = new HashMap<>();
+    final Map<Character, Object> palette = new HashMap<>();
+
+    private void addFunctionMapping(char c, Function<BuildingInfo, IBlockState> function) {
+        palette.put(c, function);
+    }
 
     public void addMapping(char c, IBlockState state) {
-        palette.put(c, info -> state);
+        palette.put(c, state);
     }
 
     public void addMapping(char c, Block block) {
         IBlockState state = block.getDefaultState();
-        palette.put(c, info -> state);
+        palette.put(c, state);
     }
 
     public void addMapping(char c, String styledBlock) {
-        palette.put(c, info -> info.getStyle().get(styledBlock));
-    }
-
-    public void addMappingViaPalette(char c, Pair<Float, Character>... randomBlocks) {
-        List<Pair<Float, Function<BuildingInfo, IBlockState>>> compiled = new ArrayList<>();
-        for (Pair<Float, Character> pair : randomBlocks) {
-            compiled.add(Pair.of(pair.getLeft(), palette.get(pair.getRight())));
-        }
-
-        palette.put(c, info -> {
-            float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
-            for (Pair<Float, Function<BuildingInfo, IBlockState>> pair : compiled) {
-                r -= pair.getKey();
-                if (r <= 0) {
-                    return pair.getRight().apply(info);
-                }
-            }
-            return LostCitiesTerrainGenerator.air;
-        });
+        palette.put(c, styledBlock);
     }
 
     public void addMappingViaState(char c, Pair<Float, IBlockState>... randomBlocks) {
-        palette.put(c, info -> {
+        addFunctionMapping(c, info -> {
             float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
             for (Pair<Float, IBlockState> pair : randomBlocks) {
                 r -= pair.getKey();
@@ -64,7 +50,7 @@ public class Palette {
     }
 
     public void addMappingViaStyle(char c, Pair<Float, String>... randomBlocks) {
-        palette.put(c, info -> {
+        addFunctionMapping(c, info -> {
             float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
             for (Pair<Float, String> pair : randomBlocks) {
                 r -= pair.getKey();
@@ -76,12 +62,12 @@ public class Palette {
         });
     }
 
-    public IBlockState get(char c, BuildingInfo info) {
-        try {
-            return palette.get(c).apply(info);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    public IBlockState get(char c, BuildingInfo info) {
+//        try {
+//            return palette.get(c).apply(info);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 }

@@ -2,9 +2,7 @@ package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
-import mcjty.lostcities.dimensions.world.lost.cityassets.Building;
-import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
+import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.dimensions.world.lost.data.*;
 import net.minecraft.block.*;
 import net.minecraft.init.Blocks;
@@ -35,7 +33,6 @@ public class BuildingInfo {
     public final BuildingPart[] floorTypes;
     public final boolean[] connectionAtX;
     public final boolean[] connectionAtZ;
-//    public final int topType;
     public final int glassType;
     public final int glassColor;
     public final int buildingStyle;
@@ -57,10 +54,18 @@ public class BuildingInfo {
     private BuildingInfo zmax = null;
     private DamageArea damageArea = null;
     private Style style = null;
+    private CompiledPalette compiledPalette = null;
 
 
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
+
+    public CompiledPalette getCompiledPalette() {
+        if (compiledPalette == null) {
+            compiledPalette = new CompiledPalette(getStyle(), LostCitiesTerrainGenerator.getPalette());
+        }
+        return compiledPalette;
+    }
 
     public DamageArea getDamageArea() {
         if (damageArea == null) {
