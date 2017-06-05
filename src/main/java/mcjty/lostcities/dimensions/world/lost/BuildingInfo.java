@@ -259,6 +259,16 @@ public class BuildingInfo {
         }
     }
 
+    public int getLevelCount() {
+        if (isLibrary || isDataCenter) {
+            return getFloorData().length;
+        } else {
+            String buildingName = AssetRegistries.BUILDINGS.getBuilding(buildingType);
+            Building building = AssetRegistries.BUILDINGS.get(buildingName);
+            return building.getPartCount();
+        }
+    }
+
     public Level[] getFloorData() {
         if (isLibrary) {
             switch (building2x2Section) {
@@ -510,7 +520,7 @@ public class BuildingInfo {
         connectionAtX = new boolean[floors + floorsBelowGround + 2];
         connectionAtZ = new boolean[floors + floorsBelowGround + 2];
         for (int i = 0; i <= floors + floorsBelowGround + 1; i++) {
-            floorTypes[i] = rand.nextInt(getFloorData().length);
+            floorTypes[i] = rand.nextInt(getLevelCount());
             connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed, provider) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
             connectionAtZ[i] = isCity(chunkX, chunkZ - 1, seed, provider) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
         }

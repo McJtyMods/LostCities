@@ -5,6 +5,9 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.BaseTerrainGenerator;
 import mcjty.lostcities.dimensions.world.NormalTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.dimensions.world.lost.cityassets.Building;
+import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Palette;
 import mcjty.lostcities.dimensions.world.lost.data.*;
 import mcjty.lostcities.varia.GeometryTools;
@@ -104,9 +107,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static Map<Pair<Integer, Integer>, GenInfo> getGenInfos() {
         if (genInfos == null) {
             genInfos = new HashMap<>();
-            getGenInfos(FloorsData.FLOORS, 0);
-            getGenInfos(FloorsData.FLOORS2, 1);
-            getGenInfos(FloorsData.FLOORS3, 2);
+            getGenInfos(AssetRegistries.BUILDINGS.get("building1"), 0);
+            getGenInfos(AssetRegistries.BUILDINGS.get("building2"), 1);
+            getGenInfos(AssetRegistries.BUILDINGS.get("building3"), 2);
             getGenInfos(LibraryData.LIBRARY00, 10);
             getGenInfos(LibraryData.LIBRARY10, 11);
             getGenInfos(LibraryData.LIBRARY01, 12);
@@ -117,6 +120,39 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             getGenInfos(DataCenterData.CENTER11, 23);
         }
         return genInfos;
+    }
+
+    private static void getGenInfos(Building building, int floorIdx) {
+        for (int i = 0 ; i < building.getPartCount() ; i++) {
+            GenInfo gi = new GenInfo();
+            String partName = building.getPartName(i);
+            BuildingPart part = AssetRegistries.PARTS.get(partName);
+            for (int y = 0; y < part.getSliceCount(); y++) {
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        Character c = part.getC(x, y, z);
+                        if (c == '1') {
+                            gi.addSpawnerType(new BlockPos(x, y, z), 1);
+                        } else if (c == '2') {
+                            gi.addSpawnerType(new BlockPos(x, y, z), 2);
+                        } else if (c == '3') {
+                            gi.addSpawnerType(new BlockPos(x, y, z), 3);
+                        } else if (c == '4') {
+                            gi.addSpawnerType(new BlockPos(x, y, z), 4);
+                        } else if (c == 'C') {
+                            gi.addChest(new BlockPos(x, y, z));
+                        } else if (c == 'M') {
+                            gi.addModularStorage(new BlockPos(x, y, z));
+                        } else if (c == 'F') {
+                            gi.addRandomFeatures(new BlockPos(x, y, z));
+                        } else if (c == 'R') {
+                            gi.addRandomRFToolsMachine(new BlockPos(x, y, z));
+                        }
+                    }
+                }
+            }
+            genInfos.put(Pair.of(floorIdx, i), gi);
+        }
     }
 
     private static void getGenInfos(Level[] floors, int floorIdx) {

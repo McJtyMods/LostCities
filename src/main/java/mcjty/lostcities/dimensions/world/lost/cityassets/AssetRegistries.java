@@ -14,6 +14,7 @@ public class AssetRegistries {
     }
 
     public static void init() {
+        reset();
         System.out.println("AssetRegistries.init");
         PARTS.register(FloorsData.BUILDING1_1);
         PARTS.register(FloorsData.BUILDING1_2);

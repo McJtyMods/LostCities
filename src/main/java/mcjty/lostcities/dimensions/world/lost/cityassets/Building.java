@@ -33,6 +33,10 @@ public class Building {
         return partNames.get(index);
     }
 
+    public int getPartCount() {
+        return partNames.size();
+    }
+
     public String getRandomPart(Random random, LevelInfo info) {
         List<String> partNames = new ArrayList<>();
         for (Pair<Predicate<LevelInfo>, String> pair : parts) {

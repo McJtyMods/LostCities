@@ -11,14 +11,14 @@ public class BuildingPart {
     private final String[] slices;
 
     // Dimension (should be less then 16x16)
-    private final int width;
-    private final int height;
+    private final int xSize;
+    private final int zSize;
 
-    public BuildingPart(String name, int width, int height, String[] slices) {
+    public BuildingPart(String name, int xSize, int zSize, String[] slices) {
         this.name = name;
         this.slices = slices;
-        this.width = width;
-        this.height = height;
+        this.xSize = xSize;
+        this.zSize = zSize;
     }
 
     public String getName() {
@@ -37,11 +37,15 @@ public class BuildingPart {
         return slices;
     }
 
-    public int getWidth() {
-        return width;
+    public int getXSize() {
+        return xSize;
     }
 
-    public int getHeight() {
-        return height;
+    public int getZSize() {
+        return zSize;
+    }
+
+    public Character getC(int x, int y, int z) {
+        return slices[y].charAt(z * xSize + x);
     }
 }

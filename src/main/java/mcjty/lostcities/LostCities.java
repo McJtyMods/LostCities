@@ -1,11 +1,13 @@
 package mcjty.lostcities;
 
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 @Mod(modid = LostCities.MODID, name="RFTools Dimensions",
         dependencies =
@@ -50,14 +52,8 @@ public class LostCities {
     }
 
     @Mod.EventHandler
-    public void serverStopped(FMLServerStoppedEvent event) {
-        AssetRegistries.reset();
-    }
-
-    @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandDebug());
-        AssetRegistries.init();
     }
 
     /**
