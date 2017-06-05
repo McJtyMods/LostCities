@@ -23,6 +23,7 @@ public class LostCityConfiguration {
 
     public static int GROUNDLEVEL = 71;
     public static int WATERLEVEL_OFFSET = 8;
+    public static int WATERLEVEL = -1;
 
     public static float DESTROY_LONE_BLOCKS_FACTOR = .05f;
     public static float DESTROY_OR_MOVE_CHANCE = .4f;
@@ -118,6 +119,7 @@ public class LostCityConfiguration {
 
         GROUNDLEVEL = cfg.getInt("groundLevel", CATEGORY_LOSTCITY, GROUNDLEVEL, 2, 256, "Ground level");
         WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", CATEGORY_LOSTCITY, WATERLEVEL_OFFSET, 1, 30, "How much lower the water level is compared to the ground level (63)");
+        WATERLEVEL = GROUNDLEVEL - WATERLEVEL_OFFSET;
 
         BUILDING_CHANCE = cfg.getFloat("buildingChance", CATEGORY_LOSTCITY, BUILDING_CHANCE, 0.0f, 1.0f, "The chance that a chunk in a city will have a building. Otherwise it will be a street");
         BUILDING_MINFLOORS = cfg.getInt("buildingMinFloors", CATEGORY_LOSTCITY, BUILDING_MINFLOORS, 0, 30, "The minimum number of floors (above ground) for a building (0 means the first floor only)");

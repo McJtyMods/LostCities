@@ -49,7 +49,7 @@ public class DamageArea {
         }
     }
 
-    public IBlockState damageBlock(IBlockState b, IBlockState replacement, Random rand, int x, int y, int z, Style style) {
+    public IBlockState damageBlock(IBlockState b, Random rand, int x, int y, int z, Style style) {
         float damage = getDamage(x, y, z);
         if (damage < 0.001) {
             return b;
@@ -65,10 +65,10 @@ public class DamageArea {
                 if (rand.nextFloat() < .7f) {
                     b = Blocks.IRON_BARS.getDefaultState();
                 } else {
-                    b = replacement;
+                    b = y < LostCityConfiguration.WATERLEVEL ? LostCitiesTerrainGenerator.water : LostCitiesTerrainGenerator.air;
                 }
             } else {
-                b = replacement;
+                b = y < LostCityConfiguration.WATERLEVEL ? LostCitiesTerrainGenerator.water : LostCitiesTerrainGenerator.air;
             }
         }
         return b;
