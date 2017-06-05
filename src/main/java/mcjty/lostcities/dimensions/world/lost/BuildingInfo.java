@@ -2,6 +2,9 @@ package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.dimensions.world.lost.cityassets.Building;
+import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.data.*;
 import net.minecraft.block.*;
 import net.minecraft.init.Blocks;
@@ -242,6 +245,20 @@ public class BuildingInfo {
         return hasBuilding ? (LostCityConfiguration.GROUNDLEVEL + 6 + floors * 6) : LostCityConfiguration.GROUNDLEVEL;
     }
 
+    public Level getLevel(int l) {
+        if (isLibrary || isDataCenter) {
+            Level[] floors = getFloorData();
+            return floors[floorTypes[l + floorsBelowGround]];
+        } else {
+            String buildingName = AssetRegistries.BUILDINGS.getBuilding(buildingType);
+            Building building = AssetRegistries.BUILDINGS.get(buildingName);
+            String partName = building.getPartName(floorTypes[l + floorsBelowGround]);
+            BuildingPart part = AssetRegistries.PARTS.get(partName);
+            // @todo temporary
+            return new Level(part);
+        }
+    }
+
     public Level[] getFloorData() {
         if (isLibrary) {
             switch (building2x2Section) {
@@ -267,15 +284,7 @@ public class BuildingInfo {
                     return DataCenterData.CENTER11;
             }
         }
-        switch (buildingType) {
-            case 0:
-                return FloorsData.FLOORS;
-            case 1:
-                return FloorsData.FLOORS2;
-            case 2:
-                return FloorsData.FLOORS3;
-        }
-        return FloorsData.FLOORS;
+        return null;
     }
 
     public Level getTopData(int floortype) {
@@ -422,13 +431,15 @@ public class BuildingInfo {
             doorBlock = topleft.doorBlock;
             bridgeType = topleft.bridgeType;
         } else {
-            int bt = rand.nextInt(3);
-            if (bt == 2) {
-                // Make some types more rare
-                if (rand.nextFloat() < .5f) {
-                    bt = rand.nextInt(3);
-                }
-            }
+            // @todo, weighted random!
+//            int bt = rand.nextInt(3);
+//            if (bt == 2) {
+//                // Make some types more rare
+//                if (rand.nextFloat() < .5f) {
+//                    bt = rand.nextInt(3);
+//                }
+//            }
+            int bt = rand.nextInt(AssetRegistries.BUILDINGS.getBuildingCount());
             buildingType = bt;
             if (building2x2Section == 0) {
                 isLibrary = rand.nextFloat() < LostCityConfiguration.LIBRARY_CHANCE;

@@ -926,8 +926,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int f = getFloor(height);
         int l = getLevel(height);
 //        boolean isFull = l == -1;      // The level directly underground has no windows
-        Level[] floors = info.getFloorData();
-        Level level = floors[info.floorTypes[l + info.floorsBelowGround]];
+        Level level = info.getLevel(l);
         IBlockState b = level.get(info, x, f, z);
         Style style = info.getStyle();
 

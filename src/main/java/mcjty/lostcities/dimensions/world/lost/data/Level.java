@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world.lost.data;
 
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import net.minecraft.block.state.IBlockState;
 
 public class Level {
@@ -9,6 +10,11 @@ public class Level {
 
     public Level(String[] floor) {
         this.floor = floor;
+    }
+
+    // @todo temporary for the transition
+    public Level(BuildingPart part) {
+        this(part.getSlices());
     }
 
     public String[] getFloor() {

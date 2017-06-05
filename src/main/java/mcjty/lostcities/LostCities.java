@@ -1,5 +1,6 @@
 package mcjty.lostcities;
 
+import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -50,11 +51,13 @@ public class LostCities {
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
+        AssetRegistries.reset();
     }
 
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandDebug());
+        AssetRegistries.init();
     }
 
     /**

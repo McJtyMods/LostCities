@@ -5,25 +5,36 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
  */
 public class BuildingPart {
 
+    private final String name;
+
     // Data per height level
-    private final String[] levels;
+    private final String[] slices;
 
     // Dimension (should be less then 16x16)
     private final int width;
     private final int height;
 
-    public BuildingPart(int width, int height, String[] levels) {
-        this.levels = levels;
+    public BuildingPart(String name, int width, int height, String[] slices) {
+        this.name = name;
+        this.slices = slices;
         this.width = width;
         this.height = height;
     }
 
-    public int getLevelCount() {
-        return levels.length;
+    public String getName() {
+        return name;
     }
 
-    public String getLevel(int i) {
-        return levels[i];
+    public int getSliceCount() {
+        return slices.length;
+    }
+
+    public String getSlice(int i) {
+        return slices[i];
+    }
+
+    public String[] getSlices() {
+        return slices;
     }
 
     public int getWidth() {
