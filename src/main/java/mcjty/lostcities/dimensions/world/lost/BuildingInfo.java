@@ -288,35 +288,6 @@ public class BuildingInfo {
         return null;
     }
 
-    public int getLevelCount() {
-        return getBuilding().getPartCount();
-    }
-
-//    public Level getTopData(int floortype) {
-//        if (isLibrary) {
-//            switch (building2x2Section) {
-//                case 0:
-//                    return LibraryData.TOPS_LIBRARY00[floortype];
-//                case 1:
-//                case 2:
-//                case 3:
-//                    return LibraryData.TOPS_LIBRARY[floortype];
-//            }
-//        } else if (isDataCenter) {
-//            switch (building2x2Section) {
-//                case 0:
-//                    return DataCenterData.TOPS_CENTER00[floortype];
-//                case 1:
-//                case 2:
-//                case 3:
-//                    return DataCenterData.TOPS_CENTER[floortype];
-//            }
-//        } else {
-//            return RoofTopsData.TOPS[floortype];
-//        }
-//    }
-
-
     public static boolean isCity(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
         if (buildingInfoMap.containsKey(Pair.of(chunkX, chunkZ))) {
             return buildingInfoMap.get(Pair.of(chunkX, chunkZ)).isCity;
@@ -422,15 +393,15 @@ public class BuildingInfo {
             bridgeType = topleft.bridgeType;
         } else {
             // @todo, weighted random!
-//            int bt = rand.nextInt(3);
-//            if (bt == 2) {
-//                // Make some types more rare
-//                if (rand.nextFloat() < .5f) {
-//                    bt = rand.nextInt(3);
-//                }
-//            }
+            int bt = rand.nextInt(3);
+            if (bt == 2) {
+                // Make some types more rare
+                if (rand.nextFloat() < .5f) {
+                    bt = rand.nextInt(3);
+                }
+            }
 //            int bt = rand.nextInt(AssetRegistries.BUILDINGS.getBuildingCount());
-            int bt = rand.nextInt(3);   // @todo !!!
+//            int bt = rand.nextInt(3);   // @todo !!!
             buildingType = bt;
             if (building2x2Section == 0) {
                 isLibrary = rand.nextFloat() < LostCityConfiguration.LIBRARY_CHANCE;
