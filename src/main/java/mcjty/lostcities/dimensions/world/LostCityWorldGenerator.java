@@ -5,6 +5,7 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.GenInfo;
 import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.properties.PropertyBool;
@@ -113,8 +114,8 @@ public class LostCityWorldGenerator implements IWorldGenerator {
             int f = LostCitiesTerrainGenerator.getFloor(height);
             if (f == 0) {
                 BlockPos floorpos = new BlockPos(chunkX * 16, height, chunkZ * 16);
-                int floortype = info.floorTypes[LostCitiesTerrainGenerator.getLevel(height) + info.floorsBelowGround];
-                GenInfo getInfo = LostCitiesTerrainGenerator.getGenInfos().get(Pair.of(info.getGenInfoIndex(), floortype));
+                BuildingPart partName = info.floorTypes[LostCitiesTerrainGenerator.getLevel(height) + info.floorsBelowGround];
+                GenInfo getInfo = LostCitiesTerrainGenerator.getGenInfos().get(partName.getName());
                 for (BlockPos p : getInfo.getChest()) {
                     BlockPos pos = floorpos.add(p);
                     if (!world.isAirBlock(pos)) {

@@ -24,7 +24,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
@@ -47,7 +46,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
 
     private static Palette palette = null;
-    private static Map<Pair<Integer,Integer>,GenInfo> genInfos = null;  // Pair is: <buildingType,floorType>
+    private static Map<String,GenInfo> genInfos = null;  // Pair is: <buildingType,floorType>
 
     // Use this random when it doesn't really matter i fit is generated the same every time
     public static Random globalRandom = new Random();
@@ -104,25 +103,25 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return palette;
     }
 
-    public static Map<Pair<Integer, Integer>, GenInfo> getGenInfos() {
+    public static Map<String, GenInfo> getGenInfos() {
         if (genInfos == null) {
             genInfos = new HashMap<>();
-            getGenInfos(AssetRegistries.BUILDINGS.get("building1"), 0);
-            getGenInfos(AssetRegistries.BUILDINGS.get("building2"), 1);
-            getGenInfos(AssetRegistries.BUILDINGS.get("building3"), 2);
-            getGenInfos(LibraryData.LIBRARY00, 10);
-            getGenInfos(LibraryData.LIBRARY10, 11);
-            getGenInfos(LibraryData.LIBRARY01, 12);
-            getGenInfos(LibraryData.LIBRARY11, 13);
-            getGenInfos(DataCenterData.CENTER00, 20);
-            getGenInfos(DataCenterData.CENTER10, 21);
-            getGenInfos(DataCenterData.CENTER01, 22);
-            getGenInfos(DataCenterData.CENTER11, 23);
+            getGenInfos(AssetRegistries.BUILDINGS.get("building1"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("building2"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("building3"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("library00"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("library10"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("library01"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("library11"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("center00"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("center10"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("center01"));
+            getGenInfos(AssetRegistries.BUILDINGS.get("center11"));
         }
         return genInfos;
     }
 
-    private static void getGenInfos(Building building, int floorIdx) {
+    private static void getGenInfos(Building building) {
         for (int i = 0 ; i < building.getPartCount() ; i++) {
             GenInfo gi = new GenInfo();
             String partName = building.getPartName(i);
@@ -151,39 +150,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
                 }
             }
-            genInfos.put(Pair.of(floorIdx, i), gi);
-        }
-    }
-
-    private static void getGenInfos(Level[] floors, int floorIdx) {
-        for (int i = 0; i < floors.length; i++) {
-            GenInfo gi = new GenInfo();
-            Level level = floors[i];
-            for (int y = 0; y < 6; y++) {
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        Character c = level.getC(x, y, z);
-                        if (c == '1') {
-                            gi.addSpawnerType(new BlockPos(x, y, z), 1);
-                        } else if (c == '2') {
-                            gi.addSpawnerType(new BlockPos(x, y, z), 2);
-                        } else if (c == '3') {
-                            gi.addSpawnerType(new BlockPos(x, y, z), 3);
-                        } else if (c == '4') {
-                            gi.addSpawnerType(new BlockPos(x, y, z), 4);
-                        } else if (c == 'C') {
-                            gi.addChest(new BlockPos(x, y, z));
-                        } else if (c == 'M') {
-                            gi.addModularStorage(new BlockPos(x, y, z));
-                        } else if (c == 'F') {
-                            gi.addRandomFeatures(new BlockPos(x, y, z));
-                        } else if (c == 'R') {
-                            gi.addRandomRFToolsMachine(new BlockPos(x, y, z));
-                        }
-                    }
-                }
-            }
-            genInfos.put(Pair.of(floorIdx, i), gi);
+            genInfos.put(building.getPartName(i), gi);
         }
     }
 
@@ -926,7 +893,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(baseBlock, height < waterLevel ? baseLiquid : air, rand, cx + x, height, cz + z, index, style));
             height++;
         }
-        while (height < buildingtop) {
+        while (height < buildingtop + 6) {
             IBlockState b;
 
             // Make a connection to a corridor if needed
@@ -940,18 +907,17 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             BaseTerrainGenerator.setBlockState(primer, index++, b);
             height++;
         }
-        while (height < buildingtop + 6) {
-            int f = getFloor(height);
-            int floortype = info.topType;
-            Level level = info.getTopData(floortype);
-            if (f >= level.getFloor().length) {
-                break;
-            }
-            IBlockState b = level.get(info, x, f, z);
-            b = damageArea.damageBlock(b, air, rand, cx + x, height, cz + z, index, style);
-            BaseTerrainGenerator.setBlockState(primer, index++, b);
-            height++;
-        }
+//        while (height < buildingtop + 6) {
+//            int f = getFloor(height);
+//            Level level = info.getTopData(info.topType);
+//            if (f >= level.getFloor().length) {
+//                break;
+//            }
+//            IBlockState b = level.get(info, x, f, z);
+//            b = damageArea.damageBlock(b, air, rand, cx + x, height, cz + z, index, style);
+//            BaseTerrainGenerator.setBlockState(primer, index++, b);
+//            height++;
+//        }
         int blocks = 256 - height;
         BaseTerrainGenerator.setBlockStateRange(primer, index, index + blocks, air);
         index += blocks;
@@ -963,6 +929,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int l = getLevel(height);
 //        boolean isFull = l == -1;      // The level directly underground has no windows
         Level level = info.getLevel(l);
+        if (f >= level.getFloor().length) { // @todo avoid this?
+            return air;
+        }
         IBlockState b = level.get(info, x, f, z);
         Style style = info.getStyle();
 

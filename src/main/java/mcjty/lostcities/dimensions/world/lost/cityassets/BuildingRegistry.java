@@ -16,11 +16,13 @@ public class BuildingRegistry {
         return buildings.get(name);
     }
 
+    public Building get(int i) { return buildings.get(buildingNames.get(i)); }
+
     public int getBuildingCount() {
         return buildings.size();
     }
 
-    public String getBuilding(int i) {
+    public String getBuildingName(int i) {
         return buildingNames.get(i);
     }
 

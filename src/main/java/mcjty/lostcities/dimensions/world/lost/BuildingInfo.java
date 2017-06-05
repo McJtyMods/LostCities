@@ -32,10 +32,10 @@ public class BuildingInfo {
     public final StreetType streetType;
     public final int floors;
     public final int floorsBelowGround;
-    public final int[] floorTypes;
+    public final BuildingPart[] floorTypes;
     public final boolean[] connectionAtX;
     public final boolean[] connectionAtZ;
-    public final int topType;
+//    public final int topType;
     public final int glassType;
     public final int glassColor;
     public final int buildingStyle;
@@ -246,84 +246,67 @@ public class BuildingInfo {
     }
 
     public Level getLevel(int l) {
-        if (isLibrary || isDataCenter) {
-            Level[] floors = getFloorData();
-            return floors[floorTypes[l + floorsBelowGround]];
-        } else {
-            String buildingName = AssetRegistries.BUILDINGS.getBuilding(buildingType);
-            Building building = AssetRegistries.BUILDINGS.get(buildingName);
-            String partName = building.getPartName(floorTypes[l + floorsBelowGround]);
-            BuildingPart part = AssetRegistries.PARTS.get(partName);
-            // @todo temporary
-            return new Level(part);
-        }
+        BuildingPart part = floorTypes[l + floorsBelowGround];
+        // @todo temporary
+        return new Level(part);
     }
 
-    public int getLevelCount() {
-        if (isLibrary || isDataCenter) {
-            return getFloorData().length;
-        } else {
-            String buildingName = AssetRegistries.BUILDINGS.getBuilding(buildingType);
-            Building building = AssetRegistries.BUILDINGS.get(buildingName);
-            return building.getPartCount();
-        }
-    }
-
-    public Level[] getFloorData() {
+    private Building getBuilding() {
         if (isLibrary) {
             switch (building2x2Section) {
                 case 0:
-                    return LibraryData.LIBRARY00;
+                    return AssetRegistries.BUILDINGS.get("library00");
                 case 1:
-                    return LibraryData.LIBRARY10;
+                    return AssetRegistries.BUILDINGS.get("library10");
                 case 2:
-                    return LibraryData.LIBRARY01;
+                    return AssetRegistries.BUILDINGS.get("library01");
                 case 3:
-                    return LibraryData.LIBRARY11;
-            }
-        }
-        if (isDataCenter) {
-            switch (building2x2Section) {
-                case 0:
-                    return DataCenterData.CENTER00;
-                case 1:
-                    return DataCenterData.CENTER10;
-                case 2:
-                    return DataCenterData.CENTER01;
-                case 3:
-                    return DataCenterData.CENTER11;
-            }
-        }
-        return null;
-    }
-
-    public Level getTopData(int floortype) {
-        if (isLibrary) {
-            switch (building2x2Section) {
-                case 0:
-                    return LibraryData.TOPS_LIBRARY00[floortype];
-                case 1:
-                case 2:
-                case 3:
-                    return LibraryData.TOPS_LIBRARY[floortype];
-                default:
-                    return RoofTopsData.TOPS[floortype];
+                    return AssetRegistries.BUILDINGS.get("library11");
             }
         } else if (isDataCenter) {
             switch (building2x2Section) {
                 case 0:
-                    return DataCenterData.TOPS_CENTER00[floortype];
+                    return AssetRegistries.BUILDINGS.get("center00");
                 case 1:
+                    return AssetRegistries.BUILDINGS.get("center10");
                 case 2:
+                    return AssetRegistries.BUILDINGS.get("center01");
                 case 3:
-                    return DataCenterData.TOPS_CENTER[floortype];
-                default:
-                    return RoofTopsData.TOPS[floortype];
+                    return AssetRegistries.BUILDINGS.get("center11");
             }
         } else {
-            return RoofTopsData.TOPS[floortype];
+            return AssetRegistries.BUILDINGS.get(buildingType);
         }
+        return null;
     }
+
+    public int getLevelCount() {
+        return getBuilding().getPartCount();
+    }
+
+//    public Level getTopData(int floortype) {
+//        if (isLibrary) {
+//            switch (building2x2Section) {
+//                case 0:
+//                    return LibraryData.TOPS_LIBRARY00[floortype];
+//                case 1:
+//                case 2:
+//                case 3:
+//                    return LibraryData.TOPS_LIBRARY[floortype];
+//            }
+//        } else if (isDataCenter) {
+//            switch (building2x2Section) {
+//                case 0:
+//                    return DataCenterData.TOPS_CENTER00[floortype];
+//                case 1:
+//                case 2:
+//                case 3:
+//                    return DataCenterData.TOPS_CENTER[floortype];
+//            }
+//        } else {
+//            return RoofTopsData.TOPS[floortype];
+//        }
+//    }
 
 
     // @todo not ideal
@@ -485,42 +468,45 @@ public class BuildingInfo {
             bridgeType = rand.nextInt(BridgeData.BRIDGES.length);
         }
 
-        if (isLibrary) {
-            switch (building2x2Section) {
-                case 0:
-                    topType = rand.nextInt(LibraryData.TOPS_LIBRARY00.length);
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                    topType = rand.nextInt(LibraryData.TOPS_LIBRARY.length);
-                    break;
-                default:
-                    topType = rand.nextInt(RoofTopsData.TOPS.length);
-            }
-        } else if (isDataCenter) {
-            switch (building2x2Section) {
-                case 0:
-                    topType = rand.nextInt(DataCenterData.TOPS_CENTER00.length);
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                    topType = rand.nextInt(DataCenterData.TOPS_CENTER.length);
-                    break;
-                default:
-                    topType = rand.nextInt(RoofTopsData.TOPS.length);
-            }
+//        if (isLibrary) {
+//            switch (building2x2Section) {
+//                case 0:
+//                    topType = rand.nextInt(LibraryData.TOPS_LIBRARY00.length);
+//                    break;
+//                case 1:
+//                case 2:
+//                case 3:
+//                    topType = rand.nextInt(LibraryData.TOPS_LIBRARY.length);
+//                    break;
+//                default:
+//                    topType = rand.nextInt(RoofTopsData.TOPS.length);
+//            }
+//        } else if (isDataCenter) {
+//            switch (building2x2Section) {
+//                case 0:
+//                    topType = rand.nextInt(DataCenterData.TOPS_CENTER00.length);
+//                    break;
+//                case 1:
+//                case 2:
+//                case 3:
+//                    topType = rand.nextInt(DataCenterData.TOPS_CENTER.length);
+//                    break;
+//                default:
+//                    topType = rand.nextInt(RoofTopsData.TOPS.length);
+//            }
+//
+//        } else {
+//            topType = rand.nextInt(RoofTopsData.TOPS.length);
+//        }
 
-        } else {
-            topType = rand.nextInt(RoofTopsData.TOPS.length);
-        }
-
-        floorTypes = new int[floors + floorsBelowGround + 2];
+        floorTypes = new BuildingPart[floors + floorsBelowGround + 2];
         connectionAtX = new boolean[floors + floorsBelowGround + 2];
         connectionAtZ = new boolean[floors + floorsBelowGround + 2];
+        Building building = AssetRegistries.BUILDINGS.get(buildingType);
         for (int i = 0; i <= floors + floorsBelowGround + 1; i++) {
-            floorTypes[i] = rand.nextInt(getLevelCount());
+//            floorTypes[i] = rand.nextInt(getLevelCount());
+            String randomPart = building.getRandomPart(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));
+            floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
             connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed, provider) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
             connectionAtZ[i] = isCity(chunkX, chunkZ - 1, seed, provider) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
         }
