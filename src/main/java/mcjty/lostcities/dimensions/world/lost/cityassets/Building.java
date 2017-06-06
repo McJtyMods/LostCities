@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
-public class Building {
+public class Building implements IAsset {
 
     private final String name;
 
@@ -18,15 +18,17 @@ public class Building {
         this.name = name;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
-    public void addPart(Predicate<LevelInfo> test, String partName) {
+    public Building addPart(Predicate<LevelInfo> test, String partName) {
         parts.add(Pair.of(test, partName));
         if (!partNames.contains(partName)) {
             partNames.add(partName);
         }
+        return this;
     }
 
     public String getPartName(int index) {

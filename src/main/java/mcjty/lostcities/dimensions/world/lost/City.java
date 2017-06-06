@@ -2,6 +2,8 @@ package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.dimensions.world.lost.cityassets.CityStyle;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 
@@ -25,6 +27,10 @@ public class City {
         rand.nextFloat();
         rand.nextFloat();
         return LostCityConfiguration.CITY_MINRADIUS + rand.nextInt(LostCityConfiguration.CITY_MAXRADIUS - LostCityConfiguration.CITY_MINRADIUS);
+    }
+
+    public static CityStyle getCityStyle(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        return AssetRegistries.CITYSTYLES.get("standard");  // @todo
     }
 
     public static float getCityFactor(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {

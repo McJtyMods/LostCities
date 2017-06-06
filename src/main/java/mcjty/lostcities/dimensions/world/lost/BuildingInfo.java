@@ -23,7 +23,8 @@ public class BuildingInfo {
     public final boolean hasBuilding;
     public final int building2x2Section;    // -1 for not, 0 for top left, 1 for top right, 2 for bottom left, 3 for bottom right
 
-    public final int buildingType;
+    public final MultiBuilding multiBuilding;
+    public final Building buildingType;
     public final int fountainType;
     public final int parkType;
     public final int bridgeType;
@@ -36,8 +37,8 @@ public class BuildingInfo {
     public final int glassType;
     public final int glassColor;
     public final int buildingStyle;
-    public final boolean isLibrary;     // If true this is a library (only if it is also a 2x2 building)
-    public final boolean isDataCenter;  // If true this is a data center (only if it is also a 2x2 building)
+//    public final boolean isLibrary;     // If true this is a library (only if it is also a 2x2 building)
+//    public final boolean isDataCenter;  // If true this is a data center (only if it is also a 2x2 building)
 
     public final boolean xBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
     public final boolean zBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
@@ -54,6 +55,7 @@ public class BuildingInfo {
     private BuildingInfo zmax = null;
     private DamageArea damageArea = null;
     private Style style = null;
+    private CityStyle cityStyle = null;
     private CompiledPalette compiledPalette = null;
 
 
@@ -72,6 +74,13 @@ public class BuildingInfo {
             damageArea = new DamageArea(seed, chunkX, chunkZ, provider);
         }
         return damageArea;
+    }
+
+    public CityStyle getCityStyle() {
+        if (cityStyle == null) {
+            cityStyle = City.getCityStyle(seed, chunkX, chunkZ, provider);
+        }
+        return cityStyle;
     }
 
     public Style getStyle() {
@@ -260,32 +269,7 @@ public class BuildingInfo {
     }
 
     private Building getBuilding() {
-        if (isLibrary) {
-            switch (building2x2Section) {
-                case 0:
-                    return AssetRegistries.BUILDINGS.get("library00");
-                case 1:
-                    return AssetRegistries.BUILDINGS.get("library10");
-                case 2:
-                    return AssetRegistries.BUILDINGS.get("library01");
-                case 3:
-                    return AssetRegistries.BUILDINGS.get("library11");
-            }
-        } else if (isDataCenter) {
-            switch (building2x2Section) {
-                case 0:
-                    return AssetRegistries.BUILDINGS.get("center00");
-                case 1:
-                    return AssetRegistries.BUILDINGS.get("center10");
-                case 2:
-                    return AssetRegistries.BUILDINGS.get("center01");
-                case 3:
-                    return AssetRegistries.BUILDINGS.get("center11");
-            }
-        } else {
-            return AssetRegistries.BUILDINGS.get(buildingType);
-        }
-        return null;
+        return buildingType;
     }
 
     public static boolean isCity(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
@@ -378,9 +362,26 @@ public class BuildingInfo {
                 default:
                     throw new RuntimeException("What!");
             }
-            isLibrary = topleft.isLibrary;
-            isDataCenter = topleft.isDataCenter;
-            buildingType = topleft.buildingType;
+//            isLibrary = topleft.isLibrary;
+//            isDataCenter = topleft.isDataCenter;
+            multiBuilding = topleft.multiBuilding;
+            if (multiBuilding != null) {
+                switch(building2x2Section) {
+                    case 1:
+                        buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(1, 0));
+                        break;
+                    case 2:
+                        buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(0, 1));
+                        break;
+                    case 3:
+                        buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(1, 1));
+                        break;
+                    default:
+                        throw new RuntimeException("What 2!");
+                }
+            } else {
+                buildingType = topleft.buildingType;
+            }
             streetType = topleft.streetType;
             fountainType = topleft.fountainType;
             parkType = topleft.parkType;
@@ -392,27 +393,25 @@ public class BuildingInfo {
             doorBlock = topleft.doorBlock;
             bridgeType = topleft.bridgeType;
         } else {
-            // @todo, weighted random!
-            int bt = rand.nextInt(3);
-            if (bt == 2) {
-                // Make some types more rare
-                if (rand.nextFloat() < .5f) {
-                    bt = rand.nextInt(3);
-                }
-            }
-//            int bt = rand.nextInt(AssetRegistries.BUILDINGS.getBuildingCount());
-//            int bt = rand.nextInt(3);   // @todo !!!
-            buildingType = bt;
             if (building2x2Section == 0) {
-                isLibrary = rand.nextFloat() < LostCityConfiguration.LIBRARY_CHANCE;
+                multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(getCityStyle().getRandomMultiBuilding(provider, rand));
+                buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(0, 0));
+                System.out.println("multiBuilding.getName() = " + multiBuilding.getName());
+                System.out.println("multiBuilding.get(0, 0) = " + multiBuilding.get(0, 0));
             } else {
-                isLibrary = false;
+                multiBuilding = null;
+                buildingType = AssetRegistries.BUILDINGS.get(getCityStyle().getRandomBuilding(provider, rand));
             }
-            if (building2x2Section == 0 && !isLibrary) {
-                isDataCenter = rand.nextFloat() < LostCityConfiguration.LIBRARY_CHANCE;
-            } else {
-                isDataCenter = false;
-            }
+//            if (building2x2Section == 0) {
+//                isLibrary = rand.nextFloat() < LostCityConfiguration.LIBRARY_CHANCE;
+//            } else {
+//                isLibrary = false;
+//            }
+//            if (building2x2Section == 0 && !isLibrary) {
+//                isDataCenter = rand.nextFloat() < LostCityConfiguration.LIBRARY_CHANCE;
+//            } else {
+//                isDataCenter = false;
+//            }
             if (rand.nextDouble() < .2f) {
                 streetType = StreetType.values()[rand.nextInt(StreetType.values().length)];
             } else {
@@ -444,8 +443,8 @@ public class BuildingInfo {
         for (int i = 0; i <= floors + floorsBelowGround; i++) {
             String randomPart = building.getRandomPart(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));
             floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
-            connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed, provider) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
-            connectionAtZ[i] = isCity(chunkX, chunkZ - 1, seed, provider) ? (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE) : false;
+            connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed, provider) && (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE);
+            connectionAtZ[i] = isCity(chunkX, chunkZ - 1, seed, provider) && (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE);
         }
 
         if (hasBuilding && floorsBelowGround > 0) {
@@ -600,10 +599,7 @@ public class BuildingInfo {
         while (i.canRailGoThrough() && i.xRailCorridor) {
             i = i.getXmax();
         }
-        if ((!i.hasBuilding) || i.floorsBelowGround == 0) {
-            return false;
-        }
-        return true;
+        return !((!i.hasBuilding) || i.floorsBelowGround == 0);
     }
 
     public boolean hasZCorridor() {
@@ -621,10 +617,7 @@ public class BuildingInfo {
         while (i.canRailGoThrough() && i.zRailCorridor) {
             i = i.getZmax();
         }
-        if ((!i.hasBuilding) || i.floorsBelowGround == 0) {
-            return false;
-        }
-        return true;
+        return !((!i.hasBuilding) || i.floorsBelowGround == 0);
     }
 
     // Return true if it is possible for a rail section to go through here

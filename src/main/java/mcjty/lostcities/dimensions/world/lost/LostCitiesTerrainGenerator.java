@@ -106,7 +106,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static Map<String, GenInfo> getGenInfos() {
         if (genInfos == null) {
             genInfos = new HashMap<>();
-            for (int i = 0 ; i < AssetRegistries.BUILDINGS.getBuildingCount() ; i++) {
+            for (int i = 0 ; i < AssetRegistries.BUILDINGS.getCount() ; i++) {
                 getGenInfos(AssetRegistries.BUILDINGS.get(i));
             }
         }

@@ -6,7 +6,7 @@ import net.minecraft.block.state.IBlockState;
 /**
  * A section of a building. Can be either a complete floor or part of a floor.
  */
-public class BuildingPart {
+public class BuildingPart implements IAsset {
 
     private final String name;
 
@@ -24,6 +24,7 @@ public class BuildingPart {
         this.zSize = zSize;
     }
 
+    @Override
     public String getName() {
         return name;
     }
