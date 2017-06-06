@@ -103,7 +103,7 @@ public class BuildingInfo {
                     style.register("glass_or_brick", style.get("street"), true);
                     break;
                 case 2:
-                    style.register("glass_or_brick", style.get("street2"), true);
+                    style.register("glass_or_brick", style.get("street"), true);
                     break;
                 case 3:
                     style.register("glass_or_brick", style.get("quartz"), true);

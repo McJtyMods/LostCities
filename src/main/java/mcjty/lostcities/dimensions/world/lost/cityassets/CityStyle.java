@@ -20,6 +20,10 @@ public class CityStyle implements IAsset {
     private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
     private final List<List<Pair<Float, String>>> randomStyleChoices = new ArrayList<>();
 
+    public CityStyle(JsonObject object) {
+        readFromJSon(object);
+    }
+
     public CityStyle(String name) {
         this.name = name;
     }
@@ -48,8 +52,8 @@ public class CityStyle implements IAsset {
         for (JsonElement element : array) {
             List<Pair<Float, String>> styles = new ArrayList<>();
             for (JsonElement el : element.getAsJsonArray()) {
-                float factor = element.getAsJsonObject().get("factor").getAsFloat();
-                String style = element.getAsJsonObject().get("style").getAsString();
+                float factor = el.getAsJsonObject().get("factor").getAsFloat();
+                String style = el.getAsJsonObject().get("style").getAsString();
                 styles.add(Pair.of(factor, style));
             }
             randomStyleChoices.add(styles);

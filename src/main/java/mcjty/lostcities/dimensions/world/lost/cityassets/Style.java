@@ -28,6 +28,10 @@ public class Style implements IAsset {
         this.name = name;
     }
 
+    public Style(JsonObject object) {
+        readFromJSon(object);
+    }
+
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();

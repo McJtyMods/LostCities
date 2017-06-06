@@ -22,6 +22,10 @@ public class BuildingPart implements IAsset {
     private int xSize;
     private int zSize;
 
+    public BuildingPart(JsonObject object) {
+        readFromJSon(object);
+    }
+
     public BuildingPart(String name, int xSize, int zSize, String[] slices) {
         this.name = name;
         this.slices = slices;

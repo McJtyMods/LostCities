@@ -1,5 +1,8 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +33,12 @@ public class AbstractAssetRegistry<T extends IAsset> {
     }
 
     public void reset() {
-        assets.clear();;
+        assets.clear();
+    }
+
+    public void writeToJson(JsonArray array) {
+        for (Map.Entry<String, T> entry : assets.entrySet()) {
+            array.add(entry.getValue().writeToJSon());
+        }
     }
 }

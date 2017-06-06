@@ -54,6 +54,7 @@ public class LostCities {
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandDebug());
+        event.registerServerCommand(new CommandSaveAssets());
     }
 
     /**

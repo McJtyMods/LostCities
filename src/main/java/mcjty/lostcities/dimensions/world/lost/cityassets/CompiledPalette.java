@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +19,16 @@ public class CompiledPalette {
         for (Map.Entry<Character, Object> entry : originalPalette.palette.entrySet()) {
             Object value = entry.getValue();
             if (value instanceof String) {
-                palette.put(entry.getKey(), style.get((String) value));
+                IBlockState state = style.get((String) value);
+                if (state != null) {
+                    palette.put(entry.getKey(), state);
+                } else {
+                    palette.put(entry.getKey(), Blocks.AIR.getDefaultState());
+                }
             } else {
+                if (value == null) {
+                    throw new RuntimeException("Invalid palette entry for '" + entry.getKey() + "'!");
+                }
                 palette.put(entry.getKey(), value);
             }
         }

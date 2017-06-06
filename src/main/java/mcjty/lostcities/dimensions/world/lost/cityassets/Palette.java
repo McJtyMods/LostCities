@@ -26,6 +26,11 @@ public class Palette implements IAsset {
     private String name;
     final Map<Character, Object> palette = new HashMap<>();
 
+
+    public Palette(JsonObject object) {
+        readFromJSon(object);
+    }
+
     public Palette(String name) {
         this.name = name;
     }
@@ -53,7 +58,7 @@ public class Palette implements IAsset {
                 }
                 palette.put(c, ((Block)value).getStateFromMeta(meta));
             } else if (o.has("style")) {
-                value = o.get("style");
+                value = o.get("style").getAsString();
                 palette.put(c, value);
             } else if (o.has("styles")) {
                 JsonArray array = o.get("styles").getAsJsonArray();
@@ -71,8 +76,8 @@ public class Palette implements IAsset {
                 for (JsonElement el : array) {
                     JsonObject ob = el.getAsJsonObject();
                     Float f = ob.get("factor").getAsFloat();
-                    String block = o.get("block").getAsString();
-                    int meta = o.get("meta").getAsInt();
+                    String block = ob.get("block").getAsString();
+                    int meta = ob.get("meta").getAsInt();
                     Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block));
                     blocks.add(Pair.of(f, b.getStateFromMeta(meta)));
                 }

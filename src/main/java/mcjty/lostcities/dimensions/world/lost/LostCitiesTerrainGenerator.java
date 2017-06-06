@@ -874,7 +874,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             return air;
         }
         IBlockState b = part.get(info, x, f, z);
-        Style style = info.getStyle();
 
         // If we are underground, the block is glass, we are on the side and the chunk next to
         // us doesn't have a building or floor there we replace the glass with a solid block

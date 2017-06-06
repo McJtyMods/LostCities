@@ -13,6 +13,10 @@ public class MultiBuilding implements IAsset {
     private int dimZ;
     private String[][] buildings;
 
+    public MultiBuilding(JsonObject object) {
+        readFromJSon(object);
+    }
+
     public MultiBuilding(String name, int dimX, int dimZ) {
         this.name = name;
         this.dimX = dimX;

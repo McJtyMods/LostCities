@@ -20,6 +20,10 @@ public class Building implements IAsset {
     private final List<String> partNames = new ArrayList<>();
     private String paletteName;
 
+    public Building(JsonObject object) {
+        readFromJSon(object);
+    }
+
     public Building(String name) {
         this.name = name;
     }
@@ -38,10 +42,9 @@ public class Building implements IAsset {
         partNames.clear();
         for (JsonElement element : partArray) {
             String partName = element.getAsJsonObject().get("part").getAsString();
-            JsonObject testObject = element.getAsJsonObject().get("test").getAsJsonObject();
             Predicate<LevelInfo> test = levelInfo -> true;
-            if (testObject.has("top")) {
-                boolean top = testObject.get("top").getAsBoolean();
+            if (element.getAsJsonObject().has("top")) {
+                boolean top = element.getAsJsonObject().get("top").getAsBoolean();
                 if (top) {
                     test = levelInfo -> levelInfo.isTopOfBuilding();
                 } else {

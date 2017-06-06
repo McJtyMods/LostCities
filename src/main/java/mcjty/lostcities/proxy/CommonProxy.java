@@ -1,9 +1,11 @@
 package mcjty.lostcities.proxy;
 
 import mcjty.lostcities.ForgeEventHandlers;
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.ModDimensions;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.FMLLog;
@@ -13,6 +15,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
+import java.io.InputStream;
 
 public abstract class CommonProxy {
 
@@ -26,7 +29,9 @@ public abstract class CommonProxy {
 
 //        SimpleNetworkWrapper network = PacketHandler.registerMessages(LostCities.MODID, "lostcities");
 //        RFToolsDimMessages.registerNetworkMessages(network);
-        AssetRegistries.init();
+//        AssetRegistries.init();
+        InputStream inputstream = LostCities.class.getResourceAsStream("/assets/lostcities/citydata/library.json");
+        AssetRegistries.load(inputstream);
         ModDimensions.init();
     }
 
