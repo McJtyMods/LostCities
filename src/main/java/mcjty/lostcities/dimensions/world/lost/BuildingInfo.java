@@ -85,134 +85,35 @@ public class BuildingInfo {
         return cityStyle;
     }
 
-    public Style getStyle() {
-        if (style != null) {
-            return style;
-        }
-        style = new Style();
-
+    private void createStyle(Random rand) {
         if (!isCity) {
-            style.register("bricks", Blocks.STONEBRICK.getDefaultState(), true);
-            style.register("bricks_cracked", Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CRACKED), true);
-            style.register("bricks_mossy", Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.MOSSY), true);
-            style.register("bricks_variant", Blocks.DOUBLE_STONE_SLAB.getDefaultState(), true);
-            style.register("bricks_monster", Blocks.STONEBRICK.getDefaultState(), true);
-            return style;
+            style = new Style(
+                    AssetRegistries.STYLES.get("street"),
+                    AssetRegistries.STYLES.get("outside"),
+                    AssetRegistries.STYLES.get("glass"));
+        } else {
+            style = getCityStyle().getRandomStyle(provider, rand);
+            switch (glassType) {
+                case 0:
+                    style.register("glass_or_brick", style.get("glass"));
+                    break;
+                case 1:
+                    style.register("glass_or_brick", style.get("street"), true);
+                    break;
+                case 2:
+                    style.register("glass_or_brick", style.get("street2"), true);
+                    break;
+                case 3:
+                    style.register("glass_or_brick", style.get("quartz"), true);
+                    break;
+                default:
+                    style.register("glass_or_brick", style.get("glass"));
+                    break;
+            }
         }
+    }
 
-        style.register("street", Blocks.DOUBLE_STONE_SLAB.getDefaultState(), true);
-        style.register("street2", Blocks.BRICK_BLOCK.getDefaultState(), true);
-
-        IBlockState glass;
-        IBlockState glass_full;
-        switch (glassColor) {
-            case 0:
-                glass = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.WHITE);
-                glass_full = glass;
-                break;
-            case 1:
-                glass = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY);
-                glass_full = glass;
-                break;
-            case 2:
-                glass = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.LIGHT_BLUE);
-                glass_full = glass;
-                break;
-            case 3:
-                glass = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BLUE);
-                glass_full = glass;
-                break;
-            case 4:
-                glass = Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.WHITE);
-                glass_full = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.WHITE);
-                break;
-            case 5:
-                glass = Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY);
-                glass_full = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY);
-                break;
-            case 6:
-                glass = Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.LIGHT_BLUE);
-                glass_full = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.LIGHT_BLUE);
-                break;
-            case 7:
-                glass = Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BLUE);
-                glass_full = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BLUE);
-                break;
-            case 8:
-                glass = Blocks.GLASS_PANE.getDefaultState();
-                glass_full = Blocks.GLASS.getDefaultState();
-                break;
-            default:
-                glass = Blocks.GLASS.getDefaultState();
-                glass_full = glass;
-                break;
-        }
-        style.register("glass", glass);
-        style.register("glass_full", glass_full);
-
-        style.register("quartz", Blocks.QUARTZ_BLOCK.getDefaultState(), true);
-
-        IBlockState bricks;
-        IBlockState bricks_variant;
-        IBlockState bricks_cracked;
-        IBlockState bricks_mossy;
-        IBlockState bricks_monster;
-        switch (buildingStyle) {
-            case 0:
-                bricks = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.CYAN);
-                bricks_variant = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.BLACK);
-                bricks_cracked = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.CYAN);
-                bricks_mossy = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.CYAN);
-                bricks_monster = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.CYAN);
-                break;
-            case 1:
-                bricks = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GRAY);
-                bricks_variant = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.BLACK);
-                bricks_cracked = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GRAY);
-                bricks_mossy = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GRAY);
-                bricks_monster = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GRAY);
-                break;
-            case 2:
-                bricks = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
-                bricks_variant = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.BROWN);
-                bricks_cracked = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
-                bricks_mossy = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
-                bricks_monster = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
-                break;
-            default:
-                bricks = Blocks.STONEBRICK.getDefaultState();
-                bricks_variant = Blocks.DOUBLE_STONE_SLAB.getDefaultState();
-                bricks_cracked = Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CRACKED);
-                bricks_mossy = Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.MOSSY);
-                bricks_monster = Blocks.MONSTER_EGG.getDefaultState().withProperty(BlockSilverfish.VARIANT, BlockSilverfish.EnumType.STONEBRICK);
-                break;
-        }
-
-        style.register("bricks", bricks, true);
-        style.register("bricks_cracked", bricks_cracked, true);
-        style.register("bricks_mossy", bricks_mossy, true);
-        style.register("bricks_variant", bricks_variant, true);
-        style.register("bricks_monster", bricks_monster, true);
-
-        switch (glassType) {
-            case 0:
-                style.register("glass_or_brick", style.get("glass"));
-                break;
-            case 1:
-                style.register("glass_or_brick", style.get("street"), true);
-                break;
-            case 2:
-                style.register("glass_or_brick", style.get("street2"), true);
-                break;
-            case 3:
-                style.register("glass_or_brick", style.get("quartz"), true);
-                break;
-            default:
-                style.register("glass_or_brick", style.get("glass"));
-                break;
-        }
-
-
+    public Style getStyle() {
         return style;
     }
 
@@ -396,6 +297,7 @@ public class BuildingInfo {
             buildingStyle = topleft.buildingStyle;
             doorBlock = topleft.doorBlock;
             bridgeType = topleft.bridgeType;
+            createStyle(rand);
         } else {
             if (building2x2Section == 0) {
                 multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(getCityStyle().getRandomMultiBuilding(provider, rand));
@@ -426,6 +328,7 @@ public class BuildingInfo {
             buildingStyle = rand.nextInt(4);
             doorBlock = getRandomDoor(rand);
             bridgeType = rand.nextInt(BridgeData.BRIDGES.length);
+            createStyle(rand);
         }
 
         floorTypes = new BuildingPart[floors + floorsBelowGround + 1];

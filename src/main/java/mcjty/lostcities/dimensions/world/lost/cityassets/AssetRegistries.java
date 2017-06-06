@@ -1,9 +1,16 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import mcjty.lostcities.dimensions.world.lost.Style;
 import mcjty.lostcities.dimensions.world.lost.data.DataCenterData;
 import mcjty.lostcities.dimensions.world.lost.data.FloorsData;
 import mcjty.lostcities.dimensions.world.lost.data.LibraryData;
 import mcjty.lostcities.dimensions.world.lost.data.RoofTopsData;
+import net.minecraft.block.BlockColored;
+import net.minecraft.block.BlockSilverfish;
+import net.minecraft.block.BlockStainedGlass;
+import net.minecraft.block.BlockStoneBrick;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class AssetRegistries {
@@ -12,6 +19,7 @@ public class AssetRegistries {
     public static final AbstractAssetRegistry<Building> BUILDINGS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<MultiBuilding> MULTI_BUILDINGS = new AbstractAssetRegistry<>();
+    public static final AbstractAssetRegistry<Style> STYLES = new AbstractAssetRegistry<>();
 
     public static final void reset() {
         System.out.println("AssetRegistries.reset");
@@ -19,6 +27,7 @@ public class AssetRegistries {
         BUILDINGS.reset();
         CITYSTYLES.reset();
         MULTI_BUILDINGS.reset();
+        STYLES.reset();
     }
 
     public static void init() {
@@ -115,6 +124,7 @@ public class AssetRegistries {
                 .set(0, 1, "building3")
                 .set(1, 1, "building3"));
 
+        //noinspection unchecked
         CITYSTYLES.register(new CityStyle("standard")
                 .addBuilding(cityInfo -> Pair.of(.4f, "building1"))
                 .addBuilding(cityInfo -> Pair.of(.4f, "building2"))
@@ -123,8 +133,84 @@ public class AssetRegistries {
                 .addMultiBuilding(cityInfo -> Pair.of(.3f, "multi2"))
                 .addMultiBuilding(cityInfo -> Pair.of(.2f, "multi3"))
                 .addMultiBuilding(cityInfo -> Pair.of(.1f, "library"))
-                .addMultiBuilding(cityInfo -> Pair.of(.1f, "center")));
+                .addMultiBuilding(cityInfo -> Pair.of(.1f, "center"))
+                .addRandomStyleChoice(Pair.of(1.0f, "bricks"), Pair.of(1.0f, "bricks_cyan"), Pair.of(1.0f, "bricks_gray"), Pair.of(1.0f, "bricks_silver"))
+                .addRandomStyleChoice(Pair.of(1.0f, "street"))
+                .addRandomStyleChoice(Pair.of(1.0f, "glass_white"), Pair.of(1.0f, "glass_gray"), Pair.of(1.0f, "glass_light_blue"), Pair.of(1.0f, "glass_blue"),
+                        Pair.of(1.0f, "glass_pane_white"), Pair.of(1.0f, "glass_pane_gray"), Pair.of(1.0f, "glass_pane_light_blue"), Pair.of(1.0f, "glass_pane_blue"),
+                        Pair.of(1.0f, "glass"), Pair.of(1.0f, "glass_pane"))
+        );
 
+        STYLES.register(new Style("outside")
+                .register("quartz", Blocks.QUARTZ_BLOCK.getDefaultState(), true)
+                .register("bricks", Blocks.STONEBRICK.getDefaultState(), true)
+                .register("bricks_variant", Blocks.DOUBLE_STONE_SLAB.getDefaultState(), true)
+                .register("bricks_cracked", Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CRACKED), true)
+                .register("bricks_mossy", Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.MOSSY), true)
+                .register("bricks_monster", Blocks.STONEBRICK.getDefaultState(), true));
+        STYLES.register(new Style("bricks")
+                .register("quartz", Blocks.QUARTZ_BLOCK.getDefaultState(), true)
+                .register("bricks", Blocks.STONEBRICK.getDefaultState(), true)
+                .register("bricks_variant", Blocks.DOUBLE_STONE_SLAB.getDefaultState(), true)
+                .register("bricks_cracked", Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CRACKED), true)
+                .register("bricks_mossy", Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.MOSSY), true)
+                .register("bricks_monster", Blocks.MONSTER_EGG.getDefaultState().withProperty(BlockSilverfish.VARIANT, BlockSilverfish.EnumType.STONEBRICK), true));
+        STYLES.register(new Style("bricks_cyan")
+                .register("quartz", Blocks.QUARTZ_BLOCK.getDefaultState(), true)
+                .register("bricks", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.CYAN), true)
+                .register("bricks_variant", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.BLACK), true)
+                .register("bricks_cracked", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.CYAN), true)
+                .register("bricks_mossy", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.CYAN), true)
+                .register("bricks_monster", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.CYAN), true));
+        STYLES.register(new Style("bricks_gray")
+                .register("quartz", Blocks.QUARTZ_BLOCK.getDefaultState(), true)
+                .register("bricks", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GRAY), true)
+                .register("bricks_variant", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.BLACK), true)
+                .register("bricks_cracked", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GRAY), true)
+                .register("bricks_mossy", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GRAY), true)
+                .register("bricks_monster", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GRAY), true));
+        STYLES.register(new Style("bricks_silver")
+                .register("quartz", Blocks.QUARTZ_BLOCK.getDefaultState(), true)
+                .register("bricks", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER), true)
+                .register("bricks_variant", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.BROWN), true)
+                .register("bricks_cracked", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER), true)
+                .register("bricks_mossy", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER), true)
+                .register("bricks_monster", Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER), true));
+
+        STYLES.register(new Style("glass_white")
+                .register("glass", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.WHITE))
+                .register("glass_full", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.WHITE)));
+        STYLES.register(new Style("glass_gray")
+                .register("glass", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY))
+                .register("glass_full", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)));
+        STYLES.register(new Style("glass_light_blue")
+                .register("glass", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.LIGHT_BLUE))
+                .register("glass_full", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.LIGHT_BLUE)));
+        STYLES.register(new Style("glass_blue")
+                .register("glass", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BLUE))
+                .register("glass_full", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BLUE)));
+        STYLES.register(new Style("glass_pane_white")
+                .register("glass", Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.WHITE))
+                .register("glass_full", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.WHITE)));
+        STYLES.register(new Style("glass_pane_gray")
+                .register("glass", Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY))
+                .register("glass_full", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.GRAY)));
+        STYLES.register(new Style("glass_pane_light_blue")
+                .register("glass", Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.LIGHT_BLUE))
+                .register("glass_full", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.LIGHT_BLUE)));
+        STYLES.register(new Style("glass_pane_blue")
+                .register("glass", Blocks.STAINED_GLASS_PANE.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BLUE))
+                .register("glass_full", Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockStainedGlass.COLOR, EnumDyeColor.BLUE)));
+        STYLES.register(new Style("glass")
+                .register("glass", Blocks.GLASS.getDefaultState())
+                .register("glass_full", Blocks.GLASS.getDefaultState()));
+        STYLES.register(new Style("glass_pane")
+                .register("glass", Blocks.GLASS_PANE.getDefaultState())
+                .register("glass_full", Blocks.GLASS.getDefaultState()));
+
+        STYLES.register(new Style("street")
+                .register("street", Blocks.DOUBLE_STONE_SLAB.getDefaultState(), true)
+                .register("street2", Blocks.BRICK_BLOCK.getDefaultState(), true));
     }
 
     private static void createDataCenter() {

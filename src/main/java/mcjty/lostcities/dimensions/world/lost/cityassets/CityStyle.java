@@ -1,9 +1,12 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import com.google.common.collect.Lists;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.lost.Style;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
@@ -14,6 +17,7 @@ public class CityStyle implements IAsset {
 
     private final List<Function<CityInfo, Pair<Float, String>>> buildingSelector = new ArrayList<>();
     private final List<Function<CityInfo, Pair<Float, String>>> multiBuildingSelector = new ArrayList<>();
+    private final List<List<Pair<Float, String>>> randomStyleChoices = new ArrayList<>();
 
     public CityStyle(String name) {
         this.name = name;
@@ -32,6 +36,36 @@ public class CityStyle implements IAsset {
     public CityStyle addMultiBuilding(Function<CityInfo, Pair<Float, String>> function) {
         multiBuildingSelector.add(function);
         return this;
+    }
+
+    public CityStyle addRandomStyleChoice(Pair<Float, String>... styles) {
+        randomStyleChoices.add(Lists.newArrayList(styles));
+        return this;
+    }
+
+    public Style getRandomStyle(LostCityChunkGenerator provider, Random random) {
+        Style style = new Style();
+        for (List<Pair<Float, String>> pairs : randomStyleChoices) {
+            float totalweight = 0;
+            for (Pair<Float, String> pair : pairs) {
+                totalweight += pair.getKey();
+            }
+            float r = random.nextFloat() * totalweight;
+            Style tomerge = null;
+            for (Pair<Float, String> pair : pairs) {
+                r -= pair.getKey();
+                if (r <= 0) {
+                    tomerge = AssetRegistries.STYLES.get(pair.getRight());
+                    if (tomerge == null) {
+                        throw new RuntimeException("Style '" + pair.getRight() + "' is missing!");
+                    }
+                    break;
+                }
+            }
+            style.merge(tomerge);
+        }
+
+        return style;
     }
 
     public String getRandomBuilding(LostCityChunkGenerator provider, Random random) {

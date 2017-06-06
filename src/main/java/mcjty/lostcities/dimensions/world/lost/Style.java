@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
+import mcjty.lostcities.dimensions.world.lost.cityassets.IAsset;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
@@ -10,9 +11,33 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Style {
+public class Style implements IAsset {
+
+    private final String name;
+
     private Map<String, IBlockState> styledBlocks = new HashMap<>();
     private Set<IBlockState> damagedToIronBars = new HashSet<>();
+
+    public Style(String name) {
+        this.name = name;
+    }
+
+    public Style(Style... styles) {
+        this("__merged__");
+        for (Style style : styles) {
+            merge(style);
+        }
+    }
+
+    public void merge(Style style) {
+        styledBlocks.putAll(style.styledBlocks);
+        damagedToIronBars.addAll(style.damagedToIronBars);
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 
     public boolean isGlass(IBlockState b) {
         return b.getBlock() == Blocks.GLASS || b.getBlock() == Blocks.GLASS_PANE;
@@ -35,14 +60,16 @@ public class Style {
         return styledBlocks.get(name);
     }
 
-    public void register(String name, IBlockState block) {
+    public Style register(String name, IBlockState block) {
         styledBlocks.put(name, block);
+        return this;
     }
 
-    public void register(String name, IBlockState block, boolean ironBars) {
+    public Style register(String name, IBlockState block, boolean ironBars) {
         styledBlocks.put(name, block);
         if (ironBars) {
             damagedToIronBars.add(block);
         }
+        return this;
     }
 }
