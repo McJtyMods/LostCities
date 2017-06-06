@@ -4,6 +4,7 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.dimensions.world.lost.data.*;
+import mcjty.lostcities.varia.QualityRandom;
 import net.minecraft.block.*;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
@@ -37,8 +38,6 @@ public class BuildingInfo {
     public final int glassType;
     public final int glassColor;
     public final int buildingStyle;
-//    public final boolean isLibrary;     // If true this is a library (only if it is also a 2x2 building)
-//    public final boolean isDataCenter;  // If true this is a data center (only if it is also a 2x2 building)
 
     public final boolean xBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
     public final boolean zBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
@@ -263,8 +262,7 @@ public class BuildingInfo {
         return floors;
     }
 
-
-    public BuildingPart getPart(int l) {
+    public BuildingPart getFloor(int l) {
         return floorTypes[l + floorsBelowGround];
     }
 
@@ -278,6 +276,21 @@ public class BuildingInfo {
         } else {
             float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
             return cityFactor > LostCityConfiguration.CITY_THRESSHOLD;
+        }
+    }
+
+    private BuildingInfo calculateTopLeft() {
+        switch (building2x2Section) {
+            case 0:
+                return this;
+            case 1:
+                return getXmin();
+            case 2:
+                return getZmin();
+            case 3:
+                return getXmin().getZmin();
+            default:
+                throw new RuntimeException("What!");
         }
     }
 
@@ -344,26 +357,12 @@ public class BuildingInfo {
         }
 
         Random rand = getBuildingRandom(chunkX, chunkZ, seed);
-        hasBuilding = building2x2Section >= 0 || (isCity && (chunkX != 0 || chunkZ != 0) && rand.nextFloat() < LostCityConfiguration.BUILDING_CHANCE);
+        float bc = rand.nextFloat();
+        hasBuilding = building2x2Section >= 0 || (isCity && (chunkX != 0 || chunkZ != 0) && bc < LostCityConfiguration.BUILDING_CHANCE);
 
         // In a 2x2 building we copy all information from the top-left chunk
         if (building2x2Section >= 1) {
-            BuildingInfo topleft;
-            switch (building2x2Section) {
-                case 1:
-                    topleft = getXmin();
-                    break;
-                case 2:
-                    topleft = getZmin();
-                    break;
-                case 3:
-                    topleft = getXmin().getZmin();
-                    break;
-                default:
-                    throw new RuntimeException("What!");
-            }
-//            isLibrary = topleft.isLibrary;
-//            isDataCenter = topleft.isDataCenter;
+            BuildingInfo topleft = calculateTopLeft();
             multiBuilding = topleft.multiBuilding;
             if (multiBuilding != null) {
                 switch(building2x2Section) {
@@ -396,22 +395,10 @@ public class BuildingInfo {
             if (building2x2Section == 0) {
                 multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(getCityStyle().getRandomMultiBuilding(provider, rand));
                 buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(0, 0));
-                System.out.println("multiBuilding.getName() = " + multiBuilding.getName());
-                System.out.println("multiBuilding.get(0, 0) = " + multiBuilding.get(0, 0));
             } else {
                 multiBuilding = null;
                 buildingType = AssetRegistries.BUILDINGS.get(getCityStyle().getRandomBuilding(provider, rand));
             }
-//            if (building2x2Section == 0) {
-//                isLibrary = rand.nextFloat() < LostCityConfiguration.LIBRARY_CHANCE;
-//            } else {
-//                isLibrary = false;
-//            }
-//            if (building2x2Section == 0 && !isLibrary) {
-//                isDataCenter = rand.nextFloat() < LostCityConfiguration.LIBRARY_CHANCE;
-//            } else {
-//                isDataCenter = false;
-//            }
             if (rand.nextDouble() < .2f) {
                 streetType = StreetType.values()[rand.nextInt(StreetType.values().length)];
             } else {
@@ -658,7 +645,7 @@ public class BuildingInfo {
     }
 
     public static Random getBuildingRandom(int chunkX, int chunkZ, long seed) {
-        Random rand = new Random(seed + chunkZ * 341873128712L + chunkX * 132897987541L);
+        Random rand = new QualityRandom(seed + chunkZ * 341873128712L + chunkX * 132897987541L);
         rand.nextFloat();
         rand.nextFloat();
         return rand;

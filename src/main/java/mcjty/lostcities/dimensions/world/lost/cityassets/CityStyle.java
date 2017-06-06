@@ -46,7 +46,6 @@ public class CityStyle implements IAsset {
             }
         }
         float r = random.nextFloat() * totalweight;
-        System.out.println("single: r = " + r);
         for (Pair<Float, String> pair : buildings) {
             r -= pair.getKey();
             if (r <= 0) {
@@ -68,7 +67,6 @@ public class CityStyle implements IAsset {
             }
         }
         float r = random.nextFloat() * totalweight;
-        System.out.println("multi: r = " + r);
         for (Pair<Float, String> pair : multiBuildings) {
             r -= pair.getKey();
             if (r <= 0) {

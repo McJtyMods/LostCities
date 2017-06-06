@@ -908,7 +908,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int l = getLevel(height);
         boolean isTop = l == info.getNumFloors();   // The top does not need generated doors
 
-        BuildingPart part = info.getPart(l);
+        BuildingPart part = info.getFloor(l);
         if (f >= part.getSliceCount()) { // @todo avoid this?
             return air;
         }
