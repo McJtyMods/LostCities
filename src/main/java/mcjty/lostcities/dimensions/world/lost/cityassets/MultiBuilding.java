@@ -48,7 +48,7 @@ public class MultiBuilding implements IAsset {
         for (int z = 0 ; z < dimZ ; z++) {
             JsonArray ar = buildingArray.get(z).getAsJsonArray();
             for (int x = 0 ; x < dimX ; x++) {
-                buildings[x][z] = ar.get(x).getAsString();
+                buildings[z][x] = ar.get(x).getAsString();
             }
         }
     }

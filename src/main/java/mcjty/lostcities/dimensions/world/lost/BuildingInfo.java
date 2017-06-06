@@ -299,7 +299,7 @@ public class BuildingInfo {
             buildingStyle = topleft.buildingStyle;
             doorBlock = topleft.doorBlock;
             bridgeType = topleft.bridgeType;
-            createStyle(rand);
+            style = topleft.getStyle();
         } else {
             if (building2x2Section == 0) {
                 multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(getCityStyle().getRandomMultiBuilding(provider, rand));
