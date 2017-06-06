@@ -32,7 +32,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private static IBlockState bedrock;
     public static IBlockState air;
     public static IBlockState water;
+
     private IBlockState baseBlock;
+    private IBlockState street;
+    private IBlockState street2;
+    private IBlockState glass;
+    private IBlockState bricks;
 
     public static final ResourceLocation LOOT = new ResourceLocation(LostCities.MODID, "chests/lostcitychest");
     private static final int STREETBORDER = 3;
@@ -154,6 +159,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         air = Blocks.AIR.getDefaultState();
         water = Blocks.WATER.getDefaultState();
         bedrock = Blocks.BEDROCK.getDefaultState();
+        street = info.getStyle().get("street");
+        street2 = info.getStyle().get("street2");
+        bricks = info.getStyle().get("bricks");
+        glass = info.getStyle().get("glass");
 
         if (info.isCity) {
             doCityChunk(chunkX, chunkZ, primer, info);
@@ -681,31 +690,31 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 if (isStreetBorder(x, z)) {
                     if (x <= STREETBORDER && z > STREETBORDER && z < (15 - STREETBORDER)
                             && (info.getXmin().doesRoadExtendTo() || (info.getXmin().hasXBridge(provider) >= 0))) {
-                        b = style.street;
+                        b = street;
                     } else if (x >= (15 - STREETBORDER) && z > STREETBORDER && z < (15 - STREETBORDER)
                             && (info.getXmax().doesRoadExtendTo() || (info.getXmax().hasXBridge(provider) >= 0))) {
-                        b = style.street;
+                        b = street;
                     } else if (z <= STREETBORDER && x > STREETBORDER && x < (15 - STREETBORDER)
                             && (info.getZmin().doesRoadExtendTo() || (info.getZmin().hasZBridge(provider) >= 0))) {
-                        b = style.street;
+                        b = street;
                     } else if (z >= (15 - STREETBORDER) && x > STREETBORDER && x < (15 - STREETBORDER)
                             && (info.getZmax().doesRoadExtendTo() || (info.getZmax().hasZBridge(provider) >= 0))) {
-                        b = style.street;
+                        b = street;
                     }
                 } else {
-                    b = style.street;
+                    b = street;
                 }
                 break;
             case FULL:
                 if (isSide(x, z)) {
-                    b = style.street;
+                    b = street;
                 } else {
-                    b = style.street2;
+                    b = street2;
                 }
                 break;
             case PARK:
                 if (x == 0 || x == 15 || z == 0 || z == 15) {
-                    b = style.street;
+                    b = street;
                     if (elevated) {
                         boolean el00 = info.getXmin().getZmin().isElevatedParkSection();
                         boolean el10 = info.getZmin().isElevatedParkSection();
@@ -825,10 +834,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 b = Blocks.IRON_BARS.getDefaultState();
                                 break;
                             case 1:
-                                b = adjacentInfo.getStyle().bricks;
+                                b = adjacentInfo.getStyle().get("bricks");
                                 break;
                             default:
-                                b = adjacentInfo.getStyle().bricks_cracked;
+                                b = adjacentInfo.getStyle().get("bricks_cracked");
                                 break;
                         }
                         BaseTerrainGenerator.setBlockState(primer, index, b);
@@ -917,8 +926,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         // If we are underground, the block is glass, we are on the side and the chunk next to
         // us doesn't have a building or floor there we replace the glass with a solid block
-        if (l < 0 && (b == Blocks.GLASS.getDefaultState() || b == style.glass) && isSide(x, z) && (!info.getAdjacent(x, z).hasBuilding || info.getAdjacent(x, z).floorsBelowGround < -l)) {
-            b = style.bricks;
+        if (l < 0 && (b == Blocks.GLASS.getDefaultState() || b == glass) && isSide(x, z) && (!info.getAdjacent(x, z).hasBuilding || info.getAdjacent(x, z).floorsBelowGround < -l)) {
+            b = bricks;
         }
 
         // For buildings that have a style which causes gaps at the side we fill in that gap if we are
@@ -930,7 +939,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         // for buildings that have a hole in the bottom floor we fill that hole if we are
         // at the bottom of the building
         if (b == air && f == 0 && (l+info.floorsBelowGround) == 0) {
-            b = style.bricks;
+            b = bricks;
         }
 
         if (!isTop) {
@@ -938,13 +947,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 BuildingInfo info2 = info.getXmin();
                 if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround))) {
                     if (f == 3 || z == 6 || z == 9) {
-                        b = style.bricks;
+                        b = bricks;
                     } else {
                         b = air;
                     }
                 } else if ((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) {
                     if (f == 3 || z == 6 || z == 9) {
-                        b = style.bricks;
+                        b = bricks;
                     } else {
                         b = info.doorBlock.getDefaultState()
                                 .withProperty(BlockDoor.HALF, f == 1 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER)
@@ -956,13 +965,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 BuildingInfo info2 = info.getXmax();
                 if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround)) && info2.hasConnectionAtX(l + info2.floorsBelowGround)) {
                     if (f == 3 || z == 6 || z == 9) {
-                        b = style.bricks;
+                        b = bricks;
                     } else {
                         b = air;
                     }
                 } else if (((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) && info2.hasConnectionAtX(l + info2.floorsBelowGround)) {
                     if (f == 3 || z == 6 || z == 9) {
-                        b = style.bricks;
+                        b = bricks;
                     } else {
                         b = info.doorBlock.getDefaultState()
                                 .withProperty(BlockDoor.HALF, f == 1 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER)
@@ -975,13 +984,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 BuildingInfo info2 = info.getZmin();
                 if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround))) {
                     if (f == 3 || x == 6 || x == 9) {
-                        b = style.bricks;
+                        b = bricks;
                     } else {
                         b = air;
                     }
                 } else if ((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) {
                     if (f == 3 || x == 6 || x == 9) {
-                        b = style.bricks;
+                        b = bricks;
                     } else {
                         b = info.doorBlock.getDefaultState()
                                 .withProperty(BlockDoor.HALF, f == 1 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER)
@@ -993,13 +1002,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 BuildingInfo info2 = info.getZmax();
                 if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround)) && info2.hasConnectionAtZ(l + info2.floorsBelowGround)) {
                     if (f == 3 || x == 6 || x == 9) {
-                        b = style.bricks;
+                        b = bricks;
                     } else {
                         b = air;
                     }
                 } else if (((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) && info2.hasConnectionAtZ(l + info2.floorsBelowGround)) {
                     if (f == 3 || x == 6 || x == 9) {
-                        b = style.bricks;
+                        b = bricks;
                     } else {
                         b = info.doorBlock.getDefaultState()
                                 .withProperty(BlockDoor.HALF, f == 1 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER)
@@ -1012,7 +1021,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         boolean down = f == 0 && (l + info.floorsBelowGround) == 0;
 
         if (b.getBlock() == Blocks.LADDER && down) {
-            b = style.bricks;
+            b = bricks;
         }
         return b;
     }

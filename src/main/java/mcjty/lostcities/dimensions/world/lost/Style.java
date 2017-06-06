@@ -3,35 +3,27 @@ package mcjty.lostcities.dimensions.world.lost;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Style {
-    public IBlockState street;
-    public IBlockState street2;
-    public IBlockState glass;
-    public IBlockState glass_full;
-    public IBlockState quartz;
-    public IBlockState bricks;
-    public IBlockState bricks_variant;
-    public IBlockState bricks_cracked;
-    public IBlockState bricks_mossy;
-    public IBlockState bricks_monster;
-
     private Map<String, IBlockState> styledBlocks = new HashMap<>();
+    private Set<IBlockState> damagedToIronBars = new HashSet<>();
 
     public boolean isGlass(IBlockState b) {
-        return b != null && (b == glass || b == glass_full);
+        return b.getBlock() == Blocks.GLASS || b.getBlock() == Blocks.GLASS_PANE;
     }
 
     public boolean canBeDamagedToIronBars(IBlockState b) {
-        return b != null && (b == bricks || b == bricks_cracked || b == bricks_mossy
-                || b == bricks_variant || b == quartz);
+        return damagedToIronBars.contains(b);
     }
 
     public boolean isEasyToDestroy(IBlockState b) {
-        return b != null && (b == glass || b == glass_full);
+        return isGlass(b);
     }
 
     public boolean isLiquid(IBlockState b) {
@@ -45,5 +37,12 @@ public class Style {
 
     public void register(String name, IBlockState block) {
         styledBlocks.put(name, block);
+    }
+
+    public void register(String name, IBlockState block, boolean ironBars) {
+        styledBlocks.put(name, block);
+        if (ironBars) {
+            damagedToIronBars.add(block);
+        }
     }
 }
