@@ -8,9 +8,7 @@ import mcjty.lostcities.dimensions.world.lost.data.FountainData;
 import mcjty.lostcities.dimensions.world.lost.data.ParkData;
 import mcjty.lostcities.varia.QualityRandom;
 import net.minecraft.block.*;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumDyeColor;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;

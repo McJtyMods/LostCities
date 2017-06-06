@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
-import mcjty.lostcities.dimensions.world.lost.Style;
 import mcjty.lostcities.dimensions.world.lost.data.DataCenterData;
 import mcjty.lostcities.dimensions.world.lost.data.FloorsData;
 import mcjty.lostcities.dimensions.world.lost.data.LibraryData;

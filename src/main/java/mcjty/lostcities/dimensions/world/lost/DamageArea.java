@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.Style;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;

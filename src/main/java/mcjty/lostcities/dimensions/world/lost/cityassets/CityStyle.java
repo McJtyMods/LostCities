@@ -2,11 +2,9 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import com.google.common.collect.Lists;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.lost.Style;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Function;

@@ -1,6 +1,5 @@
-package mcjty.lostcities.dimensions.world.lost;
+package mcjty.lostcities.dimensions.world.lost.cityassets;
 
-import mcjty.lostcities.dimensions.world.lost.cityassets.IAsset;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
