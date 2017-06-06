@@ -12,7 +12,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -49,12 +51,36 @@ public class Palette implements IAsset {
                     // @todo
                     throw new RuntimeException("Cannot find block '" + block + "'!");
                 }
+                palette.put(c, ((Block)value).getStateFromMeta(meta));
             } else if (o.has("style")) {
                 value = o.get("style");
+                palette.put(c, value);
+            } else if (o.has("styles")) {
+                JsonArray array = o.get("styles").getAsJsonArray();
+                List<Pair<Float, String>> styles = new ArrayList<>();
+                for (JsonElement el : array) {
+                    JsonObject ob = el.getAsJsonObject();
+                    Float f = ob.get("factor").getAsFloat();
+                    String style = ob.get("style").getAsString();
+                    styles.add(Pair.of(f, style));
+                }
+                addMappingViaStyle(c, styles.toArray(new Pair[styles.size()]));
+            } else if (o.has("blocks")) {
+                JsonArray array = o.get("blocks").getAsJsonArray();
+                List<Pair<Float, IBlockState>> blocks = new ArrayList<>();
+                for (JsonElement el : array) {
+                    JsonObject ob = el.getAsJsonObject();
+                    Float f = ob.get("factor").getAsFloat();
+                    String block = o.get("block").getAsString();
+                    int meta = o.get("meta").getAsInt();
+                    Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block));
+                    blocks.add(Pair.of(f, b.getStateFromMeta(meta)));
+                }
+                addMappingViaState(c, blocks.toArray(new Pair[blocks.size()]));
+
             } else {
-                // @todo
+                throw new RuntimeException("Illegal palette!");
             }
-            palette.put(c, value);
         }
     }
 
