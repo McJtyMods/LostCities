@@ -1,5 +1,10 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import net.minecraft.nbt.NBTTagCompound;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -9,7 +14,7 @@ import java.util.function.Predicate;
 
 public class Building implements IAsset {
 
-    private final String name;
+    private String name;
 
     private final List<Pair<Predicate<LevelInfo>, String>> parts = new ArrayList<>();
     private final List<String> partNames = new ArrayList<>();
@@ -22,6 +27,47 @@ public class Building implements IAsset {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        name = object.get("name").getAsString();
+        paletteName = object.get("palette").getAsString();
+        JsonArray partArray = object.get("parts").getAsJsonArray();
+        parts.clear();
+        partNames.clear();
+        for (JsonElement element : partArray) {
+            String partName = element.getAsJsonObject().get("part").getAsString();
+            JsonObject testObject = element.getAsJsonObject().get("test").getAsJsonObject();
+            Predicate<LevelInfo> test = levelInfo -> true;
+            if (testObject.has("top")) {
+                boolean top = testObject.get("top").getAsBoolean();
+                if (top) {
+                    test = levelInfo -> levelInfo.isTopOfBuilding();
+                } else {
+                    test = levelInfo -> !levelInfo.isTopOfBuilding();
+                }
+            }
+            addPart(test, partName);
+        }
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = new JsonObject();
+        object.add("type", new JsonPrimitive("building"));
+        object.add("name", new JsonPrimitive(name));
+        object.add("palette", new JsonPrimitive(paletteName));
+        JsonArray partArray = new JsonArray();
+        for (Pair<Predicate<LevelInfo>, String> part : parts) {
+            JsonObject partObject = new JsonObject();
+            partObject.add("test", new JsonPrimitive("@todo"));
+            partObject.add("part", new JsonPrimitive(part.getRight()));
+            partArray.add(partObject);
+        }
+        object.add("parts", partArray);
+
+        return object;
     }
 
     public String getPaletteName() {

@@ -1,9 +1,15 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -15,7 +21,8 @@ import java.util.function.Function;
  */
 public class Palette implements IAsset {
 
-    private final String name;
+    private String name;
+    final Map<Character, Object> palette = new HashMap<>();
 
     public Palette(String name) {
         this.name = name;
@@ -26,7 +33,54 @@ public class Palette implements IAsset {
         return name;
     }
 
-    final Map<Character, Object> palette = new HashMap<>();
+    @Override
+    public void readFromJSon(JsonObject object) {
+        name = object.get("name").getAsString();
+        JsonArray paletteArray = object.get("palette").getAsJsonArray();
+        for (JsonElement element : paletteArray) {
+            JsonObject o = element.getAsJsonObject();
+            Object value = null;
+            Character c = o.get("char").getAsCharacter();
+            if (o.has("block")) {
+                String block = o.get("block").getAsString();
+                int meta = o.get("meta").getAsInt();
+                value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block));
+                if (value == null) {
+                    // @todo
+                    throw new RuntimeException("Cannot find block '" + block + "'!");
+                }
+            } else if (o.has("style")) {
+                value = o.get("style");
+            } else {
+                // @todo
+            }
+            palette.put(c, value);
+        }
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = new JsonObject();
+        object.add("type", new JsonPrimitive("palette"));
+        object.add("name", new JsonPrimitive(name));
+        JsonArray array = new JsonArray();
+        for (Map.Entry<Character, Object> entry : palette.entrySet()) {
+            JsonObject o = new JsonObject();
+            o.add("char", new JsonPrimitive(entry.getKey()));
+            if (entry.getValue() instanceof IBlockState) {
+                IBlockState state = (IBlockState) entry.getValue();
+                o.add("block", new JsonPrimitive(state.getBlock().getRegistryName().toString()));
+                o.add("meta", new JsonPrimitive(state.getBlock().getMetaFromState(state)));
+            } else if (entry.getValue() instanceof String) {
+                o.add("style", new JsonPrimitive((String) entry.getValue()));
+            } else {
+                o.add("test", new JsonPrimitive("@todo"));
+            }
+            array.add(o);
+        }
+        object.add("palette", array);
+        return object;
+    }
 
     private void addFunctionMapping(char c, Function<BuildingInfo, IBlockState> function) {
         palette.put(c, function);

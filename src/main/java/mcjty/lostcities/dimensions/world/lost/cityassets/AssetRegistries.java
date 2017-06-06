@@ -172,14 +172,14 @@ public class AssetRegistries {
     private static void createCityStyles() {
         //noinspection unchecked
         CITYSTYLES.register(new CityStyle("standard")
-                .addBuilding(cityInfo -> Pair.of(.4f, "building1"))
-                .addBuilding(cityInfo -> Pair.of(.4f, "building2"))
-                .addBuilding(cityInfo -> Pair.of(.2f, "building3"))
-                .addMultiBuilding(cityInfo -> Pair.of(.3f, "multi1"))
-                .addMultiBuilding(cityInfo -> Pair.of(.3f, "multi2"))
-                .addMultiBuilding(cityInfo -> Pair.of(.2f, "multi3"))
-                .addMultiBuilding(cityInfo -> Pair.of(.1f, "library"))
-                .addMultiBuilding(cityInfo -> Pair.of(.1f, "center"))
+                .addBuilding(.4f, "building1")
+                .addBuilding(.4f, "building2")
+                .addBuilding(.2f, "building3")
+                .addMultiBuilding(.3f, "multi1")
+                .addMultiBuilding(.3f, "multi2")
+                .addMultiBuilding(.2f, "multi3")
+                .addMultiBuilding(.1f, "library")
+                .addMultiBuilding(.1f, "center")
                 .addRandomStyleChoice(Pair.of(1.0f, "bricks"), Pair.of(1.0f, "bricks_cyan"), Pair.of(1.0f, "bricks_gray"), Pair.of(1.0f, "bricks_silver"))
                 .addRandomStyleChoice(Pair.of(1.0f, "street"))
                 .addRandomStyleChoice(Pair.of(1.0f, "glass_white"), Pair.of(1.0f, "glass_gray"), Pair.of(1.0f, "glass_light_blue"), Pair.of(1.0f, "glass_blue"),

@@ -1,20 +1,23 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Function;
 
 public class CityStyle implements IAsset {
 
-    private final String name;
+    private String name;
 
-    private final List<Function<CityInfo, Pair<Float, String>>> buildingSelector = new ArrayList<>();
-    private final List<Function<CityInfo, Pair<Float, String>>> multiBuildingSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> buildingSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
     private final List<List<Pair<Float, String>>> randomStyleChoices = new ArrayList<>();
 
     public CityStyle(String name) {
@@ -26,13 +29,80 @@ public class CityStyle implements IAsset {
         return name;
     }
 
-    public CityStyle addBuilding(Function<CityInfo, Pair<Float, String>> function) {
-        buildingSelector.add(function);
+    @Override
+    public void readFromJSon(JsonObject object) {
+        name = object.get("name").getAsString();
+        JsonArray array = object.get("buildings").getAsJsonArray();
+        for (JsonElement element : array) {
+            float factor = element.getAsJsonObject().get("factor").getAsFloat();
+            String building = element.getAsJsonObject().get("building").getAsString();
+            buildingSelector.add(Pair.of(factor, building));
+        }
+        array = object.get("multibuildings").getAsJsonArray();
+        for (JsonElement element : array) {
+            float factor = element.getAsJsonObject().get("factor").getAsFloat();
+            String building = element.getAsJsonObject().get("multibuilding").getAsString();
+            multiBuildingSelector.add(Pair.of(factor, building));
+        }
+        array = object.get("randomstylechoices").getAsJsonArray();
+        for (JsonElement element : array) {
+            List<Pair<Float, String>> styles = new ArrayList<>();
+            for (JsonElement el : element.getAsJsonArray()) {
+                float factor = element.getAsJsonObject().get("factor").getAsFloat();
+                String style = element.getAsJsonObject().get("style").getAsString();
+                styles.add(Pair.of(factor, style));
+            }
+            randomStyleChoices.add(styles);
+        }
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = new JsonObject();
+        object.add("type", new JsonPrimitive("citystyle"));
+        object.add("name", new JsonPrimitive(name));
+
+        JsonArray array = new JsonArray();
+        for (Pair<Float, String> pair : buildingSelector) {
+            JsonObject o = new JsonObject();
+            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("building", new JsonPrimitive(pair.getValue()));
+            array.add(o);
+        }
+        object.add("buildings", array);
+
+        array = new JsonArray();
+        for (Pair<Float, String> pair : multiBuildingSelector) {
+            JsonObject o = new JsonObject();
+            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("multibuilding", new JsonPrimitive(pair.getValue()));
+            array.add(o);
+        }
+        object.add("multibuildings", array);
+
+        array = new JsonArray();
+        for (List<Pair<Float, String>> list : randomStyleChoices) {
+            JsonArray a = new JsonArray();
+            for (Pair<Float, String> pair : list) {
+                JsonObject o = new JsonObject();
+                o.add("factor", new JsonPrimitive(pair.getKey()));
+                o.add("style", new JsonPrimitive(pair.getValue()));
+                a.add(o);
+            }
+            array.add(a);
+        }
+        object.add("randomstylechoices", array);
+
+        return object;
+    }
+
+    public CityStyle addBuilding(float factor, String building) {
+        buildingSelector.add(Pair.of(factor, building));
         return this;
     }
 
-    public CityStyle addMultiBuilding(Function<CityInfo, Pair<Float, String>> function) {
-        multiBuildingSelector.add(function);
+    public CityStyle addMultiBuilding(float factor, String multiBuilding) {
+        multiBuildingSelector.add(Pair.of(factor, multiBuilding));
         return this;
     }
 
@@ -69,13 +139,9 @@ public class CityStyle implements IAsset {
     public String getRandomBuilding(LostCityChunkGenerator provider, Random random) {
         List<Pair<Float, String>> buildings = new ArrayList<>();
         float totalweight = 0;
-        CityInfo cityInfo = new CityInfo(provider, random);
-        for (Function<CityInfo, Pair<Float, String>> function : buildingSelector) {
-            Pair<Float, String> pair = function.apply(cityInfo);
-            if (pair != null) {
-                buildings.add(pair);
-                totalweight += pair.getKey();
-            }
+        for (Pair<Float, String> pair : buildingSelector) {
+            buildings.add(pair);
+            totalweight += pair.getKey();
         }
         float r = random.nextFloat() * totalweight;
         for (Pair<Float, String> pair : buildings) {
@@ -90,13 +156,9 @@ public class CityStyle implements IAsset {
     public String getRandomMultiBuilding(LostCityChunkGenerator provider, Random random) {
         List<Pair<Float, String>> multiBuildings = new ArrayList<>();
         float totalweight = 0;
-        CityInfo cityInfo = new CityInfo(provider, random);
-        for (Function<CityInfo, Pair<Float, String>> function : multiBuildingSelector) {
-            Pair<Float, String> pair = function.apply(cityInfo);
-            if (pair != null) {
-                multiBuildings.add(pair);
-                totalweight += pair.getKey();
-            }
+        for (Pair<Float, String> pair : multiBuildingSelector) {
+            multiBuildings.add(pair);
+            totalweight += pair.getKey();
         }
         float r = random.nextFloat() * totalweight;
         for (Pair<Float, String> pair : multiBuildings) {
@@ -106,24 +168,5 @@ public class CityStyle implements IAsset {
             }
         }
         return null;
-    }
-
-
-    public static class CityInfo {
-        private final LostCityChunkGenerator provider;
-        private final Random random;
-
-        public CityInfo(LostCityChunkGenerator provider, Random random) {
-            this.provider = provider;
-            this.random = random;
-        }
-
-        public LostCityChunkGenerator getProvider() {
-            return provider;
-        }
-
-        public Random getRandom() {
-            return random;
-        }
     }
 }
