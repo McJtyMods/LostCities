@@ -1,15 +1,14 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.lost.data.DataCenterData;
 import mcjty.lostcities.dimensions.world.lost.data.FloorsData;
 import mcjty.lostcities.dimensions.world.lost.data.LibraryData;
 import mcjty.lostcities.dimensions.world.lost.data.RoofTopsData;
-import net.minecraft.block.BlockColored;
-import net.minecraft.block.BlockSilverfish;
-import net.minecraft.block.BlockStainedGlass;
-import net.minecraft.block.BlockStoneBrick;
+import net.minecraft.block.*;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class AssetRegistries {
@@ -19,6 +18,7 @@ public class AssetRegistries {
     public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<MultiBuilding> MULTI_BUILDINGS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Style> STYLES = new AbstractAssetRegistry<>();
+    public static final AbstractAssetRegistry<Palette> PALETTES = new AbstractAssetRegistry<>();
 
     public static final void reset() {
         System.out.println("AssetRegistries.reset");
@@ -27,119 +27,76 @@ public class AssetRegistries {
         CITYSTYLES.reset();
         MULTI_BUILDINGS.reset();
         STYLES.reset();
+        PALETTES.reset();
     }
 
     public static void init() {
         reset();
         System.out.println("AssetRegistries.init");
 
-        PARTS.register(FloorsData.BUILDING1_1);
-        PARTS.register(FloorsData.BUILDING1_2);
-        PARTS.register(FloorsData.BUILDING1_3);
-        PARTS.register(FloorsData.BUILDING1_4);
-        PARTS.register(FloorsData.BUILDING1_5);
-        PARTS.register(FloorsData.BUILDING1_6);
-        PARTS.register(FloorsData.BUILDING1_7);
-        PARTS.register(FloorsData.BUILDING1_8);
-        PARTS.register(FloorsData.BUILDING1_9);
-        PARTS.register(FloorsData.BUILDING2_1);
-        PARTS.register(FloorsData.BUILDING2_2);
-        PARTS.register(FloorsData.BUILDING2_3);
-        PARTS.register(FloorsData.BUILDING2_4);
-        PARTS.register(FloorsData.BUILDING3_1);
-        PARTS.register(FloorsData.BUILDING3_2);
-        PARTS.register(FloorsData.BUILDING3_3);
-        PARTS.register(FloorsData.BUILDING3_4);
-
-        PARTS.register(RoofTopsData.TOP1X1_1);
-        PARTS.register(RoofTopsData.TOP1X1_2);
-        PARTS.register(RoofTopsData.TOP1X1_3);
-        PARTS.register(RoofTopsData.TOP1X1_4);
-
-        PARTS.register(LibraryData.LIBRARY00_1);
-        PARTS.register(LibraryData.LIBRARY01_1);
-        PARTS.register(LibraryData.LIBRARY01_2);
-        PARTS.register(LibraryData.LIBRARY01_3);
-        PARTS.register(LibraryData.LIBRARY10_1);
-        PARTS.register(LibraryData.LIBRARY10_2);
-        PARTS.register(LibraryData.LIBRARY10_3);
-        PARTS.register(LibraryData.LIBRARY10_4);
-        PARTS.register(LibraryData.LIBRARY10_5);
-        PARTS.register(LibraryData.LIBRARY11_1);
-        PARTS.register(LibraryData.LIBRARY11_2);
-        PARTS.register(LibraryData.TOP_LIBRARY00_1);
-        PARTS.register(LibraryData.TOP_LIBRARY00_2);
-        PARTS.register(LibraryData.TOP_LIBRARY_1);
-        PARTS.register(LibraryData.TOP_LIBRARY_2);
-        PARTS.register(LibraryData.TOP_LIBRARY_3);
-        PARTS.register(LibraryData.TOP_LIBRARY_4);
-
-        PARTS.register(DataCenterData.CENTER00_1);
-        PARTS.register(DataCenterData.CENTER00_2);
-        PARTS.register(DataCenterData.CENTER00_3);
-        PARTS.register(DataCenterData.CENTER01_1);
-        PARTS.register(DataCenterData.CENTER01_2);
-        PARTS.register(DataCenterData.CENTER10_1);
-        PARTS.register(DataCenterData.CENTER10_2);
-        PARTS.register(DataCenterData.CENTER10_3);
-        PARTS.register(DataCenterData.CENTER10_4);
-        PARTS.register(DataCenterData.CENTER11_1);
-        PARTS.register(DataCenterData.TOP_CENTER00_1);
-        PARTS.register(DataCenterData.TOP_CENTER00_2);
-        PARTS.register(DataCenterData.TOP_CENTER_1);
-        PARTS.register(DataCenterData.TOP_CENTER_2);
-        PARTS.register(DataCenterData.TOP_CENTER_3);
-        PARTS.register(DataCenterData.TOP_CENTER_4);
-
+        createPalettes();
+        createParts();
         createBuilding1();
         createBuilding2();
         createBuilding3();
         createDataCenter();
         createLibrary();
+        createMultiBuildings();
+        createCityStyles();
+        createStyles();
+    }
 
-        MULTI_BUILDINGS.register(new MultiBuilding("library", 2, 2)
-                .set(0, 0, "library00")
-                .set(1, 0, "library10")
-                .set(0, 1, "library01")
-                .set(1, 1, "library11"));
-        MULTI_BUILDINGS.register(new MultiBuilding("center", 2, 2)
-                .set(0, 0, "center00")
-                .set(1, 0, "center10")
-                .set(0, 1, "center01")
-                .set(1, 1, "center11"));
-        MULTI_BUILDINGS.register(new MultiBuilding("multi1", 2, 2)
-                .set(0, 0, "building1")
-                .set(1, 0, "building1")
-                .set(0, 1, "building1")
-                .set(1, 1, "building1"));
-        MULTI_BUILDINGS.register(new MultiBuilding("multi2", 2, 2)
-                .set(0, 0, "building2")
-                .set(1, 0, "building2")
-                .set(0, 1, "building2")
-                .set(1, 1, "building2"));
-        MULTI_BUILDINGS.register(new MultiBuilding("multi3", 2, 2)
-                .set(0, 0, "building3")
-                .set(1, 0, "building3")
-                .set(0, 1, "building3")
-                .set(1, 1, "building3"));
-
+    private static void createPalettes() {
         //noinspection unchecked
-        CITYSTYLES.register(new CityStyle("standard")
-                .addBuilding(cityInfo -> Pair.of(.4f, "building1"))
-                .addBuilding(cityInfo -> Pair.of(.4f, "building2"))
-                .addBuilding(cityInfo -> Pair.of(.2f, "building3"))
-                .addMultiBuilding(cityInfo -> Pair.of(.3f, "multi1"))
-                .addMultiBuilding(cityInfo -> Pair.of(.3f, "multi2"))
-                .addMultiBuilding(cityInfo -> Pair.of(.2f, "multi3"))
-                .addMultiBuilding(cityInfo -> Pair.of(.1f, "library"))
-                .addMultiBuilding(cityInfo -> Pair.of(.1f, "center"))
-                .addRandomStyleChoice(Pair.of(1.0f, "bricks"), Pair.of(1.0f, "bricks_cyan"), Pair.of(1.0f, "bricks_gray"), Pair.of(1.0f, "bricks_silver"))
-                .addRandomStyleChoice(Pair.of(1.0f, "street"))
-                .addRandomStyleChoice(Pair.of(1.0f, "glass_white"), Pair.of(1.0f, "glass_gray"), Pair.of(1.0f, "glass_light_blue"), Pair.of(1.0f, "glass_blue"),
-                        Pair.of(1.0f, "glass_pane_white"), Pair.of(1.0f, "glass_pane_gray"), Pair.of(1.0f, "glass_pane_light_blue"), Pair.of(1.0f, "glass_pane_blue"),
-                        Pair.of(1.0f, "glass"), Pair.of(1.0f, "glass_pane"))
+        PALETTES.register(new Palette("default")
+                .addMapping(' ', Blocks.AIR)
+                .addMapping('l', Blocks.LADDER)
+                .addMapping('*', Blocks.FLOWER_POT)
+                .addMapping('Q', Blocks.QUARTZ_BLOCK)
+                .addMapping('L', Blocks.BOOKSHELF)
+                .addMapping('W', Blocks.WATER)
+                .addMapping('w', Blocks.COBBLESTONE_WALL)
+                .addMapping('S', Blocks.DOUBLE_STONE_SLAB)
+                .addMapping('_', Blocks.STONE_SLAB)
+                .addMapping('.', Blocks.OAK_FENCE)
+                .addMapping('-', Blocks.WOODEN_PRESSURE_PLATE)
+                .addMapping('<', Blocks.QUARTZ_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.NORTH))
+                .addMapping('>', Blocks.QUARTZ_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.SOUTH))
+                .addMapping('$', "bricks_variant")
+                .addMapping('X', "bricks_monster")
+                .addMapping('=', "glass")
+                .addMapping('+', "glass_full")
+                .addMapping('@', "glass_or_brick")
+                .addMapping(':', Blocks.IRON_BARS)
+                .addMapping('D', Blocks.DIRT)
+                .addMapping('G', Blocks.GRASS)
+                .addMapping('1', Blocks.PLANKS)
+                .addMapping('2', Blocks.PLANKS)
+                .addMapping('3', Blocks.PLANKS)
+                .addMapping('4', Blocks.PLANKS)
+                .addMapping('C', Blocks.PLANKS)     // Chest
+                .addMapping('F', Blocks.PLANKS)     // Feature
+                .addMappingViaStyle('#',
+                        Pair.of(LostCityConfiguration.STYLE_CHANCE_CRACKED, "bricks_cracked"),
+                        Pair.of(LostCityConfiguration.STYLE_CHANCE_MOSSY, "bricks_mossy"),
+                        Pair.of(2.0f, "bricks"))
+                .addMappingViaStyle('x', Pair.of(LostCityConfiguration.STYLE_CHANCE_CRACKED, "bricks_cracked"),
+                        Pair.of(LostCityConfiguration.STYLE_CHANCE_MOSSY, "bricks_mossy"),
+                        Pair.of(2.0f, "bricks"))
+                .addMappingViaState('p',
+                        Pair.of(.3f, Blocks.RED_FLOWER.getDefaultState()),
+                        Pair.of(.3f, Blocks.YELLOW_FLOWER.getDefaultState()),
+                        Pair.of(.1f, Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA)),
+                        Pair.of(.1f, Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH)),
+                        Pair.of(.1f, Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK)),
+                        Pair.of(2.0f, Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE)))
+                .addMappingViaState('%',
+                        Pair.of(.3f, Blocks.WEB.getDefaultState()),
+                        Pair.of(2.0f, Blocks.AIR.getDefaultState()))
         );
+    }
 
+    private static void createStyles() {
         STYLES.register(new Style("outside")
                 .register("quartz", Blocks.QUARTZ_BLOCK.getDefaultState(), true)
                 .register("bricks", Blocks.STONEBRICK.getDefaultState(), true)
@@ -212,13 +169,121 @@ public class AssetRegistries {
                 .register("street2", Blocks.BRICK_BLOCK.getDefaultState(), true));
     }
 
+    private static void createCityStyles() {
+        //noinspection unchecked
+        CITYSTYLES.register(new CityStyle("standard")
+                .addBuilding(cityInfo -> Pair.of(.4f, "building1"))
+                .addBuilding(cityInfo -> Pair.of(.4f, "building2"))
+                .addBuilding(cityInfo -> Pair.of(.2f, "building3"))
+                .addMultiBuilding(cityInfo -> Pair.of(.3f, "multi1"))
+                .addMultiBuilding(cityInfo -> Pair.of(.3f, "multi2"))
+                .addMultiBuilding(cityInfo -> Pair.of(.2f, "multi3"))
+                .addMultiBuilding(cityInfo -> Pair.of(.1f, "library"))
+                .addMultiBuilding(cityInfo -> Pair.of(.1f, "center"))
+                .addRandomStyleChoice(Pair.of(1.0f, "bricks"), Pair.of(1.0f, "bricks_cyan"), Pair.of(1.0f, "bricks_gray"), Pair.of(1.0f, "bricks_silver"))
+                .addRandomStyleChoice(Pair.of(1.0f, "street"))
+                .addRandomStyleChoice(Pair.of(1.0f, "glass_white"), Pair.of(1.0f, "glass_gray"), Pair.of(1.0f, "glass_light_blue"), Pair.of(1.0f, "glass_blue"),
+                        Pair.of(1.0f, "glass_pane_white"), Pair.of(1.0f, "glass_pane_gray"), Pair.of(1.0f, "glass_pane_light_blue"), Pair.of(1.0f, "glass_pane_blue"),
+                        Pair.of(1.0f, "glass"), Pair.of(1.0f, "glass_pane"))
+        );
+    }
+
+    private static void createMultiBuildings() {
+        MULTI_BUILDINGS.register(new MultiBuilding("library", 2, 2)
+                .set(0, 0, "library00")
+                .set(1, 0, "library10")
+                .set(0, 1, "library01")
+                .set(1, 1, "library11"));
+        MULTI_BUILDINGS.register(new MultiBuilding("center", 2, 2)
+                .set(0, 0, "center00")
+                .set(1, 0, "center10")
+                .set(0, 1, "center01")
+                .set(1, 1, "center11"));
+        MULTI_BUILDINGS.register(new MultiBuilding("multi1", 2, 2)
+                .set(0, 0, "building1")
+                .set(1, 0, "building1")
+                .set(0, 1, "building1")
+                .set(1, 1, "building1"));
+        MULTI_BUILDINGS.register(new MultiBuilding("multi2", 2, 2)
+                .set(0, 0, "building2")
+                .set(1, 0, "building2")
+                .set(0, 1, "building2")
+                .set(1, 1, "building2"));
+        MULTI_BUILDINGS.register(new MultiBuilding("multi3", 2, 2)
+                .set(0, 0, "building3")
+                .set(1, 0, "building3")
+                .set(0, 1, "building3")
+                .set(1, 1, "building3"));
+    }
+
+    private static void createParts() {
+        PARTS.register(FloorsData.BUILDING1_1);
+        PARTS.register(FloorsData.BUILDING1_2);
+        PARTS.register(FloorsData.BUILDING1_3);
+        PARTS.register(FloorsData.BUILDING1_4);
+        PARTS.register(FloorsData.BUILDING1_5);
+        PARTS.register(FloorsData.BUILDING1_6);
+        PARTS.register(FloorsData.BUILDING1_7);
+        PARTS.register(FloorsData.BUILDING1_8);
+        PARTS.register(FloorsData.BUILDING1_9);
+        PARTS.register(FloorsData.BUILDING2_1);
+        PARTS.register(FloorsData.BUILDING2_2);
+        PARTS.register(FloorsData.BUILDING2_3);
+        PARTS.register(FloorsData.BUILDING2_4);
+        PARTS.register(FloorsData.BUILDING3_1);
+        PARTS.register(FloorsData.BUILDING3_2);
+        PARTS.register(FloorsData.BUILDING3_3);
+        PARTS.register(FloorsData.BUILDING3_4);
+
+        PARTS.register(RoofTopsData.TOP1X1_1);
+        PARTS.register(RoofTopsData.TOP1X1_2);
+        PARTS.register(RoofTopsData.TOP1X1_3);
+        PARTS.register(RoofTopsData.TOP1X1_4);
+
+        PARTS.register(LibraryData.LIBRARY00_1);
+        PARTS.register(LibraryData.LIBRARY01_1);
+        PARTS.register(LibraryData.LIBRARY01_2);
+        PARTS.register(LibraryData.LIBRARY01_3);
+        PARTS.register(LibraryData.LIBRARY10_1);
+        PARTS.register(LibraryData.LIBRARY10_2);
+        PARTS.register(LibraryData.LIBRARY10_3);
+        PARTS.register(LibraryData.LIBRARY10_4);
+        PARTS.register(LibraryData.LIBRARY10_5);
+        PARTS.register(LibraryData.LIBRARY11_1);
+        PARTS.register(LibraryData.LIBRARY11_2);
+        PARTS.register(LibraryData.TOP_LIBRARY00_1);
+        PARTS.register(LibraryData.TOP_LIBRARY00_2);
+        PARTS.register(LibraryData.TOP_LIBRARY_1);
+        PARTS.register(LibraryData.TOP_LIBRARY_2);
+        PARTS.register(LibraryData.TOP_LIBRARY_3);
+        PARTS.register(LibraryData.TOP_LIBRARY_4);
+
+        PARTS.register(DataCenterData.CENTER00_1);
+        PARTS.register(DataCenterData.CENTER00_2);
+        PARTS.register(DataCenterData.CENTER00_3);
+        PARTS.register(DataCenterData.CENTER01_1);
+        PARTS.register(DataCenterData.CENTER01_2);
+        PARTS.register(DataCenterData.CENTER10_1);
+        PARTS.register(DataCenterData.CENTER10_2);
+        PARTS.register(DataCenterData.CENTER10_3);
+        PARTS.register(DataCenterData.CENTER10_4);
+        PARTS.register(DataCenterData.CENTER11_1);
+        PARTS.register(DataCenterData.TOP_CENTER00_1);
+        PARTS.register(DataCenterData.TOP_CENTER00_2);
+        PARTS.register(DataCenterData.TOP_CENTER_1);
+        PARTS.register(DataCenterData.TOP_CENTER_2);
+        PARTS.register(DataCenterData.TOP_CENTER_3);
+        PARTS.register(DataCenterData.TOP_CENTER_4);
+    }
+
     private static void createDataCenter() {
         Building center00 = new Building("center00")
                 .addPart(levelInfo -> !levelInfo.isTopOfBuilding(), DataCenterData.CENTER00_1.getName())
                 .addPart(levelInfo -> !levelInfo.isTopOfBuilding(), DataCenterData.CENTER00_2.getName())
                 .addPart(levelInfo -> !levelInfo.isTopOfBuilding(), DataCenterData.CENTER00_3.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER00_1.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER00_2.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER00_2.getName())
+                .setPaletteName("default");
         AssetRegistries.BUILDINGS.register(center00);
 
         Building center01 = new Building("center01")
@@ -227,7 +292,8 @@ public class AssetRegistries {
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_2.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_3.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_4.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_4.getName())
+                .setPaletteName("default");
         AssetRegistries.BUILDINGS.register(center01);
 
         Building center10 = new Building("center10")
@@ -238,7 +304,8 @@ public class AssetRegistries {
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_2.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_3.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_4.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_4.getName())
+                .setPaletteName("default");
         AssetRegistries.BUILDINGS.register(center10);
 
         Building center11 = new Building("center11")
@@ -246,7 +313,8 @@ public class AssetRegistries {
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_2.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_3.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_4.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), DataCenterData.TOP_CENTER_4.getName())
+                .setPaletteName("default");
         AssetRegistries.BUILDINGS.register(center11);
     }
 
@@ -254,7 +322,8 @@ public class AssetRegistries {
         Building library00 = new Building("library00")
                 .addPart(levelInfo -> !levelInfo.isTopOfBuilding(), LibraryData.LIBRARY00_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY00_1.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY00_2.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY00_2.getName())
+                .setPaletteName("default");
         AssetRegistries.BUILDINGS.register(library00);
 
         Building library01 = new Building("library01")
@@ -264,7 +333,8 @@ public class AssetRegistries {
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_2.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_3.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_4.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_4.getName())
+                .setPaletteName("default");
         AssetRegistries.BUILDINGS.register(library01);
 
         Building library10 = new Building("library10")
@@ -276,7 +346,8 @@ public class AssetRegistries {
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_2.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_3.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_4.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_4.getName())
+                .setPaletteName("default");
         AssetRegistries.BUILDINGS.register(library10);
 
         Building library11 = new Building("library11")
@@ -285,7 +356,8 @@ public class AssetRegistries {
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_2.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_3.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_4.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), LibraryData.TOP_LIBRARY_4.getName())
+                .setPaletteName("default");
         AssetRegistries.BUILDINGS.register(library11);
     }
 
@@ -298,7 +370,8 @@ public class AssetRegistries {
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_2.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_3.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_4.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_4.getName())
+                .setPaletteName("default");
         BUILDINGS.register(building3);
     }
 
@@ -311,7 +384,8 @@ public class AssetRegistries {
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_2.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_3.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_4.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_4.getName())
+                .setPaletteName("default");
         BUILDINGS.register(building2);
     }
 
@@ -329,7 +403,8 @@ public class AssetRegistries {
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_1.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_2.getName())
                 .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_3.getName())
-                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_4.getName());
+                .addPart(levelInfo -> levelInfo.isTopOfBuilding(), RoofTopsData.TOP1X1_4.getName())
+                .setPaletteName("default");
         BUILDINGS.register(building1);
     }
 }

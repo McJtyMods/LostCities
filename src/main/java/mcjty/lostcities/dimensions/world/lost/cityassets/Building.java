@@ -13,6 +13,7 @@ public class Building implements IAsset {
 
     private final List<Pair<Predicate<LevelInfo>, String>> parts = new ArrayList<>();
     private final List<String> partNames = new ArrayList<>();
+    private String paletteName;
 
     public Building(String name) {
         this.name = name;
@@ -21,6 +22,15 @@ public class Building implements IAsset {
     @Override
     public String getName() {
         return name;
+    }
+
+    public String getPaletteName() {
+        return paletteName;
+    }
+
+    public Building setPaletteName(String paletteName) {
+        this.paletteName = paletteName;
+        return this;
     }
 
     public Building addPart(Predicate<LevelInfo> test, String partName) {

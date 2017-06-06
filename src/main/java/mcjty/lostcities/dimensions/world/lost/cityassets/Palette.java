@@ -6,16 +6,25 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 /**
  * A palette of materials as used by building parts
  */
-public class Palette {
+public class Palette implements IAsset {
+
+    private final String name;
+
+    public Palette(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 
     final Map<Character, Object> palette = new HashMap<>();
 
@@ -23,20 +32,23 @@ public class Palette {
         palette.put(c, function);
     }
 
-    public void addMapping(char c, IBlockState state) {
+    public Palette addMapping(char c, IBlockState state) {
         palette.put(c, state);
+        return this;
     }
 
-    public void addMapping(char c, Block block) {
+    public Palette addMapping(char c, Block block) {
         IBlockState state = block.getDefaultState();
         palette.put(c, state);
+        return this;
     }
 
-    public void addMapping(char c, String styledBlock) {
+    public Palette addMapping(char c, String styledBlock) {
         palette.put(c, styledBlock);
+        return this;
     }
 
-    public void addMappingViaState(char c, Pair<Float, IBlockState>... randomBlocks) {
+    public Palette addMappingViaState(char c, Pair<Float, IBlockState>... randomBlocks) {
         addFunctionMapping(c, info -> {
             float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
             for (Pair<Float, IBlockState> pair : randomBlocks) {
@@ -47,9 +59,10 @@ public class Palette {
             }
             return LostCitiesTerrainGenerator.air;
         });
+        return this;
     }
 
-    public void addMappingViaStyle(char c, Pair<Float, String>... randomBlocks) {
+    public Palette addMappingViaStyle(char c, Pair<Float, String>... randomBlocks) {
         addFunctionMapping(c, info -> {
             float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
             for (Pair<Float, String> pair : randomBlocks) {
@@ -60,14 +73,6 @@ public class Palette {
             }
             return LostCitiesTerrainGenerator.air;
         });
+        return this;
     }
-
-//    public IBlockState get(char c, BuildingInfo info) {
-//        try {
-//            return palette.get(c).apply(info);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
 }

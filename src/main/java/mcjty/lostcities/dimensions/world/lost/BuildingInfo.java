@@ -7,7 +7,7 @@ import mcjty.lostcities.dimensions.world.lost.data.BridgeData;
 import mcjty.lostcities.dimensions.world.lost.data.FountainData;
 import mcjty.lostcities.dimensions.world.lost.data.ParkData;
 import mcjty.lostcities.varia.QualityRandom;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -62,9 +62,13 @@ public class BuildingInfo {
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
 
+    public Palette getPalette() {
+        return AssetRegistries.PALETTES.get(buildingType.getPaletteName());
+    }
+
     public CompiledPalette getCompiledPalette() {
         if (compiledPalette == null) {
-            compiledPalette = new CompiledPalette(getStyle(), LostCitiesTerrainGenerator.getPalette());
+            compiledPalette = new CompiledPalette(getStyle(), getPalette());
         }
         return compiledPalette;
     }
