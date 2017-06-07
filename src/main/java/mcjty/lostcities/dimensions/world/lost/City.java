@@ -4,6 +4,7 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CityStyle;
+import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 
@@ -32,6 +33,29 @@ public class City {
     public static CityStyle getCityStyle(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         return AssetRegistries.CITYSTYLES.get("standard");  // @todo
     }
+
+    // Call this only for a valid city center (isCityCenter for these parameters returns true)
+//    public static int getCityLevel(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+//        float r = getCityRadius(seed, chunkX, chunkZ);
+//        int offset = (int) ((r+15) / 16);
+//        float minheight = 1000000;
+//        float maxheight = -1000000;
+//        int centerX = chunkX * 16 + 8;
+//        int centerZ = chunkZ * 16 + 8;
+//        float sqr = r*r;
+//        for (int cx = chunkX - offset ; cx <= chunkX + offset ; cx++) {
+//            for (int cz = chunkZ - offset ; cz <= chunkZ + offset ; cz++) {
+//                GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(cx * 16, cz * 16, cx * 16 + 15, cz * 16 + 15);
+//                double sq = GeometryTools.squaredDistanceBoxPoint(box, centerX, centerZ);
+//                if (sq < sqr) {
+//                    Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (cx - 1) * 4 - 2, cz * 4 - 2, 10, 10);
+//                    for (Biome biome : biomes) {
+//                        biome.getBaseHeight()
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     public static float getCityFactor(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         float factor = 0;

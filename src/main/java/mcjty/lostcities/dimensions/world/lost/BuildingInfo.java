@@ -6,11 +6,16 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.QualityRandom;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import static mcjty.lostcities.dimensions.world.lost.BuildingInfo.Orientation.X;
+import static mcjty.lostcities.dimensions.world.lost.BuildingInfo.Orientation.Z;
 
 public class BuildingInfo {
     public final int chunkX;
@@ -34,6 +39,8 @@ public class BuildingInfo {
     public final boolean[] connectionAtX;
     public final boolean[] connectionAtZ;
 
+    public final int cityLevel;         // The first floor of buildings starts at groundLevel + cityLevel * 6
+
     public final boolean xBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
     public final boolean zBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
 
@@ -52,6 +59,58 @@ public class BuildingInfo {
     private Palette palette = null;
     private CompiledPalette compiledPalette = null;
 
+    public enum Direction {
+        XMIN(X),
+        XMAX(X),
+        ZMIN(Z),
+        ZMAX(Z);
+
+        private final Orientation orientation;
+
+        Direction(Orientation orientation) {
+            this.orientation = orientation;
+        }
+
+        public Orientation getOrientation() {
+            return orientation;
+        }
+
+        @Nonnull
+        public BuildingInfo get(BuildingInfo info) {
+            switch (this) {
+                case XMIN:
+                    return info.getXmin();
+                case XMAX:
+                    return info.getXmax();
+                case ZMIN:
+                    return info.getZmin();
+                case ZMAX:
+                    return info.getZmax();
+            }
+            throw new IllegalStateException("Cannot happen!");
+        }
+    }
+
+    public enum Orientation {
+        X(Direction.XMIN, Direction.XMAX),
+        Z(Direction.ZMIN, Direction.ZMAX);
+
+        private final Direction minDir;
+        private final Direction maxDir;
+
+        Orientation(Direction minDir, Direction maxDir) {
+            this.minDir = minDir;
+            this.maxDir = maxDir;
+        }
+
+        public Direction getMinDir() {
+            return minDir;
+        }
+
+        public Direction getMaxDir() {
+            return maxDir;
+        }
+    }
 
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
@@ -131,7 +190,11 @@ public class BuildingInfo {
     }
 
     public int getMaxHeight() {
-        return hasBuilding ? (LostCityConfiguration.GROUNDLEVEL + floors * 6) : LostCityConfiguration.GROUNDLEVEL;
+        return hasBuilding ? (getCityGroundLevel() + floors * 6) : getCityGroundLevel();
+    }
+
+    public int getCityGroundLevel() {
+        return LostCityConfiguration.GROUNDLEVEL + cityLevel * 6;
     }
 
     public int getNumFloors() {
@@ -257,6 +320,7 @@ public class BuildingInfo {
             } else {
                 buildingType = topleft.buildingType;
             }
+            cityLevel = topleft.cityLevel;
             streetType = topleft.streetType;
             fountainType = topleft.fountainType;
             parkType = topleft.parkType;
@@ -274,6 +338,22 @@ public class BuildingInfo {
                 multiBuilding = null;
                 buildingType = AssetRegistries.BUILDINGS.get(getCityStyle().getRandomBuilding(provider, rand));
             }
+
+            // @todo: average out nearby biomes?
+            Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+            float height = 0.0f;
+            for (Biome biome : biomes) {
+                height += biome.getBaseHeight();
+            }
+            height /= biomes.length;
+            if (height < 0.3f) {
+                cityLevel = 0;
+            } else if (height < 0.6f) {
+                cityLevel = 1;
+            } else {
+                cityLevel = 2;
+            }
+
             if (rand.nextDouble() < .2f) {
                 streetType = StreetType.values()[rand.nextInt(StreetType.values().length)];
             } else {
@@ -380,6 +460,16 @@ public class BuildingInfo {
         cnt += getXmax().getZmin().isStreetSection() ? 1 : 0;
         cnt += getXmax().getZmax().isStreetSection() ? 1 : 0;
         return cnt >= 3;
+    }
+
+    public BuildingPart hasBridge(LostCityChunkGenerator provider, Orientation orientation) {
+        switch (orientation) {
+            case X:
+                return hasXBridge(provider);
+            case Z:
+                return hasZBridge(provider);
+        }
+        return null;
     }
 
     public BuildingPart hasXBridge(LostCityChunkGenerator provider) {
@@ -513,6 +603,21 @@ public class BuildingInfo {
         boolean b = isCity && !hasBuilding;
         if (b) {
             return !isElevatedParkSection();
+        }
+        return false;
+    }
+
+    // Return true if there can be a road connection between the two given chunks
+    public static boolean hasRoadConnection(BuildingInfo i1, BuildingInfo i2) {
+        if (!i1.doesRoadExtendTo()) {
+            return false;
+        }
+        if (!i2.doesRoadExtendTo()) {
+            return false;
+        }
+        if (Math.abs(i1.cityLevel-i2.cityLevel) <= 0 /* @todo temporary, should be <= 1 */ ) {
+            // We allow a road difference of 1 maximum
+            return true;
         }
         return false;
     }

@@ -41,7 +41,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         int cz = chunkZ * 16;
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, world.getSeed(), chunkGenerator);
 
-        int bottom = Math.max(LostCityConfiguration.GROUNDLEVEL + 3, info.hasBuilding ? info.getMaxHeight() : (LostCityConfiguration.GROUNDLEVEL + 3));
+        int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? info.getMaxHeight() : (info.getCityGroundLevel() + 3));
 
         if (info.getXmin().hasBuilding) {
             if (info.getXmin().getDamageArea().getDamageFactor() < .4f) {
@@ -107,14 +107,14 @@ public class LostCityWorldGenerator implements IWorldGenerator {
             buildingtop = info.getMaxHeight();
         }
 
-        int height = LostCityConfiguration.GROUNDLEVEL - info.floorsBelowGround * 6;
+        int height = info.getCityGroundLevel() - info.floorsBelowGround * 6;
 
 
         while (height < buildingtop) {
             int f = LostCitiesTerrainGenerator.getFloor(height);
             if (f == 0) {
                 BlockPos floorpos = new BlockPos(chunkX * 16, height, chunkZ * 16);
-                BuildingPart partName = info.floorTypes[LostCitiesTerrainGenerator.getLevel(height) + info.floorsBelowGround];
+                BuildingPart partName = info.floorTypes[LostCitiesTerrainGenerator.getLevel(info, height) + info.floorsBelowGround];
                 GenInfo getInfo = LostCitiesTerrainGenerator.getGenInfos().get(partName.getName());
                 for (BlockPos p : getInfo.getChest()) {
                     BlockPos pos = floorpos.add(p);
