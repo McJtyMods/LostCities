@@ -5,7 +5,6 @@ import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.dimensions.world.lost.data.BridgeData;
 import mcjty.lostcities.dimensions.world.lost.data.FountainData;
-import mcjty.lostcities.dimensions.world.lost.data.ParkData;
 import mcjty.lostcities.varia.QualityRandom;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -28,7 +27,7 @@ public class BuildingInfo {
     public final MultiBuilding multiBuilding;
     public final Building buildingType;
     public final int fountainType;
-    public final int parkType;
+    public final BuildingPart parkType;
     public final int bridgeType;
     public final StreetType streetType;
     private final int floors;
@@ -296,7 +295,7 @@ public class BuildingInfo {
             } else {
                 fountainType = -1;
             }
-            parkType = rand.nextInt(ParkData.PARKS.length);
+            parkType = AssetRegistries.PARTS.get(getCityStyle().getRandomPark(provider, rand));
             int f = LostCityConfiguration.BUILDING_MINFLOORS + rand.nextInt((int) (LostCityConfiguration.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (LostCityConfiguration.BUILDING_MAXFLOORS_CHANCE - LostCityConfiguration.BUILDING_MINFLOORS_CHANCE)));
             if (f > LostCityConfiguration.BUILDING_MAXFLOORS) {
                 f = LostCityConfiguration.BUILDING_MAXFLOORS;
