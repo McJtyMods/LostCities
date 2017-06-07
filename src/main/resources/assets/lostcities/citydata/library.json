@@ -1,6 +1,50 @@
 [
   {
     "type": "style",
+    "name": "glass_side_glass",
+    "blocks": [
+      {
+        "name": "glass_or_brick",
+        "style": "glass"
+      }
+    ],
+    "ironbars": []
+  },
+  {
+    "type": "style",
+    "name": "glass_side_street",
+    "blocks": [
+      {
+        "name": "glass_or_brick",
+        "style": "street"
+      }
+    ],
+    "ironbars": []
+  },
+  {
+    "type": "style",
+    "name": "glass_side_bricks",
+    "blocks": [
+      {
+        "name": "glass_or_brick",
+        "style": "bricks"
+      }
+    ],
+    "ironbars": []
+  },
+  {
+    "type": "style",
+    "name": "glass_side_quartz",
+    "blocks": [
+      {
+        "name": "glass_or_brick",
+        "style": "quartz"
+      }
+    ],
+    "ironbars": []
+  },
+  {
+    "type": "style",
     "name": "bricks",
     "blocks": [
       {
@@ -521,6 +565,24 @@
         {
           "factor": 1.0,
           "style": "bricks_silver"
+        }
+      ],
+      [
+        {
+          "factor": 1.0,
+          "style": "glass_side_glass"
+        },
+        {
+          "factor": 1.0,
+          "style": "glass_side_street"
+        },
+        {
+          "factor": 1.0,
+          "style": "glass_side_bricks"
+        },
+        {
+          "factor": 1.0,
+          "style": "glass_side_quartz"
         }
       ],
       [

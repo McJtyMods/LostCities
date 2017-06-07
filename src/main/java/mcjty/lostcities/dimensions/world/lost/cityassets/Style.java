@@ -22,6 +22,7 @@ public class Style implements IAsset {
     private String name;
 
     private Map<String, IBlockState> styledBlocks = new HashMap<>();
+    private Map<String, String> styledBlocksViaStyle = new HashMap<>();
     private Set<IBlockState> damagedToIronBars = new HashSet<>();
 
     public Style(String name) {
@@ -37,15 +38,21 @@ public class Style implements IAsset {
         name = object.get("name").getAsString();
         JsonArray blocksArray = object.get("blocks").getAsJsonArray();
         for (JsonElement element : blocksArray) {
-            String n = element.getAsJsonObject().get("name").getAsString();
-            String block = element.getAsJsonObject().get("block").getAsString();
-            int meta = element.getAsJsonObject().get("meta").getAsInt();
-            Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block));
-            if (value == null) {
-                // @todo
-                throw new RuntimeException("Cannot find block '" + block + "'!");
+            JsonObject ob = element.getAsJsonObject();
+            String n = ob.get("name").getAsString();
+            if (ob.has("block")) {
+                String block = ob.get("block").getAsString();
+                int meta = ob.get("meta").getAsInt();
+                Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block));
+                if (value == null) {
+                    // @todo
+                    throw new RuntimeException("Cannot find block '" + block + "'!");
+                }
+                styledBlocks.put(n, value.getStateFromMeta(meta));
+            } else {
+                String style = ob.get("style").getAsString();
+                styledBlocksViaStyle.put(n, style);
             }
-            styledBlocks.put(n, value.getStateFromMeta(meta));
         }
 
         JsonArray ironArray = object.get("ironbars").getAsJsonArray();
@@ -74,6 +81,12 @@ public class Style implements IAsset {
             o.add("meta", new JsonPrimitive(entry.getValue().getBlock().getMetaFromState(entry.getValue())));
             array.add(o);
         }
+        for (Map.Entry<String, String> entry : styledBlocksViaStyle.entrySet()) {
+            JsonObject o = new JsonObject();
+            o.add("name", new JsonPrimitive(entry.getKey()));
+            o.add("style", new JsonPrimitive(entry.getValue()));
+            array.add(o);
+        }
         object.add("blocks", array);
 
         array = new JsonArray();
@@ -97,6 +110,22 @@ public class Style implements IAsset {
     public void merge(Style style) {
         styledBlocks.putAll(style.styledBlocks);
         damagedToIronBars.addAll(style.damagedToIronBars);
+        styledBlocksViaStyle.putAll(style.styledBlocksViaStyle);
+    }
+
+    public void resolveStyles() {
+        boolean work = true;
+        while (work) {
+            work = false;
+            for (Map.Entry<String, String> entry : new HashMap<>(styledBlocksViaStyle).entrySet()) {
+                if (styledBlocks.containsKey(entry.getValue())) {
+                    IBlockState state = styledBlocks.get(entry.getValue());
+                    styledBlocks.put(entry.getKey(), state);
+                    styledBlocksViaStyle.remove(entry.getKey());
+                    work = true;
+                }
+            }
+        }
     }
 
     @Override

@@ -36,9 +36,6 @@ public class BuildingInfo {
     public final BuildingPart[] floorTypes;
     public final boolean[] connectionAtX;
     public final boolean[] connectionAtZ;
-    public final int glassType;
-    public final int glassColor;
-    public final int buildingStyle;
 
     public final boolean xBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
     public final boolean zBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
@@ -95,23 +92,7 @@ public class BuildingInfo {
                     AssetRegistries.STYLES.get("glass"));
         } else {
             style = getCityStyle().getRandomStyle(provider, rand);
-            switch (glassType) {
-                case 0:
-                    style.register("glass_or_brick", style.get("glass"));
-                    break;
-                case 1:
-                    style.register("glass_or_brick", style.get("street"), true);
-                    break;
-                case 2:
-                    style.register("glass_or_brick", style.get("street"), true);
-                    break;
-                case 3:
-                    style.register("glass_or_brick", style.get("quartz"), true);
-                    break;
-                default:
-                    style.register("glass_or_brick", style.get("glass"));
-                    break;
-            }
+            style.resolveStyles();
         }
     }
 
@@ -294,9 +275,6 @@ public class BuildingInfo {
             parkType = topleft.parkType;
             floors = topleft.floors;
             floorsBelowGround = topleft.floorsBelowGround;
-            glassType = topleft.glassType;
-            glassColor = topleft.glassColor;
-            buildingStyle = topleft.buildingStyle;
             doorBlock = topleft.doorBlock;
             bridgeType = topleft.bridgeType;
             style = topleft.getStyle();
@@ -325,9 +303,6 @@ public class BuildingInfo {
             }
             floors = f + 1;
             floorsBelowGround = LostCityConfiguration.BUILDING_MINCELLARS + (LostCityConfiguration.BUILDING_MAXCELLARS <= 0 ? 0 : rand.nextInt(LostCityConfiguration.BUILDING_MAXCELLARS));
-            glassType = rand.nextInt(4);
-            glassColor = rand.nextInt(5 + 5);
-            buildingStyle = rand.nextInt(4);
             doorBlock = getRandomDoor(rand);
             bridgeType = rand.nextInt(BridgeData.BRIDGES.length);
             createStyle(rand);
