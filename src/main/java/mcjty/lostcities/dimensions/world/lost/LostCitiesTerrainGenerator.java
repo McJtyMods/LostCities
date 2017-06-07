@@ -9,8 +9,6 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Building;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Style;
-import mcjty.lostcities.dimensions.world.lost.data.BridgeData;
-import mcjty.lostcities.dimensions.world.lost.data.Level;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
@@ -195,20 +193,19 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateBridges(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
-        int bt = info.hasXBridge(provider);
-        if (bt >= 0) {
+        BuildingPart bt = info.hasXBridge(provider);
+        if (bt != null) {
             int cx = chunkX * 16;
             int cz = chunkZ * 16;
             DamageArea damageArea = info.getDamageArea();
             Style style = info.getStyle();
-            Level level = BridgeData.BRIDGES[bt];
             for (int x = 0 ; x < 16 ; x++) {
                 for (int z = 0 ; z < 16 ; z++) {
                     int index = (x << 12) | (z << 8) + groundLevel + 1;
                     int height = groundLevel + 1;
                     int l = 0;
-                    while (l < level.getFloor().length) {
-                        IBlockState b = level.get(info, x, l, z);
+                    while (l < bt.getSliceCount()) {
+                        IBlockState b = bt.get(info, x, l, z);
                         b = damageArea.damageBlock(b, provider.rand, cx + x, height, cz + z, style);
                         BaseTerrainGenerator.setBlockState(primer, index++, b);
                         height++;
@@ -216,7 +213,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
                 }
             }
-            if (info.getXmin().hasXBridge(provider) >= 0 && info.getXmax().hasXBridge(provider) >= 0) {
+            if (info.getXmin().hasXBridge(provider) != null && info.getXmax().hasXBridge(provider) != null) {
                 // Needs support
                 for (int y = waterLevel-10 ; y <= groundLevel ; y++) {
                     setBridgeSupport(primer, cx, cz, damageArea, style, 7, y, 7);
@@ -225,7 +222,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     setBridgeSupport(primer, cx, cz, damageArea, style, 8, y, 8);
                 }
             }
-            if (info.getXmin().hasXBridge(provider) < 0) {
+            if (info.getXmin().hasXBridge(provider) == null) {
                 // Connection to the side section
                 int x = 0;
                 for (int z = 6 ; z <= 9 ; z++) {
@@ -234,7 +231,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     BaseTerrainGenerator.setBlockState(primer, index, b);
                 }
             }
-            if (info.getXmax().hasXBridge(provider) < 0) {
+            if (info.getXmax().hasXBridge(provider) == null) {
                 // Connection to the side section
                 int x = 15;
                 for (int z = 6 ; z <= 9 ; z++) {
@@ -245,19 +242,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         } else {
             bt = info.hasZBridge(provider);
-            if (bt >= 0) {
+            if (bt != null) {
                 int cx = chunkX * 16;
                 int cz = chunkZ * 16;
                 DamageArea damageArea = info.getDamageArea();
                 Style style = info.getStyle();
-                Level level = BridgeData.BRIDGES[bt];
                 for (int x = 0 ; x < 16 ; x++) {
                     for (int z = 0 ; z < 16 ; z++) {
                         int index = (x << 12) | (z << 8) + groundLevel + 1;
                         int height = groundLevel + 1;
                         int l = 0;
-                        while (l < level.getFloor().length) {
-                            IBlockState b = level.get(info, z, l, x);       // Swap x/z
+                        while (l < bt.getSliceCount()) {
+                            IBlockState b = bt.get(info, z, l, x);       // Swap x/z
                             b = damageArea.damageBlock(b, provider.rand, cx + x, height, cz + z, style);
                             BaseTerrainGenerator.setBlockState(primer, index++, b);
                             height++;
@@ -265,7 +261,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         }
                     }
                 }
-                if (info.getZmin().hasZBridge(provider) >= 0 && info.getZmax().hasZBridge(provider) >= 0) {
+                if (info.getZmin().hasZBridge(provider) != null && info.getZmax().hasZBridge(provider) != null) {
                     // Needs support
                     for (int y = waterLevel-10 ; y <= groundLevel ; y++) {
                         setBridgeSupport(primer, cx, cz, damageArea, style, 7, y, 7);
@@ -274,7 +270,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         setBridgeSupport(primer, cx, cz, damageArea, style, 8, y, 8);
                     }
                 }
-                if (info.getZmin().hasZBridge(provider) < 0) {
+                if (info.getZmin().hasZBridge(provider) == null) {
                     // Connection to the side section
                     int z = 0;
                     for (int x = 6 ; x <= 9 ; x++) {
@@ -283,7 +279,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         BaseTerrainGenerator.setBlockState(primer, index, b);
                     }
                 }
-                if (info.getZmax().hasZBridge(provider) < 0) {
+                if (info.getZmax().hasZBridge(provider) == null) {
                     // Connection to the side section
                     int z = 15;
                     for (int x = 6 ; x <= 9 ; x++) {
@@ -639,16 +635,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             case NORMAL:
                 if (isStreetBorder(x, z)) {
                     if (x <= STREETBORDER && z > STREETBORDER && z < (15 - STREETBORDER)
-                            && (info.getXmin().doesRoadExtendTo() || (info.getXmin().hasXBridge(provider) >= 0))) {
+                            && (info.getXmin().doesRoadExtendTo() || (info.getXmin().hasXBridge(provider) != null))) {
                         b = street;
                     } else if (x >= (15 - STREETBORDER) && z > STREETBORDER && z < (15 - STREETBORDER)
-                            && (info.getXmax().doesRoadExtendTo() || (info.getXmax().hasXBridge(provider) >= 0))) {
+                            && (info.getXmax().doesRoadExtendTo() || (info.getXmax().hasXBridge(provider) != null))) {
                         b = street;
                     } else if (z <= STREETBORDER && x > STREETBORDER && x < (15 - STREETBORDER)
-                            && (info.getZmin().doesRoadExtendTo() || (info.getZmin().hasZBridge(provider) >= 0))) {
+                            && (info.getZmin().doesRoadExtendTo() || (info.getZmin().hasZBridge(provider) != null))) {
                         b = street;
                     } else if (z >= (15 - STREETBORDER) && x > STREETBORDER && x < (15 - STREETBORDER)
-                            && (info.getZmax().doesRoadExtendTo() || (info.getZmax().hasZBridge(provider) >= 0))) {
+                            && (info.getZmax().doesRoadExtendTo() || (info.getZmax().hasZBridge(provider) != null))) {
                         b = street;
                     }
                 } else {
@@ -803,23 +799,23 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private boolean isDoOceanBorder(BuildingInfo info, int chunkX, int chunkZ, int x, int z) {
-        if (x == 0 && !info.getXmin().isCity && info.getXmin().hasXBridge(provider) < 0) {
+        if (x == 0 && !info.getXmin().isCity && info.getXmin().hasXBridge(provider) == null) {
             Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
             if (isOcean(biomes)) {
                 return true;
             }
-        } else if (x == 15 && !info.getXmax().isCity && info.getXmax().hasXBridge(provider) < 0) {
+        } else if (x == 15 && !info.getXmax().isCity && info.getXmax().hasXBridge(provider) == null) {
             Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX + 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
             if (isOcean(biomes)) {
                 return true;
             }
         }
-        if (z == 0 && !info.getZmin().isCity && info.getZmin().hasZBridge(provider) < 0) {
+        if (z == 0 && !info.getZmin().isCity && info.getZmin().hasZBridge(provider) == null) {
             Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, chunkX * 4 - 2, (chunkZ - 1) * 4 - 2, 10, 10);
             if (isOcean(biomes)) {
                 return true;
             }
-        } else if (z == 15 && !info.getZmax().isCity && info.getZmax().hasZBridge(provider) < 0) {
+        } else if (z == 15 && !info.getZmax().isCity && info.getZmax().hasZBridge(provider) == null) {
             Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, chunkX * 4 - 2, (chunkZ + 1) * 4 - 2, 10, 10);
             if (isOcean(biomes)) {
                 return true;

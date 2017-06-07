@@ -3,8 +3,6 @@ package mcjty.lostcities.dimensions.world.lost;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
-import mcjty.lostcities.dimensions.world.lost.data.BridgeData;
-import mcjty.lostcities.dimensions.world.lost.data.FountainData;
 import mcjty.lostcities.varia.QualityRandom;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -28,7 +26,7 @@ public class BuildingInfo {
     public final Building buildingType;
     public final BuildingPart fountainType;
     public final BuildingPart parkType;
-    public final int bridgeType;
+    public final BuildingPart bridgeType;
     public final StreetType streetType;
     private final int floors;
     public final int floorsBelowGround;
@@ -303,7 +301,7 @@ public class BuildingInfo {
             floors = f + 1;
             floorsBelowGround = LostCityConfiguration.BUILDING_MINCELLARS + (LostCityConfiguration.BUILDING_MAXCELLARS <= 0 ? 0 : rand.nextInt(LostCityConfiguration.BUILDING_MAXCELLARS));
             doorBlock = getRandomDoor(rand);
-            bridgeType = rand.nextInt(BridgeData.BRIDGES.length);
+            bridgeType = AssetRegistries.PARTS.get(getCityStyle().getRandomBridge(provider, rand));
             createStyle(rand);
         }
 
@@ -393,64 +391,64 @@ public class BuildingInfo {
         return cnt >= 3;
     }
 
-    public int hasXBridge(LostCityChunkGenerator provider) {
+    public BuildingPart hasXBridge(LostCityChunkGenerator provider) {
         if (!xBridge) {
-            return -1;
+            return null;
         }
         if (!LostCitiesTerrainGenerator.isWaterBiome(provider, chunkX, chunkZ)) {
-            return -1;
+            return null;
         }
-        int bt = bridgeType;
+        BuildingPart bt = bridgeType;
         BuildingInfo i = getXmin();
         while ((!i.isCity) && i.xBridge && LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ)) {
             bt = i.bridgeType;
             i = i.getXmin();
         }
         if ((!i.isCity) || i.hasBuilding) {
-            return -1;
+            return null;
         }
         i = getXmax();
         while ((!i.isCity) && i.xBridge && LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ)) {
             i = i.getXmax();
         }
         if ((!i.isCity) || i.hasBuilding) {
-            return -1;
+            return null;
         }
         return bt;
     }
 
-    public int hasZBridge(LostCityChunkGenerator provider) {
+    public BuildingPart hasZBridge(LostCityChunkGenerator provider) {
         if (!zBridge) {
-            return -1;
+            return null;
         }
         if (!LostCitiesTerrainGenerator.isWaterBiome(provider, chunkX, chunkZ)) {
-            return -1;
+            return null;
         }
-        if (hasXBridge(provider) >= 0) {
-            return -1;
+        if (hasXBridge(provider) != null) {
+            return null;
         }
 
-        int bt = bridgeType;
+        BuildingPart bt = bridgeType;
         BuildingInfo i = getZmin();
         while ((!i.isCity) && i.zBridge && LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ)) {
-            if (i.hasXBridge(provider) >= 0) {
-                return -1;
+            if (i.hasXBridge(provider) != null) {
+                return null;
             }
             bt = i.bridgeType;
             i = i.getZmin();
         }
         if ((!i.isCity) || i.hasBuilding) {
-            return -1;
+            return null;
         }
         i = getZmax();
         while ((!i.isCity) && i.zBridge && LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ)) {
-            if (i.hasXBridge(provider) >= 0) {
-                return -1;
+            if (i.hasXBridge(provider) != null) {
+                return null;
             }
             i = i.getZmax();
         }
         if ((!i.isCity) || i.hasBuilding) {
-            return -1;
+            return null;
         }
         return bt;
     }

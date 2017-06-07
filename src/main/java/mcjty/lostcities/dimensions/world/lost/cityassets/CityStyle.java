@@ -17,6 +17,7 @@ public class CityStyle implements IAsset {
     private String name;
 
     private final List<Pair<Float, String>> buildingSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> bridgeSelector = new ArrayList<>();
     private final List<Pair<Float, String>> parkSelector = new ArrayList<>();
     private final List<Pair<Float, String>> fountainSelector = new ArrayList<>();
     private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
@@ -61,6 +62,12 @@ public class CityStyle implements IAsset {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
             String fountain = element.getAsJsonObject().get("fountain").getAsString();
             fountainSelector.add(Pair.of(factor, fountain));
+        }
+        array = object.get("bridges").getAsJsonArray();
+        for (JsonElement element : array) {
+            float factor = element.getAsJsonObject().get("factor").getAsFloat();
+            String fountain = element.getAsJsonObject().get("bridge").getAsString();
+            bridgeSelector.add(Pair.of(factor, fountain));
         }
         array = object.get("randomstylechoices").getAsJsonArray();
         for (JsonElement element : array) {
@@ -117,6 +124,15 @@ public class CityStyle implements IAsset {
         object.add("fountains", array);
 
         array = new JsonArray();
+        for (Pair<Float, String> pair : bridgeSelector) {
+            JsonObject o = new JsonObject();
+            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("bridge", new JsonPrimitive(pair.getValue()));
+            array.add(o);
+        }
+        object.add("bridges", array);
+
+        array = new JsonArray();
         for (List<Pair<Float, String>> list : randomStyleChoices) {
             JsonArray a = new JsonArray();
             for (Pair<Float, String> pair : list) {
@@ -130,16 +146,6 @@ public class CityStyle implements IAsset {
         object.add("randomstylechoices", array);
 
         return object;
-    }
-
-    public CityStyle addPark(float factor, String park) {
-        parkSelector.add(Pair.of(factor, park));
-        return this;
-    }
-
-    public CityStyle addFountain(float factor, String fountain) {
-        fountainSelector.add(Pair.of(factor, fountain));
-        return this;
     }
 
     public CityStyle addBuilding(float factor, String building) {
@@ -191,6 +197,23 @@ public class CityStyle implements IAsset {
         }
         float r = random.nextFloat() * totalweight;
         for (Pair<Float, String> pair : parks) {
+            r -= pair.getKey();
+            if (r <= 0) {
+                return pair.getRight();
+            }
+        }
+        return null;
+    }
+
+    public String getRandomBridge(LostCityChunkGenerator provider, Random random) {
+        List<Pair<Float, String>> bridges = new ArrayList<>();
+        float totalweight = 0;
+        for (Pair<Float, String> pair : bridgeSelector) {
+            bridges.add(pair);
+            totalweight += pair.getKey();
+        }
+        float r = random.nextFloat() * totalweight;
+        for (Pair<Float, String> pair : bridges) {
             r -= pair.getKey();
             if (r <= 0) {
                 return pair.getRight();
