@@ -54,6 +54,11 @@ public class LostCityConfiguration {
     public static String[] CITY_BIOME_FACTORS = new String[] { "river=0", "frozen_river=0", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.4" };
     public static Map<String, Float> biomeFactorMap = null;
 
+    public static String[] ASSETS = new String[] {
+            "/assets/lostcities/citydata/library.json",
+            "$lostcities/userassets.json"
+    };
+
     public static float BUILDING_CHANCE = .3f;
     public static int BUILDING_MINFLOORS = 0;
     public static int BUILDING_MAXFLOORS = 9;
@@ -112,6 +117,9 @@ public class LostCityConfiguration {
     }
 
     private static void initLostcity(Configuration cfg) {
+        ASSETS = cfg.getStringList("assets", CATEGORY_CITIES, ASSETS, "List of asset libraries loaded in the specified order. " +
+            "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded form the config directory");
+
         STYLE_CHANCE_CRACKED = cfg.getFloat("styleChanceCracked", CATEGORY_LOSTCITY, STYLE_CHANCE_CRACKED, 0.0f, 1.0f, "The chance that a brick will be cracked");
         STYLE_CHANCE_MOSSY = cfg.getFloat("styleChanceMossy", CATEGORY_LOSTCITY, STYLE_CHANCE_MOSSY, 0.0f, 1.0f, "The chance that a brick will be mossy");
 

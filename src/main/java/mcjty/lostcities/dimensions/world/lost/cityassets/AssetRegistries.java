@@ -3,11 +3,9 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import mcjty.lostcities.LostCities;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 public class AssetRegistries {
 
@@ -28,10 +26,17 @@ public class AssetRegistries {
         PALETTES.reset();
     }
 
+    public static void load(File file) {
+        try {
+            load(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            // Not an error
+        }
+    }
+
     public static void load(InputStream inputstream) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, "UTF-8"));
-            reset();
             System.out.println("AssetRegistries.load");
             JsonParser parser = new JsonParser();
             JsonElement element = parser.parse(br);

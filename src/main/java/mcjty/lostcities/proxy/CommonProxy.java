@@ -27,11 +27,18 @@ public abstract class CommonProxy {
         mainConfig = new Configuration(new File(modConfigDir.getPath(), "lostcities.cfg"));
         readMainConfig();
 
-//        SimpleNetworkWrapper network = PacketHandler.registerMessages(LostCities.MODID, "lostcities");
-//        RFToolsDimMessages.registerNetworkMessages(network);
-//        AssetRegistries.init();
-        InputStream inputstream = LostCities.class.getResourceAsStream("/assets/lostcities/citydata/library.json");
-        AssetRegistries.load(inputstream);
+        AssetRegistries.reset();
+        for (String path : LostCityConfiguration.ASSETS) {
+            if (path.startsWith("/")) {
+                InputStream inputstream = LostCities.class.getResourceAsStream(path);
+                AssetRegistries.load(inputstream);
+            } else if (path.startsWith("$")) {
+                File file = new File(modConfigDir.getPath() + File.separator + path.substring(1));
+                AssetRegistries.load(file);
+            } else {
+                throw new RuntimeException("Invalid path for lostcity resource in 'assets' config!");
+            }
+        }
         ModDimensions.init();
     }
 
