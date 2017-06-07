@@ -1,517 +1,8 @@
 [
   {
-    "type": "style",
-    "name": "glass_side_glass",
-    "blocks": [
-      {
-        "name": "glass_or_brick",
-        "style": "glass"
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_side_street",
-    "blocks": [
-      {
-        "name": "glass_or_brick",
-        "style": "street"
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_side_bricks",
-    "blocks": [
-      {
-        "name": "glass_or_brick",
-        "style": "bricks"
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_side_quartz",
-    "blocks": [
-      {
-        "name": "glass_or_brick",
-        "style": "quartz"
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "bricks",
-    "blocks": [
-      {
-        "name": "bricks",
-        "block": "minecraft:stonebrick",
-        "meta": 0
-      },
-      {
-        "name": "bricks_mossy",
-        "block": "minecraft:stonebrick",
-        "meta": 1
-      },
-      {
-        "name": "bricks_variant",
-        "block": "minecraft:double_stone_slab",
-        "meta": 0
-      },
-      {
-        "name": "bricks_cracked",
-        "block": "minecraft:stonebrick",
-        "meta": 2
-      },
-      {
-        "name": "quartz",
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      },
-      {
-        "name": "bricks_monster",
-        "block": "minecraft:monster_egg",
-        "meta": 2
-      }
-    ],
-    "ironbars": [
-      {
-        "block": "minecraft:stonebrick",
-        "meta": 0
-      },
-      {
-        "block": "minecraft:stonebrick",
-        "meta": 2
-      },
-      {
-        "block": "minecraft:double_stone_slab",
-        "meta": 0
-      },
-      {
-        "block": "minecraft:stonebrick",
-        "meta": 1
-      },
-      {
-        "block": "minecraft:monster_egg",
-        "meta": 2
-      },
-      {
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      }
-    ]
-  },
-  {
-    "type": "style",
-    "name": "glass",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:glass",
-        "meta": 0
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:glass",
-        "meta": 0
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_pane_white",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:stained_glass",
-        "meta": 0
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:stained_glass_pane",
-        "meta": 0
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_pane_gray",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:stained_glass",
-        "meta": 7
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:stained_glass_pane",
-        "meta": 7
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_blue",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:stained_glass",
-        "meta": 11
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:stained_glass",
-        "meta": 11
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_gray",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:stained_glass",
-        "meta": 7
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:stained_glass",
-        "meta": 7
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_pane_blue",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:stained_glass",
-        "meta": 11
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:stained_glass_pane",
-        "meta": 11
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "outside",
-    "blocks": [
-      {
-        "name": "bricks",
-        "block": "minecraft:stonebrick",
-        "meta": 0
-      },
-      {
-        "name": "bricks_mossy",
-        "block": "minecraft:stonebrick",
-        "meta": 1
-      },
-      {
-        "name": "bricks_variant",
-        "block": "minecraft:double_stone_slab",
-        "meta": 0
-      },
-      {
-        "name": "bricks_cracked",
-        "block": "minecraft:stonebrick",
-        "meta": 2
-      },
-      {
-        "name": "quartz",
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      },
-      {
-        "name": "bricks_monster",
-        "block": "minecraft:stonebrick",
-        "meta": 0
-      }
-    ],
-    "ironbars": [
-      {
-        "block": "minecraft:stonebrick",
-        "meta": 0
-      },
-      {
-        "block": "minecraft:stonebrick",
-        "meta": 2
-      },
-      {
-        "block": "minecraft:double_stone_slab",
-        "meta": 0
-      },
-      {
-        "block": "minecraft:stonebrick",
-        "meta": 1
-      },
-      {
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      }
-    ]
-  },
-  {
-    "type": "style",
-    "name": "street",
-    "blocks": [
-      {
-        "name": "street",
-        "block": "minecraft:double_stone_slab",
-        "meta": 0
-      },
-      {
-        "name": "street2",
-        "block": "minecraft:brick_block",
-        "meta": 0
-      }
-    ],
-    "ironbars": [
-      {
-        "block": "minecraft:brick_block",
-        "meta": 0
-      },
-      {
-        "block": "minecraft:double_stone_slab",
-        "meta": 0
-      }
-    ]
-  },
-  {
-    "type": "style",
-    "name": "bricks_cyan",
-    "blocks": [
-      {
-        "name": "bricks",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 9
-      },
-      {
-        "name": "bricks_mossy",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 9
-      },
-      {
-        "name": "bricks_variant",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 15
-      },
-      {
-        "name": "bricks_cracked",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 9
-      },
-      {
-        "name": "quartz",
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      },
-      {
-        "name": "bricks_monster",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 9
-      }
-    ],
-    "ironbars": [
-      {
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 9
-      },
-      {
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 15
-      },
-      {
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      }
-    ]
-  },
-  {
-    "type": "style",
-    "name": "bricks_gray",
-    "blocks": [
-      {
-        "name": "bricks",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 7
-      },
-      {
-        "name": "bricks_mossy",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 7
-      },
-      {
-        "name": "bricks_variant",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 15
-      },
-      {
-        "name": "bricks_cracked",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 7
-      },
-      {
-        "name": "quartz",
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      },
-      {
-        "name": "bricks_monster",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 7
-      }
-    ],
-    "ironbars": [
-      {
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 7
-      },
-      {
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 15
-      },
-      {
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      }
-    ]
-  },
-  {
-    "type": "style",
-    "name": "bricks_silver",
-    "blocks": [
-      {
-        "name": "bricks",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 8
-      },
-      {
-        "name": "bricks_mossy",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 8
-      },
-      {
-        "name": "bricks_variant",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 12
-      },
-      {
-        "name": "bricks_cracked",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 8
-      },
-      {
-        "name": "quartz",
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      },
-      {
-        "name": "bricks_monster",
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 8
-      }
-    ],
-    "ironbars": [
-      {
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 12
-      },
-      {
-        "block": "minecraft:quartz_block",
-        "meta": 0
-      },
-      {
-        "block": "minecraft:stained_hardened_clay",
-        "meta": 8
-      }
-    ]
-  },
-  {
-    "type": "style",
-    "name": "glass_pane_light_blue",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:stained_glass",
-        "meta": 3
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:stained_glass_pane",
-        "meta": 3
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_white",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:stained_glass",
-        "meta": 0
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:stained_glass",
-        "meta": 0
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_light_blue",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:stained_glass",
-        "meta": 3
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:stained_glass",
-        "meta": 3
-      }
-    ],
-    "ironbars": []
-  },
-  {
-    "type": "style",
-    "name": "glass_pane",
-    "blocks": [
-      {
-        "name": "glass_full",
-        "block": "minecraft:glass",
-        "meta": 0
-      },
-      {
-        "name": "glass",
-        "block": "minecraft:glass_pane",
-        "meta": 0
-      }
-    ],
-    "ironbars": []
-  },
-  {
     "type": "citystyle",
     "name": "standard",
+    "style": "standard",
     "buildings": [
       {
         "factor": 0.4,
@@ -593,311 +84,430 @@
         "factor": 1.0,
         "park": "park_fountain2"
       }
-    ],
-    "randomstylechoices": [
-      [
-        {
-          "factor": 1.0,
-          "style": "bricks"
-        },
-        {
-          "factor": 1.0,
-          "style": "bricks_cyan"
-        },
-        {
-          "factor": 1.0,
-          "style": "bricks_gray"
-        },
-        {
-          "factor": 1.0,
-          "style": "bricks_silver"
-        }
-      ],
-      [
-        {
-          "factor": 1.0,
-          "style": "glass_side_glass"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_side_street"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_side_bricks"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_side_quartz"
-        }
-      ],
-      [
-        {
-          "factor": 1.0,
-          "style": "street"
-        }
-      ],
-      [
-        {
-          "factor": 1.0,
-          "style": "glass_white"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_gray"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_light_blue"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_blue"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_pane_white"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_pane_gray"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_pane_light_blue"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_pane_blue"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass"
-        },
-        {
-          "factor": 1.0,
-          "style": "glass_pane"
-        }
-      ]
     ]
   },
+
+  {
+    "type": "palette",
+    "name": "bricks_standard",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:monster_egg@2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:double_stone_slab",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "blocks": [
+          {
+            "factor": 0.06,
+            "block": "minecraft:stonebrick@2"
+          },
+          {
+            "factor": 0.05,
+            "block": "minecraft:stonebrick@1"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:stonebrick"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_cyan",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@9",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:stained_hardened_clay@15",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@9",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_gray",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@7",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:stained_hardened_clay@15",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@7",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_silver",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@8",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:stained_hardened_clay@12",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@8",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+
+  {
+    "type": "palette",
+    "name": "glass_side_variant_glass",
+    "palette": [
+      {
+        "char": "@",
+        "frompalette": "a"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_side_variant_street",
+    "palette": [
+      {
+        "char": "@",
+        "block": "minecraft:double_stone_slab",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_side_variant_bricks",
+    "palette": [
+      {
+        "char": "@",
+        "frompalette": "#"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_side_variant_quartz",
+    "palette": [
+      {
+        "char": "@",
+        "block": "minecraft:quartz_block",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+
+  {
+    "type": "palette",
+    "name": "glass_full",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:glass"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:glass"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_pane",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:glass"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:glass_pane"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_full_white",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_pane_white",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass_pane"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_full_gray",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@7"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass@7"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_pane_gray",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@7"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass_pane@7"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_full_blue",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@11"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass@11"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_pane_blue",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@11"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass_pane@11"
+      }
+    ]
+  },  {
+  "type": "palette",
+  "name": "glass_full_light_blue",
+  "palette": [
+    {
+      "char": "+",
+      "block": "minecraft:stained_glass@3"
+    },
+    {
+      "char": "a",
+      "block": "minecraft:stained_glass@3"
+    }
+  ]
+},
+  {
+    "type": "palette",
+    "name": "glass_pane_light_blue",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@3"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass_pane@3"
+      }
+    ]
+  },
+
   {
     "type": "palette",
     "name": "default",
     "palette": [
       {
-        "char": "@",
-        "style": "glass_or_brick"
-      },
-      {
         "char": "C",
-        "block": "minecraft:planks",
-        "meta": 0
+        "block": "minecraft:planks"
       },
       {
         "char": "D",
-        "block": "minecraft:dirt",
-        "meta": 0
+        "block": "minecraft:dirt"
       },
       {
         "char": "F",
-        "block": "minecraft:planks",
-        "meta": 0
+        "block": "minecraft:planks"
       },
       {
         "char": "G",
-        "block": "minecraft:grass",
-        "meta": 0
+        "block": "minecraft:grass"
       },
       {
         "char": "L",
-        "block": "minecraft:bookshelf",
-        "meta": 0
+        "block": "minecraft:bookshelf"
       },
       {
         "char": "Q",
         "block": "minecraft:quartz_block",
-        "meta": 0
+        "damaged": "minecraft:iron_bars"
       },
       {
         "char": "S",
         "block": "minecraft:double_stone_slab",
-        "meta": 0
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "B",
+        "block": "minecraft:brick_block",
+        "damaged": "minecraft:iron_bars"
       },
       {
         "char": "W",
-        "block": "minecraft:water",
-        "meta": 0
-      },
-      {
-        "char": "X",
-        "style": "bricks_monster"
+        "block": "minecraft:water"
       },
       {
         "char": "_",
-        "block": "minecraft:stone_slab",
-        "meta": 0
+        "block": "minecraft:stone_slab"
       },
       {
         "char": " ",
-        "block": "minecraft:air",
-        "meta": 0
-      },
-      {
-        "char": "#",
-        "styles": [
-          {
-            "factor": 0.06,
-            "style": "bricks_cracked"
-          },
-          {
-            "factor": 0.05,
-            "style": "bricks_mossy"
-          },
-          {
-            "factor": 2.0,
-            "style": "bricks"
-          }
-        ]
-      },
-      {
-        "char": "$",
-        "style": "bricks_variant"
+        "block": "minecraft:air"
       },
       {
         "char": "%",
         "blocks": [
           {
             "factor": 0.3,
-            "block": "minecraft:web",
-            "meta": 0
+            "block": "minecraft:web"
           },
           {
             "factor": 2.0,
-            "block": "minecraft:air",
-            "meta": 0
+            "block": "minecraft:air"
           }
         ]
       },
       {
         "char": "*",
-        "block": "minecraft:flower_pot",
-        "meta": 0
-      },
-      {
-        "char": "+",
-        "style": "glass_full"
+        "block": "minecraft:flower_pot"
       },
       {
         "char": "l",
-        "block": "minecraft:ladder",
-        "meta": 2
+        "block": "minecraft:ladder@2"
       },
       {
         "char": "-",
-        "block": "minecraft:wooden_pressure_plate",
-        "meta": 0
+        "block": "minecraft:wooden_pressure_plate"
       },
       {
         "char": ".",
-        "block": "minecraft:fence",
-        "meta": 0
+        "block": "minecraft:fence"
       },
       {
         "char": "p",
         "blocks": [
           {
             "factor": 0.3,
-            "block": "minecraft:red_flower",
-            "meta": 0
+            "block": "minecraft:red_flower"
           },
           {
             "factor": 0.3,
-            "block": "minecraft:yellow_flower",
-            "meta": 0
+            "block": "minecraft:yellow_flower"
           },
           {
             "factor": 0.1,
-            "block": "minecraft:sapling",
-            "meta": 0
+            "block": "minecraft:sapling"
           },
           {
             "factor": 0.1,
-            "block": "minecraft:sapling",
-            "meta": 1
+            "block": "minecraft:sapling@1"
           },
           {
             "factor": 0.1,
-            "block": "minecraft:sapling",
-            "meta": 2
+            "block": "minecraft:sapling@2"
           },
           {
             "factor": 2.0,
-            "block": "minecraft:sapling",
-            "meta": 4
+            "block": "minecraft:sapling@4"
           }
         ]
       },
       {
         "char": "1",
-        "block": "minecraft:planks",
-        "meta": 0
+        "block": "minecraft:planks"
       },
       {
         "char": "2",
-        "block": "minecraft:planks",
-        "meta": 0
+        "block": "minecraft:planks"
       },
       {
         "char": "3",
-        "block": "minecraft:planks",
-        "meta": 0
+        "block": "minecraft:planks"
       },
       {
         "char": "4",
-        "block": "minecraft:planks",
-        "meta": 0
+        "block": "minecraft:planks"
       },
       {
         "char": "w",
-        "block": "minecraft:cobblestone_wall",
-        "meta": 0
-      },
-      {
-        "char": "x",
-        "styles": [
-          {
-            "factor": 0.06,
-            "style": "bricks_cracked"
-          },
-          {
-            "factor": 0.05,
-            "style": "bricks_mossy"
-          },
-          {
-            "factor": 2.0,
-            "style": "bricks"
-          }
-        ]
+        "block": "minecraft:cobblestone_wall"
       },
       {
         "char": ":",
-        "block": "minecraft:iron_bars",
-        "meta": 0
+        "block": "minecraft:iron_bars"
       },
       {
         "char": "(",
-        "block": "minecraft:quartz_stairs",
-        "meta": 3
-      },
-      {
-        "char": "a",
-        "style": "glass"
+        "block": "minecraft:quartz_stairs@3"
       },
       {
         "char": ")",
-        "block": "minecraft:quartz_stairs",
-        "meta": 2
+        "block": "minecraft:quartz_stairs@2"
       }
     ]
   },
@@ -1128,10 +738,10 @@
         "                ",
         "                ",
         "                ",
-        "      xxxx      ",
-        "      xWWx      ",
-        "      xWWx      ",
-        "      xxxx      ",
+        "      ####      ",
+        "      #WW#      ",
+        "      #WW#      ",
+        "      ####      ",
         "                ",
         "                ",
         "                ",
@@ -1153,12 +763,12 @@
         "                ",
         "                ",
         "                ",
-        "       xx       ",
-        "      xWWx      ",
-        "     xWWWWx     ",
-        "     xWWWWx     ",
-        "      xWWx      ",
-        "       xx       ",
+        "       ##       ",
+        "      #WW#      ",
+        "     #WWWW#     ",
+        "     #WWWW#     ",
+        "      #WW#      ",
+        "       ##       ",
         "                ",
         "                ",
         "                ",
@@ -1180,10 +790,10 @@
         "                ",
         "                ",
         "                ",
-        "      xxxx      ",
-        "      xWWx      ",
-        "      xWWx      ",
-        "      xxxx      ",
+        "      ####      ",
+        "      #WW#      ",
+        "      #WW#      ",
+        "      ####      ",
         "                ",
         "                ",
         "                ",
@@ -1234,10 +844,10 @@
         "                ",
         "                ",
         "                ",
-        "      xxxx      ",
-        "      x  x      ",
-        "      x  x      ",
-        "      xxxx      ",
+        "      ####      ",
+        "      #  #      ",
+        "      #  #      ",
+        "      ####      ",
         "                ",
         "                ",
         "                ",
@@ -1392,10 +1002,10 @@
         " wp  p        w ",
         " w           pw ",
         "       p   p    ",
-        "  p    xx       ",
-        "      xWWx  p   ",
-        "    p xWWx      ",
-        "       xx       ",
+        "  p    ##       ",
+        "      #WW#  p   ",
+        "    p #WW#      ",
+        "       ##       ",
         "  p       p     ",
         " w    p     p w ",
         " w            w ",
@@ -1454,11 +1064,11 @@
         " w   p        w ",
         " w           pw ",
         "           p    ",
-        "  p    xxx      ",
-        "      xWWWx p   ",
-        "    p xWWWx     ",
-        "      xWWWx     ",
-        "  p    xxxp     ",
+        "  p    ###      ",
+        "      #WWW# p   ",
+        "    p #WWW#     ",
+        "      #WWW#     ",
+        "  p    ###p     ",
         " w    p     p w ",
         " w            w ",
         " w p     p    w ",
@@ -1656,13 +1266,13 @@
         "                ",
         "                ",
         "                ",
-        "    xaaaaax     ",
+        "    #aaaaa#     ",
         "    a     a     ",
         "    a     a     ",
         "          a     ",
         "    a     a     ",
         "    a     a     ",
-        "    xaaaaax     ",
+        "    #aaaaa#     ",
         "                ",
         "                ",
         "                ",
@@ -1674,13 +1284,13 @@
         "                ",
         "                ",
         "                ",
-        "    xaaaaax     ",
+        "    #aaaaa#     ",
         "    a     a     ",
         "    a     a     ",
         "          a     ",
         "    a     a     ",
         "    a     a     ",
-        "    xaaaaax     ",
+        "    #aaaaa#     ",
         "                ",
         "                ",
         "                ",
@@ -1692,13 +1302,13 @@
         "                ",
         "                ",
         "                ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
         "                ",
         "                ",
         "                ",
@@ -2256,13 +1866,13 @@
         "a               ",
         "a               ",
         "a               ",
-        "#xx:::::::xxx   ",
+        "###:::::::###   ",
         "a               ",
-        "a   LLL     x   ",
+        "a   LLL     #   ",
         "a           :   ",
         "a   LLL     :   ",
-        "#           x   ",
-        "a F         x   ",
+        "#           #   ",
+        "a F         #   ",
         "aa#aaaa#aaaa#aaa"
       ],
       [
@@ -2274,13 +1884,13 @@
         "a               ",
         "a               ",
         "a               ",
-        "#xx:::::::xxx   ",
+        "###:::::::###   ",
         "a               ",
-        "a   LLL     x   ",
+        "a   LLL     #   ",
         "a           :   ",
         "a   LLL     :   ",
-        "#           x   ",
-        "a           x   ",
+        "#           #   ",
+        "a           #   ",
         "aa#aaaa#aaaa#aaa"
       ],
       [
@@ -2292,13 +1902,13 @@
         "a               ",
         "a               ",
         "a               ",
-        "#xx:::::::xxx   ",
-        "a           x   ",
-        "a   LLL     x   ",
+        "###:::::::###   ",
+        "a           #   ",
+        "a   LLL     #   ",
         "a           :   ",
         "a   LLL     :   ",
-        "#           x   ",
-        "a           x   ",
+        "#           #   ",
+        "a           #   ",
         "aa#aaaa#aaaa#aaa"
       ],
       [
@@ -2310,13 +1920,13 @@
         "#               ",
         "#               ",
         "#               ",
-        "#xx:::::::xxx   ",
-        "#           x   ",
-        "#           x   ",
+        "###:::::::###   ",
+        "#           #   ",
+        "#           #   ",
         "#           :   ",
         "#           :   ",
-        "#           x   ",
-        "#           x   ",
+        "#           #   ",
+        "#           #   ",
         "################"
       ],
       [
@@ -2365,16 +1975,16 @@
       ],
       [
         "################",
-        "#        x     #",
-        "#        x   x #",
-        "#        x   x #",
-        "#        x     #",
-        "#        x     #",
-        "#xxxxxxxxx     #",
+        "#        #     #",
+        "#        #   # #",
+        "#        #   # #",
+        "#        #     #",
+        "#        #     #",
+        "##########     #",
         "#              #",
         "#              #",
         "#      l       #",
-        "#     xxx      #",
+        "#     ###      #",
         "#              #",
         "#              #",
         "#              #",
@@ -2388,11 +1998,11 @@
         "#        :   * #",
         "a        :     a",
         "a        :     a",
-        "#::::::::x     #",
+        "#::::::::#     #",
         "a              a",
         "a              a",
         "#      l       #",
-        "a     xxx      a",
+        "a     ###      a",
         "a              a",
         "#              #",
         "a              a",
@@ -2406,11 +2016,11 @@
         "#        :     #",
         "a        :     a",
         "a        :     a",
-        "#::::::::x     #",
+        "#::::::::#     #",
         "a              a",
         "a              a",
         "#      l       #",
-        "a     xxx      a",
+        "a     ###      a",
         "a              a",
         "#              #",
         "a              a",
@@ -2482,15 +2092,15 @@
       [
         "################",
         "#              #",
-        "#   xxx        #",
-        "#   xxx        #",
-        "#   xxx        #",
+        "#   ###        #",
+        "#   ###        #",
+        "#   ###        #",
         "#              #",
-        "#xxxxxxxxx     #",
-        "#        x     #",
-        "#        x     #",
-        "#      l x     #",
-        "#  xxxxxxx    F#",
+        "##########     #",
+        "#        #     #",
+        "#        #     #",
+        "#      l #     #",
+        "#  #######    F#",
         "#             F#",
         "#             L#",
         "#              #",
@@ -2504,11 +2114,11 @@
         "#    C         #",
         "a              a",
         "a              a",
-        "#xxxaaaxxx     #",
-        "a        x     a",
-        "a        x     a",
-        "#      l x     #",
-        "a  xxxxxxx     a",
+        "####aaa###     #",
+        "a        #     a",
+        "a        #     a",
+        "#      l #     #",
+        "a  #######     a",
         "a              a",
         "#             L#",
         "a              a",
@@ -2522,11 +2132,11 @@
         "#              #",
         "a              a",
         "a              a",
-        "#xxxxxxxxx     #",
-        "a        x     a",
-        "a        x     a",
-        "#      l x     #",
-        "a  xxxxxxx     a",
+        "##########     #",
+        "a        #     a",
+        "a        #     a",
+        "#      l #     #",
+        "a  #######     a",
         "a              a",
         "#             L#",
         "a              a",
@@ -2597,16 +2207,16 @@
       ],
       [
         "################",
-        "#        x     #",
-        "#       Fx     #",
-        "#       Fx     #",
-        "#        x     #",
+        "#        #     #",
+        "#       F#     #",
+        "#       F#     #",
+        "#        #     #",
         "#              #",
-        "#        x     #",
-        "#        x     #",
-        "#        x     #",
-        "#xxx   l x     #",
-        "# Cxxxxxxx     #",
+        "#        #     #",
+        "#        #     #",
+        "#        #     #",
+        "####   l #     #",
+        "# C#######     #",
         "#              #",
         "#              #",
         "#       1   2  #",
@@ -2615,16 +2225,16 @@
       ],
       [
         "#aa#aa#aa#aa#aa#",
-        "a        x     a",
-        "a        x     a",
-        "#        x     #",
-        "a        x     a",
+        "a        #     a",
+        "a        #     a",
+        "#        #     #",
+        "a        #     a",
         "a              a",
-        "#        x     #",
-        "a        x     a",
-        "a        x     a",
-        "#xxx   l x     #",
-        "a  xxxxxxx     a",
+        "#        #     #",
+        "a        #     a",
+        "a        #     a",
+        "####   l #     #",
+        "a  #######     a",
         "a              a",
         "#              #",
         "a              a",
@@ -2633,16 +2243,16 @@
       ],
       [
         "#aa#aa#aa#aa#aa#",
-        "a        x     a",
-        "a        x     a",
-        "#        x     #",
-        "a        x     a",
-        "a        x     a",
-        "#        x     #",
-        "a        x     a",
-        "a        x     a",
-        "#xxx   l x     #",
-        "a  xxxxxxx     a",
+        "a        #     a",
+        "a        #     a",
+        "#        #     #",
+        "a        #     a",
+        "a        #     a",
+        "#        #     #",
+        "a        #     a",
+        "a        #     a",
+        "####   l #     #",
+        "a  #######     a",
         "a              a",
         "#              #",
         "a              a",
@@ -2838,7 +2448,7 @@
         "#              #",
         "#              #",
         "#      l       #",
-        "#     xxx      #",
+        "#     ###      #",
         "#              #",
         "#              #",
         "#              #",
@@ -2856,7 +2466,7 @@
         "a              a",
         "a              a",
         "#      l       #",
-        "a     xxx      a",
+        "a     ###      a",
         "a              a",
         "#              #",
         "a              a",
@@ -2874,7 +2484,7 @@
         "a              a",
         "a              a",
         "#      l       #",
-        "a     xxx      a",
+        "a     ###      a",
         "a              a",
         "#              #",
         "a              a",
@@ -3070,11 +2680,11 @@
         "a               ",
         "a               ",
         "a            )) ",
-        "##xxxxxxx   Q  Q",
-        " a FF xxx   Q  Q",
-        " a    xxx   Q  Q",
-        " a    xxx   Q  Q",
-        "##x xxxxx   Q  Q",
+        "#########   Q  Q",
+        " a FF ###   Q  Q",
+        " a    ###   Q  Q",
+        " a    ###   Q  Q",
+        "### #####   Q  Q",
         "##              "
       ],
       [
@@ -3088,11 +2698,11 @@
         "a               ",
         "a               ",
         "a               ",
-        "##xxxxxxx   a))a",
-        " a    xxx   a  a",
-        " a    xxx   a  a",
-        " a    xxx   a  a",
-        "##x xxxxx   a  a",
+        "#########   a))a",
+        " a    ###   a  a",
+        " a    ###   a  a",
+        " a    ###   a  a",
+        "### #####   a  a",
         "##              "
       ],
       [
@@ -3106,11 +2716,11 @@
         "a               ",
         "a               ",
         "a               ",
-        "##xxxxxxx   a  a",
-        " a    xxx   a))a",
-        " a    xxx   a  a",
-        " a    xxx   a  a",
-        "##x xxxxx   a  a",
+        "#########   a  a",
+        " a    ###   a))a",
+        " a    ###   a  a",
+        " a    ###   a  a",
+        "### #####   a  a",
         "##              "
       ],
       [
@@ -3124,11 +2734,11 @@
         "a               ",
         "a               ",
         "a               ",
-        "##xxxxxxx   a  a",
-        " a    xxx   a  a",
-        " a    xxx   a))a",
-        " a    xxx   a  a",
-        "##x xxxxx   a  a",
+        "#########   a  a",
+        " a    ###   a  a",
+        " a    ###   a))a",
+        " a    ###   a  a",
+        "### #####   a  a",
         "##              "
       ],
       [
@@ -3302,11 +2912,11 @@
         "a               ",
         "a               ",
         "a            )) ",
-        "##xxxxxxx   Q  Q",
-        " a CC x1x   Q  Q",
-        " a    x2x   Q  Q",
-        " a    x3x   Q  Q",
-        "##x xxxxx   Q  Q",
+        "#########   Q  Q",
+        " a CC #1#   Q  Q",
+        " a    #2#   Q  Q",
+        " a    #3#   Q  Q",
+        "### #####   Q  Q",
         "##              "
       ],
       [
@@ -3320,11 +2930,11 @@
         "a               ",
         "a               ",
         "a               ",
-        "##xxxxxxx   a))a",
-        " a    xxx   a  a",
-        " a    xxx   a  a",
-        " a    xxx   a  a",
-        "##x xxxxx   a  a",
+        "#########   a))a",
+        " a    ###   a  a",
+        " a    ###   a  a",
+        " a    ###   a  a",
+        "### #####   a  a",
         "##              "
       ],
       [
@@ -3338,11 +2948,11 @@
         "a               ",
         "a               ",
         "a               ",
-        "##xxxxxxx   a  a",
-        " a    x4x   a))a",
-        " a    x3x   a  a",
-        " a    x2x   a  a",
-        "##x xxxxx   a  a",
+        "#########   a  a",
+        " a    #4#   a))a",
+        " a    #3#   a  a",
+        " a    #2#   a  a",
+        "### #####   a  a",
         "##              "
       ],
       [
@@ -3356,11 +2966,11 @@
         "a               ",
         "a               ",
         "a               ",
-        "##xxxxxxx   a  a",
-        " a    xxx   a  a",
-        " a    xxx   a))a",
-        " a    xxx   a  a",
-        "##x xxxxx   a  a",
+        "#########   a  a",
+        " a    ###   a  a",
+        " a    ###   a))a",
+        " a    ###   a  a",
+        "### #####   a  a",
         "##              "
       ],
       [
@@ -3433,11 +3043,11 @@
         "                ",
         "                ",
         "                ",
-        "     xxxxx      ",
-        "     xxxxx      ",
-        "     xxxxx      ",
-        "     xxxxx      ",
-        "     xxxxx      ",
+        "     #####      ",
+        "     #####      ",
+        "     #####      ",
+        "     #####      ",
+        "     #####      ",
         "                ",
         "                ",
         "                ",
@@ -3528,17 +3138,17 @@
         "               a",
         "               #",
         "    FLLLLF     a",
-        "  xxxxxxxxxx   a",
-        "  x1xxxxxx2x   a",
-        "  xxxxxxxxxx   a",
-        "  xxxC C xxxF  #",
-        "  xxx    xxxL  a",
-        "  xxx  C xxxL  a",
-        "         xxxL  a",
-        "  xxx   CxxxF  a",
-        "  xxxxxxxxxx   #",
-        "  x4xxxxxx3x   a",
-        "  xxxxxxxxxx   a",
+        "  ##########   a",
+        "  #1######2#   a",
+        "  ##########   a",
+        "  ###C C ###F  #",
+        "  ###    ###L  a",
+        "  ###  C ###L  a",
+        "         ###L  a",
+        "  ###   C###F  a",
+        "  ##########   #",
+        "  #4######3#   a",
+        "  ##########   a",
         "    FLLLLF     a"
       ],
       [
@@ -3546,17 +3156,17 @@
         "               a",
         "               #",
         "     LLLL      a",
-        "  xxxxxxxxxx   a",
-        "  xxxxxxxxxx   a",
-        "  xxxxxxxxxx   a",
-        "  xxx    xxx   #",
-        "  xxx    xxxL  a",
-        "  xxx    xxxL  a",
-        "         xxxL  a",
-        "  xxx    xxx   a",
-        "  xxxxxxxxxx   #",
-        "  xxxxxxxxxx   a",
-        "  xxxxxxxxxx   a",
+        "  ##########   a",
+        "  ##########   a",
+        "  ##########   a",
+        "  ###    ###   #",
+        "  ###    ###L  a",
+        "  ###    ###L  a",
+        "         ###L  a",
+        "  ###    ###   a",
+        "  ##########   #",
+        "  ##########   a",
+        "  ##########   a",
         "     LLLL      a"
       ],
       [
@@ -3564,17 +3174,17 @@
         "               a",
         "               #",
         "     LLLL      a",
-        "  xxxxxxxxxx   a",
-        "  xxxxxxxxxx   a",
-        "  xxxxxxxxxx   a",
-        "  xxx    xxx   #",
-        "  xxx    xxxL  a",
-        "  xxx    xxxL  a",
-        "  xxx    xxxL  a",
-        "  xxx    xxx   a",
-        "  xxxxxxxxxx   #",
-        "  xxxxxxxxxx   a",
-        "  xxxxxxxxxx   a",
+        "  ##########   a",
+        "  ##########   a",
+        "  ##########   a",
+        "  ###    ###   #",
+        "  ###    ###L  a",
+        "  ###    ###L  a",
+        "  ###    ###L  a",
+        "  ###    ###   a",
+        "  ##########   #",
+        "  ##########   a",
+        "  ##########   a",
         "     LLLL      a"
       ],
       [
@@ -3582,17 +3192,17 @@
         "               #",
         "               #",
         "               #",
-        "  xxxxxxxxxx   #",
-        "  xxxxxxxxxx   #",
-        "  xxxxxxxxxx   #",
-        "  xxx%  %xxx   #",
-        "  xxx    xxx   #",
-        "  xxx    xxx   #",
-        "  xxx    xxx   #",
-        "  xxx%  %xxx   #",
-        "  xxxxxxxxxx   #",
-        "  xxxxxxxxxx   #",
-        "  xxxxxxxxxx   #",
+        "  ##########   #",
+        "  ##########   #",
+        "  ##########   #",
+        "  ###%  %###   #",
+        "  ###    ###   #",
+        "  ###    ###   #",
+        "  ###    ###   #",
+        "  ###%  %###   #",
+        "  ##########   #",
+        "  ##########   #",
+        "  ##########   #",
         "               #"
       ],
       [
@@ -3624,9 +3234,9 @@
       [
         "                ",
         "                ",
-        "  xxx           ",
-        "  x x           ",
-        "  xxx           ",
+        "  ###           ",
+        "  # #           ",
+        "  ###           ",
         "                ",
         "    aaaaaaa     ",
         "    a:   :a     ",
@@ -3664,13 +3274,13 @@
         "                ",
         "  : :           ",
         "                ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
         "                ",
         "                ",
         "                "
@@ -3740,9 +3350,9 @@
       [
         "                ",
         "                ",
-        "  xxx           ",
-        "  x x           ",
-        "  xxx           ",
+        "  ###           ",
+        "  # #           ",
+        "  ###           ",
         "                ",
         "    aaaaaaa     ",
         "    a:   :a     ",
@@ -3780,13 +3390,13 @@
         "                ",
         "  : :           ",
         "                ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
         "                ",
         "                ",
         "                "
@@ -3897,11 +3507,11 @@
         "                ",
         "                ",
         "                ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
         "                ",
         "                ",
         "                ",
@@ -4689,12 +4299,12 @@
         "              a ",
         "              a ",
         "              a ",
-        "   xxxxxxxx   ##",
-        "   ++++4CCx    a",
-        "          x    a",
-        "          x    a",
-        "   ++++4CCx    a",
-        "   xxxxxxxx   ##",
+        "   ########   ##",
+        "   ++++4CC#    a",
+        "          #    a",
+        "          #    a",
+        "   ++++4CC#    a",
+        "   ########   ##",
         "              a ",
         "              a ",
         "              a ",
@@ -4707,12 +4317,12 @@
         "              a ",
         "              a ",
         "              a ",
-        "   xxxxxxxx   ##",
-        "   +++++++x    a",
-        "          x    a",
-        "          x    a",
-        "   +++++++x    a",
-        "   xxxxxxxx   ##",
+        "   ########   ##",
+        "   +++++++#    a",
+        "          #    a",
+        "          #    a",
+        "   +++++++#    a",
+        "   ########   ##",
         "              a ",
         "              a ",
         "              a ",
@@ -4725,12 +4335,12 @@
         "              a ",
         "              a ",
         "              a ",
-        "   xxxxxxxx   ##",
-        "   +++++++x    a",
-        "          x    a",
-        "          x    a",
-        "   +++++++x    a",
-        "   xxxxxxxx   ##",
+        "   ########   ##",
+        "   +++++++#    a",
+        "          #    a",
+        "          #    a",
+        "   +++++++#    a",
+        "   ########   ##",
         "              a ",
         "              a ",
         "              a ",
@@ -4743,12 +4353,12 @@
         "              a ",
         "              a ",
         "              a ",
-        "   xxxxxxxx   ##",
-        "   +++++++x    a",
-        "          x    a",
-        "          x    a",
-        "   +++++++x    a",
-        "   xxxxxxxx   ##",
+        "   ########   ##",
+        "   +++++++#    a",
+        "          #    a",
+        "          #    a",
+        "   +++++++#    a",
+        "   ########   ##",
         "              a ",
         "              a ",
         "              a ",
@@ -4805,17 +4415,17 @@
         "              a ",
         "              a ",
         "              a ",
-        "  xxx   xxx   ##",
-        "  +x+   +x+    a",
-        "  :x:   :x:    a",
-        "  +x+   +x+    a",
-        "  :x:   :x:    a",
-        "  +x+   +x+   ##",
-        "  :x:   :x:   a ",
-        "  +x+   +x+   a ",
-        "  :x:   :x:   a ",
-        "  +x+   +x+   ##",
-        "  xxx   xxx   ##"
+        "  ###   ###   ##",
+        "  +#+   +#+    a",
+        "  :#:   :#:    a",
+        "  +#+   +#+    a",
+        "  :#:   :#:    a",
+        "  +#+   +#+   ##",
+        "  :#:   :#:   a ",
+        "  +#+   +#+   a ",
+        "  :#:   :#:   a ",
+        "  +#+   +#+   ##",
+        "  ###   ###   ##"
       ],
       [
         "##   #aaaa#   ##",
@@ -4823,17 +4433,17 @@
         "              a ",
         "              a ",
         "              a ",
-        "  xxx   xxx   ##",
-        "  +x+   +x+    a",
-        "  :x:   :x:    a",
-        "  +x+   +x+    a",
-        "  :x:   :x:    a",
-        "  +x+   +x+   ##",
-        "  :x:   :x:   a ",
-        "  +x+   +x+   a ",
-        "  :x:   :x:   a ",
-        "  +x+   +x+   ##",
-        "  xxx   xxx   ##"
+        "  ###   ###   ##",
+        "  +#+   +#+    a",
+        "  :#:   :#:    a",
+        "  +#+   +#+    a",
+        "  :#:   :#:    a",
+        "  +#+   +#+   ##",
+        "  :#:   :#:   a ",
+        "  +#+   +#+   a ",
+        "  :#:   :#:   a ",
+        "  +#+   +#+   ##",
+        "  ###   ###   ##"
       ],
       [
         "##   #aaaa#   ##",
@@ -4841,17 +4451,17 @@
         "              a ",
         "              a ",
         "              a ",
-        "  xxx   xxx   ##",
-        "  +x+   +x+    a",
-        "  :x:   :x:    a",
-        "  +x+   +x+    a",
-        "  :x:   :x:    a",
-        "  +x+   +x+   ##",
-        "  :x:   :x:   a ",
-        "  +x+   +x+   a ",
-        "  :x:   :x:   a ",
-        "  +x+   +x+   ##",
-        "  xxx   xxx   ##"
+        "  ###   ###   ##",
+        "  +#+   +#+    a",
+        "  :#:   :#:    a",
+        "  +#+   +#+    a",
+        "  :#:   :#:    a",
+        "  +#+   +#+   ##",
+        "  :#:   :#:   a ",
+        "  +#+   +#+   a ",
+        "  :#:   :#:   a ",
+        "  +#+   +#+   ##",
+        "  ###   ###   ##"
       ],
       [
         "##   #aaaa#   ##",
@@ -4859,17 +4469,17 @@
         "              a ",
         "              a ",
         "              a ",
-        "  xxx   xxx   ##",
-        "  +x+   +x+    a",
-        "  :x:   :x:    a",
-        "  +x+   +x+    a",
-        "  :x:   :x:    a",
-        "  +x+   +x+   ##",
-        "  :x:   :x:   a ",
-        "  +x+   +x+   a ",
-        "  :x:   :x:   a ",
-        "  +x+   +x+   ##",
-        "  xxx   xxx   ##"
+        "  ###   ###   ##",
+        "  +#+   +#+    a",
+        "  :#:   :#:    a",
+        "  +#+   +#+    a",
+        "  :#:   :#:    a",
+        "  +#+   +#+   ##",
+        "  :#:   :#:   a ",
+        "  +#+   +#+   a ",
+        "  :#:   :#:   a ",
+        "  +#+   +#+   ##",
+        "  ###   ###   ##"
       ],
       [
         "##   #aaaa#   ##",
@@ -5062,13 +4672,13 @@
         "                ",
         "                ",
         "                ",
-        "    xaaaaax     ",
+        "    #aaaaa#     ",
         "    a     a     ",
         "    a     a     ",
         "          a     ",
         "    a     a     ",
         "    a     a     ",
-        "    xaaaaax     ",
+        "    #aaaaa#     ",
         "                ",
         "                ",
         "                ",
@@ -5080,13 +4690,13 @@
         "                ",
         "                ",
         "                ",
-        "    xaaaaax     ",
+        "    #aaaaa#     ",
         "    a     a     ",
         "    a     a     ",
         "          a     ",
         "    a     a     ",
         "    a     a     ",
-        "    xaaaaax     ",
+        "    #aaaaa#     ",
         "                ",
         "                ",
         "                ",
@@ -5098,13 +4708,13 @@
         "                ",
         "                ",
         "                ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
-        "    xxxxxxx     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
+        "    #######     ",
         "                ",
         "                ",
         "                ",
@@ -5165,16 +4775,16 @@
       ],
       [
         "#aa@aaaaaaaa@aa#",
-        "a  x        x  a",
-        "a  xF       x  a",
-        "@  xF      Lx  @",
-        "a  xD      Lx  a",
-        "a  x        x  a",
+        "a  #        #  a",
+        "a  #F       #  a",
+        "@  #F      L#  @",
+        "a  #D      L#  a",
+        "a  #        #  a",
         "a              a",
-        "a  x        x  a",
-        "a  x        x  a",
-        "a  x   l    x  a",
-        "a  xxxxxxxxxx  a",
+        "a  #        #  a",
+        "a  #        #  a",
+        "a  #   l    #  a",
+        "a  ##########  a",
         "a              a",
         "@              @",
         "a              a",
@@ -5183,16 +4793,16 @@
       ],
       [
         "#aa@aaaaaaaa@aa#",
-        "a  x        x  a",
-        "a  x        x  a",
-        "@  x       Lx  @",
-        "a  x*      Lx  a",
-        "a  x        x  a",
+        "a  #        #  a",
+        "a  #        #  a",
+        "@  #       L#  @",
+        "a  #*      L#  a",
+        "a  #        #  a",
         "a              a",
-        "a  x        x  a",
-        "a  x        x  a",
-        "a  x   l    x  a",
-        "a  xxxxxxxxxx  a",
+        "a  #        #  a",
+        "a  #        #  a",
+        "a  #   l    #  a",
+        "a  ##########  a",
         "a              a",
         "@              @",
         "a              a",
@@ -5201,16 +4811,16 @@
       ],
       [
         "#aa@aaaaaaaa@aa#",
-        "a  x        x  a",
-        "a  x        x  a",
-        "@  x        x  @",
-        "a  x        x  a",
-        "a  x        x  a",
-        "a  x        x  a",
-        "a  x        x  a",
-        "a  x        x  a",
-        "a  x   l    x  a",
-        "a  xxxxxxxxxx  a",
+        "a  #        #  a",
+        "a  #        #  a",
+        "@  #        #  @",
+        "a  #        #  a",
+        "a  #        #  a",
+        "a  #        #  a",
+        "a  #        #  a",
+        "a  #        #  a",
+        "a  #   l    #  a",
+        "a  ##########  a",
         "a              a",
         "@              @",
         "a              a",
@@ -5387,16 +4997,16 @@
       ],
       [
         "#aa@aaaaaaaa@aa#",
-        "a      x       a",
-        "a      xF      a",
+        "a      #       a",
+        "a      #F      a",
         "@              @",
-        "a      x       a",
-        "a     Lx       a",
-        "a    xxxxx     a",
-        "a    x   x     a",
-        "a    x   xF    a",
-        "a      l x     a",
-        "axxxxXxxxX     a",
+        "a      #       a",
+        "a     L#       a",
+        "a    #####     a",
+        "a    #   #     a",
+        "a    #   #F    a",
+        "a      l #     a",
+        "a########X     a",
         "a       :      a",
         "@       :      @",
         "a   C          a",
@@ -5405,16 +5015,16 @@
       ],
       [
         "#aa@aaaaaaaa@aa#",
-        "a      x       a",
-        "a      x       a",
+        "a      #       a",
+        "a      #       a",
         "@              @",
-        "a      x       a",
-        "a     Lx       a",
-        "a    xxxxx     a",
-        "a    x   x     a",
-        "a    x   x     a",
-        "a      l x     a",
-        "axxxxxxxxx     a",
+        "a      #       a",
+        "a     L#       a",
+        "a    #####     a",
+        "a    #   #     a",
+        "a    #   #     a",
+        "a      l #     a",
+        "a#########     a",
         "a       :      a",
         "@       :      @",
         "a              a",
@@ -5423,16 +5033,16 @@
       ],
       [
         "#aa@aaaaaaaa@aa#",
-        "a      x       a",
-        "a      x       a",
-        "@      x       @",
-        "a      x       a",
-        "a     Lx       a",
-        "a    xxxxx     a",
-        "a    x   x     a",
-        "a    x   x     a",
-        "a    x l x     a",
-        "axxxxxxxxx     a",
+        "a      #       a",
+        "a      #       a",
+        "@      #       @",
+        "a      #       a",
+        "a     L#       a",
+        "a    #####     a",
+        "a    #   #     a",
+        "a    #   #     a",
+        "a    # l #     a",
+        "a#########     a",
         "a       :      a",
         "@       :      @",
         "a              a",
@@ -5619,16 +5229,16 @@
       ],
       [
         "#aa@aaaaaaaa@aa#",
-        "a      x       a",
-        "a      x       a",
+        "a      #       a",
+        "a      #       a",
         "@              @",
-        "a      x       a",
-        "a      x       a",
-        "a    xxxxx     a",
-        "a    x   x     a",
-        "a    x   xL    a",
-        "a      l xL    a",
-        "axxxxxxxxx     a",
+        "a      #       a",
+        "a      #       a",
+        "a    #####     a",
+        "a    #   #     a",
+        "a    #   #L    a",
+        "a      l #L    a",
+        "a#########     a",
         "a    F         a",
         "@              @",
         "a              a",
@@ -5637,16 +5247,16 @@
       ],
       [
         "#aa@aaaaaaaa@aa#",
-        "a      x       a",
-        "a      x       a",
+        "a      #       a",
+        "a      #       a",
         "@              @",
-        "a      x       a",
-        "a      x       a",
-        "a    xxxxx     a",
-        "a    x   x     a",
-        "a    x   xL    a",
-        "a      l xL    a",
-        "axxxxxxxxx     a",
+        "a      #       a",
+        "a      #       a",
+        "a    #####     a",
+        "a    #   #     a",
+        "a    #   #L    a",
+        "a      l #L    a",
+        "a#########     a",
         "a              a",
         "@              @",
         "a              a",
@@ -5655,16 +5265,16 @@
       ],
       [
         "#aa@aaaaaaaa@aa#",
-        "a      x       a",
-        "a      x       a",
-        "@      x       @",
-        "a      x       a",
-        "a      x       a",
-        "a    xxxxx     a",
-        "a    x   x     a",
-        "a    x   x     a",
-        "a    x l x     a",
-        "axxxxxxxxx     a",
+        "a      #       a",
+        "a      #       a",
+        "@      #       @",
+        "a      #       a",
+        "a      #       a",
+        "a    #####     a",
+        "a    #   #     a",
+        "a    #   #     a",
+        "a    # l #     a",
+        "a#########     a",
         "a              a",
         "@              @",
         "a              a",
@@ -5740,15 +5350,15 @@
         "@              @",
         "a              a",
         "a              a",
-        "a    xx xx     a",
-        "a    x   xxxxxxa",
+        "a    ## ##     a",
+        "a    #   ######a",
         "a              a",
-        "a    x l x     a",
-        "a    xxxxx     a",
-        "a      Fx      a",
-        "@       x      @",
+        "a    # l #     a",
+        "a    #####     a",
+        "a      F#      a",
+        "@       #      @",
         "a              a",
-        "a       x      a",
+        "a       #      a",
         "#aa@aaaaaaaa@aa#"
       ],
       [
@@ -5758,15 +5368,15 @@
         "@              @",
         "a              a",
         "a              a",
-        "a    xx xx     a",
-        "a    x   xxx:xxa",
+        "a    ## ##     a",
+        "a    #   ###:##a",
         "a              a",
-        "a    x l x     a",
-        "a    xxxxx     a",
-        "a       x      a",
-        "@       x      @",
+        "a    # l #     a",
+        "a    #####     a",
+        "a       #      a",
+        "@       #      @",
         "a              a",
-        "a       x      a",
+        "a       #      a",
         "#aa@aaaaaaaa@aa#"
       ],
       [
@@ -5776,15 +5386,15 @@
         "@              @",
         "a              a",
         "a              a",
-        "a    xxxxx     a",
-        "a    x   xxxxxxa",
-        "a    x   x     a",
-        "a    x l x     a",
-        "a    xxxxx     a",
-        "a       x      a",
-        "@       x      @",
-        "a       x      a",
-        "a       x      a",
+        "a    #####     a",
+        "a    #   ######a",
+        "a    #   #     a",
+        "a    # l #     a",
+        "a    #####     a",
+        "a       #      a",
+        "@       #      @",
+        "a       #      a",
+        "a       #      a",
         "#aa@aaaaaaaa@aa#"
       ],
       [
@@ -5855,12 +5465,12 @@
         " a            a ",
         " a            a ",
         " a            a ",
-        "##xx xxxxxxxxx##",
+        "#### ###########",
         "#       FF     #",
         "#              #",
         "#              #",
         "#      l      C#",
-        "##xxxxxxxxx xx##",
+        "########### ####",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -5873,12 +5483,12 @@
         " a            a ",
         " a            a ",
         " a            a ",
-        "##xx xxxxxxxxx##",
+        "#### ###########",
         "#              #",
         "#              #",
         "#              #",
         "#      l       #",
-        "##xxxxxxxxx xx##",
+        "########### ####",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -5891,12 +5501,12 @@
         " a            a ",
         " a            a ",
         " a            a ",
-        "##xxxxxxxxxxxx##",
+        "################",
         "#            %%#",
         "#              #",
         "#              #",
         "#%     l      %#",
-        "##xxxxxxxxxxxx##",
+        "################",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -5972,11 +5582,11 @@
         "@              @",
         "a              a",
         "a              a",
-        "a    xx xx     a",
-        "a    x   x     a",
-        "a    x   x     a",
+        "a    ## ##     a",
+        "a    #   #     a",
+        "a    #   #     a",
         "a    X l X     a",
-        "a  QQxxxxxQQ   a",
+        "a  QQ#####QQ   a",
         "a      CF      a",
         "@              @",
         "a              a",
@@ -5990,11 +5600,11 @@
         "@              @",
         "a              a",
         "a              a",
-        "a    xx xx     a",
-        "a    x   x     a",
-        "a    x   x     a",
-        "a    x l x     a",
-        "a  QQxxxxxQQ   a",
+        "a    ## ##     a",
+        "a    #   #     a",
+        "a    #   #     a",
+        "a    # l #     a",
+        "a  QQ#####QQ   a",
         "a              a",
         "@              @",
         "a              a",
@@ -6008,11 +5618,11 @@
         "@              @",
         "a              a",
         "a              a",
-        "a    xxxxx     a",
-        "a    x   x     a",
-        "a    x   x     a",
-        "a    x l x     a",
-        "a  QQxxxxxQQ   a",
+        "a    #####     a",
+        "a    #   #     a",
+        "a    #   #     a",
+        "a    # l #     a",
+        "a  QQ#####QQ   a",
         "a              a",
         "@              @",
         "a              a",
@@ -6084,15 +5694,15 @@
       [
         "##   ######   ##",
         "##aaa#    #aaa##",
-        " a  Fx        a ",
-        " a  Fx        a ",
-        " a   xF       a ",
-        "##   xF       ##",
-        "#    x        L#",
-        "#    x         #",
-        "#    x         #",
-        "#    x l       #",
-        "##   xxxxx xxx##",
+        " a  F#        a ",
+        " a  F#        a ",
+        " a   #F       a ",
+        "##   #F       ##",
+        "#    #        L#",
+        "#    #         #",
+        "#    #         #",
+        "#    # l       #",
+        "##   ##### #####",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -6102,15 +5712,15 @@
       [
         "##   ######   ##",
         "##aaa#    #aaa##",
-        " a   x        a ",
-        " a   x        a ",
+        " a   #        a ",
+        " a   #        a ",
         " a   a        a ",
         "##   a        ##",
         "#    a         #",
         "#    a         #",
-        "#    x         #",
-        "#    x l       #",
-        "##   xxxxx xxx##",
+        "#    #         #",
+        "#    # l       #",
+        "##   ##### #####",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -6120,15 +5730,15 @@
       [
         "##   ######   ##",
         "##aaa#    #aaa##",
-        " a   x        a ",
-        " a   x        a ",
-        " a   x        a ",
-        "##   x        ##",
-        "#    x         #",
-        "#    x         #",
-        "#    x         #",
-        "#    x l       #",
-        "##   xxxxxxxxx##",
+        " a   #        a ",
+        " a   #        a ",
+        " a   #        a ",
+        "##   #        ##",
+        "#    #         #",
+        "#    #         #",
+        "#    #         #",
+        "#    # l       #",
+        "##   ###########",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -6204,11 +5814,11 @@
         "@              @",
         "a              a",
         "a              a",
-        "a    xx xx     a",
-        "a    x   x     a",
-        "a    x   x     a",
-        "a    x l x     a",
-        "ax xxxxxxxxxxxxa",
+        "a    ## ##     a",
+        "a    #   #     a",
+        "a    #   #     a",
+        "a    # l #     a",
+        "a# ############a",
         "a     FFF      a",
         "@              @",
         "a              a",
@@ -6222,11 +5832,11 @@
         "@              @",
         "a              a",
         "a              a",
-        "a    xx xx     a",
-        "a    x   x     a",
-        "a    x   x     a",
-        "a    x l x     a",
-        "ax xxxxxxxxaaaxa",
+        "a    ## ##     a",
+        "a    #   #     a",
+        "a    #   #     a",
+        "a    # l #     a",
+        "a# ########aaa#a",
         "a              a",
         "@              @",
         "a              a",
@@ -6240,11 +5850,11 @@
         "@              @",
         "a              a",
         "a              a",
-        "a    xxxxx     a",
-        "a    x   x     a",
-        "a    x   x     a",
-        "a    x l x     a",
-        "axxxxxxxxxxxxxxa",
+        "a    #####     a",
+        "a    #   #     a",
+        "a    #   #     a",
+        "a    # l #     a",
+        "a##############a",
         "a              a",
         "@              @",
         "a              a",
@@ -6319,12 +5929,12 @@
         " a            a ",
         " a            a ",
         " a            a ",
-        "##  xxxxxxx   ##",
+        "##  #######   ##",
         "#   :     :    #",
         "#   :          #",
         "#   :          #",
         "#   :  l  :    #",
-        "##  xxxxxxx   ##",
+        "##  #######   ##",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -6337,12 +5947,12 @@
         " a            a ",
         " a            a ",
         " a            a ",
-        "##  xxxxxxx   ##",
+        "##  #######   ##",
         "#   :     :    #",
         "#   :          #",
         "#   :          #",
         "#   :  l  :    #",
-        "##  xxxxxxx   ##",
+        "##  #######   ##",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -6355,12 +5965,12 @@
         " a            a ",
         " a            a ",
         " a            a ",
-        "##  xxxxxxx   ##",
+        "##  #######   ##",
         "#   :     :    #",
         "#   :          #",
         "#   :          #",
         "#   :  l  :    #",
-        "##  xxxxxxx   ##",
+        "##  #######   ##",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -6440,7 +6050,7 @@
         "a              a",
         "aL             a",
         "aF     l       a",
-        "aF    xxx::::::a",
+        "aF    ###::::::a",
         "a      :       a",
         "@      :       @",
         "a      :       a",
@@ -6458,7 +6068,7 @@
         "a              a",
         "aL             a",
         "a      l       a",
-        "a     xxx::::::a",
+        "a     ###::::::a",
         "a      :       a",
         "@      :       @",
         "a      :       a",
@@ -6476,7 +6086,7 @@
         "a              a",
         "aL             a",
         "a      l       a",
-        "a     xxx::::::a",
+        "a     ###::::::a",
         "a      :       a",
         "@      :       @",
         "a      :       a",
@@ -6556,7 +6166,7 @@
         "#              #",
         "#              #",
         "#      l       #",
-        "##    xxx     ##",
+        "##    ###     ##",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -6574,7 +6184,7 @@
         "#              #",
         "#              #",
         "#      l       #",
-        "##    xxx     ##",
+        "##    ###     ##",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -6592,7 +6202,7 @@
         "#              #",
         "#              #",
         "#      l       #",
-        "##    xxx     ##",
+        "##    ###     ##",
         " a            a ",
         " a            a ",
         " a            a ",
@@ -6672,7 +6282,7 @@
         "a              a",
         "a              a",
         "a      l       a",
-        "axxxxxxxxxxx  xa",
+        "a###########  #a",
         "a              a",
         "@              @",
         "a              a",
@@ -6690,7 +6300,7 @@
         "a              a",
         "a              a",
         "a      l       a",
-        "ax::xxxxxxxx  xa",
+        "a#::########  #a",
         "a              a",
         "@              @",
         "a              a",
@@ -6708,7 +6318,7 @@
         "a              a",
         "a              a",
         "a      l       a",
-        "axxxxxxxxxxxxxxa",
+        "a##############a",
         "a              a",
         "@              @",
         "a              a",
@@ -6779,17 +6389,17 @@
       ],
       [
         "##              ",
-        "##    x+:+:+:+x ",
-        " a    xxxxxxxxx ",
-        " a    x+:+:+:+x ",
+        "##    #+:+:+:+# ",
+        " a    ######### ",
+        " a    #+:+:+:+# ",
         " a              ",
-        "##    x+:+:+:+x ",
-        "a     xxxxxxxxx ",
-        "a     x+:+:+:+x ",
+        "##    #+:+:+:+# ",
+        "a     ######### ",
+        "a     #+:+:+:+# ",
         "a               ",
-        "a     x+:+:+:+x ",
-        "##    xxxxxxxxx ",
-        " a    x+:+:+:+x ",
+        "a     #+:+:+:+# ",
+        "##    ######### ",
+        " a    #+:+:+:+# ",
         " a              ",
         " a              ",
         "##aaa#    #aaa##",
@@ -6797,17 +6407,17 @@
       ],
       [
         "##              ",
-        "##    x+:+:+:+x ",
-        " a    xxxxxxxxx ",
-        " a    x+:+:+:+x ",
+        "##    #+:+:+:+# ",
+        " a    ######### ",
+        " a    #+:+:+:+# ",
         " a              ",
-        "##    x+:+:+:+x ",
-        "a     xxxxxxxxx ",
-        "a     x+:+:+:+x ",
+        "##    #+:+:+:+# ",
+        "a     ######### ",
+        "a     #+:+:+:+# ",
         "a               ",
-        "a     x+:+:+:+x ",
-        "##    xxxxxxxxx ",
-        " a    x+:+:+:+x ",
+        "a     #+:+:+:+# ",
+        "##    ######### ",
+        " a    #+:+:+:+# ",
         " a              ",
         " a              ",
         "##aaa#    #aaa##",
@@ -6815,17 +6425,17 @@
       ],
       [
         "##              ",
-        "##    x+:+:+:+x ",
-        " a    xxxxxxxxx ",
-        " a    x+:+:+:+x ",
+        "##    #+:+:+:+# ",
+        " a    ######### ",
+        " a    #+:+:+:+# ",
         " a              ",
-        "##    x+:+:+:+x ",
-        "a     xxxxxxxxx ",
-        "a     x+:+:+:+x ",
+        "##    #+:+:+:+# ",
+        "a     ######### ",
+        "a     #+:+:+:+# ",
         "a               ",
-        "a     x+:+:+:+x ",
-        "##    xxxxxxxxx ",
-        " a    x+:+:+:+x ",
+        "a     #+:+:+:+# ",
+        "##    ######### ",
+        " a    #+:+:+:+# ",
         " a              ",
         " a              ",
         "##aaa#    #aaa##",
@@ -6833,17 +6443,17 @@
       ],
       [
         "##              ",
-        "##    x+:+:+:+x ",
-        " a    xxxxxxxxx ",
-        " a    x+:+:+:+x ",
+        "##    #+:+:+:+# ",
+        " a    ######### ",
+        " a    #+:+:+:+# ",
         " a              ",
-        "##    x+:+:+:+x ",
-        "a     xxxxxxxxx ",
-        "a     x+:+:+:+x ",
+        "##    #+:+:+:+# ",
+        "a     ######### ",
+        "a     #+:+:+:+# ",
         "a               ",
-        "a     x+:+:+:+x ",
-        "##    xxxxxxxxx ",
-        " a    x+:+:+:+x ",
+        "a     #+:+:+:+# ",
+        "##    ######### ",
+        " a    #+:+:+:+# ",
         " a              ",
         " a              ",
         "##aaa#    #aaa##",
@@ -7102,9 +6712,128 @@
     ]
   },
   {
+    "type": "style",
+    "name": "outside",
+    "randompalettes": [
+      [
+        {
+          "factor": 1.0,
+          "palette": "default"
+        }
+      ],
+      [
+        {
+          "factor": 1.0,
+          "palette": "bricks_standard"
+        }
+      ],
+      [
+        {
+          "factor": 1.0,
+          "palette": "glass_full"
+        }
+      ],
+      [
+        {
+          "factor": 1.0,
+          "palette": "glass_side_variant_glass"
+        }
+      ]
+    ]
+  },
+  {
+    "type": "style",
+    "name": "standard",
+    "randompalettes": [
+      [
+        {
+          "factor": 1.0,
+          "palette": "default"
+        }
+      ],
+      [
+        {
+          "factor": 1.0,
+          "palette": "bricks_standard"
+        },
+        {
+          "factor": 1.0,
+          "palette": "bricks_cyan"
+        },
+        {
+          "factor": 1.0,
+          "palette": "bricks_gray"
+        },
+        {
+          "factor": 1.0,
+          "palette": "bricks_silver"
+        }
+      ],
+      [
+        {
+          "factor": 1.0,
+          "palette": "glass_full"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_pane"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_full_white"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_pane_white"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_full_blue"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_pane_blue"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_full_light_blue"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_pane_light_blue"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_full_gray"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_pane_gray"
+        }
+      ],
+      [
+        {
+          "factor": 1.0,
+          "palette": "glass_side_variant_glass"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_side_variant_glass"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_side_variant_bricks"
+        },
+        {
+          "factor": 1.0,
+          "palette": "glass_side_variant_quartz"
+        }
+      ]
+    ]
+  },
+  {
     "type": "building",
     "name": "center00",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7131,7 +6860,6 @@
   {
     "type": "building",
     "name": "center11",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7158,7 +6886,6 @@
   {
     "type": "building",
     "name": "building1",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7217,7 +6944,6 @@
   {
     "type": "building",
     "name": "center10",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7256,7 +6982,6 @@
   {
     "type": "building",
     "name": "building2",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7295,7 +7020,6 @@
   {
     "type": "building",
     "name": "building3",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7334,7 +7058,6 @@
   {
     "type": "building",
     "name": "center01",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7365,7 +7088,6 @@
   {
     "type": "building",
     "name": "library00",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7384,7 +7106,6 @@
   {
     "type": "building",
     "name": "library11",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7415,7 +7136,6 @@
   {
     "type": "building",
     "name": "library10",
-    "palette": "default",
     "parts": [
       {
         "top": false,
@@ -7458,7 +7178,6 @@
   {
     "type": "building",
     "name": "library01",
-    "palette": "default",
     "parts": [
       {
         "top": false,

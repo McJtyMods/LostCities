@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.nbt.NBTTagCompound;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ public class Building implements IAsset {
 
     private final List<Pair<Predicate<LevelInfo>, String>> parts = new ArrayList<>();
     private final List<String> partNames = new ArrayList<>();
-    private String paletteName;
 
     public Building(JsonObject object) {
         readFromJSon(object);
@@ -36,7 +34,6 @@ public class Building implements IAsset {
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
-        paletteName = object.get("palette").getAsString();
         JsonArray partArray = object.get("parts").getAsJsonArray();
         parts.clear();
         partNames.clear();
@@ -60,7 +57,6 @@ public class Building implements IAsset {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("building"));
         object.add("name", new JsonPrimitive(name));
-        object.add("palette", new JsonPrimitive(paletteName));
         JsonArray partArray = new JsonArray();
         for (Pair<Predicate<LevelInfo>, String> part : parts) {
             JsonObject partObject = new JsonObject();
@@ -69,18 +65,9 @@ public class Building implements IAsset {
             partArray.add(partObject);
         }
         object.add("parts", partArray);
-
         return object;
     }
 
-    public String getPaletteName() {
-        return paletteName;
-    }
-
-    public Building setPaletteName(String paletteName) {
-        this.paletteName = paletteName;
-        return this;
-    }
 
     public Building addPart(Predicate<LevelInfo> test, String partName) {
         parts.add(Pair.of(test, partName));

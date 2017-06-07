@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Style;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.state.IBlockState;
@@ -50,21 +51,22 @@ public class DamageArea {
         }
     }
 
-    public IBlockState damageBlock(IBlockState b, Random rand, int x, int y, int z, Style style) {
+    public IBlockState damageBlock(IBlockState b, Random rand, int x, int y, int z, CompiledPalette palette) {
         float damage = getDamage(x, y, z);
         if (damage < 0.001) {
             return b;
         }
-        if (style.isEasyToDestroy(b)) {
+        if (palette.isEasyToDestroy(b)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }
-        if (style.isLiquid(b)) {
+        if (palette.isLiquid(b)) {
             damage *= 10f;
         }
         if (rand.nextFloat() <= damage) {
-            if (damage < BLOCK_DAMAGE_CHANCE && style.canBeDamagedToIronBars(b)) {
+            IBlockState damaged = palette.canBeDamagedToIronBars(b);
+            if (damage < BLOCK_DAMAGE_CHANCE && damaged != null) {
                 if (rand.nextFloat() < .7f) {
-                    b = Blocks.IRON_BARS.getDefaultState();
+                    b = damaged;
                 } else {
                     b = y < LostCityConfiguration.WATERLEVEL ? LostCitiesTerrainGenerator.water : LostCitiesTerrainGenerator.air;
                 }

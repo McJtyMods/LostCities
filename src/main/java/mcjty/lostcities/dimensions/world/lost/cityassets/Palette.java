@@ -6,10 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
+import mcjty.lostcities.varia.Tools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -25,7 +24,10 @@ public class Palette implements IAsset {
 
     private String name;
     final Map<Character, Object> palette = new HashMap<>();
+    final Map<Character, IBlockState> damaged = new HashMap<>();
 
+    public Palette() {
+    }
 
     public Palette(JsonObject object) {
         readFromJSon(object);
@@ -35,9 +37,18 @@ public class Palette implements IAsset {
         this.name = name;
     }
 
+    public void merge(Palette other) {
+        palette.putAll(other.palette);
+        damaged.putAll(other.damaged);
+    }
+
     @Override
     public String getName() {
         return name;
+    }
+
+    public Map<Character, IBlockState> getDamaged() {
+        return damaged;
     }
 
     @Override
@@ -50,26 +61,10 @@ public class Palette implements IAsset {
             Character c = o.get("char").getAsCharacter();
             if (o.has("block")) {
                 String block = o.get("block").getAsString();
-                int meta = o.get("meta").getAsInt();
-                value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block));
-                if (value == null) {
-                    // @todo
-                    throw new RuntimeException("Cannot find block '" + block + "'!");
-                }
-                palette.put(c, ((Block)value).getStateFromMeta(meta));
-            } else if (o.has("style")) {
-                value = o.get("style").getAsString();
+                palette.put(c, Tools.stringToState(block));
+            } else if (o.has("frompalette")) {
+                value = o.get("frompalette").getAsString();
                 palette.put(c, value);
-            } else if (o.has("styles")) {
-                JsonArray array = o.get("styles").getAsJsonArray();
-                List<Pair<Float, String>> styles = new ArrayList<>();
-                for (JsonElement el : array) {
-                    JsonObject ob = el.getAsJsonObject();
-                    Float f = ob.get("factor").getAsFloat();
-                    String style = ob.get("style").getAsString();
-                    styles.add(Pair.of(f, style));
-                }
-                addMappingViaStyle(c, styles.toArray(new Pair[styles.size()]));
             } else if (o.has("blocks")) {
                 JsonArray array = o.get("blocks").getAsJsonArray();
                 List<Pair<Float, IBlockState>> blocks = new ArrayList<>();
@@ -77,14 +72,14 @@ public class Palette implements IAsset {
                     JsonObject ob = el.getAsJsonObject();
                     Float f = ob.get("factor").getAsFloat();
                     String block = ob.get("block").getAsString();
-                    int meta = ob.get("meta").getAsInt();
-                    Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(block));
-                    blocks.add(Pair.of(f, b.getStateFromMeta(meta)));
+                    blocks.add(Pair.of(f, Tools.stringToState(block)));
                 }
                 addMappingViaState(c, blocks.toArray(new Pair[blocks.size()]));
-
             } else {
                 throw new RuntimeException("Illegal palette!");
+            }
+            if (o.has("damaged")) {
+                damaged.put(c, Tools.stringToState(o.get("damaged").getAsString()));
             }
         }
     }
@@ -100,12 +95,14 @@ public class Palette implements IAsset {
             o.add("char", new JsonPrimitive(entry.getKey()));
             if (entry.getValue() instanceof IBlockState) {
                 IBlockState state = (IBlockState) entry.getValue();
-                o.add("block", new JsonPrimitive(state.getBlock().getRegistryName().toString()));
-                o.add("meta", new JsonPrimitive(state.getBlock().getMetaFromState(state)));
+                o.add("block", new JsonPrimitive(Tools.stateToString(state)));
             } else if (entry.getValue() instanceof String) {
-                o.add("style", new JsonPrimitive((String) entry.getValue()));
+                o.add("frompalette", new JsonPrimitive((String) entry.getValue()));
             } else {
                 o.add("test", new JsonPrimitive("@todo"));
+            }
+            if (damaged.containsKey(entry.getKey())) {
+                o.add("damaged", new JsonPrimitive(Tools.stateToString(damaged.get(entry.getKey()))));
             }
             array.add(o);
         }
@@ -140,20 +137,6 @@ public class Palette implements IAsset {
                 r -= pair.getKey();
                 if (r <= 0) {
                     return pair.getRight();
-                }
-            }
-            return LostCitiesTerrainGenerator.air;
-        });
-        return this;
-    }
-
-    public Palette addMappingViaStyle(char c, Pair<Float, String>... randomBlocks) {
-        addFunctionMapping(c, info -> {
-            float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
-            for (Pair<Float, String> pair : randomBlocks) {
-                r -= pair.getKey();
-                if (r <= 0) {
-                    return info.getStyle().get(pair.getRight());
                 }
             }
             return LostCitiesTerrainGenerator.air;

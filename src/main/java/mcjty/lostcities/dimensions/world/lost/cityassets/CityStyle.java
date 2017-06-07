@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -21,7 +20,7 @@ public class CityStyle implements IAsset {
     private final List<Pair<Float, String>> parkSelector = new ArrayList<>();
     private final List<Pair<Float, String>> fountainSelector = new ArrayList<>();
     private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
-    private final List<List<Pair<Float, String>>> randomStyleChoices = new ArrayList<>();
+    private String style;
 
     public CityStyle(JsonObject object) {
         readFromJSon(object);
@@ -36,9 +35,14 @@ public class CityStyle implements IAsset {
         return name;
     }
 
+    public String getStyle() {
+        return style;
+    }
+
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
+        style = object.get("style").getAsString();
         JsonArray array = object.get("buildings").getAsJsonArray();
         for (JsonElement element : array) {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
@@ -69,16 +73,6 @@ public class CityStyle implements IAsset {
             String fountain = element.getAsJsonObject().get("bridge").getAsString();
             bridgeSelector.add(Pair.of(factor, fountain));
         }
-        array = object.get("randomstylechoices").getAsJsonArray();
-        for (JsonElement element : array) {
-            List<Pair<Float, String>> styles = new ArrayList<>();
-            for (JsonElement el : element.getAsJsonArray()) {
-                float factor = el.getAsJsonObject().get("factor").getAsFloat();
-                String style = el.getAsJsonObject().get("style").getAsString();
-                styles.add(Pair.of(factor, style));
-            }
-            randomStyleChoices.add(styles);
-        }
     }
 
     @Override
@@ -86,6 +80,7 @@ public class CityStyle implements IAsset {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("citystyle"));
         object.add("name", new JsonPrimitive(name));
+        object.add("style", new JsonPrimitive(style));
 
         JsonArray array = new JsonArray();
         for (Pair<Float, String> pair : buildingSelector) {
@@ -132,19 +127,6 @@ public class CityStyle implements IAsset {
         }
         object.add("bridges", array);
 
-        array = new JsonArray();
-        for (List<Pair<Float, String>> list : randomStyleChoices) {
-            JsonArray a = new JsonArray();
-            for (Pair<Float, String> pair : list) {
-                JsonObject o = new JsonObject();
-                o.add("factor", new JsonPrimitive(pair.getKey()));
-                o.add("style", new JsonPrimitive(pair.getValue()));
-                a.add(o);
-            }
-            array.add(a);
-        }
-        object.add("randomstylechoices", array);
-
         return object;
     }
 
@@ -156,36 +138,6 @@ public class CityStyle implements IAsset {
     public CityStyle addMultiBuilding(float factor, String multiBuilding) {
         multiBuildingSelector.add(Pair.of(factor, multiBuilding));
         return this;
-    }
-
-    public CityStyle addRandomStyleChoice(Pair<Float, String>... styles) {
-        randomStyleChoices.add(Lists.newArrayList(styles));
-        return this;
-    }
-
-    public Style getRandomStyle(LostCityChunkGenerator provider, Random random) {
-        Style style = new Style();
-        for (List<Pair<Float, String>> pairs : randomStyleChoices) {
-            float totalweight = 0;
-            for (Pair<Float, String> pair : pairs) {
-                totalweight += pair.getKey();
-            }
-            float r = random.nextFloat() * totalweight;
-            Style tomerge = null;
-            for (Pair<Float, String> pair : pairs) {
-                r -= pair.getKey();
-                if (r <= 0) {
-                    tomerge = AssetRegistries.STYLES.get(pair.getRight());
-                    if (tomerge == null) {
-                        throw new RuntimeException("Style '" + pair.getRight() + "' is missing!");
-                    }
-                    break;
-                }
-            }
-            style.merge(tomerge);
-        }
-
-        return style;
     }
 
     public String getRandomPark(LostCityChunkGenerator provider, Random random) {

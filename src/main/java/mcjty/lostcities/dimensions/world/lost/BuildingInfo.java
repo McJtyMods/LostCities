@@ -48,21 +48,17 @@ public class BuildingInfo {
     private BuildingInfo zmin = null;
     private BuildingInfo zmax = null;
     private DamageArea damageArea = null;
-    private Style style = null;
     private CityStyle cityStyle = null;
+    private Palette palette = null;
     private CompiledPalette compiledPalette = null;
 
 
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
 
-    public Palette getPalette() {
-        return AssetRegistries.PALETTES.get(buildingType.getPaletteName());
-    }
-
     public CompiledPalette getCompiledPalette() {
         if (compiledPalette == null) {
-            compiledPalette = new CompiledPalette(getStyle(), getPalette());
+            compiledPalette = new CompiledPalette(palette);
         }
         return compiledPalette;
     }
@@ -81,20 +77,14 @@ public class BuildingInfo {
         return cityStyle;
     }
 
-    private void createStyle(Random rand) {
+    private void createPalette(Random rand) {
+        Style style;
         if (!isCity) {
-            style = new Style(
-                    AssetRegistries.STYLES.get("street"),
-                    AssetRegistries.STYLES.get("outside"),
-                    AssetRegistries.STYLES.get("glass"));
+            style = AssetRegistries.STYLES.get("outside");
         } else {
-            style = getCityStyle().getRandomStyle(provider, rand);
-            style.resolveStyles();
+            style = AssetRegistries.STYLES.get(getCityStyle().getStyle());
         }
-    }
-
-    public Style getStyle() {
-        return style;
+        palette = style.getRandomPalette(provider, rand);
     }
 
     // x between 0 and 15, z between 0 and 15
@@ -274,7 +264,8 @@ public class BuildingInfo {
             floorsBelowGround = topleft.floorsBelowGround;
             doorBlock = topleft.doorBlock;
             bridgeType = topleft.bridgeType;
-            style = topleft.getStyle();
+            palette = topleft.palette;
+            compiledPalette = topleft.getCompiledPalette();
         } else {
             if (building2x2Section == 0) {
                 multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(getCityStyle().getRandomMultiBuilding(provider, rand));
@@ -302,7 +293,7 @@ public class BuildingInfo {
             floorsBelowGround = LostCityConfiguration.BUILDING_MINCELLARS + (LostCityConfiguration.BUILDING_MAXCELLARS <= 0 ? 0 : rand.nextInt(LostCityConfiguration.BUILDING_MAXCELLARS));
             doorBlock = getRandomDoor(rand);
             bridgeType = AssetRegistries.PARTS.get(getCityStyle().getRandomBridge(provider, rand));
-            createStyle(rand);
+            createPalette(rand);
         }
 
         floorTypes = new BuildingPart[floors + floorsBelowGround + 1];
