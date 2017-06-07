@@ -23,6 +23,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.ChunkPrimer;
 
 import java.util.*;
@@ -330,17 +331,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public static boolean isWaterBiome(LostCityChunkGenerator provider, int chunkX, int chunkZ) {
         Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-        return isWaterBiome(biomes);
+        return isWaterBiome(biomes[55]) || isWaterBiome(biomes[54]) || isWaterBiome(biomes[56]);
+//        return isWaterBiome(biomes);
     }
 
     public static boolean isWaterBiome(Biome[] biomes) {
         for (Biome biome : biomes) {
-            if (biome != Biomes.OCEAN && biome != Biomes.DEEP_OCEAN && biome != Biomes.FROZEN_OCEAN
-                    && biome != Biomes.RIVER && biome != Biomes.FROZEN_RIVER && biome != Biomes.BEACH && biome != Biomes.COLD_BEACH) {
+            if (!isWaterBiome(biome)) {
                 return false;
             }
         }
         return true;
+    }
+
+    private static boolean isWaterBiome(Biome biome) {
+        return !(biome != Biomes.OCEAN && biome != Biomes.DEEP_OCEAN && biome != Biomes.FROZEN_OCEAN
+                && biome != Biomes.RIVER && biome != Biomes.FROZEN_RIVER && biome != Biomes.BEACH && biome != Biomes.COLD_BEACH);
     }
 
     private void flattenChunkBorder(ChunkPrimer primer, int x, int offset, int z, Random rand, BuildingInfo info, int cx, int cz, int level) {
@@ -795,11 +801,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (isHigherThenNearbyStreetChunk(info, adjacent)) {
             return true;
         } else if (!adjacent.isCity && adjacent.hasBridge(provider, direction.getOrientation()) == null) {
-            if (adjacent.cityLevel < info.cityLevel) {
+            if (adjacent.cityLevel <= info.cityLevel) {
                 return true;
             }
-//            Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-//            if (isOcean(biomes)) {
+            // @todo, do we keep this?
+//            if (adjacent.cityLevel < info.cityLevel) {
+//                return true;
+//            }
+//            if (isWaterBiome(provider, chunkX, chunkZ)) {
 //                return true;
 //            }
         }

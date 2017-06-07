@@ -357,7 +357,8 @@ public class BuildingInfo {
                 f = LostCityConfiguration.BUILDING_MAXFLOORS;
             }
             floors = f + 1;
-            floorsBelowGround = LostCityConfiguration.BUILDING_MINCELLARS + (LostCityConfiguration.BUILDING_MAXCELLARS <= 0 ? 0 : rand.nextInt(LostCityConfiguration.BUILDING_MAXCELLARS));
+            int maxcellars = LostCityConfiguration.BUILDING_MAXCELLARS + cityLevel;
+            floorsBelowGround = LostCityConfiguration.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
             doorBlock = getRandomDoor(rand);
             bridgeType = AssetRegistries.PARTS.get(getCityStyle().getRandomBridge(provider, rand));
             createPalette(rand);
