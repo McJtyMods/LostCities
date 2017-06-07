@@ -10,7 +10,6 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.Building;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Style;
 import mcjty.lostcities.dimensions.world.lost.data.BridgeData;
-import mcjty.lostcities.dimensions.world.lost.data.FountainData;
 import mcjty.lostcities.dimensions.world.lost.data.Level;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.Block;
@@ -720,34 +719,24 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, rand, cx + x, height, cz + z, style));
         height++;
 
-        if (streetType == BuildingInfo.StreetType.PARK || info.fountainType >= 0) {
+        if (streetType == BuildingInfo.StreetType.PARK || info.fountainType != null) {
             int l = 0;
+            BuildingPart part;
             if (streetType == BuildingInfo.StreetType.PARK) {
-                BuildingPart park = info.parkType;
-                while (l < park.getSliceCount()) {
-                    if (l == 0 && doOceanBorder) {
-                        b = Blocks.COBBLESTONE_WALL.getDefaultState();
-                    } else {
-                        b = park.get(info, x, l, z);
-                    }
-                    b = damageArea.damageBlock(b, rand, cx + x, height, cz + z, style);
-                    BaseTerrainGenerator.setBlockState(primer, index++, b);
-                    height++;
-                    l++;
-                }
+                part = info.parkType;
             } else {
-                Level level = FountainData.FOUNTAINS[info.fountainType];
-                while (l < level.getFloor().length) {
-                    if (l == 0 && doOceanBorder) {
-                        b = Blocks.COBBLESTONE_WALL.getDefaultState();
-                    } else {
-                        b = level.get(info, x, l, z);
-                    }
-                    b = damageArea.damageBlock(b, rand, cx + x, height, cz + z, style);
-                    BaseTerrainGenerator.setBlockState(primer, index++, b);
-                    height++;
-                    l++;
+                part = info.fountainType;
+            }
+            while (l < part.getSliceCount()) {
+                if (l == 0 && doOceanBorder) {
+                    b = Blocks.COBBLESTONE_WALL.getDefaultState();
+                } else {
+                    b = part.get(info, x, l, z);
                 }
+                b = damageArea.damageBlock(b, rand, cx + x, height, cz + z, style);
+                BaseTerrainGenerator.setBlockState(primer, index++, b);
+                height++;
+                l++;
             }
         } else if (doOceanBorder) {
             b = Blocks.COBBLESTONE_WALL.getDefaultState();

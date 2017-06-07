@@ -26,7 +26,7 @@ public class BuildingInfo {
 
     public final MultiBuilding multiBuilding;
     public final Building buildingType;
-    public final int fountainType;
+    public final BuildingPart fountainType;
     public final BuildingPart parkType;
     public final int bridgeType;
     public final StreetType streetType;
@@ -291,9 +291,9 @@ public class BuildingInfo {
                 streetType = StreetType.NORMAL;
             }
             if (rand.nextFloat() < LostCityConfiguration.FOUNTAIN_CHANCE) {
-                fountainType = rand.nextInt(FountainData.FOUNTAINS.length);
+                fountainType = AssetRegistries.PARTS.get(getCityStyle().getRandomFountain(provider, rand));
             } else {
-                fountainType = -1;
+                fountainType = null;
             }
             parkType = AssetRegistries.PARTS.get(getCityStyle().getRandomPark(provider, rand));
             int f = LostCityConfiguration.BUILDING_MINFLOORS + rand.nextInt((int) (LostCityConfiguration.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (LostCityConfiguration.BUILDING_MAXFLOORS_CHANCE - LostCityConfiguration.BUILDING_MINFLOORS_CHANCE)));

@@ -548,6 +548,20 @@
         "multibuilding": "center"
       }
     ],
+    "fountains": [
+      {
+        "factor": 1.0,
+        "fountain": "fountain1"
+      },
+      {
+        "factor": 1.0,
+        "fountain": "fountain2"
+      },
+      {
+        "factor": 1.0,
+        "fountain": "fountain3"
+      }
+    ],
     "parks": [
       {
         "factor": 1.0,
@@ -875,6 +889,138 @@
         "block": "minecraft:quartz_stairs",
         "meta": 2
       }
+    ]
+  },
+  {
+    "type": "part",
+    "name": "fountain1",
+    "xsize": 16,
+    "zsize": 16,
+    "slices": [
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "      xxxx      ",
+        "      xWWx      ",
+        "      xWWx      ",
+        "      xxxx      ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ]
+    ]
+  },
+  {
+    "type": "part",
+    "name": "fountain2",
+    "xsize": 16,
+    "zsize": 16,
+    "slices": [
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "       xx       ",
+        "      xWWx      ",
+        "     xWWWWx     ",
+        "     xWWWWx     ",
+        "      xWWx      ",
+        "       xx       ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ]
+    ]
+  },
+  {
+    "type": "part",
+    "name": "fountain3",
+    "xsize": 16,
+    "zsize": 16,
+    "slices": [
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "      xxxx      ",
+        "      xWWx      ",
+        "      xWWx      ",
+        "      xxxx      ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "      :  :      ",
+        "                ",
+        "                ",
+        "      :  :      ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "      :  :      ",
+        "                ",
+        "                ",
+        "      :  :      ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "      xxxx      ",
+        "      x  x      ",
+        "      x  x      ",
+        "      xxxx      ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ]
     ]
   },
   {
