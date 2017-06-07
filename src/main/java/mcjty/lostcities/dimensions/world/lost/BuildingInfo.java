@@ -60,19 +60,14 @@ public class BuildingInfo {
     private CompiledPalette compiledPalette = null;
 
     public enum Direction {
-        XMIN(X),
-        XMAX(X),
-        ZMIN(Z),
-        ZMAX(Z);
+        XMIN,
+        XMAX,
+        ZMIN,
+        ZMAX;
 
-        private final Orientation orientation;
-
-        Direction(Orientation orientation) {
-            this.orientation = orientation;
-        }
 
         public Orientation getOrientation() {
-            return orientation;
+            return (this == XMIN || this == XMAX) ? Orientation.X : Orientation.Z;
         }
 
         @Nonnull
@@ -92,23 +87,15 @@ public class BuildingInfo {
     }
 
     public enum Orientation {
-        X(Direction.XMIN, Direction.XMAX),
-        Z(Direction.ZMIN, Direction.ZMAX);
-
-        private final Direction minDir;
-        private final Direction maxDir;
-
-        Orientation(Direction minDir, Direction maxDir) {
-            this.minDir = minDir;
-            this.maxDir = maxDir;
-        }
+        X,
+        Z;
 
         public Direction getMinDir() {
-            return minDir;
+            return this == X ? Direction.XMIN : Direction.ZMIN;
         }
 
         public Direction getMaxDir() {
-            return maxDir;
+            return this == X ? Direction.XMAX : Direction.ZMAX;
         }
     }
 

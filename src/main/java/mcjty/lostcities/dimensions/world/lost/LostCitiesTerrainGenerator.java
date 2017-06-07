@@ -277,12 +277,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
 
-        int height = info.getCityGroundLevel();
-        if (isOcean(provider.biomesForGeneration)) {
-            // We have an ocean biome here. Flatten to a lower level
-            height = waterLevel + 4;
-        }
-
         List<GeometryTools.AxisAlignedBB2D> boxes = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
@@ -291,7 +285,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int ccz = chunkZ + z;
                     BuildingInfo info2 = BuildingInfo.getBuildingInfo(ccx, ccz, provider.seed, provider);
                     if (info2.isCity) {
-                        boxes.add(new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15));
+                        GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
+                        box.aux = info2.getCityGroundLevel();
+                        boxes.add(box);
                     }
                 }
             }
@@ -300,12 +296,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     double mindist = 1000000000.0;
+                    int minheight = 1000000000;
                     for (GeometryTools.AxisAlignedBB2D box : boxes) {
                         double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
                         if (dist < mindist) {
                             mindist = dist;
                         }
+                        if (box.aux < minheight) {
+                            minheight = box.aux;
+                        }
                     }
+                    int height = minheight;//info.getCityGroundLevel();
+                    if (isOcean(provider.biomesForGeneration)) {
+                        // We have an ocean biome here. Flatten to a lower level
+                        height = waterLevel + 4;
+                    }
+
                     int offset = (int) (Math.sqrt(mindist) * 2);
                     flattenChunkBorder(primer, x, offset, z, provider.rand, info, cx, cz, height);
                 }

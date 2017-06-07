@@ -43,6 +43,7 @@ public class CommandDebug implements CompatCommand {
             System.out.println("info.buildingType = " + info.buildingType.getName());
             System.out.println("info.floors = " + info.getNumFloors());
             System.out.println("info.floorsBelowGround = " + info.floorsBelowGround);
+            System.out.println("info.cityLevel = " + info.cityLevel);
         }
     }
 
