@@ -16,7 +16,7 @@ import java.util.function.Function;
 public class CompiledPalette {
 
     private final Map<Character, Object> palette = new HashMap<>();
-    private final Map<Character, IBlockState> damagedToBlock = new HashMap<>();
+    private final Map<IBlockState, IBlockState> damagedToBlock = new HashMap<>();
 
     public CompiledPalette(Palette... palettes) {
         // First add the straight palette entries
@@ -43,7 +43,8 @@ public class CompiledPalette {
                     if (value instanceof String) {
                         char c = ((String) value).charAt(0);
                         if (palette.containsKey(c) && !palette.containsKey(entry.getKey())) {
-                            palette.put(entry.getKey(), palette.get(c));
+                            Object s = palette.get(c);
+                            palette.put(entry.getKey(), s);
                             dirty = true;
                         }
                     }
@@ -52,8 +53,8 @@ public class CompiledPalette {
         }
 
         for (Palette p : palettes) {
-            for (Map.Entry<Character, IBlockState> entry : p.getDamaged().entrySet()) {
-                Character c = entry.getKey();
+            for (Map.Entry<IBlockState, IBlockState> entry : p.getDamaged().entrySet()) {
+                IBlockState c = entry.getKey();
                 damagedToBlock.put(c, entry.getValue());
             }
         }

@@ -440,7 +440,7 @@ public class BuildingInfo {
     }
 
     // This returns the actual stair direction. It keeps track if there are stair chunks around
-    // it that have higher stair priority
+    // it those have higher stair priority
     public Direction getActualStairDirection() {
         if (!actualStairsCalculated) {
             actualStairsCalculated = true;
@@ -449,7 +449,7 @@ public class BuildingInfo {
                 for (int cx = -1; cx <= 1; cx++) {
                     for (int cz = -1; cz <= 1; cz++) {
                         if (cx != 0 || cz != 0) {
-                            BuildingInfo adjacent = getBuildingInfo(cx, cz, seed, provider);
+                            BuildingInfo adjacent = getBuildingInfo(chunkX + cx, chunkZ + cz, seed, provider);
                             if (adjacent.getStairDirection() != null && adjacent.stairPriority > stairPriority) {
                                 actualStairDirection = null;
                                 break;

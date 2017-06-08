@@ -24,7 +24,7 @@ public class Palette implements IAsset {
 
     private String name;
     final Map<Character, Object> palette = new HashMap<>();
-    final Map<Character, IBlockState> damaged = new HashMap<>();
+    final Map<IBlockState, IBlockState> damaged = new HashMap<>();
 
     public Palette() {
     }
@@ -47,7 +47,7 @@ public class Palette implements IAsset {
         return name;
     }
 
-    public Map<Character, IBlockState> getDamaged() {
+    public Map<IBlockState, IBlockState> getDamaged() {
         return damaged;
     }
 
@@ -59,9 +59,17 @@ public class Palette implements IAsset {
             JsonObject o = element.getAsJsonObject();
             Object value = null;
             Character c = o.get("char").getAsCharacter();
+            IBlockState dmg = null;
+            if (o.has("damaged")) {
+                dmg = Tools.stringToState(o.get("damaged").getAsString());
+            }
             if (o.has("block")) {
                 String block = o.get("block").getAsString();
-                palette.put(c, Tools.stringToState(block));
+                IBlockState state = Tools.stringToState(block);
+                palette.put(c, state);
+                if (dmg != null) {
+                    damaged.put(state, dmg);
+                }
             } else if (o.has("frompalette")) {
                 value = o.get("frompalette").getAsString();
                 palette.put(c, value);
@@ -72,14 +80,15 @@ public class Palette implements IAsset {
                     JsonObject ob = el.getAsJsonObject();
                     Float f = ob.get("factor").getAsFloat();
                     String block = ob.get("block").getAsString();
-                    blocks.add(Pair.of(f, Tools.stringToState(block)));
+                    IBlockState state = Tools.stringToState(block);
+                    blocks.add(Pair.of(f, state));
+                    if (dmg != null) {
+                        damaged.put(state, dmg);
+                    }
                 }
                 addMappingViaState(c, blocks.toArray(new Pair[blocks.size()]));
             } else {
                 throw new RuntimeException("Illegal palette!");
-            }
-            if (o.has("damaged")) {
-                damaged.put(c, Tools.stringToState(o.get("damaged").getAsString()));
             }
         }
     }
