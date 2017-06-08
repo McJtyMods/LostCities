@@ -426,13 +426,13 @@ public class BuildingInfo {
         if (!stairsCalculated) {
             stairsCalculated = true;
             if (streetType != StreetType.PARK && !hasBuilding && isCity) {
-                if (cityLevel == getXmin().cityLevel - 1 && !getXmin().hasBuilding) {
+                if (cityLevel == getXmin().cityLevel - 1 && !getXmin().hasBuilding && getXmin().isCity) {
                     stairDirection = Direction.XMIN;
-                } else if (cityLevel == getXmax().cityLevel - 1 && !getXmax().hasBuilding) {
+                } else if (cityLevel == getXmax().cityLevel - 1 && !getXmax().hasBuilding && getXmax().isCity) {
                     stairDirection = Direction.XMAX;
-                } else if (cityLevel == getZmin().cityLevel - 1 && !getZmin().hasBuilding) {
+                } else if (cityLevel == getZmin().cityLevel - 1 && !getZmin().hasBuilding && getZmin().isCity) {
                     stairDirection = Direction.ZMIN;
-                } else if (cityLevel == getZmax().cityLevel - 1 && !getZmax().hasBuilding) {
+                } else if (cityLevel == getZmax().cityLevel - 1 && !getZmax().hasBuilding && getZmax().isCity) {
                     stairDirection = Direction.ZMAX;
                 } else {
                     stairDirection = null;
@@ -504,7 +504,7 @@ public class BuildingInfo {
             bt = i.bridgeType;
             i = i.getXmin();
         }
-        if ((!i.isCity) || i.hasBuilding) {
+        if ((!i.isCity) || i.hasBuilding || i.cityLevel > 0) {  // @todo support bridges at higher levels?
             return null;
         }
         i = getXmax();
@@ -514,7 +514,7 @@ public class BuildingInfo {
             }
             i = i.getXmax();
         }
-        if ((!i.isCity) || i.hasBuilding) {
+        if ((!i.isCity) || i.hasBuilding || i.cityLevel > 0) {
             return null;
         }
         xBridgeType = bt;
@@ -556,7 +556,7 @@ public class BuildingInfo {
             bt = i.bridgeType;
             i = i.getZmin();
         }
-        if ((!i.isCity) || i.hasBuilding) {
+        if ((!i.isCity) || i.hasBuilding || i.cityLevel > 0) {
             return null;
         }
         i = getZmax();
@@ -569,7 +569,7 @@ public class BuildingInfo {
             }
             i = i.getZmax();
         }
-        if ((!i.isCity) || i.hasBuilding) {
+        if ((!i.isCity) || i.hasBuilding || i.cityLevel > 0) {
             return null;
         }
         zBridgeType = bt;
