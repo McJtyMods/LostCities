@@ -757,37 +757,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         BaseTerrainGenerator.setBlockStateRange(primer, index, index + blocks, air);
         index += blocks;
 
-        // Check if we can generate stairs
-        // @todo, other directions
-//        Direction stairDirection = info.getStairDirection();
-//        if (stairDirection == Direction.XMIN && x <= 1) {
-//            int y;
-//            if (z < 2) {
-//                y = 12;
-//            } else {
-//                y = 12-(z-2);
-//            }
-//            if (y >= 2) {
-//                IBlockState slabup = Blocks.STONE_SLAB.getDefaultState().withProperty(BlockStoneSlab.HALF, BlockSlab.EnumBlockHalf.TOP);
-//                IBlockState slabdown = Blocks.STONE_SLAB.getDefaultState().withProperty(BlockStoneSlab.HALF, BlockSlab.EnumBlockHalf.BOTTOM);
-//                if (y % 2 == 0) {
-//                    b = slabdown;
-//                } else {
-//                    b = slabup;
-//                }
-//                int realy = info.getCityGroundLevel() + y/2;
-//                b = damageArea.damageBlock(b, rand, cx + x, realy, cz + z, palette);
-//                BaseTerrainGenerator.setBlockState(primer, index-256+realy, b);
-//                if (z == 2 && x == 1) {
-//                    for (int dy = 1 ; dy <= 5 ; dy++) {
-//                        b = damageArea.damageBlock(Blocks.COBBLESTONE_WALL.getDefaultState(), rand, cx + x, realy - dy, cz + z, palette);
-//                        BaseTerrainGenerator.setBlockState(primer, index - 256 + realy - dy, b);
-//                    }
-//                }
-//            }
-//        }
-//
-
         return index;
     }
 
