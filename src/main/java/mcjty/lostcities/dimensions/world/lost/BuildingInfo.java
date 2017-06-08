@@ -57,6 +57,11 @@ public class BuildingInfo {
     private Palette palette = null;
     private CompiledPalette compiledPalette = null;
 
+    private boolean xBridgeTypeCalculated = false;
+    private boolean zBridgeTypeCalculated = false;
+    private BuildingPart xBridgeType = null;
+    private BuildingPart zBridgeType = null;
+
     private boolean stairsCalculated = false;
     private Direction stairDirection;
     private boolean actualStairsCalculated = false;
@@ -475,6 +480,12 @@ public class BuildingInfo {
 
     // To prevent adjacent bridges of the same direction we give the bridges at even chunk Z coordinates higher priority
     public BuildingPart hasXBridge(LostCityChunkGenerator provider) {
+        if (xBridgeTypeCalculated) {
+            return xBridgeType;
+        }
+        xBridgeTypeCalculated = true;
+        xBridgeType = null;
+
         if (!xBridge) {
             return null;
         }
@@ -506,11 +517,18 @@ public class BuildingInfo {
         if ((!i.isCity) || i.hasBuilding) {
             return null;
         }
+        xBridgeType = bt;
         return bt;
     }
 
     // To prevent adjacent bridges of the same direction we give the bridges at even chunk X coordinates higher priority
     public BuildingPart hasZBridge(LostCityChunkGenerator provider) {
+        if (zBridgeTypeCalculated) {
+            return zBridgeType;
+        }
+        zBridgeTypeCalculated = true;
+        zBridgeType = null;
+
         if (!zBridge) {
             return null;
         }
@@ -554,6 +572,7 @@ public class BuildingInfo {
         if ((!i.isCity) || i.hasBuilding) {
             return null;
         }
+        zBridgeType = bt;
         return bt;
     }
 
