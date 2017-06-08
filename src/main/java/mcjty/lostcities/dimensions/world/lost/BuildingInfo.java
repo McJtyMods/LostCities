@@ -9,7 +9,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -29,6 +28,8 @@ public class BuildingInfo {
     public final BuildingPart fountainType;
     public final BuildingPart parkType;
     public final BuildingPart bridgeType;
+    public final BuildingPart stairType;
+    private final float stairPriority;      // A random number that indicates if this chunk should get a stair if there are competing stairs around it. The highest wins
     public final StreetType streetType;
     private final int floors;
     public final int floorsBelowGround;
@@ -56,45 +57,10 @@ public class BuildingInfo {
     private Palette palette = null;
     private CompiledPalette compiledPalette = null;
 
-    public enum Direction {
-        XMIN,
-        XMAX,
-        ZMIN,
-        ZMAX;
-
-
-        public Orientation getOrientation() {
-            return (this == XMIN || this == XMAX) ? Orientation.X : Orientation.Z;
-        }
-
-        @Nonnull
-        public BuildingInfo get(BuildingInfo info) {
-            switch (this) {
-                case XMIN:
-                    return info.getXmin();
-                case XMAX:
-                    return info.getXmax();
-                case ZMIN:
-                    return info.getZmin();
-                case ZMAX:
-                    return info.getZmax();
-            }
-            throw new IllegalStateException("Cannot happen!");
-        }
-    }
-
-    public enum Orientation {
-        X,
-        Z;
-
-        public Direction getMinDir() {
-            return this == X ? Direction.XMIN : Direction.ZMIN;
-        }
-
-        public Direction getMaxDir() {
-            return this == X ? Direction.XMAX : Direction.ZMAX;
-        }
-    }
+    private boolean stairsCalculated = false;
+    private Direction stairDirection;
+    private boolean actualStairsCalculated = false;
+    private Direction actualStairDirection;
 
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
@@ -288,7 +254,7 @@ public class BuildingInfo {
             BuildingInfo topleft = calculateTopLeft();
             multiBuilding = topleft.multiBuilding;
             if (multiBuilding != null) {
-                switch(building2x2Section) {
+                switch (building2x2Section) {
                     case 1:
                         buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(1, 0));
                         break;
@@ -312,6 +278,8 @@ public class BuildingInfo {
             floorsBelowGround = topleft.floorsBelowGround;
             doorBlock = topleft.doorBlock;
             bridgeType = topleft.bridgeType;
+            stairType = topleft.stairType;
+            stairPriority = topleft.stairPriority;
             palette = topleft.palette;
             compiledPalette = topleft.getCompiledPalette();
         } else {
@@ -358,6 +326,8 @@ public class BuildingInfo {
             floorsBelowGround = LostCityConfiguration.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
             doorBlock = getRandomDoor(rand);
             bridgeType = AssetRegistries.PARTS.get(getCityStyle().getRandomBridge(provider, rand));
+            stairType = AssetRegistries.PARTS.get(getCityStyle().getRandomStair(provider, rand));
+            stairPriority = rand.nextFloat();
             createPalette(rand);
         }
 
@@ -446,6 +416,52 @@ public class BuildingInfo {
         cnt += getXmax().getZmax().isStreetSection() ? 1 : 0;
         return cnt >= 3;
     }
+
+    private Direction getStairDirection() {
+        if (!stairsCalculated) {
+            stairsCalculated = true;
+            if (streetType != StreetType.PARK && !hasBuilding && isCity) {
+                if (cityLevel == getXmin().cityLevel - 1 && !getXmin().hasBuilding) {
+                    stairDirection = Direction.XMIN;
+                } else if (cityLevel == getXmax().cityLevel - 1 && !getXmax().hasBuilding) {
+                    stairDirection = Direction.XMAX;
+                } else if (cityLevel == getZmin().cityLevel - 1 && !getZmin().hasBuilding) {
+                    stairDirection = Direction.ZMIN;
+                } else if (cityLevel == getZmax().cityLevel - 1 && !getZmax().hasBuilding) {
+                    stairDirection = Direction.ZMAX;
+                } else {
+                    stairDirection = null;
+                }
+            } else {
+                stairDirection = null;
+            }
+        }
+        return stairDirection;
+    }
+
+    // This returns the actual stair direction. It keeps track if there are stair chunks around
+    // it that have higher stair priority
+    public Direction getActualStairDirection() {
+        if (!actualStairsCalculated) {
+            actualStairsCalculated = true;
+            actualStairDirection = getStairDirection();
+            if (actualStairDirection != null) {
+                for (int cx = -1; cx <= 1; cx++) {
+                    for (int cz = -1; cz <= 1; cz++) {
+                        if (cx != 0 || cz != 0) {
+                            BuildingInfo adjacent = getBuildingInfo(cx, cz, seed, provider);
+                            if (adjacent.getStairDirection() != null && adjacent.stairPriority > stairPriority) {
+                                actualStairDirection = null;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return actualStairDirection;
+    }
+
 
     public BuildingPart hasBridge(LostCityChunkGenerator provider, Orientation orientation) {
         switch (orientation) {
@@ -605,7 +621,7 @@ public class BuildingInfo {
         if (!i2.doesRoadExtendTo()) {
             return false;
         }
-        if (Math.abs(i1.cityLevel-i2.cityLevel) <= 0 /* @todo temporary, should be <= 1 */ ) {
+        if (Math.abs(i1.cityLevel - i2.cityLevel) <= 0 /* @todo temporary, should be <= 1 */) {
             // We allow a road difference of 1 maximum
             return true;
         }

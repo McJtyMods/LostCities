@@ -49,6 +49,20 @@
         "bridge": "bridge_covered"
       }
     ],
+    "stairs": [
+      {
+        "factor": 1.0,
+        "stair": "stairs1"
+      },
+      {
+        "factor": 1.0,
+        "stair": "stairs2"
+      },
+      {
+        "factor": 1.0,
+        "stair": "stairsbig"
+      }
+    ],
     "fountains": [
       {
         "factor": 1.0,
@@ -86,7 +100,6 @@
       }
     ]
   },
-
   {
     "type": "palette",
     "name": "bricks_standard",
@@ -184,7 +197,6 @@
       }
     ]
   },
-
   {
     "type": "palette",
     "name": "glass_side_variant_glass",
@@ -227,7 +239,6 @@
       }
     ]
   },
-
   {
     "type": "palette",
     "name": "glass_full",
@@ -339,20 +350,21 @@
         "block": "minecraft:stained_glass_pane@11"
       }
     ]
-  },  {
-  "type": "palette",
-  "name": "glass_full_light_blue",
-  "palette": [
-    {
-      "char": "+",
-      "block": "minecraft:stained_glass@3"
-    },
-    {
-      "char": "a",
-      "block": "minecraft:stained_glass@3"
-    }
-  ]
-},
+  },
+  {
+    "type": "palette",
+    "name": "glass_full_light_blue",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@3"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass@3"
+      }
+    ]
+  },
   {
     "type": "palette",
     "name": "glass_pane_light_blue",
@@ -367,7 +379,6 @@
       }
     ]
   },
-
   {
     "type": "palette",
     "name": "default",
@@ -412,8 +423,16 @@
         "block": "minecraft:water"
       },
       {
+        "char": "x",
+        "block": "minecraft:stonebrick"
+      },
+      {
         "char": "_",
         "block": "minecraft:stone_slab"
+      },
+      {
+        "char": "=",
+        "block": "minecraft:stone_slab@8"
       },
       {
         "char": " ",
@@ -508,9 +527,362 @@
       {
         "char": ")",
         "block": "minecraft:quartz_stairs@2"
+      },
+      {
+        "char": "/",
+        "block": "minecraft:stone_stairs@1"
       }
     ]
   },
+  {
+    "type": "part",
+    "name": "stairsbig",
+    "xsize": 6,
+    "zsize": 12,
+    "meta": [
+      {
+        "key": "z1",
+        "integer": 4
+      },
+      {
+        "key": "z2",
+        "integer": 11
+      }
+    ],
+    "slices": [
+      [
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "xxxxxx",
+        "xxxxx/",
+        "xxxxx/",
+        "xxxxx/",
+        "xxxxx/",
+        "xxxxx/",
+        "xxxxx/",
+        "xxxxxx"
+      ],
+      [
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "xxxxx_",
+        "xxxx/ ",
+        "xxxx/ ",
+        "xxxx/ ",
+        "xxxx/ ",
+        "xxxx/ ",
+        "xxxx/ ",
+        "xxxxx_"
+      ],
+      [
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "xxxx_ ",
+        "xxx/  ",
+        "xxx/  ",
+        "xxx/  ",
+        "xxx/  ",
+        "xxx/  ",
+        "xxx/  ",
+        "xxxx_ "
+      ],
+      [
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "xxx_  ",
+        "xx/   ",
+        "xx/   ",
+        "xx/   ",
+        "xx/   ",
+        "xx/   ",
+        "xx/   ",
+        "xxx_  "
+      ],
+      [
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "xx_   ",
+        "x/    ",
+        "x/    ",
+        "x/    ",
+        "x/    ",
+        "x/    ",
+        "x/    ",
+        "xx_   "
+      ],
+      [
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "x_    ",
+        "/     ",
+        "/     ",
+        "/     ",
+        "/     ",
+        "/     ",
+        "/     ",
+        "x_    "
+      ],
+      [
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "_     ",
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "      ",
+        "_     "
+      ]
+    ]
+  },
+  {
+    "type": "part",
+    "name": "stairs1",
+    "xsize": 2,
+    "zsize": 13,
+    "meta": [
+      {
+        "key": "z1",
+        "integer": 0
+      },
+      {
+        "key": "z2",
+        "integer": 2
+      }
+    ],
+    "slices": [
+      [
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "==",
+        "__"
+      ],
+      [
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "==",
+        "__",
+        "  ",
+        "  "
+      ],
+      [
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "==",
+        "__",
+        "  ",
+        "  ",
+        "  ",
+        "  "
+      ],
+      [
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "==",
+        "__",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  "
+      ],
+      [
+        "  ",
+        "  ",
+        " w",
+        "==",
+        "__",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  "
+      ],
+      [
+        "__",
+        "__",
+        "__",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  "
+      ]
+    ]
+  },  {
+  "type": "part",
+  "name": "stairs2",
+  "xsize": 2,
+  "zsize": 16,
+  "meta": [
+    {
+      "key": "z1",
+      "integer": 13
+    },
+    {
+      "key": "z2",
+      "integer": 15
+    }
+  ],
+  "slices": [
+    [
+      "  ",
+      "  ",
+      "  ",
+      "__",
+      "==",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      " w",
+      "  ",
+      "  "
+    ],
+    [
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "__",
+      "==",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      " w",
+      "  ",
+      "  "
+    ],
+    [
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "__",
+      "==",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      " w",
+      "  ",
+      "  "
+    ],
+    [
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "__",
+      "==",
+      "  ",
+      "  ",
+      " w",
+      "  ",
+      "  "
+    ],
+    [
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "__",
+      "==",
+      " w",
+      "  ",
+      "  "
+    ],
+    [
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "  ",
+      "__",
+      "__",
+      "__"
+    ]
+  ]
+},
   {
     "type": "part",
     "name": "bridge_open",

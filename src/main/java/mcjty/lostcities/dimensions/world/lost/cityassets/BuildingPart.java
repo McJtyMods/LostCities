@@ -8,6 +8,9 @@ import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import net.minecraft.block.state.IBlockState;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A section of a building. Can be either a complete floor or part of a floor.
  */
@@ -22,6 +25,8 @@ public class BuildingPart implements IAsset {
     private int xSize;
     private int zSize;
 
+    private Map<String, Object> metadata = new HashMap<>();
+
     public BuildingPart(JsonObject object) {
         readFromJSon(object);
     }
@@ -31,6 +36,19 @@ public class BuildingPart implements IAsset {
         this.slices = slices;
         this.xSize = xSize;
         this.zSize = zSize;
+    }
+
+    public Integer getMetaInteger(String key) {
+        return (Integer) metadata.get(key);
+    }
+    public Boolean getMetaBoolean(String key) {
+        return (Boolean) metadata.get(key);
+    }
+    public Float getMetaFloat(String key) {
+        return (Float) metadata.get(key);
+    }
+    public String getMetaString(String key) {
+        return (String) metadata.get(key);
     }
 
     @Override
@@ -54,6 +72,22 @@ public class BuildingPart implements IAsset {
             }
             slices[i++] = slice;
         }
+        if (object.has("meta")) {
+            JsonArray metaArray = object.get("meta").getAsJsonArray();
+            for (JsonElement element : metaArray) {
+                JsonObject o = element.getAsJsonObject();
+                String key = o.get("key").getAsString();
+                if (o.has("integer")) {
+                    metadata.put(key, o.get("integer").getAsInt());
+                } else if (o.has("float")) {
+                    metadata.put(key, o.get("float").getAsFloat());
+                } else if (o.has("boolean")) {
+                    metadata.put(key, o.get("boolean").getAsBoolean());
+                } else if (o.has("string")) {
+                    metadata.put(key, o.get("string").getAsString());
+                }
+            }
+        }
     }
 
     @Override
@@ -74,6 +108,24 @@ public class BuildingPart implements IAsset {
             sliceArray.add(a);
         }
         object.add("slices", sliceArray);
+
+        JsonArray metaArray = new JsonArray();
+        for (Map.Entry<String, Object> entry : metadata.entrySet()) {
+            JsonObject o = new JsonObject();
+            o.add("key", new JsonPrimitive(entry.getKey()));
+            Object v = entry.getValue();
+            if (v instanceof Integer) {
+                o.add("integer", new JsonPrimitive((Integer) v));
+            } else if (v instanceof Float) {
+                o.add("float", new JsonPrimitive((Float) v));
+            } else if (v instanceof Boolean) {
+                o.add("boolean", new JsonPrimitive((Boolean) v));
+            } else if (v instanceof String) {
+                o.add("string", new JsonPrimitive((String) v));
+            }
+            metaArray.add(o);
+        }
+        object.add("meta", metaArray);
 
         return object;
     }
@@ -99,7 +151,7 @@ public class BuildingPart implements IAsset {
     }
 
     public IBlockState get(BuildingInfo info, int x, int y, int z) {
-        return info.getCompiledPalette().get(slices[y].charAt(z * 16 + x), info);
+        return info.getCompiledPalette().get(slices[y].charAt(z * xSize + x), info);
     }
 
     public Character getC(int x, int y, int z) {

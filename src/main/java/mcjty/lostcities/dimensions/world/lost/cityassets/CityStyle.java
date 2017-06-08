@@ -19,6 +19,7 @@ public class CityStyle implements IAsset {
     private final List<Pair<Float, String>> bridgeSelector = new ArrayList<>();
     private final List<Pair<Float, String>> parkSelector = new ArrayList<>();
     private final List<Pair<Float, String>> fountainSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> stairSelector = new ArrayList<>();
     private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
     private String style;
 
@@ -66,6 +67,12 @@ public class CityStyle implements IAsset {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
             String fountain = element.getAsJsonObject().get("fountain").getAsString();
             fountainSelector.add(Pair.of(factor, fountain));
+        }
+        array = object.get("stairs").getAsJsonArray();
+        for (JsonElement element : array) {
+            float factor = element.getAsJsonObject().get("factor").getAsFloat();
+            String fountain = element.getAsJsonObject().get("stair").getAsString();
+            stairSelector.add(Pair.of(factor, fountain));
         }
         array = object.get("bridges").getAsJsonArray();
         for (JsonElement element : array) {
@@ -119,6 +126,15 @@ public class CityStyle implements IAsset {
         object.add("fountains", array);
 
         array = new JsonArray();
+        for (Pair<Float, String> pair : stairSelector) {
+            JsonObject o = new JsonObject();
+            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("stair", new JsonPrimitive(pair.getValue()));
+            array.add(o);
+        }
+        object.add("stairs", array);
+
+        array = new JsonArray();
         for (Pair<Float, String> pair : bridgeSelector) {
             JsonObject o = new JsonObject();
             o.add("factor", new JsonPrimitive(pair.getKey()));
@@ -140,88 +156,45 @@ public class CityStyle implements IAsset {
         return this;
     }
 
-    public String getRandomPark(LostCityChunkGenerator provider, Random random) {
-        List<Pair<Float, String>> parks = new ArrayList<>();
+    private String getRandomFromList(LostCityChunkGenerator provider, Random random, List<Pair<Float, String>> list) {
+        List<Pair<Float, String>> elements = new ArrayList<>();
         float totalweight = 0;
-        for (Pair<Float, String> pair : parkSelector) {
-            parks.add(pair);
+        for (Pair<Float, String> pair : list) {
+            elements.add(pair);
             totalweight += pair.getKey();
         }
         float r = random.nextFloat() * totalweight;
-        for (Pair<Float, String> pair : parks) {
+        for (Pair<Float, String> pair : elements) {
             r -= pair.getKey();
             if (r <= 0) {
                 return pair.getRight();
             }
         }
         return null;
+    }
+
+
+    public String getRandomStair(LostCityChunkGenerator provider, Random random) {
+        return getRandomFromList(provider, random, stairSelector);
+    }
+
+    public String getRandomPark(LostCityChunkGenerator provider, Random random) {
+        return getRandomFromList(provider, random, parkSelector);
     }
 
     public String getRandomBridge(LostCityChunkGenerator provider, Random random) {
-        List<Pair<Float, String>> bridges = new ArrayList<>();
-        float totalweight = 0;
-        for (Pair<Float, String> pair : bridgeSelector) {
-            bridges.add(pair);
-            totalweight += pair.getKey();
-        }
-        float r = random.nextFloat() * totalweight;
-        for (Pair<Float, String> pair : bridges) {
-            r -= pair.getKey();
-            if (r <= 0) {
-                return pair.getRight();
-            }
-        }
-        return null;
+        return getRandomFromList(provider, random, bridgeSelector);
     }
 
     public String getRandomFountain(LostCityChunkGenerator provider, Random random) {
-        List<Pair<Float, String>> fountains = new ArrayList<>();
-        float totalweight = 0;
-        for (Pair<Float, String> pair : fountainSelector) {
-            fountains.add(pair);
-            totalweight += pair.getKey();
-        }
-        float r = random.nextFloat() * totalweight;
-        for (Pair<Float, String> pair : fountains) {
-            r -= pair.getKey();
-            if (r <= 0) {
-                return pair.getRight();
-            }
-        }
-        return null;
+        return getRandomFromList(provider, random, fountainSelector);
     }
 
     public String getRandomBuilding(LostCityChunkGenerator provider, Random random) {
-        List<Pair<Float, String>> buildings = new ArrayList<>();
-        float totalweight = 0;
-        for (Pair<Float, String> pair : buildingSelector) {
-            buildings.add(pair);
-            totalweight += pair.getKey();
-        }
-        float r = random.nextFloat() * totalweight;
-        for (Pair<Float, String> pair : buildings) {
-            r -= pair.getKey();
-            if (r <= 0) {
-                return pair.getRight();
-            }
-        }
-        return null;
+        return getRandomFromList(provider, random, buildingSelector);
     }
 
     public String getRandomMultiBuilding(LostCityChunkGenerator provider, Random random) {
-        List<Pair<Float, String>> multiBuildings = new ArrayList<>();
-        float totalweight = 0;
-        for (Pair<Float, String> pair : multiBuildingSelector) {
-            multiBuildings.add(pair);
-            totalweight += pair.getKey();
-        }
-        float r = random.nextFloat() * totalweight;
-        for (Pair<Float, String> pair : multiBuildings) {
-            r -= pair.getKey();
-            if (r <= 0) {
-                return pair.getRight();
-            }
-        }
-        return null;
+        return getRandomFromList(provider, random, multiBuildingSelector);
     }
 }
