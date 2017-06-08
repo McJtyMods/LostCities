@@ -12,10 +12,7 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.Building;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.varia.GeometryTools;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockRail;
-import net.minecraft.block.BlockRailBase;
+import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
@@ -23,7 +20,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.ChunkPrimer;
 
 import java.util.*;
@@ -697,7 +693,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 break;
         }
         if (doOceanBorder) {
-            b = Blocks.STONEBRICK.getDefaultState();
+            // @todo expand for the other stair sides
+            if (!(x == 15 && z <= 2 && hasStairsGoingUpTo(info.getXmax(), info))) {
+                b = Blocks.STONEBRICK.getDefaultState();
+            }
         }
         BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, rand, cx + x, height, cz + z, palette));
         height++;
@@ -731,7 +730,41 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int blocks = 256 - height;
         BaseTerrainGenerator.setBlockStateRange(primer, index, index + blocks, air);
         index += blocks;
+
+        // Check if we can generate stairs
+        if (hasStairsGoingUpTo(info, info.getXmin()) && x <= 1) {
+            int y;
+            if (z < 2) {
+                y = 12;
+            } else {
+                y = 12-(z-2);
+            }
+            if (y >= 0) {
+                IBlockState slabup = Blocks.STONE_SLAB.getDefaultState().withProperty(BlockStoneSlab.HALF, BlockSlab.EnumBlockHalf.TOP);
+                IBlockState slabdown = Blocks.STONE_SLAB.getDefaultState().withProperty(BlockStoneSlab.HALF, BlockSlab.EnumBlockHalf.BOTTOM);
+                if (y % 2 == 0) {
+                    b = slabdown;
+                } else {
+                    b = slabup;
+                }
+                int realy = info.getCityGroundLevel() + y/2;
+                b = damageArea.damageBlock(b, rand, cx + x, realy, cz + z, palette);
+                BaseTerrainGenerator.setBlockState(primer, index-256+realy, b);
+                if (z == 2 && x == 1) {
+                    for (int dy = 1 ; dy <= 5 ; dy++) {
+                        b = damageArea.damageBlock(Blocks.COBBLESTONE_WALL.getDefaultState(), rand, cx + x, realy - dy, cz + z, palette);
+                        BaseTerrainGenerator.setBlockState(primer, index - 256 + realy - dy, b);
+                    }
+                }
+            }
+        }
+
+
         return index;
+    }
+
+    private boolean hasStairsGoingUpTo(BuildingInfo info, BuildingInfo goingTo) {
+        return info.streetType != BuildingInfo.StreetType.PARK && info.cityLevel == goingTo.cityLevel - 1 && !goingTo.hasBuilding;
     }
 
     private void generateDebris(ChunkPrimer primer, Random rand, BuildingInfo info) {
@@ -860,10 +893,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private IBlockState getBlockForLevel(BuildingInfo info, int x, int z, int height) {
         int f = getFloor(height);
-        int l = getLevel(info, height);
-        boolean isTop = l == info.getNumFloors();   // The top does not need generated doors
+        int localLevel = getLevel(info, height);
+        boolean isTop = localLevel == info.getNumFloors();   // The top does not need generated doors
 
-        BuildingPart part = info.getFloor(l);
+        BuildingPart part = info.getFloor(localLevel);
         if (f >= part.getSliceCount()) { // @todo avoid this?
             return air;
         }
@@ -871,32 +904,33 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         // If we are underground, the block is glass, we are on the side and the chunk next to
         // us doesn't have a building or floor there we replace the glass with a solid block
-        if (l < 0 && (b == Blocks.GLASS.getDefaultState() || b == Blocks.GLASS_PANE.getDefaultState()) && isSide(x, z) && (!info.getAdjacent(x, z).hasBuilding || info.getAdjacent(x, z).floorsBelowGround < -l)) {
+        BuildingInfo adjacent = info.getAdjacent(x, z);
+
+        if (localLevel < 0 && (b == Blocks.GLASS.getDefaultState() || b == Blocks.GLASS_PANE.getDefaultState()) && isSide(x, z) && (!adjacent.hasBuilding || adjacent.floorsBelowGround < -localLevel)) {
             b = bricks;
         }
 
         // For buildings that have a style which causes gaps at the side we fill in that gap if we are
         // at ground level
-        if (b == air && height == info.getCityGroundLevel() && isSide(x, z)) {
+        if (b == air && isSide(x, z) && adjacent.isCity && height == adjacent.getCityGroundLevel()) {
             b = baseBlock;
         }
 
         // for buildings that have a hole in the bottom floor we fill that hole if we are
         // at the bottom of the building
-        if (b == air && f == 0 && (l+info.floorsBelowGround) == 0) {
+        if (b == air && f == 0 && (localLevel+info.floorsBelowGround) == 0) {
             b = bricks;
         }
 
         if (!isTop) {
-            if (x == 0 && (z >= 6 && z <= 9) && f >= 1 && f <= 3 && info.hasConnectionAtX(l + info.floorsBelowGround)) {
-                BuildingInfo info2 = info.getXmin();
-                if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround))) {
+            if (x == 0 && (z >= 6 && z <= 9) && f >= 1 && f <= 3 && info.hasConnectionAtX(localLevel + info.floorsBelowGround)) {
+                if (hasConnectionWithBuilding(localLevel, info, adjacent)) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = bricks;
                     } else {
                         b = air;
                     }
-                } else if ((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) {
+                } else if (hasConnectionToTopOrOutside(localLevel, info, adjacent)) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = bricks;
                     } else {
@@ -907,14 +941,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
                 }
             } else if (x == 15 && (z >= 6 && z <= 9) && f >= 1 && f <= 3) {
-                BuildingInfo info2 = info.getXmax();
-                if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround)) && info2.hasConnectionAtX(l + info2.floorsBelowGround)) {
+                if (hasConnectionWithBuildingMax(localLevel, info, adjacent, Orientation.X)) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = bricks;
                     } else {
                         b = air;
                     }
-                } else if (((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) && info2.hasConnectionAtX(l + info2.floorsBelowGround)) {
+                } else if ((hasConnectionToTopOrOutside(localLevel, info, adjacent)) && adjacent.hasConnectionAtX(localLevel + adjacent.floorsBelowGround)) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = bricks;
                     } else {
@@ -925,15 +958,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
                 }
             }
-            if (z == 0 && (x >= 6 && x <= 9) && f >= 1 && f <= 3 && info.hasConnectionAtZ(l + info.floorsBelowGround)) {
-                BuildingInfo info2 = info.getZmin();
-                if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround))) {
+            if (z == 0 && (x >= 6 && x <= 9) && f >= 1 && f <= 3 && info.hasConnectionAtZ(localLevel + info.floorsBelowGround)) {
+                if (hasConnectionWithBuilding(localLevel, info, adjacent)) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = bricks;
                     } else {
                         b = air;
                     }
-                } else if ((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) {
+                } else if (hasConnectionToTopOrOutside(localLevel, info, adjacent)) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = bricks;
                     } else {
@@ -944,14 +976,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
                 }
             } else if (z == 15 && (x >= 6 && x <= 9) && f >= 1 && f <= 3) {
-                BuildingInfo info2 = info.getZmax();
-                if (info2.hasBuilding && ((l >= 0 && l < info2.getNumFloors()) || (l < 0 && (-l) <= info2.floorsBelowGround)) && info2.hasConnectionAtZ(l + info2.floorsBelowGround)) {
+                if (hasConnectionWithBuildingMax(localLevel, info, adjacent, Orientation.Z)) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = bricks;
                     } else {
                         b = air;
                     }
-                } else if (((!info2.hasBuilding && l == 0) || (info2.hasBuilding && l == info2.getNumFloors())) && info2.hasConnectionAtZ(l + info2.floorsBelowGround)) {
+                } else if ((hasConnectionToTopOrOutside(localLevel, info, adjacent)) && adjacent.hasConnectionAtZ(localLevel + adjacent.floorsBelowGround)) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = bricks;
                     } else {
@@ -963,12 +994,31 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
-        boolean down = f == 0 && (l + info.floorsBelowGround) == 0;
+        boolean down = f == 0 && (localLevel + info.floorsBelowGround) == 0;
 
         if (b.getBlock() == Blocks.LADDER && down) {
             b = bricks;
         }
         return b;
+    }
+
+    private boolean hasConnectionWithBuildingMax(int localLevel, BuildingInfo info, BuildingInfo info2, Orientation x) {
+        int globalLevel = info.localToGlobal(localLevel);
+        int localAdjacent = info2.globalToLocal(globalLevel);
+        int level = localAdjacent + info2.floorsBelowGround;
+        return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.floorsBelowGround)) && info2.hasConnectionAt(level, x);
+    }
+
+    private boolean hasConnectionToTopOrOutside(int localLevel, BuildingInfo info, BuildingInfo info2) {
+        int globalLevel = info.localToGlobal(localLevel);
+        int localAdjacent = info2.globalToLocal(globalLevel);
+        return (!info2.hasBuilding && localLevel == 0 && localAdjacent == 0) || (info2.hasBuilding && localAdjacent == info2.getNumFloors());
+    }
+
+    private boolean hasConnectionWithBuilding(int localLevel, BuildingInfo info, BuildingInfo info2) {
+        int globalLevel = info.localToGlobal(localLevel);
+        int localAdjacent = info2.globalToLocal(globalLevel);
+        return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.floorsBelowGround));
     }
 
     public static int getFloor(int height) {

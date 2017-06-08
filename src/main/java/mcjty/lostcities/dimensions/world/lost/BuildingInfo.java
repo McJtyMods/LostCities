@@ -14,9 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import static mcjty.lostcities.dimensions.world.lost.BuildingInfo.Orientation.X;
-import static mcjty.lostcities.dimensions.world.lost.BuildingInfo.Orientation.Z;
-
 public class BuildingInfo {
     public final int chunkX;
     public final int chunkZ;
@@ -464,12 +461,12 @@ public class BuildingInfo {
         if (!xBridge) {
             return null;
         }
-        if (!LostCitiesTerrainGenerator.isWaterBiome(provider, chunkX, chunkZ)) {
+        if (!isSuitableForBridge(provider, BuildingInfo.this)) {
             return null;
         }
         BuildingPart bt = bridgeType;
         BuildingInfo i = getXmin();
-        while ((!i.isCity) && i.xBridge && LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ)) {
+        while ((!i.isCity) && i.xBridge && isSuitableForBridge(provider, i)) {
             bt = i.bridgeType;
             i = i.getXmin();
         }
@@ -477,7 +474,7 @@ public class BuildingInfo {
             return null;
         }
         i = getXmax();
-        while ((!i.isCity) && i.xBridge && LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ)) {
+        while ((!i.isCity) && i.xBridge && isSuitableForBridge(provider, i)) {
             i = i.getXmax();
         }
         if ((!i.isCity) || i.hasBuilding) {
@@ -490,7 +487,7 @@ public class BuildingInfo {
         if (!zBridge) {
             return null;
         }
-        if (!LostCitiesTerrainGenerator.isWaterBiome(provider, chunkX, chunkZ)) {
+        if (!isSuitableForBridge(provider, BuildingInfo.this)) {
             return null;
         }
         if (hasXBridge(provider) != null) {
@@ -499,7 +496,7 @@ public class BuildingInfo {
 
         BuildingPart bt = bridgeType;
         BuildingInfo i = getZmin();
-        while ((!i.isCity) && i.zBridge && LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ)) {
+        while ((!i.isCity) && i.zBridge && isSuitableForBridge(provider, i)) {
             if (i.hasXBridge(provider) != null) {
                 return null;
             }
@@ -510,7 +507,7 @@ public class BuildingInfo {
             return null;
         }
         i = getZmax();
-        while ((!i.isCity) && i.zBridge && LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ)) {
+        while ((!i.isCity) && i.zBridge && isSuitableForBridge(provider, i)) {
             if (i.hasXBridge(provider) != null) {
                 return null;
             }
@@ -521,6 +518,11 @@ public class BuildingInfo {
         }
         return bt;
     }
+
+    private boolean isSuitableForBridge(LostCityChunkGenerator provider, BuildingInfo i) {
+        return i.cityLevel < cityLevel || LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ);
+    }
+
 
     public boolean hasXCorridor() {
         if (!xRailCorridor) {
@@ -617,6 +619,26 @@ public class BuildingInfo {
         return rand;
     }
 
+    // Convert a local building level to a global one (where cityLevel == 0)
+    public int localToGlobal(int l) {
+        return l + cityLevel;
+    }
+
+    public int globalToLocal(int l) {
+        return l - cityLevel;
+    }
+
+    public boolean hasConnectionAt(int level, Orientation orientation) {
+        switch (orientation) {
+            case X:
+                return hasConnectionAtX(level);
+            case Z:
+                return hasConnectionAtZ(level);
+        }
+        throw new IllegalStateException("Cannot happen!");
+    }
+
+    // This checks if there can be a connection at minX
     public boolean hasConnectionAtX(int level) {
         if (!isCity) {
             return false;
@@ -630,6 +652,7 @@ public class BuildingInfo {
         return connectionAtX[level];
     }
 
+    // This checks if there can be a connection at minZ
     public boolean hasConnectionAtZ(int level) {
         if (!isCity) {
             return false;
