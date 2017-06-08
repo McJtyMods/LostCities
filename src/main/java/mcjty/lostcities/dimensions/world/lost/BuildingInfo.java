@@ -473,16 +473,23 @@ public class BuildingInfo {
         return null;
     }
 
+    // To prevent adjacent bridges of the same direction we give the bridges at even chunk Z coordinates higher priority
     public BuildingPart hasXBridge(LostCityChunkGenerator provider) {
         if (!xBridge) {
             return null;
         }
-        if (!isSuitableForBridge(provider, BuildingInfo.this)) {
+        if (!isSuitableForBridge(provider, this)) {
+            return null;
+        }
+        if (chunkZ % 2 != 0 && (getZmin().hasXBridge(provider) != null || getZmax().hasXBridge(provider) != null)) {
             return null;
         }
         BuildingPart bt = bridgeType;
         BuildingInfo i = getXmin();
         while ((!i.isCity) && i.xBridge && isSuitableForBridge(provider, i)) {
+            if (chunkZ % 2 != 0 && (i.getZmin().hasXBridge(provider) != null || i.getZmax().hasXBridge(provider) != null)) {
+                return null;
+            }
             bt = i.bridgeType;
             i = i.getXmin();
         }
@@ -491,6 +498,9 @@ public class BuildingInfo {
         }
         i = getXmax();
         while ((!i.isCity) && i.xBridge && isSuitableForBridge(provider, i)) {
+            if (chunkZ % 2 != 0 && (i.getZmin().hasXBridge(provider) != null || i.getZmax().hasXBridge(provider) != null)) {
+                return null;
+            }
             i = i.getXmax();
         }
         if ((!i.isCity) || i.hasBuilding) {
@@ -499,14 +509,19 @@ public class BuildingInfo {
         return bt;
     }
 
+    // To prevent adjacent bridges of the same direction we give the bridges at even chunk X coordinates higher priority
     public BuildingPart hasZBridge(LostCityChunkGenerator provider) {
         if (!zBridge) {
             return null;
         }
-        if (!isSuitableForBridge(provider, BuildingInfo.this)) {
+        if (!isSuitableForBridge(provider, this)) {
             return null;
         }
         if (hasXBridge(provider) != null) {
+            return null;
+        }
+
+        if (chunkX % 2 != 0 && (getXmin().hasZBridge(provider) != null || getXmax().hasZBridge(provider) != null)) {
             return null;
         }
 
@@ -516,6 +531,10 @@ public class BuildingInfo {
             if (i.hasXBridge(provider) != null) {
                 return null;
             }
+            if (chunkX % 2 != 0 && (i.getXmin().hasZBridge(provider) != null || i.getXmax().hasZBridge(provider) != null)) {
+                return null;
+            }
+
             bt = i.bridgeType;
             i = i.getZmin();
         }
@@ -525,6 +544,9 @@ public class BuildingInfo {
         i = getZmax();
         while ((!i.isCity) && i.zBridge && isSuitableForBridge(provider, i)) {
             if (i.hasXBridge(provider) != null) {
+                return null;
+            }
+            if (chunkX % 2 != 0 && (i.getXmin().hasZBridge(provider) != null || i.getXmax().hasZBridge(provider) != null)) {
                 return null;
             }
             i = i.getZmax();
