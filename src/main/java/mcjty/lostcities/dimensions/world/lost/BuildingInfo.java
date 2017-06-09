@@ -307,8 +307,10 @@ public class BuildingInfo {
                 cityLevel = 0;
             } else if (height < 0.6f) {
                 cityLevel = 1;
-            } else {
+            } else if (height < 2) {
                 cityLevel = 2;
+            } else {
+                cityLevel = 3;
             }
 
             if (rand.nextDouble() < .2f) {

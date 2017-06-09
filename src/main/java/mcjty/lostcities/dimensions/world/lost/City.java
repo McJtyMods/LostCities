@@ -8,6 +8,7 @@ import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -75,6 +76,12 @@ public class City {
 
         Float foundFactor = null;
         Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+
+        if (biomes[55].getBaseHeight() > 4 || biomes[54].getBaseHeight() > 4 || biomes[56].getBaseHeight() > 4) {
+            return 0;   // These biomes are too high
+        }
+
+
         for (Biome biome : biomes) {
             Map<String, Float> map = LostCityConfiguration.getBiomeFactorMap();
             ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);

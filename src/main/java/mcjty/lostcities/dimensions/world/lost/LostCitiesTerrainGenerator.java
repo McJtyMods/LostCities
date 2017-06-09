@@ -477,28 +477,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 // Too small to split
                 return -1;
             }
-//            int minblocksBelow = 5; //connectedBlocks.size() / 2 - connectionThresshold;
-//            int maxblocksBelow = connectedBlocks.size() - connectionThresshold * 2;
+            int cuttingY = -1;      // Where we will cut
+            int cuttingCount = 1000000;
             int below = 0;
             for (int y = lowestY ; y <= highestY ; y++) {
                 if (y >= 3 && blocksPerY.get(y) <= connectionThresshold) {
-                    // There are few blocks here so this is a potential split place.
-                    // Only split if our average number of blocks per level so far is
-                    // lower then the total average number of blocks per level
-                    float currentAverage = (float) below / (y-lowestY);
-                    if (currentAverage < averageBlocksPerLevel / 2 /* @todo configurable factor*/) {
-                        return y;
+                    if (blocksPerY.get(y) < cuttingCount) {
+                        cuttingCount = blocksPerY.get(y);
+                        cuttingY = y;
+                    } else if (blocksPerY.get(y) > cuttingCount * 4) {
+                        return cuttingY;
                     }
                 }
-                below += blocksPerY.get(y);
-//
-//                if (blocksPerY.get(y) <= connectionThresshold && below >= minblocksBelow) {
-//                    return y;
-//                }
-//                below += blocksPerY.get(y);
-//                if (below > maxblocksBelow) {
-//                    return -1;
-//                }
             }
             return -1;
         }
