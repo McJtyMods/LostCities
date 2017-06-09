@@ -530,10 +530,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     /// Fix floating blocks after an explosion
     private void fixAfterExplosion(ChunkPrimer primer, BuildingInfo info, Random rand) {
-        int start = info.getCityGroundLevel() - info.floorsBelowGround * 6;
-//        int start = LostCityConfiguration.EXPLOSION_MINHEIGHT - LostCityConfiguration.EXPLOSION_MAXRADIUS;
+//        int start = info.getCityGroundLevel() - info.floorsBelowGround * 6;
+        int start = 30;
         int end = info.getMaxHeight() + 6;
         char air = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
+        char gold = (char) Block.BLOCK_STATE_IDS.get(Blocks.GOLD_BLOCK.getDefaultState());
         char liquid = (char) Block.BLOCK_STATE_IDS.get(water);
 
         List<Blob> blobs = new ArrayList<>();
@@ -571,7 +572,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
             if (rand.nextFloat() < LostCityConfiguration.DESTROY_OR_MOVE_CHANCE && blob.connectedBlocks.size() < LostCityConfiguration.DESTROY_SMALL_SECTIONS_SIZE) {
                 for (Integer index : blob.connectedBlocks) {
-                    primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : air;
+                    primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : gold;
                 }
             } else {
                 for (Integer index : blob.connectedBlocks) {
@@ -839,7 +840,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int x = rand.nextInt(16);
                     int z = rand.nextInt(16);
                     if (rand.nextFloat() < locationFactor.apply(x, z)) {
-                        int index = (x << 12) | (z << 8) + 255;
+                        int index = (x << 12) | (z << 8) + 254;     // Start one lower for safety
                         while (primer.data[index] == air || primer.data[index] == liquid) {
                             index--;
                         }
