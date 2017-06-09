@@ -15,9 +15,9 @@ public class ModDimensions {
         GameRegistry.registerWorldGenerator(new LostCityWorldGenerator(), 1000);
         worldType = new LostWorldType();
         // @todo disabled due to not working
-//        if (LostCities.biomesoplenty) {
-//            worldTypeBOP = new LostWorldTypeBOP();
-//        }
+        if (LostCities.biomesoplenty) {
+            worldTypeBOP = new LostWorldTypeBOP();
+        }
     }
 
 }

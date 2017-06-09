@@ -23,7 +23,10 @@ public class LostWorldTypeBOP extends WorldType {
         if (biomeProvider == null) {
             for (WorldType type : WorldType.WORLD_TYPES) {
                 if ("BIOMESOP".equals(type.getName())) {
+                    WorldType orig = world.getWorldInfo().getTerrainType();
+                    world.getWorldInfo().setTerrainType(type);
                     biomeProvider = type.getBiomeProvider(world);
+                    world.getWorldInfo().setTerrainType(orig);
                     break;
                 }
             }

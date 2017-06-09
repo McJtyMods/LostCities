@@ -531,6 +531,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     /// Fix floating blocks after an explosion
     private void fixAfterExplosion(ChunkPrimer primer, BuildingInfo info, Random rand) {
         int start = info.getCityGroundLevel() - info.floorsBelowGround * 6;
+//        int start = LostCityConfiguration.EXPLOSION_MINHEIGHT - LostCityConfiguration.EXPLOSION_MAXRADIUS;
         int end = info.getMaxHeight() + 6;
         char air = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
         char liquid = (char) Block.BLOCK_STATE_IDS.get(water);
