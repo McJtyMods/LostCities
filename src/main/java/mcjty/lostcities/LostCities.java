@@ -31,6 +31,7 @@ public class LostCities {
     public static LostCities instance;
 
     public static boolean chisel = false;
+    public static boolean biomesoplenty = false;
 
     /**
      * Run before anything else. Read your config, create blocks, items, etc, and
@@ -38,6 +39,8 @@ public class LostCities {
      */
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
+        chisel = Loader.isModLoaded("chisel");
+        biomesoplenty = Loader.isModLoaded("biomesoplenty");
         this.proxy.preInit(e);
     }
 
@@ -47,8 +50,6 @@ public class LostCities {
     @Mod.EventHandler
     public void init(FMLInitializationEvent e) {
         this.proxy.init(e);
-
-        chisel = Loader.isModLoaded("chisel");
     }
 
     @Mod.EventHandler
