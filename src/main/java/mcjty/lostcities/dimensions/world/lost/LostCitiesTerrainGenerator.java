@@ -113,6 +113,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         } else {
             doNormalChunk(chunkX, chunkZ, primer, info);
         }
+        if (info.getDamageArea().hasExplosions()) {
+            fixAfterExplosion(primer, chunkX, chunkZ, info, provider.rand);
+        }
         generateDebris(primer, provider.rand, info);
     }
 
@@ -396,11 +399,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        if (building) {
-            if (info.getDamageArea().hasExplosions()) {
-                fixAfterExplosion(primer, info, rand);
-            }
-        } else {
+        if (!building) {
             generateStreetDecorations(chunkX, chunkZ, primer, info, rand);
         }
     }
@@ -435,22 +434,77 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private static class Blob {
         private final int starty;
         private final int endy;
-        private final Set<Integer> connectedBlocks = new HashSet<>();
+        private Set<Integer> connectedBlocks = new HashSet<>();
+        private final Map<Integer, Integer> blocksPerY = new HashMap<>();
         private int connections = 0;
         private int lowestY;
+        private int highestY;
 
         public Blob(int starty, int endy) {
             this.starty = starty;
             this.endy = endy;
             lowestY = 256;
+            highestY = 0;
         }
 
         public boolean contains(int index) {
             return connectedBlocks.contains(index);
         }
 
+        public int getLowestY() {
+            return lowestY;
+        }
+
+        public int getHighestY() {
+            return highestY;
+        }
+
+        public Set<Integer> cut(int y) {
+            Set<Integer> toRemove = new HashSet<>();
+            for (Integer block : connectedBlocks) {
+                if ((block & 255) >= y) {
+                    toRemove.add(block);
+                }
+            }
+            connectedBlocks.removeAll(toRemove);
+            return toRemove;
+        }
+
+        public int needsSplitting() {
+            float averageBlocksPerLevel = (float) connectedBlocks.size() / (highestY - lowestY + 1);
+            int connectionThresshold = (int) (averageBlocksPerLevel / 10);
+            if (connectionThresshold <= 0) {
+                // Too small to split
+                return -1;
+            }
+//            int minblocksBelow = 5; //connectedBlocks.size() / 2 - connectionThresshold;
+//            int maxblocksBelow = connectedBlocks.size() - connectionThresshold * 2;
+            int below = 0;
+            for (int y = lowestY ; y <= highestY ; y++) {
+                if (y >= 3 && blocksPerY.get(y) <= connectionThresshold) {
+                    // There are few blocks here so this is a potential split place.
+                    // Only split if our average number of blocks per level so far is
+                    // lower then the total average number of blocks per level
+                    float currentAverage = (float) below / (y-lowestY);
+                    if (currentAverage < averageBlocksPerLevel / 2 /* @todo configurable factor*/) {
+                        return y;
+                    }
+                }
+                below += blocksPerY.get(y);
+//
+//                if (blocksPerY.get(y) <= connectionThresshold && below >= minblocksBelow) {
+//                    return y;
+//                }
+//                below += blocksPerY.get(y);
+//                if (below > maxblocksBelow) {
+//                    return -1;
+//                }
+            }
+            return -1;
+        }
+
         public boolean destroyOrMoveThis() {
-            return ((float) connections / connectedBlocks.size()) < LostCityConfiguration.DESTROY_LONE_BLOCKS_FACTOR;
+            return connections < 5 || (((float) connections / connectedBlocks.size()) < LostCityConfiguration.DESTROY_LONE_BLOCKS_FACTOR);
         }
 
         private boolean isOutside(BuildingInfo info, int x, int y, int z) {
@@ -479,31 +533,42 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 return true;
             }
             if (y < starty) {
-                connections++;
+                connections += 5;
                 return true;
             }
             return false;
         }
 
-        public void scan(BuildingInfo info, ChunkPrimer primer, char a, BlockPos pos) {
+        public void scan(BuildingInfo info, ChunkPrimer primer, char air, char liquid, BlockPos pos) {
             Queue<BlockPos> todo = new ArrayDeque<>();
             todo.add(pos);
 
             while (!todo.isEmpty()) {
                 pos = todo.poll();
-                int index = calcIndex(pos.getX(), pos.getY(), pos.getZ());
+                int x = pos.getX();
+                int y = pos.getY();
+                int z = pos.getZ();
+                int index = calcIndex(x, y, z);
                 if (connectedBlocks.contains(index)) {
                     continue;
                 }
-                if (isOutside(info, pos.getX(), pos.getY(), pos.getZ())) {
+                if (isOutside(info, x, y, z)) {
                     continue;
                 }
-                if (primer.data[index] == a) {
+                if (primer.data[index] == air || primer.data[index] == liquid) {
                     continue;
                 }
                 connectedBlocks.add(index);
-                if (pos.getY() < lowestY) {
-                    lowestY = pos.getY();
+                if (!blocksPerY.containsKey(y)) {
+                    blocksPerY.put(y, 1);
+                } else {
+                    blocksPerY.put(y, blocksPerY.get(y)+1);
+                }
+                if (y < lowestY) {
+                    lowestY = y;
+                }
+                if (y > highestY) {
+                    highestY = y;
                 }
                 todo.add(pos.up());
                 todo.add(pos.down());
@@ -514,7 +579,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        private int calcIndex(int x, int y, int z) {
+        public static int calcIndex(int x, int y, int z) {
             return (x << 12) | (z << 8) + y;
         }
     }
@@ -529,12 +594,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     /// Fix floating blocks after an explosion
-    private void fixAfterExplosion(ChunkPrimer primer, BuildingInfo info, Random rand) {
+    private void fixAfterExplosion(ChunkPrimer primer, int chunkX, int chunkZ, BuildingInfo info, Random rand) {
 //        int start = info.getCityGroundLevel() - info.floorsBelowGround * 6;
-        int start = 30;
-        int end = info.getMaxHeight() + 6;
+        int start = info.getDamageArea().getLowestExplosionHeight();
+//        int end = info.getMaxHeight() + 20;//@todo 6;
+        int end = info.getDamageArea().getHighestExplosionHeight();
         char air = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
-        char gold = (char) Block.BLOCK_STATE_IDS.get(Blocks.GOLD_BLOCK.getDefaultState());
         char liquid = (char) Block.BLOCK_STATE_IDS.get(water);
 
         List<Blob> blobs = new ArrayList<>();
@@ -548,11 +613,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         Blob blob = findBlob(blobs, index);
                         if (blob == null) {
                             blob = new Blob(start, end + 6);
-                            blob.scan(info, primer, air, new BlockPos(x, y, z));
+                            blob.scan(info, primer, air, liquid, new BlockPos(x, y, z));
                             blobs.add(blob);
                         }
                     }
                     index++;
+                }
+            }
+        }
+
+        // Split large blobs that have very thin connections in Y direction
+        for (Blob blob : blobs) {
+            int y = blob.needsSplitting();
+            if (y != -1) {
+                Set<Integer> toRemove = blob.cut(y);
+                for (Integer index : toRemove) {
+                    primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : air;
                 }
             }
         }
@@ -564,20 +640,25 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             return y1 - y2;
         });
 
+
         Blob blocksToMove = new Blob(0, 256);
         for (Blob blob : blobs) {
             if (!blob.destroyOrMoveThis()) {
                 // The rest of the blobs doesn't have to be destroyed anymore
                 break;
             }
-            if (rand.nextFloat() < LostCityConfiguration.DESTROY_OR_MOVE_CHANCE && blob.connectedBlocks.size() < LostCityConfiguration.DESTROY_SMALL_SECTIONS_SIZE) {
+//            if (blob.connectedBlocks.size() == 1 && blob.connections == 1 && primer.data[blob.connectedBlocks.iterator().next()-1] == air) {
+//                // Solitary blocks and one connection are removed if there is nothing below them
+//                // because it is very likely that they don't connect to the adjacent chunk either
+//                int index = blob.connectedBlocks.iterator().next();
+//                primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : air;
+            if (rand.nextFloat() < LostCityConfiguration.DESTROY_OR_MOVE_CHANCE || blob.connectedBlocks.size() < LostCityConfiguration.DESTROY_SMALL_SECTIONS_SIZE
+                    || blob.connections < 5) {
                 for (Integer index : blob.connectedBlocks) {
-                    primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : gold;
+                    primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : air;
                 }
             } else {
-                for (Integer index : blob.connectedBlocks) {
-                    blocksToMove.connectedBlocks.add(index);
-                }
+                blocksToMove.connectedBlocks.addAll(blob.connectedBlocks);
             }
         }
         for (Integer index : blocksToMove.connectedBlocks) {
