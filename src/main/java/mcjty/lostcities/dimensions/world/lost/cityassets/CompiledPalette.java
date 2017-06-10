@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
@@ -74,8 +75,9 @@ public class CompiledPalette {
         }
     }
 
-    public boolean isGlass(IBlockState b) {
-        return b.getBlock() == Blocks.GLASS || b.getBlock() == Blocks.GLASS_PANE;
+    public static boolean isGlass(IBlockState b) {
+        Block block = b.getBlock();
+        return block == Blocks.GLASS || block == Blocks.GLASS_PANE || block == Blocks.STAINED_GLASS || block == Blocks.STAINED_GLASS_PANE;
     }
 
     public IBlockState canBeDamagedToIronBars(IBlockState b) {

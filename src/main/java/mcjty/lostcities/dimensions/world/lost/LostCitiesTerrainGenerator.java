@@ -826,6 +826,55 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
+        char a = (char) Block.BLOCK_STATE_IDS.get(air);
+        // Go back to groundlevel
+        while (primer.data[index-1] == a) {
+            index--;
+            height--;
+        }
+        // Only generate random leaf blocks on top of normal stone
+        if (primer.data[index-1] == (char) Block.BLOCK_STATE_IDS.get(baseBlock)) {
+            if (info.getXmin().hasBuilding && x <= 2) {
+                while (rand.nextFloat() < (LostCityConfiguration.CHANCE_OF_RANDOM_LEAFBLOCKS * (3 - x))) {
+                    b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                    b = damageArea.damageBlock(b, rand, cx + x, height, cz + z, palette);
+                    BaseTerrainGenerator.setBlockState(primer, index++, b);
+                    height++;
+                }
+            }
+            if (info.getXmax().hasBuilding && x >= 13) {
+                while (rand.nextFloat() < (LostCityConfiguration.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 12))) {
+                    b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                    b = damageArea.damageBlock(b, rand, cx + x, height, cz + z, palette);
+                    BaseTerrainGenerator.setBlockState(primer, index++, b);
+                    height++;
+                }
+            }
+            if (info.getZmin().hasBuilding && z <= 2) {
+                while (rand.nextFloat() < (LostCityConfiguration.CHANCE_OF_RANDOM_LEAFBLOCKS * (3 - z))) {
+                    b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                    b = damageArea.damageBlock(b, rand, cx + x, height, cz + z, palette);
+                    BaseTerrainGenerator.setBlockState(primer, index++, b);
+                    height++;
+                }
+            }
+            if (info.getZmax().hasBuilding && z <= 13) {
+                while (rand.nextFloat() < (LostCityConfiguration.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 12))) {
+                    b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                    b = damageArea.damageBlock(b, rand, cx + x, height, cz + z, palette);
+                    BaseTerrainGenerator.setBlockState(primer, index++, b);
+                    height++;
+                }
+            }
+
+            while (rand.nextFloat() < (LostCityConfiguration.CHANCE_OF_RANDOM_LEAFBLOCKS / 6)) {
+                b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                b = damageArea.damageBlock(b, rand, cx + x, height, cz + z, palette);
+                BaseTerrainGenerator.setBlockState(primer, index++, b);
+                height++;
+            }
+        }
+
         int blocks = 256 - height;
         BaseTerrainGenerator.setBlockStateRange(primer, index, index + blocks, air);
         index += blocks;
@@ -1023,7 +1072,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         // us doesn't have a building or floor there we replace the glass with a solid block
         BuildingInfo adjacent = info.getAdjacent(x, z);
 
-        if (localLevel < 0 && (b == Blocks.GLASS.getDefaultState() || b == Blocks.GLASS_PANE.getDefaultState()) && isSide(x, z) && (!adjacent.hasBuilding || adjacent.floorsBelowGround < -localLevel)) {
+        if (localLevel < 0 && CompiledPalette.isGlass(b) && isSide(x, z) && (!adjacent.hasBuilding || adjacent.floorsBelowGround < -localLevel)) {
             b = bricks;
         }
 

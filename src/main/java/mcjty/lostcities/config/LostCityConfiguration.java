@@ -15,11 +15,10 @@ public class LostCityConfiguration {
     public static final String CATEGORY_EXPLOSIONS = "explosions";
     public static final String CATEGORY_CITIES = "cities";
 
-
-
     public static int DEBRIS_TO_NEARBYCHUNK_FACTOR = 200;
 
     public static float VINE_CHANCE = 0.009f;
+    public static float CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
 
     public static int GROUNDLEVEL = 71;
     public static int WATERLEVEL_OFFSET = 8;
@@ -124,6 +123,7 @@ public class LostCityConfiguration {
         STYLE_CHANCE_MOSSY = cfg.getFloat("styleChanceMossy", CATEGORY_LOSTCITY, STYLE_CHANCE_MOSSY, 0.0f, 1.0f, "The chance that a brick will be mossy");
 
         VINE_CHANCE = cfg.getFloat("vineChance", CATEGORY_LOSTCITY, VINE_CHANCE, 0.0f, 1.0f, "The chance that a block on the outside of a building will be covered with a vine");
+        CHANCE_OF_RANDOM_LEAFBLOCKS = cfg.getFloat("randomLeafBlockChance", CATEGORY_LOSTCITY, CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f, "Chance that leafblocks will be generated at the border of a building and a street");
 
         GROUNDLEVEL = cfg.getInt("groundLevel", CATEGORY_LOSTCITY, GROUNDLEVEL, 2, 256, "Ground level");
         WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", CATEGORY_LOSTCITY, WATERLEVEL_OFFSET, 1, 30, "How much lower the water level is compared to the ground level (63)");
