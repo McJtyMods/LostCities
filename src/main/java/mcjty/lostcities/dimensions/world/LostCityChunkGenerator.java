@@ -17,6 +17,7 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.gen.ChunkProviderSettings;
 import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.MapGenCaves;
@@ -66,6 +67,13 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
     // Holds ravine generator
     private MapGenBase ravineGenerator = new MapGenRavine();
 
+    public IChunkGenerator otherGenerator = null;
+
+    public LostCityChunkGenerator(World world, IChunkGenerator otherGenerator) {
+        this(world);
+        this.otherGenerator = otherGenerator;
+    }
+
     public LostCityChunkGenerator(World world) {
 
         {
@@ -99,6 +107,15 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
         this.rand.setSeed(chunkX * 341873128712L + chunkZ * 132897987541L);
+
+        if (otherGenerator != null) {
+            BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, seed, this);
+            if (!info.isCity) {
+                return otherGenerator.provideChunk(chunkX, chunkZ);
+            }
+        }
+
+
         ChunkPrimer chunkprimer = new ChunkPrimer();
 
         this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
