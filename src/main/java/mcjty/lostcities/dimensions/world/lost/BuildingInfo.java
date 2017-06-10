@@ -6,12 +6,11 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.QualityRandom;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class BuildingInfo {
     public final int chunkX;
@@ -67,8 +66,23 @@ public class BuildingInfo {
     private boolean actualStairsCalculated = false;
     private Direction actualStairDirection;
 
+    // A list of todo's for mob spawners
+    private final List<Pair<BlockPos, String>> mobSpawnerTodo = new ArrayList<>();
+
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
+
+    public void addSpawnerTodo(BlockPos pos, String mobId) {
+        mobSpawnerTodo.add(Pair.of(pos, mobId));
+    }
+
+    public List<Pair<BlockPos, String>> getMobSpawnerTodo() {
+        return mobSpawnerTodo;
+    }
+
+    public void clearMobSpawnerTodo() {
+        mobSpawnerTodo.clear();
+    }
 
     public CompiledPalette getCompiledPalette() {
         if (compiledPalette == null) {

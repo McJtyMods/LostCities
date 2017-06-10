@@ -502,19 +502,23 @@
       },
       {
         "char": "1",
-        "block": "minecraft:planks"
+        "block": "minecraft:mob_spawner",
+        "mob": "Zombie"
       },
       {
         "char": "2",
-        "block": "minecraft:planks"
+        "block": "minecraft:mob_spawner",
+        "mob": "Skeleton"
       },
       {
         "char": "3",
-        "block": "minecraft:planks"
+        "block": "minecraft:mob_spawner",
+        "mob": "Spider"
       },
       {
         "char": "4",
-        "block": "minecraft:planks"
+        "block": "minecraft:mob_spawner",
+        "mob": "Blaze"
       },
       {
         "char": "w",

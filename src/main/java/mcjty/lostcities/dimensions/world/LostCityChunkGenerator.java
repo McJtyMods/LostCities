@@ -109,6 +109,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         this.rand.setSeed(chunkX * 341873128712L + chunkZ * 132897987541L);
 
         if (otherGenerator != null) {
+            // For ATG, experimental
             BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, seed, this);
             if (!info.isCity) {
                 return otherGenerator.provideChunk(chunkX, chunkZ);

@@ -3,7 +3,6 @@ package mcjty.lostcities.dimensions.world;
 import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.DamageArea;
 import mcjty.lostcities.dimensions.world.lost.GenInfo;
 import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
@@ -24,7 +23,6 @@ import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Map;
 import java.util.Random;
 
 import static mcjty.lostcities.dimensions.world.lost.DamageArea.BLOCK_DAMAGE_CHANCE;
@@ -110,6 +108,9 @@ public class LostCityWorldGenerator implements IWorldGenerator {
     }
 
     private void generateLootSpawners(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator chunkGenerator) {
+        int cx = chunkX * 16;
+        int cz = chunkZ * 16;
+
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, world.getSeed(), chunkGenerator);
 
         int buildingtop = 0;
@@ -118,61 +119,40 @@ public class LostCityWorldGenerator implements IWorldGenerator {
             buildingtop = info.getMaxHeight();
         }
 
-        int height = info.getCityGroundLevel() - info.floorsBelowGround * 6;
+        for (Pair<BlockPos, String> pair : info.getMobSpawnerTodo()) {
+            BlockPos pos = pair.getKey().add(cx, 0, cz);
+            // Double check that it is still a spawner (could be destroyed by explosion)
+            if (world.getBlockState(pos).getBlock() == Blocks.MOB_SPAWNER) {
+                TileEntity tileentity = world.getTileEntity(pos);
+                if (tileentity instanceof TileEntityMobSpawner) {
+                    TileEntityMobSpawner spawner = (TileEntityMobSpawner) tileentity;
+                    String id = pair.getValue();
+                    String fixedId = EntityTools.fixEntityId(id);
+                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation(fixedId), fixedId);
+                }
+            }
+        }
+        info.clearMobSpawnerTodo();
 
+
+        int height = info.getCityGroundLevel() - info.floorsBelowGround * 6;
 
         while (height < buildingtop) {
             int f = LostCitiesTerrainGenerator.getFloor(height);
             if (f == 0) {
-                BlockPos floorpos = new BlockPos(chunkX * 16, height, chunkZ * 16);
+                BlockPos floorpos = new BlockPos(cx, height, cz);
                 BuildingPart partName = info.floorTypes[LostCitiesTerrainGenerator.getLevel(info, height) + info.floorsBelowGround];
-                GenInfo getInfo = LostCitiesTerrainGenerator.getGenInfos().get(partName.getName());
-                for (BlockPos p : getInfo.getChest()) {
+                GenInfo genInfo = LostCitiesTerrainGenerator.getGenInfos().get(partName.getName());
+                for (BlockPos p : genInfo.getChest()) {
                     BlockPos pos = floorpos.add(p);
                     if (!world.isAirBlock(pos)) {
                         createLootChest(random, world, pos);
                     }
                 }
-                for (BlockPos p : getInfo.getRandomFeatures()) {
+                for (BlockPos p : genInfo.getRandomFeatures()) {
                     BlockPos pos = floorpos.add(p);
                     if (!world.isAirBlock(pos)) {
                         createRandomFeature(random, world, pos);
-                    }
-                }
-//                for (BlockPos p : getInfo.getModularStorages()) {
-//                    BlockPos pos = floorpos.add(p);
-//                    if (!world.isAirBlock(pos)) {
-//                        createModularStorage(random, world, pos);
-//                    }
-//                }
-//                for (BlockPos p : getInfo.getRandomRFToolsMachines()) {
-//                    BlockPos pos = floorpos.add(p);
-//                    if (!world.isAirBlock(pos)) {
-//                        createRFToolsMachine(random, world, pos);
-//                    }
-//                }
-                for (Map.Entry<BlockPos, Integer> entry : getInfo.getSpawnerType().entrySet()) {
-                    BlockPos pos = floorpos.add(entry.getKey());
-                    if (!world.isAirBlock(pos)) {
-                        world.setBlockState(pos, Blocks.MOB_SPAWNER.getDefaultState());
-                        TileEntity tileentity = world.getTileEntity(pos);
-                        if (tileentity instanceof TileEntityMobSpawner) {
-                            TileEntityMobSpawner spawner = (TileEntityMobSpawner) tileentity;
-                            switch (entry.getValue()) {
-                                case 1:
-                                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation("minecraft:zombie"), "Zombie");
-                                    break;
-                                case 2:
-                                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation("minecraft:skeleton"), "Skeleton");
-                                    break;
-                                case 3:
-                                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation("minecraft:spider"), "Spider");
-                                    break;
-                                case 4:
-                                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation("minecraft:blaze"), "Blaze");
-                                    break;
-                            }
-                        }
                     }
                 }
             }

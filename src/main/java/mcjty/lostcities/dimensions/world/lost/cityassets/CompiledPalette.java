@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
-import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
@@ -9,7 +8,7 @@ import net.minecraft.init.Blocks;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * More efficient representation of a palette useful for a single chunk
@@ -18,6 +17,7 @@ public class CompiledPalette {
 
     private final Map<Character, Object> palette = new HashMap<>();
     private final Map<IBlockState, IBlockState> damagedToBlock = new HashMap<>();
+    private final Map<Character, String> mobIds = new HashMap<>();
 
     public CompiledPalette(Palette... palettes) {
         // First add the straight palette entries
@@ -58,16 +58,20 @@ public class CompiledPalette {
                 IBlockState c = entry.getKey();
                 damagedToBlock.put(c, entry.getValue());
             }
+            for (Map.Entry<Character, String> entry : p.getMobIds().entrySet()) {
+                Character c = entry.getKey();
+                mobIds.put(c, entry.getValue());
+            }
         }
     }
 
-    public IBlockState get(char c, BuildingInfo info) {
+    public IBlockState get(char c) {
         try {
             Object o = palette.get(c);
             if (o instanceof IBlockState) {
                 return (IBlockState) o;
             } else {
-                return ((Function<BuildingInfo, IBlockState>) o).apply(info);
+                return ((Supplier<IBlockState>) o).get();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,6 +87,8 @@ public class CompiledPalette {
     public IBlockState canBeDamagedToIronBars(IBlockState b) {
         return damagedToBlock.get(b);
     }
+
+    public String getMobId(Character c) { return mobIds.get(c); }
 
     public boolean isEasyToDestroy(IBlockState b) {
         return isGlass(b);

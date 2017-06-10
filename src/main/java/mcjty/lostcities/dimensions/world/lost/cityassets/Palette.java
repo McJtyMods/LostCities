@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * A palette of materials as used by building parts
@@ -25,6 +27,7 @@ public class Palette implements IAsset {
     private String name;
     final Map<Character, Object> palette = new HashMap<>();
     final Map<IBlockState, IBlockState> damaged = new HashMap<>();
+    final Map<Character, String> mobIds = new HashMap<>(); // For spawners
 
     public Palette() {
     }
@@ -40,6 +43,7 @@ public class Palette implements IAsset {
     public void merge(Palette other) {
         palette.putAll(other.palette);
         damaged.putAll(other.damaged);
+        mobIds.putAll(other.mobIds);
     }
 
     @Override
@@ -51,6 +55,10 @@ public class Palette implements IAsset {
         return damaged;
     }
 
+    public Map<Character, String> getMobIds() {
+        return mobIds;
+    }
+
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
@@ -60,8 +68,12 @@ public class Palette implements IAsset {
             Object value = null;
             Character c = o.get("char").getAsCharacter();
             IBlockState dmg = null;
+            String mobId = null;
             if (o.has("damaged")) {
                 dmg = Tools.stringToState(o.get("damaged").getAsString());
+            }
+            if (o.has("mob")) {
+                mobIds.put(c, o.get("mob").getAsString());
             }
             if (o.has("block")) {
                 String block = o.get("block").getAsString();
@@ -105,22 +117,21 @@ public class Palette implements IAsset {
             if (entry.getValue() instanceof IBlockState) {
                 IBlockState state = (IBlockState) entry.getValue();
                 o.add("block", new JsonPrimitive(Tools.stateToString(state)));
+                if (damaged.containsKey(state)) {
+                    o.add("damaged", new JsonPrimitive(Tools.stateToString(damaged.get(state))));
+                }
             } else if (entry.getValue() instanceof String) {
                 o.add("frompalette", new JsonPrimitive((String) entry.getValue()));
             } else {
                 o.add("test", new JsonPrimitive("@todo"));
             }
-            if (damaged.containsKey(entry.getKey())) {
-                o.add("damaged", new JsonPrimitive(Tools.stateToString(damaged.get(entry.getKey()))));
+            if (mobIds.containsKey(entry.getKey())) {
+                o.add("mob", new JsonPrimitive(mobIds.get(entry.getKey())));
             }
             array.add(o);
         }
         object.add("palette", array);
         return object;
-    }
-
-    private void addFunctionMapping(char c, Function<BuildingInfo, IBlockState> function) {
-        palette.put(c, function);
     }
 
     public Palette addMapping(char c, IBlockState state) {
@@ -140,7 +151,7 @@ public class Palette implements IAsset {
     }
 
     public Palette addMappingViaState(char c, Pair<Float, IBlockState>... randomBlocks) {
-        addFunctionMapping(c, info -> {
+        Supplier<IBlockState> function = () -> {
             float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
             for (Pair<Float, IBlockState> pair : randomBlocks) {
                 r -= pair.getKey();
@@ -149,7 +160,8 @@ public class Palette implements IAsset {
                 }
             }
             return LostCitiesTerrainGenerator.air;
-        });
+        };
+        palette.put(c, function);
         return this;
     }
 }

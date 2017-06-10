@@ -151,7 +151,11 @@ public class BuildingPart implements IAsset {
     }
 
     public IBlockState get(BuildingInfo info, int x, int y, int z) {
-        return info.getCompiledPalette().get(slices[y].charAt(z * xSize + x), info);
+        return info.getCompiledPalette().get(slices[y].charAt(z * xSize + x));
+    }
+
+    public String getMobID(BuildingInfo info, int x, int y, int z) {
+        return info.getCompiledPalette().getMobId(slices[y].charAt(z * xSize + x));
     }
 
     public Character getC(int x, int y, int z) {

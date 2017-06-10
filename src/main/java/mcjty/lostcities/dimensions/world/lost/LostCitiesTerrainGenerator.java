@@ -71,15 +71,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         Character c = part.getC(x, y, z);
-                        if (c == '1') {
-                            gi.addSpawnerType(new BlockPos(x, y, z), 1);
-                        } else if (c == '2') {
-                            gi.addSpawnerType(new BlockPos(x, y, z), 2);
-                        } else if (c == '3') {
-                            gi.addSpawnerType(new BlockPos(x, y, z), 3);
-                        } else if (c == '4') {
-                            gi.addSpawnerType(new BlockPos(x, y, z), 4);
-                        } else if (c == 'C') {
+                        if (c == 'C') {
                             gi.addChest(new BlockPos(x, y, z));
                         } else if (c == 'M') {
                             gi.addModularStorage(new BlockPos(x, y, z));
@@ -104,9 +96,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         water = Blocks.WATER.getDefaultState();
         bedrock = Blocks.BEDROCK.getDefaultState();
         // @todo This should not be hardcoded here
-        street = info.getCompiledPalette().get('S', info);
-        street2 = info.getCompiledPalette().get('B', info);
-        bricks = info.getCompiledPalette().get('#', info);
+        street = info.getCompiledPalette().get('S');
+        street2 = info.getCompiledPalette().get('B');
+        bricks = info.getCompiledPalette().get('#');
 
         if (info.isCity) {
             doCityChunk(chunkX, chunkZ, primer, info);
@@ -971,7 +963,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 b = Blocks.IRON_BARS.getDefaultState();
                                 break;
                             default:
-                                b = adjacentInfo.getCompiledPalette().get('#', adjacentInfo);   // @todo hardcoded!
+                                b = adjacentInfo.getCompiledPalette().get('#');   // @todo hardcoded!
                                 break;
                         }
                         BaseTerrainGenerator.setBlockState(primer, index, b);
@@ -1165,6 +1157,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (b.getBlock() == Blocks.LADDER && down) {
             b = bricks;
         }
+
+        // If this is a spawner we put it on a todo so that the world generator can put the correct mob in it
+        // @todo support this system in other places too
+        if (b.getBlock() == Blocks.MOB_SPAWNER) {
+            String mobid = part.getMobID(info, x, f, z);
+            info.addSpawnerTodo(new BlockPos(x, height, z), mobid);
+        }
+
         return b;
     }
 
