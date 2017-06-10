@@ -40,7 +40,7 @@ public class LostCities {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         chisel = Loader.isModLoaded("chisel");
-        biomesoplenty = Loader.isModLoaded("biomesoplenty");
+        biomesoplenty = Loader.isModLoaded("biomesoplenty") || Loader.isModLoaded("BiomesOPlenty");
         this.proxy.preInit(e);
     }
 
