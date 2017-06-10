@@ -3,9 +3,6 @@ package mcjty.lostcities.dimensions.world;
 import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.GenInfo;
-import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
-import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.properties.PropertyBool;
@@ -142,70 +139,8 @@ public class LostCityWorldGenerator implements IWorldGenerator {
             }
         }
         info.clearChestTodo();
-
-
-        int height = info.getCityGroundLevel() - info.floorsBelowGround * 6;
-
-        while (height < buildingtop) {
-            int f = LostCitiesTerrainGenerator.getFloor(height);
-            if (f == 0) {
-                BlockPos floorpos = new BlockPos(cx, height, cz);
-                BuildingPart partName = info.floorTypes[LostCitiesTerrainGenerator.getLevel(info, height) + info.floorsBelowGround];
-                GenInfo genInfo = LostCitiesTerrainGenerator.getGenInfos().get(partName.getName());
-                for (BlockPos p : genInfo.getRandomFeatures()) {
-                    BlockPos pos = floorpos.add(p);
-                    if (!world.isAirBlock(pos)) {
-                        createRandomFeature(random, world, pos);
-                    }
-                }
-            }
-            height++;
-        }
-
     }
 
-    private void createRandomFeature(Random random, World world, BlockPos pos) {
-        switch (random.nextInt(60)) {
-            case 0:
-            case 1:
-                world.setBlockState(pos, Blocks.BREWING_STAND.getDefaultState());
-                break;
-            case 2:
-            case 3:
-                world.setBlockState(pos, Blocks.ANVIL.getDefaultState());
-                break;
-            case 4:
-            case 5:
-                world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
-                break;
-            case 6:
-                world.setBlockState(pos, Blocks.ENCHANTING_TABLE.getDefaultState());
-                break;
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-            case 15:
-            case 16:
-                world.setBlockState(pos, Blocks.CRAFTING_TABLE.getDefaultState());
-                break;
-            case 20:
-//                createModularStorage(random, world, pos);
-//                break;
-            case 25:
-            case 26:
-            case 27:
-            case 28:
-            case 29:
-            case 30:
-                world.setBlockState(pos, Blocks.WEB.getDefaultState());
-                break;
-            default:
-                world.setBlockState(pos, Blocks.FURNACE.getDefaultState());
-                break;
-        }
-    }
 
     private void createLootChest(Random random, World world, BlockPos pos) {
         world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, EnumFacing.SOUTH));

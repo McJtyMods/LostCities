@@ -397,7 +397,36 @@
       },
       {
         "char": "F",
-        "block": "minecraft:planks"
+        "blocks": [
+          {
+            "factor": 0.7,
+            "block": "minecraft:web"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:furnace"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:crafting_table"
+          },
+          {
+            "factor": 0.3,
+            "block": "minecraft:brewing_stand"
+          },
+          {
+            "factor": 0.3,
+            "block": "minecraft:anvil"
+          },
+          {
+            "factor": 0.2,
+            "block": "minecraft:cauldron"
+          },
+          {
+            "factor": 1,
+            "block": "minecraft:enchanting_table"
+          }
+        ]
       },
       {
         "char": "G",

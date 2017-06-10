@@ -5,8 +5,6 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.BaseTerrainGenerator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.NormalTerrainGenerator;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
-import mcjty.lostcities.dimensions.world.lost.cityassets.Building;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.varia.GeometryTools;
@@ -47,39 +45,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
 
-    private static Map<String, GenInfo> genInfos = null;  // Pair is: <buildingType,floorType>
-
     // Use this random when it doesn't really matter i fit is generated the same every time
     public static Random globalRandom = new Random();
-
-    public static Map<String, GenInfo> getGenInfos() {
-        if (genInfos == null) {
-            genInfos = new HashMap<>();
-            for (int i = 0; i < AssetRegistries.BUILDINGS.getCount(); i++) {
-                getGenInfos(AssetRegistries.BUILDINGS.get(i));
-            }
-        }
-        return genInfos;
-    }
-
-    private static void getGenInfos(Building building) {
-        for (int i = 0; i < building.getPartCount(); i++) {
-            GenInfo gi = new GenInfo();
-            String partName = building.getPartName(i);
-            BuildingPart part = AssetRegistries.PARTS.get(partName);
-            for (int y = 0; y < part.getSliceCount(); y++) {
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        Character c = part.getC(x, y, z);
-                        if (c == 'F') {
-                            gi.addRandomFeatures(new BlockPos(x, y, z));
-                        }
-                    }
-                }
-            }
-            genInfos.put(building.getPartName(i), gi);
-        }
-    }
 
     @Override
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
