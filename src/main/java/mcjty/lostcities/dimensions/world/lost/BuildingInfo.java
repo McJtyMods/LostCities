@@ -66,11 +66,24 @@ public class BuildingInfo {
     private boolean actualStairsCalculated = false;
     private Direction actualStairDirection;
 
-    // A list of todo's for mob spawners
+    // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, String>> mobSpawnerTodo = new ArrayList<>();
+    private final List<BlockPos> chestTodo = new ArrayList<>();
 
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
+
+    public void addChestTodo(BlockPos pos) {
+        chestTodo.add(pos);
+    }
+
+    public List<BlockPos> getChestTodo() {
+        return chestTodo;
+    }
+
+    public void clearChestTodo() {
+        chestTodo.clear();
+    }
 
     public void addSpawnerTodo(BlockPos pos, String mobId) {
         mobSpawnerTodo.add(Pair.of(pos, mobId));

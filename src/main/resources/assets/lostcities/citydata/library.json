@@ -389,7 +389,7 @@
     "palette": [
       {
         "char": "C",
-        "block": "minecraft:planks"
+        "block": "minecraft:chest"
       },
       {
         "char": "D",

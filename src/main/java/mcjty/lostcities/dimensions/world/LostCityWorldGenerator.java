@@ -134,6 +134,15 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         }
         info.clearMobSpawnerTodo();
 
+        for (BlockPos cpos : info.getChestTodo()) {
+            BlockPos pos = cpos.add(cx, 0, cz);
+            // Double check that it is still a chest (could be destroyed by explosion)
+            if (world.getBlockState(pos).getBlock() == Blocks.CHEST) {
+                createLootChest(random, world, pos);
+            }
+        }
+        info.clearChestTodo();
+
 
         int height = info.getCityGroundLevel() - info.floorsBelowGround * 6;
 
@@ -143,12 +152,6 @@ public class LostCityWorldGenerator implements IWorldGenerator {
                 BlockPos floorpos = new BlockPos(cx, height, cz);
                 BuildingPart partName = info.floorTypes[LostCitiesTerrainGenerator.getLevel(info, height) + info.floorsBelowGround];
                 GenInfo genInfo = LostCitiesTerrainGenerator.getGenInfos().get(partName.getName());
-                for (BlockPos p : genInfo.getChest()) {
-                    BlockPos pos = floorpos.add(p);
-                    if (!world.isAirBlock(pos)) {
-                        createLootChest(random, world, pos);
-                    }
-                }
                 for (BlockPos p : genInfo.getRandomFeatures()) {
                     BlockPos pos = floorpos.add(p);
                     if (!world.isAirBlock(pos)) {

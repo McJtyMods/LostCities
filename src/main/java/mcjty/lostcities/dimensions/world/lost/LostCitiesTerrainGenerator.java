@@ -71,14 +71,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         Character c = part.getC(x, y, z);
-                        if (c == 'C') {
-                            gi.addChest(new BlockPos(x, y, z));
-                        } else if (c == 'M') {
-                            gi.addModularStorage(new BlockPos(x, y, z));
-                        } else if (c == 'F') {
+                        if (c == 'F') {
                             gi.addRandomFeatures(new BlockPos(x, y, z));
-                        } else if (c == 'R') {
-                            gi.addRandomRFToolsMachine(new BlockPos(x, y, z));
                         }
                     }
                 }
@@ -1163,6 +1157,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (b.getBlock() == Blocks.MOB_SPAWNER) {
             String mobid = part.getMobID(info, x, f, z);
             info.addSpawnerTodo(new BlockPos(x, height, z), mobid);
+        } else if (b.getBlock() == Blocks.CHEST) {
+            info.addChestTodo(new BlockPos(x, height, z));
         }
 
         return b;
