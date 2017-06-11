@@ -8,6 +8,7 @@ import net.minecraft.init.Blocks;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -62,6 +63,24 @@ public class CompiledPalette {
                 Character c = entry.getKey();
                 mobIds.put(c, entry.getValue());
             }
+        }
+    }
+
+    public Set<Character> getCharacters() {
+        return palette.keySet();
+    }
+
+    public IBlockState getStraight(char c) {
+        try {
+            Object o = palette.get(c);
+            if (o instanceof IBlockState) {
+                return (IBlockState) o;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

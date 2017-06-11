@@ -58,6 +58,7 @@ public class LostCities {
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandDebug());
         event.registerServerCommand(new CommandSaveAssets());
+        event.registerServerCommand(new CommandExport());
     }
 
     /**

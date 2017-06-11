@@ -59,6 +59,10 @@ public class Palette implements IAsset {
         return mobIds;
     }
 
+    public Map<Character, Object> getPalette() {
+        return palette;
+    }
+
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
