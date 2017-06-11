@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
                         "after:forge@[" + LostCities.MIN_FORGE11_VER + ",)",
         version = LostCities.VERSION,
         acceptableRemoteVersions = "*",
-        acceptedMinecraftVersions = "[1.10,1.12)")
+        acceptedMinecraftVersions = "[1.10,1.13)")
 public class LostCities {
     public static final String MODID = "lostcities";
     public static final String VERSION = "0.0.4beta";

@@ -17,11 +17,7 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.IChunkGenerator;
-import net.minecraft.world.gen.ChunkProviderSettings;
-import net.minecraft.world.gen.MapGenBase;
-import net.minecraft.world.gen.MapGenCaves;
-import net.minecraft.world.gen.MapGenRavine;
+import net.minecraft.world.gen.*;
 import net.minecraft.world.gen.feature.WorldGenDungeons;
 import net.minecraft.world.gen.feature.WorldGenLakes;
 import net.minecraft.world.gen.structure.*;
@@ -43,7 +39,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
     public WorldType worldType;
     private final BaseTerrainGenerator terrainGenerator;
 
-    private ChunkProviderSettings settings = null;
+    private ChunkGeneratorSettings settings = null;
 
     public Biome[] biomesForGeneration;
 
@@ -56,9 +52,9 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
     private MapGenMineshaft mineshaftGenerator = new MapGenMineshaft();
     private MapGenScatteredFeature scatteredFeatureGenerator = new MapGenScatteredFeature();
 
-    public ChunkProviderSettings getSettings() {
+    public ChunkGeneratorSettings getSettings() {
         if (settings == null) {
-            ChunkProviderSettings.Factory factory = new ChunkProviderSettings.Factory();
+            ChunkGeneratorSettings.Factory factory = new ChunkGeneratorSettings.Factory();
             settings = factory.build();
         }
         return settings;
@@ -333,4 +329,22 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
             this.oceanMonumentGenerator.generate(this.worldObj, x, z, null);
         }
     }
+
+    @Override
+    public boolean func_193414_a(World p_193414_1_, String p_193414_2_, BlockPos p_193414_3_) {
+        if ("Stronghold".equals(p_193414_2_) && this.strongholdGenerator != null) {
+            return this.strongholdGenerator.isInsideStructure(p_193414_3_);
+//        } else if ("Mansion".equals(p_193414_2_) && this.woodlandMansionGenerator != null) {
+//            return this.woodlandMansionGenerator.isInsideStructure(p_193414_3_);
+        } else if ("Monument".equals(p_193414_2_) && this.oceanMonumentGenerator != null) {
+            return this.oceanMonumentGenerator.isInsideStructure(p_193414_3_);
+        } else if ("Village".equals(p_193414_2_) && this.villageGenerator != null) {
+            return this.villageGenerator.isInsideStructure(p_193414_3_);
+        } else if ("Mineshaft".equals(p_193414_2_) && this.mineshaftGenerator != null) {
+            return this.mineshaftGenerator.isInsideStructure(p_193414_3_);
+        } else {
+            return "Temple".equals(p_193414_2_) && this.scatteredFeatureGenerator != null ? this.scatteredFeatureGenerator.isInsideStructure(p_193414_3_) : false;
+        }
+    }
+
 }
