@@ -1,6 +1,5 @@
 package mcjty.lostcities;
 
-import mcjty.lib.compat.CompatCommand;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import net.minecraft.command.CommandException;
@@ -16,7 +15,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public class CommandDebug implements CompatCommand {
+public class CommandDebug implements ICommand {
 
     @Override
     public String getName() {

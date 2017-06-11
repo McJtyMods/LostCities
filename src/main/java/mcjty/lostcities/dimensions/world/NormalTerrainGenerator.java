@@ -1,9 +1,9 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lib.tools.MathTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
@@ -167,7 +167,7 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
                     double d7 = this.minLimitRegion[i] / 512.0D;
                     double d8 = this.maxLimitRegion[i] / 512.0D;
                     double d9 = (this.mainNoiseRegion[i] / 10.0D + 1.0D) / 2.0D;
-                    double d10 = MathTools.clamp(d7, d8, d9) - d6;
+                    double d10 = MathHelper.clamp(d7, d8, d9) - d6;
 
                     if (j2 > 29) {
                         double d11 = ((j2 - 29) / 3.0F);

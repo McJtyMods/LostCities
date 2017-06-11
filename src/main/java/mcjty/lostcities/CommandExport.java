@@ -3,11 +3,8 @@ package mcjty.lostcities;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import mcjty.lib.compat.CompatCommand;
-import mcjty.lib.tools.ChatTools;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Palette;
 import net.minecraft.block.state.IBlockState;
@@ -31,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CommandExport implements CompatCommand {
+public class CommandExport implements ICommand {
 
     @Override
     public String getName() {
@@ -127,7 +124,7 @@ public class CommandExport implements CompatCommand {
             writer.print(gson.toJson(array));
             writer.flush();
         } catch (FileNotFoundException e) {
-            ChatTools.addChatMessage(sender, new TextComponentString("Error writing to file '" + args[0] + "'!"));
+            sender.sendMessage(new TextComponentString("Error writing to file '" + args[0] + "'!"));
         } catch (Exception e) {
             e.printStackTrace();
         }

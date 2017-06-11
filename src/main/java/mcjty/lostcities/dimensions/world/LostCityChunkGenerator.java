@@ -1,7 +1,5 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lib.compat.CompatChunkGenerator;
-import mcjty.lib.compat.CompatMapGenStructure;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
@@ -25,12 +23,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
-public class LostCityChunkGenerator implements CompatChunkGenerator {
+public class LostCityChunkGenerator implements IChunkGenerator {
 
     public Random rand;
     public long seed;
@@ -294,11 +293,21 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         return Biome.getSpawnableList(creatureType);
     }
 
-    @Override
-    public BlockPos clGetStrongholdGen(World worldIn, String structureName, BlockPos position) {
-        return "Stronghold".equals(structureName) && this.strongholdGenerator != null
-                ? CompatMapGenStructure.getClosestStrongholdPos(this.strongholdGenerator, worldIn, position)
-                : null;
+    @Nullable
+    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
+        if ("Stronghold".equals(structureName) && this.strongholdGenerator != null) {
+            return this.strongholdGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+//        } else if ("Mansion".equals(structureName) && this.woodlandMansionGenerator != null) {
+//            return this.woodlandMansionGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+        } else if ("Monument".equals(structureName) && this.oceanMonumentGenerator != null) {
+            return this.oceanMonumentGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+        } else if ("Village".equals(structureName) && this.villageGenerator != null) {
+            return this.villageGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+        } else if ("Mineshaft".equals(structureName) && this.mineshaftGenerator != null) {
+            return this.mineshaftGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+        } else {
+            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null ? this.scatteredFeatureGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_) : null;
+        }
     }
 
     @Override

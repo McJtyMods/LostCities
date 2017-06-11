@@ -1,12 +1,12 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.MobSpawnerBaseLogic;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityMobSpawner;
@@ -124,8 +124,10 @@ public class LostCityWorldGenerator implements IWorldGenerator {
                 if (tileentity instanceof TileEntityMobSpawner) {
                     TileEntityMobSpawner spawner = (TileEntityMobSpawner) tileentity;
                     String id = pair.getValue();
-                    String fixedId = EntityTools.fixEntityId(id);
-                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation(fixedId), fixedId);
+                    MobSpawnerBaseLogic mobspawnerbaselogic = spawner.getSpawnerBaseLogic();
+                    mobspawnerbaselogic.setEntityId(new ResourceLocation(id));
+                    spawner.markDirty();
+
                 }
             }
         }
