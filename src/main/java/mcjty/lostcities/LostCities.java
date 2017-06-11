@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
         acceptedMinecraftVersions = "[1.10,1.12)")
 public class LostCities {
     public static final String MODID = "lostcities";
-    public static final String VERSION = "0.0.4beta";
+    public static final String VERSION = "0.0.5beta";
     public static final String MIN_FORGE10_VER = "12.18.1.2082";
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
     public static final String COMPATLAYER_VER = "0.1.6";
@@ -42,7 +42,7 @@ public class LostCities {
     public void preInit(FMLPreInitializationEvent e) {
         chisel = Loader.isModLoaded("chisel");
         biomesoplenty = Loader.isModLoaded("biomesoplenty") || Loader.isModLoaded("BiomesOPlenty");
-        atg = Loader.isModLoaded("atg");
+//        atg = Loader.isModLoaded("atg"); // @todo
         this.proxy.preInit(e);
     }
 
