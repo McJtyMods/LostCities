@@ -1033,7 +1033,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         BuildingInfo adjacent = info.getAdjacent(x, z);
 
         if (localLevel < 0 && CompiledPalette.isGlass(b) && isSide(x, z) && (!adjacent.hasBuilding || adjacent.floorsBelowGround < -localLevel)) {
-            b = bricks;
+            // However, if there is a street next to us and the city level is lower then we generate windows like normal anyway
+            if (!(adjacent.isCity && (!adjacent.hasBuilding) && (info.cityLevel+localLevel) >= adjacent.cityLevel)) {
+                b = bricks;
+            }
         }
 
         // For buildings that have a style which causes gaps at the side we fill in that gap if we are
