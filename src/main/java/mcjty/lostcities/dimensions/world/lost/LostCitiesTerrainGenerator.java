@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world.lost;
 
-import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.BaseTerrainGenerator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
@@ -13,7 +12,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -394,12 +392,17 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         private int connections = 0;
         private int lowestY;
         private int highestY;
+        private float avgdamage;
 
         public Blob(int starty, int endy) {
             this.starty = starty;
             this.endy = endy;
             lowestY = 256;
             highestY = 0;
+        }
+
+        public float getAvgdamage() {
+            return avgdamage;
         }
 
         public boolean contains(int index) {
@@ -454,25 +457,25 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         private boolean isOutside(BuildingInfo info, int x, int y, int z) {
             if (x < 0) {
-                if (y <= info.getXmin().getMaxHeight()) {
+                if (y <= info.getXmin().getMaxHeight()+3) {
                     connections++;
                 }
                 return true;
             }
             if (x > 15) {
-                if (y <= info.getXmax().getMaxHeight()) {
+                if (y <= info.getXmax().getMaxHeight()+3) {
                     connections++;
                 }
                 return true;
             }
             if (z < 0) {
-                if (y <= info.getZmin().getMaxHeight()) {
+                if (y <= info.getZmin().getMaxHeight()+3) {
                     connections++;
                 }
                 return true;
             }
             if (z > 15) {
-                if (y <= info.getZmax().getMaxHeight()) {
+                if (y <= info.getZmax().getMaxHeight()+3) {
                     connections++;
                 }
                 return true;
@@ -485,6 +488,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         public void scan(BuildingInfo info, ChunkPrimer primer, char air, char liquid, BlockPos pos) {
+            DamageArea damageArea = info.getDamageArea();
+            avgdamage = 0;
             Queue<BlockPos> todo = new ArrayDeque<>();
             todo.add(pos);
 
@@ -504,6 +509,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     continue;
                 }
                 connectedBlocks.add(index);
+                avgdamage += damageArea.getDamage(x, y, z);
                 if (!blocksPerY.containsKey(y)) {
                     blocksPerY.put(y, 1);
                 } else {
@@ -522,6 +528,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 todo.add(pos.south());
                 todo.add(pos.north());
             }
+
+            avgdamage /= (float) connectedBlocks.size();
         }
 
         public static int calcIndex(int x, int y, int z) {
@@ -569,11 +577,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         // Split large blobs that have very thin connections in Y direction
         for (Blob blob : blobs) {
-            int y = blob.needsSplitting();
-            if (y != -1) {
-                Set<Integer> toRemove = blob.cut(y);
-                for (Integer index : toRemove) {
-                    primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : air;
+            if (blob.getAvgdamage() > .3f) {
+                int y = blob.needsSplitting();
+                if (y != -1) {
+                    Set<Integer> toRemove = blob.cut(y);
+                    for (Integer index : toRemove) {
+                        primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : air;
+                    }
                 }
             }
         }
@@ -592,11 +602,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 // The rest of the blobs doesn't have to be destroyed anymore
                 break;
             }
-//            if (blob.connectedBlocks.size() == 1 && blob.connections == 1 && primer.data[blob.connectedBlocks.iterator().next()-1] == air) {
-//                // Solitary blocks and one connection are removed if there is nothing below them
-//                // because it is very likely that they don't connect to the adjacent chunk either
-//                int index = blob.connectedBlocks.iterator().next();
-//                primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : air;
             if (rand.nextFloat() < LostCityConfiguration.DESTROY_OR_MOVE_CHANCE || blob.connectedBlocks.size() < LostCityConfiguration.DESTROY_SMALL_SECTIONS_SIZE
                     || blob.connections < 5) {
                 for (Integer index : blob.connectedBlocks) {
