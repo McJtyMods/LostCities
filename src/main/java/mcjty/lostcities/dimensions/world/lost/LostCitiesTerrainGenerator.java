@@ -31,11 +31,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private IBlockState baseBlock;
     private IBlockState street;
+    private IBlockState streetBase;
     private IBlockState street2;
     private IBlockState bricks;
     private int streetBorder;
-
-    public static final ResourceLocation LOOT = new ResourceLocation(LostCities.MODID, "chests/lostcitychest");
 
 
     public LostCitiesTerrainGenerator() {
@@ -57,6 +56,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         water = Blocks.WATER.getDefaultState();
         bedrock = Blocks.BEDROCK.getDefaultState();
         street = info.getCompiledPalette().get(info.getCityStyle().getStreetBlock());
+        streetBase = info.getCompiledPalette().get(info.getCityStyle().getStreetBaseBlock());
         street2 = info.getCompiledPalette().get(info.getCityStyle().getStreetVariantBlock());
         streetBorder = (16 - info.getCityStyle().getStreetWidth()) / 2;
 
@@ -668,7 +668,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             height++;
         }
 
-        b = baseBlock;
+        b = streetBase;
         switch (streetType) {
             case NORMAL:
                 if (isStreetBorder(x, z)) {

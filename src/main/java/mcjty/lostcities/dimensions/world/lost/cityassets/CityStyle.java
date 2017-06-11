@@ -25,6 +25,7 @@ public class CityStyle implements IAsset {
 
     private int streetWidth;
     private Character streetBlock;
+    private Character streetBaseBlock;
     private Character streetVariantBlock;
 
     public CityStyle(JsonObject object) {
@@ -52,6 +53,10 @@ public class CityStyle implements IAsset {
         return streetBlock;
     }
 
+    public Character getStreetBaseBlock() {
+        return streetBaseBlock;
+    }
+
     public Character getStreetVariantBlock() {
         return streetVariantBlock;
     }
@@ -64,6 +69,7 @@ public class CityStyle implements IAsset {
             JsonObject s = object.get("street").getAsJsonObject();
             streetBlock = s.get("street").getAsCharacter();
             streetVariantBlock = s.get("streetvariant").getAsCharacter();
+            streetBaseBlock = s.get("streetbase").getAsCharacter();
             streetWidth = s.get("width").getAsInt();
         }
         JsonArray array = object.get("buildings").getAsJsonArray();
@@ -114,6 +120,7 @@ public class CityStyle implements IAsset {
         JsonObject s = new JsonObject();
         s.add("street", new JsonPrimitive(streetBlock));
         s.add("streetvariant", new JsonPrimitive(streetVariantBlock));
+        s.add("streetbase", new JsonPrimitive(streetBaseBlock));
         s.add("width", new JsonPrimitive(streetWidth));
         object.add("street", s);
 

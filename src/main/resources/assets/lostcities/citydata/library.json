@@ -6,6 +6,7 @@
     "street": {
       "width": 8,
       "street": "S",
+      "streetbase": "b",
       "streetvariant": "B"
     },
     "buildings": [
@@ -450,6 +451,10 @@
         "char": "S",
         "block": "minecraft:double_stone_slab",
         "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "b",
+        "block": "minecraft:stone"
       },
       {
         "char": "B",
