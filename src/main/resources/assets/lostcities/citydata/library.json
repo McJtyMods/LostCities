@@ -3,6 +3,11 @@
     "type": "citystyle",
     "name": "standard",
     "style": "standard",
+    "street": {
+      "width": 8,
+      "street": "S",
+      "streetvariant": "B"
+    },
     "buildings": [
       {
         "factor": 0.4,

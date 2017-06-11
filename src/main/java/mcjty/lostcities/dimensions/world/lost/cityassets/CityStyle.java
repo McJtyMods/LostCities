@@ -23,6 +23,10 @@ public class CityStyle implements IAsset {
     private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
     private String style;
 
+    private int streetWidth;
+    private Character streetBlock;
+    private Character streetVariantBlock;
+
     public CityStyle(JsonObject object) {
         readFromJSon(object);
     }
@@ -40,10 +44,28 @@ public class CityStyle implements IAsset {
         return style;
     }
 
+    public int getStreetWidth() {
+        return streetWidth;
+    }
+
+    public Character getStreetBlock() {
+        return streetBlock;
+    }
+
+    public Character getStreetVariantBlock() {
+        return streetVariantBlock;
+    }
+
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
         style = object.get("style").getAsString();
+        if (object.has("street")) {
+            JsonObject s = object.get("street").getAsJsonObject();
+            streetBlock = s.get("street").getAsCharacter();
+            streetVariantBlock = s.get("streetvariant").getAsCharacter();
+            streetWidth = s.get("width").getAsInt();
+        }
         JsonArray array = object.get("buildings").getAsJsonArray();
         for (JsonElement element : array) {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
@@ -88,6 +110,12 @@ public class CityStyle implements IAsset {
         object.add("type", new JsonPrimitive("citystyle"));
         object.add("name", new JsonPrimitive(name));
         object.add("style", new JsonPrimitive(style));
+
+        JsonObject s = new JsonObject();
+        s.add("street", new JsonPrimitive(streetBlock));
+        s.add("streetvariant", new JsonPrimitive(streetVariantBlock));
+        s.add("width", new JsonPrimitive(streetWidth));
+        object.add("street", s);
 
         JsonArray array = new JsonArray();
         for (Pair<Float, String> pair : buildingSelector) {

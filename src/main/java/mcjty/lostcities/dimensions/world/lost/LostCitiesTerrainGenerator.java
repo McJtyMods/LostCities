@@ -33,9 +33,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private IBlockState street;
     private IBlockState street2;
     private IBlockState bricks;
+    private int streetBorder;
 
     public static final ResourceLocation LOOT = new ResourceLocation(LostCities.MODID, "chests/lostcitychest");
-    private static final int STREETBORDER = 3;
 
 
     public LostCitiesTerrainGenerator() {
@@ -50,15 +50,17 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     @Override
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
-        baseBlock = Blocks.STONE.getDefaultState(); // @todo provider.dimensionInformation.getBaseBlockForTerrain();
+        baseBlock = Blocks.STONE.getDefaultState();
 
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider.seed, provider);
         air = Blocks.AIR.getDefaultState();
         water = Blocks.WATER.getDefaultState();
         bedrock = Blocks.BEDROCK.getDefaultState();
+        street = info.getCompiledPalette().get(info.getCityStyle().getStreetBlock());
+        street2 = info.getCompiledPalette().get(info.getCityStyle().getStreetVariantBlock());
+        streetBorder = (16 - info.getCityStyle().getStreetWidth()) / 2;
+
         // @todo This should not be hardcoded here
-        street = info.getCompiledPalette().get('S');
-        street2 = info.getCompiledPalette().get('B');
         bricks = info.getCompiledPalette().get('#');
 
         if (info.isCity) {
@@ -670,16 +672,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         switch (streetType) {
             case NORMAL:
                 if (isStreetBorder(x, z)) {
-                    if (x <= STREETBORDER && z > STREETBORDER && z < (15 - STREETBORDER)
+                    if (x <= streetBorder && z > streetBorder && z < (15 - streetBorder)
                             && (BuildingInfo.hasRoadConnection(info, info.getXmin()) || (info.getXmin().hasXBridge(provider) != null))) {
                         b = street;
-                    } else if (x >= (15 - STREETBORDER) && z > STREETBORDER && z < (15 - STREETBORDER)
+                    } else if (x >= (15 - streetBorder) && z > streetBorder && z < (15 - streetBorder)
                             && (BuildingInfo.hasRoadConnection(info, info.getXmax()) || (info.getXmax().hasXBridge(provider) != null))) {
                         b = street;
-                    } else if (z <= STREETBORDER && x > STREETBORDER && x < (15 - STREETBORDER)
+                    } else if (z <= streetBorder && x > streetBorder && x < (15 - streetBorder)
                             && (BuildingInfo.hasRoadConnection(info, info.getZmin()) || (info.getZmin().hasZBridge(provider) != null))) {
                         b = street;
-                    } else if (z >= (15 - STREETBORDER) && x > STREETBORDER && x < (15 - STREETBORDER)
+                    } else if (z >= (15 - streetBorder) && x > streetBorder && x < (15 - streetBorder)
                             && (BuildingInfo.hasRoadConnection(info, info.getZmax()) || (info.getZmax().hasZBridge(provider) != null))) {
                         b = street;
                     }
@@ -1167,7 +1169,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private boolean isStreetBorder(int x, int z) {
-        return x <= STREETBORDER || x >= (15 - STREETBORDER) || z <= STREETBORDER || z >= (15 - STREETBORDER);
+        return x <= streetBorder || x >= (15 - streetBorder) || z <= streetBorder || z >= (15 - streetBorder);
     }
 
     private boolean isRailDoorway(int x, int z) {
