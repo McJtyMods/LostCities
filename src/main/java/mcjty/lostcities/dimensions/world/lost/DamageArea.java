@@ -5,6 +5,7 @@ import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Style;
 import mcjty.lostcities.varia.GeometryTools;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -56,6 +57,12 @@ public class DamageArea {
         if (damage < 0.001) {
             return b;
         }
+
+        Block block = b.getBlock();
+        if (block == Blocks.BEDROCK || block == Blocks.END_PORTAL || block == Blocks.END_PORTAL_FRAME) {
+            return b;
+        }
+
         if (palette.isEasyToDestroy(b)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }

@@ -615,8 +615,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             char c = primer.data[index];
             primer.data[index] = ((index & 0xff) < waterLevel) ? liquid : air;
             index--;
-            while (blocksToMove.contains(index) || primer.data[index] == air || primer.data[index] == liquid) {
+            int y = index & 255;
+            while (y > 2 && (blocksToMove.contains(index) || primer.data[index] == air || primer.data[index] == liquid)) {
                 index--;
+                y--;
             }
             index++;
             primer.data[index] = c;
