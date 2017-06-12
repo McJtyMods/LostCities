@@ -19,12 +19,12 @@
         "building": "building2"
       },
       {
-        "factor": 0.4,
-        "building": "building4"
+        "factor": 0.2,
+        "building": "building3"
       },
       {
         "factor": 0.2,
-        "building": "building3"
+        "building": "building4"
       }
     ],
     "multibuildings": [
@@ -37,12 +37,12 @@
         "multibuilding": "multi2"
       },
       {
-        "factor": 0.3,
-        "multibuilding": "multi4"
+        "factor": 0.2,
+        "multibuilding": "multi3"
       },
       {
         "factor": 0.2,
-        "multibuilding": "multi3"
+        "multibuilding": "multi4"
       },
       {
         "factor": 0.1,
@@ -1675,9 +1675,175 @@
       ]
     ]
   },
-
-
   {
+    "type": "part",
+    "name": "top4_1",
+    "xsize": 16,
+    "zsize": 16,
+    "slices": [
+      [
+        "                ",
+        "                ",
+        "  ###           ",
+        "  ###           ",
+        "  ###           ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "   :            ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "   :            ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "   :            ",
+        "  :::           ",
+        "   :            ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ]
+    ]
+  },
+  {
+    "type": "part",
+    "name": "top4_2",
+    "xsize": 16,
+    "zsize": 16,
+    "slices": [
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "         :  :   ",
+        "         :  :   ",
+        "         :  :   ",
+        "         :  :   ",
+        "                ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "         :  :   ",
+        "         :  :   ",
+        "         :  :   ",
+        "         :  :   ",
+        "                ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "         ____   ",
+        "         ____   ",
+        "         ____   ",
+        "         ____   ",
+        "                ",
+        "                ",
+        "                "
+      ]
+    ]
+  },
+  {
+      "type": "part",
+      "name": "top4_3",
+      "xsize": 16,
+      "zsize": 16,
+      "slices": [
+        [
+          "                ",
+          "                ",
+          "                ",
+          "                ",
+          "                ",
+          "                ",
+          "                ",
+          "                ",
+          "         ::::   ",
+          "         :  :   ",
+          "         :  :   ",
+          "         :  :   ",
+          "         :  :   ",
+          "                ",
+          "                ",
+          "                "
+        ]
+      ]
+    },
+    {
     "type": "part",
     "name": "building4_1",
     "xsize": 16,
@@ -8071,16 +8237,32 @@
     "name": "building4",
     "parts": [
       {
+        "top": false,
         "part": "building4_1"
       },
       {
+        "top": false,
         "part": "building4_2"
       },
       {
+        "top": false,
         "part": "building4_3"
       },
       {
+        "top": false,
         "part": "building4_4"
+      },
+      {
+        "top": true,
+        "part": "top4_1"
+      },
+      {
+        "top": true,
+        "part": "top4_2"
+      },
+      {
+        "top": true,
+        "part": "top4_3"
       }
     ]
   },
