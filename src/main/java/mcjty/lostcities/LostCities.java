@@ -1,13 +1,11 @@
 package mcjty.lostcities;
 
+import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.*;
 
 @Mod(modid = LostCities.MODID, name="RFTools Dimensions",
         dependencies =
@@ -59,6 +57,14 @@ public class LostCities {
         event.registerServerCommand(new CommandDebug());
         event.registerServerCommand(new CommandSaveAssets());
         event.registerServerCommand(new CommandExport());
+        System.out.println("################### LostCities.serverLoad");
+        BuildingInfo.cleanBuildingInfoCache();
+    }
+
+    @Mod.EventHandler
+    public void serverStopped(FMLServerStoppedEvent event) {
+        System.out.println("################### LostCities.serverStopped");
+        BuildingInfo.cleanBuildingInfoCache();
     }
 
     /**

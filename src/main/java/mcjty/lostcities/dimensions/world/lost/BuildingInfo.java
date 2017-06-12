@@ -245,6 +245,9 @@ public class BuildingInfo {
         }
     }
 
+    public static void cleanBuildingInfoCache() {
+        buildingInfoMap.clear();
+    }
 
     public static BuildingInfo getBuildingInfo(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
         Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
