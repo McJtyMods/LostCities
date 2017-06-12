@@ -57,13 +57,11 @@ public class LostCities {
         event.registerServerCommand(new CommandDebug());
         event.registerServerCommand(new CommandSaveAssets());
         event.registerServerCommand(new CommandExport());
-        System.out.println("################### LostCities.serverLoad");
         BuildingInfo.cleanBuildingInfoCache();
     }
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
-        System.out.println("################### LostCities.serverStopped");
         BuildingInfo.cleanBuildingInfoCache();
     }
 
