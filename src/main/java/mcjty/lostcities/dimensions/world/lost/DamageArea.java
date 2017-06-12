@@ -1,9 +1,7 @@
 package mcjty.lostcities.dimensions.world.lost;
 
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
-import mcjty.lostcities.dimensions.world.lost.cityassets.Style;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -31,10 +29,10 @@ public class DamageArea {
         this.chunkZ = chunkZ;
         chunkBox = new AxisAlignedBB(chunkX * 16, 0, chunkZ * 16, chunkX * 16 + 15, 256, chunkZ * 16 + 15);
 
-        int offset = (LostCityConfiguration.EXPLOSION_MAXRADIUS+15) / 16;
+        int offset = (provider.profile.EXPLOSION_MAXRADIUS+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                if ((!LostCityConfiguration.EXPLOSIONS_IN_CITIES_ONLY) || BuildingInfo.isCity(cx, cz, seed, provider)) {
+                if ((!provider.profile.EXPLOSIONS_IN_CITIES_ONLY) || BuildingInfo.isCity(cx, cz, seed, provider)) {
                     Explosion explosion = getExplosionAt(cx, cz, provider);
                     if (explosion != null) {
                         if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
@@ -52,7 +50,7 @@ public class DamageArea {
         }
     }
 
-    public IBlockState damageBlock(IBlockState b, Random rand, int x, int y, int z, CompiledPalette palette) {
+    public IBlockState damageBlock(IBlockState b, LostCityChunkGenerator provider, int x, int y, int z, CompiledPalette palette) {
         float damage = getDamage(x, y, z);
         if (damage < 0.001) {
             return b;
@@ -69,16 +67,16 @@ public class DamageArea {
         if (palette.isLiquid(b)) {
             damage *= 10f;
         }
-        if (rand.nextFloat() <= damage) {
+        if (provider.rand.nextFloat() <= damage) {
             IBlockState damaged = palette.canBeDamagedToIronBars(b);
             if (damage < BLOCK_DAMAGE_CHANCE && damaged != null) {
-                if (rand.nextFloat() < .7f) {
+                if (provider.rand.nextFloat() < .7f) {
                     b = damaged;
                 } else {
-                    b = y < LostCityConfiguration.WATERLEVEL ? LostCitiesTerrainGenerator.water : LostCitiesTerrainGenerator.air;
+                    b = y < provider.profile.WATERLEVEL ? LostCitiesTerrainGenerator.water : LostCitiesTerrainGenerator.air;
                 }
             } else {
-                b = y < LostCityConfiguration.WATERLEVEL ? LostCitiesTerrainGenerator.water : LostCitiesTerrainGenerator.air;
+                b = y < provider.profile.WATERLEVEL ? LostCitiesTerrainGenerator.water : LostCitiesTerrainGenerator.air;
             }
         }
         return b;
@@ -93,9 +91,9 @@ public class DamageArea {
         Random rand = new Random(seed + chunkZ * 295075153L + chunkX * 797003437L);
         rand.nextFloat();
         rand.nextFloat();
-        if (rand.nextFloat() < LostCityConfiguration.EXPLOSION_CHANCE) {
-            return new Explosion(LostCityConfiguration.EXPLOSION_MINRADIUS + rand.nextInt(LostCityConfiguration.EXPLOSION_MAXRADIUS - LostCityConfiguration.EXPLOSION_MINRADIUS),
-                    new BlockPos(chunkX * 16 + rand.nextInt(16), BuildingInfo.getBuildingInfo(chunkX, chunkZ, seed, provider).cityLevel * 6 + LostCityConfiguration.EXPLOSION_MINHEIGHT + rand.nextInt(LostCityConfiguration.EXPLOSION_MAXHEIGHT - LostCityConfiguration.EXPLOSION_MINHEIGHT), chunkZ * 16 + rand.nextInt(16)));
+        if (rand.nextFloat() < provider.profile.EXPLOSION_CHANCE) {
+            return new Explosion(provider.profile.EXPLOSION_MINRADIUS + rand.nextInt(provider.profile.EXPLOSION_MAXRADIUS - provider.profile.EXPLOSION_MINRADIUS),
+                    new BlockPos(chunkX * 16 + rand.nextInt(16), BuildingInfo.getBuildingInfo(chunkX, chunkZ, seed, provider).cityLevel * 6 + provider.profile.EXPLOSION_MINHEIGHT + rand.nextInt(provider.profile.EXPLOSION_MAXHEIGHT - provider.profile.EXPLOSION_MINHEIGHT), chunkZ * 16 + rand.nextInt(16)));
         }
         return null;
     }
@@ -104,9 +102,9 @@ public class DamageArea {
         Random rand = new Random(seed + chunkZ * 1400305337L + chunkX * 573259391L);
         rand.nextFloat();
         rand.nextFloat();
-        if (rand.nextFloat() < LostCityConfiguration.MINI_EXPLOSION_CHANCE) {
-            return new Explosion(LostCityConfiguration.MINI_EXPLOSION_MINRADIUS + rand.nextInt(LostCityConfiguration.MINI_EXPLOSION_MAXRADIUS - LostCityConfiguration.MINI_EXPLOSION_MINRADIUS),
-                    new BlockPos(chunkX * 16 + rand.nextInt(16), BuildingInfo.getBuildingInfo(chunkX, chunkZ, seed, provider).cityLevel * 6 + LostCityConfiguration.MINI_EXPLOSION_MINHEIGHT + rand.nextInt(LostCityConfiguration.MINI_EXPLOSION_MAXHEIGHT - LostCityConfiguration.MINI_EXPLOSION_MINHEIGHT), chunkZ * 16 + rand.nextInt(16)));
+        if (rand.nextFloat() < provider.profile.MINI_EXPLOSION_CHANCE) {
+            return new Explosion(provider.profile.MINI_EXPLOSION_MINRADIUS + rand.nextInt(provider.profile.MINI_EXPLOSION_MAXRADIUS - provider.profile.MINI_EXPLOSION_MINRADIUS),
+                    new BlockPos(chunkX * 16 + rand.nextInt(16), BuildingInfo.getBuildingInfo(chunkX, chunkZ, seed, provider).cityLevel * 6 + provider.profile.MINI_EXPLOSION_MINHEIGHT + rand.nextInt(provider.profile.MINI_EXPLOSION_MAXHEIGHT - provider.profile.MINI_EXPLOSION_MINHEIGHT), chunkZ * 16 + rand.nextInt(16)));
         }
         return null;
     }

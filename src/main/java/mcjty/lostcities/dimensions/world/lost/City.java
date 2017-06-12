@@ -1,14 +1,11 @@
 package mcjty.lostcities.dimensions.world.lost;
 
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CityStyle;
-import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -17,18 +14,18 @@ import java.util.Random;
  */
 public class City {
 
-    private static boolean isCityCenter(long seed, int chunkX, int chunkZ) {
+    private static boolean isCityCenter(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Random rand = new Random(seed + chunkZ * 797003437L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
-        return rand.nextFloat() < LostCityConfiguration.CITY_CHANCE;
+        return rand.nextFloat() < provider.profile.CITY_CHANCE;
     }
 
-    private static float getCityRadius(long seed, int chunkX, int chunkZ) {
+    private static float getCityRadius(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Random rand = new Random(seed + chunkZ * 100001653L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
-        return LostCityConfiguration.CITY_MINRADIUS + rand.nextInt(LostCityConfiguration.CITY_MAXRADIUS - LostCityConfiguration.CITY_MINRADIUS);
+        return provider.profile.CITY_MINRADIUS + rand.nextInt(provider.profile.CITY_MAXRADIUS - provider.profile.CITY_MINRADIUS);
     }
 
     public static CityStyle getCityStyle(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
@@ -60,11 +57,11 @@ public class City {
 
     public static float getCityFactor(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         float factor = 0;
-        int offset = (LostCityConfiguration.CITY_MAXRADIUS+15) / 16;
+        int offset = (provider.profile.CITY_MAXRADIUS+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                if (isCityCenter(seed, cx, cz)) {
-                    float radius = getCityRadius(seed, cx, cz);
+                if (isCityCenter(seed, cx, cz, provider)) {
+                    float radius = getCityRadius(seed, cx, cz, provider);
                     float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
                     if (sqdist < radius * radius) {
                         float dist = (float) Math.sqrt(sqdist);
@@ -83,7 +80,7 @@ public class City {
 
 
         for (Biome biome : biomes) {
-            Map<String, Float> map = LostCityConfiguration.getBiomeFactorMap();
+            Map<String, Float> map = provider.profile.getBiomeFactorMap();
             ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
             Float f = map.get(object.toString());
             if (f != null) {
@@ -93,7 +90,7 @@ public class City {
         }
 
         if (foundFactor == null) {
-            factor = factor * LostCityConfiguration.CITY_DEFAULT_BIOME_FACTOR;
+            factor = factor * provider.profile.CITY_DEFAULT_BIOME_FACTOR;
         } else {
             factor = factor * foundFactor;
         }

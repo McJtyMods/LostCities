@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -14,7 +13,7 @@ import java.util.Arrays;
  * The base terrain generator.
  */
 public interface BaseTerrainGenerator {
-    void setup(World world, LostCityChunkGenerator generator);
+    void setup(World world);
 
     void generate(int chunkX, int chunkZ, ChunkPrimer chunkPrimer);
 

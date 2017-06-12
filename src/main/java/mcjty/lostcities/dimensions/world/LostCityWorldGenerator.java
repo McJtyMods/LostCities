@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lib.tools.EntityTools;
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockVine;
@@ -34,10 +33,10 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         }
     }
 
-    private void generateVines(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator chunkGenerator) {
+    private void generateVines(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator provider) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
-        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, world.getSeed(), chunkGenerator);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, world.getSeed(), provider);
 
         int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? info.getMaxHeight() : (info.getCityGroundLevel() + 3));
 
@@ -45,7 +44,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
             if (info.getXmin().getDamageArea().getDamageFactor() < .4f) {
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < (info.getXmin().getMaxHeight()-6); y++) {
-                        if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
+                        if (random.nextFloat() < provider.profile.VINE_CHANCE) {
                             if (info.getDamageArea().getDamage(0, y, z) < BLOCK_DAMAGE_CHANCE) {
                                 createVineStrip(random, world, bottom, y, BlockVine.WEST, cx + 0, cz + z);
                             }
@@ -58,7 +57,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
             if (info.getXmax().getDamageArea().getDamageFactor() < .4f) {
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < (info.getXmax().getMaxHeight()-6); y++) {
-                        if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
+                        if (random.nextFloat() < provider.profile.VINE_CHANCE) {
                             if (info.getDamageArea().getDamage(15, y, z) < BLOCK_DAMAGE_CHANCE) {
                                 createVineStrip(random, world, bottom, y, BlockVine.EAST, cx + 15, cz + z);
                             }
@@ -71,7 +70,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
             if (info.getZmin().getDamageArea().getDamageFactor() < .4f) {
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < (info.getZmin().getMaxHeight()-6); y++) {
-                        if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
+                        if (random.nextFloat() < provider.profile.VINE_CHANCE) {
                             if (info.getDamageArea().getDamage(x, y, 0) < BLOCK_DAMAGE_CHANCE) {
                                 createVineStrip(random, world, bottom, y, BlockVine.NORTH, cx + x, cz + 0);
                             }
@@ -84,7 +83,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
             if (info.getZmax().getDamageArea().getDamageFactor() < .4f) {
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < (info.getMaxHeight()-6); y++) {
-                        if (random.nextFloat() < LostCityConfiguration.VINE_CHANCE) {
+                        if (random.nextFloat() < provider.profile.VINE_CHANCE) {
                             if (info.getDamageArea().getDamage(x, y, 15) < BLOCK_DAMAGE_CHANCE) {
                                 createVineStrip(random, world, bottom, y, BlockVine.SOUTH, cx + x, cz + 15);
                             }

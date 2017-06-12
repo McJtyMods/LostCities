@@ -1,8 +1,12 @@
 package mcjty.lostcities.dimensions.world;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import mcjty.lib.compat.CompatChunkGenerator;
 import mcjty.lib.compat.CompatMapGenStructure;
 import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
 import net.minecraft.block.BlockFalling;
@@ -35,6 +39,8 @@ import java.util.Random;
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
 public class LostCityChunkGenerator implements CompatChunkGenerator {
+
+    public LostCityProfile profile; // Current profile
 
     public Random rand;
     public long seed;
@@ -88,20 +94,41 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         }
 
 
+        String generatorOptions = world.getWorldInfo().getGeneratorOptions();
+        if (generatorOptions == null || generatorOptions.trim().isEmpty()) {
+            profile = LostCityConfiguration.profiles.get("default");
+            if (profile == null) {
+                throw new RuntimeException("Something went wrong! Profile '" + "default" + "' is missing!");
+            }
+        } else {
+            JsonParser parser = new JsonParser();
+            JsonElement parsed = parser.parse(generatorOptions);
+            String profileName;
+            if (parsed.getAsJsonObject().has("profile")) {
+                profileName = parsed.getAsJsonObject().get("profile").getAsString();
+            } else {
+                profileName = "default";
+            }
+            profile = LostCityConfiguration.profiles.get(profileName);
+            if (profile == null) {
+                throw new RuntimeException("Something went wrong! Profile '" + profileName + "' is missing!");
+            }
+        }
+
+        System.out.println("LostCityChunkGenerator.LostCityChunkGenerator: profile=" + profile.getName());
+
         this.worldObj = world;
 
         this.worldType = world.getWorldInfo().getTerrainType();
 
         this.seed = world.getSeed();
-//        System.out.println("GenericChunkGenerator: seed = " + seed);
         this.rand = new Random((seed + 516) * 314);
-//        this.rand = new Random(seed);
 
-        int waterLevel = (byte) (LostCityConfiguration.GROUNDLEVEL - LostCityConfiguration.WATERLEVEL_OFFSET);
+        int waterLevel = (byte) (profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET);
         world.setSeaLevel(waterLevel);
 
-        terrainGenerator = new LostCitiesTerrainGenerator();
-        terrainGenerator.setup(world, this);
+        terrainGenerator = new LostCitiesTerrainGenerator(this);
+        terrainGenerator.setup(world);
     }
 
     @Override
@@ -124,19 +151,19 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
         terrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, chunkprimer, this.biomesForGeneration);
 
-        if (LostCityConfiguration.GENERATE_CAVES) {
+        if (profile.GENERATE_CAVES) {
             this.caveGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
         }
-        if (LostCityConfiguration.GENERATE_RAVINES) {
+        if (profile.GENERATE_RAVINES) {
             this.ravineGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
         }
 
-        if (LostCityConfiguration.GENERATE_MINESHAFTS) {
+        if (profile.GENERATE_MINESHAFTS) {
             this.mineshaftGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
         }
 
-        if (LostCityConfiguration.GENERATE_VILLAGES) {
-            if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
+        if (profile.GENERATE_VILLAGES) {
+            if (profile.PREVENT_VILLAGES_IN_CITIES) {
                 if (!BuildingInfo.isCity(chunkX, chunkZ, seed, this)) {
                     this.villageGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
                 }
@@ -145,15 +172,15 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
             }
         }
 
-        if (LostCityConfiguration.GENERATE_STRONGHOLDS) {
+        if (profile.GENERATE_STRONGHOLDS) {
             this.strongholdGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
         }
 
-        if (LostCityConfiguration.GENERATE_SCATTERED) {
+        if (profile.GENERATE_SCATTERED) {
             this.scatteredFeatureGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
         }
 
-        if (LostCityConfiguration.GENERATE_OCEANMONUMENTS) {
+        if (profile.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
         }
 
@@ -185,11 +212,11 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         ChunkPos cp = new ChunkPos(chunkX, chunkZ);
 
-        if (LostCityConfiguration.GENERATE_MINESHAFTS) {
+        if (profile.GENERATE_MINESHAFTS) {
             this.mineshaftGenerator.generateStructure(w, this.rand, cp);
         }
-        if (LostCityConfiguration.GENERATE_VILLAGES) {
-            if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
+        if (profile.GENERATE_VILLAGES) {
+            if (profile.PREVENT_VILLAGES_IN_CITIES) {
                 if (!BuildingInfo.isCity(chunkX, chunkZ, seed, this)) {
                     flag = this.villageGenerator.generateStructure(w, this.rand, cp);
                 }
@@ -197,13 +224,13 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
                 flag = this.villageGenerator.generateStructure(w, this.rand, cp);
             }
         }
-        if (LostCityConfiguration.GENERATE_STRONGHOLDS) {
+        if (profile.GENERATE_STRONGHOLDS) {
             this.strongholdGenerator.generateStructure(w, this.rand, cp);
         }
-        if (LostCityConfiguration.GENERATE_SCATTERED) {
+        if (profile.GENERATE_SCATTERED) {
             this.scatteredFeatureGenerator.generateStructure(w, this.rand, cp);
         }
-        if (LostCityConfiguration.GENERATE_OCEANMONUMENTS) {
+        if (profile.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generateStructure(w, this.rand, cp);
         }
 
@@ -225,7 +252,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
             l1 = this.rand.nextInt(this.rand.nextInt(248) + 8);
             i2 = z + this.rand.nextInt(16) + 8;
 
-            if (l1 < (LostCityConfiguration.GROUNDLEVEL - LostCityConfiguration.WATERLEVEL_OFFSET) || this.rand.nextInt(10) == 0) {
+            if (l1 < (profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET) || this.rand.nextInt(10) == 0) {
                 (new WorldGenLakes(Blocks.LAVA)).generate(w, this.rand, new BlockPos(k1, l1, i2));
             }
         }
@@ -307,12 +334,12 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     @Override
     public void recreateStructures(Chunk chunkIn, int x, int z) {
-        if (LostCityConfiguration.GENERATE_MINESHAFTS) {
+        if (profile.GENERATE_MINESHAFTS) {
             this.mineshaftGenerator.generate(this.worldObj, x, z, null);
         }
 
-        if (LostCityConfiguration.GENERATE_VILLAGES) {
-            if (LostCityConfiguration.PREVENT_VILLAGES_IN_CITIES) {
+        if (profile.GENERATE_VILLAGES) {
+            if (profile.PREVENT_VILLAGES_IN_CITIES) {
                 if (!BuildingInfo.isCity(x, z, seed, this)) {
                     this.villageGenerator.generate(this.worldObj, x, z, null);
                 }
@@ -321,15 +348,15 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
             }
         }
 
-        if (LostCityConfiguration.GENERATE_STRONGHOLDS) {
+        if (profile.GENERATE_STRONGHOLDS) {
             this.strongholdGenerator.generate(this.worldObj, x, z, null);
         }
 
-        if (LostCityConfiguration.GENERATE_SCATTERED) {
+        if (profile.GENERATE_SCATTERED) {
             this.scatteredFeatureGenerator.generate(this.worldObj, x, z, null);
         }
 
-        if (LostCityConfiguration.GENERATE_OCEANMONUMENTS) {
+        if (profile.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generate(this.worldObj, x, z, null);
         }
     }

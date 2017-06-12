@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world.lost;
 
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.QualityRandom;
@@ -176,7 +175,7 @@ public class BuildingInfo {
     }
 
     public int getCityGroundLevel() {
-        return LostCityConfiguration.GROUNDLEVEL + cityLevel * 6;
+        return provider.profile.GROUNDLEVEL + cityLevel * 6;
     }
 
     public int getNumFloors() {
@@ -196,7 +195,7 @@ public class BuildingInfo {
             return buildingInfoMap.get(Pair.of(chunkX, chunkZ)).isCity;
         } else {
             float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
-            return cityFactor > LostCityConfiguration.CITY_THRESSHOLD;
+            return cityFactor > provider.profile.CITY_THRESSHOLD;
         }
     }
 
@@ -222,7 +221,7 @@ public class BuildingInfo {
         boolean isCity = isCity(chunkX, chunkZ, seed, provider);
         if (isCity) {
             Random rand = getBuildingRandom(chunkX, chunkZ, seed);
-            return rand.nextFloat() < LostCityConfiguration.BUILDING2X2_CHANCE;
+            return rand.nextFloat() < provider.profile.BUILDING2X2_CHANCE;
         } else {
             return false;
         }
@@ -263,7 +262,7 @@ public class BuildingInfo {
         this.chunkZ = chunkZ;
         this.seed = seed;
         float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
-        isCity = cityFactor > LostCityConfiguration.CITY_THRESSHOLD;
+        isCity = cityFactor > provider.profile.CITY_THRESSHOLD;
 
         if (isTopLeftOf2x2Building(chunkX, chunkZ, seed, provider)) {
             building2x2Section = 0;
@@ -279,7 +278,7 @@ public class BuildingInfo {
 
         Random rand = getBuildingRandom(chunkX, chunkZ, seed);
         float bc = rand.nextFloat();
-        hasBuilding = building2x2Section >= 0 || (isCity && (chunkX != 0 || chunkZ != 0) && bc < LostCityConfiguration.BUILDING_CHANCE);
+        hasBuilding = building2x2Section >= 0 || (isCity && (chunkX != 0 || chunkZ != 0) && bc < provider.profile.BUILDING_CHANCE);
 
         // In a 2x2 building we copy all information from the top-left chunk
         if (building2x2Section >= 1) {
@@ -345,19 +344,19 @@ public class BuildingInfo {
             } else {
                 streetType = StreetType.NORMAL;
             }
-            if (rand.nextFloat() < LostCityConfiguration.FOUNTAIN_CHANCE) {
+            if (rand.nextFloat() < provider.profile.FOUNTAIN_CHANCE) {
                 fountainType = AssetRegistries.PARTS.get(getCityStyle().getRandomFountain(provider, rand));
             } else {
                 fountainType = null;
             }
             parkType = AssetRegistries.PARTS.get(getCityStyle().getRandomPark(provider, rand));
-            int f = LostCityConfiguration.BUILDING_MINFLOORS + rand.nextInt((int) (LostCityConfiguration.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (LostCityConfiguration.BUILDING_MAXFLOORS_CHANCE - LostCityConfiguration.BUILDING_MINFLOORS_CHANCE)));
-            if (f > LostCityConfiguration.BUILDING_MAXFLOORS) {
-                f = LostCityConfiguration.BUILDING_MAXFLOORS;
+            int f = provider.profile.BUILDING_MINFLOORS + rand.nextInt((int) (provider.profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (provider.profile.BUILDING_MAXFLOORS_CHANCE - provider.profile.BUILDING_MINFLOORS_CHANCE)));
+            if (f > provider.profile.BUILDING_MAXFLOORS) {
+                f = provider.profile.BUILDING_MAXFLOORS;
             }
             floors = f + 1;
-            int maxcellars = LostCityConfiguration.BUILDING_MAXCELLARS + cityLevel;
-            floorsBelowGround = LostCityConfiguration.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
+            int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
+            floorsBelowGround = provider.profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
             doorBlock = getRandomDoor(rand);
             bridgeType = AssetRegistries.PARTS.get(getCityStyle().getRandomBridge(provider, rand));
             stairType = AssetRegistries.PARTS.get(getCityStyle().getRandomStair(provider, rand));
@@ -372,24 +371,24 @@ public class BuildingInfo {
         for (int i = 0; i <= floors + floorsBelowGround; i++) {
             String randomPart = building.getRandomPart(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));
             floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
-            connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed, provider) && (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE);
-            connectionAtZ[i] = isCity(chunkX, chunkZ - 1, seed, provider) && (rand.nextFloat() < LostCityConfiguration.BUILDING_DOORWAYCHANCE);
+            connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
+            connectionAtZ[i] = isCity(chunkX, chunkZ - 1, seed, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
         }
 
         if (hasBuilding && floorsBelowGround > 0) {
             xRailCorridor = false;
             zRailCorridor = false;
         } else {
-            xRailCorridor = rand.nextFloat() < LostCityConfiguration.CORRIDOR_CHANCE;
-            zRailCorridor = rand.nextFloat() < LostCityConfiguration.CORRIDOR_CHANCE;
+            xRailCorridor = rand.nextFloat() < provider.profile.CORRIDOR_CHANCE;
+            zRailCorridor = rand.nextFloat() < provider.profile.CORRIDOR_CHANCE;
         }
 
         if (isCity) {
             xBridge = false;
             zBridge = false;
         } else {
-            xBridge = rand.nextFloat() < LostCityConfiguration.BRIDGE_CHANCE;
-            zBridge = rand.nextFloat() < LostCityConfiguration.BRIDGE_CHANCE;
+            xBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
+            zBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
         }
     }
 

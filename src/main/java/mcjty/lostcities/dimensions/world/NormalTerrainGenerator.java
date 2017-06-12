@@ -37,7 +37,8 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
     private double[] depthBuffer = new double[256];
 
 
-    public NormalTerrainGenerator() {
+    public NormalTerrainGenerator(LostCityChunkGenerator provider) {
+        this.provider = provider;
         this.heightMap = new double[825];
 
         this.biomeWeights = new float[25];
@@ -51,9 +52,8 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
 
 
     @Override
-    public void setup(World world, LostCityChunkGenerator provider) {
+    public void setup(World world) {
         this.world = world;
-        this.provider = provider;
 
         this.minLimitPerlinNoise = new NoiseGeneratorOctaves(provider.rand, 16);
         this.maxLimitPerlinNoise = new NoiseGeneratorOctaves(provider.rand, 16);
