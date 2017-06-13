@@ -9,15 +9,17 @@ import java.io.*;
 
 public class AssetRegistries {
 
+    public static final AbstractAssetRegistry<WorldStyle> WORLDSTYLES = new AbstractAssetRegistry<>();
+    public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<BuildingPart> PARTS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Building> BUILDINGS = new AbstractAssetRegistry<>();
-    public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<MultiBuilding> MULTI_BUILDINGS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Style> STYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Palette> PALETTES = new AbstractAssetRegistry<>();
 
     public static final void reset() {
         System.out.println("AssetRegistries.reset");
+        WORLDSTYLES.reset();
         PARTS.reset();
         BUILDINGS.reset();
         CITYSTYLES.reset();
@@ -55,6 +57,8 @@ public class AssetRegistries {
                     BUILDINGS.register(new Building(object));
                 } else if ("multibuilding".equals(type)) {
                     MULTI_BUILDINGS.register(new MultiBuilding(object));
+                } else if ("worldstyle".equals(type)) {
+                    WORLDSTYLES.register(new WorldStyle(object));
                 } else {
                     throw new RuntimeException("Unknown type '" + type + "'!");
                 }

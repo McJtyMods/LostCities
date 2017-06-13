@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import mcjty.lib.compat.CompatChunkGenerator;
@@ -9,6 +8,8 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Biomes;
@@ -41,6 +42,7 @@ import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     public LostCityProfile profile; // Current profile
+    public WorldStyle worldStyle;
 
     public Random rand;
     public long seed;
@@ -116,6 +118,10 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         }
 
         System.out.println("LostCityChunkGenerator.LostCityChunkGenerator: profile=" + profile.getName());
+        worldStyle = AssetRegistries.WORLDSTYLES.get(profile.getWorldStyle());
+        if (worldStyle != null) {
+            throw new RuntimeException("Unknown worldstryle '" + profile.getWorldStyle() + "'!");
+        }
 
         this.worldObj = world;
 

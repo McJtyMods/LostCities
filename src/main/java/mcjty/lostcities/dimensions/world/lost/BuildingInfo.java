@@ -2,10 +2,12 @@ package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
+import mcjty.lostcities.varia.Counter;
 import mcjty.lostcities.varia.QualityRandom;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -110,9 +112,41 @@ public class BuildingInfo {
         return damageArea;
     }
 
+    public Set<ChunkPos> findConnectedStreets() {
+        Set<ChunkPos> streets = new HashSet<>();
+        Queue<ChunkPos> todo = new ArrayDeque<>();
+        todo.add(new ChunkPos(chunkX, chunkZ));
+        while (!todo.isEmpty()) {
+            ChunkPos cp = todo.poll();
+            BuildingInfo bi = getBuildingInfo(cp.chunkXPos, cp.chunkZPos, seed, provider);
+            if (bi.isCity && !bi.hasBuilding && !streets.contains(cp)) {
+                streets.add(cp);
+                todo.add(new ChunkPos(cp.chunkXPos-1, cp.chunkZPos));
+                todo.add(new ChunkPos(cp.chunkXPos+1, cp.chunkZPos));
+                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos-1));
+                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos+1));
+            }
+        }
+        return streets;
+    }
+
     public CityStyle getCityStyle() {
         if (cityStyle == null) {
-            cityStyle = City.getCityStyle(seed, chunkX, chunkZ, provider);
+            // If this is a street we find all other street chunks connected to this and pick the cityStyle
+            // that represents the majority. This is to prevent streets from switching style randomly if two
+            // different styled cities mix
+            if (isCity && !hasBuilding) {
+                Set<ChunkPos> connectedStreets = findConnectedStreets();
+                Counter<String> counter = new Counter<>();
+                for (ChunkPos cp : connectedStreets) {
+                    BuildingInfo bi = getBuildingInfo(cp.chunkXPos, cp.chunkZPos, seed, provider);
+                    cityStyle = City.getCityStyle(seed, cp.chunkXPos, cp.chunkZPos, provider);
+                    counter.add(cityStyle.getName());
+                }
+                cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
+            } else {
+                cityStyle = City.getCityStyle(seed, chunkX, chunkZ, provider);
+            }
         }
         return cityStyle;
     }

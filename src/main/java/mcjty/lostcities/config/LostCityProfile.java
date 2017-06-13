@@ -18,7 +18,9 @@ public class LostCityProfile {
 
     private final String name;
     private final Optional<LostCityProfile> inheritFrom;
+
     private String description = "Default generation, common cities, explosions";
+    private String worldStyle = "standard";
 
     public int DEBRIS_TO_NEARBYCHUNK_FACTOR = 200;
 
@@ -119,6 +121,8 @@ public class LostCityProfile {
 
     private void initLostcity(Configuration cfg) {
         description = cfg.getString("description", categoryLostcity, inheritFrom.orElse(this).description, "The description of this profile");
+        worldStyle = cfg.getString("worldStyle", categoryLostcity, inheritFrom.orElse(this).worldStyle, "The worldstyle used by this profile (defined in the assets)");
+
         STYLE_CHANCE_CRACKED = cfg.getFloat("styleChanceCracked", categoryLostcity, inheritFrom.orElse(this).STYLE_CHANCE_CRACKED, 0.0f, 1.0f, "The chance that a brick will be cracked");
         STYLE_CHANCE_MOSSY = cfg.getFloat("styleChanceMossy", categoryLostcity, inheritFrom.orElse(this).STYLE_CHANCE_MOSSY, 0.0f, 1.0f, "The chance that a brick will be mossy");
 
@@ -218,6 +222,10 @@ public class LostCityProfile {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getWorldStyle() {
+        return worldStyle;
     }
 
     public Map<String, Float> getBiomeFactorMap() {
