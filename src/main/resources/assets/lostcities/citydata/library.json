@@ -8,15 +8,16 @@
         "citystyle": "standard"
       },
       {
-        "factor": 0.5,
-        "citystyle": "test"
+        "factor": 9.0,
+        "biomes": ["desert", "desert_hills"],
+        "citystyle": "citystyle_desert"
       }
     ]
   },
   {
     "type": "citystyle",
-    "name": "test",
-    "style": "nether",
+    "name": "citystyle_desert",
+    "style": "desert",
     "street": {
       "width": 8,
       "street": "S",
@@ -253,21 +254,102 @@
   },
   {
     "type": "palette",
-    "name": "bricks_nether",
+    "name": "bricks_desert",
     "palette": [
       {
         "char": "X",
-        "block": "minecraft:nether_brick",
+        "block": "minecraft:sandstone@2",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "$",
-        "block": "minecraft:purpur_double_slab",
+        "block": "minecraft:double_stone_slab2",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "#",
-        "block": "minecraft:nether_brick",
+        "blocks": [
+          {
+            "factor": 0.1,
+            "block": "minecraft:sandstone"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:sandstone@2"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_desert_red",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@14",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:double_stone_slab2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@14",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_desert_orange",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@1",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:double_stone_slab2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@1",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_desert_redsand",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:red_sandstone@2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:double_stone_slab2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "blocks": [
+          {
+            "factor": 0.1,
+            "block": "minecraft:red_sandstone"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:red_sandstone@2"
+          }
+        ],
         "damaged": "minecraft:iron_bars"
       }
     ]
@@ -753,7 +835,7 @@
   },
   {
     "type": "palette",
-    "name": "default_nether",
+    "name": "default_desert",
     "palette": [
       {
         "char": "C",
@@ -811,7 +893,7 @@
       },
       {
         "char": "S",
-        "block": "minecraft:purpur_double_slab",
+        "block": "minecraft:double_stone_slab2",
         "damaged": "minecraft:iron_bars"
       },
       {
@@ -829,15 +911,15 @@
       },
       {
         "char": "x",
-        "block": "minecraft:nether_brick"
+        "block": "minecraft:sandstone@2"
       },
       {
         "char": "_",
-        "block": "minecraft:purpur_slab"
+        "block": "minecraft:stone_slab@1"
       },
       {
         "char": "=",
-        "block": "minecraft:purpur_slab@8"
+        "block": "minecraft:stone_slab@9"
       },
       {
         "char": " ",
@@ -8274,18 +8356,26 @@
   },
   {
     "type": "style",
-    "name": "nether",
+    "name": "desert",
     "randompalettes": [
       [
         {
           "factor": 1.0,
-          "palette": "default_nether"
+          "palette": "default_desert"
         }
       ],
       [
         {
           "factor": 1.0,
-          "palette": "bricks_nether"
+          "palette": "bricks_desert"
+        },
+        {
+          "factor": 1.0,
+          "palette": "bricks_desert_red"
+        },
+        {
+          "factor": 1.0,
+          "palette": "bricks_desert_orange"
         }
       ],
       [

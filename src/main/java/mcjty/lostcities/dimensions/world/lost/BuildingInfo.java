@@ -53,7 +53,6 @@ public class BuildingInfo {
     private BuildingInfo zmin = null;
     private BuildingInfo zmax = null;
     private DamageArea damageArea = null;
-    private CityStyle cityStyle = null;
     private Palette palette = null;
     private CompiledPalette compiledPalette = null;
 
@@ -73,6 +72,9 @@ public class BuildingInfo {
 
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
+    private static Map<Pair<Integer, Integer>, Boolean> isCityMap = new HashMap<>();
+    private static Map<Pair<Integer, Integer>, Boolean> hasBuildingMap = new HashMap<>();
+    private static Map<Pair<Integer, Integer>, CityStyle> cityStyleCache = new HashMap<>();
 
     public void addChestTodo(BlockPos pos) {
         chestTodo.add(pos);
@@ -118,8 +120,7 @@ public class BuildingInfo {
         todo.add(new ChunkPos(chunkX, chunkZ));
         while (!todo.isEmpty()) {
             ChunkPos cp = todo.poll();
-            BuildingInfo bi = getBuildingInfo(cp.chunkXPos, cp.chunkZPos, seed, provider);
-            if (bi.isCity && !bi.hasBuilding && !streets.contains(cp)) {
+            if (isCity(cp.chunkXPos, cp.chunkZPos, seed, provider) && !hasBuilding(cp.chunkXPos, cp.chunkZPos, seed, provider) && !streets.contains(cp)) {
                 streets.add(cp);
                 todo.add(new ChunkPos(cp.chunkXPos-1, cp.chunkZPos));
                 todo.add(new ChunkPos(cp.chunkXPos+1, cp.chunkZPos));
@@ -131,7 +132,9 @@ public class BuildingInfo {
     }
 
     public CityStyle getCityStyle() {
-        if (cityStyle == null) {
+        Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
+        if (!cityStyleCache.containsKey(key)) {
+            CityStyle cityStyle;
             // If this is a street we find all other street chunks connected to this and pick the cityStyle
             // that represents the majority. This is to prevent streets from switching style randomly if two
             // different styled cities mix
@@ -139,7 +142,6 @@ public class BuildingInfo {
                 Set<ChunkPos> connectedStreets = findConnectedStreets();
                 Counter<String> counter = new Counter<>();
                 for (ChunkPos cp : connectedStreets) {
-                    BuildingInfo bi = getBuildingInfo(cp.chunkXPos, cp.chunkZPos, seed, provider);
                     cityStyle = City.getCityStyle(seed, cp.chunkXPos, cp.chunkZPos, provider);
                     counter.add(cityStyle.getName());
                 }
@@ -147,8 +149,10 @@ public class BuildingInfo {
             } else {
                 cityStyle = City.getCityStyle(seed, chunkX, chunkZ, provider);
             }
+            cityStyleCache.put(key, cityStyle);
+            return cityStyle;
         }
-        return cityStyle;
+        return cityStyleCache.get(key);
     }
 
     private void createPalette(Random rand) {
@@ -225,12 +229,42 @@ public class BuildingInfo {
     }
 
     public static boolean isCity(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
-        if (buildingInfoMap.containsKey(Pair.of(chunkX, chunkZ))) {
-            return buildingInfoMap.get(Pair.of(chunkX, chunkZ)).isCity;
+        Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
+        if (isCityMap.containsKey(key)) {
+            return isCityMap.get(key);
         } else {
             float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
-            return cityFactor > provider.profile.CITY_THRESSHOLD;
+            boolean isCity = cityFactor > provider.profile.CITY_THRESSHOLD;
+            isCityMap.put(key, isCity);
+            return isCity;
         }
+    }
+
+    public static boolean hasBuilding(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
+        Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
+        if (hasBuildingMap.containsKey(key)) {
+            return hasBuildingMap.get(key);
+        }
+        boolean isCity = isCity(chunkX, chunkZ, seed, provider);
+
+        int section;
+        if (isTopLeftOf2x2Building(chunkX, chunkZ, seed, provider)) {
+            section = 0;
+        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ, seed, provider)) {
+            section = 1;
+        } else if (isTopLeftOf2x2Building(chunkX, chunkZ - 1, seed, provider)) {
+            section = 2;
+        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, seed, provider)) {
+            section = 3;
+        } else {
+            section = -1;
+        }
+
+        Random rand = getBuildingRandom(chunkX, chunkZ, seed);
+        float bc = rand.nextFloat();
+        boolean b = section >= 0 || (isCity && (chunkX != 0 || chunkZ != 0) && bc < provider.profile.BUILDING_CHANCE);
+        hasBuildingMap.put(key, b);
+        return b;
     }
 
     private BuildingInfo calculateTopLeft() {
@@ -281,6 +315,9 @@ public class BuildingInfo {
 
     public static void cleanBuildingInfoCache() {
         buildingInfoMap.clear();
+        isCityMap.clear();
+        hasBuildingMap.clear();
+        cityStyleCache.clear();
     }
 
     public static BuildingInfo getBuildingInfo(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
@@ -298,8 +335,7 @@ public class BuildingInfo {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         this.seed = seed;
-        float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
-        isCity = cityFactor > provider.profile.CITY_THRESSHOLD;
+        isCity = isCity(chunkX, chunkZ, seed, provider);
 
         if (isTopLeftOf2x2Building(chunkX, chunkZ, seed, provider)) {
             building2x2Section = 0;
@@ -351,12 +387,13 @@ public class BuildingInfo {
             palette = topleft.palette;
             compiledPalette = topleft.getCompiledPalette();
         } else {
+            CityStyle cs = getCityStyle();
             if (building2x2Section == 0) {
-                multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(getCityStyle().getRandomMultiBuilding(provider, rand));
+                multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(cs.getRandomMultiBuilding(provider, rand));
                 buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(0, 0));
             } else {
                 multiBuilding = null;
-                buildingType = AssetRegistries.BUILDINGS.get(getCityStyle().getRandomBuilding(provider, rand));
+                buildingType = AssetRegistries.BUILDINGS.get(cs.getRandomBuilding(provider, rand));
             }
 
             // @todo: average out nearby biomes?
@@ -382,11 +419,12 @@ public class BuildingInfo {
                 streetType = StreetType.NORMAL;
             }
             if (rand.nextFloat() < provider.profile.FOUNTAIN_CHANCE) {
-                fountainType = AssetRegistries.PARTS.get(getCityStyle().getRandomFountain(provider, rand));
+                fountainType = AssetRegistries.PARTS.get(cs.getRandomFountain(provider, rand));
             } else {
                 fountainType = null;
             }
-            parkType = AssetRegistries.PARTS.get(getCityStyle().getRandomPark(provider, rand));
+            parkType = AssetRegistries.PARTS.get(cs.getRandomPark(provider, rand));
+            float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
             int f = provider.profile.BUILDING_MINFLOORS + rand.nextInt((int) (provider.profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (provider.profile.BUILDING_MAXFLOORS_CHANCE - provider.profile.BUILDING_MINFLOORS_CHANCE)));
             if (f > provider.profile.BUILDING_MAXFLOORS) {
                 f = provider.profile.BUILDING_MAXFLOORS;
@@ -395,8 +433,8 @@ public class BuildingInfo {
             int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
             floorsBelowGround = provider.profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
             doorBlock = getRandomDoor(rand);
-            bridgeType = AssetRegistries.PARTS.get(getCityStyle().getRandomBridge(provider, rand));
-            stairType = AssetRegistries.PARTS.get(getCityStyle().getRandomStair(provider, rand));
+            bridgeType = AssetRegistries.PARTS.get(cs.getRandomBridge(provider, rand));
+            stairType = AssetRegistries.PARTS.get(cs.getRandomStair(provider, rand));
             stairPriority = rand.nextFloat();
             createPalette(rand);
         }

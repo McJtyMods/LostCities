@@ -119,8 +119,8 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         System.out.println("LostCityChunkGenerator.LostCityChunkGenerator: profile=" + profile.getName());
         worldStyle = AssetRegistries.WORLDSTYLES.get(profile.getWorldStyle());
-        if (worldStyle != null) {
-            throw new RuntimeException("Unknown worldstryle '" + profile.getWorldStyle() + "'!");
+        if (worldStyle == null) {
+            throw new RuntimeException("Unknown worldstyle '" + profile.getWorldStyle() + "'!");
         }
 
         this.worldObj = world;

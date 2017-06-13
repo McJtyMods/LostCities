@@ -37,7 +37,7 @@ public class City {
         Random rand = new Random(seed + chunkZ * 899809363L + chunkX * 256203221L);
         rand.nextFloat();
         rand.nextFloat();
-        return provider.worldStyle.getRandomCityStyle(provider, rand);
+        return provider.worldStyle.getRandomCityStyle(provider, chunkX, chunkZ, rand);
     }
 
     // Calculate the citystyle based on all surrounding cities
@@ -47,7 +47,6 @@ public class City {
         rand.nextFloat();
 
         int offset = (provider.profile.CITY_MAXRADIUS+15) / 16;
-        float totalfactor = 0.0f;
         List<Pair<Float, String>> styles = new ArrayList<>();
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
@@ -61,6 +60,9 @@ public class City {
                     }
                 }
             }
+        }
+        if (styles.isEmpty()) {
+            return AssetRegistries.CITYSTYLES.get(provider.worldStyle.getRandomCityStyle(provider, chunkX, chunkZ, rand));
         }
         return AssetRegistries.CITYSTYLES.get(Tools.getRandomFromList(provider, rand, styles));
     }

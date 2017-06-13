@@ -6,17 +6,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.varia.Tools;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.function.Predicate;
 
 public class WorldStyle implements IAsset {
 
     private String name;
 
-    private final List<Pair<Float, String>> cityStyleSelector = new ArrayList<>();
+    private final List<Pair<Predicate<Info>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
 
     public WorldStyle(JsonObject object) {
         readFromJSon(object);
@@ -36,10 +37,38 @@ public class WorldStyle implements IAsset {
         name = object.get("name").getAsString();
         JsonArray array = object.get("citystyles").getAsJsonArray();
         for (JsonElement element : array) {
-            float factor = element.getAsJsonObject().get("factor").getAsFloat();
-            String building = element.getAsJsonObject().get("citystyle").getAsString();
-            cityStyleSelector.add(Pair.of(factor, building));
+            JsonObject o = element.getAsJsonObject();
+            float factor = o.get("factor").getAsFloat();
+            String building = o.get("citystyle").getAsString();
+            Predicate<Info> predicate = info -> true;
+            if (o.has("biomes")) {
+                JsonArray ar = o.get("biomes").getAsJsonArray();
+                Set<String> biomes = new HashSet<>();
+                for (JsonElement el : ar) {
+                    Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(el.getAsString()));
+                    if (biome != null) {
+                        biomes.add(Biome.REGISTRY.getNameForObject(biome).toString());
+                    }
+                }
+                predicate = info -> hasBiomes(info, biomes);
+            }
+            cityStyleSelector.add(Pair.of(predicate, Pair.of(factor, building)));
         }
+    }
+
+    private boolean isValidBiome(Set<String> biomeSet, Biome biome) {
+        ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
+        return biomeSet.contains(object.toString());
+    }
+
+    private boolean hasBiomes(Info info, Set<String> biomeSet) {
+        Biome[] biomes = info.biomes;
+
+        if (isValidBiome(biomeSet, biomes[55]) || isValidBiome(biomeSet, biomes[54]) || isValidBiome(biomeSet, biomes[56])
+                || isValidBiome(biomeSet, biomes[5]) || isValidBiome(biomeSet, biomes[95]) ) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -49,23 +78,40 @@ public class WorldStyle implements IAsset {
         object.add("name", new JsonPrimitive(name));
 
         JsonArray array = new JsonArray();
-        for (Pair<Float, String> pair : cityStyleSelector) {
+        for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getKey()));
-            o.add("citystyle", new JsonPrimitive(pair.getValue()));
+            Pair<Float, String> ff = pair.getValue();
+            o.add("factor", new JsonPrimitive(ff.getKey()));
+            o.add("citystyle", new JsonPrimitive(ff.getValue()));
             array.add(o);
         }
         object.add("citystyles", array);
         return object;
     }
 
-    public WorldStyle addCityStyle(float factor, String cityStyle){
-        cityStyleSelector.add(Pair.of(factor, cityStyle));
-        return this;
+
+    public String getRandomCityStyle(LostCityChunkGenerator provider, int chunkX, int chunkZ, Random random) {
+        Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        Info info = new Info(biomes, chunkX, chunkZ);
+        List<Pair<Float, String>> ct = new ArrayList<>();
+        for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {
+            if (pair.getKey().test(info)) {
+                ct.add(pair.getValue());
+            }
+        }
+
+        return Tools.getRandomFromList(provider, random, ct);
     }
 
+    private static class Info {
+        private Biome[] biomes;
+        private int chunkX;
+        private int chunkZ;
 
-    public String getRandomCityStyle(LostCityChunkGenerator provider, Random random) {
-        return Tools.getRandomFromList(provider, random, cityStyleSelector);
+        public Info(Biome[] biomes, int chunkX, int chunkZ) {
+            this.biomes = biomes;
+            this.chunkX = chunkX;
+            this.chunkZ = chunkZ;
+        }
     }
 }

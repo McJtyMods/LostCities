@@ -47,6 +47,7 @@ public class CommandDebug implements CompatCommand {
             System.out.println("info.isCity = " + info.isCity);
             System.out.println("info.chunkX = " + info.chunkX);
             System.out.println("info.chunkZ = " + info.chunkZ);
+            System.out.println("info.getCityStyle() = " + info.getCityStyle().getName());
         }
     }
 
