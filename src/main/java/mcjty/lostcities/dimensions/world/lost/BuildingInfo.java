@@ -146,10 +146,13 @@ public class BuildingInfo {
                     counter.add(cityStyle.getName());
                 }
                 cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
+                for (ChunkPos cp : connectedStreets) {
+                    cityStyleCache.put(Pair.of(cp.chunkXPos, cp.chunkZPos), cityStyle);
+                }
             } else {
                 cityStyle = City.getCityStyle(seed, chunkX, chunkZ, provider);
+                cityStyleCache.put(key, cityStyle);
             }
-            cityStyleCache.put(key, cityStyle);
             return cityStyle;
         }
         return cityStyleCache.get(key);
