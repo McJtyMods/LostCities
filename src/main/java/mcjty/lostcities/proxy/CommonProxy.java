@@ -26,19 +26,6 @@ public abstract class CommonProxy {
         modConfigDir = e.getModConfigurationDirectory();
         mainConfig = new Configuration(new File(modConfigDir.getPath(), "lostcities.cfg"));
         readMainConfig();
-
-        AssetRegistries.reset();
-        for (String path : LostCityConfiguration.ASSETS) {
-            if (path.startsWith("/")) {
-                InputStream inputstream = LostCities.class.getResourceAsStream(path);
-                AssetRegistries.load(inputstream);
-            } else if (path.startsWith("$")) {
-                File file = new File(modConfigDir.getPath() + File.separator + path.substring(1));
-                AssetRegistries.load(file);
-            } else {
-                throw new RuntimeException("Invalid path for lostcity resource in 'assets' config!");
-            }
-        }
         ModDimensions.init();
     }
 
@@ -65,6 +52,20 @@ public abstract class CommonProxy {
         }
 
         mainConfig = null;
+
+
+        AssetRegistries.reset();
+        for (String path : LostCityConfiguration.ASSETS) {
+            if (path.startsWith("/")) {
+                InputStream inputstream = LostCities.class.getResourceAsStream(path);
+                AssetRegistries.load(inputstream);
+            } else if (path.startsWith("$")) {
+                File file = new File(modConfigDir.getPath() + File.separator + path.substring(1));
+                AssetRegistries.load(file);
+            } else {
+                throw new RuntimeException("Invalid path for lostcity resource in 'assets' config!");
+            }
+        }
     }
 
 }

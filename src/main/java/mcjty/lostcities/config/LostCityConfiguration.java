@@ -10,6 +10,7 @@ public class LostCityConfiguration {
     public static final String CATEGORY_GENERAL = "general";
 
     public static String[] ASSETS = new String[] {
+            "/assets/lostcities/citydata/palette.json",
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
     };

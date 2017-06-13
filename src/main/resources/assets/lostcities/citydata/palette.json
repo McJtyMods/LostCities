@@ -1,0 +1,783 @@
+[
+  {
+    "type": "palette",
+    "name": "bricks_desert",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:sandstone@2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:double_stone_slab2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "blocks": [
+          {
+            "factor": 0.1,
+            "block": "minecraft:sandstone"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:sandstone@2"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_desert_red",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@14",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:double_stone_slab2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@14",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_desert_orange",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@1",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:double_stone_slab2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@1",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_desert_redsand",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:red_sandstone@2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:double_stone_slab2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "blocks": [
+          {
+            "factor": 0.1,
+            "block": "minecraft:red_sandstone"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:red_sandstone@2"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_standard",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:monster_egg@2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:double_stone_slab",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "blocks": [
+          {
+            "factor": 0.06,
+            "block": "minecraft:stonebrick@2"
+          },
+          {
+            "factor": 0.05,
+            "block": "minecraft:stonebrick@1"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:stonebrick"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_cyan",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@9",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:stained_hardened_clay@15",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@9",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_gray",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@7",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:stained_hardened_clay@15",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@7",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "bricks_silver",
+    "palette": [
+      {
+        "char": "X",
+        "block": "minecraft:stained_hardened_clay@8",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "$",
+        "block": "minecraft:stained_hardened_clay@12",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "#",
+        "block": "minecraft:stained_hardened_clay@8",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_side_variant_glass",
+    "palette": [
+      {
+        "char": "@",
+        "frompalette": "a"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_side_variant_street",
+    "palette": [
+      {
+        "char": "@",
+        "block": "minecraft:double_stone_slab",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_side_variant_bricks",
+    "palette": [
+      {
+        "char": "@",
+        "frompalette": "#"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_side_variant_quartz",
+    "palette": [
+      {
+        "char": "@",
+        "block": "minecraft:quartz_block",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_full",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:glass"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:glass"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_pane",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:glass"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:glass_pane"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_full_white",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_pane_white",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass_pane"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_full_gray",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@7"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass@7"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_pane_gray",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@7"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass_pane@7"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_full_blue",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@11"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass@11"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_pane_blue",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@11"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass_pane@11"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_full_light_blue",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@3"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass@3"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "glass_pane_light_blue",
+    "palette": [
+      {
+        "char": "+",
+        "block": "minecraft:stained_glass@3"
+      },
+      {
+        "char": "a",
+        "block": "minecraft:stained_glass_pane@3"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "default",
+    "palette": [
+      {
+        "char": "C",
+        "block": "minecraft:chest"
+      },
+      {
+        "char": "D",
+        "block": "minecraft:dirt"
+      },
+      {
+        "char": "F",
+        "blocks": [
+          {
+            "factor": 0.7,
+            "block": "minecraft:web"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:furnace"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:crafting_table"
+          },
+          {
+            "factor": 0.3,
+            "block": "minecraft:brewing_stand"
+          },
+          {
+            "factor": 0.3,
+            "block": "minecraft:anvil"
+          },
+          {
+            "factor": 0.2,
+            "block": "minecraft:cauldron"
+          },
+          {
+            "factor": 1,
+            "block": "minecraft:enchanting_table"
+          }
+        ]
+      },
+      {
+        "char": "G",
+        "block": "minecraft:grass"
+      },
+      {
+        "char": "L",
+        "block": "minecraft:bookshelf"
+      },
+      {
+        "char": "Q",
+        "block": "minecraft:quartz_block",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "S",
+        "block": "minecraft:double_stone_slab",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "b",
+        "block": "minecraft:stone"
+      },
+      {
+        "char": "B",
+        "block": "minecraft:brick_block",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "W",
+        "block": "minecraft:water"
+      },
+      {
+        "char": "x",
+        "block": "minecraft:stonebrick"
+      },
+      {
+        "char": "_",
+        "block": "minecraft:stone_slab"
+      },
+      {
+        "char": "=",
+        "block": "minecraft:stone_slab@8"
+      },
+      {
+        "char": " ",
+        "block": "minecraft:air"
+      },
+      {
+        "char": "%",
+        "blocks": [
+          {
+            "factor": 0.3,
+            "block": "minecraft:web"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:air"
+          }
+        ]
+      },
+      {
+        "char": "*",
+        "block": "minecraft:flower_pot"
+      },
+      {
+        "char": "l",
+        "block": "minecraft:ladder@2"
+      },
+      {
+        "char": "-",
+        "block": "minecraft:wooden_pressure_plate"
+      },
+      {
+        "char": ".",
+        "block": "minecraft:fence"
+      },
+      {
+        "char": "p",
+        "blocks": [
+          {
+            "factor": 0.3,
+            "block": "minecraft:red_flower"
+          },
+          {
+            "factor": 0.3,
+            "block": "minecraft:yellow_flower"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:sapling"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      },
+      {
+        "char": "1",
+        "block": "minecraft:mob_spawner",
+        "mob": "Zombie"
+      },
+      {
+        "char": "2",
+        "block": "minecraft:mob_spawner",
+        "mob": "Skeleton"
+      },
+      {
+        "char": "3",
+        "block": "minecraft:mob_spawner",
+        "mob": "Spider"
+      },
+      {
+        "char": "4",
+        "block": "minecraft:mob_spawner",
+        "mob": "Blaze"
+      },
+      {
+        "char": "w",
+        "block": "minecraft:cobblestone_wall"
+      },
+      {
+        "char": ":",
+        "block": "minecraft:iron_bars"
+      },
+      {
+        "char": "c",
+        "block": "minecraft:stone_brick_stairs@2"
+      },
+      {
+        "char": "d",
+        "block": "minecraft:stone_brick_stairs@7"
+      },
+      {
+        "char": "(",
+        "block": "minecraft:quartz_stairs@3"
+      },
+      {
+        "char": ")",
+        "block": "minecraft:quartz_stairs@2"
+      },
+      {
+        "char": "/",
+        "block": "minecraft:stone_stairs@1"
+      }
+    ]
+  },
+  {
+    "type": "palette",
+    "name": "default_desert",
+    "palette": [
+      {
+        "char": "C",
+        "block": "minecraft:chest"
+      },
+      {
+        "char": "D",
+        "block": "minecraft:dirt"
+      },
+      {
+        "char": "F",
+        "blocks": [
+          {
+            "factor": 0.7,
+            "block": "minecraft:web"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:furnace"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:crafting_table"
+          },
+          {
+            "factor": 0.3,
+            "block": "minecraft:brewing_stand"
+          },
+          {
+            "factor": 0.3,
+            "block": "minecraft:anvil"
+          },
+          {
+            "factor": 0.2,
+            "block": "minecraft:cauldron"
+          },
+          {
+            "factor": 1,
+            "block": "minecraft:enchanting_table"
+          }
+        ]
+      },
+      {
+        "char": "G",
+        "block": "minecraft:grass"
+      },
+      {
+        "char": "L",
+        "block": "minecraft:bookshelf"
+      },
+      {
+        "char": "Q",
+        "block": "minecraft:quartz_block",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "S",
+        "block": "minecraft:double_stone_slab2",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "b",
+        "block": "minecraft:stone"
+      },
+      {
+        "char": "B",
+        "block": "minecraft:red_nether_brick",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "W",
+        "block": "minecraft:water"
+      },
+      {
+        "char": "x",
+        "block": "minecraft:sandstone@2"
+      },
+      {
+        "char": "_",
+        "block": "minecraft:stone_slab@1"
+      },
+      {
+        "char": "=",
+        "block": "minecraft:stone_slab@9"
+      },
+      {
+        "char": " ",
+        "block": "minecraft:air"
+      },
+      {
+        "char": "%",
+        "blocks": [
+          {
+            "factor": 0.3,
+            "block": "minecraft:web"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:air"
+          }
+        ]
+      },
+      {
+        "char": "*",
+        "block": "minecraft:flower_pot"
+      },
+      {
+        "char": "l",
+        "block": "minecraft:ladder@2"
+      },
+      {
+        "char": "-",
+        "block": "minecraft:wooden_pressure_plate"
+      },
+      {
+        "char": ".",
+        "block": "minecraft:fence"
+      },
+      {
+        "char": "p",
+        "blocks": [
+          {
+            "factor": 0.3,
+            "block": "minecraft:red_flower"
+          },
+          {
+            "factor": 0.3,
+            "block": "minecraft:yellow_flower"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:sapling"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "factor": 0.1,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      },
+      {
+        "char": "1",
+        "block": "minecraft:mob_spawner",
+        "mob": "Zombie"
+      },
+      {
+        "char": "2",
+        "block": "minecraft:mob_spawner",
+        "mob": "Skeleton"
+      },
+      {
+        "char": "3",
+        "block": "minecraft:mob_spawner",
+        "mob": "Spider"
+      },
+      {
+        "char": "4",
+        "block": "minecraft:mob_spawner",
+        "mob": "Blaze"
+      },
+      {
+        "char": "w",
+        "block": "minecraft:cobblestone_wall"
+      },
+      {
+        "char": ":",
+        "block": "minecraft:iron_bars"
+      },
+      {
+        "char": "c",
+        "block": "minecraft:stone_brick_stairs@2"
+      },
+      {
+        "char": "d",
+        "block": "minecraft:stone_brick_stairs@7"
+      },
+      {
+        "char": "(",
+        "block": "minecraft:quartz_stairs@3"
+      },
+      {
+        "char": ")",
+        "block": "minecraft:quartz_stairs@2"
+      },
+      {
+        "char": "/",
+        "block": "minecraft:stone_stairs@1"
+      }
+    ]
+  }
+]
