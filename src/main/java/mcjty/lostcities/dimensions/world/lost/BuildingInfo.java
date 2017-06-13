@@ -610,6 +610,9 @@ public class BuildingInfo {
         if ((!i.isCity) || i.hasBuilding || i.cityLevel > 0) {  // @todo support bridges at higher levels?
             return null;
         }
+
+        BuildingInfo minimum = i;
+
         i = getXmax();
         while ((!i.isCity) && i.xBridge && isSuitableForBridge(provider, i)) {
             if (chunkZ % 2 != 0 && (i.getZmin().hasXBridge(provider) != null || i.getZmax().hasXBridge(provider) != null)) {
@@ -621,6 +624,16 @@ public class BuildingInfo {
             return null;
         }
         xBridgeType = bt;
+        // Here we can automatically mark the rest of the bridge as ok. Saves on calculation
+        i = i.getXmin();
+        while (i != minimum) {
+            i.xBridgeType = bt;
+            i.xBridgeTypeCalculated = true;
+            i.zBridgeType = null;
+            i.zBridgeTypeCalculated = true;
+            i = i.getXmin();
+        }
+
         return bt;
     }
 
@@ -659,6 +672,9 @@ public class BuildingInfo {
             bt = i.bridgeType;
             i = i.getZmin();
         }
+
+        BuildingInfo minimum = i;
+
         if ((!i.isCity) || i.hasBuilding || i.cityLevel > 0) {
             return null;
         }
@@ -676,6 +692,16 @@ public class BuildingInfo {
             return null;
         }
         zBridgeType = bt;
+        // Here we can automatically mark the rest of the bridge as ok. Saves on calculation
+        i = i.getZmin();
+        while (i != minimum) {
+            i.zBridgeType = bt;
+            i.zBridgeTypeCalculated = true;
+            i.xBridgeType = null;
+            i.xBridgeTypeCalculated = true;
+            i = i.getZmin();
+        }
+
         return bt;
     }
 
