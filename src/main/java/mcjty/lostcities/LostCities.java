@@ -1,6 +1,7 @@
 package mcjty.lostcities;
 
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.Highway;
 import mcjty.lostcities.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -57,12 +58,14 @@ public class LostCities {
         event.registerServerCommand(new CommandDebug());
         event.registerServerCommand(new CommandSaveAssets());
         event.registerServerCommand(new CommandExport());
-        BuildingInfo.cleanBuildingInfoCache();
+        BuildingInfo.cleanCache();
+        Highway.cleanCache();
     }
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
-        BuildingInfo.cleanBuildingInfoCache();
+        BuildingInfo.cleanCache();
+        Highway.cleanCache();
     }
 
     /**

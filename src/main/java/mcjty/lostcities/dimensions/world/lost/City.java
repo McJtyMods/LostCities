@@ -18,31 +18,31 @@ import java.util.Random;
  */
 public class City {
 
-    private static boolean isCityCenter(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        Random rand = new Random(seed + chunkZ * 797003437L + chunkX * 295075153L);
+    private static boolean isCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        Random rand = new Random(provider.seed + chunkZ * 797003437L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
         return rand.nextFloat() < provider.profile.CITY_CHANCE;
     }
 
-    private static float getCityRadius(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        Random rand = new Random(seed + chunkZ * 100001653L + chunkX * 295075153L);
+    private static float getCityRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        Random rand = new Random(provider.seed + chunkZ * 100001653L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
         return provider.profile.CITY_MINRADIUS + rand.nextInt(provider.profile.CITY_MAXRADIUS - provider.profile.CITY_MINRADIUS);
     }
 
     // Call this on a city center to get the style of that city
-    private static String getCityStyleForCityCenter(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        Random rand = new Random(seed + chunkZ * 899809363L + chunkX * 256203221L);
+    private static String getCityStyleForCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        Random rand = new Random(provider.seed + chunkZ * 899809363L + chunkX * 256203221L);
         rand.nextFloat();
         rand.nextFloat();
         return provider.worldStyle.getRandomCityStyle(provider, chunkX, chunkZ, rand);
     }
 
     // Calculate the citystyle based on all surrounding cities
-    public static CityStyle getCityStyle(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        Random rand = new Random(seed + chunkZ * 593441843L + chunkX * 217645177L);
+    public static CityStyle getCityStyle(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        Random rand = new Random(provider.seed + chunkZ * 593441843L + chunkX * 217645177L);
         rand.nextFloat();
         rand.nextFloat();
 
@@ -50,13 +50,13 @@ public class City {
         List<Pair<Float, String>> styles = new ArrayList<>();
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                if (isCityCenter(seed, cx, cz, provider)) {
-                    float radius = getCityRadius(seed, cx, cz, provider);
+                if (isCityCenter(cx, cz, provider)) {
+                    float radius = getCityRadius(cx, cz, provider);
                     float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
                     if (sqdist < radius * radius) {
                         float dist = (float) Math.sqrt(sqdist);
                         float factor = (radius - dist) / radius;
-                        styles.add(Pair.of(factor, getCityStyleForCityCenter(seed, chunkX, chunkZ, provider)));
+                        styles.add(Pair.of(factor, getCityStyleForCityCenter(chunkX, chunkZ, provider)));
                     }
                 }
             }
@@ -67,13 +67,14 @@ public class City {
         return AssetRegistries.CITYSTYLES.get(Tools.getRandomFromList(provider, rand, styles));
     }
 
-    public static float getCityFactor(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static float getCityFactor(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        long seed = provider.seed;
         float factor = 0;
         int offset = (provider.profile.CITY_MAXRADIUS+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                if (isCityCenter(seed, cx, cz, provider)) {
-                    float radius = getCityRadius(seed, cx, cz, provider);
+                if (isCityCenter(cx, cz, provider)) {
+                    float radius = getCityRadius(cx, cz, provider);
                     float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
                     if (sqdist < radius * radius) {
                         float dist = (float) Math.sqrt(sqdist);

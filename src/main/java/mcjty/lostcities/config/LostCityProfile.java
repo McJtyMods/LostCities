@@ -31,6 +31,10 @@ public class LostCityProfile {
     public int WATERLEVEL_OFFSET = 8;
     public int WATERLEVEL = -1;
 
+//    public int MIN_HIGHWAY_LENGTH = 10;
+//    public int MAX_HIGHWAY_LENGTH = 50;
+//    public float HIGHWAY_CHANCE = 1.0f/(50*5);
+
     public float DESTROY_LONE_BLOCKS_FACTOR = .05f;
     public float DESTROY_OR_MOVE_CHANCE = .4f;
     public int DESTROY_SMALL_SECTIONS_SIZE = 50;
@@ -155,6 +159,11 @@ public class LostCityProfile {
                 "There actually being a bridge also depends on the presence of adjacent bridges and other conditions");
 
         FOUNTAIN_CHANCE = cfg.getFloat("fountainChance", categoryLostcity, inheritFrom.orElse(this).FOUNTAIN_CHANCE, 0.0f, 1.0f, "The chance that a street section contains a fountain");
+
+//        MIN_HIGHWAY_LENGTH = cfg.getInt("minHighwayLength", categoryLostcity, inheritFrom.orElse(this).MIN_HIGHWAY_LENGTH, 0, 200,
+//                "The minimum length of a highway (in chunks)");
+//        MAX_HIGHWAY_LENGTH = cfg.getInt("maxHighwayLength", categoryLostcity, inheritFrom.orElse(this).MAX_HIGHWAY_LENGTH, 0, 1000,
+//                "The maximum length of a highway (in chunks). Set to 0 to disable highways");
 
         BEDROCK_LAYER = cfg.getInt("bedrockLayer", categoryLostcity, inheritFrom.orElse(this).BEDROCK_LAYER, 0, 10,
                 "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");

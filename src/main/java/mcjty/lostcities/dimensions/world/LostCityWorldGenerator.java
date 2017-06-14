@@ -36,7 +36,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
     private void generateVines(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator provider) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
-        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, world.getSeed(), provider);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
         int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? info.getMaxHeight() : (info.getCityGroundLevel() + 3));
 
@@ -107,7 +107,7 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
 
-        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, world.getSeed(), chunkGenerator);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, chunkGenerator);
 
         int buildingtop = 0;
         boolean building = info.hasBuilding;

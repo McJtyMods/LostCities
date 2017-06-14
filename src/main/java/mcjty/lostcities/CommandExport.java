@@ -7,7 +7,6 @@ import mcjty.lib.compat.CompatCommand;
 import mcjty.lib.tools.ChatTools;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Palette;
 import net.minecraft.block.state.IBlockState;
@@ -65,7 +64,7 @@ public class CommandExport implements CompatCommand {
             Map<IBlockState, Character> mapping = new HashMap<>();
             Palette palette = new Palette("give_name");
             LostCityChunkGenerator provider = (LostCityChunkGenerator) ((ChunkProviderServer)server.getEntityWorld().getChunkProvider()).chunkGenerator;
-            BuildingInfo info = BuildingInfo.getBuildingInfo(start.getX() >> 4, start.getZ() >> 4, provider.seed, provider);
+            BuildingInfo info = BuildingInfo.getBuildingInfo(start.getX() >> 4, start.getZ() >> 4, provider);
             for (Character character : info.getCompiledPalette().getCharacters()) {
                 IBlockState state = info.getCompiledPalette().getStraight(character);
                 if (state != null) {

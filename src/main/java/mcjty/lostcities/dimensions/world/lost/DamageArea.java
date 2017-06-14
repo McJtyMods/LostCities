@@ -23,8 +23,8 @@ public class DamageArea {
     private final List<Explosion> explosions = new ArrayList<>();
     private final AxisAlignedBB chunkBox;
 
-    public DamageArea(long seed, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        this.seed = seed;
+    public DamageArea(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        this.seed = provider.seed;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         chunkBox = new AxisAlignedBB(chunkX * 16, 0, chunkZ * 16, chunkX * 16 + 15, 256, chunkZ * 16 + 15);
@@ -32,7 +32,7 @@ public class DamageArea {
         int offset = (provider.profile.EXPLOSION_MAXRADIUS+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                if ((!provider.profile.EXPLOSIONS_IN_CITIES_ONLY) || BuildingInfo.isCity(cx, cz, seed, provider)) {
+                if ((!provider.profile.EXPLOSIONS_IN_CITIES_ONLY) || BuildingInfo.isCity(cx, cz, provider)) {
                     Explosion explosion = getExplosionAt(cx, cz, provider);
                     if (explosion != null) {
                         if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
@@ -51,6 +51,9 @@ public class DamageArea {
     }
 
     public IBlockState damageBlock(IBlockState b, LostCityChunkGenerator provider, int x, int y, int z, CompiledPalette palette) {
+        if (b == LostCitiesTerrainGenerator.air) {
+            return b;
+        }
         float damage = getDamage(x, y, z);
         if (damage < 0.001) {
             return b;
@@ -93,7 +96,7 @@ public class DamageArea {
         rand.nextFloat();
         if (rand.nextFloat() < provider.profile.EXPLOSION_CHANCE) {
             return new Explosion(provider.profile.EXPLOSION_MINRADIUS + rand.nextInt(provider.profile.EXPLOSION_MAXRADIUS - provider.profile.EXPLOSION_MINRADIUS),
-                    new BlockPos(chunkX * 16 + rand.nextInt(16), BuildingInfo.getBuildingInfo(chunkX, chunkZ, seed, provider).cityLevel * 6 + provider.profile.EXPLOSION_MINHEIGHT + rand.nextInt(provider.profile.EXPLOSION_MAXHEIGHT - provider.profile.EXPLOSION_MINHEIGHT), chunkZ * 16 + rand.nextInt(16)));
+                    new BlockPos(chunkX * 16 + rand.nextInt(16), BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider).cityLevel * 6 + provider.profile.EXPLOSION_MINHEIGHT + rand.nextInt(provider.profile.EXPLOSION_MAXHEIGHT - provider.profile.EXPLOSION_MINHEIGHT), chunkZ * 16 + rand.nextInt(16)));
         }
         return null;
     }
@@ -104,7 +107,7 @@ public class DamageArea {
         rand.nextFloat();
         if (rand.nextFloat() < provider.profile.MINI_EXPLOSION_CHANCE) {
             return new Explosion(provider.profile.MINI_EXPLOSION_MINRADIUS + rand.nextInt(provider.profile.MINI_EXPLOSION_MAXRADIUS - provider.profile.MINI_EXPLOSION_MINRADIUS),
-                    new BlockPos(chunkX * 16 + rand.nextInt(16), BuildingInfo.getBuildingInfo(chunkX, chunkZ, seed, provider).cityLevel * 6 + provider.profile.MINI_EXPLOSION_MINHEIGHT + rand.nextInt(provider.profile.MINI_EXPLOSION_MAXHEIGHT - provider.profile.MINI_EXPLOSION_MINHEIGHT), chunkZ * 16 + rand.nextInt(16)));
+                    new BlockPos(chunkX * 16 + rand.nextInt(16), BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider).cityLevel * 6 + provider.profile.MINI_EXPLOSION_MINHEIGHT + rand.nextInt(provider.profile.MINI_EXPLOSION_MAXHEIGHT - provider.profile.MINI_EXPLOSION_MINHEIGHT), chunkZ * 16 + rand.nextInt(16)));
         }
         return null;
     }

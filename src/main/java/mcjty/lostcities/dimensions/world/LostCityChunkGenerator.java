@@ -143,7 +143,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         if (otherGenerator != null) {
             // For ATG, experimental
-            BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, seed, this);
+            BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, this);
             if (!info.isCity) {
                 return otherGenerator.provideChunk(chunkX, chunkZ);
             }
@@ -170,7 +170,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         if (profile.GENERATE_VILLAGES) {
             if (profile.PREVENT_VILLAGES_IN_CITIES) {
-                if (!BuildingInfo.isCity(chunkX, chunkZ, seed, this)) {
+                if (!BuildingInfo.isCity(chunkX, chunkZ, this)) {
                     this.villageGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
                 }
             } else {
@@ -223,7 +223,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         }
         if (profile.GENERATE_VILLAGES) {
             if (profile.PREVENT_VILLAGES_IN_CITIES) {
-                if (!BuildingInfo.isCity(chunkX, chunkZ, seed, this)) {
+                if (!BuildingInfo.isCity(chunkX, chunkZ, this)) {
                     flag = this.villageGenerator.generateStructure(w, this.rand, cp);
                 }
             } else {
@@ -346,7 +346,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         if (profile.GENERATE_VILLAGES) {
             if (profile.PREVENT_VILLAGES_IN_CITIES) {
-                if (!BuildingInfo.isCity(x, z, seed, this)) {
+                if (!BuildingInfo.isCity(x, z, this)) {
                     this.villageGenerator.generate(this.worldObj, x, z, null);
                 }
             } else {

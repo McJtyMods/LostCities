@@ -181,70 +181,7 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
         }
     }
 
-    @Override
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
-        IBlockState baseBlock = Blocks.STONE.getDefaultState(); // @todo provider.dimensionInformation.getBaseBlockForTerrain();
-//        byte baseMeta = provider.dimensionInformation.getBaseBlockForTerrain().getMeta();
-        Block baseLiquid = Blocks.WATER; // @todo provider.dimensionInformation.getFluidForTerrain();
-
-        generateHeightmap(chunkX * 4, 0, chunkZ * 4);
-
-        byte waterLevel = 63;
-        for (int x4 = 0; x4 < 4; ++x4) {
-            int l = x4 * 5;
-            int i1 = (x4 + 1) * 5;
-
-            for (int z4 = 0; z4 < 4; ++z4) {
-                int k1 = (l + z4) * 33;
-                int l1 = (l + z4 + 1) * 33;
-                int i2 = (i1 + z4) * 33;
-                int j2 = (i1 + z4 + 1) * 33;
-
-                for (int height32 = 0; height32 < 32; ++height32) {
-                    double d1 = heightMap[k1 + height32];
-                    double d2 = heightMap[l1 + height32];
-                    double d3 = heightMap[i2 + height32];
-                    double d4 = heightMap[j2 + height32];
-                    double d5 = (heightMap[k1 + height32 + 1] - d1) * 0.125D;
-                    double d6 = (heightMap[l1 + height32 + 1] - d2) * 0.125D;
-                    double d7 = (heightMap[i2 + height32 + 1] - d3) * 0.125D;
-                    double d8 = (heightMap[j2 + height32 + 1] - d4) * 0.125D;
-
-                    for (int h = 0; h < 8; ++h) {
-                        double d10 = d1;
-                        double d11 = d2;
-                        double d12 = (d3 - d1) * 0.25D;
-                        double d13 = (d4 - d2) * 0.25D;
-                        int height = (height32 * 8) + h;
-
-                        for (int x = 0; x < 4; ++x) {
-                            int index = ((x + (x4 * 4)) << 12) | ((0 + (z4 * 4)) << 8) | height;
-                            short maxheight = 256;
-                            index -= maxheight;
-                            double d16 = (d11 - d10) * 0.25D;
-                            double d15 = d10 - d16;
-
-                            for (int z = 0; z < 4; ++z) {
-                                index += maxheight;
-                                if ((d15 += d16) > 0.0D) {
-                                    BaseTerrainGenerator.setBlockState(primer, index, baseBlock);
-                                } else if (height < waterLevel) {
-                                    BaseTerrainGenerator.setBlockState(primer, index, baseLiquid.getDefaultState());
-                                }
-                            }
-
-                            d10 += d12;
-                            d11 += d13;
-                        }
-
-                        d1 += d5;
-                        d2 += d6;
-                        d3 += d7;
-                        d4 += d8;
-                    }
-                }
-            }
-        }
     }
 
     @Override

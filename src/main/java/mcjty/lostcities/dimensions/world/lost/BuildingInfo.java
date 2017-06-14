@@ -16,7 +16,6 @@ import java.util.*;
 public class BuildingInfo {
     public final int chunkX;
     public final int chunkZ;
-    public final long seed;
     public final LostCityChunkGenerator provider;
 
     public final boolean isCity;
@@ -37,6 +36,7 @@ public class BuildingInfo {
     public final boolean[] connectionAtX;
     public final boolean[] connectionAtZ;
 
+    public final int highwayXLevel;     // 0 or 1 if there is a highway at this chunk
     public final int cityLevel;         // The first floor of buildings starts at groundLevel + cityLevel * 6
 
     public final boolean xBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
@@ -109,7 +109,7 @@ public class BuildingInfo {
 
     public DamageArea getDamageArea() {
         if (damageArea == null) {
-            damageArea = new DamageArea(seed, chunkX, chunkZ, provider);
+            damageArea = new DamageArea(chunkX, chunkZ, provider);
         }
         return damageArea;
     }
@@ -120,7 +120,7 @@ public class BuildingInfo {
         todo.add(new ChunkPos(chunkX, chunkZ));
         while (!todo.isEmpty()) {
             ChunkPos cp = todo.poll();
-            if (isCity(cp.chunkXPos, cp.chunkZPos, seed, provider) && !hasBuilding(cp.chunkXPos, cp.chunkZPos, seed, provider) && !streets.contains(cp)) {
+            if (isCity(cp.chunkXPos, cp.chunkZPos, provider) && !hasBuilding(cp.chunkXPos, cp.chunkZPos, provider) && !streets.contains(cp)) {
                 streets.add(cp);
                 todo.add(new ChunkPos(cp.chunkXPos-1, cp.chunkZPos));
                 todo.add(new ChunkPos(cp.chunkXPos+1, cp.chunkZPos));
@@ -142,15 +142,18 @@ public class BuildingInfo {
                 Set<ChunkPos> connectedStreets = findConnectedStreets();
                 Counter<String> counter = new Counter<>();
                 for (ChunkPos cp : connectedStreets) {
-                    cityStyle = City.getCityStyle(seed, cp.chunkXPos, cp.chunkZPos, provider);
+                    cityStyle = City.getCityStyle(cp.chunkXPos, cp.chunkZPos, provider);
                     counter.add(cityStyle.getName());
                 }
                 cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
+                if (cityStyle == null) {
+                    System.out.println("BuildingInfo.getCityStyle");
+                }
                 for (ChunkPos cp : connectedStreets) {
                     cityStyleCache.put(Pair.of(cp.chunkXPos, cp.chunkZPos), cityStyle);
                 }
             } else {
-                cityStyle = City.getCityStyle(seed, chunkX, chunkZ, provider);
+                cityStyle = City.getCityStyle(chunkX, chunkZ, provider);
                 cityStyleCache.put(key, cityStyle);
             }
             return cityStyle;
@@ -185,28 +188,28 @@ public class BuildingInfo {
 
     public BuildingInfo getXmin() {
         if (xmin == null) {
-            xmin = getBuildingInfo(chunkX - 1, chunkZ, seed, provider);
+            xmin = getBuildingInfo(chunkX - 1, chunkZ, provider);
         }
         return xmin;
     }
 
     public BuildingInfo getXmax() {
         if (xmax == null) {
-            xmax = getBuildingInfo(chunkX + 1, chunkZ, seed, provider);
+            xmax = getBuildingInfo(chunkX + 1, chunkZ, provider);
         }
         return xmax;
     }
 
     public BuildingInfo getZmin() {
         if (zmin == null) {
-            zmin = getBuildingInfo(chunkX, chunkZ - 1, seed, provider);
+            zmin = getBuildingInfo(chunkX, chunkZ - 1, provider);
         }
         return zmin;
     }
 
     public BuildingInfo getZmax() {
         if (zmax == null) {
-            zmax = getBuildingInfo(chunkX, chunkZ + 1, seed, provider);
+            zmax = getBuildingInfo(chunkX, chunkZ + 1, provider);
         }
         return zmax;
     }
@@ -231,41 +234,41 @@ public class BuildingInfo {
         return buildingType;
     }
 
-    public static boolean isCity(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
+    public static boolean isCity(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
         if (isCityMap.containsKey(key)) {
             return isCityMap.get(key);
         } else {
-            float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
+            float cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
             boolean isCity = cityFactor > provider.profile.CITY_THRESSHOLD;
             isCityMap.put(key, isCity);
             return isCity;
         }
     }
 
-    public static boolean hasBuilding(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
+    public static boolean hasBuilding(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
         if (hasBuildingMap.containsKey(key)) {
             return hasBuildingMap.get(key);
         }
-        boolean isCity = isCity(chunkX, chunkZ, seed, provider);
+        boolean isCity = isCity(chunkX, chunkZ, provider);
 
         int section;
-        if (isTopLeftOf2x2Building(chunkX, chunkZ, seed, provider)) {
+        if (isTopLeftOf2x2Building(chunkX, chunkZ, provider)) {
             section = 0;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ, seed, provider)) {
+        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ, provider)) {
             section = 1;
-        } else if (isTopLeftOf2x2Building(chunkX, chunkZ - 1, seed, provider)) {
+        } else if (isTopLeftOf2x2Building(chunkX, chunkZ - 1, provider)) {
             section = 2;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, seed, provider)) {
+        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider)) {
             section = 3;
         } else {
             section = -1;
         }
 
-        Random rand = getBuildingRandom(chunkX, chunkZ, seed);
+        Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
         float bc = rand.nextFloat();
-        boolean b = section >= 0 || (isCity && (chunkX != 0 || chunkZ != 0) && bc < provider.profile.BUILDING_CHANCE);
+        boolean b = section >= 0 || (isCity && !hasHighway(chunkX, chunkZ, provider) && bc < provider.profile.BUILDING_CHANCE);
         hasBuildingMap.put(key, b);
         return b;
     }
@@ -285,76 +288,79 @@ public class BuildingInfo {
         }
     }
 
-    private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
-        if (chunkX == 0 && chunkZ == 0) {
-            return false;
-        }
-        boolean isCity = isCity(chunkX, chunkZ, seed, provider);
-        if (isCity) {
-            Random rand = getBuildingRandom(chunkX, chunkZ, seed);
+    private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (isMultiBuildingCandidate(chunkX, chunkZ, provider)) {
+            Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
             return rand.nextFloat() < provider.profile.BUILDING2X2_CHANCE;
         } else {
             return false;
         }
     }
 
-    private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
-        if (isCandidateForTopLeftOf2x2Building(chunkX, chunkZ, seed, provider) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ, seed, provider) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, seed, provider) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ - 1, seed, provider) &&
+    private static boolean isMultiBuildingCandidate(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        return isCity(chunkX, chunkZ, provider) && !hasHighway(chunkX, chunkZ, provider);
+    }
 
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ - 1, seed, provider) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ, seed, provider) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ + 1, seed, provider) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, seed, provider) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, seed, provider)
+    private static boolean hasHighway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        return Highway.getXHighwayLevel(chunkX, chunkZ, provider) >= 0;
+    }
+
+    private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (isCandidateForTopLeftOf2x2Building(chunkX, chunkZ, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ - 1, provider) &&
+
+                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ - 1, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ + 1, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, provider) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, provider)
                 ) {
-            return isCity(chunkX + 1, chunkZ, seed, provider) && isCity(chunkX + 1, chunkZ + 1, seed, provider) && isCity(chunkX, chunkZ + 1, seed, provider);
+            return isMultiBuildingCandidate(chunkX + 1, chunkZ, provider) && isMultiBuildingCandidate(chunkX + 1, chunkZ + 1, provider) && isMultiBuildingCandidate(chunkX, chunkZ + 1, provider);
         } else {
             return false;
         }
     }
 
-    public static void cleanBuildingInfoCache() {
+    public static void cleanCache() {
         buildingInfoMap.clear();
         isCityMap.clear();
         hasBuildingMap.clear();
         cityStyleCache.clear();
     }
 
-    public static BuildingInfo getBuildingInfo(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
+    public static BuildingInfo getBuildingInfo(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
         if (buildingInfoMap.containsKey(key)) {
             return buildingInfoMap.get(key);
         }
-        BuildingInfo info = new BuildingInfo(chunkX, chunkZ, seed, provider);
+        BuildingInfo info = new BuildingInfo(chunkX, chunkZ, provider);
         buildingInfoMap.put(key, info);
         return info;
     }
 
-    private BuildingInfo(int chunkX, int chunkZ, long seed, LostCityChunkGenerator provider) {
+    private BuildingInfo(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         this.provider = provider;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        this.seed = seed;
-        isCity = isCity(chunkX, chunkZ, seed, provider);
+        isCity = isCity(chunkX, chunkZ, provider);
 
-        if (isTopLeftOf2x2Building(chunkX, chunkZ, seed, provider)) {
+        if (isTopLeftOf2x2Building(chunkX, chunkZ, provider)) {
             building2x2Section = 0;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ, seed, provider)) {
+        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ, provider)) {
             building2x2Section = 1;
-        } else if (isTopLeftOf2x2Building(chunkX, chunkZ - 1, seed, provider)) {
+        } else if (isTopLeftOf2x2Building(chunkX, chunkZ - 1, provider)) {
             building2x2Section = 2;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, seed, provider)) {
+        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider)) {
             building2x2Section = 3;
         } else {
             building2x2Section = -1;
         }
 
-        Random rand = getBuildingRandom(chunkX, chunkZ, seed);
+        Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
         float bc = rand.nextFloat();
-        hasBuilding = building2x2Section >= 0 || (isCity && (chunkX != 0 || chunkZ != 0) && bc < provider.profile.BUILDING_CHANCE);
+        hasBuilding = building2x2Section >= 0 || (isCity && !hasHighway(chunkX, chunkZ, provider) && bc < provider.profile.BUILDING_CHANCE);
 
         // In a 2x2 building we copy all information from the top-left chunk
         if (building2x2Section >= 1) {
@@ -377,6 +383,7 @@ public class BuildingInfo {
             } else {
                 buildingType = topleft.buildingType;
             }
+            highwayXLevel = topleft.highwayXLevel;
             cityLevel = topleft.cityLevel;
             streetType = topleft.streetType;
             fountainType = topleft.fountainType;
@@ -399,22 +406,8 @@ public class BuildingInfo {
                 buildingType = AssetRegistries.BUILDINGS.get(cs.getRandomBuilding(provider, rand));
             }
 
-            // @todo: average out nearby biomes?
-            Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-            float height = 0.0f;
-            for (Biome biome : biomes) {
-                height += biome.getBaseHeight();
-            }
-            height /= biomes.length;
-            if (height < 0.3f) {
-                cityLevel = 0;
-            } else if (height < 0.6f) {
-                cityLevel = 1;
-            } else if (height < 2) {
-                cityLevel = 2;
-            } else {
-                cityLevel = 3;
-            }
+            highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
+            cityLevel = getCityLevel(chunkX, chunkZ, provider);
 
             if (rand.nextDouble() < .2f) {
                 streetType = StreetType.values()[rand.nextInt(StreetType.values().length)];
@@ -427,7 +420,7 @@ public class BuildingInfo {
                 fountainType = null;
             }
             parkType = AssetRegistries.PARTS.get(cs.getRandomPark(provider, rand));
-            float cityFactor = City.getCityFactor(seed, chunkX, chunkZ, provider);
+            float cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
             int f = provider.profile.BUILDING_MINFLOORS + rand.nextInt((int) (provider.profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (provider.profile.BUILDING_MAXFLOORS_CHANCE - provider.profile.BUILDING_MINFLOORS_CHANCE)));
             if (f > provider.profile.BUILDING_MAXFLOORS) {
                 f = provider.profile.BUILDING_MAXFLOORS;
@@ -449,8 +442,8 @@ public class BuildingInfo {
         for (int i = 0; i <= floors + floorsBelowGround; i++) {
             String randomPart = building.getRandomPart(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));
             floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
-            connectionAtX[i] = isCity(chunkX - 1, chunkZ, seed, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
-            connectionAtZ[i] = isCity(chunkX, chunkZ - 1, seed, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
+            connectionAtX[i] = isCity(chunkX - 1, chunkZ, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
+            connectionAtZ[i] = isCity(chunkX, chunkZ - 1, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
         }
 
         if (hasBuilding && floorsBelowGround > 0) {
@@ -468,6 +461,27 @@ public class BuildingInfo {
             xBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
             zBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
         }
+    }
+
+    public static int getCityLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        // @todo: average out nearby biomes?
+        Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        float height = 0.0f;
+        for (Biome biome : biomes) {
+            height += biome.getBaseHeight();
+        }
+        height /= biomes.length;
+        int cityLevel;
+        if (height < 0.3f) {
+            cityLevel = 0;
+        } else if (height < 0.6f) {
+            cityLevel = 1;
+        } else if (height < 2) {
+            cityLevel = 2;
+        } else {
+            cityLevel = 3;
+        }
+        return cityLevel;
     }
 
     private Block getRandomDoor(Random rand) {
@@ -560,7 +574,7 @@ public class BuildingInfo {
                 for (int cx = -1; cx <= 1; cx++) {
                     for (int cz = -1; cz <= 1; cz++) {
                         if (cx != 0 || cz != 0) {
-                            BuildingInfo adjacent = getBuildingInfo(chunkX + cx, chunkZ + cz, seed, provider);
+                            BuildingInfo adjacent = getBuildingInfo(chunkX + cx, chunkZ + cz, provider);
                             if (adjacent.getStairDirection() != null && adjacent.stairPriority > stairPriority) {
                                 actualStairDirection = null;
                                 break;
