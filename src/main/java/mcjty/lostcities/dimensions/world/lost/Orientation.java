@@ -11,4 +11,8 @@ public enum Orientation {
     public Direction getMaxDir() {
         return this == X ? Direction.XMAX : Direction.ZMAX;
     }
+
+    public Orientation getOpposite() {
+        return this == X ? Z : X;
+    }
 }

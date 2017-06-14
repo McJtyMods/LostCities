@@ -1,6 +1,20 @@
 [
   {
     "type": "palette",
+    "name": "default",
+    "palette": [
+      {
+        "char": " ",
+        "block": "minecraft:air"
+      },
+      {
+        "char": "~",
+        "block": "minecraft:command_block"
+      }
+    ]
+  },
+  {
+    "type": "palette",
     "name": "bricks_desert",
     "palette": [
       {
@@ -469,10 +483,6 @@
         "block": "minecraft:stone_slab@8"
       },
       {
-        "char": " ",
-        "block": "minecraft:air"
-      },
-      {
         "char": "%",
         "blocks": [
           {
@@ -667,10 +677,6 @@
       {
         "char": "=",
         "block": "minecraft:stone_slab@9"
-      },
-      {
-        "char": " ",
-        "block": "minecraft:air"
       },
       {
         "char": "%",

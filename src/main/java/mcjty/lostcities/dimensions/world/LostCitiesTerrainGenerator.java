@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.dimensions.world.lost.*;
+import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.varia.GeometryTools;
@@ -22,6 +23,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private final byte waterLevel;
     private static IBlockState bedrock;
     public static IBlockState air;
+    public static IBlockState hardAir;  // Used in parts to carve out
     public static IBlockState water;
 
     private IBlockState baseBlock;
@@ -48,6 +50,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
         air = Blocks.AIR.getDefaultState();
+        hardAir = Blocks.COMMAND_BLOCK.getDefaultState();
         water = Blocks.WATER.getDefaultState();
         bedrock = Blocks.BEDROCK.getDefaultState();
         street = info.getCompiledPalette().get(info.getCityStyle().getStreetBlock());
@@ -72,6 +75,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
+
+        DamageArea damageArea = info.getDamageArea();
 
         generateHeightmap(chunkX * 4, 0, chunkZ * 4);
         for (int x4 = 0; x4 < 4; ++x4) {
@@ -111,7 +116,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             for (int z = 0; z < 4; ++z) {
                                 index += maxheight;
                                 if ((d15 += d16) > 0.0D) {
-                                    IBlockState b = info.getDamageArea().damageBlock(baseBlock, provider, cx + (x4 * 4) + x, height, cz + (z4 * 4) + z, info.getCompiledPalette());
+                                    IBlockState b = damageArea.damageBlock(baseBlock, provider, cx + (x4 * 4) + x, height, cz + (z4 * 4) + z, info.getCompiledPalette());
                                     BaseTerrainGenerator.setBlockState(primer, index, b);
                                 } else if (height < waterLevel) {
                                     BaseTerrainGenerator.setBlockState(primer, index, water);
@@ -137,102 +142,83 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateHighways(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
-        int cx = chunkX * 16;
-        int cz = chunkZ * 16;
         int level = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
         if (level >= 0) {
-            DamageArea damageArea = info.getDamageArea();
-            CompiledPalette palette = info.getCompiledPalette();
+            System.out.println("LostCitiesTerrainGenerator.generateXHighways at " + chunkX*16 + "," + chunkZ*16);
+            generateHighwayPart(chunkX, chunkZ, primer, info, level, Rotation.ROTATE_NONE);
+        }
+        level = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
+        if (level >= 0) {
+            System.out.println("LostCitiesTerrainGenerator.generateZHighways at " + chunkX*16 + "," + chunkZ*16);
+            generateHighwayPart(chunkX, chunkZ, primer, info, level, Rotation.ROTATE_90);
+        }
+    }
 
-            int highwayGroundLevel = provider.profile.GROUNDLEVEL + level * 6;
-            for (int x = 0 ; x < 16 ; x++) {
-                for (int z = 0; z < 16; z++) {
-                    int index = (x << 12) | (z << 8) + highwayGroundLevel;
-                    int height = highwayGroundLevel;
-                    IBlockState b;
-                    if (z == 7 || z == 8) {
-                        b = street2;
-                    } else if (z == 0 || z == 15) {
-                        b = Blocks.STONEBRICK.getDefaultState();    // Make configurable @todo
-                    } else {
-                        b = street;
-                    }
-                    b = damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette);
-                    BaseTerrainGenerator.setBlockState(primer, index++, b);
-                    height++;
-                    for (int y = 0 ; y < 4 ; y++) {
-                        BaseTerrainGenerator.setBlockState(primer, index++, air);
-                        height++;
-                    }
+    private void generateHighwayPart(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, int level, Rotation rotation) {
+        char a = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
+        char l = (char) Block.BLOCK_STATE_IDS.get(water);
+
+        int cx = chunkX * 16;
+        int cz = chunkZ * 16;
+
+        DamageArea damageArea = info.getDamageArea();
+        CompiledPalette palette = info.getCompiledPalette();
+
+        int highwayGroundLevel = provider.profile.GROUNDLEVEL + level * 6;
+        int nonair = 0;
+        // Estimate how many non-air blocks we have to replace to see if we are going to need a tunnel
+        for (int x = 3 ; x < 16 ; x += 3) {
+            for (int z = 3 ; z < 16 ; z += 3) {
+                int index = (x << 12) | (z << 8);
+                if (primer.data[index+highwayGroundLevel+2] != a) {
+                    nonair++;
+                }
+                if (primer.data[index+highwayGroundLevel+4] != a) {
+                    nonair++;
                 }
             }
+        }
 
-            if (isWaterBiome(provider, chunkX, chunkZ)) {
-                char a = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
-                char l = (char) Block.BLOCK_STATE_IDS.get(water);
-                int index = highwayGroundLevel + 1; // (coordinate 0,0)
-                int height = index;
+        IBlockState b;
+        if (isWaterBiome(provider, chunkX, chunkZ)) {
+            generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge"), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
+        } else if (nonair > 20) {
+            // If we replaced a lot of non-air blocks then we assume we are carving out a tunnel
+            generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel"), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
+        } else {
+            // Otherwise simple highway
+            generatePart(primer, info, AssetRegistries.PARTS.get("highway_open"), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
+        }
 
-                IBlockState b;
-                for (int x = 0 ; x < 16 ; x++) {
-                    if (x == 0 ) {
-                        b = Blocks.STONEBRICK.getDefaultState();
-                    } else {
-                        b = Blocks.IRON_BARS.getDefaultState(); // @todo configure!
-                    }
-                    BaseTerrainGenerator.setBlockState(primer, index + (x << 12), damageArea.damageBlock(b, provider, cx + x, height, cz, palette));
-                    BaseTerrainGenerator.setBlockState(primer, index + (x << 12) + (15 << 8), damageArea.damageBlock(b, provider, cx + x, height, cz + 15, palette));
-                }
-                index++;
-                height++;
-
-                b = Blocks.COBBLESTONE_WALL.getDefaultState();
-                for (int y = 1; y < 8; y++) {
-                    BaseTerrainGenerator.setBlockState(primer, index, damageArea.damageBlock(b, provider, cx, height, cz, palette));
-                    BaseTerrainGenerator.setBlockState(primer, index + (15<<8), damageArea.damageBlock(b, provider, cx, height, cz+15, palette));
-                    if (y == 7) {
-                        for (int z = 1 ; z < 15 ; z++) {
-                            BaseTerrainGenerator.setBlockState(primer, index + (z << 8), damageArea.damageBlock(b, provider, cx, height, cz + z, palette));
-                        }
-                    }
-                    index++;
-                    height++;
-                }
-                index = highwayGroundLevel - 1; // (coordinate 0,0)
-                height = index;
-                for (int y = 0 ; y < 40 ; y++) {
-                    boolean done = false;
-                    if (primer.data[index] == a || primer.data[index] == l) {
-                        BaseTerrainGenerator.setBlockState(primer, index, damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), provider, cx, height, cz, palette));
-                        done = true;
-                    }
-                    if (primer.data[index+(15<<8)] == a || primer.data[index+(15<<8)] == l) {
-                        BaseTerrainGenerator.setBlockState(primer, index+(15<<8), damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), provider, cx, height, cz+15, palette));
-                        done = true;
-                    }
-                    index--;
-                    height--;
-                    if (!done) {
-                        break;
-                    }
-                }
-            } else {
-                IBlockState b = Blocks.COBBLESTONE_WALL.getDefaultState();
-                int index = highwayGroundLevel + 1; // (coordinate 0,0)
-                int height = index;
-                for (int y = 0; y < 12; y++) {
-                    BaseTerrainGenerator.setBlockState(primer, index, damageArea.damageBlock(b, provider, cx, height, cz, palette));
-                    if (y == 11) {
-                        BaseTerrainGenerator.setBlockState(primer, index + (1 << 8), damageArea.damageBlock(b, provider, cx, height, cz + 1, palette));
-                    }
-                    index++;
-                    height++;
-                }
+        // Make sure the bridge is supported if needed
+        // @todo rotate the supports!
+        int index = highwayGroundLevel - 1; // (coordinate 0,0)
+        int height = index;
+        for (int y = 0 ; y < 40 ; y++) {
+            boolean done = false;
+            if (primer.data[index] == a || primer.data[index] == l) {
+                BaseTerrainGenerator.setBlockState(primer, index, damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), provider, cx, height, cz, palette));
+                done = true;
+            }
+            if (primer.data[index+(15<<8)] == a || primer.data[index+(15<<8)] == l) {
+                BaseTerrainGenerator.setBlockState(primer, index+(15<<8), damageArea.damageBlock(Blocks.STONEBRICK.getDefaultState(), provider, cx, height, cz+15, palette));
+                done = true;
+            }
+            index--;
+            height--;
+            if (!done) {
+                break;
             }
         }
     }
 
     private void generateBridges(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
+        int highwayLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
+        if (highwayLevel == 0) {
+            // If there is a highway at level 0 we cannot generate bridge parts. If there
+            // is no highway or a highway at level 1 then bridge sections can generate just fine
+            return;
+        }
         BuildingPart bt = info.hasXBridge(provider);
         if (bt != null) {
             generateBridge(chunkX, chunkZ, primer, info, bt, Orientation.X);
@@ -447,7 +433,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         if (!building) {
-            generateStreetDecorations(chunkX, chunkZ, primer, info, rand);
+            int levelX = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
+            int levelZ = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
+            if (levelX < 0 && levelZ < 0) {
+                generateStreetDecorations(chunkX, chunkZ, primer, info, rand);
+            } else {
+                generateHighways(chunkX, chunkZ, primer, info);
+            }
         }
     }
 
@@ -474,7 +466,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     throw new RuntimeException("Cannot happen!");
             }
 
-            generatePart(primer, rand, info, stairs, rotation, chunkX, chunkZ, 0, oy, 0);
+            generatePart(primer, info, stairs, rotation, chunkX, chunkZ, 0, oy, 0);
         }
     }
 
@@ -733,40 +725,40 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         IBlockState railx = Blocks.RAIL.getDefaultState().withProperty(BlockRail.SHAPE, BlockRailBase.EnumRailDirection.EAST_WEST);
         IBlockState railz = Blocks.RAIL.getDefaultState();
 
-        if (highwayLevel != -1 && highwayLevel < info.cityLevel) {
-            // We have a highway going under the city street. If there was a corridor here then
-            // that will simply connect to this highway tunnel
-            while (height < highwayLevel) {
-                IBlockState b = baseBlock;
-                if (doOceanBorder) {
-                    b = Blocks.STONEBRICK.getDefaultState();    // @todo must be configurable
-                }
-                BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
-                height++;
-            }
-            IBlockState b;
-            if (z == 0 || z == 15) {
-                b = Blocks.STONEBRICK.getDefaultState();
-            } else if (z == 7 || z == 8) {
-                b = street2;
-            } else {
-                b = street;
-            }
-            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
-            height++;
-            if (z == 0 || z == 15) {
-                b = Blocks.STONEBRICK.getDefaultState();
-            } else {
-                b = air;
-            }
-            for (int i = 0 ; i < 4 ; i++) {
-                BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
-                height++;
-            }
-            b = Blocks.STONEBRICK.getDefaultState();
-            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
-            height++;
-        }
+//        if (highwayLevel != -1 && highwayLevel < info.cityLevel) {
+//            // We have a highway going under the city street. If there was a corridor here then
+//            // that will simply connect to this highway tunnel
+//            while (height < highwayLevel) {
+//                IBlockState b = baseBlock;
+//                if (doOceanBorder) {
+//                    b = Blocks.STONEBRICK.getDefaultState();    // @todo must be configurable
+//                }
+//                BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
+//                height++;
+//            }
+//            IBlockState b;
+//            if (z == 0 || z == 15) {
+//                b = Blocks.STONEBRICK.getDefaultState();
+//            } else if (z == 7 || z == 8) {
+//                b = street2;
+//            } else {
+//                b = street;
+//            }
+//            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
+//            height++;
+//            if (z == 0 || z == 15) {
+//                b = Blocks.STONEBRICK.getDefaultState();
+//            } else {
+//                b = air;
+//            }
+//            for (int i = 0 ; i < 4 ; i++) {
+//                BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
+//                height++;
+//            }
+//            b = Blocks.STONEBRICK.getDefaultState();
+//            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
+//            height++;
+//        }
 
         while (height < info.getCityGroundLevel()) {
             IBlockState b = baseBlock;
@@ -799,31 +791,31 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         IBlockState b;
 
         if (highwayLevel == info.cityLevel) {
-            // We have a highway at exactly the same level as the city. Skip the street and park generation then
-            if (z == 0 || z == 15) {
-                b = Blocks.STONEBRICK.getDefaultState();
-            } else if (z == 7 || z == 8) {
-                b = street2;
-            } else {
-                b = street;
-            }
-            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
-            height++;
-
-            int i = 0;
-            if (doOceanBorder && z == 0 || z == 15) {       // Only allow ocean borders in that direction
-                if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
-                    b = Blocks.COBBLESTONE_WALL.getDefaultState();
-                    b = damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette);
-                    BaseTerrainGenerator.setBlockState(primer, index++, b);
-                    height++;
-                    i++;
-                }
-            }
-            for ( ; i < 4 ; i++) {
-                BaseTerrainGenerator.setBlockState(primer, index++, air);
-                height++;
-            }
+//            // We have a highway at exactly the same level as the city. Skip the street and park generation then
+//            if (z == 0 || z == 15) {
+//                b = Blocks.STONEBRICK.getDefaultState();
+//            } else if (z == 7 || z == 8) {
+//                b = street2;
+//            } else {
+//                b = street;
+//            }
+//            BaseTerrainGenerator.setBlockState(primer, index++, damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette));
+//            height++;
+//
+//            int i = 0;
+//            if (doOceanBorder && z == 0 || z == 15) {       // Only allow ocean borders in that direction
+//                if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
+//                    b = Blocks.COBBLESTONE_WALL.getDefaultState();
+//                    b = damageArea.damageBlock(b, provider, cx + x, height, cz + z, palette);
+//                    BaseTerrainGenerator.setBlockState(primer, index++, b);
+//                    height++;
+//                    i++;
+//                }
+//            }
+//            for ( ; i < 4 ; i++) {
+//                BaseTerrainGenerator.setBlockState(primer, index++, air);
+//                height++;
+//            }
         } else {
             BuildingInfo.StreetType streetType = info.streetType;
             boolean elevated = info.isElevatedParkSection();
@@ -1025,7 +1017,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return needOpening;
     }
 
-    private void generatePart(ChunkPrimer primer, Random rand, BuildingInfo info, BuildingPart part,
+    private void generatePart(ChunkPrimer primer, BuildingInfo info, BuildingPart part,
                               Rotation rotation,
                               int chunkX, int chunkZ,
                               int ox, int oy, int oz) {
@@ -1045,7 +1037,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
                     // We don't replace the world where the part is empty (air)
                     if (b != air) {
-                        b = damageArea.damageBlock(b, provider, cx + rx, oy + y, cz + rz, palette);
+                        if (b == hardAir) {
+                            b = air;
+                        } else {
+                            b = damageArea.damageBlock(b, provider, cx + rx, oy + y, cz + rz, palette);
+                        }
                         BaseTerrainGenerator.setBlockState(primer, index, b);
                     }
                     index++;

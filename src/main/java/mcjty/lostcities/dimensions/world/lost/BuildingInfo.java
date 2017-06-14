@@ -38,6 +38,7 @@ public class BuildingInfo {
     public final boolean[] connectionAtZ;
 
     public final int highwayXLevel;     // 0 or 1 if there is a highway at this chunk
+    public final int highwayZLevel;     // 0 or 1 if there is a highway at this chunk
     public final int cityLevel;         // The first floor of buildings starts at groundLevel + cityLevel * 6
 
     public final boolean xBridge;       // A boolean indicating that this chunk is a candidate for holding a bridge (no guarantee)
@@ -385,6 +386,7 @@ public class BuildingInfo {
                 buildingType = topleft.buildingType;
             }
             highwayXLevel = topleft.highwayXLevel;
+            highwayZLevel = topleft.highwayZLevel;
             cityLevel = topleft.cityLevel;
             streetType = topleft.streetType;
             fountainType = topleft.fountainType;
@@ -408,6 +410,7 @@ public class BuildingInfo {
             }
 
             highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
+            highwayZLevel = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
             cityLevel = getCityLevel(chunkX, chunkZ, provider);
 
             if (rand.nextDouble() < .2f) {
