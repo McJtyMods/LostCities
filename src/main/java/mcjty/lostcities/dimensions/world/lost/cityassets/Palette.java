@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import mcjty.lostcities.varia.Tools;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

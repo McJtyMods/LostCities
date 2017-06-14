@@ -7,7 +7,6 @@ import mcjty.lib.compat.CompatMapGenStructure;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.LostCitiesTerrainGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import net.minecraft.block.BlockFalling;

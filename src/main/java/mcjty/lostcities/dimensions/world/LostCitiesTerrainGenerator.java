@@ -1,8 +1,6 @@
-package mcjty.lostcities.dimensions.world.lost;
+package mcjty.lostcities.dimensions.world;
 
-import mcjty.lostcities.dimensions.world.BaseTerrainGenerator;
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.NormalTerrainGenerator;
+import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.varia.GeometryTools;

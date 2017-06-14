@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
+import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.Counter;
@@ -869,7 +870,7 @@ public class BuildingInfo {
         return connectionAtZ[level];
     }
 
-    enum StreetType {
+    public enum StreetType {
         NORMAL,
         FULL,
         PARK

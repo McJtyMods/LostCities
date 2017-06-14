@@ -30,7 +30,7 @@ public enum Rotation {
         throw new IllegalStateException("Cannot happen!");
     }
 
-    int rotateX(int x, int z) {
+    public int rotateX(int x, int z) {
         switch (this) {
             case ROTATE_NONE:
                 return x;
@@ -44,7 +44,7 @@ public enum Rotation {
         throw new IllegalStateException("Cannot happen!");
     }
 
-    int rotateZ(int x, int z) {
+    public int rotateZ(int x, int z) {
         switch (this) {
             case ROTATE_NONE:
                 return z;
