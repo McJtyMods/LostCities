@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
+import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
@@ -323,6 +324,29 @@ public class BuildingInfo {
 
     private static boolean hasHighway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         return Highway.getXHighwayLevel(chunkX, chunkZ, provider) >= 0 || Highway.getZHighwayLevel(chunkX, chunkZ, provider) >= 0;
+    }
+
+    // Return true if a highway at this level would be a tunnel
+    public boolean isTunnel(int level) {
+        if (isCity) {
+            // We need a tunnel if the city goes above this level
+            return cityLevel > level;
+        }
+
+        // Get the (possbily cached) heightmap for this chunk
+        ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
+        // The height at which the highway would be + a thresshold of 3
+        int highwayHeight = provider.profile.GROUNDLEVEL + level * 6 + 3;
+        // If there are many places in the chunk above this height we will need a tunnel
+        int cnt = 0;
+        for (int x = 2 ; x < 16 ; x += 3) {
+            for (int z = 2 ; z < 16 ; z += 3) {
+                if (heightmap.getHeight(x, z) > highwayHeight) {
+                    cnt++;
+                }
+            }
+        }
+        return cnt > 12;    // We make a tunnel if more then half of the chunk is above the highway
     }
 
     private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, LostCityChunkGenerator provider) {

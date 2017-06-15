@@ -44,7 +44,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     // Use this random when it doesn't really matter i fit is generated the same every time
     public static Random globalRandom = new Random();
 
-    @Override
+    // Note that for normal chunks this is called with a pre-filled in landscape primer
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
         baseBlock = Blocks.STONE.getDefaultState();
 
@@ -64,19 +64,26 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (info.isCity) {
             doCityChunk(chunkX, chunkZ, primer, info);
         } else {
+            // We already have a prefilled core chunk (as generated from doCoreChunk)
             doNormalChunk(chunkX, chunkZ, primer, info);
         }
+
+        // We make a new random here because the primer for a normal chunk may have
+        // been cached and we want to be able to do the same when returning from a cached
+        // primer vs generating it here
+        provider.rand.setSeed(chunkX * 257017164707L + chunkZ * 101754694003L);
+
         if (info.getDamageArea().hasExplosions()) {
             fixAfterExplosion(primer, chunkX, chunkZ, info, provider.rand);
         }
         generateDebris(primer, provider.rand, info);
     }
 
-    private void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
+    public void doCoreChunk(int chunkX, int chunkZ, ChunkPrimer primer) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
-
-        DamageArea damageArea = info.getDamageArea();
+        char base = (char) Block.BLOCK_STATE_IDS.get(baseBlock);
+        char liquid = (char) Block.BLOCK_STATE_IDS.get(water);
 
         generateHeightmap(chunkX * 4, 0, chunkZ * 4);
         for (int x4 = 0; x4 < 4; ++x4) {
@@ -116,10 +123,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             for (int z = 0; z < 4; ++z) {
                                 index += maxheight;
                                 if ((d15 += d16) > 0.0D) {
-                                    IBlockState b = damageArea.damageBlock(baseBlock, provider, cx + (x4 * 4) + x, height, cz + (z4 * 4) + z, info.getCompiledPalette());
-                                    BaseTerrainGenerator.setBlockState(primer, index, b);
+                                    BaseTerrainGenerator.setBlockState(primer, index, base);
                                 } else if (height < waterLevel) {
-                                    BaseTerrainGenerator.setBlockState(primer, index, water);
+                                    BaseTerrainGenerator.setBlockState(primer, index, liquid);
                                 }
                             }
 
@@ -131,6 +137,36 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         d2 += d6;
                         d3 += d7;
                         d4 += d8;
+                    }
+                }
+            }
+        }
+    }
+
+    public void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
+        int cx = chunkX * 16;
+        int cz = chunkZ * 16;
+
+        DamageArea damageArea = info.getDamageArea();
+        if (damageArea.hasExplosions()) {
+            // @todo
+            // Maybe this can be done even more optimal by splitting the chunk in smaller explosion affected sub-chunks?
+            char air = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
+            char liquid = (char) Block.BLOCK_STATE_IDS.get(water);
+
+            for (int x = 0 ; x < 16 ; x++) {
+                for (int z = 0 ; z < 16 ; z++) {
+                    int index = (x << 12) | (z << 8);
+                    for (int y = 0 ; y < 256 ; y++) {
+                        char d = primer.data[index];
+                        if (d != air && d != liquid) {
+                            IBlockState b = Block.BLOCK_STATE_IDS.getByValue(d);
+                            IBlockState newb = damageArea.damageBlock(b, provider, cx + x, y, cz + z, info.getCompiledPalette());
+                            if (newb != b) {
+                                BaseTerrainGenerator.setBlockState(primer, index, b);
+                            }
+                        }
+                        index++;
                     }
                 }
             }
@@ -177,23 +213,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         CompiledPalette palette = info.getCompiledPalette();
 
         int highwayGroundLevel = provider.profile.GROUNDLEVEL + level * 6;
-        int nonair = 0;
-        // Estimate how many non-air blocks we have to replace to see if we are going to need a tunnel
-        for (int x = 3; x < 16; x += 3) {
-            for (int z = 3; z < 16; z += 3) {
-                int index = (x << 12) | (z << 8);
-                if (primer.data[index + highwayGroundLevel + 2] != a) {
-                    nonair++;
-                }
-                if (primer.data[index + highwayGroundLevel + 4] != a) {
-                    nonair++;
-                }
-            }
-        }
 
         int height;
-        if (nonair > 20 && (!isWaterBiome(provider, chunkX, chunkZ) || info.isCity)) {
-            // If we replaced a lot of non-air blocks then we assume we are carving out a tunnel
+        if (info.isTunnel(level)) {
+            // We know we need a tunnel
             height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
@@ -354,8 +377,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int cz = chunkZ * 16;
 
         List<GeometryTools.AxisAlignedBB2D> boxes = new ArrayList<>();
-        // @todo downwards smoothing disabled until we can figure out a way to get the height of a chunk without actually having to calculate it
-//        List<GeometryTools.AxisAlignedBB2D> boxesDownwards = new ArrayList<>();
+        List<GeometryTools.AxisAlignedBB2D> boxesDownwards = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 if (x != 0 || z != 0) {
@@ -366,10 +388,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
                         box.height = info2.getCityGroundLevel();
                         boxes.add(box);
-//                    } else if (info.getMaxHighwayLevel() < 0 && info2.getMaxHighwayLevel() >= 0) {
-//                        GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
-//                        box.height = provider.profile.GROUNDLEVEL + info2.getMaxHighwayLevel() * 6;
-//                        boxesDownwards.add(box);
+                    } else if (info2.getMaxHighwayLevel() >= 0 && !info2.isTunnel(info2.getMaxHighwayLevel())) {
+                        // There is a highway but no tunnel. So we need to smooth downwards
+                        GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
+                        box.height = provider.profile.GROUNDLEVEL + info2.getMaxHighwayLevel() * 6;
+                        boxesDownwards.add(box);
                     }
                 }
             }
@@ -399,31 +422,31 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
-//        if (!boxesDownwards.isEmpty()) {
-//            for (int x = 0; x < 16; x++) {
-//                for (int z = 0; z < 16; z++) {
-//                    double mindist = 1000000000.0;
-//                    int minheight = 1000000000;
-//                    for (GeometryTools.AxisAlignedBB2D box : boxesDownwards) {
-//                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
-//                        if (dist < mindist) {
-//                            mindist = dist;
-//                        }
-//                        if (box.height < minheight) {
-//                            minheight = box.height;
-//                        }
-//                    }
-//                    int height = minheight;//info.getCityGroundLevel();
-//                    if (isOcean(provider.biomesForGeneration)) {
-//                        // We have an ocean biome here. Flatten to a lower level
-//                        height = waterLevel + 4;
-//                    }
-//
-//                    int offset = (int) (Math.sqrt(mindist) * 2);
-//                    flattenChunkBorderDownwards(primer, x, offset, z, provider.rand, info, cx, cz, height);
-//                }
-//            }
-//        }
+        if (!boxesDownwards.isEmpty()) {
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    double mindist = 1000000000.0;
+                    int minheight = 1000000000;
+                    for (GeometryTools.AxisAlignedBB2D box : boxesDownwards) {
+                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
+                        if (dist < mindist) {
+                            mindist = dist;
+                        }
+                        if (box.height < minheight) {
+                            minheight = box.height;
+                        }
+                    }
+                    int height = minheight;//info.getCityGroundLevel();
+                    if (isOcean(provider.biomesForGeneration)) {
+                        // We have an ocean biome here. Flatten to a lower level
+                        height = waterLevel + 4;
+                    }
+
+                    int offset = (int) (Math.sqrt(mindist) * 2);
+                    flattenChunkBorderDownwards(primer, x, offset, z, provider.rand, info, cx, cz, height);
+                }
+            }
+        }
     }
 
     public static boolean isOcean(Biome[] biomes) {

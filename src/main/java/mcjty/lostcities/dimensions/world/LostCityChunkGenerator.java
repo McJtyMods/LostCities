@@ -9,6 +9,7 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
+import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Biomes;
@@ -33,7 +34,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
@@ -48,7 +51,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     public World worldObj;
     public WorldType worldType;
-    public final BaseTerrainGenerator terrainGenerator;
+    public final LostCitiesTerrainGenerator terrainGenerator;
 
     private ChunkProviderSettings settings = null;
 
@@ -56,6 +59,13 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     private MapGenBase caveGenerator = new MapGenCaves();
 
+    // Sometimes we have to precalculate primers for a chunk before the
+    // chunk is generated. In that case we cache them here so that when the
+    // chunk is really generated it will find it and use that instead of
+    // making that primer again
+    // @todo, make this cache timed so that primers expire if they are not used quickly enough?
+    private Map<ChunkCoord, ChunkPrimer> cachedPrimers = new HashMap<>();
+    private Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
 
     private MapGenStronghold strongholdGenerator = new MapGenStronghold();
     private StructureOceanMonument oceanMonumentGenerator = new StructureOceanMonument();
@@ -136,10 +146,34 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         terrainGenerator.setup(world);
     }
 
+    public ChunkPrimer generatePrimer(int chunkX, int chunkZ) {
+        this.rand.setSeed(chunkX * 341873128712L + chunkZ * 132897987541L);
+        ChunkPrimer chunkprimer = new ChunkPrimer();
+        this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        terrainGenerator.doCoreChunk(chunkX, chunkZ, chunkprimer);
+        return chunkprimer;
+    }
+
+    // Get a heightmap for a chunk. If needed calculate (and cache) a primer
+    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
+        ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
+        if (cachedHeightmaps.containsKey(key)) {
+            return cachedHeightmaps.get(key);
+        } else if (cachedPrimers.containsKey(key)) {
+            ChunkHeightmap heightmap = new ChunkHeightmap(cachedPrimers.get(key));
+            cachedHeightmaps.put(key, heightmap);
+            return heightmap;
+        } else {
+            ChunkPrimer primer = generatePrimer(chunkX, chunkZ);
+            cachedPrimers.put(key, primer);
+            ChunkHeightmap heightmap = new ChunkHeightmap(cachedPrimers.get(key));
+            cachedHeightmaps.put(key, heightmap);
+            return heightmap;
+        }
+    }
+
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
-        this.rand.setSeed(chunkX * 341873128712L + chunkZ * 132897987541L);
-
         if (otherGenerator != null) {
             // For ATG, experimental
             BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, this);
@@ -148,11 +182,23 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
             }
         }
 
+        ChunkPrimer chunkprimer;
+        ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
+        if (cachedPrimers.containsKey(key)) {
+            // We calculated a primer earlier. Reuse it
+            chunkprimer = cachedPrimers.get(key);
+            cachedPrimers.remove(key);
+        } else {
+            chunkprimer = generatePrimer(chunkX, chunkZ);
+        }
+        // Calculate the chunk heightmap in case we need it later
+        if (!cachedHeightmaps.containsKey(key)) {
+            // We might need this later
+            cachedHeightmaps.put(key, new ChunkHeightmap(chunkprimer));
+        }
 
-        ChunkPrimer chunkprimer = new ChunkPrimer();
-
-        this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
         terrainGenerator.generate(chunkX, chunkZ, chunkprimer);
+
         this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
         terrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, chunkprimer, this.biomesForGeneration);
 

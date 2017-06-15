@@ -1,9 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lib.tools.MathTools;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
@@ -51,7 +48,6 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
     }
 
 
-    @Override
     public void setup(World world) {
         this.world = world;
 
@@ -181,10 +177,6 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
         }
     }
 
-    public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
-    }
-
-    @Override
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
         ChunkGeneratorEvent.ReplaceBiomeBlocks event = new ChunkGeneratorEvent.ReplaceBiomeBlocks(provider, chunkX, chunkZ, primer, world);
         MinecraftForge.EVENT_BUS.post(event);
