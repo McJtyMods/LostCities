@@ -217,7 +217,16 @@ public class BuildingInfo {
     }
 
     public int getMaxHeight() {
-        return hasBuilding ? (getCityGroundLevel() + floors * 6) : getCityGroundLevel();
+        if (hasBuilding) {
+            return getCityGroundLevel() + floors * 6;
+        } else {
+            int m = getMaxHighwayLevel();
+            if (m >= 0) {
+                return provider.profile.GROUNDLEVEL + m * 6;
+            } else {
+                return getCityGroundLevel();
+            }
+        }
     }
 
     public int getCityGroundLevel() {
@@ -301,6 +310,10 @@ public class BuildingInfo {
 
     private static boolean isMultiBuildingCandidate(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         return isCity(chunkX, chunkZ, provider) && !hasHighway(chunkX, chunkZ, provider);
+    }
+
+    private int getMaxHighwayLevel() {
+        return Math.max(getHighwayXLevel(), getHighwayZLevel());
     }
 
     private static boolean hasHighway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {

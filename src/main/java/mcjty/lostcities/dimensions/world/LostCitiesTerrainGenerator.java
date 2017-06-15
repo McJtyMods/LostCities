@@ -530,6 +530,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         private int lowestY;
         private int highestY;
         private float avgdamage;
+        private int cntMindamage;  // Number of blocks that receive almost no damage
 
         public Blob(int starty, int endy) {
             this.starty = starty;
@@ -540,6 +541,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         public float getAvgdamage() {
             return avgdamage;
+        }
+
+        public int getCntMindamage() {
+            return cntMindamage;
         }
 
         public boolean contains(int index) {
@@ -627,6 +632,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         public void scan(BuildingInfo info, ChunkPrimer primer, char air, char liquid, BlockPos pos) {
             DamageArea damageArea = info.getDamageArea();
             avgdamage = 0;
+            cntMindamage = 0;
             Queue<BlockPos> todo = new ArrayDeque<>();
             todo.add(pos);
 
@@ -646,7 +652,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     continue;
                 }
                 connectedBlocks.add(index);
-                avgdamage += damageArea.getDamage(x, y, z);
+                float damage = damageArea.getDamage(x, y, z);
+                if (damage < 0.01f) {
+                    cntMindamage++;
+                }
+                avgdamage += damage;
                 if (!blocksPerY.containsKey(y)) {
                     blocksPerY.put(y, 1);
                 } else {
@@ -714,7 +724,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         // Split large blobs that have very thin connections in Y direction
         for (Blob blob : blobs) {
-            if (blob.getAvgdamage() > .3f) {
+            if (blob.getAvgdamage() > .3f && blob.getCntMindamage() < 10) { // @todo configurable?
                 int y = blob.needsSplitting();
                 if (y != -1) {
                     Set<Integer> toRemove = blob.cut(y);
