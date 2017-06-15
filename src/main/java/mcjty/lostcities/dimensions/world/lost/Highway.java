@@ -56,8 +56,8 @@ public class Highway {
             return cache.get(cp);
         }
 
-        // X Highways can only occur at chunkZ that is a multiple of 4
-        if ((cp.getCoord(orientation.getOpposite()) & 3) != 0) {
+        // Highways can only occur at chunkZ that is a multiple of 8
+        if ((cp.getCoord(orientation.getOpposite()) & 7) != 0) {
             cache.put(cp, -1);
             return -1;
         }
@@ -84,10 +84,10 @@ public class Highway {
                 if (BuildingInfo.isCity(lower.getChunkX(), lower.getChunkZ(), provider) && BuildingInfo.isCity(higher.getChunkX(), higher.getChunkZ(), provider)) {
                     // We have a city at both sides. Valid highway:
                     level = BuildingInfo.getCityLevel(lower.getChunkX(), lower.getChunkZ(), provider);
+                    for (ChunkCoord cc = lower ; cc.getCoord(orientation) <= higher.getCoord(orientation) ; cc = cc.higher(orientation)) {
+                        cache.put(cc, level);
+                    }
                 }
-            }
-            for (ChunkCoord cc = lower ; cc.getCoord(orientation) <= higher.getCoord(orientation) ; cc = cc.higher(orientation)) {
-                cache.put(cc, level);
             }
             return level;
 

@@ -304,7 +304,7 @@ public class BuildingInfo {
     }
 
     private static boolean hasHighway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return Highway.getXHighwayLevel(chunkX, chunkZ, provider) >= 0;
+        return Highway.getXHighwayLevel(chunkX, chunkZ, provider) >= 0 || Highway.getZHighwayLevel(chunkX, chunkZ, provider) >= 0;
     }
 
     private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
@@ -465,6 +465,14 @@ public class BuildingInfo {
             xBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
             zBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
         }
+    }
+
+    public int getHighwayXLevel() {
+        return Highway.getXHighwayLevel(chunkX, chunkZ, provider);
+    }
+
+    public int getHighwayZLevel() {
+        return Highway.getZHighwayLevel(chunkX, chunkZ, provider);
     }
 
     public static int getCityLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {

@@ -3,6 +3,7 @@ package mcjty.lostcities;
 import mcjty.lib.compat.CompatCommand;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.Highway;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -48,6 +49,8 @@ public class CommandDebug implements CompatCommand {
             System.out.println("info.chunkX = " + info.chunkX);
             System.out.println("info.chunkZ = " + info.chunkZ);
             System.out.println("info.getCityStyle() = " + info.getCityStyle().getName());
+            System.out.println("info.getHighwayXLevel() = " + info.getHighwayXLevel());
+            System.out.println("info.getHighwayZLevel() = " + info.getHighwayZLevel());
         }
     }
 
