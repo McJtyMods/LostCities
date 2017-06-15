@@ -1,7 +1,7 @@
 [
   {
     "type": "style",
-    "name": "chisel",
+    "name": "desert_chisel",
     "randompalettes": [
       [
         {
@@ -12,25 +12,21 @@
       [
         {
           "factor": 1.0,
-          "palette": "default_chisel"
+          "palette": "default_chisel_desert"
         }
       ],
       [
         {
           "factor": 1.0,
-          "palette": "bricks_chisel_standard"
+          "palette": "bricks_chisel_desert"
         },
         {
           "factor": 1.0,
-          "palette": "bricks_chisel_cyan"
+          "palette": "bricks_chisel_desert_red"
         },
         {
           "factor": 1.0,
-          "palette": "bricks_chisel_gray"
-        },
-        {
-          "factor": 1.0,
-          "palette": "bricks_chisel_silver"
+          "palette": "bricks_chisel_desert_orange"
         }
       ],
       [
@@ -97,28 +93,28 @@
   },
   {
     "type": "palette",
-    "name": "bricks_chisel_standard",
+    "name": "bricks_chisel_desert",
     "palette": [
       {
         "char": "X",
-        "block": "chisel:concrete_gray1@8",
+        "block": "minecraft:sandstone@2",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "$",
-        "block": "minecraft:double_stone_slab",
+        "block": "minecraft:double_stone_slab2",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "#",
         "blocks": [
           {
-            "factor": 0.06,
-            "block": "chisel:concrete_gray@2"
+            "factor": 0.1,
+            "block": "minecraft:sandstone"
           },
           {
             "factor": 2.0,
-            "block": "chisel:concrete_gray1@8"
+            "block": "minecraft:sandstone@2"
           }
         ],
         "damaged": "minecraft:iron_bars"
@@ -127,97 +123,79 @@
   },
   {
     "type": "palette",
-    "name": "bricks_chisel_cyan",
+    "name": "bricks_chisel_desert_red",
     "palette": [
       {
         "char": "X",
-        "block": "chisel:concrete_lightgray1@8",
+        "block": "minecraft:stained_hardened_clay@14",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "$",
-        "block": "minecraft:double_stone_slab",
+        "block": "minecraft:double_stone_slab2",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "#",
-        "blocks": [
-          {
-            "factor": 0.06,
-            "block": "chisel:concrete_lightgray@2"
-          },
-          {
-            "factor": 2.0,
-            "block": "chisel:concrete_lightgray1@8"
-          }
-        ],
+        "block": "minecraft:stained_hardened_clay@14",
         "damaged": "minecraft:iron_bars"
       }
     ]
   },
   {
     "type": "palette",
-    "name": "bricks_chisel_gray",
+    "name": "bricks_chisel_desert_orange",
     "palette": [
       {
         "char": "X",
-        "block": "chisel:concrete_white1@8",
+        "block": "minecraft:stained_hardened_clay@1",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "$",
-        "block": "minecraft:double_stone_slab",
+        "block": "minecraft:double_stone_slab2",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "#",
-        "blocks": [
-          {
-            "factor": 0.06,
-            "block": "chisel:concrete_white@2"
-          },
-          {
-            "factor": 2.0,
-            "block": "chisel:concrete_white1@8"
-          }
-        ],
+        "block": "minecraft:stained_hardened_clay@1",
         "damaged": "minecraft:iron_bars"
       }
     ]
   },
   {
     "type": "palette",
-    "name": "bricks_chisel_silver",
+    "name": "bricks_chisel_desert_redsand",
     "palette": [
       {
         "char": "X",
-        "block": "chisel:concrete_gray1@8",
+        "block": "minecraft:red_sandstone@2",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "$",
-        "block": "minecraft:double_stone_slab",
+        "block": "minecraft:double_stone_slab2",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "#",
         "blocks": [
           {
-            "factor": 0.06,
-            "block": "chisel:concrete_gray@2"
+            "factor": 0.1,
+            "block": "minecraft:red_sandstone"
           },
           {
             "factor": 2.0,
-            "block": "chisel:concrete_gray1@8"
+            "block": "minecraft:red_sandstone@2"
           }
         ],
         "damaged": "minecraft:iron_bars"
       }
     ]
-  },
+  }m
   {
     "type": "palette",
-    "name": "default_chisel",
+    "name": "default_chisel_desert",
     "palette": [
       {
         "char": "Q",
@@ -236,7 +214,7 @@
       },
       {
         "char": "S",
-        "block": "chisel:concrete_lightgray@7",
+        "block": "minecraft:double_stone_slab2",
         "damaged": "minecraft:iron_bars"
       },
       {
@@ -245,12 +223,12 @@
       },
       {
         "char": "B",
-        "block": "minecraft:brick_block",
+        "block": "minecraft:red_nether_brick",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "x",
-        "block": "minecraft:stonebrick"
+        "block": "minecraft:sandstone@2"
       },
       {
         "char": "o",
@@ -258,11 +236,11 @@
       },
       {
         "char": "_",
-        "block": "minecraft:stone_slab"
+        "block": "minecraft:stone_slab@1"
       },
       {
         "char": "=",
-        "block": "minecraft:stone_slab@8"
+        "block": "minecraft:stone_slab@9"
       },
       {
         "char": "p",

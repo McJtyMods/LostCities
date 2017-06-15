@@ -11,6 +11,8 @@ public class LostCityConfiguration {
 
     public static String[] ASSETS = new String[] {
             "/assets/lostcities/citydata/palette.json",
+            "/assets/lostcities/citydata/palette_desert.json",
+            "/assets/lostcities/citydata/highwayparts.json",
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
     };
