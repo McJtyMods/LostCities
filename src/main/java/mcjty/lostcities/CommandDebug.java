@@ -51,6 +51,8 @@ public class CommandDebug implements CompatCommand {
             System.out.println("info.getCityStyle() = " + info.getCityStyle().getName());
             System.out.println("info.getHighwayXLevel() = " + info.getHighwayXLevel());
             System.out.println("info.getHighwayZLevel() = " + info.getHighwayZLevel());
+            double a = BuildingInfo.getChunkHeight(info.chunkX, info.chunkZ, info.provider);
+            System.out.println("Average height: " + a);
         }
     }
 

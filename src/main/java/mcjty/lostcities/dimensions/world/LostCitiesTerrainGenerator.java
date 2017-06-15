@@ -146,32 +146,27 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int levelZ = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
         if (levelX == levelZ && levelX >= 0) {
             // Crossing
-            System.out.println("### LostCitiesTerrainGenerator.generate CROSSING at " + chunkX * 16 + "," + chunkZ * 16);
-            generateHighwayPart(chunkX, chunkZ, primer, info, levelX, Rotation.ROTATE_NONE, "_bi");
+            generateHighwayPart(chunkX, chunkZ, primer, info, levelX, Rotation.ROTATE_NONE, info.getXmax(), info.getZmax(), "_bi");
         } else if (levelX >= 0 && levelZ >= 0) {
             // There are two highways on different level. Make sure the lowest one is done first because it
             // will clear out what is above it
             if (levelX == 0) {
-                System.out.println("LostCitiesTerrainGenerator.generateXHighways/Zat " + chunkX * 16 + "," + chunkZ * 16);
-                generateHighwayPart(chunkX, chunkZ, primer, info, levelX, Rotation.ROTATE_NONE, "");
-                generateHighwayPart(chunkX, chunkZ, primer, info, levelZ, Rotation.ROTATE_90, "");
+                generateHighwayPart(chunkX, chunkZ, primer, info, levelX, Rotation.ROTATE_NONE, info.getZmin(), info.getZmax(), "");
+                generateHighwayPart(chunkX, chunkZ, primer, info, levelZ, Rotation.ROTATE_90, info.getXmax(), info.getXmax(), "");
             } else {
-                System.out.println("LostCitiesTerrainGenerator.generateXHighways/Zat " + chunkX * 16 + "," + chunkZ * 16);
-                generateHighwayPart(chunkX, chunkZ, primer, info, levelZ, Rotation.ROTATE_90, "");
-                generateHighwayPart(chunkX, chunkZ, primer, info, levelX, Rotation.ROTATE_NONE, "");
+                generateHighwayPart(chunkX, chunkZ, primer, info, levelZ, Rotation.ROTATE_90, info.getXmax(), info.getXmax(), "");
+                generateHighwayPart(chunkX, chunkZ, primer, info, levelX, Rotation.ROTATE_NONE, info.getZmin(), info.getZmax(), "");
             }
         } else {
             if (levelX >= 0) {
-                System.out.println("LostCitiesTerrainGenerator.generateXHighways at " + chunkX * 16 + "," + chunkZ * 16);
-                generateHighwayPart(chunkX, chunkZ, primer, info, levelX, Rotation.ROTATE_NONE, "");
+                generateHighwayPart(chunkX, chunkZ, primer, info, levelX, Rotation.ROTATE_NONE, info.getZmin(), info.getZmax(), "");
             } else if (levelZ >= 0) {
-                System.out.println("LostCitiesTerrainGenerator.generateZHighways at " + chunkX * 16 + "," + chunkZ * 16);
-                generateHighwayPart(chunkX, chunkZ, primer, info, levelZ, Rotation.ROTATE_90, "");
+                generateHighwayPart(chunkX, chunkZ, primer, info, levelZ, Rotation.ROTATE_90, info.getXmax(), info.getXmax(), "");
             }
         }
     }
 
-    private void generateHighwayPart(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, int level, Rotation rotation, String suffix) {
+    private void generateHighwayPart(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, int level, Rotation rotation, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix) {
         char a = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
         char l = (char) Block.BLOCK_STATE_IDS.get(water);
 
@@ -197,29 +192,28 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         int height;
-        if (!info.isCity && isWaterBiome(provider, chunkX, chunkZ)) {
-            height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
-            // Clear a bit more above the highway
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    int index = (x << 12) | (z << 8) + height;
-                    BaseTerrainGenerator.setBlockStateRange(primer, index, index + 30, air);
-                }
-            }
-        } else if (nonair > 20) {
-            // If we replaced a lot of non-air blocks then we assume we are carving out a tunnel
-            height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
-        } else {
-            // Otherwise simple highway
+        if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
+            // Simple highway in the city
             height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_open" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     int index = (x << 12) | (z << 8) + height;
-                    BaseTerrainGenerator.setBlockStateRange(primer, index, index + 30, air);
+                    BaseTerrainGenerator.setBlockStateRange(primer, index, index + 15, air);
                 }
             }
-
+        } else if (nonair > 20 && (!isWaterBiome(provider, chunkX, chunkZ) || info.isCity)) {
+            // If we replaced a lot of non-air blocks then we assume we are carving out a tunnel
+            height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
+        } else {
+            height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
+            // Clear a bit more above the highway
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    int index = (x << 12) | (z << 8) + height;
+                    BaseTerrainGenerator.setBlockStateRange(primer, index, index + 15, air);
+                }
+            }
         }
 
         // Make sure the bridge is supported if needed
@@ -360,6 +354,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int cz = chunkZ * 16;
 
         List<GeometryTools.AxisAlignedBB2D> boxes = new ArrayList<>();
+        // @todo downwards smoothing disabled until we can figure out a way to get the height of a chunk without actually having to calculate it
+//        List<GeometryTools.AxisAlignedBB2D> boxesDownwards = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 if (x != 0 || z != 0) {
@@ -368,8 +364,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     BuildingInfo info2 = BuildingInfo.getBuildingInfo(ccx, ccz, provider);
                     if (info2.isCity) {
                         GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
-                        box.aux = info2.getCityGroundLevel();
+                        box.height = info2.getCityGroundLevel();
                         boxes.add(box);
+//                    } else if (info.getMaxHighwayLevel() < 0 && info2.getMaxHighwayLevel() >= 0) {
+//                        GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
+//                        box.height = provider.profile.GROUNDLEVEL + info2.getMaxHighwayLevel() * 6;
+//                        boxesDownwards.add(box);
                     }
                 }
             }
@@ -384,8 +384,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         if (dist < mindist) {
                             mindist = dist;
                         }
-                        if (box.aux < minheight) {
-                            minheight = box.aux;
+                        if (box.height < minheight) {
+                            minheight = box.height;
                         }
                     }
                     int height = minheight;//info.getCityGroundLevel();
@@ -399,6 +399,31 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
+//        if (!boxesDownwards.isEmpty()) {
+//            for (int x = 0; x < 16; x++) {
+//                for (int z = 0; z < 16; z++) {
+//                    double mindist = 1000000000.0;
+//                    int minheight = 1000000000;
+//                    for (GeometryTools.AxisAlignedBB2D box : boxesDownwards) {
+//                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
+//                        if (dist < mindist) {
+//                            mindist = dist;
+//                        }
+//                        if (box.height < minheight) {
+//                            minheight = box.height;
+//                        }
+//                    }
+//                    int height = minheight;//info.getCityGroundLevel();
+//                    if (isOcean(provider.biomesForGeneration)) {
+//                        // We have an ocean biome here. Flatten to a lower level
+//                        height = waterLevel + 4;
+//                    }
+//
+//                    int offset = (int) (Math.sqrt(mindist) * 2);
+//                    flattenChunkBorderDownwards(primer, x, offset, z, provider.rand, info, cx, cz, height);
+//                }
+//            }
+//        }
     }
 
     public static boolean isOcean(Biome[] biomes) {
@@ -444,6 +469,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         int r = rand.nextInt(2);
         index = (x << 12) | (z << 8) + level + offset + r;
+        for (int y = level + offset + 3; y < 256; y++) {
+            IBlockState b = BaseTerrainGenerator.getBlockState(primer, index);
+            if (b != air) {
+                BaseTerrainGenerator.setBlockState(primer, index, air);
+            }
+            index++;
+        }
+    }
+
+    private void flattenChunkBorderDownwards(ChunkPrimer primer, int x, int offset, int z, Random rand, BuildingInfo info, int cx, int cz, int level) {
+        int r = rand.nextInt(2);
+        int index = (x << 12) | (z << 8) + level + offset + r;
         for (int y = level + offset + 3; y < 256; y++) {
             IBlockState b = BaseTerrainGenerator.getBlockState(primer, index);
             if (b != air) {
@@ -1120,13 +1157,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             if (adjacent.cityLevel <= info.cityLevel) {
                 return true;
             }
-            // @todo, do we keep this?
-//            if (adjacent.cityLevel < info.cityLevel) {
-//                return true;
-//            }
-//            if (isWaterBiome(provider, chunkX, chunkZ)) {
-//                return true;
-//            }
         }
         return false;
     }

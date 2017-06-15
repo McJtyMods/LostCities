@@ -312,7 +312,7 @@ public class BuildingInfo {
         return isCity(chunkX, chunkZ, provider) && !hasHighway(chunkX, chunkZ, provider);
     }
 
-    private int getMaxHighwayLevel() {
+    public int getMaxHighwayLevel() {
         return Math.max(getHighwayXLevel(), getHighwayZLevel());
     }
 
@@ -486,6 +486,28 @@ public class BuildingInfo {
 
     public int getHighwayZLevel() {
         return Highway.getZHighwayLevel(chunkX, chunkZ, provider);
+    }
+
+    public static double getChunkHeight(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        LostCitiesTerrainGenerator generator = (LostCitiesTerrainGenerator) provider.terrainGenerator;
+        provider.biomesForGeneration = provider.worldObj.getBiomeProvider().getBiomesForGeneration(provider.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        generator.generateHeightmap(chunkX * 4, 0, chunkZ * 4);
+        double t = 0;
+        double minv = 1000000;
+        double maxv = -1000000;
+        for (double v : generator.heightMap) {
+            if (v < minv) {
+                minv = v;
+            }
+            if (v > maxv) {
+                maxv = v;
+            }
+            t += v;
+        }
+        double a = t / generator.heightMap.length;
+        System.out.println("minv = " + minv);
+        System.out.println("maxv = " + maxv);
+        return a;
     }
 
     public static int getCityLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {

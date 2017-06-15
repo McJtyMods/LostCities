@@ -19,7 +19,7 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
     private World world;
     protected LostCityChunkGenerator provider;
 
-    protected final double[] heightMap;
+    public final double[] heightMap;
     private double[] mainNoiseRegion;
     private double[] minLimitRegion;
     private double[] maxLimitRegion;
@@ -75,7 +75,7 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
 //        this.field_185985_d = ctx.getForest();
     }
 
-    protected void generateHeightmap(int chunkX4, int chunkY4, int chunkZ4) {
+    public void generateHeightmap(int chunkX4, int chunkY4, int chunkZ4) {
         ChunkProviderSettings settings = provider.getSettings();
         this.depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion, chunkX4, chunkZ4, 5, 5, (double)settings.depthNoiseScaleX, (double)settings.depthNoiseScaleZ, (double)settings.depthNoiseScaleExponent);
         float f = settings.coordinateScale;
@@ -101,22 +101,22 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
                 for (int j1 = -2; j1 <= 2; ++j1) {
                     for (int k1 = - 2; k1 <=  2; ++k1) {
                         Biome Biome1 = provider.biomesForGeneration[k + j1 + 2 + (l + k1 + 2) * 10];
-                        float f5 = provider.getSettings().biomeDepthOffSet + Biome1.getBaseHeight() * provider.getSettings().biomeDepthWeight;
-                        float f6 = provider.getSettings().biomeScaleOffset + Biome1.getHeightVariation() * provider.getSettings().biomeScaleWeight;
+                        float baseHeight = provider.getSettings().biomeDepthOffSet + Biome1.getBaseHeight() * provider.getSettings().biomeDepthWeight;
+                        float heightVariation = provider.getSettings().biomeScaleOffset + Biome1.getHeightVariation() * provider.getSettings().biomeScaleWeight;
 
-                        if (provider.worldType == WorldType.AMPLIFIED && f5 > 0.0F) {
-                            f5 = 1.0F + f5 * 2.0F;
-                            f6 = 1.0F + f6 * 4.0F;
+                        if (provider.worldType == WorldType.AMPLIFIED && baseHeight > 0.0F) {
+                            baseHeight = 1.0F + baseHeight * 2.0F;
+                            heightVariation = 1.0F + heightVariation * 4.0F;
                         }
 
-                        float f7 = biomeWeights[j1 + 2 + (k1 + 2) * 5] / (f5 + 2.0F);
+                        float f7 = biomeWeights[j1 + 2 + (k1 + 2) * 5] / (baseHeight + 2.0F);
 
                         if (Biome1.getBaseHeight() > Biome.getBaseHeight()) {
                             f7 /= 2.0F;
                         }
 
-                        f2 += f6 * f7;
-                        f3 += f5 * f7;
+                        f2 += heightVariation * f7;
+                        f3 += baseHeight * f7;
                         f4 += f7;
                     }
                 }

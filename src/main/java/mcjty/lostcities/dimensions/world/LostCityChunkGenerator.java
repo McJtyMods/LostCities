@@ -48,7 +48,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     public World worldObj;
     public WorldType worldType;
-    private final BaseTerrainGenerator terrainGenerator;
+    public final BaseTerrainGenerator terrainGenerator;
 
     private ChunkProviderSettings settings = null;
 

@@ -50,7 +50,7 @@ public class GeometryTools {
         public final double minY;
         public final double maxX;
         public final double maxY;
-        public int aux;
+        public int height;
 
         public AxisAlignedBB2D(double minX, double minY, double maxX, double maxY) {
             this.minX = minX;
