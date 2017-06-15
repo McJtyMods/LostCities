@@ -144,6 +144,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     public void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
+        breakBlocksForDamage(chunkX, chunkZ, primer, info);
+        flattenChunkToCityBorder(chunkX, chunkZ, primer, info);
+        generateBridges(chunkX, chunkZ, primer, info);
+        generateHighways(chunkX, chunkZ, primer, info);
+    }
+
+    private void breakBlocksForDamage(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
 
@@ -171,10 +178,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
-
-        flattenChunkToCityBorder(chunkX, chunkZ, primer, info);
-        generateBridges(chunkX, chunkZ, primer, info);
-        generateHighways(chunkX, chunkZ, primer, info);
     }
 
     private void generateHighways(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
