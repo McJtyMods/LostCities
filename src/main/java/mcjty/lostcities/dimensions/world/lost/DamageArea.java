@@ -118,6 +118,18 @@ public class DamageArea {
         return !explosions.isEmpty();
     }
 
+    // Return true if this subchunk (every 16 blocks) is affected by explosions
+    public boolean hasExplosions(int y) {
+        AxisAlignedBB box = new AxisAlignedBB(chunkX * 16, y * 16, chunkZ * 16, chunkX * 16 + 15, y * 16 + 15, chunkZ * 16 + 15);
+        for (Explosion explosion : explosions) {
+            double dmin = GeometryTools.squaredDistanceBoxPoint(box, explosion.getCenter());
+            if (dmin <= explosion.getRadius() * explosion.getRadius()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Get the lowest height that is affected by an explosion
     public int getLowestExplosionHeight() {
         int lowest = 1000;
