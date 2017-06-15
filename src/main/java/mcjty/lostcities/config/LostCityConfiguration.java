@@ -12,6 +12,8 @@ public class LostCityConfiguration {
     public static String[] ASSETS = new String[] {
             "/assets/lostcities/citydata/palette.json",
             "/assets/lostcities/citydata/palette_desert.json",
+            "/assets/lostcities/citydata/palette_chisel.json",
+            "/assets/lostcities/citydata/palette_chisel_desert.json",
             "/assets/lostcities/citydata/highwayparts.json",
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
@@ -28,7 +30,7 @@ public class LostCityConfiguration {
 
         initStandardProfiles();
         String[] profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings"}, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
+                new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "chisel"}, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
         for (String name : profileList) {
             LostCityProfile profile = new LostCityProfile(name, standardProfiles.get(name));
             profile.init(cfg);
@@ -65,6 +67,12 @@ public class LostCityConfiguration {
         profile.BUILDING_MAXFLOORS_CHANCE = 15;
         profile.BUILDING_MAXFLOORS = 20;
         standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("chisel");
+        profile.setDescription("Use Chisel blocks (only if chisel is available!)");
+        profile.setWorldStyle("chisel");
+        standardProfiles.put(profile.getName(), profile);
+
 
     }
 

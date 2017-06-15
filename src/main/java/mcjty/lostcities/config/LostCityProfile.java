@@ -233,6 +233,10 @@ public class LostCityProfile {
         return description;
     }
 
+    public void setWorldStyle(String worldStyle) {
+        this.worldStyle = worldStyle;
+    }
+
     public String getWorldStyle() {
         return worldStyle;
     }

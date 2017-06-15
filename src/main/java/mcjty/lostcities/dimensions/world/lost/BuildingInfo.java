@@ -133,6 +133,10 @@ public class BuildingInfo {
         return streets;
     }
 
+    public Style getOutsideStyle() {
+        return AssetRegistries.STYLES.get(provider.worldStyle.getOutsideStyle());
+    }
+
     public CityStyle getCityStyle() {
         Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
         if (!cityStyleCache.containsKey(key)) {
@@ -148,9 +152,6 @@ public class BuildingInfo {
                     counter.add(cityStyle.getName());
                 }
                 cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
-                if (cityStyle == null) {
-                    System.out.println("BuildingInfo.getCityStyle");
-                }
                 for (ChunkPos cp : connectedStreets) {
                     cityStyleCache.put(Pair.of(cp.chunkXPos, cp.chunkZPos), cityStyle);
                 }
@@ -166,9 +167,13 @@ public class BuildingInfo {
     private void createPalette(Random rand) {
         Style style;
         if (!isCity) {
-            style = AssetRegistries.STYLES.get("outside");
+            style = getOutsideStyle();
         } else {
-            style = AssetRegistries.STYLES.get(getCityStyle().getStyle());
+            String name = getCityStyle().getStyle();
+            style = AssetRegistries.STYLES.get(name);
+            if (style == null) {
+                throw new RuntimeException("Cannot find style '" + name + "'!");
+            }
         }
         palette = style.getRandomPalette(provider, rand);
     }

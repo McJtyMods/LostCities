@@ -58,7 +58,7 @@ public abstract class CommonProxy {
         for (String path : LostCityConfiguration.ASSETS) {
             if (path.startsWith("/")) {
                 InputStream inputstream = LostCities.class.getResourceAsStream(path);
-                AssetRegistries.load(inputstream);
+                AssetRegistries.load(inputstream, path);
             } else if (path.startsWith("$")) {
                 File file = new File(modConfigDir.getPath() + File.separator + path.substring(1));
                 AssetRegistries.load(file);

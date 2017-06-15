@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 public class WorldStyle implements IAsset {
 
     private String name;
+    private String outsideStyle;
 
     private final List<Pair<Predicate<Info>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
 
@@ -35,6 +36,7 @@ public class WorldStyle implements IAsset {
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
+        outsideStyle = object.get("outsidestyle").getAsString();
         JsonArray array = object.get("citystyles").getAsJsonArray();
         for (JsonElement element : array) {
             JsonObject o = element.getAsJsonObject();
@@ -71,11 +73,16 @@ public class WorldStyle implements IAsset {
         return false;
     }
 
+    public String getOutsideStyle() {
+        return outsideStyle;
+    }
+
     @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("worldstyle"));
         object.add("name", new JsonPrimitive(name));
+        object.add("outsidestyle", new JsonPrimitive(outsideStyle));
 
         JsonArray array = new JsonArray();
         for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {

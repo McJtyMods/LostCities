@@ -30,13 +30,13 @@ public class AssetRegistries {
 
     public static void load(File file) {
         try {
-            load(new FileInputStream(file));
+            load(new FileInputStream(file), file.getName());
         } catch (FileNotFoundException e) {
             // Not an error
         }
     }
 
-    public static void load(InputStream inputstream) {
+    public static void load(InputStream inputstream, String filename) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, "UTF-8"));
             System.out.println("AssetRegistries.load");
@@ -60,7 +60,7 @@ public class AssetRegistries {
                 } else if ("worldstyle".equals(type)) {
                     WORLDSTYLES.register(new WorldStyle(object));
                 } else {
-                    throw new RuntimeException("Unknown type '" + type + "'!");
+                    throw new RuntimeException("Unknown type '" + type + " in " + filename + "'!");
                 }
             }
         } catch (UnsupportedEncodingException e) {
