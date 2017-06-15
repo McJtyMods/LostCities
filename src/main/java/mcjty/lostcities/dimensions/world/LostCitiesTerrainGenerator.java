@@ -512,6 +512,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void doCityChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
         boolean building = info.hasBuilding;
+        char base = (char) Block.BLOCK_STATE_IDS.get(baseBlock);
 
         Random rand = new Random(provider.seed * 377 + chunkZ * 341873128712L + chunkX * 132897987541L);
         rand.nextFloat();
@@ -528,7 +529,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
 
                 while (height < provider.profile.BEDROCK_LAYER + 30 + rand.nextInt(3)) {
-                    BaseTerrainGenerator.setBlockState(primer, index++, baseBlock);
+                    BaseTerrainGenerator.setBlockState(primer, index++, base);
                     height++;
                 }
 
@@ -1173,7 +1174,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private int generateBuilding(ChunkPrimer primer, BuildingInfo info, Random rand, int chunkX, int chunkZ, int index, int x, int z, int height) {
-        DamageArea damageArea = info.getDamageArea();
+        char base = (char) Block.BLOCK_STATE_IDS.get(baseBlock);
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
         int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * 6;
@@ -1187,7 +1188,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         while (height < lowestLevel) {
-            BaseTerrainGenerator.setBlockState(primer, index++, baseBlock);
+            BaseTerrainGenerator.setBlockState(primer, index++, base);
             height++;
         }
         while (height < buildingtop + 6) {
