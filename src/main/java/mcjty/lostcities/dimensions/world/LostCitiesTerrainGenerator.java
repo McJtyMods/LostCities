@@ -73,8 +73,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         // primer vs generating it here
         provider.rand.setSeed(chunkX * 257017164707L + chunkZ * 101754694003L);
 
-        breakBlocksForDamage(chunkX, chunkZ, primer, info);
         if (info.getDamageArea().hasExplosions()) {
+            breakBlocksForDamage(chunkX, chunkZ, primer, info);
             fixAfterExplosion(primer, chunkX, chunkZ, info, provider.rand);
         }
         generateDebris(primer, provider.rand, info);
@@ -155,26 +155,24 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int cz = chunkZ * 16;
 
         DamageArea damageArea = info.getDamageArea();
-        if (damageArea.hasExplosions()) {
-            char air = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
-            char liquid = (char) Block.BLOCK_STATE_IDS.get(water);
+        char air = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
+        char liquid = (char) Block.BLOCK_STATE_IDS.get(water);
 
-            for (int yy = 0; yy < 16; yy++) {
-                if (damageArea.hasExplosions(yy)) {
-                    for (int x = 0; x < 16; x++) {
-                        for (int z = 0; z < 16; z++) {
-                            int index = (x << 12) | (z << 8) + yy * 16;
-                            for (int y = 0 ; y < 16 ; y++) {
-                                char d = primer.data[index];
-                                if (d != air && d != liquid) {
-                                    IBlockState b = Block.BLOCK_STATE_IDS.getByValue(d);
-                                    IBlockState newb = damageArea.damageBlock(b, provider, cx + x, y, cz + z, info.getCompiledPalette());
-                                    if (newb != b) {
-                                        BaseTerrainGenerator.setBlockState(primer, index, b);
-                                    }
+        for (int yy = 0; yy < 16; yy++) {
+            if (damageArea.hasExplosions(yy)) {
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        int index = (x << 12) | (z << 8) + yy * 16;
+                        for (int y = 0 ; y < 16 ; y++) {
+                            char d = primer.data[index];
+                            if (d != air && d != liquid) {
+                                IBlockState b = Block.BLOCK_STATE_IDS.getByValue(d);
+                                IBlockState newb = damageArea.damageBlock(b, provider, cx + x, y, cz + z, info.getCompiledPalette());
+                                if (newb != b) {
+                                    BaseTerrainGenerator.setBlockState(primer, index, b);
                                 }
-                                index++;
                             }
+                            index++;
                         }
                     }
                 }
