@@ -42,9 +42,9 @@ public class LostCityProfile {
 
     public float EXPLOSION_CHANCE = .005f;
     public int EXPLOSION_MINRADIUS = 17;
-    public int EXPLOSION_MAXRADIUS = 80;
-    public int EXPLOSION_MINHEIGHT = 78;
-    public int EXPLOSION_MAXHEIGHT = 128;
+    public int EXPLOSION_MAXRADIUS = 60;
+    public int EXPLOSION_MINHEIGHT = 80;
+    public int EXPLOSION_MAXHEIGHT = 100;
 
     public float MINI_EXPLOSION_CHANCE = .07f;
     public int MINI_EXPLOSION_MINRADIUS = 5;

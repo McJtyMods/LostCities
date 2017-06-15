@@ -23,18 +23,31 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private final byte waterLevel;
     private static IBlockState bedrock;
     public static char airChar;
+    public static char hardAirChar;
     public static char bricksChar;
     public static char baseChar;
+    public static char wallChar;
     public static char liquidChar;
+    public static char leavesChar;
+    public static char ironbarsChar;
+    public static char ladderChar;
+    public static char grassChar;
+    public static char glassChar;
+    public static char glassPaneChar;
+    public static char stainedGlassChar;
+    public static char stainedGlassPaneChar;
+    public static char bedrockChar;
+    public static char endportalChar;
+    public static char endportalFrameChar;
     public static IBlockState air;
     public static IBlockState hardAir;  // Used in parts to carve out
     public static IBlockState water;
 
     private IBlockState baseBlock;
-    private IBlockState street;
-    private IBlockState streetBase;
-    private IBlockState street2;
-    private IBlockState bricks;
+    private Character street;
+    private Character streetBase;
+    private Character street2;
+    private Character bricks;
     private int streetBorder;
 
 
@@ -53,6 +66,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         baseBlock = Blocks.STONE.getDefaultState();
 
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+
+        // @todo this setup is not very clean
         air = Blocks.AIR.getDefaultState();
         hardAir = Blocks.COMMAND_BLOCK.getDefaultState();
         water = Blocks.WATER.getDefaultState();
@@ -63,9 +78,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         streetBorder = (16 - info.getCityStyle().getStreetWidth()) / 2;
 
         airChar = (char) Block.BLOCK_STATE_IDS.get(air);
+        hardAirChar = (char) Block.BLOCK_STATE_IDS.get(hardAir);
         bricksChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONEBRICK.getDefaultState());
+        wallChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COBBLESTONE_WALL.getDefaultState());
         baseChar = (char) Block.BLOCK_STATE_IDS.get(baseBlock);
         liquidChar = (char) Block.BLOCK_STATE_IDS.get(water);
+        leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false));
+        ironbarsChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.IRON_BARS.getDefaultState());
+        ladderChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LADDER.getDefaultState());
+        grassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRASS.getDefaultState());
+        glassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS.getDefaultState());
+        glassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS_PANE.getDefaultState());
+        stainedGlassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS.getDefaultState());
+        stainedGlassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS_PANE.getDefaultState());
+        bedrockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.BEDROCK.getDefaultState());
+        endportalChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL.getDefaultState());
+        endportalFrameChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL_FRAME.getDefaultState());
 
         // @todo This should not be hardcoded here
         bricks = info.getCompiledPalette().get('#');
@@ -170,11 +198,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         int index = (x << 12) | (z << 8) + yy * 16;
                         for (int y = 0 ; y < 16 ; y++) {
                             char d = primer.data[index];
-                            if (d != airChar && d != liquidChar) {
-                                IBlockState b = Block.BLOCK_STATE_IDS.getByValue(d);
-                                IBlockState newb = damageArea.damageBlock(b, provider, cx + x, y, cz + z, info.getCompiledPalette());
-                                if (newb != b) {
-                                    BaseTerrainGenerator.setBlockState(primer, index, b);
+                            if (d != airChar) {
+                                Character newd = damageArea.damageBlock(d, provider, cx + x, yy * 16 + y, cz + z, info.getCompiledPalette());
+                                if (newd != d) {
+                                    BaseTerrainGenerator.setBlockState(primer, index, newd);
                                 }
                             }
                             index++;
@@ -309,7 +336,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 int height = groundLevel + 1;
                 int l = 0;
                 while (l < bt.getSliceCount()) {
-                    IBlockState b = orientation == Orientation.X ? bt.get(info, x, l, z) : bt.get(info, z, l, x); // @todo general rotation system?
+                    Character b = orientation == Orientation.X ? bt.get(info, x, l, z) : bt.get(info, z, l, x); // @todo general rotation system?
                     BaseTerrainGenerator.setBlockState(primer, index++, b);
                     height++;
                     l++;
@@ -863,7 +890,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             height++;
         }
 
-        IBlockState b;
+        Character b;
 
         if (info.getHighwayXLevel() != info.cityLevel && info.getHighwayZLevel() != info.cityLevel) {
             BuildingInfo.StreetType streetType = info.streetType;
@@ -916,45 +943,45 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             boolean el22 = info.getXmax().getZmax().isElevatedParkSection();
                             if (x == 0 && z == 0) {
                                 if (el01 && el00 && el10) {
-                                    b = Blocks.GRASS.getDefaultState();
+                                    b = grassChar;
                                 }
                             } else if (x == 15 && z == 0) {
                                 if (el21 && el20 && el10) {
-                                    b = Blocks.GRASS.getDefaultState();
+                                    b = grassChar;
                                 }
                             } else if (x == 0 && z == 15) {
                                 if (el01 && el02 && el12) {
-                                    b = Blocks.GRASS.getDefaultState();
+                                    b = grassChar;
                                 }
                             } else if (x == 15 && z == 15) {
                                 if (el12 && el22 && el21) {
-                                    b = Blocks.GRASS.getDefaultState();
+                                    b = grassChar;
                                 }
                             } else if (x == 0) {
                                 if (el01) {
-                                    b = Blocks.GRASS.getDefaultState();
+                                    b = grassChar;
                                 }
                             } else if (x == 15) {
                                 if (el21) {
-                                    b = Blocks.GRASS.getDefaultState();
+                                    b = grassChar;
                                 }
                             } else if (z == 0) {
                                 if (el10) {
-                                    b = Blocks.GRASS.getDefaultState();
+                                    b = grassChar;
                                 }
                             } else if (z == 15) {
                                 if (el12) {
-                                    b = Blocks.GRASS.getDefaultState();
+                                    b = grassChar;
                                 }
                             }
                         }
                     } else {
-                        b = Blocks.GRASS.getDefaultState();
+                        b = grassChar;
                     }
                     break;
             }
             if (doOceanBorder) {
-                b = Blocks.STONEBRICK.getDefaultState();
+                b = bricksChar;
             }
             BaseTerrainGenerator.setBlockState(primer, index++, b);
             height++;
@@ -969,7 +996,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
                 while (l < part.getSliceCount()) {
                     if (l == 0 && doOceanBorder && !borderNeedsConnectionToAdjacentChunk(info, x, z)) {
-                        b = Blocks.COBBLESTONE_WALL.getDefaultState();
+                        b = wallChar;
                     } else {
                         b = part.get(info, x, l, z);
                     }
@@ -979,7 +1006,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             } else if (doOceanBorder) {
                 if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
-                    b = Blocks.COBBLESTONE_WALL.getDefaultState();
+                    b = wallChar;
                     BaseTerrainGenerator.setBlockState(primer, index++, b);
                     height++;
                 }
@@ -994,35 +1021,35 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             if (primer.data[index - 1] == baseChar) {
                 if (info.getXmin().hasBuilding && x <= 2) {
                     while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (3 - x))) {
-                        b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                        b = leavesChar;
                         BaseTerrainGenerator.setBlockState(primer, index++, b);
                         height++;
                     }
                 }
                 if (info.getXmax().hasBuilding && x >= 13) {
                     while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 12))) {
-                        b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                        b = leavesChar;
                         BaseTerrainGenerator.setBlockState(primer, index++, b);
                         height++;
                     }
                 }
                 if (info.getZmin().hasBuilding && z <= 2) {
                     while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (3 - z))) {
-                        b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                        b = leavesChar;
                         BaseTerrainGenerator.setBlockState(primer, index++, b);
                         height++;
                     }
                 }
                 if (info.getZmax().hasBuilding && z <= 13) {
                     while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 12))) {
-                        b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                        b = leavesChar;
                         BaseTerrainGenerator.setBlockState(primer, index++, b);
                         height++;
                     }
                 }
 
                 while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS / 6)) {
-                    b = Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false);
+                    b = leavesChar;
                     BaseTerrainGenerator.setBlockState(primer, index++, b);
                     height++;
                 }
@@ -1070,14 +1097,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 int rz = oz + rotation.rotateZ(x, z);
                 int index = (rx << 12) | (rz << 8) + oy;
                 for (int y = 0; y < part.getSliceCount(); y++) {
-                    IBlockState b = part.get(info, x, y, z);
-                    if (rotation != Rotation.ROTATE_NONE && b.getBlock() instanceof BlockStairs) {
-                        b = b.withRotation(rotation.getMcRotation());
+                    Character b = part.get(info, x, y, z);
+                    if (rotation != Rotation.ROTATE_NONE) {
+                        IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
+                        if (bs.getBlock() instanceof BlockStairs) {
+                            bs = bs.withRotation(rotation.getMcRotation());
+                            b = (char) Block.BLOCK_STATE_IDS.get(bs);
+                        }
                     }
                     // We don't replace the world where the part is empty (air)
-                    if (b != air) {
-                        if (b == hardAir) {
-                            b = air;
+                    if (b != airChar) {
+                        if (b == hardAirChar) {
+                            b = airChar;
                         }
                         BaseTerrainGenerator.setBlockState(primer, index, b);
                     }
@@ -1118,10 +1149,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             index--;
                         }
                         index++;
-                        IBlockState b;
+                        Character b;
                         switch (rand.nextInt(5)) {
                             case 0:
-                                b = Blocks.IRON_BARS.getDefaultState();
+                                b = ironbarsChar;
                                 break;
                             default:
                                 b = adjacentInfo.getCompiledPalette().get('#');   // @todo hardcoded!
@@ -1182,11 +1213,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             height++;
         }
         while (height < buildingtop + 6) {
-            IBlockState b;
+            Character b;
 
             // Make a connection to a corridor if needed
             if (corridor && height >= groundLevel - 5 && height <= groundLevel - 3) {   // This uses actual groundLevel
-                b = air;
+                b = airChar;
             } else {
                 b = getBlockForLevel(info, x, z, height);
             }
@@ -1200,16 +1231,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return index;
     }
 
-    private IBlockState getBlockForLevel(BuildingInfo info, int x, int z, int height) {
+    private Character getBlockForLevel(BuildingInfo info, int x, int z, int height) {
         int f = getFloor(height);
         int localLevel = getLevel(info, height);
         boolean isTop = localLevel == info.getNumFloors();   // The top does not need generated doors
 
         BuildingPart part = info.getFloor(localLevel);
         if (f >= part.getSliceCount()) { // @todo avoid this?
-            return air;
+            return airChar;
         }
-        IBlockState b = part.get(info, x, f, z);
+        Character b = part.get(info, x, f, z);
 
         // If we are underground, the block is glass, we are on the side and the chunk next to
         // us doesn't have a building or floor there we replace the glass with a solid block
@@ -1224,13 +1255,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         // For buildings that have a style which causes gaps at the side we fill in that gap if we are
         // at ground level
-        if (b == air && isSide(x, z) && adjacent.isCity && height == adjacent.getCityGroundLevel()) {
-            b = baseBlock;
+        if (b == airChar && isSide(x, z) && adjacent.isCity && height == adjacent.getCityGroundLevel()) {
+            b = baseChar;
         }
 
         // for buildings that have a hole in the bottom floor we fill that hole if we are
         // at the bottom of the building
-        if (b == air && f == 0 && (localLevel + info.floorsBelowGround) == 0) {
+        if (b == airChar && f == 0 && (localLevel + info.floorsBelowGround) == 0) {
             b = bricks;
         }
 
@@ -1240,16 +1271,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (f == 3 || z == 6 || z == 9) {
                         b = bricks;
                     } else {
-                        b = air;
+                        b = airChar;
                     }
                 } else if (hasConnectionToTopOrOutside(localLevel, info, adjacent)) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = bricks;
                     } else {
-                        b = info.doorBlock.getDefaultState()
+                        b = (char) Block.BLOCK_STATE_IDS.get(info.doorBlock.getDefaultState()
                                 .withProperty(BlockDoor.HALF, f == 1 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER)
                                 .withProperty(BlockDoor.HINGE, z == 7 ? BlockDoor.EnumHingePosition.LEFT : BlockDoor.EnumHingePosition.RIGHT)
-                                .withProperty(BlockDoor.FACING, EnumFacing.EAST);
+                                .withProperty(BlockDoor.FACING, EnumFacing.EAST));
                     }
                 }
             } else if (x == 15 && (z >= 6 && z <= 9) && f >= 1 && f <= 3) {
@@ -1257,16 +1288,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (f == 3 || z == 6 || z == 9) {
                         b = bricks;
                     } else {
-                        b = air;
+                        b = airChar;
                     }
                 } else if ((hasConnectionToTopOrOutside(localLevel, info, adjacent)) && adjacent.hasConnectionAtX(localLevel + adjacent.floorsBelowGround)) {
                     if (f == 3 || z == 6 || z == 9) {
                         b = bricks;
                     } else {
-                        b = info.doorBlock.getDefaultState()
+                        b = (char) Block.BLOCK_STATE_IDS.get(info.doorBlock.getDefaultState()
                                 .withProperty(BlockDoor.HALF, f == 1 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER)
                                 .withProperty(BlockDoor.HINGE, z == 8 ? BlockDoor.EnumHingePosition.LEFT : BlockDoor.EnumHingePosition.RIGHT)
-                                .withProperty(BlockDoor.FACING, EnumFacing.WEST);
+                                .withProperty(BlockDoor.FACING, EnumFacing.WEST));
                     }
                 }
             }
@@ -1275,16 +1306,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (f == 3 || x == 6 || x == 9) {
                         b = bricks;
                     } else {
-                        b = air;
+                        b = airChar;
                     }
                 } else if (hasConnectionToTopOrOutside(localLevel, info, adjacent)) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = bricks;
                     } else {
-                        b = info.doorBlock.getDefaultState()
+                        b = (char) Block.BLOCK_STATE_IDS.get(info.doorBlock.getDefaultState()
                                 .withProperty(BlockDoor.HALF, f == 1 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER)
                                 .withProperty(BlockDoor.HINGE, x == 8 ? BlockDoor.EnumHingePosition.LEFT : BlockDoor.EnumHingePosition.RIGHT)
-                                .withProperty(BlockDoor.FACING, EnumFacing.SOUTH);
+                                .withProperty(BlockDoor.FACING, EnumFacing.SOUTH));
                     }
                 }
             } else if (z == 15 && (x >= 6 && x <= 9) && f >= 1 && f <= 3) {
@@ -1292,32 +1323,33 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (f == 3 || x == 6 || x == 9) {
                         b = bricks;
                     } else {
-                        b = air;
+                        b = airChar;
                     }
                 } else if ((hasConnectionToTopOrOutside(localLevel, info, adjacent)) && adjacent.hasConnectionAtZ(localLevel + adjacent.floorsBelowGround)) {
                     if (f == 3 || x == 6 || x == 9) {
                         b = bricks;
                     } else {
-                        b = info.doorBlock.getDefaultState()
+                        b = (char) Block.BLOCK_STATE_IDS.get(info.doorBlock.getDefaultState()
                                 .withProperty(BlockDoor.HALF, f == 1 ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER)
                                 .withProperty(BlockDoor.HINGE, x == 7 ? BlockDoor.EnumHingePosition.LEFT : BlockDoor.EnumHingePosition.RIGHT)
-                                .withProperty(BlockDoor.FACING, EnumFacing.NORTH);
+                                .withProperty(BlockDoor.FACING, EnumFacing.NORTH));
                     }
                 }
             }
         }
         boolean down = f == 0 && (localLevel + info.floorsBelowGround) == 0;
 
-        if (b.getBlock() == Blocks.LADDER && down) {
-            b = bricks;
+        if (b == ladderChar && down) {
+            return bricks;
         }
 
         // If this is a spawner we put it on a todo so that the world generator can put the correct mob in it
         // @todo support this system in other places too
-        if (b.getBlock() == Blocks.MOB_SPAWNER) {
+        Block block = Block.BLOCK_STATE_IDS.getByValue(b).getBlock();
+        if (block == Blocks.MOB_SPAWNER) {
             String mobid = part.getMobID(info, x, f, z);
             info.addSpawnerTodo(new BlockPos(x, height, z), mobid);
-        } else if (b.getBlock() == Blocks.CHEST) {
+        } else if (block == Blocks.CHEST) {
             info.addChestTodo(new BlockPos(x, height, z));
         }
 

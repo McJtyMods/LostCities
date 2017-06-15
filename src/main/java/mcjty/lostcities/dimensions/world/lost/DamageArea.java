@@ -4,9 +4,6 @@ import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.varia.GeometryTools;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
@@ -51,36 +48,32 @@ public class DamageArea {
         }
     }
 
-    public IBlockState damageBlock(IBlockState b, LostCityChunkGenerator provider, int x, int y, int z, CompiledPalette palette) {
-        if (b == LostCitiesTerrainGenerator.air) {
-            return b;
-        }
+    public Character damageBlock(Character b, LostCityChunkGenerator provider, int x, int y, int z, CompiledPalette palette) {
         float damage = getDamage(x, y, z);
         if (damage < 0.001) {
             return b;
         }
 
-        Block block = b.getBlock();
-        if (block == Blocks.BEDROCK || block == Blocks.END_PORTAL || block == Blocks.END_PORTAL_FRAME) {
+        if (b == LostCitiesTerrainGenerator.bedrockChar || b == LostCitiesTerrainGenerator.endportalChar || b == LostCitiesTerrainGenerator.endportalFrameChar) {
             return b;
         }
 
-        if (palette.isEasyToDestroy(b)) {
+        if (CompiledPalette.isGlass(b)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }
-        if (palette.isLiquid(b)) {
+        if (b == LostCitiesTerrainGenerator.liquidChar) {
             damage *= 10f;
         }
         if (provider.rand.nextFloat() <= damage) {
-            IBlockState damaged = palette.canBeDamagedToIronBars(b);
+            Character damaged = palette.canBeDamagedToIronBars(b);
             if (damage < BLOCK_DAMAGE_CHANCE && damaged != null) {
                 if (provider.rand.nextFloat() < .7f) {
                     b = damaged;
                 } else {
-                    b = y < provider.profile.WATERLEVEL ? LostCitiesTerrainGenerator.water : LostCitiesTerrainGenerator.air;
+                    b = y < provider.profile.WATERLEVEL ? LostCitiesTerrainGenerator.liquidChar : LostCitiesTerrainGenerator.airChar;
                 }
             } else {
-                b = y < provider.profile.WATERLEVEL ? LostCitiesTerrainGenerator.water : LostCitiesTerrainGenerator.air;
+                b = y < provider.profile.WATERLEVEL ? LostCitiesTerrainGenerator.liquidChar : LostCitiesTerrainGenerator.airChar;
             }
         }
         return b;
