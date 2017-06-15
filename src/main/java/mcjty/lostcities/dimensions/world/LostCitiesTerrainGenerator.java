@@ -192,7 +192,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         int height;
-        if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
+        if (nonair > 20 && (!isWaterBiome(provider, chunkX, chunkZ) || info.isCity)) {
+            // If we replaced a lot of non-air blocks then we assume we are carving out a tunnel
+            height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
+        } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
             height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_open" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
             // Clear a bit more above the highway
@@ -202,9 +205,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     BaseTerrainGenerator.setBlockStateRange(primer, index, index + 15, air);
                 }
             }
-        } else if (nonair > 20 && (!isWaterBiome(provider, chunkX, chunkZ) || info.isCity)) {
-            // If we replaced a lot of non-air blocks then we assume we are carving out a tunnel
-            height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
         } else {
             height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge" + suffix), rotation, chunkX, chunkZ, 0, highwayGroundLevel, 0);
             // Clear a bit more above the highway
