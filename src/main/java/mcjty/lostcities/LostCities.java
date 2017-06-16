@@ -1,7 +1,5 @@
 package mcjty.lostcities;
 
-import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.Highway;
 import mcjty.lostcities.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -10,18 +8,13 @@ import net.minecraftforge.fml.common.event.*;
 
 @Mod(modid = LostCities.MODID, name="RFTools Dimensions",
         dependencies =
-                        "required-after:compatlayer@[" + LostCities.COMPATLAYER_VER + ",);" +
-                        "after:Forge@[" + LostCities.MIN_FORGE10_VER + ",);" +
                         "after:forge@[" + LostCities.MIN_FORGE11_VER + ",)",
         version = LostCities.VERSION,
-        acceptableRemoteVersions = "*",
-        acceptedMinecraftVersions = "[1.10,1.12)")
+        acceptableRemoteVersions = "*")
 public class LostCities {
     public static final String MODID = "lostcities";
-    public static final String VERSION = "0.0.6beta";
-    public static final String MIN_FORGE10_VER = "12.18.1.2082";
+    public static final String VERSION = "0.0.5beta";
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
-    public static final String COMPATLAYER_VER = "0.1.6";
 
     @SidedProxy(clientSide="mcjty.lostcities.proxy.ClientProxy", serverSide="mcjty.lostcities.proxy.ServerProxy")
     public static CommonProxy proxy;
@@ -41,7 +34,7 @@ public class LostCities {
     public void preInit(FMLPreInitializationEvent e) {
         chisel = Loader.isModLoaded("chisel");
         biomesoplenty = Loader.isModLoaded("biomesoplenty") || Loader.isModLoaded("BiomesOPlenty");
-//        atg = Loader.isModLoaded("atg"); // @todo
+//        atg = Loader.isModLoaded("atg"); @todo
         this.proxy.preInit(e);
     }
 

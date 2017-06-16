@@ -8,6 +8,7 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.gen.IChunkGenerator;
 
 public class LostWorldType extends WorldType {
 

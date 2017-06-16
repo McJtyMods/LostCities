@@ -9,6 +9,7 @@ import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.gen.IChunkGenerator;
 
 public class LostWorldTypeATG extends WorldType {
 
