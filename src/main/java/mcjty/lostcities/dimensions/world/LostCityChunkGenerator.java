@@ -373,19 +373,17 @@ public class LostCityChunkGenerator implements IChunkGenerator {
 
     @Nullable
     @Override
-    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
+    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean findUnexplored) {
         if ("Stronghold".equals(structureName) && this.strongholdGenerator != null) {
-            return this.strongholdGenerator.getNearestStructurePos(worldIn, position, p_180513_4_);
-//        } else if ("Mansion".equals(structureName) && this.woodlandMansionGenerator != null) {
-//            return this.woodlandMansionGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+            return this.strongholdGenerator.getNearestStructurePos(worldIn, position, findUnexplored);
         } else if ("Monument".equals(structureName) && this.oceanMonumentGenerator != null) {
-            return this.oceanMonumentGenerator.getNearestStructurePos(worldIn, position, p_180513_4_);
+            return this.oceanMonumentGenerator.getNearestStructurePos(worldIn, position, findUnexplored);
         } else if ("Village".equals(structureName) && this.villageGenerator != null) {
-            return this.villageGenerator.getNearestStructurePos(worldIn, position, p_180513_4_);
+            return this.villageGenerator.getNearestStructurePos(worldIn, position, findUnexplored);
         } else if ("Mineshaft".equals(structureName) && this.mineshaftGenerator != null) {
-            return this.mineshaftGenerator.getNearestStructurePos(worldIn, position, p_180513_4_);
+            return this.mineshaftGenerator.getNearestStructurePos(worldIn, position, findUnexplored);
         } else {
-            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null ? this.scatteredFeatureGenerator.getNearestStructurePos(worldIn, position, p_180513_4_) : null;
+            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null ? this.scatteredFeatureGenerator.getNearestStructurePos(worldIn, position, findUnexplored) : null;
         }
     }
 
