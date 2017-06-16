@@ -123,6 +123,25 @@ public class DamageArea {
         return false;
     }
 
+    // Return true if this subchunk is completely destroyed by an explosion
+    public boolean isCompletelyDestroyed(int y) {
+        AxisAlignedBB box = new AxisAlignedBB(chunkX * 16, y * 16, chunkZ * 16, chunkX * 16 + 15, y * 16 + 15, chunkZ * 16 + 15);
+        for (Explosion explosion : explosions) {
+            double dmax = GeometryTools.maxSquaredDistanceBoxPoint(box, explosion.getCenter());
+            int sqdist = explosion.getRadius() * explosion.getRadius();
+            if (dmax <= sqdist) {
+                // The distance at which this explosion is totally fatal (destroys all blocks)
+                double dist = (explosion.getRadius() - 3.0 * explosion.getRadius()) / -3.0;
+                dist *= dist;
+                if (dmax <= dist) {
+                    return true;
+                }
+            }
+        }
+        return false;
+
+    }
+
     // Get the lowest height that is affected by an explosion
     public int getLowestExplosionHeight() {
         for (int yy = 0 ; yy < 16 ; yy++) {

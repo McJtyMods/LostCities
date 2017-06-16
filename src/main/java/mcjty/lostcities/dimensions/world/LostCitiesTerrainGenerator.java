@@ -112,7 +112,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         if (info.getDamageArea().hasExplosions()) {
             breakBlocksForDamage(chunkX, chunkZ, primer, info);
-            fixAfterExplosion(primer, chunkX, chunkZ, info, provider.rand);
+            fixAfterExplosion(primer, info, provider.rand);
         }
         generateDebris(primer, provider.rand, info);
     }
@@ -190,18 +190,29 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         for (int yy = 0; yy < 16; yy++) {
             if (damageArea.hasExplosions(yy)) {
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        int index = (x << 12) | (z << 8) + yy * 16;
-                        for (int y = 0 ; y < 16 ; y++) {
-                            char d = primer.data[index];
-                            if (d != airChar) {
-                                Character newd = damageArea.damageBlock(d, provider, cx + x, yy * 16 + y, cz + z, info.getCompiledPalette());
-                                if (newd != d) {
-                                    BaseTerrainGenerator.setBlockState(primer, index, newd);
-                                }
+                if (damageArea.isCompletelyDestroyed(yy)) {
+                    for (int x = 0; x < 16; x++) {
+                        for (int z = 0; z < 16; z++) {
+                            int index = (x << 12) | (z << 8) + yy * 16;
+                            for (int y = 0; y < 16; y++) {
+                                primer.data[index++] = airChar;
                             }
-                            index++;
+                        }
+                    }
+                } else {
+                    for (int x = 0; x < 16; x++) {
+                        for (int z = 0; z < 16; z++) {
+                            int index = (x << 12) | (z << 8) + yy * 16;
+                            for (int y = 0; y < 16; y++) {
+                                char d = primer.data[index];
+                                if (d != airChar) {
+                                    Character newd = damageArea.damageBlock(d, provider, cx + x, yy * 16 + y, cz + z, info.getCompiledPalette());
+                                    if (newd != d) {
+                                        BaseTerrainGenerator.setBlockState(primer, index, newd);
+                                    }
+                                }
+                                index++;
+                            }
                         }
                     }
                 }
@@ -772,7 +783,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     /// Fix floating blocks after an explosion
-    private void fixAfterExplosion(ChunkPrimer primer, int chunkX, int chunkZ, BuildingInfo info, Random rand) {
+    private void fixAfterExplosion(ChunkPrimer primer, BuildingInfo info, Random rand) {
         int start = info.getDamageArea().getLowestExplosionHeight();
         if (start == -1) {
             // Nothing is affected

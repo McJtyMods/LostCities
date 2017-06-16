@@ -28,6 +28,29 @@ public class GeometryTools {
         return dmin;
     }
 
+    public static double maxSquaredDistanceBoxPoint(AxisAlignedBB chunkBox, BlockPos center) {
+        double dmax = 0;
+
+        if (center.getX() < (chunkBox.minX + chunkBox.maxX) / 2) {
+            dmax += Math.pow(center.getX() - chunkBox.maxX, 2);
+        } else {
+            dmax += Math.pow(center.getX() - chunkBox.minX, 2);
+        }
+
+        if (center.getY() < (chunkBox.minY + chunkBox.maxY) / 2) {
+            dmax += Math.pow(center.getY() - chunkBox.maxY, 2);
+        } else {
+            dmax += Math.pow(center.getY() - chunkBox.minY, 2);
+        }
+
+        if (center.getZ() < (chunkBox.minZ + chunkBox.maxZ) / 2) {
+            dmax += Math.pow(center.getZ() - chunkBox.maxZ, 2);
+        } else {
+            dmax += Math.pow(center.getZ() - chunkBox.minZ, 2);
+        }
+        return dmax;
+    }
+
     public static double squaredDistanceBoxPoint(AxisAlignedBB2D chunkBox, int x, int y) {
         double dmin = 0;
 
