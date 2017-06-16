@@ -1,7 +1,7 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lib.compat.CompatChunkGenerator;
-import mcjty.lib.compat.CompatMapGenStructure;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
@@ -29,6 +29,7 @@ import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;

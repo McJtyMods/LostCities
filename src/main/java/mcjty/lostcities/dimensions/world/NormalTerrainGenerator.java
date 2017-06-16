@@ -1,8 +1,5 @@
 package mcjty.lostcities.dimensions.world;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -75,7 +72,7 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
     }
 
     public void generateHeightmap(int chunkX4, int chunkY4, int chunkZ4) {
-        ChunkProviderSettings settings = provider.getSettings();
+        ChunkGeneratorSettings settings = provider.getSettings();
         this.depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion, chunkX4, chunkZ4, 5, 5, (double)settings.depthNoiseScaleX, (double)settings.depthNoiseScaleZ, (double)settings.depthNoiseScaleExponent);
         float f = settings.coordinateScale;
         float f1 = settings.heightScale;
