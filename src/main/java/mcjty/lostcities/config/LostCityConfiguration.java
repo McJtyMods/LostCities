@@ -22,7 +22,7 @@ public class LostCityConfiguration {
     public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
 
-    public static void init(Configuration cfg) {
+    public static String[] init(Configuration cfg) {
         cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General settings");
 
         ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, "List of asset libraries loaded in the specified order. " +
@@ -31,11 +31,7 @@ public class LostCityConfiguration {
         initStandardProfiles();
         String[] profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
                 new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "chisel"}, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
-        for (String name : profileList) {
-            LostCityProfile profile = new LostCityProfile(name, standardProfiles.get(name));
-            profile.init(cfg);
-            profiles.put(name, profile);
-        }
+        return profileList;
     }
 
     private static void initStandardProfiles() {

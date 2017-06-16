@@ -2,6 +2,7 @@ package mcjty.lostcities.proxy;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.ModDimensions;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,15 +17,18 @@ import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class CommonProxy {
 
     public static File modConfigDir;
     private Configuration mainConfig;
+    private List<Configuration> profileConfigs = new ArrayList<>();
 
     public void preInit(FMLPreInitializationEvent e) {
         modConfigDir = e.getModConfigurationDirectory();
-        mainConfig = new Configuration(new File(modConfigDir.getPath(), "lostcities.cfg"));
+        mainConfig = new Configuration(new File(modConfigDir.getPath() + File.separator + "lostcities", "general.cfg"));
         readMainConfig();
         ModDimensions.init();
     }
@@ -33,12 +37,31 @@ public abstract class CommonProxy {
         Configuration cfg = mainConfig;
         try {
             cfg.load();
-            LostCityConfiguration.init(cfg);
+            String[] profileList = LostCityConfiguration.init(cfg);
+
+            for (String name : profileList) {
+                LostCityProfile profile = new LostCityProfile(name, LostCityConfiguration.standardProfiles.get(name));
+                Configuration profileCfg = new Configuration(new File(modConfigDir.getPath() + File.separator + "lostcities", "profile_" + name + ".cfg"));
+                profileCfg.load();
+                profile.init(profileCfg);
+                LostCityConfiguration.profiles.put(name, profile);
+                profileConfigs.add(profileCfg);
+            }
+
         } catch (Exception e1) {
             FMLLog.log(Level.ERROR, e1, "Problem loading config file!");
         } finally {
-            if (mainConfig.hasChanged()) {
-                mainConfig.save();
+            saveConfigs();
+        }
+    }
+
+    private void saveConfigs() {
+        if (mainConfig.hasChanged()) {
+            mainConfig.save();
+        }
+        for (Configuration config : profileConfigs) {
+            if (config.hasChanged()) {
+                config.save();
             }
         }
     }
@@ -47,12 +70,9 @@ public abstract class CommonProxy {
     }
 
     public void postInit(FMLPostInitializationEvent e) {
-        if (mainConfig.hasChanged()) {
-            mainConfig.save();
-        }
-
+        saveConfigs();
         mainConfig = null;
-
+        profileConfigs.clear();
 
         AssetRegistries.reset();
         for (String path : LostCityConfiguration.ASSETS) {

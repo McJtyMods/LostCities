@@ -125,26 +125,22 @@ public class DamageArea {
 
     // Get the lowest height that is affected by an explosion
     public int getLowestExplosionHeight() {
-        int lowest = 1000;
-        for (Explosion explosion : explosions) {
-            int y = explosion.getCenter().getY() - explosion.getRadius();
-            if (y < lowest) {
-                lowest = y;
+        for (int yy = 0 ; yy < 16 ; yy++) {
+            if (hasExplosions(yy)) {
+                return yy * 16;
             }
         }
-        return lowest > 1 ? lowest : 1;
+        return -1;
     }
 
     // Get the lowest height that is affected by an explosion
     public int getHighestExplosionHeight() {
-        int highest = -1000;
-        for (Explosion explosion : explosions) {
-            int y = explosion.getCenter().getY() + explosion.getRadius();
-            if (y > highest) {
-                highest = y;
+        for (int yy = 15 ; yy >= 0 ; yy--) {
+            if (hasExplosions(yy)) {
+                return yy * 16 + 15;
             }
         }
-        return highest < 254 ? highest : 254;
+        return -1;
     }
 
     // Give an indication of how much damage this chunk got

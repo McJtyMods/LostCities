@@ -773,9 +773,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     /// Fix floating blocks after an explosion
     private void fixAfterExplosion(ChunkPrimer primer, int chunkX, int chunkZ, BuildingInfo info, Random rand) {
-//        int start = info.getCityGroundLevel() - info.floorsBelowGround * 6;
         int start = info.getDamageArea().getLowestExplosionHeight();
-//        int end = info.getMaxHeight() + 20;//@todo 6;
+        if (start == -1) {
+            // Nothing is affected
+            return;
+        }
         int end = info.getDamageArea().getHighestExplosionHeight();
 
         List<Blob> blobs = new ArrayList<>();
