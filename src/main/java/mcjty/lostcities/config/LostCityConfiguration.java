@@ -30,7 +30,7 @@ public class LostCityConfiguration {
 
         initStandardProfiles();
         String[] profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "chisel"}, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
+                new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "chisel"}, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
         return profileList;
     }
 
@@ -62,6 +62,13 @@ public class LostCityConfiguration {
         profile.BUILDING_MINFLOORS_CHANCE = 8;
         profile.BUILDING_MAXFLOORS_CHANCE = 15;
         profile.BUILDING_MAXFLOORS = 20;
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("safe");
+        profile.setDescription("Safe mode: no spawners, lighting but no loot");
+        profile.GENERATE_SPAWNERS = false;
+        profile.GENERATE_LIGHTING = true;
+        profile.GENERATE_LOOT = false;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("chisel");

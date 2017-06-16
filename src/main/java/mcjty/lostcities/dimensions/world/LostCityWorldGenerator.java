@@ -109,12 +109,6 @@ public class LostCityWorldGenerator implements IWorldGenerator {
 
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, chunkGenerator);
 
-        int buildingtop = 0;
-        boolean building = info.hasBuilding;
-        if (building) {
-            buildingtop = info.getMaxHeight();
-        }
-
         for (Pair<BlockPos, String> pair : info.getMobSpawnerTodo()) {
             BlockPos pos = pair.getKey().add(cx, 0, cz);
             // Double check that it is still a spawner (could be destroyed by explosion)
@@ -134,7 +128,9 @@ public class LostCityWorldGenerator implements IWorldGenerator {
             BlockPos pos = cpos.add(cx, 0, cz);
             // Double check that it is still a chest (could be destroyed by explosion)
             if (world.getBlockState(pos).getBlock() == Blocks.CHEST) {
-                createLootChest(random, world, pos);
+                if (chunkGenerator.profile.GENERATE_LOOT) {
+                    createLootChest(random, world, pos);
+                }
             }
         }
         info.clearChestTodo();
