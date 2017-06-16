@@ -123,12 +123,12 @@ public class BuildingInfo {
         todo.add(new ChunkPos(chunkX, chunkZ));
         while (!todo.isEmpty()) {
             ChunkPos cp = todo.poll();
-            if (isCity(cp.chunkXPos, cp.chunkZPos, provider) && !hasBuilding(cp.chunkXPos, cp.chunkZPos, provider) && !streets.contains(cp)) {
+            if (isCity(cp.x, cp.z, provider) && !hasBuilding(cp.x, cp.z, provider) && !streets.contains(cp)) {
                 streets.add(cp);
-                todo.add(new ChunkPos(cp.chunkXPos-1, cp.chunkZPos));
-                todo.add(new ChunkPos(cp.chunkXPos+1, cp.chunkZPos));
-                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos-1));
-                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos+1));
+                todo.add(new ChunkPos(cp.x-1, cp.z));
+                todo.add(new ChunkPos(cp.x+1, cp.z));
+                todo.add(new ChunkPos(cp.x, cp.z-1));
+                todo.add(new ChunkPos(cp.x, cp.z+1));
             }
         }
         return streets;
@@ -149,12 +149,12 @@ public class BuildingInfo {
                 Set<ChunkPos> connectedStreets = findConnectedStreets();
                 Counter<String> counter = new Counter<>();
                 for (ChunkPos cp : connectedStreets) {
-                    cityStyle = City.getCityStyle(cp.chunkXPos, cp.chunkZPos, provider);
+                    cityStyle = City.getCityStyle(cp.x, cp.z, provider);
                     counter.add(cityStyle.getName());
                 }
                 cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
                 for (ChunkPos cp : connectedStreets) {
-                    cityStyleCache.put(Pair.of(cp.chunkXPos, cp.chunkZPos), cityStyle);
+                    cityStyleCache.put(Pair.of(cp.x, cp.z), cityStyle);
                 }
             } else {
                 cityStyle = City.getCityStyle(chunkX, chunkZ, provider);

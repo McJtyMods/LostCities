@@ -47,14 +47,14 @@ public class GuiLostCityConfiguration extends GuiScreen {
             actionHandler.put(id, () -> setProfile(entry.getValue()));
             id++;
 
-            GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRendererObj, id++, 140, y, 200, 20, 0xffffffff);
+            GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 140, y, 200, 20, 0xffffffff);
             label.addLine(entry.getValue().getDescription());
             this.labelList.add(label);
             y += 22;
         }
 
         y += 10;
-        GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRendererObj, id++, 20, y, 340, 20, 0xffffffff);
+        GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 20, y, 340, 20, 0xffffffff);
         label.addLine("(note, you can create your own profiles and many more");
         label.addLine("configuration options in 'lostcities.cfg')");
         this.labelList.add(label);

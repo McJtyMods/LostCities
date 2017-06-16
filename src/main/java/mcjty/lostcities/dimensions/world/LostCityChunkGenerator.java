@@ -168,12 +168,12 @@ public class LostCityChunkGenerator implements IChunkGenerator {
     }
 
     @Override
-    public Chunk provideChunk(int chunkX, int chunkZ) {
+    public Chunk generateChunk(int chunkX, int chunkZ) {
         if (otherGenerator != null) {
             // For ATG, experimental
             BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, this);
             if (!info.isCity) {
-                return otherGenerator.provideChunk(chunkX, chunkZ);
+                return otherGenerator.generateChunk(chunkX, chunkZ);
             }
         }
 
@@ -372,19 +372,20 @@ public class LostCityChunkGenerator implements IChunkGenerator {
     }
 
     @Nullable
-    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
+    @Override
+    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean p_180513_4_) {
         if ("Stronghold".equals(structureName) && this.strongholdGenerator != null) {
-            return this.strongholdGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+            return this.strongholdGenerator.getNearestStructurePos(worldIn, position, p_180513_4_);
 //        } else if ("Mansion".equals(structureName) && this.woodlandMansionGenerator != null) {
 //            return this.woodlandMansionGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
         } else if ("Monument".equals(structureName) && this.oceanMonumentGenerator != null) {
-            return this.oceanMonumentGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+            return this.oceanMonumentGenerator.getNearestStructurePos(worldIn, position, p_180513_4_);
         } else if ("Village".equals(structureName) && this.villageGenerator != null) {
-            return this.villageGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+            return this.villageGenerator.getNearestStructurePos(worldIn, position, p_180513_4_);
         } else if ("Mineshaft".equals(structureName) && this.mineshaftGenerator != null) {
-            return this.mineshaftGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_);
+            return this.mineshaftGenerator.getNearestStructurePos(worldIn, position, p_180513_4_);
         } else {
-            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null ? this.scatteredFeatureGenerator.getClosestStrongholdPos(worldIn, position, p_180513_4_) : null;
+            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null ? this.scatteredFeatureGenerator.getNearestStructurePos(worldIn, position, p_180513_4_) : null;
         }
     }
 
@@ -418,7 +419,7 @@ public class LostCityChunkGenerator implements IChunkGenerator {
     }
 
     @Override
-    public boolean func_193414_a(World p_193414_1_, String p_193414_2_, BlockPos p_193414_3_) {
+    public boolean isInsideStructure(World p_193414_1_, String p_193414_2_, BlockPos p_193414_3_) {
         if ("Stronghold".equals(p_193414_2_) && this.strongholdGenerator != null) {
             return this.strongholdGenerator.isInsideStructure(p_193414_3_);
 //        } else if ("Mansion".equals(p_193414_2_) && this.woodlandMansionGenerator != null) {
