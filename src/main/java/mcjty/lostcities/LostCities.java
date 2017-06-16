@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.event.*;
         acceptedMinecraftVersions = "[1.10,1.12)")
 public class LostCities {
     public static final String MODID = "lostcities";
-    public static final String VERSION = "0.0.5beta";
+    public static final String VERSION = "0.0.6beta";
     public static final String MIN_FORGE10_VER = "12.18.1.2082";
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
     public static final String COMPATLAYER_VER = "0.1.6";
