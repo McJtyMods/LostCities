@@ -118,9 +118,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     public void doCoreChunk(int chunkX, int chunkZ, ChunkPrimer primer) {
-        int cx = chunkX * 16;
-        int cz = chunkZ * 16;
-
         generateHeightmap(chunkX * 4, 0, chunkZ * 4);
         for (int x4 = 0; x4 < 4; ++x4) {
             int l = x4 * 5;

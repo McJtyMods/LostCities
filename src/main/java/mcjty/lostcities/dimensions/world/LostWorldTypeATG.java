@@ -1,9 +1,14 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.gui.GuiLostCityConfiguration;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiCreateWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class LostWorldTypeATG extends WorldType {
 
@@ -44,5 +49,16 @@ public class LostWorldTypeATG extends WorldType {
             }
         }
         return biomeProvider;
+    }
+
+    @Override
+    public boolean isCustomizable() {
+        return true;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void onCustomizeButton(Minecraft mc, GuiCreateWorld guiCreateWorld) {
+        mc.displayGuiScreen(new GuiLostCityConfiguration(guiCreateWorld));
     }
 }

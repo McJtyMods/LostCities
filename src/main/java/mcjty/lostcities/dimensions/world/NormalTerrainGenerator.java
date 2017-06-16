@@ -98,7 +98,7 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
                     for (int k1 = - 2; k1 <=  2; ++k1) {
                         Biome Biome1 = provider.biomesForGeneration[k + j1 + 2 + (l + k1 + 2) * 10];
                         float baseHeight = provider.getSettings().biomeDepthOffSet + Biome1.getBaseHeight() * provider.getSettings().biomeDepthWeight;
-                        float heightVariation = provider.getSettings().biomeScaleOffset + Biome1.getHeightVariation() * provider.getSettings().biomeScaleWeight;
+                        float heightVariation = Math.abs(provider.getSettings().biomeScaleOffset + Biome1.getHeightVariation() * provider.getSettings().biomeScaleWeight);
 
                         if (provider.worldType == WorldType.AMPLIFIED && baseHeight > 0.0F) {
                             baseHeight = 1.0F + baseHeight * 2.0F;
