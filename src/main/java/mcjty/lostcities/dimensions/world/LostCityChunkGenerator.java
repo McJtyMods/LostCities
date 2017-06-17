@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import mcjty.lib.compat.CompatChunkGenerator;
 import mcjty.lib.compat.CompatMapGenStructure;
+import mcjty.lostcities.api.IChunkPrimerFactory;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
@@ -84,9 +85,9 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
     // Holds ravine generator
     private MapGenBase ravineGenerator = new MapGenRavine();
 
-    public IChunkGenerator otherGenerator = null;
+    public IChunkPrimerFactory otherGenerator = null;
 
-    public LostCityChunkGenerator(World world, IChunkGenerator otherGenerator) {
+    public LostCityChunkGenerator(World world, IChunkPrimerFactory otherGenerator) {
         this(world);
         this.otherGenerator = otherGenerator;
     }
@@ -149,8 +150,14 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
     public ChunkPrimer generatePrimer(int chunkX, int chunkZ) {
         this.rand.setSeed(chunkX * 341873128712L + chunkZ * 132897987541L);
         ChunkPrimer chunkprimer = new ChunkPrimer();
-        this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
-        terrainGenerator.doCoreChunk(chunkX, chunkZ, chunkprimer);
+
+        if (otherGenerator != null) {
+            // For ATG, experimental
+            otherGenerator.fillChunk(chunkX, chunkZ, chunkprimer);
+        } else {
+            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
+            terrainGenerator.doCoreChunk(chunkX, chunkZ, chunkprimer);
+        }
         return chunkprimer;
     }
 
@@ -174,14 +181,6 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
-        if (otherGenerator != null) {
-            // For ATG, experimental
-            BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, this);
-            if (!info.isCity) {
-                return otherGenerator.provideChunk(chunkX, chunkZ);
-            }
-        }
-
         ChunkPrimer chunkprimer;
         ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
         if (cachedPrimers.containsKey(key)) {

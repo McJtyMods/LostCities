@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.api.IChunkPrimerFactory;
 import mcjty.lostcities.gui.GuiLostCityConfiguration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiCreateWorld;
@@ -10,36 +11,42 @@ import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class LostWorldTypeATG extends WorldType {
+public class LostWorldTypeAdapter extends WorldType {
 
-    public LostWorldTypeATG() {
-        super("lostcities_atg");
+    public LostWorldTypeAdapter(String other) {
+        super("lostcities_" + other);
+        this.otherWorldtype = other;
     }
 
+    private final String otherWorldtype;
     private BiomeProvider biomeProvider = null;
-    private IChunkGenerator atgGenerator = null;
+    private IChunkGenerator otherGenerator = null;
+    private IChunkPrimerFactory factory = null;
 
     @Override
     public IChunkGenerator getChunkGenerator(World world, String generatorOptions) {
-        if (atgGenerator == null) {
+        if (otherGenerator == null) {
             for (WorldType type : WorldType.WORLD_TYPES) {
-                if ("atg".equals(type.getName())) {
+                if (otherWorldtype.equals(type.getName())) {
                     WorldType orig = world.getWorldInfo().getTerrainType();
                     world.getWorldInfo().setTerrainType(type);
-                    atgGenerator = type.getChunkGenerator(world, generatorOptions);
+                    otherGenerator = type.getChunkGenerator(world, generatorOptions);
                     world.getWorldInfo().setTerrainType(orig);
+                    if (otherGenerator instanceof IChunkPrimerFactory) {
+                        factory = (IChunkPrimerFactory) otherGenerator;
+                    }
                     break;
                 }
             }
         }
-        return new LostCityChunkGenerator(world, atgGenerator);
+        return new LostCityChunkGenerator(world, factory);
     }
 
     @Override
     public BiomeProvider getBiomeProvider(World world) {
         if (biomeProvider == null) {
             for (WorldType type : WorldType.WORLD_TYPES) {
-                if ("atg".equals(type.getName())) {
+                if (otherWorldtype.equals(type.getName())) {
                     WorldType orig = world.getWorldInfo().getTerrainType();
                     world.getWorldInfo().setTerrainType(type);
                     biomeProvider = type.getBiomeProvider(world);
