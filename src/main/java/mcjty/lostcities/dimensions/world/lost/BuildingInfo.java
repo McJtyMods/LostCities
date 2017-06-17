@@ -540,24 +540,39 @@ public class BuildingInfo {
     }
 
     public static int getCityLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        // @todo: average out nearby biomes?
-        Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-        float height = 0.0f;
-        for (Biome biome : biomes) {
-            height += biome.getBaseHeight();
-        }
-        height /= biomes.length;
-        int cityLevel;
-        if (height < 0.3f) {
-            cityLevel = 0;
-        } else if (height < 0.6f) {
-            cityLevel = 1;
-        } else if (height < 2) {
-            cityLevel = 2;
+        if (provider.otherGenerator != null) {
+            int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);
+            int cityLevel;
+            if (height < 75) {
+                cityLevel = 0;
+            } else if (height < 83) {
+                cityLevel = 1;
+            } else if (height < 91) {
+                cityLevel = 2;
+            } else {
+                cityLevel = 3;
+            }
+            return cityLevel;
         } else {
-            cityLevel = 3;
+            // @todo: average out nearby biomes?
+            Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+            float height = 0.0f;
+            for (Biome biome : biomes) {
+                height += biome.getBaseHeight();
+            }
+            height /= biomes.length;
+            int cityLevel;
+            if (height < 0.3f) {
+                cityLevel = 0;
+            } else if (height < 0.6f) {
+                cityLevel = 1;
+            } else if (height < 2) {
+                cityLevel = 2;
+            } else {
+                cityLevel = 3;
+            }
+            return cityLevel;
         }
-        return cityLevel;
     }
 
     private Block getRandomDoor(Random rand) {

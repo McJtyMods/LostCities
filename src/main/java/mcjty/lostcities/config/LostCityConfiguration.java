@@ -19,6 +19,8 @@ public class LostCityConfiguration {
             "$lostcities/userassets.json"
     };
 
+    public static String[] ADAPTING_WORLDTYPES = new String[] {};
+
     public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
 
@@ -27,6 +29,8 @@ public class LostCityConfiguration {
 
         ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, "List of asset libraries loaded in the specified order. " +
                 "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded from the config directory");
+        ADAPTING_WORLDTYPES = cfg.getStringList("adaptingWorldTypes", CATEGORY_GENERAL, ADAPTING_WORLDTYPES, "List of other worldtypes (id) that this mod will try " +
+                "to work with. The worldtype has to support the IChunkPrimerFactory API for this to work");
 
         initStandardProfiles();
         String[] profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,

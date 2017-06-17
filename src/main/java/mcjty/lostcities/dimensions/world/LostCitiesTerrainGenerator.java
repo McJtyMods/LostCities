@@ -19,8 +19,8 @@ import java.util.function.BiFunction;
 
 public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
-    private final byte groundLevel;
-    private final byte waterLevel;
+    private final int groundLevel;
+    private final int waterLevel;
     private static IBlockState bedrock;
     public static char airChar;
     public static char hardAirChar;
@@ -40,6 +40,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char endportalChar;
     public static char endportalFrameChar;
     public static char torchChar;
+    public static char goldBlockChar;
+    public static char diamondBlockChar;
     public static IBlockState air;
     public static IBlockState hardAir;  // Used in parts to carve out
     public static IBlockState water;
@@ -54,8 +56,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public LostCitiesTerrainGenerator(LostCityChunkGenerator provider) {
         super(provider);
-        this.groundLevel = (byte) provider.profile.GROUNDLEVEL;
-        this.waterLevel = (byte) (provider.profile.WATERLEVEL);
+        this.groundLevel = provider.profile.GROUNDLEVEL;
+        this.waterLevel = provider.profile.WATERLEVEL;
     }
 
 
@@ -96,6 +98,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         endportalChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL.getDefaultState());
         endportalFrameChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL_FRAME.getDefaultState());
         torchChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.TORCH.getDefaultState());
+        goldBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GOLD_BLOCK.getDefaultState());
+        diamondBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.DIAMOND_BLOCK.getDefaultState());
 
         // @todo This should not be hardcoded here
         bricks = info.getCompiledPalette().get('#');
@@ -213,7 +217,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
         flattenChunkToCityBorder(chunkX, chunkZ, primer);
-        generateBridges(primer, info);
+        generateBridges(primer, info, torches);
         generateHighways(chunkX, chunkZ, primer, info, torches);
     }
 
@@ -228,9 +232,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 if (damageArea.isCompletelyDestroyed(yy)) {
                     for (int x = 0; x < 16; x++) {
                         for (int z = 0; z < 16; z++) {
-                            int index = (x << 12) | (z << 8) + yy * 16;
+                            int height = yy * 16;
+                            int index = (x << 12) | (z << 8) + height;
                             for (int y = 0; y < 16; y++) {
-                                primer.data[index++] = airChar;
+                                primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
+                                index++;
                             }
                         }
                     }
@@ -240,7 +246,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             int index = (x << 12) | (z << 8) + yy * 16;
                             for (int y = 0; y < 16; y++) {
                                 char d = primer.data[index];
-                                if (d != airChar) {
+                                if (d != airChar || (index & 0xff) < waterLevel) {
                                     Character newd = damageArea.damageBlock(d, provider, cx + x, yy * 16 + y, cz + z, info.getCompiledPalette());
                                     if (newd != d) {
                                         BaseTerrainGenerator.setBlockState(primer, index, newd);
@@ -346,7 +352,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void generateBridges(ChunkPrimer primer, BuildingInfo info) {
+    private void generateBridges(ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
         if (info.getHighwayXLevel() == 0 || info.getHighwayZLevel() == 0) {
             // If there is a highway at level 0 we cannot generate bridge parts. If there
             // is no highway or a highway at level 1 then bridge sections can generate just fine
@@ -354,22 +360,29 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         BuildingPart bt = info.hasXBridge(provider);
         if (bt != null) {
-            generateBridge(primer, info, bt, Orientation.X);
+            generateBridge(primer, info, bt, Orientation.X, torches);
         } else {
             bt = info.hasZBridge(provider);
             if (bt != null) {
-                generateBridge(primer, info, bt, Orientation.Z);
+                generateBridge(primer, info, bt, Orientation.Z, torches);
             }
         }
     }
 
-    private void generateBridge(ChunkPrimer primer, BuildingInfo info, BuildingPart bt, Orientation orientation) {
+    private void generateBridge(ChunkPrimer primer, BuildingInfo info, BuildingPart bt, Orientation orientation, List<Integer> torches) {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 int index = (x << 12) | (z << 8) + groundLevel + 1;
                 int l = 0;
                 while (l < bt.getSliceCount()) {
                     Character b = orientation == Orientation.X ? bt.get(info, x, l, z) : bt.get(info, z, l, x); // @todo general rotation system?
+                    if (b == torchChar) {
+                        if (provider.profile.GENERATE_LIGHTING) {
+                            torches.add(index);
+                        } else {
+                            b = airChar;        // No torch!
+                        }
+                    }
                     BaseTerrainGenerator.setBlockState(primer, index++, b);
                     l++;
                 }
@@ -821,7 +834,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 int index = (x << 12) | (z << 8) + start;
                 for (int y = start; y < end; y++) {
                     char p = primer.data[index];
-                    if (p != airChar) {
+                    if (p != airChar && p != liquidChar) {
                         Blob blob = findBlob(blobs, index);
                         if (blob == null) {
                             blob = new Blob(start, end + 6);

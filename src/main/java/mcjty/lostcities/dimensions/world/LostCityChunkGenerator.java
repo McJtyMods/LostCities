@@ -79,9 +79,9 @@ public class LostCityChunkGenerator implements IChunkGenerator {
     // Holds ravine generator
     private MapGenBase ravineGenerator = new MapGenRavine();
 
-    public IChunkGenerator otherGenerator = null;
+    public IChunkPrimerFactory otherGenerator = null;
 
-    public LostCityChunkGenerator(World world, IChunkGenerator otherGenerator) {
+    public LostCityChunkGenerator(World world, IChunkPrimerFactory otherGenerator) {
         this(world);
         this.otherGenerator = otherGenerator;
     }
@@ -144,8 +144,14 @@ public class LostCityChunkGenerator implements IChunkGenerator {
     public ChunkPrimer generatePrimer(int chunkX, int chunkZ) {
         this.rand.setSeed(chunkX * 341873128712L + chunkZ * 132897987541L);
         ChunkPrimer chunkprimer = new ChunkPrimer();
-        this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
-        terrainGenerator.doCoreChunk(chunkX, chunkZ, chunkprimer);
+
+        if (otherGenerator != null) {
+            // For ATG, experimental
+            otherGenerator.fillChunk(chunkX, chunkZ, chunkprimer);
+        } else {
+            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
+            terrainGenerator.doCoreChunk(chunkX, chunkZ, chunkprimer);
+        }
         return chunkprimer;
     }
 
@@ -168,15 +174,7 @@ public class LostCityChunkGenerator implements IChunkGenerator {
     }
 
     @Override
-    public Chunk generateChunk(int chunkX, int chunkZ) {
-        if (otherGenerator != null) {
-            // For ATG, experimental
-            BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, this);
-            if (!info.isCity) {
-                return otherGenerator.generateChunk(chunkX, chunkZ);
-            }
-        }
-
+    public Chunk provideChunk(int chunkX, int chunkZ) {
         ChunkPrimer chunkprimer;
         ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
         if (cachedPrimers.containsKey(key)) {
