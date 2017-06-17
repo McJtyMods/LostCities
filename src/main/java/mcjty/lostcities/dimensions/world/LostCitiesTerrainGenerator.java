@@ -217,7 +217,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
         flattenChunkToCityBorder(chunkX, chunkZ, primer);
-        generateBridges(primer, info);
+        generateBridges(primer, info, torches);
         generateHighways(chunkX, chunkZ, primer, info, torches);
     }
 
@@ -352,7 +352,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void generateBridges(ChunkPrimer primer, BuildingInfo info) {
+    private void generateBridges(ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
         if (info.getHighwayXLevel() == 0 || info.getHighwayZLevel() == 0) {
             // If there is a highway at level 0 we cannot generate bridge parts. If there
             // is no highway or a highway at level 1 then bridge sections can generate just fine
@@ -360,22 +360,29 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         BuildingPart bt = info.hasXBridge(provider);
         if (bt != null) {
-            generateBridge(primer, info, bt, Orientation.X);
+            generateBridge(primer, info, bt, Orientation.X, torches);
         } else {
             bt = info.hasZBridge(provider);
             if (bt != null) {
-                generateBridge(primer, info, bt, Orientation.Z);
+                generateBridge(primer, info, bt, Orientation.Z, torches);
             }
         }
     }
 
-    private void generateBridge(ChunkPrimer primer, BuildingInfo info, BuildingPart bt, Orientation orientation) {
+    private void generateBridge(ChunkPrimer primer, BuildingInfo info, BuildingPart bt, Orientation orientation, List<Integer> torches) {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 int index = (x << 12) | (z << 8) + groundLevel + 1;
                 int l = 0;
                 while (l < bt.getSliceCount()) {
                     Character b = orientation == Orientation.X ? bt.get(info, x, l, z) : bt.get(info, z, l, x); // @todo general rotation system?
+                    if (b == torchChar) {
+                        if (provider.profile.GENERATE_LIGHTING) {
+                            torches.add(index);
+                        } else {
+                            b = airChar;        // No torch!
+                        }
+                    }
                     BaseTerrainGenerator.setBlockState(primer, index++, b);
                     l++;
                 }
