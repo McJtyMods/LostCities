@@ -61,9 +61,6 @@ public class DamageArea {
         if (CompiledPalette.isGlass(b)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }
-        if (b == LostCitiesTerrainGenerator.liquidChar) {
-            damage *= 10f;
-        }
         if (provider.rand.nextFloat() <= damage) {
             Character damaged = palette.canBeDamagedToIronBars(b);
             if (damage < BLOCK_DAMAGE_CHANCE && damaged != null) {
