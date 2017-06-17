@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import mcjty.lostcities.api.IChunkPrimerFactory;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
@@ -174,7 +175,7 @@ public class LostCityChunkGenerator implements IChunkGenerator {
     }
 
     @Override
-    public Chunk provideChunk(int chunkX, int chunkZ) {
+    public Chunk generateChunk(int chunkX, int chunkZ) {
         ChunkPrimer chunkprimer;
         ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
         if (cachedPrimers.containsKey(key)) {
