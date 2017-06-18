@@ -1,4 +1,4 @@
-package mcjty.lostcities;
+package mcjty.lostcities.commands;
 
 import mcjty.lib.compat.CompatCommand;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
@@ -21,7 +21,7 @@ public class CommandDebug implements CompatCommand {
 
     @Override
     public String getName() {
-        return "lostdebug";
+        return "lc_debug";
     }
 
     @Override

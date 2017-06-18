@@ -1,4 +1,4 @@
-package mcjty.lostcities;
+package mcjty.lostcities.commands;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,11 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CommandExport implements CompatCommand {
+public class CommandExportBuilding implements CompatCommand {
 
     @Override
     public String getName() {
-        return "lostexport";
+        return "lc_exportbuilding";
     }
 
     @Override
