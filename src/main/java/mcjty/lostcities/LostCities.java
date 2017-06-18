@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 
-@Mod(modid = LostCities.MODID, name="RFTools Dimensions",
+@Mod(modid = LostCities.MODID, name="The Lost Cities",
         dependencies =
                         "required-after:compatlayer@[" + LostCities.COMPATLAYER_VER + ",);" +
                         "after:Forge@[" + LostCities.MIN_FORGE10_VER + ",);" +
