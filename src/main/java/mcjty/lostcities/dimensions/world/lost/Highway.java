@@ -81,7 +81,7 @@ public class Highway {
 
             int level = -1;
             if (higher.getCoord(orientation)-lower.getCoord(orientation) >= 5) {
-                if (BuildingInfo.isCity(lower.getChunkX(), lower.getChunkZ(), provider) && BuildingInfo.isCity(higher.getChunkX(), higher.getChunkZ(), provider)) {
+                if (BuildingInfo.isCityRaw(lower.getChunkX(), lower.getChunkZ(), provider) && BuildingInfo.isCityRaw(higher.getChunkX(), higher.getChunkZ(), provider)) {
                     // We have a city at both sides. Valid highway:
                     level = BuildingInfo.getCityLevel(lower.getChunkX(), lower.getChunkZ(), provider);
                     for (ChunkCoord cc = lower ; cc.getCoord(orientation) <= higher.getCoord(orientation) ; cc = cc.higher(orientation)) {
