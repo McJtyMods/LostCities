@@ -15,8 +15,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
-import static team.chisel.client.ClientUtil.rand;
-
 public class BuildingInfo {
     public final int chunkX;
     public final int chunkZ;
@@ -268,7 +266,7 @@ public class BuildingInfo {
                 cityInfo.cityLevel = getCityLevel(chunkX, chunkZ, provider);
             }
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
-            cityInfo.hasBuilding = cityInfo.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, cityInfo.section, rand);
+            cityInfo.hasBuilding = cityInfo.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, cityInfo.section, cityInfo.cityLevel, rand);
 
             cityInfoMap.put(key, cityInfo);
             return cityInfo;
@@ -291,7 +289,7 @@ public class BuildingInfo {
         return getCityInfo(chunkX, chunkZ, provider).hasBuilding;
     }
 
-    private static boolean checkBuildingPossibility(int chunkX, int chunkZ, LostCityChunkGenerator provider, int section, Random rand) {
+    private static boolean checkBuildingPossibility(int chunkX, int chunkZ, LostCityChunkGenerator provider, int section, int cityLevel, Random rand) {
         boolean b;
         float bc = rand.nextFloat();
         if (section >= 0) {
@@ -302,7 +300,10 @@ public class BuildingInfo {
             b = false;
         } else if (hasHighway(chunkX, chunkZ, provider)) {
             // We are above a highway. Check if we have room for a building
-            b = false; // @todo
+            int maxh = Math.max(Highway.getXHighwayLevel(chunkX, chunkZ, provider), Highway.getZHighwayLevel(chunkX, chunkZ, provider));
+            b = cityLevel > maxh+1;       // Allow a building if it is higher then the maximum highway + one
+            // Later we should take care to make sure we don't have too many cellars
+            // Note that for easy of coding we still disallow multi-buildings above highways
         } else {
             // General case
             b = true;
@@ -514,7 +515,17 @@ public class BuildingInfo {
             }
             floors = f + 1;
             int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
-            floorsBelowGround = provider.profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
+
+            int fb = provider.profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
+            if (getMaxHighwayLevel() >= 0) {
+                // If we are above a highway we make sure we can't have too many cellars
+                fb = Math.min(cityLevel-getMaxHighwayLevel()-1, fb);
+                if (fb < 0) {
+                    fb = 0;
+                }
+            }
+            floorsBelowGround = fb;
+
             doorBlock = getRandomDoor(rand);
             bridgeType = AssetRegistries.PARTS.get(cs.getRandomBridge(provider, rand));
             stairType = AssetRegistries.PARTS.get(cs.getRandomStair(provider, rand));

@@ -617,6 +617,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             } else {
                 generateHighways(chunkX, chunkZ, primer, info, torches);
             }
+        } else {
+            int levelX = info.getHighwayXLevel();
+            int levelZ = info.getHighwayZLevel();
+            if (levelX >= 0 || levelZ >= 0) {
+                generateHighways(chunkX, chunkZ, primer, info, torches);
+            }
         }
     }
 
