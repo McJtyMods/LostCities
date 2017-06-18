@@ -542,37 +542,59 @@ public class BuildingInfo {
     public static int getCityLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         if (provider.otherGenerator != null) {
             int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);
-            int cityLevel;
-            if (height < 75) {
-                cityLevel = 0;
-            } else if (height < 83) {
-                cityLevel = 1;
-            } else if (height < 91) {
-                cityLevel = 2;
-            } else {
-                cityLevel = 3;
-            }
-            return cityLevel;
+            return getLevelBasedOnHeight(height, provider);
         } else {
             // @todo: average out nearby biomes?
             Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-            float height = 0.0f;
+            float h = 0.0f;
             for (Biome biome : biomes) {
-                height += biome.getBaseHeight();
+                h += biome.getBaseHeight();
             }
-            height /= biomes.length;
-            int cityLevel;
-            if (height < 0.3f) {
-                cityLevel = 0;
-            } else if (height < 0.6f) {
-                cityLevel = 1;
-            } else if (height < 2) {
-                cityLevel = 2;
+            h /= biomes.length;
+
+            // deep ocean = -1.8
+            // ocean = -1
+            // river = -0.5
+            // swampland = -0.2
+            // beach = 0
+            // plains = .125
+            // taiga = 0.2
+            // ice mountains/desert hills = 0.45
+            // hills edge/stone beach = 0.8
+            // extreme hills = 1
+            // savanna plateau = 1.5
+            // mesa = 1.5
+            int height = 0;
+
+            if (h < 0.15f) {
+                height = 70;
+            } else if (h < 0.4f) {
+                height = 79;
+            } else if (h < 0.7f) {
+                height = 88;
+            } else if (h < 1.3) {
+                height = 95;
             } else {
-                cityLevel = 3;
+                height = 100;
             }
-            return cityLevel;
+            return getLevelBasedOnHeight(height, provider);
         }
+    }
+
+    private static int getLevelBasedOnHeight(int height, LostCityChunkGenerator provider) {
+        int cityLevel;
+        if (height < provider.profile.CITY_LEVEL0_HEIGHT) {
+            cityLevel = 0;
+        } else if (height < provider.profile.CITY_LEVEL1_HEIGHT) {
+            cityLevel = 1;
+        } else if (height < provider.profile.CITY_LEVEL2_HEIGHT) {
+            cityLevel = 2;
+        } else if (height < provider.profile.CITY_LEVEL3_HEIGHT) {
+            cityLevel = 3;
+        } else {
+            cityLevel = 4;
+        }
+        return cityLevel;
     }
 
     private Block getRandomDoor(Random rand) {

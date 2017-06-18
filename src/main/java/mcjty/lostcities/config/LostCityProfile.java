@@ -64,6 +64,11 @@ public class LostCityProfile {
     public int CITY_MAXRADIUS = 128;
     public float CITY_THRESSHOLD = .2f;
 
+    public int CITY_LEVEL0_HEIGHT = 75;
+    public int CITY_LEVEL1_HEIGHT = 83;
+    public int CITY_LEVEL2_HEIGHT = 91;
+    public int CITY_LEVEL3_HEIGHT = 99;
+
     public Float CITY_DEFAULT_BIOME_FACTOR = 1.0f;
     public String[] CITY_BIOME_FACTORS = new String[] { "river=0", "frozen_river=0", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.4" };
     public Map<String, Float> biomeFactorMap = null;
@@ -189,6 +194,15 @@ public class LostCityProfile {
                 "This is important for calculating where cities are based on overlapping city circles (where the city thressholds are added)");
         CITY_BIOME_FACTORS = cfg.getStringList("cityBiomeFactors", categoryCities, inheritFrom.orElse(this).CITY_BIOME_FACTORS, "List of biomes with a factor to affect the city factor in that biome. Using the value 0 you can disable city generation in biomes");
         CITY_DEFAULT_BIOME_FACTOR = cfg.getFloat("cityBiomeFactorDefault", categoryCities, inheritFrom.orElse(this).CITY_DEFAULT_BIOME_FACTOR, 0.0f, 1.0f, "The default biome factor which is used if your biome is not specified in 'cityBiomeFactors'");
+
+        CITY_LEVEL0_HEIGHT = cfg.getInt("cityLevel0Height", categoryCities, inheritFrom.orElse(this).CITY_LEVEL0_HEIGHT, 1, 255,
+                "Below this chunk height cities will be level 0");
+        CITY_LEVEL1_HEIGHT = cfg.getInt("cityLevel1Height", categoryCities, inheritFrom.orElse(this).CITY_LEVEL1_HEIGHT, 1, 255,
+                "Below this chunk height cities will be level 1");
+        CITY_LEVEL2_HEIGHT = cfg.getInt("cityLevel2Height", categoryCities, inheritFrom.orElse(this).CITY_LEVEL2_HEIGHT, 1, 255,
+                "Below this chunk height cities will be level 2");
+        CITY_LEVEL3_HEIGHT = cfg.getInt("cityLevel3Height", categoryCities, inheritFrom.orElse(this).CITY_LEVEL3_HEIGHT, 1, 255,
+                "Below this chunk height cities will be level 3");
     }
 
     private void initExplosions(Configuration cfg) {
