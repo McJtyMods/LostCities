@@ -97,11 +97,11 @@ public class Railway {
      * The station grid repeats every 9 chunks. There is never a station at every 18/18 multiple chunk
      */
     public static RailChunkInfo getRailChunkTypeInternal(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        Random rand = new QualityRandom(/*provider.seed +*/ chunkZ * 2600003897L + chunkX * 43600002517L);
+        Random rand = new QualityRandom(provider.seed +chunkZ * 2600003897L + chunkX * 43600002517L);
         rand.nextFloat();
         rand.nextFloat();
 
-        int cityLevel = 1;//BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
+        int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
 
         // @todo make all settings based on rand below configurable
         float r = rand.nextFloat();
