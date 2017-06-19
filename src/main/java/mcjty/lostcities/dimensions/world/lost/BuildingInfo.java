@@ -302,8 +302,15 @@ public class BuildingInfo {
             // We are above a highway. Check if we have room for a building
             int maxh = Math.max(Highway.getXHighwayLevel(chunkX, chunkZ, provider), Highway.getZHighwayLevel(chunkX, chunkZ, provider));
             b = cityLevel > maxh+1;       // Allow a building if it is higher then the maximum highway + one
-            // Later we should take care to make sure we don't have too many cellars
+            // Later we will take care to make sure we don't have too many cellars
             // Note that for easy of coding we still disallow multi-buildings above highways
+        } else if (hasRailway(chunkX, chunkZ, provider)) {
+            // We are above a railway. Check if we have room for a building
+            Railway.RailChunkInfo info = Railway.getRailChunkType(chunkX, chunkZ, provider);
+            int maxh = info.getLevel();
+            b = cityLevel > maxh+1;       // Allow a building if it is higher then the maximum railway + one
+            // Later we will take care to make sure we don't have too many cellars
+            // Note that for easy of coding we still disallow multi-buildings above railways
         } else {
             // General case
             b = true;
@@ -367,7 +374,7 @@ public class BuildingInfo {
     }
 
     private static boolean isMultiBuildingCandidate(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return isCityRaw(chunkX, chunkZ, provider) && !hasHighway(chunkX, chunkZ, provider);
+        return isCityRaw(chunkX, chunkZ, provider) && !hasHighway(chunkX, chunkZ, provider) && !hasRailway(chunkX, chunkZ, provider);
     }
 
     public int getMaxHighwayLevel() {
@@ -376,6 +383,14 @@ public class BuildingInfo {
 
     private static boolean hasHighway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         return Highway.getXHighwayLevel(chunkX, chunkZ, provider) >= 0 || Highway.getZHighwayLevel(chunkX, chunkZ, provider) >= 0;
+    }
+
+    private static boolean hasRailway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        return Railway.getRailChunkType(chunkX, chunkZ, provider).getType() != Railway.RailChunkType.NONE;
+    }
+
+    public Railway.RailChunkInfo getRailInfo() {
+        return Railway.getRailChunkType(chunkX, chunkZ, provider);
     }
 
     // Return true if a highway at this level would be a tunnel

@@ -45,6 +45,18 @@
         "block": "minecraft:redstone_torch@5"
       },
       {
+        "char": "h",
+        "block": "minecraft:rail@1"
+      },
+      {
+        "char": "i",
+        "block": "minecraft:rail@1"
+      },
+      {
+        "char": "j",
+        "block": "minecraft:rail@1"
+      },
+      {
         "char": "F",
         "blocks": [
           {

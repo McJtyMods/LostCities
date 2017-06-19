@@ -216,9 +216,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     public void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
+//        debugClearChunk(chunkX, chunkZ, primer);
         flattenChunkToCityBorder(chunkX, chunkZ, primer);
         generateBridges(primer, info, torches);
         generateHighways(chunkX, chunkZ, primer, info, torches);
+
+        Railway.RailChunkInfo railInfo = info.getRailInfo();
+        if (railInfo.getType() != Railway.RailChunkType.NONE) {
+            generateRailways(primer, info, torches, railInfo);
+        }
     }
 
     private void breakBlocksForDamage(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
@@ -438,6 +444,20 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         BaseTerrainGenerator.setBlockState(primer, index, bricksChar);
     }
 
+    private void debugClearChunk(int chunkX, int chunkZ, ChunkPrimer primer) {
+        int cx = chunkX * 16;
+        int cz = chunkZ * 16;
+
+        for (int x = 0 ; x < 16 ; x++) {
+            for (int z = 0 ; z < 16 ; z++) {
+                int index = (x << 12) | (z << 8);
+                for (int y = 255 ; y >= 0 ; y--) {
+                    primer.data[index+y] = airChar;
+                }
+            }
+        }
+    }
+
     private void flattenChunkToCityBorder(int chunkX, int chunkZ, ChunkPrimer primer) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
@@ -580,6 +600,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void doCityChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
+//        debugClearChunk(chunkX, chunkZ, primer);
+
         boolean building = info.hasBuilding;
 
         Random rand = new Random(provider.seed * 377 + chunkZ * 341873128712L + chunkX * 132897987541L);
@@ -609,21 +631,60 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        if (!building) {
-            int levelX = info.getHighwayXLevel();
-            int levelZ = info.getHighwayZLevel();
+        int levelX = info.getHighwayXLevel();
+        int levelZ = info.getHighwayZLevel();
+        if (building) {
+            if (levelX >= 0 || levelZ >= 0) {
+                generateHighways(chunkX, chunkZ, primer, info, torches);
+            }
+        } else {
             if (levelX < 0 && levelZ < 0) {
                 generateStreetDecorations(primer, info, torches);
             } else {
                 generateHighways(chunkX, chunkZ, primer, info, torches);
             }
-        } else {
-            int levelX = info.getHighwayXLevel();
-            int levelZ = info.getHighwayZLevel();
-            if (levelX >= 0 || levelZ >= 0) {
-                generateHighways(chunkX, chunkZ, primer, info, torches);
-            }
         }
+
+        Railway.RailChunkInfo railInfo = info.getRailInfo();
+        if (railInfo.getType() != Railway.RailChunkType.NONE) {
+            generateRailways(primer, info, torches, railInfo);
+        }
+    }
+
+    private void generateRailways(ChunkPrimer primer, BuildingInfo info, List<Integer> torches, Railway.RailChunkInfo railInfo) {
+        int height = provider.profile.GROUNDLEVEL + railInfo.getLevel() * 6;
+        Railway.RailChunkType type = railInfo.getType();
+        BuildingPart part;
+        switch (type) {
+            case NONE:
+                return;
+            case STATION_SURFACE:
+            case STATION_EXTENSION_SURFACE:
+                part = AssetRegistries.PARTS.get("station_open");
+                break;
+            case STATION_UNDERGROUND:
+            case STATION_EXTENSION_UNDERGROUND:
+                part = AssetRegistries.PARTS.get("station_underground");
+                break;
+            case HORIZONTAL:
+                part = AssetRegistries.PARTS.get("rails_horizontal");
+                break;
+            case VERTICAL:
+                part = AssetRegistries.PARTS.get("rails_vertical");
+                break;
+            case THREE_SPLIT:
+                part = AssetRegistries.PARTS.get("rails_3split");
+                break;
+            case GOING_DOWN_TWO_FROM_SURFACE:
+            case GOING_DOWN_ONE_FROM_SURFACE:
+            case GOING_DOWN_FURTHER:
+            case DOUBLE_BEND:
+            default:
+                part = AssetRegistries.PARTS.get("rails_flat");
+                break;
+        }
+        generatePart(primer, info, part, Rotation.ROTATE_NONE, 0, height, 0,
+                torches);
     }
 
     private void generateStreetDecorations(ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {

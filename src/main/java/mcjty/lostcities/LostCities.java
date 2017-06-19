@@ -6,6 +6,7 @@ import mcjty.lostcities.commands.CommandExportBuilding;
 import mcjty.lostcities.commands.CommandExportPart;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.Highway;
+import mcjty.lostcities.dimensions.world.lost.Railway;
 import mcjty.lostcities.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -65,12 +66,14 @@ public class LostCities {
         event.registerServerCommand(new CommandBuildPart());
         BuildingInfo.cleanCache();
         Highway.cleanCache();
+        Railway.cleanCache();
     }
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
         BuildingInfo.cleanCache();
         Highway.cleanCache();
+        Railway.cleanCache();
     }
 
     /**

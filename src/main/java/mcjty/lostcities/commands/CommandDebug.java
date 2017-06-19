@@ -4,6 +4,7 @@ import mcjty.lib.compat.CompatCommand;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.Highway;
+import mcjty.lostcities.dimensions.world.lost.Railway;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -51,8 +52,9 @@ public class CommandDebug implements CompatCommand {
             System.out.println("info.getCityStyle() = " + info.getCityStyle().getName());
             System.out.println("info.getHighwayXLevel() = " + info.getHighwayXLevel());
             System.out.println("info.getHighwayZLevel() = " + info.getHighwayZLevel());
-            double a = BuildingInfo.getChunkHeight(info.chunkX, info.chunkZ, info.provider);
-            System.out.println("Average height: " + a);
+            Railway.RailChunkInfo railInfo = Railway.getRailChunkType(info.chunkX, info.chunkZ, info.provider);
+            System.out.println("railInfo.getType() = " + railInfo.getType());
+            System.out.println("railInfo.getLevel() = " + railInfo.getLevel());
         }
     }
 
