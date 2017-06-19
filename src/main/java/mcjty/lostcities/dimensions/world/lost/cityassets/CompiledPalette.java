@@ -82,7 +82,7 @@ public class CompiledPalette {
             if (o instanceof IBlockState) {
                 return (IBlockState) o;
             } else if (o instanceof Character) {
-                return Block.BLOCK_STATE_IDS.getByValue(c);
+                return Block.BLOCK_STATE_IDS.getByValue((Character) o);
             } else {
                 return null;
             }

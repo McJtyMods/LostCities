@@ -75,39 +75,38 @@ public class CommandExportPart implements CompatCommand {
                 Slice slice = new Slice();
                 slices.add(slice);
                 int cx = (start.getX() >> 4) * 16;
-                int cy = start.getY() + f * 6;
+                int cy = start.getY() + f;
                 int cz = (start.getZ() >> 4) * 16;
                 BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(cx, cy, cz);
                 for (int x = 0 ; x < 16 ; x++) {
                     for (int z = 0 ; z < 16 ; z++) {
-                        for (int y = 0 ; y < 6 ; y++) {
-                            pos.setPos(cx + x, cy + y, cz + z);
-                            IBlockState state = server.getEntityWorld().getBlockState(pos);
-                            Character character = mapping.get(state);
-                            if (character == null) {
-                                while (true) {
-                                    character = state.getBlock() == Blocks.AIR ? ' ' : palettechars.charAt(idx);
-                                    idx++;
-                                    if (!palette.getPalette().containsKey(character)) {
-                                        break;
-                                    }
+                        pos.setPos(cx + x, cy, cz + z);
+                        IBlockState state = server.getEntityWorld().getBlockState(pos);
+                        Character character = mapping.get(state);
+                        if (character == null) {
+                            while (true) {
+                                character = state.getBlock() == Blocks.AIR ? ' ' : palettechars.charAt(idx);
+                                idx++;
+                                if (!palette.getPalette().containsKey(character)) {
+                                    break;
                                 }
-                                palette.addMapping(character, state);
-                                mapping.put(state, character);
                             }
-                            slice.sequence[z*16+x] = "" + character;
+                            palette.addMapping(character, state);
+                            mapping.put(state, character);
                         }
+                        slice.sequence[z*16+x] = "" + character;
                     }
                 }
 
-                String[] sl = new String[cntSlices];
-                for (int i = 0 ; i < cntSlices ; i++) {
-                    sl[i] = StringUtils.join(slice.sequence);
-                }
-
-                BuildingPart part = new BuildingPart("p" + f, 16, 16, sl);
-                array.add(part.writeToJSon());
             }
+
+            String[] sl = new String[cntSlices];
+            for (int i = 0 ; i < cntSlices ; i++) {
+                sl[i] = StringUtils.join(slices.get(i).sequence);
+            }
+
+            BuildingPart part = new BuildingPart("part", 16, 16, sl);
+            array.add(part.writeToJSon());
 
             array.add(palette.writeToJSon());
 

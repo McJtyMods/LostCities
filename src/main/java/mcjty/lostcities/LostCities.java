@@ -2,6 +2,7 @@ package mcjty.lostcities;
 
 import mcjty.lostcities.commands.CommandDebug;
 import mcjty.lostcities.commands.CommandExportBuilding;
+import mcjty.lostcities.commands.CommandExportPart;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.Highway;
 import mcjty.lostcities.proxy.CommonProxy;
@@ -59,6 +60,7 @@ public class LostCities {
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandDebug());
         event.registerServerCommand(new CommandExportBuilding());
+        event.registerServerCommand(new CommandExportPart());
         BuildingInfo.cleanCache();
         Highway.cleanCache();
     }
