@@ -46,6 +46,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static IBlockState hardAir;  // Used in parts to carve out
     public static IBlockState water;
 
+    private static Set<Character> rotatableChars = null;
+
     private IBlockState baseBlock;
     private Character street;
     private Character streetBase;
@@ -63,6 +65,35 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     // Use this random when it doesn't really matter i fit is generated the same every time
     public static Random globalRandom = new Random();
+
+    private static Set<Character> getRotatableChars() {
+        if (rotatableChars == null) {
+            rotatableChars = new HashSet<>();
+            addRotatable(Blocks.ACACIA_STAIRS, rotatableChars);
+            addRotatable(Blocks.BIRCH_STAIRS, rotatableChars);
+            addRotatable(Blocks.BRICK_STAIRS, rotatableChars);
+            addRotatable(Blocks.QUARTZ_STAIRS, rotatableChars);
+            addRotatable(Blocks.STONE_BRICK_STAIRS, rotatableChars);
+            addRotatable(Blocks.DARK_OAK_STAIRS, rotatableChars);
+            addRotatable(Blocks.JUNGLE_STAIRS, rotatableChars);
+            addRotatable(Blocks.NETHER_BRICK_STAIRS, rotatableChars);
+            addRotatable(Blocks.OAK_STAIRS, rotatableChars);
+            addRotatable(Blocks.PURPUR_STAIRS, rotatableChars);
+            addRotatable(Blocks.RED_SANDSTONE_STAIRS, rotatableChars);
+            addRotatable(Blocks.SANDSTONE_STAIRS, rotatableChars);
+            addRotatable(Blocks.SPRUCE_STAIRS, rotatableChars);
+            addRotatable(Blocks.STONE_STAIRS, rotatableChars);
+        }
+        return rotatableChars;
+    }
+
+    private static void addRotatable(Block block, Set<Character> set) {
+        for (int m = 0 ; m < 16 ; m++) {
+            IBlockState state = block.getStateFromMeta(m);
+            set.add((char) Block.BLOCK_STATE_IDS.get(state));
+        }
+    }
+
 
     // Note that for normal chunks this is called with a pre-filled in landscape primer
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
@@ -1206,34 +1237,38 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private int generatePart(ChunkPrimer primer, BuildingInfo info, BuildingPart part,
                              Rotation rotation,
                              int ox, int oy, int oz, List<Integer> torches) {
+        CompiledPalette compiledPalette = info.getCompiledPalette();
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
-                int rx = ox + rotation.rotateX(x, z);
-                int rz = oz + rotation.rotateZ(x, z);
-                int index = (rx << 12) | (rz << 8) + oy;
-                for (int y = 0; y < part.getSliceCount(); y++) {
-                    Character b = part.get(info, x, y, z);
-                    if (rotation != Rotation.ROTATE_NONE) {
-                        IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
-                        if (bs.getBlock() instanceof BlockStairs) {
-                            bs = bs.withRotation(rotation.getMcRotation());
-                            b = (char) Block.BLOCK_STATE_IDS.get(bs);
-                        }
-                    }
-                    // We don't replace the world where the part is empty (air)
-                    if (b != airChar) {
-                        if (b == hardAirChar) {
-                            b = airChar;
-                        } else if (b == torchChar) {
-                            if (provider.profile.GENERATE_LIGHTING) {
-                                torches.add(index);
-                            } else {
-                                b = airChar;        // No torches
+                char[] vs = part.getVSlice(x, z);
+                if (vs != null) {
+                    int rx = ox + rotation.rotateX(x, z);
+                    int rz = oz + rotation.rotateZ(x, z);
+                    int index = (rx << 12) | (rz << 8) + oy;
+                    for (char c : vs) {
+                        Character b = compiledPalette.get(c);
+                        if (rotation != Rotation.ROTATE_NONE) {
+                            if (getRotatableChars().contains(b)) {
+                                IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
+                                bs = bs.withRotation(rotation.getMcRotation());
+                                b = (char) Block.BLOCK_STATE_IDS.get(bs);
                             }
                         }
-                        BaseTerrainGenerator.setBlockState(primer, index, b);
+                        // We don't replace the world where the part is empty (air)
+                        if (b != airChar) {
+                            if (b == hardAirChar) {
+                                b = airChar;
+                            } else if (b == torchChar) {
+                                if (provider.profile.GENERATE_LIGHTING) {
+                                    torches.add(index);
+                                } else {
+                                    b = airChar;        // No torches
+                                }
+                            }
+                            BaseTerrainGenerator.setBlockState(primer, index, b);
+                        }
+                        index++;
                     }
-                    index++;
                 }
             }
         }

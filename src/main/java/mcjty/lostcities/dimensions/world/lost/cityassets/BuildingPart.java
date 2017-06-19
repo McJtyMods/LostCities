@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A section of a building. Can be either a complete floor or part of a floor.
+ * A structure part
  */
 public class BuildingPart implements IAsset {
 
@@ -24,6 +24,10 @@ public class BuildingPart implements IAsset {
     // Dimension (should be less then 16x16)
     private int xSize;
     private int zSize;
+
+    // Optimized version of this part which is organized in xSize*ySize vertical strings
+    private char[][] vslices = null;
+
 
     private Map<String, Object> metadata = new HashMap<>();
 
@@ -54,6 +58,39 @@ public class BuildingPart implements IAsset {
     @Override
     public String getName() {
         return name;
+    }
+
+
+    /**
+     * Vertical slices, organized by z*xSize+x
+     */
+    public char[][] getVslices() {
+        if (vslices == null) {
+            vslices = new char[xSize * zSize][];
+            for (int x = 0 ; x < xSize ; x++) {
+                for (int z = 0 ; z < zSize ; z++) {
+                    String vs = "";
+                    boolean empty = true;
+                    for (int y = 0; y < slices.length; y++) {
+                        Character c = getC(x, y, z);
+                        vs += c;
+                        if (c != ' ') {
+                            empty = false;
+                        }
+                    }
+                    if (empty) {
+                        vslices[z*xSize+x] = null;
+                    } else {
+                        vslices[z*xSize+x] = vs.toCharArray();
+                    }
+                }
+            }
+        }
+        return vslices;
+    }
+
+    public char[] getVSlice(int x, int z) {
+        return getVslices()[z*xSize + x];
     }
 
     @Override
