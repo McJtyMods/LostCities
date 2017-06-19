@@ -96,12 +96,10 @@ public class Railway {
     /**
      * The station grid repeats every 9 chunks. There is never a station at every 18/18 multiple chunk
      */
-    public static RailChunkInfo getRailChunkTypeInternal(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    private static RailChunkInfo getRailChunkTypeInternal(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Random rand = new QualityRandom(provider.seed +chunkZ * 2600003897L + chunkX * 43600002517L);
         rand.nextFloat();
         rand.nextFloat();
-
-        int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
 
         // @todo make all settings based on rand below configurable
         float r = rand.nextFloat();
@@ -109,23 +107,44 @@ public class Railway {
         int mx = Math.floorMod(chunkX+1, 20);       // The +1 to avoid having them on highways
         int mz = Math.floorMod(chunkZ+1, 20);
         if (mx == 0 && mz == 10) {
+            int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
             if (cityLevel > 2) {
                 // We are too high here. We need an underground station
                 return new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 3);
             }
+            if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider)) {
+                // There is no city here. So no station either. But we still need a railway. A station at this
+                // point will get a three line rail through it
+                // @todo with a random chance we don't even have rails here
+                return new RailChunkInfo(HORIZONTAL, BI, -3, 3);
+            }
             return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 3) : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 3);
         }
         if (mx == 10 && mz == 0) {
+            int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
             if (cityLevel > 2) {
                 // We are too high here. We need an underground station
                 return new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 2);
             }
+            if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider)) {
+                // There is no city here. So no station either. But we still need a railway. A station at this
+                // point will get a two line rail through it
+                // @todo with a random chance we don't even have rails here
+                return new RailChunkInfo(HORIZONTAL, BI, -3, 2);
+            }
             return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 2) : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 2);
         }
         if (mx == 10 && mz == 10) {
+            int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
             if (cityLevel > 2) {
                 // We are too high here. We need an underground station
                 return new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 1);
+            }
+            if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider)) {
+                // There is no city here. So no station either. But we still need a railway. A station at this
+                // point will get a single line rail through it
+                // @todo with a random chance we don't even have rails here
+                return new RailChunkInfo(HORIZONTAL, BI, -3, 1);
             }
             return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 0) : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 1);
         }

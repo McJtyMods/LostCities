@@ -33,28 +33,44 @@
         "block": "minecraft:torch"
       },
       {
+        "char": "h",
+        "block": "minecraft:glowstone"
+      },
+      {
+        "char": "k",
+        "block": "minecraft:rail"
+      },
+      {
+        "char": "j",
+        "block": "minecraft:rail@2"
+      },
+      {
         "char": "e",
         "block": "minecraft:rail@1"
+      },
+      {
+        "char": "n",
+        "block": "minecraft:rail@9"
+      },
+      {
+        "char": "p",
+        "block": "minecraft:rail@6"
+      },
+      {
+        "char": "m",
+        "block": "minecraft:golden_rail@8"
       },
       {
         "char": "f",
         "block": "minecraft:golden_rail@9"
       },
       {
+        "char": "i",
+        "block": "minecraft:golden_rail@10"
+      },
+      {
         "char": "g",
         "block": "minecraft:redstone_torch@5"
-      },
-      {
-        "char": "h",
-        "block": "minecraft:rail@1"
-      },
-      {
-        "char": "i",
-        "block": "minecraft:rail@1"
-      },
-      {
-        "char": "j",
-        "block": "minecraft:rail@1"
       },
       {
         "char": "F",

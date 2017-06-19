@@ -606,6 +606,9 @@ public class BuildingInfo {
         return a;
     }
 
+    /**
+     * This function does not use the cache. So safe to use when the cache is building
+     */
     public static int getCityLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         if (provider.otherGenerator != null) {
             int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);

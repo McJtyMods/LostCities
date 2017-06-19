@@ -707,14 +707,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 part = AssetRegistries.PARTS.get("rails_3split");
                 break;
             case GOING_DOWN_TWO_FROM_SURFACE:
-            case GOING_DOWN_ONE_FROM_SURFACE:
             case GOING_DOWN_FURTHER:
+                part = AssetRegistries.PARTS.get("rails_down2");
+                break;
+            case GOING_DOWN_ONE_FROM_SURFACE:
+                part = AssetRegistries.PARTS.get("rails_down1");
+                break;
             case DOUBLE_BEND:
             default:
                 part = AssetRegistries.PARTS.get("rails_flat");
                 break;
         }
-        generatePart(primer, info, part, Rotation.ROTATE_NONE, 0, height, 0,
+        generatePart(primer, info, part, Rotation.ROTATE_NONE, 0, height + 60 /* @todo for debugging */, 0,
                 torches);
     }
 
@@ -1247,6 +1251,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int index = (rx << 12) | (rz << 8) + oy;
                     for (char c : vs) {
                         Character b = compiledPalette.get(c);
+                        if (b == null) {
+                            System.out.println("LostCitiesTerrainGenerator.generatePart");
+                        }
                         if (rotation != Rotation.ROTATE_NONE) {
                             if (getRotatableChars().contains(b)) {
                                 IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
