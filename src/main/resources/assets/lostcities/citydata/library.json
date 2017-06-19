@@ -33,6 +33,18 @@
         "block": "minecraft:torch"
       },
       {
+        "char": "e",
+        "block": "minecraft:rail@1"
+      },
+      {
+        "char": "f",
+        "block": "minecraft:golden_rail@9"
+      },
+      {
+        "char": "g",
+        "block": "minecraft:redstone_torch@5"
+      },
+      {
         "char": "F",
         "blocks": [
           {

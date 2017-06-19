@@ -15,6 +15,7 @@ public class LostCityConfiguration {
             "/assets/lostcities/citydata/palette_chisel.json",
             "/assets/lostcities/citydata/palette_chisel_desert.json",
             "/assets/lostcities/citydata/highwayparts.json",
+            "/assets/lostcities/citydata/railparts.json",
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
     };

@@ -1,5 +1,6 @@
 package mcjty.lostcities;
 
+import mcjty.lostcities.commands.CommandBuildPart;
 import mcjty.lostcities.commands.CommandDebug;
 import mcjty.lostcities.commands.CommandExportBuilding;
 import mcjty.lostcities.commands.CommandExportPart;
@@ -61,6 +62,7 @@ public class LostCities {
         event.registerServerCommand(new CommandDebug());
         event.registerServerCommand(new CommandExportBuilding());
         event.registerServerCommand(new CommandExportPart());
+        event.registerServerCommand(new CommandBuildPart());
         BuildingInfo.cleanCache();
         Highway.cleanCache();
     }
