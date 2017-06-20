@@ -718,6 +718,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 break;
             case VERTICAL:
                 part = AssetRegistries.PARTS.get("rails_vertical");
+                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
+                    transform = Transform.MIRROR_X;
+                }
                 break;
             case THREE_SPLIT:
                 part = AssetRegistries.PARTS.get("rails_3split");

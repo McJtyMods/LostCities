@@ -34,7 +34,7 @@ public class Railway {
 
      */
 
-    public static enum RailChunkType {
+    public enum RailChunkType {
         NONE,
         STATION_SURFACE,
         STATION_UNDERGROUND,
@@ -49,7 +49,7 @@ public class Railway {
         DOUBLE_BEND
     }
 
-    public static enum RailDirection {
+    public enum RailDirection {
         BI,
         WEST,
         EAST
@@ -184,8 +184,11 @@ public class Railway {
             }
             return RailChunkInfo.NOTHING;
         }
-        if (mx == 5 || mx == 15) {
-            return new RailChunkInfo(VERTICAL, BI, -3, 1);
+        if (mx == 5) {
+            return new RailChunkInfo(VERTICAL, EAST, -3, 1);
+        }
+        if (mx == 15) {
+            return new RailChunkInfo(VERTICAL, WEST, -3, 1);
         }
 
         return RailChunkInfo.NOTHING;
