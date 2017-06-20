@@ -1071,7 +1071,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         Character b;
 
-        if (info.getHighwayXLevel() != info.cityLevel && info.getHighwayZLevel() != info.cityLevel) {
+        Railway.RailChunkInfo railInfo = info.getRailInfo();
+
+        if (info.getHighwayXLevel() != info.cityLevel && info.getHighwayZLevel() != info.cityLevel && railInfo.getType() != Railway.RailChunkType.STATION_SURFACE  && railInfo.getType() != Railway.RailChunkType.STATION_EXTENSION_SURFACE) {
             BuildingInfo.StreetType streetType = info.streetType;
             boolean elevated = info.isElevatedParkSection();
             if (elevated) {
