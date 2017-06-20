@@ -59,7 +59,8 @@ public class CommandExportPart implements CompatCommand {
             String palettechars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             int idx = 0;
             Map<IBlockState, Character> mapping = new HashMap<>();
-            Palette palette = new Palette("give_name");
+            Palette palette = new Palette("old");
+            Palette paletteNew = new Palette("new");
             LostCityChunkGenerator provider = (LostCityChunkGenerator) ((ChunkProviderServer)server.getEntityWorld().getChunkProvider()).chunkGenerator;
             BuildingInfo info = BuildingInfo.getBuildingInfo(start.getX() >> 4, start.getZ() >> 4, provider);
             for (Character character : info.getCompiledPalette().getCharacters()) {
@@ -87,11 +88,11 @@ public class CommandExportPart implements CompatCommand {
                             while (true) {
                                 character = state.getBlock() == Blocks.AIR ? ' ' : palettechars.charAt(idx);
                                 idx++;
-                                if (!palette.getPalette().containsKey(character)) {
+                                if (!palette.getPalette().containsKey(character) && !paletteNew.getPalette().containsKey(character)) {
                                     break;
                                 }
                             }
-                            palette.addMapping(character, state);
+                            paletteNew.addMapping(character, state);
                             mapping.put(state, character);
                         }
                         slice.sequence[z*16+x] = "" + character;
@@ -109,6 +110,7 @@ public class CommandExportPart implements CompatCommand {
             array.add(part.writeToJSon());
 
             array.add(palette.writeToJSon());
+            array.add(paletteNew.writeToJSon());
 
 //            AssetRegistries.STYLES.writeToJson(array);
 //            AssetRegistries.CITYSTYLES.writeToJson(array);

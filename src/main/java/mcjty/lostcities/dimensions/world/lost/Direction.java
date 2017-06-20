@@ -15,16 +15,16 @@ public enum Direction {
     }
 
     // Rotation with xmin being 0
-    public Rotation getRotation() {
+    public Transform getRotation() {
         switch (this) {
             case XMIN:
-                return Rotation.ROTATE_NONE;
+                return Transform.ROTATE_NONE;
             case XMAX:
-                return Rotation.ROTATE_180;
+                return Transform.ROTATE_180;
             case ZMIN:
-                return Rotation.ROTATE_90;
+                return Transform.ROTATE_90;
             case ZMAX:
-                return Rotation.ROTATE_270;
+                return Transform.ROTATE_270;
         }
         throw new IllegalStateException("Cannot happen!");
     }

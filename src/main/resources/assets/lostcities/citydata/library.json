@@ -53,7 +53,11 @@
         "block": "minecraft:rail@9"
       },
       {
-        "char": "p",
+        "char": "r",
+        "block": "minecraft:rail@8"
+      },
+      {
+        "char": "q",
         "block": "minecraft:rail@6"
       },
       {

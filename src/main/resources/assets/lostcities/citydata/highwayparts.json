@@ -6,7 +6,7 @@
     "zsize": 16,
     "slices": [
       [
-        "oooooooooooooooo",
+        "xxxxxxxxxxxxxxxx",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
@@ -21,7 +21,7 @@
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
-        "oooooooooooooooo"
+        "xxxxxxxxxxxxxxxx"
       ],
       [
         "w~~~~~~~~~~~~~~~",
@@ -476,7 +476,7 @@
     "zsize": 16,
     "slices": [
       [
-        "oooooooooooooooo",
+        "xxxxxxxxxxxxxxxx",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
@@ -491,10 +491,10 @@
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
-        "oooooooooooooooo"
+        "xxxxxxxxxxxxxxxx"
       ],
       [
-        "o:::::::::::::::",
+        "x:::::::::::::::",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -509,7 +509,7 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "o:::::::::::::::"
+        "x:::::::::::::::"
       ],
       [
         "w~~~~~~~~~~~~~~~",
@@ -646,7 +646,7 @@
     "zsize": 16,
     "slices": [
       [
-        "oRRRRRRuuRRRRRRo",
+        "xRRRRRRuuRRRRRRx",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
@@ -661,10 +661,10 @@
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
-        "oRRRRRRuuRRRRRRo"
+        "xRRRRRRuuRRRRRRx"
       ],
       [
-        "o~~~~~~~~~~~~~~~",
+        "x~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -679,7 +679,7 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "o~~~~~~~~~~~~~~~"
+        "x~~~~~~~~~~~~~~~"
       ],
       [
         "w~~~~~~~~~~~~~~~",
@@ -816,7 +816,7 @@
     "zsize": 16,
     "slices": [
       [
-        "oooooooooooooooo",
+        "xxxxxxxxxxxxxxxx",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
@@ -831,10 +831,10 @@
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
-        "oooooooooooooooo"
+        "xxxxxxxxxxxxxxxx"
       ],
       [
-        "oooooooooooooooo",
+        "xxxxxxxxxxxxxxxx",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -849,10 +849,10 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "oooooooooooooooo"
+        "xxxxxxxxxxxxxxxx"
       ],
       [
-        "oooooooooooooooo",
+        "xxxxxxxxxxxxxxxx",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -867,10 +867,10 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "oooooooooooooooo"
+        "xxxxxxxxxxxxxxxx"
       ],
       [
-        "oooooooooooooooo",
+        "xxxxxxxxxxxxxxxx",
         "~~~~~~~~T~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -885,11 +885,11 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~T~~~~~~~",
-        "oooooooooooooooo"
+        "xxxxxxxxxxxxxxxx"
       ],
       [
         "                ",
-        "oooooooooooooooo",
+        "xxxxxxxxxxxxxxxx",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -902,24 +902,24 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "oooooooooooooooo",
+        "xxxxxxxxxxxxxxxx",
         "                "
       ],
       [
         "                ",
         "                ",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
         "                ",
         "                "
       ]
@@ -932,7 +932,7 @@
     "zsize": 16,
     "slices": [
       [
-        "oRRRRRRuuRRRRRRo",
+        "xRRRRRRuuRRRRRRx",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
@@ -947,10 +947,10 @@
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
-        "oRRRRRRuuRRRRRRo"
+        "xRRRRRRuuRRRRRRx"
       ],
       [
-        "o~~~~~~~~~~~~~~o",
+        "x~~~~~~~~~~~~~~x",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -965,10 +965,10 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "o~~~~~~~~~~~~~~o"
+        "x~~~~~~~~~~~~~~x"
       ],
       [
-        "o~~~~~~~~~~~~~~o",
+        "x~~~~~~~~~~~~~~x",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -983,10 +983,10 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "o~~~~~~~~~~~~~~o"
+        "x~~~~~~~~~~~~~~x"
       ],
       [
-        "o~~~~~~~~~~~~~~o",
+        "x~~~~~~~~~~~~~~x",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -1001,11 +1001,11 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "o~~~~~~~~~~~~~~o"
+        "x~~~~~~~~~~~~~~x"
       ],
       [
-        " o~~~~~~~~~~~~o ",
-        "o~~~~~~~~~~~~~~o",
+        " x~~~~~~~~~~~~x ",
+        "x~~~~~~~~~~~~~~x",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -1018,26 +1018,26 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "o~~~~~~~~~~~~~~o",
-        " o~~~~~~~~~~~~o "
+        "x~~~~~~~~~~~~~~x",
+        " x~~~~~~~~~~~~x "
       ],
       [
-        "  oooooooooooo  ",
-        "  oooooooooooo  ",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "oooooooooooooooo",
-        "  oooooooooooo  ",
-        "  oooooooooooo  "
+        "  xxxxxxxxxxxx  ",
+        "  xxxxxxxxxxxx  ",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "xxxxxxxxxxxxxxxx",
+        "  xxxxxxxxxxxx  ",
+        "  xxxxxxxxxxxx  "
       ]
     ]
   }

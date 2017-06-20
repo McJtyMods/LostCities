@@ -55,6 +55,7 @@ public class CommandDebug implements CompatCommand {
             Railway.RailChunkInfo railInfo = Railway.getRailChunkType(info.chunkX, info.chunkZ, info.provider);
             System.out.println("railInfo.getType() = " + railInfo.getType());
             System.out.println("railInfo.getLevel() = " + railInfo.getLevel());
+            System.out.println("railInfo.getDirection() = " + railInfo.getDirection());
         }
     }
 

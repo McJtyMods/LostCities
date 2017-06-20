@@ -6,6 +6,7 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.*;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
@@ -47,6 +48,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static IBlockState water;
 
     private static Set<Character> rotatableChars = null;
+    private static Set<Character> railChars = null;
 
     private IBlockState baseBlock;
     private Character street;
@@ -66,31 +68,44 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     // Use this random when it doesn't really matter i fit is generated the same every time
     public static Random globalRandom = new Random();
 
+    private static Set<Character> getRailChars() {
+        if (railChars == null) {
+            railChars = new HashSet<>();
+            addStates(Blocks.RAIL, railChars);
+            addStates(Blocks.GOLDEN_RAIL, railChars);
+        }
+        return railChars;
+    }
+
     private static Set<Character> getRotatableChars() {
         if (rotatableChars == null) {
             rotatableChars = new HashSet<>();
-            addRotatable(Blocks.ACACIA_STAIRS, rotatableChars);
-            addRotatable(Blocks.BIRCH_STAIRS, rotatableChars);
-            addRotatable(Blocks.BRICK_STAIRS, rotatableChars);
-            addRotatable(Blocks.QUARTZ_STAIRS, rotatableChars);
-            addRotatable(Blocks.STONE_BRICK_STAIRS, rotatableChars);
-            addRotatable(Blocks.DARK_OAK_STAIRS, rotatableChars);
-            addRotatable(Blocks.JUNGLE_STAIRS, rotatableChars);
-            addRotatable(Blocks.NETHER_BRICK_STAIRS, rotatableChars);
-            addRotatable(Blocks.OAK_STAIRS, rotatableChars);
-            addRotatable(Blocks.PURPUR_STAIRS, rotatableChars);
-            addRotatable(Blocks.RED_SANDSTONE_STAIRS, rotatableChars);
-            addRotatable(Blocks.SANDSTONE_STAIRS, rotatableChars);
-            addRotatable(Blocks.SPRUCE_STAIRS, rotatableChars);
-            addRotatable(Blocks.STONE_STAIRS, rotatableChars);
+            addStates(Blocks.ACACIA_STAIRS, rotatableChars);
+            addStates(Blocks.BIRCH_STAIRS, rotatableChars);
+            addStates(Blocks.BRICK_STAIRS, rotatableChars);
+            addStates(Blocks.QUARTZ_STAIRS, rotatableChars);
+            addStates(Blocks.STONE_BRICK_STAIRS, rotatableChars);
+            addStates(Blocks.DARK_OAK_STAIRS, rotatableChars);
+            addStates(Blocks.JUNGLE_STAIRS, rotatableChars);
+            addStates(Blocks.NETHER_BRICK_STAIRS, rotatableChars);
+            addStates(Blocks.OAK_STAIRS, rotatableChars);
+            addStates(Blocks.PURPUR_STAIRS, rotatableChars);
+            addStates(Blocks.RED_SANDSTONE_STAIRS, rotatableChars);
+            addStates(Blocks.SANDSTONE_STAIRS, rotatableChars);
+            addStates(Blocks.SPRUCE_STAIRS, rotatableChars);
+            addStates(Blocks.STONE_STAIRS, rotatableChars);
         }
         return rotatableChars;
     }
 
-    private static void addRotatable(Block block, Set<Character> set) {
+    private static void addStates(Block block, Set<Character> set) {
         for (int m = 0 ; m < 16 ; m++) {
-            IBlockState state = block.getStateFromMeta(m);
-            set.add((char) Block.BLOCK_STATE_IDS.get(state));
+            try {
+                IBlockState state = block.getStateFromMeta(m);
+                set.add((char) Block.BLOCK_STATE_IDS.get(state));
+            } catch (Exception e) {
+                // Ignore
+            }
         }
     }
 
@@ -303,36 +318,36 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int levelZ = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
         if (levelX == levelZ && levelX >= 0) {
             // Crossing
-            generateHighwayPart(primer, info, levelX, Rotation.ROTATE_NONE, info.getXmax(), info.getZmax(), "_bi", torches);
+            generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getXmax(), info.getZmax(), "_bi", torches);
         } else if (levelX >= 0 && levelZ >= 0) {
             // There are two highways on different level. Make sure the lowest one is done first because it
             // will clear out what is above it
             if (levelX == 0) {
-                generateHighwayPart(primer, info, levelX, Rotation.ROTATE_NONE, info.getZmin(), info.getZmax(), "", torches);
-                generateHighwayPart(primer, info, levelZ, Rotation.ROTATE_90, info.getXmax(), info.getXmax(), "", torches);
+                generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "", torches);
+                generateHighwayPart(primer, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "", torches);
             } else {
-                generateHighwayPart(primer, info, levelZ, Rotation.ROTATE_90, info.getXmax(), info.getXmax(), "", torches);
-                generateHighwayPart(primer, info, levelX, Rotation.ROTATE_NONE, info.getZmin(), info.getZmax(), "", torches);
+                generateHighwayPart(primer, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "", torches);
+                generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "", torches);
             }
         } else {
             if (levelX >= 0) {
-                generateHighwayPart(primer, info, levelX, Rotation.ROTATE_NONE, info.getZmin(), info.getZmax(), "", torches);
+                generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "", torches);
             } else if (levelZ >= 0) {
-                generateHighwayPart(primer, info, levelZ, Rotation.ROTATE_90, info.getXmax(), info.getXmax(), "", torches);
+                generateHighwayPart(primer, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "", torches);
             }
         }
     }
 
-    private void generateHighwayPart(ChunkPrimer primer, BuildingInfo info, int level, Rotation rotation, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix,
+    private void generateHighwayPart(ChunkPrimer primer, BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix,
                                      List<Integer> torches) {
         int highwayGroundLevel = provider.profile.GROUNDLEVEL + level * 6;
 
         if (info.isTunnel(level)) {
             // We know we need a tunnel
-            generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), rotation, 0, highwayGroundLevel, 0, torches);
+            generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), transform, 0, highwayGroundLevel, 0, torches);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
-            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_open" + suffix), rotation, 0, highwayGroundLevel, 0, torches);
+            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_open" + suffix), transform, 0, highwayGroundLevel, 0, torches);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -341,7 +356,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         } else {
-            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge" + suffix), rotation, 0, highwayGroundLevel, 0, torches);
+            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge" + suffix), transform, 0, highwayGroundLevel, 0, torches);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -352,7 +367,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         // Make sure the bridge is supported if needed
-        if (rotation == Rotation.ROTATE_NONE) {
+        if (transform == Transform.ROTATE_NONE) {
             int index = highwayGroundLevel - 1; // (coordinate 0,0)
             for (int y = 0; y < 40; y++) {
                 boolean done = false;
@@ -686,6 +701,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int height = provider.profile.GROUNDLEVEL + railInfo.getLevel() * 6;
         Railway.RailChunkType type = railInfo.getType();
         BuildingPart part;
+        Transform transform = Transform.ROTATE_NONE;
         switch (type) {
             case NONE:
                 return;
@@ -705,20 +721,34 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 break;
             case THREE_SPLIT:
                 part = AssetRegistries.PARTS.get("rails_3split");
+                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
+                    transform = Transform.MIRROR_X;
+                }
                 break;
             case GOING_DOWN_TWO_FROM_SURFACE:
             case GOING_DOWN_FURTHER:
                 part = AssetRegistries.PARTS.get("rails_down2");
+                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
+                    transform = Transform.MIRROR_X;
+                }
                 break;
             case GOING_DOWN_ONE_FROM_SURFACE:
                 part = AssetRegistries.PARTS.get("rails_down1");
+                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
+                    transform = Transform.MIRROR_X;
+                }
                 break;
             case DOUBLE_BEND:
+                part = AssetRegistries.PARTS.get("rails_bend");
+                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
+                    transform = Transform.MIRROR_X;
+                }
+                break;
             default:
                 part = AssetRegistries.PARTS.get("rails_flat");
                 break;
         }
-        generatePart(primer, info, part, Rotation.ROTATE_NONE, 0, height + 60 /* @todo for debugging */, 0,
+        generatePart(primer, info, part, transform, 0, height, 0,
                 torches);
     }
 
@@ -726,26 +756,26 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         Direction stairDirection = info.getActualStairDirection();
         if (stairDirection != null) {
             BuildingPart stairs = info.stairType;
-            Rotation rotation;
+            Transform transform;
             int oy = info.getCityGroundLevel() + 1;
             switch (stairDirection) {
                 case XMIN:
-                    rotation = Rotation.ROTATE_NONE;
+                    transform = Transform.ROTATE_NONE;
                     break;
                 case XMAX:
-                    rotation = Rotation.ROTATE_180;
+                    transform = Transform.ROTATE_180;
                     break;
                 case ZMIN:
-                    rotation = Rotation.ROTATE_90;
+                    transform = Transform.ROTATE_90;
                     break;
                 case ZMAX:
-                    rotation = Rotation.ROTATE_270;
+                    transform = Transform.ROTATE_270;
                     break;
                 default:
                     throw new RuntimeException("Cannot happen!");
             }
 
-            generatePart(primer, info, stairs, rotation, 0, oy, 0, torches);
+            generatePart(primer, info, stairs, transform, 0, oy, 0, torches);
         }
     }
 
@@ -1224,11 +1254,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 BuildingPart stairType = adjacent.stairType;
                 Integer z1 = stairType.getMetaInteger("z1");
                 Integer z2 = stairType.getMetaInteger("z2");
-                Rotation rotation = direction.getOpposite().getRotation();
-                int xx1 = rotation.rotateX(15, z1);
-                int zz1 = rotation.rotateZ(15, z1);
-                int xx2 = rotation.rotateX(15, z2);
-                int zz2 = rotation.rotateZ(15, z2);
+                Transform transform = direction.getOpposite().getRotation();
+                int xx1 = transform.rotateX(15, z1);
+                int zz1 = transform.rotateZ(15, z1);
+                int xx2 = transform.rotateX(15, z2);
+                int zz2 = transform.rotateZ(15, z2);
                 if (x >= Math.min(xx1, xx2) && x <= Math.max(xx1, xx2) && z >= Math.min(zz1, zz2) && z <= Math.max(zz1, zz2)) {
                     needOpening = true;
                     break;
@@ -1239,25 +1269,38 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private int generatePart(ChunkPrimer primer, BuildingInfo info, BuildingPart part,
-                             Rotation rotation,
+                             Transform transform,
                              int ox, int oy, int oz, List<Integer> torches) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
                 char[] vs = part.getVSlice(x, z);
                 if (vs != null) {
-                    int rx = ox + rotation.rotateX(x, z);
-                    int rz = oz + rotation.rotateZ(x, z);
+                    int rx = ox + transform.rotateX(x, z);
+                    int rz = oz + transform.rotateZ(x, z);
                     int index = (rx << 12) | (rz << 8) + oy;
                     for (char c : vs) {
                         Character b = compiledPalette.get(c);
                         if (b == null) {
-                            System.out.println("LostCitiesTerrainGenerator.generatePart");
+                            throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
                         }
-                        if (rotation != Rotation.ROTATE_NONE) {
+                        if (transform != Transform.ROTATE_NONE) {
                             if (getRotatableChars().contains(b)) {
                                 IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
-                                bs = bs.withRotation(rotation.getMcRotation());
+                                bs = bs.withRotation(transform.getMcRotation());
+                                b = (char) Block.BLOCK_STATE_IDS.get(bs);
+                            } else if (getRailChars().contains(b)) {
+                                IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
+                                PropertyEnum<BlockRailBase.EnumRailDirection> shapeProperty;
+                                if (bs.getBlock() == Blocks.RAIL) {
+                                    shapeProperty = BlockRail.SHAPE;
+                                } else if (bs.getBlock() == Blocks.GOLDEN_RAIL) {
+                                    shapeProperty = BlockRailPowered.SHAPE;
+                                } else {
+                                    throw new RuntimeException("Error with rail!");
+                                }
+                                BlockRailBase.EnumRailDirection shape = bs.getValue(shapeProperty);
+                                bs = bs.withProperty(shapeProperty, transform.transform(shape));
                                 b = (char) Block.BLOCK_STATE_IDS.get(bs);
                             }
                         }
