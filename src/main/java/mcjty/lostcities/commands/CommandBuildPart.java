@@ -59,7 +59,7 @@ public class CommandBuildPart implements CompatCommand {
                     for (int z = 0; z < part.getZSize(); z++) {
                         BlockPos pos = new BlockPos(info.chunkX*16+x, start.getY()+y, info.chunkZ*16+z);
                         Character character = part.getC(x, y, z);
-                        IBlockState state = palette.getStraight(character);
+                        IBlockState state = palette.getState(character);
                         if (state != null) {
                             try {
                                 sender.getEntityWorld().setBlockState(pos, state, 3);

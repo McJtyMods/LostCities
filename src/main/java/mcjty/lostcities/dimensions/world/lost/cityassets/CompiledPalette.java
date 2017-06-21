@@ -110,6 +110,22 @@ public class CompiledPalette {
         }
     }
 
+    public IBlockState getState(char c) {
+        try {
+            Object o = palette.get(c);
+            if (o instanceof Character) {
+                return Block.BLOCK_STATE_IDS.getByValue((Character) o);
+            } else if (o instanceof IBlockState) {
+                return (IBlockState) o;
+            } else {
+                return ((Supplier<IBlockState>) o).get();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static boolean isGlass(Block block) {
         return block == Blocks.GLASS || block == Blocks.GLASS_PANE || block == Blocks.STAINED_GLASS || block == Blocks.STAINED_GLASS_PANE;
     }
