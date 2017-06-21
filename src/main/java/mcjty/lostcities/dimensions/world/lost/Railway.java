@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.QualityRandom;
 
@@ -60,14 +61,20 @@ public class Railway {
         private final RailDirection direction;
         private final int level;
         private final int rails;
+        private final String part;
 
         public static final RailChunkInfo NOTHING = new RailChunkInfo(NONE, BI, 0, 0);
 
         public RailChunkInfo(RailChunkType type, RailDirection direction, int level, int rails) {
+            this(type, direction, level, rails, null);
+        }
+
+        public RailChunkInfo(RailChunkType type, RailDirection direction, int level, int rails, String part) {
             this.type = type;
             this.direction = direction;
             this.level = level;
             this.rails = rails;
+            this.part = part;
         }
 
         public RailChunkType getType() {
@@ -84,6 +91,10 @@ public class Railway {
 
         public int getRails() {
             return rails;
+        }
+
+        public String getPart() {
+            return part;
         }
     }
 
@@ -118,7 +129,7 @@ public class Railway {
                 // @todo with a random chance we don't even have rails here
                 return new RailChunkInfo(HORIZONTAL, BI, -3, 3);
             }
-            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 3) : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 3);
+            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 3, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 3);
         }
         if (mx == 10 && mz == 0) {
             int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
@@ -132,7 +143,7 @@ public class Railway {
                 // @todo with a random chance we don't even have rails here
                 return new RailChunkInfo(HORIZONTAL, BI, -3, 2);
             }
-            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 2) : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 2);
+            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 2, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 2);
         }
         if (mx == 10 && mz == 10) {
             int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
@@ -146,7 +157,7 @@ public class Railway {
                 // @todo with a random chance we don't even have rails here
                 return new RailChunkInfo(HORIZONTAL, BI, -3, 1);
             }
-            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 0) : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 1);
+            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 0, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 1);
         }
         if (mx == 0 && mz == 0) {
             return RailChunkInfo.NOTHING;

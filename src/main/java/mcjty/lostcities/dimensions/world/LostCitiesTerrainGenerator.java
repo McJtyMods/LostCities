@@ -693,7 +693,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     // that is at a spot where the city is higher then where the station is
                     part = AssetRegistries.PARTS.get("station_underground");
                 } else {
-                    part = AssetRegistries.PARTS.get("station_open");
+                    if (railInfo.getPart() != null) {
+                        part = AssetRegistries.PARTS.get(railInfo.getPart());
+                    } else {
+                        part = AssetRegistries.PARTS.get("station_open");
+                    }
                 }
                 break;
             case STATION_UNDERGROUND:
