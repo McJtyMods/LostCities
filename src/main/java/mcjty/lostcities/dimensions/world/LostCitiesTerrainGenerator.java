@@ -1503,7 +1503,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateBuilding(ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
         int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * 6;
-        int buildingtop = info.getMaxHeight();
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -1533,15 +1532,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             // Underground we replace the glass with solid bricks
             for (int x = 0 ; x < 16 ; x++) {
                 int index = (x << 12) | (0 << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel(), baseChar);
+                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel()+1, styledBricks);
                 index = (x << 12) | (15 << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel(), baseChar);
+                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel()+1, styledBricks);
             }
             for (int z = 1 ; z < 15 ; z++) {
                 int index = (0 << 12) | (z << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel(), baseChar);
+                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel()+1, styledBricks);
                 index = (15 << 12) | (z << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel(), baseChar);
+                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel()+1, styledBricks);
             }
         }
 

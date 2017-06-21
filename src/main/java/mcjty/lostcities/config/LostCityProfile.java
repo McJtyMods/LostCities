@@ -100,8 +100,11 @@ public class LostCityProfile {
     public boolean GENERATE_STRONGHOLDS = true;
     public boolean GENERATE_SCATTERED = true;
     public boolean GENERATE_OCEANMONUMENTS = true;
+    public boolean GENERATE_LAKES = true;
+    public boolean GENERATE_DUNGEONS = true;
 
     public boolean PREVENT_VILLAGES_IN_CITIES = true;
+    public boolean PREVENT_LAKES_RAVINES_IN_CITIES = false;
 
     private String categoryLostcity;
     private String categoryStructures;
@@ -249,10 +252,14 @@ public class LostCityProfile {
         GENERATE_CAVES = cfg.get(categoryStructures, "generateCaves", inheritFrom.orElse(this).GENERATE_CAVES, "Generate caves").getBoolean();
         GENERATE_RAVINES = cfg.get(categoryStructures, "generateRavines", inheritFrom.orElse(this).GENERATE_RAVINES, "Generate ravines").getBoolean();
         GENERATE_MINESHAFTS = cfg.get(categoryStructures, "generateMineshafts", inheritFrom.orElse(this).GENERATE_MINESHAFTS, "Generate mineshafts").getBoolean();
+        GENERATE_LAKES = cfg.get(categoryStructures, "generateLakes", inheritFrom.orElse(this).GENERATE_LAKES, "Generate lakes (lava/water)").getBoolean();
+        GENERATE_DUNGEONS = cfg.get(categoryStructures, "generateDungeons", inheritFrom.orElse(this).GENERATE_DUNGEONS, "Generate dungeons").getBoolean();
 
         PREVENT_VILLAGES_IN_CITIES = cfg.get(categoryStructures, "preventVillagesInCities", inheritFrom.orElse(this).PREVENT_VILLAGES_IN_CITIES, "If true then an attempt will be made to prevent villages in cities. " +
                 "Note that enabling this option will likely require a low city " +
                 "density in order to actually get a reasonable chance for villages.").getBoolean();
+        PREVENT_LAKES_RAVINES_IN_CITIES = cfg.get(categoryStructures, "preventLakesRavinesInCities", inheritFrom.orElse(this).PREVENT_LAKES_RAVINES_IN_CITIES,
+                "If true then no lakes and ravines will be generated in cities").getBoolean();
     }
 
     public String getName() {

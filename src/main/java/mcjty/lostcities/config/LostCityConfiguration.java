@@ -47,6 +47,7 @@ public class LostCityConfiguration {
         profile.setDescription("Like default but no explosion damage");
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
+        profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("rarecities");

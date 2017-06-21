@@ -211,7 +211,9 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
             this.caveGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
         }
         if (profile.GENERATE_RAVINES) {
-            this.ravineGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
+            if (!profile.PREVENT_LAKES_RAVINES_IN_CITIES || !isCity) {
+                this.ravineGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
+            }
         }
 
         if (profile.GENERATE_MINESHAFTS) {
@@ -294,32 +296,38 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         int l1;
         int i2;
 
-//            if (dimensionInformation.hasFeatureType(FeatureType.FEATURE_LAKES)) {
-        if (Biome != Biomes.DESERT && Biome != Biomes.DESERT_HILLS && !flag && this.rand.nextInt(4) == 0
-                && TerrainGen.populate(this, w, rand, chunkX, chunkZ, flag, PopulateChunkEvent.Populate.EventType.LAKE)) {
-            k1 = x + this.rand.nextInt(16) + 8;
-            l1 = this.rand.nextInt(256);
-            i2 = z + this.rand.nextInt(16) + 8;
-            (new WorldGenLakes(Blocks.WATER)).generate(w, this.rand, new BlockPos(k1, l1, i2));
-        }
+        if (profile.GENERATE_LAKES) {
+            boolean isCity = BuildingInfo.isCity(chunkX, chunkZ, this);
+            if (!profile.PREVENT_LAKES_RAVINES_IN_CITIES || !isCity) {
+                if (Biome != Biomes.DESERT && Biome != Biomes.DESERT_HILLS && !flag && this.rand.nextInt(4) == 0
+                        && TerrainGen.populate(this, w, rand, chunkX, chunkZ, flag, PopulateChunkEvent.Populate.EventType.LAKE)) {
+                    k1 = x + this.rand.nextInt(16) + 8;
+                    l1 = this.rand.nextInt(256);
+                    i2 = z + this.rand.nextInt(16) + 8;
+                    (new WorldGenLakes(Blocks.WATER)).generate(w, this.rand, new BlockPos(k1, l1, i2));
+                }
 
-        if (TerrainGen.populate(this, w, rand, chunkX, chunkZ, flag, PopulateChunkEvent.Populate.EventType.LAVA) && !flag && this.rand.nextInt(8) == 0) {
-            k1 = x + this.rand.nextInt(16) + 8;
-            l1 = this.rand.nextInt(this.rand.nextInt(248) + 8);
-            i2 = z + this.rand.nextInt(16) + 8;
+                if (TerrainGen.populate(this, w, rand, chunkX, chunkZ, flag, PopulateChunkEvent.Populate.EventType.LAVA) && !flag && this.rand.nextInt(8) == 0) {
+                    k1 = x + this.rand.nextInt(16) + 8;
+                    l1 = this.rand.nextInt(this.rand.nextInt(248) + 8);
+                    i2 = z + this.rand.nextInt(16) + 8;
 
-            if (l1 < (profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET) || this.rand.nextInt(10) == 0) {
-                (new WorldGenLakes(Blocks.LAVA)).generate(w, this.rand, new BlockPos(k1, l1, i2));
+                    if (l1 < (profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET) || this.rand.nextInt(10) == 0) {
+                        (new WorldGenLakes(Blocks.LAVA)).generate(w, this.rand, new BlockPos(k1, l1, i2));
+                    }
+                }
             }
         }
 
         boolean doGen = false;
-        doGen = TerrainGen.populate(this, w, rand, chunkX, chunkZ, flag, PopulateChunkEvent.Populate.EventType.DUNGEON);
-        for (k1 = 0; doGen && k1 < 8; ++k1) {
-            l1 = x + this.rand.nextInt(16) + 8;
-            i2 = this.rand.nextInt(256);
-            int j2 = z + this.rand.nextInt(16) + 8;
-            (new WorldGenDungeons()).generate(w, this.rand, new BlockPos(l1, i2, j2));
+        if (profile.GENERATE_DUNGEONS) {
+            doGen = TerrainGen.populate(this, w, rand, chunkX, chunkZ, flag, PopulateChunkEvent.Populate.EventType.DUNGEON);
+            for (k1 = 0; doGen && k1 < 8; ++k1) {
+                l1 = x + this.rand.nextInt(16) + 8;
+                i2 = this.rand.nextInt(256);
+                int j2 = z + this.rand.nextInt(16) + 8;
+                (new WorldGenDungeons()).generate(w, this.rand, new BlockPos(l1, i2, j2));
+            }
         }
 
         BlockPos pos = new BlockPos(x, 0, z);
