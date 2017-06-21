@@ -181,19 +181,25 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
+        boolean isCity = BuildingInfo.isCity(chunkX, chunkZ, this);
+
         ChunkPrimer chunkprimer;
-        ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
-        if (cachedPrimers.containsKey(key)) {
-            // We calculated a primer earlier. Reuse it
-            chunkprimer = cachedPrimers.get(key);
-            cachedPrimers.remove(key);
+        if (isCity) {
+            chunkprimer = new ChunkPrimer();
         } else {
-            chunkprimer = generatePrimer(chunkX, chunkZ);
-        }
-        // Calculate the chunk heightmap in case we need it later
-        if (!cachedHeightmaps.containsKey(key)) {
-            // We might need this later
-            cachedHeightmaps.put(key, new ChunkHeightmap(chunkprimer));
+            ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
+            if (cachedPrimers.containsKey(key)) {
+                // We calculated a primer earlier. Reuse it
+                chunkprimer = cachedPrimers.get(key);
+                cachedPrimers.remove(key);
+            } else {
+                chunkprimer = generatePrimer(chunkX, chunkZ);
+            }
+            // Calculate the chunk heightmap in case we need it later
+            if (!cachedHeightmaps.containsKey(key)) {
+                // We might need this later
+                cachedHeightmaps.put(key, new ChunkHeightmap(chunkprimer));
+            }
         }
 
         terrainGenerator.generate(chunkX, chunkZ, chunkprimer);
@@ -214,7 +220,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         if (profile.GENERATE_VILLAGES) {
             if (profile.PREVENT_VILLAGES_IN_CITIES) {
-                if (!BuildingInfo.isCity(chunkX, chunkZ, this)) {
+                if (!isCity) {
                     this.villageGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
                 }
             } else {
