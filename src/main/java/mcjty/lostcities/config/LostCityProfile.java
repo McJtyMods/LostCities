@@ -31,9 +31,11 @@ public class LostCityProfile {
     public int WATERLEVEL_OFFSET = 8;
     public int WATERLEVEL = -1;
 
-//    public int MIN_HIGHWAY_LENGTH = 10;
-//    public int MAX_HIGHWAY_LENGTH = 50;
-//    public float HIGHWAY_CHANCE = 1.0f/(50*5);
+    public boolean HIGHWAY_REQUIRES_TWO_CITIES = true;
+    public int HIGHWAY_LEVEL_FROM_CITIES_MODE = 0;
+    public float HIGHWAY_MAINPERLIN_SCALE = 50.0f;
+    public float HIGHWAY_SECONDARYPERLIN_SCALE = 10.0f;
+    public float HIGHWAY_PERLIN_FACTOR = 2.0f;
 
     public float DESTROY_LONE_BLOCKS_FACTOR = .05f;
     public float DESTROY_OR_MOVE_CHANCE = .4f;
@@ -169,10 +171,17 @@ public class LostCityProfile {
 
         FOUNTAIN_CHANCE = cfg.getFloat("fountainChance", categoryLostcity, inheritFrom.orElse(this).FOUNTAIN_CHANCE, 0.0f, 1.0f, "The chance that a street section contains a fountain");
 
-//        MIN_HIGHWAY_LENGTH = cfg.getInt("minHighwayLength", categoryLostcity, inheritFrom.orElse(this).MIN_HIGHWAY_LENGTH, 0, 200,
-//                "The minimum length of a highway (in chunks)");
-//        MAX_HIGHWAY_LENGTH = cfg.getInt("maxHighwayLength", categoryLostcity, inheritFrom.orElse(this).MAX_HIGHWAY_LENGTH, 0, 1000,
-//                "The maximum length of a highway (in chunks). Set to 0 to disable highways");
+
+        HIGHWAY_REQUIRES_TWO_CITIES = cfg.getBoolean("highwayRequiresTwoCities", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_REQUIRES_TWO_CITIES,
+                "If true then a highway will only generate if both sides have a valid city. If false then one city is sufficient");
+        HIGHWAY_LEVEL_FROM_CITIES_MODE = cfg.getInt("highwayLevelFromCities", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_LEVEL_FROM_CITIES_MODE,
+                0, 3, "0 (take height from top-left city), 1 (take minimum height from both cities), 2 (take maximum height from both cities), 3 (take average height)");
+        HIGHWAY_MAINPERLIN_SCALE = cfg.getFloat("highwayMainPerlinScale", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_MAINPERLIN_SCALE, 1.0f, 1000.0f,
+                "For highways on a certain axis, this value is used to scale the perlin noise generator on the main axis. Increasing this value will increase the frequency of highways but make them smaller");
+        HIGHWAY_SECONDARYPERLIN_SCALE = cfg.getFloat("highwaySecondaryPerlinScale", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_SECONDARYPERLIN_SCALE, 1.0f, 1000.0f,
+                "For highways on a certain axis, this value is used to scale the perlin noise generator on the secondary axis. Increasing this value will increase the variation of nearby highways");
+        HIGHWAY_PERLIN_FACTOR = cfg.getFloat("highwayPerlinFactor", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_PERLIN_FACTOR, -100, 100,
+                "The highway perlin noise is compared to this value. Setting this to 0 would give 50% chance of a highway being at a spot. Note that highways only generate on chunks a multiple of 8. Setting this very high will prevent highways from generating");
 
         BEDROCK_LAYER = cfg.getInt("bedrockLayer", categoryLostcity, inheritFrom.orElse(this).BEDROCK_LAYER, 0, 10,
                 "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");
