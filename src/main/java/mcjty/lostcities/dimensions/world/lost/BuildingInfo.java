@@ -31,6 +31,7 @@ public class BuildingInfo {
     public final BuildingPart bridgeType;
     public final BuildingPart stairType;
     private final float stairPriority;      // A random number that indicates if this chunk should get a stair if there are competing stairs around it. The highest wins
+    public final BuildingPart railDungeon;    // Dungeon next to rails. Will only generate if there are actually rails next to it
     public final StreetType streetType;
     private final int floors;
     public final int floorsBelowGround;
@@ -603,6 +604,16 @@ public class BuildingInfo {
         } else {
             xBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
             zBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
+        }
+
+        if (rand.nextFloat() < provider.profile.RAILWAY_DUNGEON_CHANCE) {
+            if (!hasBuilding || (Railway.RAILWAY_LEVEL_OFFSET < (cityLevel - floorsBelowGround))) {
+                railDungeon = AssetRegistries.PARTS.get(getCityStyle().getRandomRailDungeon(provider, rand));
+            } else {
+                railDungeon = null;
+            }
+        } else {
+            railDungeon = null;
         }
     }
 

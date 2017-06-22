@@ -81,6 +81,27 @@
         "block": "minecraft:redstone_torch@5"
       },
       {
+        "char": "!",
+        "blocks": [
+          {
+            "factor": 0.2,
+            "block": "minecraft:diamond_block"
+          },
+          {
+            "factor": 0.2,
+            "block": "minecraft:gold_block"
+          },
+          {
+            "factor": 0.2,
+            "block": "minecraft:emerald_block"
+          },
+          {
+            "factor": 1,
+            "block": "minecraft:iron_block"
+          }
+        ]
+      },
+      {
         "char": "F",
         "blocks": [
           {
@@ -337,6 +358,16 @@
         "factor": 0.8,
         "park": "park_fountain2"
       }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon2"
+      }
     ]
   },
   {
@@ -459,6 +490,16 @@
       {
         "factor": 0.8,
         "park": "park_fountain2"
+      }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon2"
       }
     ]
   },
@@ -583,6 +624,16 @@
         "factor": 0.8,
         "park": "park_fountain2"
       }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon2"
+      }
     ]
   },
   {
@@ -705,6 +756,16 @@
       {
         "factor": 0.8,
         "park": "park_fountain2"
+      }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon2"
       }
     ]
   },

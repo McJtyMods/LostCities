@@ -5,6 +5,7 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.varia.GeometryTools;
+import mcjty.lostcities.varia.Tools;
 import net.minecraft.block.*;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
@@ -184,6 +185,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             // We already have a prefilled core chunk (as generated from doCoreChunk)
             doNormalChunk(chunkX, chunkZ, primer, info);
         }
+
+        Railway.RailChunkInfo railInfo = info.getRailInfo();
+        if (railInfo.getType() != Railway.RailChunkType.NONE) {
+            generateRailways(primer, info, railInfo);
+        }
+        generateRailwayDungeons(chunkX, chunkX, primer, info);
+
         fixTorches(primer, info);
 
         // We make a new random here because the primer for a normal chunk may have
@@ -294,11 +302,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         flattenChunkToCityBorder(chunkX, chunkZ, primer);
         generateBridges(primer, info);
         generateHighways(chunkX, chunkZ, primer, info);
-
-        Railway.RailChunkInfo railInfo = info.getRailInfo();
-        if (railInfo.getType() != Railway.RailChunkType.NONE) {
-            generateRailways(primer, info, railInfo);
-        }
     }
 
     private void breakBlocksForDamage(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
@@ -739,10 +742,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 generateHighways(chunkX, chunkZ, primer, info);
             }
         }
+    }
 
-        Railway.RailChunkInfo railInfo = info.getRailInfo();
-        if (railInfo.getType() != Railway.RailChunkType.NONE) {
-            generateRailways(primer, info, railInfo);
+    private void generateRailwayDungeons(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
+        if (info.railDungeon == null) {
+            return;
+        }
+        if (info.getZmin().getRailInfo().getType() == Railway.RailChunkType.HORIZONTAL ||
+                info.getZmax().getRailInfo().getType() == Railway.RailChunkType.HORIZONTAL) {
+            int height = provider.profile.GROUNDLEVEL + Railway.RAILWAY_LEVEL_OFFSET * 6;
+            generatePart(primer, info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0);
         }
     }
 
@@ -778,6 +787,20 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 break;
             case HORIZONTAL:
                 part = AssetRegistries.PARTS.get("rails_horizontal");
+
+                // If the adjacent chunks are also horizontal we take a sample of the blocks around us to see if we are in water
+                Railway.RailChunkType type1 = info.getXmin().getRailInfo().getType();
+                Railway.RailChunkType type2 = info.getXmax().getRailInfo().getType();
+                if (!type1.isStation() && !type2.isStation()) {
+                    if (primer.data[Tools.calcIndex(3, height+2, 3)] == liquidChar &&
+                            primer.data[Tools.calcIndex(12, height+2, 3)] == liquidChar &&
+                            primer.data[Tools.calcIndex(3, height+2, 12)] == liquidChar &&
+                            primer.data[Tools.calcIndex(12, height+2, 12)] == liquidChar &&
+                            primer.data[Tools.calcIndex(3, height+4, 7)] == liquidChar &&
+                            primer.data[Tools.calcIndex(12, height+4, 8)] == liquidChar) {
+                        part = AssetRegistries.PARTS.get("rails_horizontal_water");
+                    }
+                }
                 break;
             case VERTICAL:
                 part = AssetRegistries.PARTS.get("rails_vertical");
@@ -815,6 +838,51 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 break;
         }
         generatePart(primer, info, part, transform, 0, height, 0);
+
+        if (type == Railway.RailChunkType.HORIZONTAL) {
+            // If there is a rail dungeon north or south we must make a connection here
+            if (info.getZmin().railDungeon != null) {
+                for (int z = 0; z < 4; z++) {
+                    primer.data[Tools.calcIndex(6, height + 1, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(6, height + 2, z)] = airChar;
+                    primer.data[Tools.calcIndex(6, height + 3, z)] = airChar;
+                    primer.data[Tools.calcIndex(7, height + 1, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(7, height + 2, z)] = airChar;
+                    primer.data[Tools.calcIndex(7, height + 3, z)] = airChar;
+                }
+                for (int z = 0; z < 3; z++) {
+                    primer.data[Tools.calcIndex(5, height + 2, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(5, height + 3, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(5, height + 4, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(6, height + 4, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(7, height + 4, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(8, height + 2, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(8, height + 3, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(8, height + 4, z)] = bricksChar;
+                }
+            }
+
+            if (info.getZmax().railDungeon != null) {
+                for (int z = 0; z < 5; z++) {
+                    primer.data[Tools.calcIndex(6, height + 1, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(6, height + 2, 15 - z)] = airChar;
+                    primer.data[Tools.calcIndex(6, height + 3, 15 - z)] = airChar;
+                    primer.data[Tools.calcIndex(7, height + 1, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(7, height + 2, 15 - z)] = airChar;
+                    primer.data[Tools.calcIndex(7, height + 3, 15 - z)] = airChar;
+                }
+                for (int z = 0; z < 4; z++) {
+                    primer.data[Tools.calcIndex(5, height + 2, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(5, height + 3, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(5, height + 4, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(6, height + 4, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(7, height + 4, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(8, height + 2, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(8, height + 3, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(8, height + 4, 15 - z)] = bricksChar;
+                }
+            }
+        }
 
         if (railInfo.getRails() < 3) {
             // We may have to reduce number of rails
@@ -1035,7 +1103,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 int x = pos.getX();
                 int y = pos.getY();
                 int z = pos.getZ();
-                int index = calcIndex(x, y, z);
+                int index = Tools.calcIndex(x, y, z);
                 if (connectedBlocks.contains(index)) {
                     continue;
                 }
@@ -1073,9 +1141,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             avgdamage /= (float) connectedBlocks.size();
         }
 
-        public static int calcIndex(int x, int y, int z) {
-            return (x << 12) | (z << 8) + y;
-        }
     }
 
     private Blob findBlob(List<Blob> blobs, int index) {

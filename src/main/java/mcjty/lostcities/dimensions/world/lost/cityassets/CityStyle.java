@@ -21,6 +21,7 @@ public class CityStyle implements IAsset {
     private final List<Pair<Float, String>> parkSelector = new ArrayList<>();
     private final List<Pair<Float, String>> fountainSelector = new ArrayList<>();
     private final List<Pair<Float, String>> stairSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> railDungeonSelector = new ArrayList<>();
     private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
     private String style;
 
@@ -73,41 +74,55 @@ public class CityStyle implements IAsset {
             streetBaseBlock = s.get("streetbase").getAsCharacter();
             streetWidth = s.get("width").getAsInt();
         }
-        JsonArray array = object.get("buildings").getAsJsonArray();
+        JsonArray array = getArraySafe(object, "buildings");
         for (JsonElement element : array) {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
             String building = element.getAsJsonObject().get("building").getAsString();
             buildingSelector.add(Pair.of(factor, building));
         }
-        array = object.get("multibuildings").getAsJsonArray();
+        array = getArraySafe(object, "multibuildings");
         for (JsonElement element : array) {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
             String building = element.getAsJsonObject().get("multibuilding").getAsString();
             multiBuildingSelector.add(Pair.of(factor, building));
         }
-        array = object.get("parks").getAsJsonArray();
+        array = getArraySafe(object, "parks");
         for (JsonElement element : array) {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
             String park = element.getAsJsonObject().get("park").getAsString();
             parkSelector.add(Pair.of(factor, park));
         }
-        array = object.get("fountains").getAsJsonArray();
+        array = getArraySafe(object, "fountains");
         for (JsonElement element : array) {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
             String fountain = element.getAsJsonObject().get("fountain").getAsString();
             fountainSelector.add(Pair.of(factor, fountain));
         }
-        array = object.get("stairs").getAsJsonArray();
+        array = getArraySafe(object, "stairs");
         for (JsonElement element : array) {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
             String fountain = element.getAsJsonObject().get("stair").getAsString();
             stairSelector.add(Pair.of(factor, fountain));
         }
-        array = object.get("bridges").getAsJsonArray();
+        array = getArraySafe(object, "bridges");
         for (JsonElement element : array) {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
             String fountain = element.getAsJsonObject().get("bridge").getAsString();
             bridgeSelector.add(Pair.of(factor, fountain));
+        }
+        array = getArraySafe(object, "raildungeons");
+        for (JsonElement element : array) {
+            float factor = element.getAsJsonObject().get("factor").getAsFloat();
+            String fountain = element.getAsJsonObject().get("dungeon").getAsString();
+            railDungeonSelector.add(Pair.of(factor, fountain));
+        }
+    }
+
+    public JsonArray getArraySafe(JsonObject object, String key) {
+        if (object.has(key)) {
+            return object.get(key).getAsJsonArray();
+        } else {
+            return new JsonArray(); // Empty array
         }
     }
 
@@ -179,6 +194,15 @@ public class CityStyle implements IAsset {
         }
         object.add("bridges", array);
 
+        array = new JsonArray();
+        for (Pair<Float, String> pair : railDungeonSelector) {
+            JsonObject o = new JsonObject();
+            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("dungeon", new JsonPrimitive(pair.getValue()));
+            array.add(o);
+        }
+        object.add("raildungeons", array);
+
         return object;
     }
 
@@ -194,6 +218,10 @@ public class CityStyle implements IAsset {
 
     public String getRandomStair(LostCityChunkGenerator provider, Random random) {
         return Tools.getRandomFromList(provider, random, stairSelector);
+    }
+
+    public String getRandomRailDungeon(LostCityChunkGenerator provider, Random random) {
+        return Tools.getRandomFromList(provider, random, railDungeonSelector);
     }
 
     public String getRandomPark(LostCityChunkGenerator provider, Random random) {

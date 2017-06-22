@@ -38,6 +38,8 @@ public class LostCityProfile {
     public float HIGHWAY_SECONDARYPERLIN_SCALE = 10.0f;
     public float HIGHWAY_PERLIN_FACTOR = 2.0f;
 
+    public float RAILWAY_DUNGEON_CHANCE = .02f;
+
     public float DESTROY_LONE_BLOCKS_FACTOR = .05f;
     public float DESTROY_OR_MOVE_CHANCE = .4f;
     public int DESTROY_SMALL_SECTIONS_SIZE = 50;
@@ -171,6 +173,8 @@ public class LostCityProfile {
 
         FOUNTAIN_CHANCE = cfg.getFloat("fountainChance", categoryLostcity, inheritFrom.orElse(this).FOUNTAIN_CHANCE, 0.0f, 1.0f, "The chance that a street section contains a fountain");
 
+        RAILWAY_DUNGEON_CHANCE = cfg.getFloat("railwayDungeonChance", categoryLostcity, inheritFrom.orElse(this).RAILWAY_DUNGEON_CHANCE, 0.0f, 1.0f,
+                "The chance that a chunk next to a railway will have a railway dungeon");
 
         HIGHWAY_REQUIRES_TWO_CITIES = cfg.getBoolean("highwayRequiresTwoCities", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_REQUIRES_TWO_CITIES,
                 "If true then a highway will only generate if both sides have a valid city. If false then one city is sufficient");

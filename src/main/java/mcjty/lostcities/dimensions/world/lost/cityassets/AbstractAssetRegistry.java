@@ -19,6 +19,9 @@ public class AbstractAssetRegistry<T extends IAsset> {
     }
 
     public T get(String name) {
+        if (name == null) {
+            return null;
+        }
         return assets.get(name);
     }
 
