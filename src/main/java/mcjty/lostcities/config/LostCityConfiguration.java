@@ -60,7 +60,7 @@ public class LostCityConfiguration {
                     "List of asset libraries loaded in the specified order. " +
                     "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded from the config directory");
 
-            String[] defaultValues = {"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "chisel"};
+            String[] defaultValues = {"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel"};
             profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
                     defaultValues, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
             List<String> mergedProfiles = new ArrayList<>();
@@ -134,7 +134,13 @@ public class LostCityConfiguration {
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = .44f;
         profile.MINI_EXPLOSION_MAXRADIUS = 10;
-        profile.ALLOWED_BIOME_FACTORS = new String[] { "fungle=1", "jungle_hills=1", "jungle_edge=1", "ocean=8", "beach=20", "river=5" };
+        profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=1", "ocean=8", "beach=20", "river=5" };
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("wasteland");
+        profile.setDescription("Wasteland, no water, bare land");
+        profile.WATERLEVEL_OFFSET = 70;
+        profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "savanna=1", "savanna_rock=1", "river=5" };
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("chisel");

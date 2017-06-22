@@ -301,6 +301,27 @@
         "block": "minecraft:stone_slab@8"
       },
       {
+        "char": "P",
+        "blocks": [
+          {
+            "factor": 0.25,
+            "block": "minecraft:sapling"
+          },
+          {
+            "factor": 0.25,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "factor": 0.25,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      },
+      {
         "char": "p",
         "blocks": [
           {

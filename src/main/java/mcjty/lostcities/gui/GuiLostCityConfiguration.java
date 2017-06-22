@@ -37,9 +37,9 @@ public class GuiLostCityConfiguration extends GuiScreen {
         actionHandler.clear();
         this.buttonList.clear();
         int id = 301;
-        int y = 10;
+        int y = 8;
         for (Map.Entry<String, LostCityProfile> entry : LostCityConfiguration.profiles.entrySet()) {
-            GuiButton button = new GuiButton(id, 20, y, 100, 20, entry.getKey());
+            GuiButton button = new GuiButton(id, 10, y, 90, 19, entry.getKey());
             if (profileName.equals(entry.getValue().getName())) {
                 button.packedFGColour = 0xffffff00;
             }
@@ -47,10 +47,10 @@ public class GuiLostCityConfiguration extends GuiScreen {
             actionHandler.put(id, () -> setProfile(entry.getValue()));
             id++;
 
-            GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 140, y, 200, 20, 0xffffffff);
+            GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 110, y, 230, 19, 0xffffffff);
             label.addLine(entry.getValue().getDescription());
             this.labelList.add(label);
-            y += 22;
+            y += 20;
         }
 
         y += 10;
