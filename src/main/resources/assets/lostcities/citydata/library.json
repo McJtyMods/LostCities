@@ -319,14 +319,18 @@
       },
       {
         "factor": 1.0,
+        "park": "park_trees"
+      },
+      {
+        "factor": 1.0,
         "park": "park_plants_pillars"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain1"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain2"
       }
     ]
@@ -438,14 +442,18 @@
       },
       {
         "factor": 1.0,
+        "park": "park_trees"
+      },
+      {
+        "factor": 1.0,
         "park": "park_plants_pillars"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain1"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain2"
       }
     ]
@@ -557,14 +565,18 @@
       },
       {
         "factor": 1.0,
+        "park": "park_trees"
+      },
+      {
+        "factor": 1.0,
         "park": "park_plants_pillars"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain1"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain2"
       }
     ]
@@ -676,14 +688,18 @@
       },
       {
         "factor": 1.0,
+        "park": "park_trees"
+      },
+      {
+        "factor": 1.0,
         "park": "park_plants_pillars"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain1"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain2"
       }
     ]
@@ -1531,6 +1547,50 @@
         "         p      ",
         "     p          ",
         "          p     ",
+        "                ",
+        "                ",
+        "                "
+      ]
+    ]
+  },
+  {
+    "type": "part",
+    "name": "park_trees",
+    "xsize": 16,
+    "zsize": 16,
+    "slices": [
+      [
+        "                ",
+        "                ",
+        "  _____  _____  ",
+        "  _SSS_  _SSS_  ",
+        "  _SDS_  _SDS_  ",
+        "  _SSS_  _SSS_  ",
+        "  _____  _____  ",
+        "                ",
+        "                ",
+        "  _____  _____  ",
+        "  _SSS_  _SSS_  ",
+        "  _SDS_  _SDS_  ",
+        "  _SSS_  _SSS_  ",
+        "  _____  _____  ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "    P      P    ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "    P      P    ",
+        "                ",
         "                ",
         "                ",
         "                "
