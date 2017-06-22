@@ -72,11 +72,37 @@ public class BuildingInfo {
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, String>> mobSpawnerTodo = new ArrayList<>();
     private final List<BlockPos> chestTodo = new ArrayList<>();
+    private final List<Integer> torchTodo = new ArrayList<>();
+    private final List<BlockPos> saplingTodo = new ArrayList<>();
 
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
     private static Map<Pair<Integer, Integer>, CityInfo> cityInfoMap = new HashMap<>();
     private static Map<Pair<Integer, Integer>, CityStyle> cityStyleCache = new HashMap<>();
+
+    public void addSaplingTodo(BlockPos pos) {
+        saplingTodo.add(pos);
+    }
+
+    public List<BlockPos> getSaplingTodo() {
+        return saplingTodo;
+    }
+
+    public void clearSaplingTodo() {
+        saplingTodo.clear();
+    }
+
+    public void addTorchTodo(int index) {
+        torchTodo.add(index);
+    }
+
+    public List<Integer> getTorchTodo() {
+        return torchTodo;
+    }
+
+    public void clearTorchTodo() {
+        torchTodo.clear();
+    }
 
     public void addChestTodo(BlockPos pos) {
         chestTodo.add(pos);

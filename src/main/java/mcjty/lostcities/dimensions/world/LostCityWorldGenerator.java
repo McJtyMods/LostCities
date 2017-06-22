@@ -3,8 +3,10 @@ package mcjty.lostcities.dimensions.world;
 import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import net.minecraft.block.BlockChest;
+import net.minecraft.block.BlockSapling;
 import net.minecraft.block.BlockVine;
 import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
@@ -30,7 +32,22 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         if (chunkGenerator instanceof LostCityChunkGenerator) {
             generateLootSpawners(random, chunkX, chunkZ, world, (LostCityChunkGenerator) chunkGenerator);
             generateVines(random, chunkX, chunkZ, world, (LostCityChunkGenerator) chunkGenerator);
+            generateTrees(random, chunkX, chunkZ, world, (LostCityChunkGenerator) chunkGenerator);
         }
+    }
+
+    private void generateTrees(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator provider) {
+        int cx = chunkX * 16;
+        int cz = chunkZ * 16;
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+        for (BlockPos cpos : info.getSaplingTodo()) {
+            BlockPos pos = cpos.add(cx, 0, cz);
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() == Blocks.SAPLING) {
+                ((BlockSapling)Blocks.SAPLING).generateTree(world, pos, state, random);
+            }
+        }
+        info.clearSaplingTodo();
     }
 
     private void generateVines(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator provider) {

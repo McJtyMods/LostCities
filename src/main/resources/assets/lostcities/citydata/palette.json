@@ -482,19 +482,19 @@
           },
           {
             "factor": 0.1,
-            "block": "minecraft:sapling@8"
+            "block": "minecraft:sapling"
           },
           {
             "factor": 0.1,
-            "block": "minecraft:sapling@9"
+            "block": "minecraft:sapling@1"
           },
           {
             "factor": 0.1,
-            "block": "minecraft:sapling@10"
+            "block": "minecraft:sapling@2"
           },
           {
             "factor": 2.0,
-            "block": "minecraft:sapling@12"
+            "block": "minecraft:sapling@4"
           }
         ]
       },
@@ -503,19 +503,19 @@
         "blocks": [
           {
             "factor": 0.25,
-            "block": "minecraft:sapling@8"
+            "block": "minecraft:sapling"
           },
           {
-            "factor": 0.1,
-            "block": "minecraft:sapling@9"
+            "factor": 0.25,
+            "block": "minecraft:sapling@1"
           },
           {
-            "factor": 0.1,
-            "block": "minecraft:sapling@10"
+            "factor": 0.25,
+            "block": "minecraft:sapling@2"
           },
           {
             "factor": 2.0,
-            "block": "minecraft:sapling@12"
+            "block": "minecraft:sapling@4"
           }
         ]
       },

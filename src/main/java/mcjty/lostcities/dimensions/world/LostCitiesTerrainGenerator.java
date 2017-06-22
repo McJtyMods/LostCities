@@ -51,6 +51,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private static Set<Character> rotatableChars = null;
     private static Set<Character> railChars = null;
+    private static Set<Character> charactersNeedingTodo = null;
 
     private IBlockState baseBlock;
     private Character street;
@@ -77,6 +78,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             addStates(Blocks.GOLDEN_RAIL, railChars);
         }
         return railChars;
+    }
+
+    private static Set<Character> getCharactersNeedingTodo() {
+        if (charactersNeedingTodo == null) {
+            charactersNeedingTodo = new HashSet<>();
+            charactersNeedingTodo.add(torchChar);
+            charactersNeedingTodo.add(spawnerChar);
+            charactersNeedingTodo.add(chestChar);
+            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA)));
+            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH)));
+            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK)));
+            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE)));
+            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.DARK_OAK)));
+            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.JUNGLE)));
+        }
+        return charactersNeedingTodo;
     }
 
     private static Set<Character> getRotatableChars() {
@@ -154,15 +171,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         // @todo This should not be hardcoded here
         styledBricks = info.getCompiledPalette().get('#');
 
-        List<Integer> torches = new ArrayList<>();
-
         if (info.isCity) {
-            doCityChunk(chunkX, chunkZ, primer, info, torches);
+            doCityChunk(chunkX, chunkZ, primer, info);
         } else {
             // We already have a prefilled core chunk (as generated from doCoreChunk)
-            doNormalChunk(chunkX, chunkZ, primer, info, torches);
+            doNormalChunk(chunkX, chunkZ, primer, info);
         }
-        fixTorches(primer, torches);
+        fixTorches(primer, info);
 
         // We make a new random here because the primer for a normal chunk may have
         // been cached and we want to be able to do the same when returning from a cached
@@ -176,7 +191,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         generateDebris(primer, provider.rand, info);
     }
 
-    private void fixTorches(ChunkPrimer primer, List<Integer> torches) {
+    private void fixTorches(ChunkPrimer primer, BuildingInfo info) {
+        List<Integer> torches = info.getTorchTodo();
         if (torches.isEmpty()) {
             return;
         }
@@ -204,6 +220,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
+        info.clearTorchTodo();
     }
 
     public void doCoreChunk(int chunkX, int chunkZ, ChunkPrimer primer) {
@@ -265,15 +282,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    public void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
+    public void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
 //        debugClearChunk(chunkX, chunkZ, primer);
         flattenChunkToCityBorder(chunkX, chunkZ, primer);
-        generateBridges(primer, info, torches);
-        generateHighways(chunkX, chunkZ, primer, info, torches);
+        generateBridges(primer, info);
+        generateHighways(chunkX, chunkZ, primer, info);
 
         Railway.RailChunkInfo railInfo = info.getRailInfo();
         if (railInfo.getType() != Railway.RailChunkType.NONE) {
-            generateRailways(primer, info, torches, railInfo);
+            generateRailways(primer, info, railInfo);
         }
     }
 
@@ -317,41 +334,40 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void generateHighways(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
+    private void generateHighways(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
         int levelX = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
         int levelZ = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
         if (levelX == levelZ && levelX >= 0) {
             // Crossing
-            generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getXmax(), info.getZmax(), "_bi", torches);
+            generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getXmax(), info.getZmax(), "_bi");
         } else if (levelX >= 0 && levelZ >= 0) {
             // There are two highways on different level. Make sure the lowest one is done first because it
             // will clear out what is above it
             if (levelX == 0) {
-                generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "", torches);
-                generateHighwayPart(primer, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "", torches);
+                generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "");
+                generateHighwayPart(primer, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "");
             } else {
-                generateHighwayPart(primer, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "", torches);
-                generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "", torches);
+                generateHighwayPart(primer, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "");
+                generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "");
             }
         } else {
             if (levelX >= 0) {
-                generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "", torches);
+                generateHighwayPart(primer, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "");
             } else if (levelZ >= 0) {
-                generateHighwayPart(primer, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "", torches);
+                generateHighwayPart(primer, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "");
             }
         }
     }
 
-    private void generateHighwayPart(ChunkPrimer primer, BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix,
-                                     List<Integer> torches) {
+    private void generateHighwayPart(ChunkPrimer primer, BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix) {
         int highwayGroundLevel = provider.profile.GROUNDLEVEL + level * 6;
 
         if (info.isTunnel(level)) {
             // We know we need a tunnel
-            generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), transform, 0, highwayGroundLevel, 0, torches);
+            generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), transform, 0, highwayGroundLevel, 0);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
-            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_open" + suffix), transform, 0, highwayGroundLevel, 0, torches);
+            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_open" + suffix), transform, 0, highwayGroundLevel, 0);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -360,7 +376,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         } else {
-            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge" + suffix), transform, 0, highwayGroundLevel, 0, torches);
+            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge" + suffix), transform, 0, highwayGroundLevel, 0);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -408,7 +424,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void generateBridges(ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
+    private void generateBridges(ChunkPrimer primer, BuildingInfo info) {
         if (info.getHighwayXLevel() == 0 || info.getHighwayZLevel() == 0) {
             // If there is a highway at level 0 we cannot generate bridge parts. If there
             // is no highway or a highway at level 1 then bridge sections can generate just fine
@@ -416,16 +432,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         BuildingPart bt = info.hasXBridge(provider);
         if (bt != null) {
-            generateBridge(primer, info, bt, Orientation.X, torches);
+            generateBridge(primer, info, bt, Orientation.X);
         } else {
             bt = info.hasZBridge(provider);
             if (bt != null) {
-                generateBridge(primer, info, bt, Orientation.Z, torches);
+                generateBridge(primer, info, bt, Orientation.Z);
             }
         }
     }
 
-    private void generateBridge(ChunkPrimer primer, BuildingInfo info, BuildingPart bt, Orientation orientation, List<Integer> torches) {
+    private void generateBridge(ChunkPrimer primer, BuildingInfo info, BuildingPart bt, Orientation orientation) {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 int index = (x << 12) | (z << 8) + groundLevel + 1;
@@ -434,7 +450,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     Character b = orientation == Orientation.X ? bt.get(info, x, l, z) : bt.get(info, z, l, x); // @todo general rotation system?
                     if (b == torchChar) {
                         if (provider.profile.GENERATE_LIGHTING) {
-                            torches.add(index);
+                            info.addTorchTodo(index);
                         } else {
                             b = airChar;        // No torch!
                         }
@@ -638,7 +654,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void doCityChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
+    private void doCityChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
         boolean building = info.hasBuilding;
 
         Random rand = new Random(provider.seed * 377 + chunkZ * 341873128712L + chunkX * 132897987541L);
@@ -653,32 +669,32 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         if (building) {
-            generateBuilding(primer, info, torches);
+            generateBuilding(primer, info);
         } else {
-            generateStreet(primer, info, rand, torches);
+            generateStreet(primer, info, rand);
         }
 
         int levelX = info.getHighwayXLevel();
         int levelZ = info.getHighwayZLevel();
         if (building) {
             if (levelX >= 0 || levelZ >= 0) {
-                generateHighways(chunkX, chunkZ, primer, info, torches);
+                generateHighways(chunkX, chunkZ, primer, info);
             }
         } else {
             if (levelX < 0 && levelZ < 0) {
-                generateStreetDecorations(primer, info, torches);
+                generateStreetDecorations(primer, info);
             } else {
-                generateHighways(chunkX, chunkZ, primer, info, torches);
+                generateHighways(chunkX, chunkZ, primer, info);
             }
         }
 
         Railway.RailChunkInfo railInfo = info.getRailInfo();
         if (railInfo.getType() != Railway.RailChunkType.NONE) {
-            generateRailways(primer, info, torches, railInfo);
+            generateRailways(primer, info, railInfo);
         }
     }
 
-    private void generateRailways(ChunkPrimer primer, BuildingInfo info, List<Integer> torches, Railway.RailChunkInfo railInfo) {
+    private void generateRailways(ChunkPrimer primer, BuildingInfo info, Railway.RailChunkInfo railInfo) {
         int height = provider.profile.GROUNDLEVEL + railInfo.getLevel() * 6;
         Railway.RailChunkType type = railInfo.getType();
         BuildingPart part;
@@ -742,10 +758,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 part = AssetRegistries.PARTS.get("rails_flat");
                 break;
         }
-        generatePart(primer, info, part, transform, 0, height, 0, torches);
+        generatePart(primer, info, part, transform, 0, height, 0);
     }
 
-    private void generateStreetDecorations(ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
+    private void generateStreetDecorations(ChunkPrimer primer, BuildingInfo info) {
         Direction stairDirection = info.getActualStairDirection();
         if (stairDirection != null) {
             BuildingPart stairs = info.stairType;
@@ -768,7 +784,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     throw new RuntimeException("Cannot happen!");
             }
 
-            generatePart(primer, info, stairs, transform, 0, oy, 0, torches);
+            generatePart(primer, info, stairs, transform, 0, oy, 0);
         }
     }
 
@@ -1022,7 +1038,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void generateStreet(ChunkPrimer primer, BuildingInfo info, Random rand, List<Integer> torches) {
+    private void generateStreet(ChunkPrimer primer, BuildingInfo info, Random rand) {
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int index = (x << 12) | (z << 8);
@@ -1083,7 +1099,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 } else {
                     part = info.fountainType;
                 }
-                generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0, torches);
+                generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0);
             }
 
             generateRandomVegetation(primer, info, rand, height);
@@ -1363,7 +1379,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private int generatePart(ChunkPrimer primer, BuildingInfo info, BuildingPart part,
                              Transform transform,
-                             int ox, int oy, int oz, List<Integer> torches) {
+                             int ox, int oy, int oz) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
@@ -1403,21 +1419,28 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         if (b != airChar) {
                             if (b == hardAirChar) {
                                 b = airChar;
-                            } else if (b == torchChar) {
-                                if (provider.profile.GENERATE_LIGHTING) {
-                                    torches.add(index);
+                            } else if (getCharactersNeedingTodo().contains(b)) {
+                                if (b == torchChar) {
+                                    if (provider.profile.GENERATE_LIGHTING) {
+                                        info.addTorchTodo(index);
+                                    } else {
+                                        b = airChar;        // No torches
+                                    }
+                                } else if (b == spawnerChar) {
+                                    if (provider.profile.GENERATE_SPAWNERS) {
+                                        String mobid = part.getMobID(info, x, y, z);
+                                        info.addSpawnerTodo(new BlockPos(x, oy + y, z), mobid);
+                                    } else {
+                                        b = airChar;
+                                    }
+                                } else if (b == chestChar) {
+                                    info.addChestTodo(new BlockPos(x, oy + y, z));
                                 } else {
-                                    b = airChar;        // No torches
+                                    IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
+                                    if (bs.getBlock() == Blocks.SAPLING) {
+                                        info.addSaplingTodo(new BlockPos(x, oy + y, z));
+                                    }
                                 }
-                            } else if (b == spawnerChar) {
-                                if (provider.profile.GENERATE_SPAWNERS) {
-                                    String mobid = part.getMobID(info, x, y, z);
-                                    info.addSpawnerTodo(new BlockPos(x, oy + y, z), mobid);
-                                } else {
-                                    b = airChar;
-                                }
-                            } else if (b == chestChar) {
-                                info.addChestTodo(new BlockPos(x, oy+y, z));
                             }
                             primer.data[index] = b;
                         }
@@ -1505,7 +1528,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return adjacent.isCity && !adjacent.hasBuilding && adjacent.cityLevel < info.cityLevel;
     }
 
-    private void generateBuilding(ChunkPrimer primer, BuildingInfo info, List<Integer> torches) {
+    private void generateBuilding(ChunkPrimer primer, BuildingInfo info) {
         int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * 6;
 
         for (int x = 0; x < 16; ++x) {
@@ -1521,7 +1544,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int height = lowestLevel;
         for (int f = -info.floorsBelowGround; f <= info.getNumFloors(); f++) {
             BuildingPart part = info.getFloor(f);
-            generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0, torches);
+            generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0);
 
             // Check for doors
             boolean isTop = f == info.getNumFloors();   // The top does not need generated doors
