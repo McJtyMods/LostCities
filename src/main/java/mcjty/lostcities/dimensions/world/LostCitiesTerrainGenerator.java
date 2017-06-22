@@ -1474,11 +1474,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 int destroyedBlocks = (int) (blocks * damage);
                 // How many go this direction (approx, based on cardinal directions from building as well as number that simply fall down)
                 destroyedBlocks /= provider.profile.DEBRIS_TO_NEARBYCHUNK_FACTOR;
+                int h = adjacentInfo.getMaxHeight() + 10;
                 for (int i = 0; i < destroyedBlocks; i++) {
                     int x = rand.nextInt(16);
                     int z = rand.nextInt(16);
                     if (rand.nextFloat() < locationFactor.apply(x, z)) {
-                        int index = (x << 12) | (z << 8) + 254;     // Start one lower for safety
+                        int index = (x << 12) | (z << 8) + h;
                         while (primer.data[index] == airChar || primer.data[index] == liquidChar) {
                             index--;
                         }
@@ -1497,20 +1498,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
-    }
-
-    private boolean isDoOceanBorder(BuildingInfo info, int x, int z) {
-        if (x == 0 && doBorder(info, Direction.XMIN)) {
-            return true;
-        } else if (x == 15 && doBorder(info, Direction.XMAX)) {
-            return true;
-        }
-        if (z == 0 && doBorder(info, Direction.ZMIN)) {
-            return true;
-        } else if (z == 15 && doBorder(info, Direction.ZMAX)) {
-            return true;
-        }
-        return false;
     }
 
     private boolean doBorder(BuildingInfo info, Direction direction) {
