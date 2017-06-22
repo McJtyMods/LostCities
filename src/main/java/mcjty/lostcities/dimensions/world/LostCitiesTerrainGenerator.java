@@ -1264,11 +1264,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
                     while (primer.data[index - 1] == airChar) {
                         index--;
-                        height--;
                     }
-                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS+1 - x))) {
+                    float v = Math.min(.8f, provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - x));
+                    int cnt = 0;
+                    while (rand.nextFloat() < v && cnt < 30) {
                         primer.data[index++] = leavesChar;
-                        height++;
+                        cnt++;
                     }
                 }
             }
@@ -1280,11 +1281,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
                     while (primer.data[index - 1] == airChar) {
                         index--;
-                        height--;
                     }
-                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 14 + provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS))) {
+                    float v = Math.min(.8f, provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 14 + provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS));
+                    int cnt = 0;
+                    while (rand.nextFloat() < v && cnt < 30) {
                         primer.data[index++] = leavesChar;
-                        height++;
+                        cnt++;
                     }
                 }
             }
@@ -1296,11 +1298,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
                     while (primer.data[index - 1] == airChar) {
                         index--;
-                        height--;
                     }
-                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS+1 - z))) {
+                    float v = Math.min(.8f, provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - z));
+                    int cnt = 0;
+                    while (rand.nextFloat() < v && cnt < 30) {
                         primer.data[index++] = leavesChar;
-                        height++;
+                        cnt++;
                     }
                 }
             }
@@ -1312,11 +1315,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
                     while (primer.data[index - 1] == airChar) {
                         index--;
-                        height--;
                     }
-                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 14 + provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS))) {
+                    float v = provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 14 + provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS);
+                    int cnt = 0;
+                    while (rand.nextFloat() < v && cnt < 30) {
                         primer.data[index++] = leavesChar;
-                        height++;
+                        cnt++;
                     }
                 }
             }
