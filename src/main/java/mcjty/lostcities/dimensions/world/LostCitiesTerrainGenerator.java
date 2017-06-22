@@ -1561,15 +1561,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             // Underground we replace the glass with solid bricks
             for (int x = 0 ; x < 16 ; x++) {
                 int index = (x << 12) | (0 << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel()+1, styledBricks);
+                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmin().getCityGroundLevel())+1, styledBricks);
                 index = (x << 12) | (15 << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel()+1, styledBricks);
+                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmax().getCityGroundLevel())+1, styledBricks);
             }
             for (int z = 1 ; z < 15 ; z++) {
                 int index = (0 << 12) | (z << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel()+1, styledBricks);
+                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmin().getCityGroundLevel())+1, styledBricks);
                 index = (15 << 12) | (z << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + info.getCityGroundLevel()+1, styledBricks);
+                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmax().getCityGroundLevel())+1, styledBricks);
             }
         }
 
