@@ -26,6 +26,7 @@ public class LostCityProfile {
 
     public float VINE_CHANCE = 0.009f;
     public float CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
+    public int THICKNESS_OF_RANDOM_LEAFBLOCKS = 2;
 
     public int GROUNDLEVEL = 71;
     public int WATERLEVEL_OFFSET = 8;
@@ -57,9 +58,6 @@ public class LostCityProfile {
     public int MINI_EXPLOSION_MAXRADIUS = 15;
     public int MINI_EXPLOSION_MINHEIGHT = 60;
     public int MINI_EXPLOSION_MAXHEIGHT = 100;
-
-    public float STYLE_CHANCE_CRACKED = 0.06f;
-    public float STYLE_CHANCE_MOSSY = 0.05f;
 
     public float CITY_CHANCE = .02f;
     public int CITY_MINRADIUS = 50;
@@ -141,11 +139,10 @@ public class LostCityProfile {
         description = cfg.getString("description", categoryLostcity, inheritFrom.orElse(this).description, "The description of this profile");
         worldStyle = cfg.getString("worldStyle", categoryLostcity, inheritFrom.orElse(this).worldStyle, "The worldstyle used by this profile (defined in the assets)");
 
-        STYLE_CHANCE_CRACKED = cfg.getFloat("styleChanceCracked", categoryLostcity, inheritFrom.orElse(this).STYLE_CHANCE_CRACKED, 0.0f, 1.0f, "The chance that a brick will be cracked");
-        STYLE_CHANCE_MOSSY = cfg.getFloat("styleChanceMossy", categoryLostcity, inheritFrom.orElse(this).STYLE_CHANCE_MOSSY, 0.0f, 1.0f, "The chance that a brick will be mossy");
-
         VINE_CHANCE = cfg.getFloat("vineChance", categoryLostcity, inheritFrom.orElse(this).VINE_CHANCE, 0.0f, 1.0f, "The chance that a block on the outside of a building will be covered with a vine");
         CHANCE_OF_RANDOM_LEAFBLOCKS = cfg.getFloat("randomLeafBlockChance", categoryLostcity, inheritFrom.orElse(this).CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f, "Chance that leafblocks will be generated at the border of a building and a street");
+        THICKNESS_OF_RANDOM_LEAFBLOCKS = cfg.getInt("randomLeafBlockThickness", categoryLostcity, inheritFrom.orElse(this).THICKNESS_OF_RANDOM_LEAFBLOCKS, 1, 8,
+                "Frequency of leafblocks as seen from the sides of buildings");
 
         GROUNDLEVEL = cfg.getInt("groundLevel", categoryLostcity, inheritFrom.orElse(this).GROUNDLEVEL, 2, 256, "Ground level");
         WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", categoryLostcity, inheritFrom.orElse(this).WATERLEVEL_OFFSET, 1, 30, "How much lower the water level is compared to the ground level (63)");

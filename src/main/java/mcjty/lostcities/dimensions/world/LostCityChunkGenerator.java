@@ -181,6 +181,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
+        LostCitiesTerrainGenerator.setupChars();
         boolean isCity = BuildingInfo.isCity(chunkX, chunkZ, this);
 
         ChunkPrimer chunkprimer;

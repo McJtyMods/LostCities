@@ -35,7 +35,7 @@ public class LostCityConfiguration {
 
         initStandardProfiles();
         String[] profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "chisel"}, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
+                new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "chisel"}, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
         return profileList;
     }
 
@@ -76,6 +76,16 @@ public class LostCityConfiguration {
         profile.GENERATE_SPAWNERS = false;
         profile.GENERATE_LIGHTING = true;
         profile.GENERATE_LOOT = false;
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("ancient");
+        profile.setDescription("Ancient city, lots of vines and leafs, small damage");
+        profile.THICKNESS_OF_RANDOM_LEAFBLOCKS = 6;
+        profile.CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
+        profile.VINE_CHANCE = 0.09f;
+        profile.EXPLOSION_CHANCE = 0;
+        profile.MINI_EXPLOSION_CHANCE = .44f;
+        profile.MINI_EXPLOSION_MAXRADIUS = 10;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("chisel");

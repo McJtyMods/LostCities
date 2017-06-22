@@ -22,6 +22,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private final int groundLevel;
     private final int waterLevel;
+    private static boolean charsSetup = false;
     public static char airChar;
     public static char hardAirChar;
     public static char bricksChar;
@@ -53,7 +54,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private static Set<Character> railChars = null;
     private static Set<Character> charactersNeedingTodo = null;
 
-    private IBlockState baseBlock;
+    private static IBlockState baseBlock;
     private Character street;
     private Character streetBase;
     private Character street2;
@@ -129,45 +130,49 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
+    public static void setupChars() {
+        if (!charsSetup) {
+            baseBlock = Blocks.STONE.getDefaultState();
+            air = Blocks.AIR.getDefaultState();
+            hardAir = Blocks.COMMAND_BLOCK.getDefaultState();
+            water = Blocks.WATER.getDefaultState();
+            airChar = (char) Block.BLOCK_STATE_IDS.get(air);
+            hardAirChar = (char) Block.BLOCK_STATE_IDS.get(hardAir);
+            bricksChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONEBRICK.getDefaultState());
+            glowstoneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLOWSTONE.getDefaultState());
+            wallChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COBBLESTONE_WALL.getDefaultState());
+            baseChar = (char) Block.BLOCK_STATE_IDS.get(baseBlock);
+            liquidChar = (char) Block.BLOCK_STATE_IDS.get(water);
+            leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false));
+            ironbarsChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.IRON_BARS.getDefaultState());
+            ladderChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LADDER.getDefaultState());
+            grassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRASS.getDefaultState());
+            glassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS.getDefaultState());
+            glassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS_PANE.getDefaultState());
+            stainedGlassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS.getDefaultState());
+            stainedGlassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS_PANE.getDefaultState());
+            bedrockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.BEDROCK.getDefaultState());
+            endportalChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL.getDefaultState());
+            endportalFrameChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL_FRAME.getDefaultState());
+            torchChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.TORCH.getDefaultState());
+            goldBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GOLD_BLOCK.getDefaultState());
+            diamondBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.DIAMOND_BLOCK.getDefaultState());
+            spawnerChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.MOB_SPAWNER.getDefaultState());
+            chestChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.CHEST.getDefaultState());
+            charsSetup = true;
+        }
+    }
 
     // Note that for normal chunks this is called with a pre-filled in landscape primer
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
-        baseBlock = Blocks.STONE.getDefaultState();
-
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
         // @todo this setup is not very clean
-        air = Blocks.AIR.getDefaultState();
-        hardAir = Blocks.COMMAND_BLOCK.getDefaultState();
-        water = Blocks.WATER.getDefaultState();
         street = info.getCompiledPalette().get(info.getCityStyle().getStreetBlock());
         streetBase = info.getCompiledPalette().get(info.getCityStyle().getStreetBaseBlock());
         street2 = info.getCompiledPalette().get(info.getCityStyle().getStreetVariantBlock());
         streetBorder = (16 - info.getCityStyle().getStreetWidth()) / 2;
 
-        airChar = (char) Block.BLOCK_STATE_IDS.get(air);
-        hardAirChar = (char) Block.BLOCK_STATE_IDS.get(hardAir);
-        bricksChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONEBRICK.getDefaultState());
-        glowstoneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLOWSTONE.getDefaultState());
-        wallChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COBBLESTONE_WALL.getDefaultState());
-        baseChar = (char) Block.BLOCK_STATE_IDS.get(baseBlock);
-        liquidChar = (char) Block.BLOCK_STATE_IDS.get(water);
-        leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false));
-        ironbarsChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.IRON_BARS.getDefaultState());
-        ladderChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LADDER.getDefaultState());
-        grassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRASS.getDefaultState());
-        glassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS.getDefaultState());
-        glassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS_PANE.getDefaultState());
-        stainedGlassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS.getDefaultState());
-        stainedGlassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS_PANE.getDefaultState());
-        bedrockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.BEDROCK.getDefaultState());
-        endportalChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL.getDefaultState());
-        endportalFrameChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL_FRAME.getDefaultState());
-        torchChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.TORCH.getDefaultState());
-        goldBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GOLD_BLOCK.getDefaultState());
-        diamondBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.DIAMOND_BLOCK.getDefaultState());
-        spawnerChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.MOB_SPAWNER.getDefaultState());
-        chestChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.CHEST.getDefaultState());
 
         // @todo This should not be hardcoded here
         styledBricks = info.getCompiledPalette().get('#');
@@ -1251,7 +1256,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateRandomVegetation(ChunkPrimer primer, BuildingInfo info, Random rand, int height) {
         if (info.getXmin().hasBuilding) {
-            for (int x = 0 ; x < 2 ; x++) {
+            for (int x = 0 ; x < provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS ; x++) {
                 for (int z = 0 ; z < 16 ; z++) {
                     int index = (x << 12) | (z << 8) + height;
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
@@ -1259,7 +1264,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         index--;
                         height--;
                     }
-                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (3 - x))) {
+                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS+1 - x))) {
                         primer.data[index++] = leavesChar;
                         height++;
                     }
@@ -1267,7 +1272,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
         if (info.getXmax().hasBuilding) {
-            for (int x = 13 ; x < 15 ; x++) {
+            for (int x = 15-provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS ; x < 15 ; x++) {
                 for (int z = 0 ; z < 16 ; z++) {
                     int index = (x << 12) | (z << 8) + height;
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
@@ -1275,7 +1280,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         index--;
                         height--;
                     }
-                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 12))) {
+                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 14 + provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS))) {
                         primer.data[index++] = leavesChar;
                         height++;
                     }
@@ -1283,7 +1288,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
         if (info.getZmin().hasBuilding) {
-            for (int z = 0 ; z < 2 ; z++) {
+            for (int z = 0 ; z < provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS ; z++) {
                 for (int x = 0 ; x < 16 ; x++) {
                     int index = (x << 12) | (z << 8) + height;
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
@@ -1291,7 +1296,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         index--;
                         height--;
                     }
-                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (3 - z))) {
+                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS+1 - z))) {
                         primer.data[index++] = leavesChar;
                         height++;
                     }
@@ -1299,7 +1304,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
         if (info.getZmax().hasBuilding) {
-            for (int z = 13 ; z < 15 ; z++) {
+            for (int z = 15-provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS ; z < 15 ; z++) {
                 for (int x = 0 ; x < 16 ; x++) {
                     int index = (x << 12) | (z << 8) + height;
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
@@ -1307,7 +1312,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         index--;
                         height--;
                     }
-                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 12))) {
+                    while (rand.nextFloat() < (provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 14 + provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS))) {
                         primer.data[index++] = leavesChar;
                         height++;
                     }
