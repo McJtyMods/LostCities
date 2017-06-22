@@ -665,9 +665,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return true;
     }
 
+    private static Biome[] biomesForBiomeCheck = null;
+
     public static boolean isWaterBiome(LostCityChunkGenerator provider, int chunkX, int chunkZ) {
-        Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-        return isWaterBiome(biomes[55]) || isWaterBiome(biomes[54]) || isWaterBiome(biomes[56]);
+        biomesForBiomeCheck = provider.worldObj.getBiomeProvider().getBiomesForGeneration(biomesForBiomeCheck, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        return isWaterBiome(biomesForBiomeCheck[55]) || isWaterBiome(biomesForBiomeCheck[54]) || isWaterBiome(biomesForBiomeCheck[56]);
 //        return isWaterBiome(biomes);
     }
 

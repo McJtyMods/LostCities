@@ -1,11 +1,8 @@
 package mcjty.lostcities.dimensions.world;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import mcjty.lib.compat.CompatChunkGenerator;
 import mcjty.lib.compat.CompatMapGenStructure;
 import mcjty.lostcities.api.IChunkPrimerFactory;
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
@@ -23,7 +20,6 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.gen.ChunkProviderSettings;
 import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.MapGenCaves;
@@ -106,26 +102,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         }
 
 
-        String generatorOptions = world.getWorldInfo().getGeneratorOptions();
-        if (generatorOptions == null || generatorOptions.trim().isEmpty()) {
-            profile = LostCityConfiguration.profiles.get("default");
-            if (profile == null) {
-                throw new RuntimeException("Something went wrong! Profile '" + "default" + "' is missing!");
-            }
-        } else {
-            JsonParser parser = new JsonParser();
-            JsonElement parsed = parser.parse(generatorOptions);
-            String profileName;
-            if (parsed.getAsJsonObject().has("profile")) {
-                profileName = parsed.getAsJsonObject().get("profile").getAsString();
-            } else {
-                profileName = "default";
-            }
-            profile = LostCityConfiguration.profiles.get(profileName);
-            if (profile == null) {
-                throw new RuntimeException("Something went wrong! Profile '" + profileName + "' is missing!");
-            }
-        }
+        profile = LostWorldType.getProfile(world);
 
         System.out.println("LostCityChunkGenerator.LostCityChunkGenerator: profile=" + profile.getName());
         worldStyle = AssetRegistries.WORLDSTYLES.get(profile.getWorldStyle());

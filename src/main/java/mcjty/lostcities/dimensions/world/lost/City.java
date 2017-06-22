@@ -67,6 +67,8 @@ public class City {
         return AssetRegistries.CITYSTYLES.get(Tools.getRandomFromList(provider, rand, styles));
     }
 
+    private static Biome[] biomesForCityFactor = null;
+
     public static float getCityFactor(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         long seed = provider.seed;
         float factor = 0;
@@ -85,15 +87,15 @@ public class City {
         }
 
         Float foundFactor = null;
-        Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        biomesForCityFactor = provider.worldObj.getBiomeProvider().getBiomesForGeneration(biomesForCityFactor, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
 
-        if (biomes[55].getBaseHeight() > 4 || biomes[54].getBaseHeight() > 4 || biomes[56].getBaseHeight() > 4
-                || biomes[5].getBaseHeight() > 4 || biomes[95].getBaseHeight() > 4) {
+        if (biomesForCityFactor[55].getBaseHeight() > 4 || biomesForCityFactor[54].getBaseHeight() > 4 || biomesForCityFactor[56].getBaseHeight() > 4
+                || biomesForCityFactor[5].getBaseHeight() > 4 || biomesForCityFactor[95].getBaseHeight() > 4) {
             return 0;   // These biomes are too high
         }
 
 
-        for (Biome biome : biomes) {
+        for (Biome biome : biomesForCityFactor) {
             Map<String, Float> map = provider.profile.getBiomeFactorMap();
             ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
             Float f = map.get(object.toString());

@@ -149,7 +149,7 @@ public class BuildingInfo {
         todo.add(new ChunkPos(chunkX, chunkZ));
         while (!todo.isEmpty()) {
             ChunkPos cp = todo.poll();
-            if (isCity(cp.chunkXPos, cp.chunkZPos, provider) && !hasBuilding(cp.chunkXPos, cp.chunkZPos, provider) && !streets.contains(cp)) {
+            if (isCity(cp.chunkXPos, cp.chunkZPos, provider) && !hasBuilding(cp.chunkXPos, cp.chunkZPos, provider) && !streets.contains(cp) && streets.size() < 20) {
                 streets.add(cp);
                 todo.add(new ChunkPos(cp.chunkXPos-1, cp.chunkZPos));
                 todo.add(new ChunkPos(cp.chunkXPos+1, cp.chunkZPos));
@@ -626,7 +626,7 @@ public class BuildingInfo {
     }
 
     public static double getChunkHeight(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        LostCitiesTerrainGenerator generator = (LostCitiesTerrainGenerator) provider.terrainGenerator;
+        LostCitiesTerrainGenerator generator = provider.terrainGenerator;
         provider.biomesForGeneration = provider.worldObj.getBiomeProvider().getBiomesForGeneration(provider.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
         generator.generateHeightmap(chunkX * 4, 0, chunkZ * 4);
         double t = 0;
@@ -647,6 +647,8 @@ public class BuildingInfo {
         return a;
     }
 
+    private static Biome[] biomesForCityLevel = null;
+
     /**
      * This function does not use the cache. So safe to use when the cache is building
      */
@@ -656,12 +658,12 @@ public class BuildingInfo {
             return getLevelBasedOnHeight(height, provider);
         } else {
             // @todo: average out nearby biomes?
-            Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+            biomesForCityLevel = provider.worldObj.getBiomeProvider().getBiomesForGeneration(biomesForCityLevel, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
             float h = 0.0f;
-            for (Biome biome : biomes) {
+            for (Biome biome : biomesForCityLevel) {
                 h += biome.getBaseHeight();
             }
-            h /= biomes.length;
+            h /= biomesForCityLevel.length;
 
             // deep ocean = -1.8
             // ocean = -1

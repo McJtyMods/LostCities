@@ -97,9 +97,11 @@ public class WorldStyle implements IAsset {
     }
 
 
+    private static Biome[] biomesForCityStyle = null;
+
     public String getRandomCityStyle(LostCityChunkGenerator provider, int chunkX, int chunkZ, Random random) {
-        Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-        Info info = new Info(biomes, chunkX, chunkZ);
+        biomesForCityStyle = provider.worldObj.getBiomeProvider().getBiomesForGeneration(biomesForCityStyle, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        Info info = new Info(biomesForCityStyle, chunkX, chunkZ);
         List<Pair<Float, String>> ct = new ArrayList<>();
         for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {
             if (pair.getKey().test(info)) {

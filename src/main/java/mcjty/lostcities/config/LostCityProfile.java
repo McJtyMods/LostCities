@@ -75,6 +75,9 @@ public class LostCityProfile {
     public String[] CITY_BIOME_FACTORS = new String[] { "river=0", "frozen_river=0", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.4" };
     public Map<String, Float> biomeFactorMap = null;
 
+    public String[] ALLOWED_BIOME_FACTORS = new String[] { };
+
+
     public float BUILDING_CHANCE = .3f;
     public int BUILDING_MINFLOORS = 0;
     public int BUILDING_MAXFLOORS = 9;
@@ -196,6 +199,9 @@ public class LostCityProfile {
                 "If true the chests in the buildings will contain loot");
         GENERATE_LIGHTING = cfg.getBoolean("generateLigthing", categoryLostcity, inheritFrom.orElse(this).GENERATE_LIGHTING,
                 "If true then there will be minimal lighting in the buildings");
+
+        ALLOWED_BIOME_FACTORS = cfg.getStringList("allowedBiomeFactors", categoryCities, inheritFrom.orElse(this).ALLOWED_BIOME_FACTORS,
+                "List of biomes that are allowed in the world. Empty list is default all biomes. The factor controls how much that biome is favored over the others (higher means less favored!)");
     }
 
     private void initCities(Configuration cfg) {
