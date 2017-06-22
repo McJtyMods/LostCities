@@ -12,6 +12,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
@@ -59,8 +60,8 @@ public class CommandBuildPart implements CompatCommand {
                     for (int z = 0; z < part.getZSize(); z++) {
                         BlockPos pos = new BlockPos(info.chunkX*16+x, start.getY()+y, info.chunkZ*16+z);
                         Character character = part.getC(x, y, z);
-                        IBlockState state = palette.getState(character);
-                        if (state != null) {
+                        IBlockState state = palette.getStraight(character);
+                        if (state != null && state.getBlock() != Blocks.COMMAND_BLOCK) {
                             try {
                                 sender.getEntityWorld().setBlockState(pos, state, 3);
                             } catch (Exception e) {

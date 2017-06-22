@@ -700,6 +700,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         Railway.RailChunkType type = railInfo.getType();
         BuildingPart part;
         Transform transform = Transform.ROTATE_NONE;
+        boolean needsStaircase = false;
         switch (type) {
             case NONE:
                 return;
@@ -718,6 +719,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
                 break;
             case STATION_UNDERGROUND:
+                part = AssetRegistries.PARTS.get("station_underground_stairs");
+                needsStaircase = true;
+                break;
             case STATION_EXTENSION_UNDERGROUND:
                 part = AssetRegistries.PARTS.get("station_underground");
                 break;
@@ -760,6 +764,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 break;
         }
         generatePart(primer, info, part, transform, 0, height, 0);
+        if (needsStaircase) {
+            part = AssetRegistries.PARTS.get("station_staircase");
+            for (int i = railInfo.getLevel() + 1 ; i < info.cityLevel ; i++) {
+                height = provider.profile.GROUNDLEVEL + i * 6;
+                generatePart(primer, info, part, transform, 0, height, 0);
+            }
+            height = provider.profile.GROUNDLEVEL + info.cityLevel * 6;
+            part = AssetRegistries.PARTS.get("station_staircase_surface");
+            generatePart(primer, info, part, transform, 0, height, 0);
+        }
     }
 
     private void generateStreetDecorations(ChunkPrimer primer, BuildingInfo info) {

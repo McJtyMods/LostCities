@@ -4,9 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import mcjty.lostcities.varia.Tools;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -14,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * A palette of materials as used by building parts
@@ -69,7 +66,6 @@ public class Palette implements IAsset {
             Object value = null;
             Character c = o.get("char").getAsCharacter();
             IBlockState dmg = null;
-            String mobId = null;
             if (o.has("damaged")) {
                 dmg = Tools.stringToState(o.get("damaged").getAsString());
             }
@@ -140,29 +136,8 @@ public class Palette implements IAsset {
         return this;
     }
 
-    public Palette addMapping(char c, Block block) {
-        IBlockState state = block.getDefaultState();
-        palette.put(c, state);
-        return this;
-    }
-
-    public Palette addMapping(char c, String styledBlock) {
-        palette.put(c, styledBlock);
-        return this;
-    }
-
     public Palette addMappingViaState(char c, Pair<Float, IBlockState>... randomBlocks) {
-        Supplier<IBlockState> function = () -> {
-            float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
-            for (Pair<Float, IBlockState> pair : randomBlocks) {
-                r -= pair.getKey();
-                if (r <= 0) {
-                    return pair.getRight();
-                }
-            }
-            return LostCitiesTerrainGenerator.air;
-        };
-        palette.put(c, function);
+        palette.put(c, randomBlocks);
         return this;
     }
 }

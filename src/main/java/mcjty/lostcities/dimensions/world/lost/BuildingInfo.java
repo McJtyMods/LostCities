@@ -333,10 +333,14 @@ public class BuildingInfo {
         } else if (hasRailway(chunkX, chunkZ, provider)) {
             // We are above a railway. Check if we have room for a building
             Railway.RailChunkInfo info = Railway.getRailChunkType(chunkX, chunkZ, provider);
-            int maxh = info.getLevel();
-            b = cityLevel > maxh+1;       // Allow a building if it is higher then the maximum railway + one
-            // Later we will take care to make sure we don't have too many cellars
-            // Note that for easy of coding we still disallow multi-buildings above railways
+            if (info.getType() == Railway.RailChunkType.STATION_UNDERGROUND) {
+                b = false;  // No building directly above the underground station
+            } else {
+                int maxh = info.getLevel();
+                b = cityLevel > maxh + 1;       // Allow a building if it is higher then the maximum railway + one
+                // Later we will take care to make sure we don't have too many cellars
+                // Note that for easy of coding we still disallow multi-buildings above railways
+            }
         } else {
             // General case
             b = true;
