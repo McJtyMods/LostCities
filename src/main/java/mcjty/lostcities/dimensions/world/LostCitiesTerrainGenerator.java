@@ -804,6 +804,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 break;
             case VERTICAL:
                 part = AssetRegistries.PARTS.get("rails_vertical");
+                if (primer.data[Tools.calcIndex(3, height+2, 3)] == liquidChar &&
+                        primer.data[Tools.calcIndex(12, height+2, 3)] == liquidChar &&
+                        primer.data[Tools.calcIndex(3, height+2, 12)] == liquidChar &&
+                        primer.data[Tools.calcIndex(12, height+2, 12)] == liquidChar &&
+                        primer.data[Tools.calcIndex(3, height+4, 7)] == liquidChar &&
+                        primer.data[Tools.calcIndex(12, height+4, 8)] == liquidChar) {
+                    part = AssetRegistries.PARTS.get("rails_vertical_water");
+                }
                 if (railInfo.getDirection() == Railway.RailDirection.EAST) {
                     transform = Transform.MIRROR_X;
                 }
