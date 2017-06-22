@@ -1241,6 +1241,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
                     if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
                         primer.data[index + (height++)] = glassChar;
+                        info.addGenericTodo(new BlockPos(x , height, z));
                         primer.data[index + (height++)] = glowstoneChar;
                     } else {
                         primer.data[index + (height++)] = bricksChar;
