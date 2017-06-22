@@ -48,12 +48,7 @@ public class DamageArea {
         }
     }
 
-    public Character damageBlock(Character b, LostCityChunkGenerator provider, int x, int y, int z, CompiledPalette palette) {
-        float damage = getDamage(x, y, z);
-        if (damage < 0.001) {
-            return b;
-        }
-
+    public Character damageBlock(Character b, LostCityChunkGenerator provider, int y, float damage, CompiledPalette palette) {
         if (b == LostCitiesTerrainGenerator.bedrockChar || b == LostCitiesTerrainGenerator.endportalChar || b == LostCitiesTerrainGenerator.endportalFrameChar) {
             return b;
         }

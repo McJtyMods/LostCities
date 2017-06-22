@@ -193,7 +193,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         if (info.getDamageArea().hasExplosions()) {
             breakBlocksForDamage(chunkX, chunkZ, primer, info);
-            fixAfterExplosion(primer, info, provider.rand);
+            fixAfterExplosionNew(primer, info, provider.rand);
         }
         generateDebris(primer, provider.rand, info);
     }
@@ -307,9 +307,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         DamageArea damageArea = info.getDamageArea();
 
+        boolean clear = false;
+        float damageFactor = 1.0f;
+
         for (int yy = 0; yy < 16; yy++) {
-            if (damageArea.hasExplosions(yy)) {
-                if (damageArea.isCompletelyDestroyed(yy)) {
+            if (clear || damageArea.hasExplosions(yy)) {
+                if (clear || damageArea.isCompletelyDestroyed(yy)) {
                     for (int x = 0; x < 16; x++) {
                         for (int z = 0; z < 16; z++) {
                             int height = yy * 16;
@@ -320,22 +323,64 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             }
                         }
                     }
+                    // All further subchunks will also be totally cleared
+                    clear = true;
                 } else {
-                    for (int x = 0; x < 16; x++) {
-                        for (int z = 0; z < 16; z++) {
-                            int index = (x << 12) | (z << 8) + yy * 16;
-                            for (int y = 0; y < 16; y++) {
+                    for (int y = 0 ; y < 16 ; y++) {
+                        int cntDamaged = 0;
+                        int cntAir = 0;
+                        int index = yy*16 + y;
+                        int cury = yy * 16 + y;
+                        for (int x = 0; x < 16; x++) {
+                            for (int z = 0; z < 16; z++) {
                                 char d = primer.data[index];
                                 if (d != airChar || (index & 0xff) < waterLevel) {
-                                    Character newd = damageArea.damageBlock(d, provider, cx + x, yy * 16 + y, cz + z, info.getCompiledPalette());
-                                    if (newd != d) {
-                                        primer.data[index] = newd;
+                                    float damage = damageArea.getDamage(cx + x, cury, cz + z) * damageFactor;
+                                    if (damage >= 0.001) {
+                                        Character newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette());
+                                        if (newd != d) {
+                                            primer.data[index] = newd;
+                                            cntDamaged++;
+                                        }
                                     }
+                                } else {
+                                    cntAir++;
                                 }
-                                index++;
+                                index += 1<<8;
                             }
                         }
+
+                        int tot = cntDamaged + cntAir;
+                        if (tot > 250) {
+                            damageFactor = 200;
+                            clear = true;
+                        } else if (tot > 220) {
+                            damageFactor = damageFactor * 1.4f;
+                        } else if (tot > 180) {
+                            damageFactor = damageFactor * 1.2f;
+                        }
+
                     }
+
+//                    for (int x = 0; x < 16; x++) {
+//                        for (int z = 0; z < 16; z++) {
+//                            int index = (x << 12) | (z << 8) + yy * 16;
+//                            for (int y = 0; y < 16; y++) {
+//                                char d = primer.data[index];
+//                                if (d != airChar || (index & 0xff) < waterLevel) {
+//                                    int cury = yy * 16 + y;
+//                                    float damage = damageArea.getDamage(cx + x, cury, cz + z);
+//                                    if (damage >= 0.001) {
+//                                        Character newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette());
+//                                        if (newd != d) {
+//                                            primer.data[index] = newd;
+//                                        }
+//                                    }
+//                                }
+//                                index++;
+//                            }
+//                        }
+//                    }
                 }
             }
         }
@@ -1083,6 +1128,85 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
+
+        // Sort all blobs we delete with lowest first
+        blobs.sort((o1, o2) -> {
+            int y1 = o1.destroyOrMoveThis(provider) ? o1.lowestY : 1000;
+            int y2 = o2.destroyOrMoveThis(provider) ? o2.lowestY : 1000;
+            return y1 - y2;
+        });
+
+
+        Blob blocksToMove = new Blob(0, 256);
+        for (Blob blob : blobs) {
+            if (!blob.destroyOrMoveThis(provider)) {
+                // The rest of the blobs doesn't have to be destroyed anymore
+                break;
+            }
+            if (rand.nextFloat() < provider.profile.DESTROY_OR_MOVE_CHANCE || blob.connectedBlocks.size() < provider.profile.DESTROY_SMALL_SECTIONS_SIZE
+                    || blob.connections < 5) {
+                for (Integer index : blob.connectedBlocks) {
+                    primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
+                }
+            } else {
+                blocksToMove.connectedBlocks.addAll(blob.connectedBlocks);
+            }
+        }
+        for (Integer index : blocksToMove.connectedBlocks) {
+            char c = primer.data[index];
+            primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
+            index--;
+            int y = index & 255;
+            while (y > 2 && (blocksToMove.contains(index) || primer.data[index] == airChar || primer.data[index] == liquidChar)) {
+                index--;
+                y--;
+            }
+            index++;
+            primer.data[index] = c;
+        }
+    }
+
+    /// Fix floating blocks after an explosion
+    private void fixAfterExplosionNew(ChunkPrimer primer, BuildingInfo info, Random rand) {
+        int start = info.getDamageArea().getLowestExplosionHeight();
+        if (start == -1) {
+            // Nothing is affected
+            return;
+        }
+        int end = info.getDamageArea().getHighestExplosionHeight();
+
+        List<Blob> blobs = new ArrayList<>();
+
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                int index = (x << 12) | (z << 8) + start;
+                for (int y = start; y < end; y++) {
+                    char p = primer.data[index];
+                    if (p != airChar && p != liquidChar) {
+                        Blob blob = findBlob(blobs, index);
+                        if (blob == null) {
+                            blob = new Blob(start, end + 6);
+                            blob.scan(info, primer, airChar, liquidChar, new BlockPos(x, y, z));
+                            blobs.add(blob);
+                        }
+                    }
+                    index++;
+                }
+            }
+        }
+
+//        // Split large blobs that have very thin connections in Y direction
+//        for (Blob blob : blobs) {
+//            if (blob.getAvgdamage() > .3f && blob.getCntMindamage() < 10) { // @todo configurable?
+//                int y = blob.needsSplitting();
+//                if (y != -1) {
+//                    Set<Integer> toRemove = blob.cut(y);
+//                    for (Integer index : toRemove) {
+//                        primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
+//                    }
+//                }
+//            }
+//        }
 
         // Sort all blobs we delete with lowest first
         blobs.sort((o1, o2) -> {
