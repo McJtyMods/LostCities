@@ -86,6 +86,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             charactersNeedingTodo.add(torchChar);
             charactersNeedingTodo.add(spawnerChar);
             charactersNeedingTodo.add(chestChar);
+            charactersNeedingTodo.add(glowstoneChar);
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK)));
@@ -1433,8 +1434,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                     } else {
                                         b = airChar;
                                     }
-                                } else if (b == chestChar) {
-                                    info.addChestTodo(new BlockPos(x, oy + y, z));
+                                } else if (b == chestChar || b == glowstoneChar) {
+                                    info.addGenericTodo(new BlockPos(x, oy + y, z));
                                 } else {
                                     IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
                                     if (bs.getBlock() == Blocks.SAPLING) {

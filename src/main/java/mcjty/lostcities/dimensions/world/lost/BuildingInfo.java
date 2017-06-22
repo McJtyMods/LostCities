@@ -71,7 +71,7 @@ public class BuildingInfo {
 
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, String>> mobSpawnerTodo = new ArrayList<>();
-    private final List<BlockPos> chestTodo = new ArrayList<>();
+    private final List<BlockPos> genericTodo = new ArrayList<>();
     private final List<Integer> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
 
@@ -104,16 +104,16 @@ public class BuildingInfo {
         torchTodo.clear();
     }
 
-    public void addChestTodo(BlockPos pos) {
-        chestTodo.add(pos);
+    public void addGenericTodo(BlockPos pos) {
+        genericTodo.add(pos);
     }
 
-    public List<BlockPos> getChestTodo() {
-        return chestTodo;
+    public List<BlockPos> getGenericTodo() {
+        return genericTodo;
     }
 
-    public void clearChestTodo() {
-        chestTodo.clear();
+    public void clearGenericTodo() {
+        genericTodo.clear();
     }
 
     public void addSpawnerTodo(BlockPos pos, String mobId) {

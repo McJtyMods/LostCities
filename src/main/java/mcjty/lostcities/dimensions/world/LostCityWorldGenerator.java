@@ -141,16 +141,19 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         }
         info.clearMobSpawnerTodo();
 
-        for (BlockPos cpos : info.getChestTodo()) {
+        for (BlockPos cpos : info.getGenericTodo()) {
             BlockPos pos = cpos.add(cx, 0, cz);
             // Double check that it is still a chest (could be destroyed by explosion)
-            if (world.getBlockState(pos).getBlock() == Blocks.CHEST) {
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() == Blocks.CHEST) {
                 if (chunkGenerator.profile.GENERATE_LOOT) {
                     createLootChest(random, world, pos);
                 }
+            } else if (state.getBlock() == Blocks.GLOWSTONE) {
+                world.setBlockState(pos, state, 3);
             }
         }
-        info.clearChestTodo();
+        info.clearGenericTodo();
     }
 
 
