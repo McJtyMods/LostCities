@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
+import org.apache.logging.log4j.Logger;
 
 @Mod(modid = LostCities.MODID, name="The Lost Cities",
         dependencies =
@@ -38,12 +39,15 @@ public class LostCities {
     public static boolean biomesoplenty = false;
     public static boolean atg = false;
 
+    public static Logger logger;
+
     /**
      * Run before anything else. Read your config, create blocks, items, etc, and
      * register them with the GameRegistry.
      */
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
+        logger = e.getModLog();
         chisel = Loader.isModLoaded("chisel");
         biomesoplenty = Loader.isModLoaded("biomesoplenty") || Loader.isModLoaded("BiomesOPlenty");
 //        atg = Loader.isModLoaded("atg"); // @todo
