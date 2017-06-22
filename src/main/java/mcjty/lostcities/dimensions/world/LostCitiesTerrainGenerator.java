@@ -115,6 +115,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             addStates(Blocks.SANDSTONE_STAIRS, rotatableChars);
             addStates(Blocks.SPRUCE_STAIRS, rotatableChars);
             addStates(Blocks.STONE_STAIRS, rotatableChars);
+            addStates(Blocks.LADDER, rotatableChars);
         }
         return rotatableChars;
     }
