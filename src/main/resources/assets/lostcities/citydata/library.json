@@ -61,6 +61,10 @@
         "block": "minecraft:rail@6"
       },
       {
+        "char": "s",
+        "block": "minecraft:rail@7"
+      },
+      {
         "char": "m",
         "block": "minecraft:golden_rail@8"
       },

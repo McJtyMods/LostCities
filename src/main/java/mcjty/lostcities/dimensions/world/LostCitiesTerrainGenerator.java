@@ -764,6 +764,68 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 break;
         }
         generatePart(primer, info, part, transform, 0, height, 0);
+
+        if (railInfo.getRails() < 3) {
+            // We may have to reduce number of rails
+            int index;
+            switch (railInfo.getType()) {
+                case NONE:
+                    break;
+                case STATION_SURFACE:
+                case STATION_UNDERGROUND:
+                case STATION_EXTENSION_SURFACE:
+                case STATION_EXTENSION_UNDERGROUND:
+                case HORIZONTAL:
+                    if (railInfo.getRails() == 1) {
+                        for (int x = 0 ; x < 16 ; x++) {
+                            index = (x << 12) | (5 << 8) + height + 1;
+                            primer.data[index] = bricksChar;
+                            index = (x << 12) | (9 << 8) + height + 1;
+                            primer.data[index] = bricksChar;
+                        }
+                    } else {
+                        for (int x = 0 ; x < 16 ; x++) {
+                            index = (x << 12) | (7 << 8) + height + 1;
+                            primer.data[index] = bricksChar;
+                        }
+                    }
+                    break;
+                case GOING_DOWN_TWO_FROM_SURFACE:
+                case GOING_DOWN_ONE_FROM_SURFACE:
+                case GOING_DOWN_FURTHER:
+                    if (railInfo.getRails() == 1) {
+                        for (int x = 0 ; x < 16 ; x++) {
+                            for (int y = height + 1 ; y < height + part.getSliceCount() ; y++) {
+                                index = (x << 12) | (5 << 8) + y;
+                                if (getRailChars().contains(primer.data[index])) {
+                                    primer.data[index] = bricksChar;
+                                }
+                                index = (x << 12) | (9 << 8) + y;
+                                if (getRailChars().contains(primer.data[index])) {
+                                    primer.data[index] = bricksChar;
+                                }
+                            }
+                        }
+                    } else {
+                        for (int x = 0 ; x < 16 ; x++) {
+                            for (int y = height + 1 ; y < height + part.getSliceCount() ; y++) {
+                                index = (x << 12) | (7 << 8) + y;
+                                if (getRailChars().contains(primer.data[index])) {
+                                    primer.data[index] = bricksChar;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case THREE_SPLIT:
+                    break;
+                case VERTICAL:
+                    break;
+                case DOUBLE_BEND:
+                    break;
+            }
+        }
+
         if (needsStaircase) {
             part = AssetRegistries.PARTS.get("station_staircase");
             for (int i = railInfo.getLevel() + 1 ; i < info.cityLevel ; i++) {
@@ -1561,15 +1623,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             // Underground we replace the glass with solid bricks
             for (int x = 0 ; x < 16 ; x++) {
                 int index = (x << 12) | (0 << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmin().getCityGroundLevel())+1, styledBricks);
+                // Use safe version because this may end up being lower
+                BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmin().getCityGroundLevel())+1, styledBricks);
                 index = (x << 12) | (15 << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmax().getCityGroundLevel())+1, styledBricks);
+                BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmax().getCityGroundLevel())+1, styledBricks);
             }
             for (int z = 1 ; z < 15 ; z++) {
                 int index = (0 << 12) | (z << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmin().getCityGroundLevel())+1, styledBricks);
+                BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmin().getCityGroundLevel())+1, styledBricks);
                 index = (15 << 12) | (z << 8);
-                BaseTerrainGenerator.setBlockStateRange(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmax().getCityGroundLevel())+1, styledBricks);
+                BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmax().getCityGroundLevel())+1, styledBricks);
             }
         }
 

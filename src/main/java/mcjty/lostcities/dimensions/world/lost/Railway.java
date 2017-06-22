@@ -157,7 +157,7 @@ public class Railway {
                 // @todo with a random chance we don't even have rails here
                 return new RailChunkInfo(HORIZONTAL, BI, -3, 1);
             }
-            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 0, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 1);
+            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 1, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, -3, 1);
         }
         if (mx == 0 && mz == 0) {
             return RailChunkInfo.NOTHING;

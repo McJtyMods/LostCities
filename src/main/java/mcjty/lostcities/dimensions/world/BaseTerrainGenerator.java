@@ -30,6 +30,13 @@ public interface BaseTerrainGenerator {
         Arrays.fill(primer.data, s, e, c);
     }
 
+    static void setBlockStateRangeSafe(ChunkPrimer primer, int s, int e, char c) {
+        if (e <= s) {
+            return;
+        }
+        Arrays.fill(primer.data, s, e, c);
+    }
+
     static IBlockState getBlockState(ChunkPrimer primer, int index) {
         IBlockState iblockstate = Block.BLOCK_STATE_IDS.getByValue(primer.data[index]);
         return iblockstate == null ? defaultState : iblockstate;
