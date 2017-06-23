@@ -85,11 +85,11 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
     public IChunkPrimerFactory otherGenerator = null;
 
     public LostCityChunkGenerator(World world, IChunkPrimerFactory otherGenerator) {
-        this(world);
+        this(world, world.getSeed());
         this.otherGenerator = otherGenerator;
     }
 
-    public LostCityChunkGenerator(World world) {
+    public LostCityChunkGenerator(World world, long seed) {
 
         {
             caveGenerator = TerrainGen.getModdedMapGen(caveGenerator, CAVE);
@@ -115,7 +115,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
         this.worldType = world.getWorldInfo().getTerrainType();
 
-        this.seed = world.getSeed();
+        this.seed = seed;
         this.rand = new Random((seed + 516) * 314);
 
         int waterLevel = (byte) (profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET);
