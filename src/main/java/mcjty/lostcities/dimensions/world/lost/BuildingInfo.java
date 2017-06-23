@@ -4,6 +4,7 @@ import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
 import mcjty.lostcities.varia.QualityRandom;
 import net.minecraft.block.Block;
@@ -18,6 +19,7 @@ import java.util.*;
 public class BuildingInfo {
     public final int chunkX;
     public final int chunkZ;
+    public final ChunkCoord coord;
     public final LostCityChunkGenerator provider;
 
     public final boolean isCity;
@@ -78,9 +80,9 @@ public class BuildingInfo {
     private final List<BlockPos> saplingTodo = new ArrayList<>();
 
     // BuildingInfo cache
-    private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
-    private static Map<Pair<Integer, Integer>, CityInfo> cityInfoMap = new HashMap<>();
-    private static Map<Pair<Integer, Integer>, CityStyle> cityStyleCache = new HashMap<>();
+    private static Map<ChunkCoord, BuildingInfo> buildingInfoMap = new HashMap<>();
+    private static Map<ChunkCoord, CityInfo> cityInfoMap = new HashMap<>();
+    private static Map<ChunkCoord, CityStyle> cityStyleCache = new HashMap<>();
 
     public void addSaplingTodo(BlockPos pos) {
         saplingTodo.add(pos);
@@ -166,8 +168,7 @@ public class BuildingInfo {
     }
 
     public CityStyle getCityStyle() {
-        Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
-        if (!cityStyleCache.containsKey(key)) {
+        if (!cityStyleCache.containsKey(coord)) {
             CityStyle cityStyle;
             // If this is a street we find all other street chunks connected to this and pick the cityStyle
             // that represents the majority. This is to prevent streets from switching style randomly if two
@@ -181,15 +182,15 @@ public class BuildingInfo {
                 }
                 cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
                 for (ChunkPos cp : connectedStreets) {
-                    cityStyleCache.put(Pair.of(cp.chunkXPos, cp.chunkZPos), cityStyle);
+                    cityStyleCache.put(new ChunkCoord(coord.getDimension(), cp.chunkXPos, cp.chunkZPos), cityStyle);
                 }
             } else {
                 cityStyle = City.getCityStyle(chunkX, chunkZ, provider);
-                cityStyleCache.put(key, cityStyle);
+                cityStyleCache.put(coord, cityStyle);
             }
             return cityStyle;
         }
-        return cityStyleCache.get(key);
+        return cityStyleCache.get(coord);
     }
 
     private void createPalette(Random rand) {
@@ -279,7 +280,7 @@ public class BuildingInfo {
     }
 
     public static CityInfo getCityInfo(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
+        ChunkCoord key = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
         if (cityInfoMap.containsKey(key)) {
             return cityInfoMap.get(key);
         } else {
@@ -473,7 +474,7 @@ public class BuildingInfo {
     }
 
     public static BuildingInfo getBuildingInfo(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
+        ChunkCoord key = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
         if (buildingInfoMap.containsKey(key)) {
             return buildingInfoMap.get(key);
         }
@@ -486,6 +487,7 @@ public class BuildingInfo {
         this.provider = provider;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
+        this.coord = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
 
         CityInfo cityInfo = getCityInfo(chunkX, chunkZ, provider);
 

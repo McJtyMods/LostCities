@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.QualityRandom;
 
@@ -218,7 +217,7 @@ public class Railway {
     }
 
     public static RailChunkInfo getRailChunkType(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
+        ChunkCoord key = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
         if (railInfo.containsKey(key)) {
             return railInfo.get(key);
         }

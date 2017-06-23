@@ -45,6 +45,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     public Random rand;
     public long seed;
+    public int dimensionId;
 
     public World worldObj;
     public WorldType worldType;
@@ -101,7 +102,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
             oceanMonumentGenerator = (StructureOceanMonument) TerrainGen.getModdedMapGen(oceanMonumentGenerator, OCEAN_MONUMENT);
         }
 
-
+        dimensionId = world.provider.getDimension();
         profile = LostWorldType.getProfile(world);
 
         System.out.println("LostCityChunkGenerator.LostCityChunkGenerator: profile=" + profile.getName());
@@ -140,7 +141,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
 
     // Get a heightmap for a chunk. If needed calculate (and cache) a primer
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
-        ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
+        ChunkCoord key = new ChunkCoord(worldObj.provider.getDimension(), chunkX, chunkZ);
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
         } else if (cachedPrimers.containsKey(key)) {
@@ -165,7 +166,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         if (isCity) {
             chunkprimer = new ChunkPrimer();
         } else {
-            ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
+            ChunkCoord key = new ChunkCoord(worldObj.provider.getDimension(), chunkX, chunkZ);
             if (cachedPrimers.containsKey(key)) {
                 // We calculated a primer earlier. Reuse it
                 chunkprimer = cachedPrimers.get(key);

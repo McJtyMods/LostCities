@@ -40,7 +40,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getXHighwayLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return getHighwayLevel(provider, Highway.xHighwayLevelCache, cp -> hasXHighway(cp, provider), Orientation.X, new ChunkCoord(chunkX, chunkZ));
+        return getHighwayLevel(provider, Highway.xHighwayLevelCache, cp -> hasXHighway(cp, provider), Orientation.X, new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
     }
 
     /**
@@ -48,7 +48,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getZHighwayLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return getHighwayLevel(provider, Highway.zHighwayLevelCache, cp -> hasZHighway(cp, provider), Orientation.Z, new ChunkCoord(chunkX, chunkZ));
+        return getHighwayLevel(provider, Highway.zHighwayLevelCache, cp -> hasZHighway(cp, provider), Orientation.Z, new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
     }
 
     private static int getHighwayLevel(LostCityChunkGenerator provider, Map<ChunkCoord, Integer> cache, Function<ChunkCoord, Boolean> hasHighway, Orientation orientation, ChunkCoord cp) {
