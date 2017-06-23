@@ -21,6 +21,7 @@ public class CityStyle implements IAsset {
     private final List<Pair<Float, String>> parkSelector = new ArrayList<>();
     private final List<Pair<Float, String>> fountainSelector = new ArrayList<>();
     private final List<Pair<Float, String>> stairSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> frontSelector = new ArrayList<>();
     private final List<Pair<Float, String>> railDungeonSelector = new ArrayList<>();
     private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
     private String style;
@@ -104,6 +105,12 @@ public class CityStyle implements IAsset {
             String fountain = element.getAsJsonObject().get("stair").getAsString();
             stairSelector.add(Pair.of(factor, fountain));
         }
+        array = getArraySafe(object, "fronts");
+        for (JsonElement element : array) {
+            float factor = element.getAsJsonObject().get("factor").getAsFloat();
+            String fountain = element.getAsJsonObject().get("front").getAsString();
+            frontSelector.add(Pair.of(factor, fountain));
+        }
         array = getArraySafe(object, "bridges");
         for (JsonElement element : array) {
             float factor = element.getAsJsonObject().get("factor").getAsFloat();
@@ -186,6 +193,15 @@ public class CityStyle implements IAsset {
         object.add("stairs", array);
 
         array = new JsonArray();
+        for (Pair<Float, String> pair : frontSelector) {
+            JsonObject o = new JsonObject();
+            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("front", new JsonPrimitive(pair.getValue()));
+            array.add(o);
+        }
+        object.add("fronts", array);
+
+        array = new JsonArray();
         for (Pair<Float, String> pair : bridgeSelector) {
             JsonObject o = new JsonObject();
             o.add("factor", new JsonPrimitive(pair.getKey()));
@@ -206,18 +222,12 @@ public class CityStyle implements IAsset {
         return object;
     }
 
-    public CityStyle addBuilding(float factor, String building) {
-        buildingSelector.add(Pair.of(factor, building));
-        return this;
-    }
-
-    public CityStyle addMultiBuilding(float factor, String multiBuilding) {
-        multiBuildingSelector.add(Pair.of(factor, multiBuilding));
-        return this;
-    }
-
     public String getRandomStair(LostCityChunkGenerator provider, Random random) {
         return Tools.getRandomFromList(provider, random, stairSelector);
+    }
+
+    public String getRandomFront(LostCityChunkGenerator provider, Random random) {
+        return Tools.getRandomFromList(provider, random, frontSelector);
     }
 
     public String getRandomRailDungeon(LostCityChunkGenerator provider, Random random) {

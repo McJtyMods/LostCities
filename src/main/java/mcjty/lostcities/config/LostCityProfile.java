@@ -86,6 +86,7 @@ public class LostCityProfile {
     public int BUILDING_MINCELLARS = 0;
     public int BUILDING_MAXCELLARS = 4;
     public float BUILDING_DOORWAYCHANCE = .6f;
+    public float BUILDING_FRONTCHANCE = .2f;
     public float LIBRARY_CHANCE = .1f;
     public float DATACENTER_CHANCE = .1f;
 
@@ -164,6 +165,7 @@ public class LostCityProfile {
         BUILDING_MINCELLARS = cfg.getInt("buildingMinCellars", categoryLostcity, inheritFrom.orElse(this).BUILDING_MINCELLARS, 0, 7, "The minimum number of cellars (below ground). 0 means no cellar");
         BUILDING_MAXCELLARS = cfg.getInt("buildingMaxCellars", categoryLostcity, inheritFrom.orElse(this).BUILDING_MAXCELLARS, 0, 7, "The maximum number of cellars (below ground). 0 means no cellar");
         BUILDING_DOORWAYCHANCE = cfg.getFloat("buildingDoorwayChance", categoryLostcity, inheritFrom.orElse(this).BUILDING_DOORWAYCHANCE, 0.0f, 1.0f, "The chance that a doorway will be generated at a side of a building (on any level). Only when possible");
+        BUILDING_FRONTCHANCE = cfg.getFloat("buildingFrontChance", categoryLostcity, inheritFrom.orElse(this).BUILDING_FRONTCHANCE, 0.0f, 1.0f, "The chance that a building will have a 'front' part if this is possible (i.e. adjacent street)");
         LIBRARY_CHANCE = cfg.getFloat("libraryChance", categoryLostcity, inheritFrom.orElse(this).LIBRARY_CHANCE, 0.0f, 1.0f, "The chance that a 2x2 building will be a library");
         DATACENTER_CHANCE = cfg.getFloat("dataCenterChance", categoryLostcity, inheritFrom.orElse(this).DATACENTER_CHANCE, 0.0f, 1.0f, "The chance that a 2x2 building will be a data center");
 

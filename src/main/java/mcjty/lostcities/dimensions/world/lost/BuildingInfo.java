@@ -30,6 +30,7 @@ public class BuildingInfo {
     public final BuildingPart parkType;
     public final BuildingPart bridgeType;
     public final BuildingPart stairType;
+    public final BuildingPart frontType;
     private final float stairPriority;      // A random number that indicates if this chunk should get a stair if there are competing stairs around it. The highest wins
     public final BuildingPart railDungeon;    // Dungeon next to rails. Will only generate if there are actually rails next to it
     public final StreetType streetType;
@@ -615,6 +616,12 @@ public class BuildingInfo {
         } else {
             railDungeon = null;
         }
+
+        if (rand.nextFloat() < provider.profile.BUILDING_FRONTCHANCE) {
+            frontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(provider, rand));
+        } else {
+            frontType = null;
+        }
     }
 
     public int getHighwayXLevel() {
@@ -1067,6 +1074,32 @@ public class BuildingInfo {
         throw new IllegalStateException("Cannot happen!");
     }
 
+    // Call this from the street reference with the (potential building) as 'adj'
+    public boolean hasFrontPartFrom(BuildingInfo adj) {
+        BuildingInfo.StreetType st = streetType;
+        boolean elevated = isElevatedParkSection();
+        if (elevated) {
+            st = BuildingInfo.StreetType.PARK;
+        }
+
+        if (adj.hasBuilding && adj.frontType != null && st == BuildingInfo.StreetType.NORMAL && cityLevel < adj.cityLevel + adj.getNumFloors()) {
+            Railway.RailChunkType type = getRailInfo().getType();
+            if (type == Railway.RailChunkType.STATION_UNDERGROUND) {
+                return false;
+            }
+            if (type == Railway.RailChunkType.GOING_DOWN_ONE_FROM_SURFACE) {
+                return false;
+            }
+            if (getMaxHighwayLevel() >= 0) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+
     // This checks if there can be a connection at minX
     public boolean hasConnectionAtX(int level) {
         if (!isCity) {
@@ -1077,6 +1110,26 @@ public class BuildingInfo {
         }
         if (level < 0 || level >= connectionAtX.length) {
             return false;
+        }
+        if (getXmin().hasFrontPartFrom(this)) {
+            return true;
+        }
+        return connectionAtX[level];
+    }
+
+    // This checks if there can be a connection at minX
+    public boolean hasConnectionAtXFromStreet(int level) {
+        if (!isCity) {
+            return false;
+        }
+        if (building2x2Section == 1 || building2x2Section == 3) {
+            return false;
+        }
+        if (level < 0 || level >= connectionAtX.length) {
+            return false;
+        }
+        if (hasFrontPartFrom(getXmin())) {
+            return true;
         }
         return connectionAtX[level];
     }
@@ -1091,6 +1144,26 @@ public class BuildingInfo {
         }
         if (level < 0 || level >= connectionAtZ.length) {
             return false;
+        }
+        if (getZmin().hasFrontPartFrom(this)) {
+            return true;
+        }
+        return connectionAtZ[level];
+    }
+
+    // This checks if there can be a connection at minZ
+    public boolean hasConnectionAtZFromStreet(int level) {
+        if (!isCity) {
+            return false;
+        }
+        if (building2x2Section == 2 || building2x2Section == 3) {
+            return false;
+        }
+        if (level < 0 || level >= connectionAtZ.length) {
+            return false;
+        }
+        if (hasFrontPartFrom(getZmin())) {
+            return true;
         }
         return connectionAtZ[level];
     }

@@ -1361,7 +1361,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 height++;
             }
 
-            char b;
             switch (streetType) {
                 case NORMAL:
                     generateNormalStreetSection(primer, info, height);
@@ -1386,6 +1385,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
             generateRandomVegetation(primer, info, rand, height);
 
+            generateFrontPart(primer, info, height, info.getXmin(), Transform.ROTATE_NONE);
+            generateFrontPart(primer, info, height, info.getZmin(), Transform.ROTATE_90);
+            generateFrontPart(primer, info, height, info.getXmax(), Transform.ROTATE_180);
+            generateFrontPart(primer, info, height, info.getZmax(), Transform.ROTATE_270);
         }
 
         if (doBorder(info, Direction.XMIN)) {
@@ -1412,8 +1415,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 generateOceanBorder(primer, info, xRail, zRail, canDoParks, x, z);
             }
         }
+    }
 
-
+    private void generateFrontPart(ChunkPrimer primer, BuildingInfo info, int height, BuildingInfo adj, Transform rot) {
+        if (info.hasFrontPartFrom(adj)) {
+            generatePart(primer, adj, adj.frontType, rot, 0, height, 0);
+        }
     }
 
     private void generateCorridors(ChunkPrimer primer, BuildingInfo info, boolean xRail, boolean zRail) {
@@ -1861,6 +1868,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateDoors(ChunkPrimer primer, BuildingInfo info, int height, int f) {
+
+        if (info.chunkX == 331 && info.chunkZ == 59) {
+            System.out.println("LostCitiesTerrainGenerator.generateDoors");
+        }
+
         if (info.hasConnectionAtX(f + info.floorsBelowGround)) {
             int x = 0;
             int index = (x << 12) | (6 << 8);
@@ -1901,7 +1913,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
             primer.data[index + height + 2] = styledBricks;
-        } else if (hasConnectionToTopOrOutside(f, info, info.getXmax()) && info.getXmax().hasConnectionAtX(f + info.getXmax().floorsBelowGround)) {
+        } else if (hasConnectionToTopOrOutside(f, info, info.getXmax()) && (info.getXmax().hasConnectionAtXFromStreet(f + info.getXmax().floorsBelowGround))) {
             int x = 15;
             int index = (x << 12) | (6 << 8);
             BaseTerrainGenerator.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
@@ -1956,7 +1968,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
             primer.data[index + height + 2] = styledBricks;
-        } else if (hasConnectionToTopOrOutside(f, info, info.getZmax()) && info.getZmax().hasConnectionAtZ(f + info.getZmax().floorsBelowGround)) {
+        } else if (hasConnectionToTopOrOutside(f, info, info.getZmax()) && (info.getZmax().hasConnectionAtZFromStreet(f + info.getZmax().floorsBelowGround))) {
             int z = 15;
             int index = (6 << 12) | (z << 8);
             BaseTerrainGenerator.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
@@ -2015,6 +2027,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int globalLevel = info.localToGlobal(localLevel);
         int localAdjacent = info2.globalToLocal(globalLevel);
         return (!info2.hasBuilding && localLevel == 0 && localAdjacent == 0) || (info2.hasBuilding && localAdjacent == info2.getNumFloors());
+//        return (!info2.hasBuilding && localLevel == localAdjacent) || (info2.hasBuilding && localAdjacent == info2.getNumFloors());
     }
 
     private boolean hasConnectionWithBuilding(int localLevel, BuildingInfo info, BuildingInfo info2) {
