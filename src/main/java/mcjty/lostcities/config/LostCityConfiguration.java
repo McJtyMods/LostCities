@@ -10,6 +10,12 @@ public class LostCityConfiguration {
 
     public static final String CATEGORY_GENERAL = "general";
 
+    public static final String ASSET_COMMENT = "List of asset libraries loaded in the specified order. " +
+            "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded from the config directory";
+    public static final String WORLDTYPES_COMMENT = "List of other worldtypes (id) that this mod will try " +
+            "to work with. The worldtype has to support the IChunkPrimerFactory API for this to work";
+    public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
+
     public static String[] ASSETS = new String[] {
             "/assets/lostcities/citydata/palette.json",
             "/assets/lostcities/citydata/palette_desert.json",
@@ -46,8 +52,7 @@ public class LostCityConfiguration {
 
         if (oldVersion != VERSION) {
             LostCities.logger.info("Upgrading Lost Cities config from " + oldVersion + " to " + VERSION + "!");
-            String[] configuredAssets = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, "List of asset libraries loaded in the specified order. " +
-                    "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded from the config directory");
+            String[] configuredAssets = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, ASSET_COMMENT);
             List<String> mergedAssets = new ArrayList<>();
             Collections.addAll(mergedAssets, ASSETS);
             for (String asset : configuredAssets) {
@@ -56,13 +61,12 @@ public class LostCityConfiguration {
                 }
             }
             cfg.getCategory(CATEGORY_GENERAL).remove("assets");
-            ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, mergedAssets.toArray(new String[mergedAssets.size()]),
-                    "List of asset libraries loaded in the specified order. " +
-                    "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded from the config directory");
+            ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, mergedAssets.toArray(new String[mergedAssets.size()]), ASSET_COMMENT);
+
 
             String[] defaultValues = {"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel"};
             profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                    defaultValues, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
+                    defaultValues, PROFILES_COMMENT);
             List<String> mergedProfiles = new ArrayList<>();
             Collections.addAll(mergedProfiles, defaultValues);
             for (String profile : profileList) {
@@ -72,18 +76,16 @@ public class LostCityConfiguration {
             }
             cfg.getCategory(CATEGORY_GENERAL).remove("profiles");
             profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                    mergedProfiles.toArray(new String[mergedProfiles.size()]), "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
+                    mergedProfiles.toArray(new String[mergedProfiles.size()]), PROFILES_COMMENT);
         } else {
-            ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, "List of asset libraries loaded in the specified order. " +
-                    "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded from the config directory");
+            ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, ASSET_COMMENT);
 
             profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                    new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "chisel"}, "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!");
+                    new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "chisel"}, PROFILES_COMMENT);
 
         }
 
-        ADAPTING_WORLDTYPES = cfg.getStringList("adaptingWorldTypes", CATEGORY_GENERAL, ADAPTING_WORLDTYPES, "List of other worldtypes (id) that this mod will try " +
-                "to work with. The worldtype has to support the IChunkPrimerFactory API for this to work");
+        ADAPTING_WORLDTYPES = cfg.getStringList("adaptingWorldTypes", CATEGORY_GENERAL, ADAPTING_WORLDTYPES, WORLDTYPES_COMMENT);
         return profileList;
     }
 
@@ -138,9 +140,11 @@ public class LostCityConfiguration {
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("wasteland");
-        profile.setDescription("Wasteland, no water, bare land");
+        profile.setDescription("Wasteland, no water, bare land (can use BOP biomes)");
         profile.WATERLEVEL_OFFSET = 70;
-        profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "savanna=1", "savanna_rock=1", "river=5" };
+        profile.GENERATE_LAKES = false;
+        profile.GENERATE_OCEANMONUMENTS = false;
+        profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("chisel");

@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.LostCities;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -14,24 +15,46 @@ import java.util.*;
 public class LostWorldFilteredBiomeProvider extends BiomeProvider {
 
     private final BiomeProvider original;
-    private final List<Pair<Float,Biome>> biomes = new ArrayList<>();
+    private final String[] allowedBiomeFactors;
+    private List<Pair<Float,Biome>> biomes = null;
     private final Map<String, Biome> translationMap = new HashMap<>();
 
     public LostWorldFilteredBiomeProvider(BiomeProvider original, String[] allowedBiomeFactors) {
         this.original = original;
+        this.allowedBiomeFactors = allowedBiomeFactors;
+    }
+
+    private void parseAllowedBiomes() {
+        if (biomes != null) {
+            return;
+        }
+        biomes = new ArrayList<>();
         for (String s : allowedBiomeFactors) {
             String[] split = StringUtils.split(s, '=');
             float f = Float.parseFloat(split[1]);
             String biomeId = split[0];
             Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
+            if (biome == null) {
+                for (Biome b : Biome.REGISTRY) {
+                    ResourceLocation registryName = b.getRegistryName();
+                    if (registryName != null && biomeId.equals(registryName.getResourcePath())) {
+                        biome = b;
+                        break;
+                    }
+                }
+            }
             if (biome != null) {
                 biomes.add(Pair.of(f, biome));
+            } else {
+                LostCities.logger.warn("Could not find biome '" + biomeId + "'!");
             }
         }
     }
 
     private Biome translate(Biome biome) {
         if (!translationMap.containsKey(biome.getBiomeName())) {
+            parseAllowedBiomes();
+
             Biome bestFit = null;
             double bestDist = 1000000000.0;
             for (Pair<Float, Biome> pair : biomes) {
