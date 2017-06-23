@@ -1,7 +1,5 @@
 package mcjty.lostcities.dimensions.world;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import mcjty.lostcities.api.IChunkPrimerFactory;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
@@ -20,10 +18,6 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.ChunkProviderSettings;
-import net.minecraft.world.gen.MapGenBase;
-import net.minecraft.world.gen.MapGenCaves;
-import net.minecraft.world.gen.MapGenRavine;
 import net.minecraft.world.gen.*;
 import net.minecraft.world.gen.feature.WorldGenDungeons;
 import net.minecraft.world.gen.feature.WorldGenLakes;
@@ -159,7 +153,7 @@ public class LostCityChunkGenerator implements IChunkGenerator {
     }
 
     @Override
-    public Chunk provideChunk(int chunkX, int chunkZ) {
+    public Chunk generateChunk(int chunkX, int chunkZ) {
         LostCitiesTerrainGenerator.setupChars();
         boolean isCity = BuildingInfo.isCity(chunkX, chunkZ, this);
 

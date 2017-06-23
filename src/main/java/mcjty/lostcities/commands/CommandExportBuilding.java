@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CommandExport implements ICommand {
+public class CommandExportBuilding implements ICommand {
 
     @Override
     public String getName() {

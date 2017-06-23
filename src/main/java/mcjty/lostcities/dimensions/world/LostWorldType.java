@@ -7,16 +7,12 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.gui.GuiLostCityConfiguration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiCreateWorld;
-import net.minecraft.init.Biomes;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.biome.BiomeProvider;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.world.gen.IChunkGenerator;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class LostWorldType extends WorldType {
 

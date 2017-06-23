@@ -150,12 +150,12 @@ public class BuildingInfo {
         todo.add(new ChunkPos(chunkX, chunkZ));
         while (!todo.isEmpty()) {
             ChunkPos cp = todo.poll();
-            if (isCity(cp.chunkXPos, cp.chunkZPos, provider) && !hasBuilding(cp.chunkXPos, cp.chunkZPos, provider) && !streets.contains(cp) && streets.size() < 20) {
+            if (isCity(cp.x, cp.z, provider) && !hasBuilding(cp.x, cp.z, provider) && !streets.contains(cp) && streets.size() < 20) {
                 streets.add(cp);
-                todo.add(new ChunkPos(cp.chunkXPos-1, cp.chunkZPos));
-                todo.add(new ChunkPos(cp.chunkXPos+1, cp.chunkZPos));
-                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos-1));
-                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos+1));
+                todo.add(new ChunkPos(cp.x-1, cp.z));
+                todo.add(new ChunkPos(cp.x+1, cp.z));
+                todo.add(new ChunkPos(cp.x, cp.z-1));
+                todo.add(new ChunkPos(cp.x, cp.z+1));
             }
         }
         return streets;
