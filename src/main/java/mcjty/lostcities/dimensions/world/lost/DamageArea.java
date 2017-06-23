@@ -27,7 +27,7 @@ public class DamageArea {
         this.chunkZ = chunkZ;
         chunkBox = new AxisAlignedBB(chunkX * 16, 0, chunkZ * 16, chunkX * 16 + 15, 256, chunkZ * 16 + 15);
 
-        int offset = (provider.profile.EXPLOSION_MAXRADIUS+15) / 16;
+        int offset = (Math.max(provider.profile.EXPLOSION_MAXRADIUS, provider.profile.MINI_EXPLOSION_MAXRADIUS)+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
                 if ((!provider.profile.EXPLOSIONS_IN_CITIES_ONLY) || BuildingInfo.isCity(cx, cz, provider)) {
@@ -48,12 +48,7 @@ public class DamageArea {
         }
     }
 
-    public Character damageBlock(Character b, LostCityChunkGenerator provider, int x, int y, int z, CompiledPalette palette) {
-        float damage = getDamage(x, y, z);
-        if (damage < 0.001) {
-            return b;
-        }
-
+    public Character damageBlock(Character b, LostCityChunkGenerator provider, int y, float damage, CompiledPalette palette) {
         if (b == LostCitiesTerrainGenerator.bedrockChar || b == LostCitiesTerrainGenerator.endportalChar || b == LostCitiesTerrainGenerator.endportalFrameChar) {
             return b;
         }

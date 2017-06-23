@@ -2,15 +2,13 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDynamicLiquid;
-import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * More efficient representation of a palette useful for a single chunk
@@ -28,6 +26,13 @@ public class CompiledPalette {
                 Object value = entry.getValue();
                 if (value instanceof IBlockState) {
                     palette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+                } else if (value instanceof Pair[]) {
+                    Pair<Float, IBlockState>[] r = (Pair<Float, IBlockState>[]) value;
+                    Pair<Float, Character>[] randomBlocks = new Pair[r.length];
+                    for (int i = 0 ; i < r.length ; i++) {
+                        randomBlocks[i] = Pair.of(r[i].getLeft(), (char) Block.BLOCK_STATE_IDS.get(r[i].getRight()));
+                    }
+                    palette.put(entry.getKey(), randomBlocks);
                 } else if (!(value instanceof String)) {
                     if (value == null) {
                         throw new RuntimeException("Invalid palette entry for '" + entry.getKey() + "'!");
@@ -82,9 +87,10 @@ public class CompiledPalette {
             if (o instanceof IBlockState) {
                 return (IBlockState) o;
             } else if (o instanceof Character) {
-                return Block.BLOCK_STATE_IDS.getByValue(c);
+                return Block.BLOCK_STATE_IDS.getByValue((Character) o);
             } else {
-                return null;
+                Pair<Float, Character>[] randomBlocks = (Pair<Float, Character>[]) o;
+                return Block.BLOCK_STATE_IDS.getByValue(randomBlocks[0].getRight());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,8 +107,15 @@ public class CompiledPalette {
                 //return (IBlockState) o;
                 throw new RuntimeException("BAH!");
             } else {
-                IBlockState bs = ((Supplier<IBlockState>) o).get();
-                return (char) Block.BLOCK_STATE_IDS.get(bs);
+                Pair<Float, Character>[] randomBlocks = (Pair<Float, Character>[]) o;
+                float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
+                for (Pair<Float, Character> pair : randomBlocks) {
+                    r -= pair.getKey();
+                    if (r <= 0) {
+                        return pair.getRight();
+                    }
+                }
+                return LostCitiesTerrainGenerator.airChar;
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.gui.GuiLostCityConfiguration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiCreateWorld;
@@ -23,8 +24,7 @@ public class LostWorldTypeBOP extends WorldType {
         return new LostCityChunkGenerator(world);
     }
 
-    @Override
-    public BiomeProvider getBiomeProvider(World world) {
+    private BiomeProvider getInternalBiomeProvider(World world) {
         if (biomeProvider == null) {
             for (WorldType type : WorldType.WORLD_TYPES) {
                 if ("BIOMESOP".equals(type.getName())) {
@@ -38,6 +38,17 @@ public class LostWorldTypeBOP extends WorldType {
         }
         return biomeProvider;
     }
+
+    @Override
+    public BiomeProvider getBiomeProvider(World world) {
+        LostCityProfile profile = LostWorldType.getProfile(world);
+        if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
+            return getInternalBiomeProvider(world);
+        } else {
+            return new LostWorldFilteredBiomeProvider(getInternalBiomeProvider(world), profile.ALLOWED_BIOME_FACTORS);
+        }
+    }
+
 
     @Override
     public boolean isCustomizable() {

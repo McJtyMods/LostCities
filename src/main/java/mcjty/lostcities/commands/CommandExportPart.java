@@ -1,8 +1,10 @@
-package mcjty.lostcities;
+package mcjty.lostcities.commands;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import mcjty.lib.compat.CompatCommand;
+import mcjty.lib.tools.ChatTools;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
@@ -23,21 +25,18 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class CommandExport implements ICommand {
+public class CommandExportPart implements CompatCommand {
 
     @Override
     public String getName() {
-        return "lostexport";
+        return "lc_exportpart";
     }
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return getName() + " <file> <floors>";
+        return getName() + " <file> <slices>";
     }
 
     @Override
@@ -49,7 +48,7 @@ public class CommandExport implements ICommand {
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         PrintWriter writer = null;
         try {
-            int floors = Integer.parseInt(args[1]);
+            int cntSlices = Integer.parseInt(args[1]);
 
             writer = new PrintWriter(new File(args[0]));
             JsonArray array = new JsonArray();
@@ -60,7 +59,8 @@ public class CommandExport implements ICommand {
             String palettechars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             int idx = 0;
             Map<IBlockState, Character> mapping = new HashMap<>();
-            Palette palette = new Palette("give_name");
+            Palette palette = new Palette("old");
+            Palette paletteNew = new Palette("new");
             LostCityChunkGenerator provider = (LostCityChunkGenerator) ((ChunkProviderServer)server.getEntityWorld().getChunkProvider()).chunkGenerator;
             BuildingInfo info = BuildingInfo.getBuildingInfo(start.getX() >> 4, start.getZ() >> 4, provider);
             for (Character character : info.getCompiledPalette().getCharacters()) {
@@ -71,47 +71,46 @@ public class CommandExport implements ICommand {
                 }
             }
 
-            for (int f = 0 ; f < floors ; f++) {
-                Slice[] slices = new Slice[6];
-                for (int y = 0 ; y < 6 ; y++) {
-                    slices[y] = new Slice();
-                }
+            List<Slice> slices = new ArrayList<>();
+            for (int f = 0 ; f < cntSlices ; f++) {
+                Slice slice = new Slice();
+                slices.add(slice);
                 int cx = (start.getX() >> 4) * 16;
-                int cy = start.getY() + f * 6;
+                int cy = start.getY() + f;
                 int cz = (start.getZ() >> 4) * 16;
                 BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(cx, cy, cz);
                 for (int x = 0 ; x < 16 ; x++) {
                     for (int z = 0 ; z < 16 ; z++) {
-                        for (int y = 0 ; y < 6 ; y++) {
-                            pos.setPos(cx + x, cy + y, cz + z);
-                            IBlockState state = server.getEntityWorld().getBlockState(pos);
-                            Character character = mapping.get(state);
-                            if (character == null) {
-                                while (true) {
-                                    character = state.getBlock() == Blocks.AIR ? ' ' : palettechars.charAt(idx);
-                                    idx++;
-                                    if (!palette.getPalette().containsKey(character)) {
-                                        break;
-                                    }
+                        pos.setPos(cx + x, cy, cz + z);
+                        IBlockState state = server.getEntityWorld().getBlockState(pos);
+                        Character character = mapping.get(state);
+                        if (character == null) {
+                            while (true) {
+                                character = state.getBlock() == Blocks.AIR ? ' ' : palettechars.charAt(idx);
+                                idx++;
+                                if (!palette.getPalette().containsKey(character) && !paletteNew.getPalette().containsKey(character)) {
+                                    break;
                                 }
-                                palette.addMapping(character, state);
-                                mapping.put(state, character);
                             }
-                            slices[y].sequence[z*16+x] = "" + character;
+                            paletteNew.addMapping(character, state);
+                            mapping.put(state, character);
                         }
+                        slice.sequence[z*16+x] = "" + character;
                     }
                 }
 
-                String[] sl = new String[6];
-                for (int i = 0 ; i < 6 ; i++) {
-                    sl[i] = StringUtils.join(slices[i].sequence);
-                }
-
-                BuildingPart part = new BuildingPart("p" + f, 16, 16, sl);
-                array.add(part.writeToJSon());
             }
 
+            String[] sl = new String[cntSlices];
+            for (int i = 0 ; i < cntSlices ; i++) {
+                sl[i] = StringUtils.join(slices.get(i).sequence);
+            }
+
+            BuildingPart part = new BuildingPart("part", 16, 16, sl);
+            array.add(part.writeToJSon());
+
             array.add(palette.writeToJSon());
+            array.add(paletteNew.writeToJSon());
 
 //            AssetRegistries.STYLES.writeToJson(array);
 //            AssetRegistries.CITYSTYLES.writeToJson(array);
@@ -124,7 +123,7 @@ public class CommandExport implements ICommand {
             writer.print(gson.toJson(array));
             writer.flush();
         } catch (FileNotFoundException e) {
-            sender.sendMessage(new TextComponentString("Error writing to file '" + args[0] + "'!"));
+            ChatTools.addChatMessage(sender, new TextComponentString("Error writing to file '" + args[0] + "'!"));
         } catch (Exception e) {
             e.printStackTrace();
         }

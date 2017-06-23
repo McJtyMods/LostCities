@@ -87,27 +87,30 @@ public class NormalTerrainGenerator implements BaseTerrainGenerator {
             return;
         }
 
+        float biomeDepthOffSet = provider.getSettings().biomeDepthOffSet;
+        float biomeDepthWeight = provider.getSettings().biomeDepthWeight;
+        float biomeScaleOffset = provider.getSettings().biomeScaleOffset;
+        float biomeScaleWeight = provider.getSettings().biomeScaleWeight;
+
         for (int k = 0; k < 5; ++k) {
             for (int l = 0; l < 5; ++l) {
                 float f2 = 0.0F;
                 float f3 = 0.0F;
                 float f4 = 0.0F;
-                Biome Biome = provider.biomesForGeneration[k + 2 + (l + 2) * 10];
+                Biome biome = provider.biomesForGeneration[k + 2 + (l + 2) * 10];
+                float biomeBaseHeight = biome.getBaseHeight();
 
                 for (int j1 = -2; j1 <= 2; ++j1) {
                     for (int k1 = - 2; k1 <=  2; ++k1) {
-                        Biome Biome1 = provider.biomesForGeneration[k + j1 + 2 + (l + k1 + 2) * 10];
-                        float baseHeight = provider.getSettings().biomeDepthOffSet + Biome1.getBaseHeight() * provider.getSettings().biomeDepthWeight;
-                        float heightVariation = Math.abs(provider.getSettings().biomeScaleOffset + Biome1.getHeightVariation() * provider.getSettings().biomeScaleWeight);
+                        Biome biome1 = provider.biomesForGeneration[k + j1 + 2 + (l + k1 + 2) * 10];
+                        float biome1BaseHeight = biome1.getBaseHeight();
 
-                        if (provider.worldType == WorldType.AMPLIFIED && baseHeight > 0.0F) {
-                            baseHeight = 1.0F + baseHeight * 2.0F;
-                            heightVariation = 1.0F + heightVariation * 4.0F;
-                        }
+                        float baseHeight = biomeDepthOffSet + biome1BaseHeight * biomeDepthWeight;
+                        float heightVariation = Math.abs(biomeScaleOffset + biome1.getHeightVariation() * biomeScaleWeight);
 
                         float f7 = biomeWeights[j1 + 2 + (k1 + 2) * 5] / (baseHeight + 2.0F);
 
-                        if (Biome1.getBaseHeight() > Biome.getBaseHeight()) {
+                        if (biome1BaseHeight > biomeBaseHeight) {
                             f7 /= 2.0F;
                         }
 

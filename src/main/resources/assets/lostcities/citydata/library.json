@@ -33,6 +33,75 @@
         "block": "minecraft:torch"
       },
       {
+        "char": "h",
+        "block": "minecraft:glowstone"
+      },
+      {
+        "char": "k",
+        "block": "minecraft:rail"
+      },
+      {
+        "char": "j",
+        "block": "minecraft:rail@2"
+      },
+      {
+        "char": "e",
+        "block": "minecraft:rail@1"
+      },
+      {
+        "char": "n",
+        "block": "minecraft:rail@9"
+      },
+      {
+        "char": "r",
+        "block": "minecraft:rail@8"
+      },
+      {
+        "char": "q",
+        "block": "minecraft:rail@6"
+      },
+      {
+        "char": "s",
+        "block": "minecraft:rail@7"
+      },
+      {
+        "char": "m",
+        "block": "minecraft:golden_rail@8"
+      },
+      {
+        "char": "f",
+        "block": "minecraft:golden_rail@9"
+      },
+      {
+        "char": "i",
+        "block": "minecraft:golden_rail@10"
+      },
+      {
+        "char": "g",
+        "block": "minecraft:redstone_torch@5"
+      },
+      {
+        "char": "!",
+        "blocks": [
+          {
+            "factor": 0.2,
+            "block": "minecraft:diamond_block"
+          },
+          {
+            "factor": 0.2,
+            "block": "minecraft:gold_block"
+          },
+          {
+            "factor": 0.2,
+            "block": "minecraft:emerald_block"
+          },
+          {
+            "factor": 1,
+            "block": "minecraft:iron_block"
+          }
+        ]
+      },
+      {
         "char": "F",
         "blocks": [
           {
@@ -232,6 +301,20 @@
         "bridge": "bridge_covered"
       }
     ],
+    "fronts": [
+      {
+        "factor": 1.0,
+        "front": "building_front1"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front2"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front3"
+      }
+    ],
     "stairs": [
       {
         "factor": 1.0,
@@ -275,15 +358,29 @@
       },
       {
         "factor": 1.0,
+        "park": "park_trees"
+      },
+      {
+        "factor": 1.0,
         "park": "park_plants_pillars"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain1"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain2"
+      }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon2"
       }
     ]
   },
@@ -351,6 +448,20 @@
         "bridge": "bridge_covered"
       }
     ],
+    "fronts": [
+      {
+        "factor": 1.0,
+        "front": "building_front1"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front2"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front3"
+      }
+    ],
     "stairs": [
       {
         "factor": 1.0,
@@ -394,15 +505,29 @@
       },
       {
         "factor": 1.0,
+        "park": "park_trees"
+      },
+      {
+        "factor": 1.0,
         "park": "park_plants_pillars"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain1"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain2"
+      }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon2"
       }
     ]
   },
@@ -470,6 +595,20 @@
         "bridge": "bridge_covered"
       }
     ],
+    "fronts": [
+      {
+        "factor": 1.0,
+        "front": "building_front1"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front2"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front3"
+      }
+    ],
     "stairs": [
       {
         "factor": 1.0,
@@ -513,15 +652,29 @@
       },
       {
         "factor": 1.0,
+        "park": "park_trees"
+      },
+      {
+        "factor": 1.0,
         "park": "park_plants_pillars"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain1"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain2"
+      }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon2"
       }
     ]
   },
@@ -589,6 +742,20 @@
         "bridge": "bridge_covered"
       }
     ],
+    "fronts": [
+      {
+        "factor": 1.0,
+        "front": "building_front1"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front2"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front3"
+      }
+    ],
     "stairs": [
       {
         "factor": 1.0,
@@ -632,17 +799,274 @@
       },
       {
         "factor": 1.0,
+        "park": "park_trees"
+      },
+      {
+        "factor": 1.0,
         "park": "park_plants_pillars"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain1"
       },
       {
-        "factor": 1.0,
+        "factor": 0.8,
         "park": "park_fountain2"
       }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon2"
+      }
     ]
+  },
+  {
+    "type": "part",
+    "name": "building_front1",
+    "xsize": 2,
+    "zsize": 16,
+    "slices": [
+      [
+        "  ",
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "  "
+      ],
+      [
+        "  ",
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "  "
+      ],
+      [
+        "  ",
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        "  ",
+        " w",
+        "  ",
+        "  ",
+        "  "
+      ],
+      [
+        "  ",
+        "  ",
+        "  ",
+        "__",
+        "__",
+        "__",
+        "__",
+        "__",
+        "__",
+        "__",
+        "__",
+        "__",
+        "__",
+        "  ",
+        "  ",
+        "  "
+      ]
+    ],
+    "meta": []
+  },
+  {
+    "type": "part",
+    "name": "building_front2",
+    "xsize": 3,
+    "zsize": 16,
+    "slices": [
+      [
+        "   ",
+        "   ",
+        "   ",
+        "## ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "## ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      [
+        "   ",
+        "   ",
+        "   ",
+        " w ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        " w ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      [
+        "   ",
+        "   ",
+        "   ",
+        " w ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        "   ",
+        " w ",
+        "   ",
+        "   ",
+        "   "
+      ],
+      [
+        "   ",
+        "   ",
+        "   ",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "   ",
+        "   ",
+        "   "
+      ]
+    ],
+    "meta": []
+  },
+  {
+    "type": "part",
+    "name": "building_front3",
+    "xsize": 3,
+    "zsize": 16,
+    "slices": [
+      [
+        "   ",
+        "   ",
+        "   ",
+        "aa#",
+        "   ",
+        "   ",
+        "  #",
+        "   ",
+        "   ",
+        "  #",
+        "   ",
+        "   ",
+        "aa#",
+        "   ",
+        "   ",
+        "   "
+      ],
+      [
+        "   ",
+        "   ",
+        "   ",
+        "aa#",
+        "   ",
+        "   ",
+        "  #",
+        "   ",
+        "   ",
+        "  #",
+        "   ",
+        "   ",
+        "aa#",
+        "   ",
+        "   ",
+        "   "
+      ],
+      [
+        "   ",
+        "   ",
+        "   ",
+        "aa#",
+        "   ",
+        "   ",
+        "  #",
+        "   ",
+        "   ",
+        "  #",
+        "   ",
+        "   ",
+        "aa#",
+        "   ",
+        "   ",
+        "   "
+      ],
+      [
+        "   ",
+        "   ",
+        "   ",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "___",
+        "   ",
+        "   ",
+        "   "
+      ]
+    ],
+    "meta": []
   },
   {
     "type": "part",
@@ -1487,6 +1911,50 @@
         "         p      ",
         "     p          ",
         "          p     ",
+        "                ",
+        "                ",
+        "                "
+      ]
+    ]
+  },
+  {
+    "type": "part",
+    "name": "park_trees",
+    "xsize": 16,
+    "zsize": 16,
+    "slices": [
+      [
+        "                ",
+        "                ",
+        "  _____  _____  ",
+        "  _SSS_  _SSS_  ",
+        "  _SDS_  _SDS_  ",
+        "  _SSS_  _SSS_  ",
+        "  _____  _____  ",
+        "                ",
+        "                ",
+        "  _____  _____  ",
+        "  _SSS_  _SSS_  ",
+        "  _SDS_  _SDS_  ",
+        "  _SSS_  _SSS_  ",
+        "  _____  _____  ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "    P      P    ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "    P      P    ",
+        "                ",
         "                ",
         "                ",
         "                "

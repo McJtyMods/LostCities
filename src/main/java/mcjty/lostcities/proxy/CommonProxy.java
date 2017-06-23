@@ -86,6 +86,8 @@ public abstract class CommonProxy {
                 throw new RuntimeException("Invalid path for lostcity resource in 'assets' config!");
             }
         }
+
+        System.out.println("Asset parts loaded: " + AssetRegistries.PARTS.getCount());
     }
 
 }

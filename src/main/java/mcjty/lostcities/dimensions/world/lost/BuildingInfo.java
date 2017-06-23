@@ -30,7 +30,9 @@ public class BuildingInfo {
     public final BuildingPart parkType;
     public final BuildingPart bridgeType;
     public final BuildingPart stairType;
+    public final BuildingPart frontType;
     private final float stairPriority;      // A random number that indicates if this chunk should get a stair if there are competing stairs around it. The highest wins
+    public final BuildingPart railDungeon;    // Dungeon next to rails. Will only generate if there are actually rails next to it
     public final StreetType streetType;
     private final int floors;
     public final int floorsBelowGround;
@@ -71,24 +73,49 @@ public class BuildingInfo {
 
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, String>> mobSpawnerTodo = new ArrayList<>();
-    private final List<BlockPos> chestTodo = new ArrayList<>();
+    private final List<BlockPos> genericTodo = new ArrayList<>();
+    private final List<Integer> torchTodo = new ArrayList<>();
+    private final List<BlockPos> saplingTodo = new ArrayList<>();
 
     // BuildingInfo cache
     private static Map<Pair<Integer, Integer>, BuildingInfo> buildingInfoMap = new HashMap<>();
-    private static Map<Pair<Integer, Integer>, Boolean> isCityMap = new HashMap<>();
-    private static Map<Pair<Integer, Integer>, Boolean> hasBuildingMap = new HashMap<>();
+    private static Map<Pair<Integer, Integer>, CityInfo> cityInfoMap = new HashMap<>();
     private static Map<Pair<Integer, Integer>, CityStyle> cityStyleCache = new HashMap<>();
 
-    public void addChestTodo(BlockPos pos) {
-        chestTodo.add(pos);
+    public void addSaplingTodo(BlockPos pos) {
+        saplingTodo.add(pos);
     }
 
-    public List<BlockPos> getChestTodo() {
-        return chestTodo;
+    public List<BlockPos> getSaplingTodo() {
+        return saplingTodo;
     }
 
-    public void clearChestTodo() {
-        chestTodo.clear();
+    public void clearSaplingTodo() {
+        saplingTodo.clear();
+    }
+
+    public void addTorchTodo(int index) {
+        torchTodo.add(index);
+    }
+
+    public List<Integer> getTorchTodo() {
+        return torchTodo;
+    }
+
+    public void clearTorchTodo() {
+        torchTodo.clear();
+    }
+
+    public void addGenericTodo(BlockPos pos) {
+        genericTodo.add(pos);
+    }
+
+    public List<BlockPos> getGenericTodo() {
+        return genericTodo;
+    }
+
+    public void clearGenericTodo() {
+        genericTodo.clear();
     }
 
     public void addSpawnerTodo(BlockPos pos, String mobId) {
@@ -123,12 +150,12 @@ public class BuildingInfo {
         todo.add(new ChunkPos(chunkX, chunkZ));
         while (!todo.isEmpty()) {
             ChunkPos cp = todo.poll();
-            if (isCity(cp.x, cp.z, provider) && !hasBuilding(cp.x, cp.z, provider) && !streets.contains(cp)) {
+            if (isCity(cp.chunkXPos, cp.chunkZPos, provider) && !hasBuilding(cp.chunkXPos, cp.chunkZPos, provider) && !streets.contains(cp) && streets.size() < 20) {
                 streets.add(cp);
-                todo.add(new ChunkPos(cp.x-1, cp.z));
-                todo.add(new ChunkPos(cp.x+1, cp.z));
-                todo.add(new ChunkPos(cp.x, cp.z-1));
-                todo.add(new ChunkPos(cp.x, cp.z+1));
+                todo.add(new ChunkPos(cp.chunkXPos-1, cp.chunkZPos));
+                todo.add(new ChunkPos(cp.chunkXPos+1, cp.chunkZPos));
+                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos-1));
+                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos+1));
             }
         }
         return streets;
@@ -251,25 +278,79 @@ public class BuildingInfo {
         return buildingType;
     }
 
-    public static boolean isCity(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static CityInfo getCityInfo(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
-        if (isCityMap.containsKey(key)) {
-            return isCityMap.get(key);
+        if (cityInfoMap.containsKey(key)) {
+            return cityInfoMap.get(key);
         } else {
+            CityInfo cityInfo = new CityInfo();
+
             float cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
-            boolean isCity = cityFactor > provider.profile.CITY_THRESSHOLD;
-            isCityMap.put(key, isCity);
-            return isCity;
+            cityInfo.isCity = cityFactor > provider.profile.CITY_THRESSHOLD;
+            cityInfo.section = getMultiBuildingSection(chunkX, chunkZ, provider);
+            if (cityInfo.section > 0) {
+                cityInfo.cityLevel = getTopLeftCityInfo(cityInfo, chunkX, chunkZ, provider).cityLevel;
+            } else {
+                cityInfo.cityLevel = getCityLevel(chunkX, chunkZ, provider);
+            }
+            Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
+            cityInfo.hasBuilding = cityInfo.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, cityInfo.section, cityInfo.cityLevel, rand);
+
+            cityInfoMap.put(key, cityInfo);
+            return cityInfo;
         }
     }
 
-    public static boolean hasBuilding(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        Pair<Integer, Integer> key = Pair.of(chunkX, chunkZ);
-        if (hasBuildingMap.containsKey(key)) {
-            return hasBuildingMap.get(key);
-        }
-        boolean isCity = isCity(chunkX, chunkZ, provider);
+    /**
+     * Don't use the cache as we're busy building the cache.
+     */
+    public static boolean isCityRaw(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        float cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
+        return cityFactor > provider.profile.CITY_THRESSHOLD;
+    }
 
+    public static boolean isCity(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        return getCityInfo(chunkX, chunkZ, provider).isCity;
+    }
+
+    public static boolean hasBuilding(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        return getCityInfo(chunkX, chunkZ, provider).hasBuilding;
+    }
+
+    private static boolean checkBuildingPossibility(int chunkX, int chunkZ, LostCityChunkGenerator provider, int section, int cityLevel, Random rand) {
+        boolean b;
+        float bc = rand.nextFloat();
+        if (section >= 0) {
+            // Part of multi-building. We have checked everything above
+            b = true;
+        } else if (bc >= provider.profile.BUILDING_CHANCE) {
+            // Random says we should have no building here
+            b = false;
+        } else if (hasHighway(chunkX, chunkZ, provider)) {
+            // We are above a highway. Check if we have room for a building
+            int maxh = Math.max(Highway.getXHighwayLevel(chunkX, chunkZ, provider), Highway.getZHighwayLevel(chunkX, chunkZ, provider));
+            b = cityLevel > maxh+1;       // Allow a building if it is higher then the maximum highway + one
+            // Later we will take care to make sure we don't have too many cellars
+            // Note that for easy of coding we still disallow multi-buildings above highways
+        } else if (hasRailway(chunkX, chunkZ, provider)) {
+            // We are above a railway. Check if we have room for a building
+            Railway.RailChunkInfo info = Railway.getRailChunkType(chunkX, chunkZ, provider);
+            if (info.getType() == Railway.RailChunkType.STATION_UNDERGROUND) {
+                b = false;  // No building directly above the underground station
+            } else {
+                int maxh = info.getLevel();
+                b = cityLevel > maxh + 1;       // Allow a building if it is higher then the maximum railway + one
+                // Later we will take care to make sure we don't have too many cellars
+                // Note that for easy of coding we still disallow multi-buildings above railways
+            }
+        } else {
+            // General case
+            b = true;
+        }
+        return b;
+    }
+
+    private static int getMultiBuildingSection(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         int section;
         if (isTopLeftOf2x2Building(chunkX, chunkZ, provider)) {
             section = 0;
@@ -282,12 +363,7 @@ public class BuildingInfo {
         } else {
             section = -1;
         }
-
-        Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
-        float bc = rand.nextFloat();
-        boolean b = section >= 0 || (isCity && !hasHighway(chunkX, chunkZ, provider) && bc < provider.profile.BUILDING_CHANCE);
-        hasBuildingMap.put(key, b);
-        return b;
+        return section;
     }
 
     private BuildingInfo calculateTopLeft() {
@@ -305,6 +381,21 @@ public class BuildingInfo {
         }
     }
 
+    private static CityInfo getTopLeftCityInfo(CityInfo thisone, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        switch (thisone.section) {
+            case 0:
+                return thisone;
+            case 1:
+                return getCityInfo(chunkX-1, chunkZ, provider);
+            case 2:
+                return getCityInfo(chunkX, chunkZ-1, provider);
+            case 3:
+                return getCityInfo(chunkX-1, chunkZ-1, provider);
+            default:
+                throw new RuntimeException("What!");
+        }
+    }
+
     private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         if (isMultiBuildingCandidate(chunkX, chunkZ, provider)) {
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
@@ -315,7 +406,7 @@ public class BuildingInfo {
     }
 
     private static boolean isMultiBuildingCandidate(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return isCity(chunkX, chunkZ, provider) && !hasHighway(chunkX, chunkZ, provider);
+        return isCityRaw(chunkX, chunkZ, provider) && !hasHighway(chunkX, chunkZ, provider) && !hasRailway(chunkX, chunkZ, provider);
     }
 
     public int getMaxHighwayLevel() {
@@ -324,6 +415,14 @@ public class BuildingInfo {
 
     private static boolean hasHighway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         return Highway.getXHighwayLevel(chunkX, chunkZ, provider) >= 0 || Highway.getZHighwayLevel(chunkX, chunkZ, provider) >= 0;
+    }
+
+    private static boolean hasRailway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        return Railway.getRailChunkType(chunkX, chunkZ, provider).getType() != Railway.RailChunkType.NONE;
+    }
+
+    public Railway.RailChunkInfo getRailInfo() {
+        return Railway.getRailChunkType(chunkX, chunkZ, provider);
     }
 
     // Return true if a highway at this level would be a tunnel
@@ -369,8 +468,7 @@ public class BuildingInfo {
 
     public static void cleanCache() {
         buildingInfoMap.clear();
-        isCityMap.clear();
-        hasBuildingMap.clear();
+        cityInfoMap.clear();
         cityStyleCache.clear();
     }
 
@@ -388,23 +486,16 @@ public class BuildingInfo {
         this.provider = provider;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        isCity = isCity(chunkX, chunkZ, provider);
 
-        if (isTopLeftOf2x2Building(chunkX, chunkZ, provider)) {
-            building2x2Section = 0;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ, provider)) {
-            building2x2Section = 1;
-        } else if (isTopLeftOf2x2Building(chunkX, chunkZ - 1, provider)) {
-            building2x2Section = 2;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider)) {
-            building2x2Section = 3;
-        } else {
-            building2x2Section = -1;
-        }
+        CityInfo cityInfo = getCityInfo(chunkX, chunkZ, provider);
+
+        isCity = cityInfo.isCity;
+        building2x2Section = cityInfo.section;
+        hasBuilding = cityInfo.hasBuilding;
+        cityLevel = cityInfo.cityLevel;
 
         Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
-        float bc = rand.nextFloat();
-        hasBuilding = building2x2Section >= 0 || (isCity && !hasHighway(chunkX, chunkZ, provider) && bc < provider.profile.BUILDING_CHANCE);
+        rand.nextFloat();       // Compatibility?
 
         // In a 2x2 building we copy all information from the top-left chunk
         if (building2x2Section >= 1) {
@@ -429,7 +520,6 @@ public class BuildingInfo {
             }
             highwayXLevel = topleft.highwayXLevel;
             highwayZLevel = topleft.highwayZLevel;
-            cityLevel = topleft.cityLevel;
             streetType = topleft.streetType;
             fountainType = topleft.fountainType;
             parkType = topleft.parkType;
@@ -453,7 +543,6 @@ public class BuildingInfo {
 
             highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
             highwayZLevel = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
-            cityLevel = getCityLevel(chunkX, chunkZ, provider);
 
             if (rand.nextDouble() < .2f) {
                 streetType = StreetType.values()[rand.nextInt(StreetType.values().length)];
@@ -473,7 +562,17 @@ public class BuildingInfo {
             }
             floors = f + 1;
             int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
-            floorsBelowGround = provider.profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
+
+            int fb = provider.profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
+            if (getMaxHighwayLevel() >= 0) {
+                // If we are above a highway we make sure we can't have too many cellars
+                fb = Math.min(cityLevel-getMaxHighwayLevel()-1, fb);
+                if (fb < 0) {
+                    fb = 0;
+                }
+            }
+            floorsBelowGround = fb;
+
             doorBlock = getRandomDoor(rand);
             bridgeType = AssetRegistries.PARTS.get(cs.getRandomBridge(provider, rand));
             stairType = AssetRegistries.PARTS.get(cs.getRandomStair(provider, rand));
@@ -507,6 +606,22 @@ public class BuildingInfo {
             xBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
             zBridge = rand.nextFloat() < provider.profile.BRIDGE_CHANCE;
         }
+
+        if (rand.nextFloat() < provider.profile.RAILWAY_DUNGEON_CHANCE) {
+            if (!hasBuilding || (Railway.RAILWAY_LEVEL_OFFSET < (cityLevel - floorsBelowGround))) {
+                railDungeon = AssetRegistries.PARTS.get(getCityStyle().getRandomRailDungeon(provider, rand));
+            } else {
+                railDungeon = null;
+            }
+        } else {
+            railDungeon = null;
+        }
+
+        if (rand.nextFloat() < provider.profile.BUILDING_FRONTCHANCE) {
+            frontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(provider, rand));
+        } else {
+            frontType = null;
+        }
     }
 
     public int getHighwayXLevel() {
@@ -518,7 +633,7 @@ public class BuildingInfo {
     }
 
     public static double getChunkHeight(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        LostCitiesTerrainGenerator generator = (LostCitiesTerrainGenerator) provider.terrainGenerator;
+        LostCitiesTerrainGenerator generator = provider.terrainGenerator;
         provider.biomesForGeneration = provider.worldObj.getBiomeProvider().getBiomesForGeneration(provider.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
         generator.generateHeightmap(chunkX * 4, 0, chunkZ * 4);
         double t = 0;
@@ -539,40 +654,67 @@ public class BuildingInfo {
         return a;
     }
 
+    private static Biome[] biomesForCityLevel = null;
+
+    /**
+     * This function does not use the cache. So safe to use when the cache is building
+     */
     public static int getCityLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         if (provider.otherGenerator != null) {
             int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);
-            int cityLevel;
-            if (height < 75) {
-                cityLevel = 0;
-            } else if (height < 83) {
-                cityLevel = 1;
-            } else if (height < 91) {
-                cityLevel = 2;
-            } else {
-                cityLevel = 3;
-            }
-            return cityLevel;
+            return getLevelBasedOnHeight(height, provider);
         } else {
             // @todo: average out nearby biomes?
-            Biome[] biomes = provider.worldObj.getBiomeProvider().getBiomesForGeneration(null, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-            float height = 0.0f;
-            for (Biome biome : biomes) {
-                height += biome.getBaseHeight();
+            biomesForCityLevel = provider.worldObj.getBiomeProvider().getBiomesForGeneration(biomesForCityLevel, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+            float h = 0.0f;
+            for (Biome biome : biomesForCityLevel) {
+                h += biome.getBaseHeight();
             }
-            height /= biomes.length;
-            int cityLevel;
-            if (height < 0.3f) {
-                cityLevel = 0;
-            } else if (height < 0.6f) {
-                cityLevel = 1;
-            } else if (height < 2) {
-                cityLevel = 2;
+            h /= biomesForCityLevel.length;
+
+            // deep ocean = -1.8
+            // ocean = -1
+            // river = -0.5
+            // swampland = -0.2
+            // beach = 0
+            // plains = .125
+            // taiga = 0.2
+            // ice mountains/desert hills = 0.45
+            // hills edge/stone beach = 0.8
+            // extreme hills = 1
+            // savanna plateau = 1.5
+            // mesa = 1.5
+            int height = 0;
+
+            if (h < 0.15f) {
+                height = 70;
+            } else if (h < 0.4f) {
+                height = 79;
+            } else if (h < 0.7f) {
+                height = 88;
+            } else if (h < 1.3) {
+                height = 95;
             } else {
-                cityLevel = 3;
+                height = 100;
             }
-            return cityLevel;
+            return getLevelBasedOnHeight(height, provider);
         }
+    }
+
+    private static int getLevelBasedOnHeight(int height, LostCityChunkGenerator provider) {
+        int cityLevel;
+        if (height < provider.profile.CITY_LEVEL0_HEIGHT) {
+            cityLevel = 0;
+        } else if (height < provider.profile.CITY_LEVEL1_HEIGHT) {
+            cityLevel = 1;
+        } else if (height < provider.profile.CITY_LEVEL2_HEIGHT) {
+            cityLevel = 2;
+        } else if (height < provider.profile.CITY_LEVEL3_HEIGHT) {
+            cityLevel = 3;
+        } else {
+            cityLevel = 4;
+        }
+        return cityLevel;
     }
 
     private Block getRandomDoor(Random rand) {
@@ -932,6 +1074,32 @@ public class BuildingInfo {
         throw new IllegalStateException("Cannot happen!");
     }
 
+    // Call this from the street reference with the (potential building) as 'adj'
+    public boolean hasFrontPartFrom(BuildingInfo adj) {
+        BuildingInfo.StreetType st = streetType;
+        boolean elevated = isElevatedParkSection();
+        if (elevated) {
+            st = BuildingInfo.StreetType.PARK;
+        }
+
+        if (adj.hasBuilding && adj.frontType != null && st == BuildingInfo.StreetType.NORMAL && cityLevel < adj.cityLevel + adj.getNumFloors()) {
+            Railway.RailChunkType type = getRailInfo().getType();
+            if (type == Railway.RailChunkType.STATION_UNDERGROUND) {
+                return false;
+            }
+            if (type == Railway.RailChunkType.GOING_DOWN_ONE_FROM_SURFACE) {
+                return false;
+            }
+            if (getMaxHighwayLevel() >= 0) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+
     // This checks if there can be a connection at minX
     public boolean hasConnectionAtX(int level) {
         if (!isCity) {
@@ -942,6 +1110,26 @@ public class BuildingInfo {
         }
         if (level < 0 || level >= connectionAtX.length) {
             return false;
+        }
+        if (getXmin().hasFrontPartFrom(this)) {
+            return true;
+        }
+        return connectionAtX[level];
+    }
+
+    // This checks if there can be a connection at minX
+    public boolean hasConnectionAtXFromStreet(int level) {
+        if (!isCity) {
+            return false;
+        }
+        if (building2x2Section == 1 || building2x2Section == 3) {
+            return false;
+        }
+        if (level < 0 || level >= connectionAtX.length) {
+            return false;
+        }
+        if (hasFrontPartFrom(getXmin())) {
+            return true;
         }
         return connectionAtX[level];
     }
@@ -956,6 +1144,26 @@ public class BuildingInfo {
         }
         if (level < 0 || level >= connectionAtZ.length) {
             return false;
+        }
+        if (getZmin().hasFrontPartFrom(this)) {
+            return true;
+        }
+        return connectionAtZ[level];
+    }
+
+    // This checks if there can be a connection at minZ
+    public boolean hasConnectionAtZFromStreet(int level) {
+        if (!isCity) {
+            return false;
+        }
+        if (building2x2Section == 2 || building2x2Section == 3) {
+            return false;
+        }
+        if (level < 0 || level >= connectionAtZ.length) {
+            return false;
+        }
+        if (hasFrontPartFrom(getZmin())) {
+            return true;
         }
         return connectionAtZ[level];
     }

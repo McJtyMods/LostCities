@@ -445,11 +445,21 @@
       },
       {
         "char": "x",
-        "block": "minecraft:stonebrick"
-      },
-      {
-        "char": "o",
-        "block": "minecraft:stonebrick"
+        "blocks": [
+          {
+            "factor": 0.06,
+            "block": "minecraft:stonebrick@2"
+          },
+          {
+            "factor": 0.05,
+            "block": "minecraft:stonebrick@1"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:stonebrick"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
       },
       {
         "char": "_",
@@ -480,6 +490,27 @@
           },
           {
             "factor": 0.1,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      },
+      {
+        "char": "P",
+        "blocks": [
+          {
+            "factor": 0.25,
+            "block": "minecraft:sapling"
+          },
+          {
+            "factor": 0.25,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "factor": 0.25,
             "block": "minecraft:sapling@2"
           },
           {

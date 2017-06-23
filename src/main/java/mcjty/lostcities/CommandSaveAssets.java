@@ -3,13 +3,20 @@ package mcjty.lostcities;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import mcjty.lib.compat.CompatCommand;
+import mcjty.lib.tools.ChatTools;
+import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.gen.ChunkProviderServer;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -18,7 +25,7 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
 
-public class CommandSaveAssets implements ICommand {
+public class CommandSaveAssets implements CompatCommand {
 
     @Override
     public String getName() {
@@ -52,7 +59,7 @@ public class CommandSaveAssets implements ICommand {
             writer.print(gson.toJson(array));
             writer.flush();
         } catch (FileNotFoundException e) {
-            sender.sendMessage(new TextComponentString("Error writing to file '" + args[0] + "'!"));
+            ChatTools.addChatMessage(sender, new TextComponentString("Error writing to file '" + args[0] + "'!"));
         }
     }
 

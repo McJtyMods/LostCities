@@ -46,6 +46,9 @@ public class Tools {
     }
 
     public static String getRandomFromList(LostCityChunkGenerator provider, Random random, List<Pair<Float, String>> list) {
+        if (list.isEmpty()) {
+            return null;
+        }
         List<Pair<Float, String>> elements = new ArrayList<>();
         float totalweight = 0;
         for (Pair<Float, String> pair : list) {
@@ -60,5 +63,9 @@ public class Tools {
             }
         }
         return null;
+    }
+
+    public static int calcIndex(int x, int y, int z) {
+        return (x << 12) | (z << 8) + y;
     }
 }

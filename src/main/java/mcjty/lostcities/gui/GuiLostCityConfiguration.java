@@ -18,6 +18,9 @@ public class GuiLostCityConfiguration extends GuiScreen {
 
     private final GuiCreateWorld parent;
     private Map<Integer, Runnable> actionHandler = new HashMap<>();
+    private int page = 0;
+    private int numpages;
+    private GuiMutableLabel pagelabel;
 
     public GuiLostCityConfiguration(GuiCreateWorld parent) {
         this.parent = parent;
@@ -34,12 +37,30 @@ public class GuiLostCityConfiguration extends GuiScreen {
             }
         }
 
+        page = 0;
+        numpages = (LostCityConfiguration.profiles.size() + 7) / 8;
+
+        setupGui(profileName);
+    }
+
+    private void setupGui(String profileName) {
         actionHandler.clear();
         this.buttonList.clear();
+        this.labelList.clear();
         int id = 301;
-        int y = 10;
+        int y = 8;
+        int num = -1;
+        int cnt = 0;
         for (Map.Entry<String, LostCityProfile> entry : LostCityConfiguration.profiles.entrySet()) {
-            GuiButton button = new GuiButton(id, 20, y, 100, 20, entry.getKey());
+            num++;
+            if (num < page*8) {
+                continue;
+            }
+            if (cnt >= 8) {
+                break;
+            }
+            cnt++;
+            GuiButton button = new GuiButton(id, 10, y, 90, 20, entry.getKey());
             if (profileName.equals(entry.getValue().getName())) {
                 button.packedFGColour = 0xffffff00;
             }
@@ -47,17 +68,33 @@ public class GuiLostCityConfiguration extends GuiScreen {
             actionHandler.put(id, () -> setProfile(entry.getValue()));
             id++;
 
-            GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 140, y, 200, 20, 0xffffffff);
+            GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 110, y, 230, 20, 0xffffffff);
             label.addLine(entry.getValue().getDescription());
             this.labelList.add(label);
             y += 22;
         }
 
-        y += 10;
+
+        y = 200;
         GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 20, y, 340, 20, 0xffffffff);
         label.addLine("(note, you can create your own profiles and many more");
         label.addLine("configuration options in 'lostcities.cfg')");
         this.labelList.add(label);
+
+        if (numpages > 1) {
+            GuiButton prev = new GuiButton(id, 330, y, 20, 19, "<");
+            this.buttonList.add(prev);
+            actionHandler.put(id, () -> { page = page > 0 ? page - 1 : page; setupGui(profileName); });
+
+            id++;
+            pagelabel = new GuiMutableLabel(Minecraft.getMinecraft().fontRenderer, id++, 360, y, 30, 20, 0xffffffff);
+            pagelabel.addLine("" + (page+1) + "/" + numpages);
+
+            GuiButton next = new GuiButton(id, 390, y, 20, 19, ">");
+            this.buttonList.add(next);
+            actionHandler.put(id, () -> { page = page < numpages-1 ? page + 1 : page; setupGui(profileName); });
+            id++;
+        }
     }
 
     private void setProfile(LostCityProfile profile) {
@@ -77,5 +114,10 @@ public class GuiLostCityConfiguration extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
+        if (numpages > 1) {
+            pagelabel.clearLines();
+            pagelabel.addLine("" + (page+1) + "/" + numpages);
+            pagelabel.drawLabel(Minecraft.getMinecraft(), mouseX, mouseY);
+        }
     }
 }

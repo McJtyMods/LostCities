@@ -1,8 +1,9 @@
-package mcjty.lostcities;
+package mcjty.lostcities.commands;
 
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.Highway;
+import mcjty.lostcities.dimensions.world.lost.Railway;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -20,7 +21,7 @@ public class CommandDebug implements ICommand {
 
     @Override
     public String getName() {
-        return "lostdebug";
+        return "lc_debug";
     }
 
     @Override
@@ -50,8 +51,11 @@ public class CommandDebug implements ICommand {
             System.out.println("info.getCityStyle() = " + info.getCityStyle().getName());
             System.out.println("info.getHighwayXLevel() = " + info.getHighwayXLevel());
             System.out.println("info.getHighwayZLevel() = " + info.getHighwayZLevel());
-            double a = BuildingInfo.getChunkHeight(info.chunkX, info.chunkZ, info.provider);
-            System.out.println("Average height: " + a);
+            Railway.RailChunkInfo railInfo = Railway.getRailChunkType(info.chunkX, info.chunkZ, info.provider);
+            System.out.println("railInfo.getType() = " + railInfo.getType());
+            System.out.println("railInfo.getLevel() = " + railInfo.getLevel());
+            System.out.println("railInfo.getDirection() = " + railInfo.getDirection());
+            System.out.println("railInfo.getRails() = " + railInfo.getRails());
         }
     }
 
