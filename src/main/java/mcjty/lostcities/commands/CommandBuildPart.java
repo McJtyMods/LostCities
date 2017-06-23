@@ -1,7 +1,5 @@
 package mcjty.lostcities.commands;
 
-import mcjty.lib.compat.CompatCommand;
-import mcjty.lib.tools.ChatTools;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
@@ -22,7 +20,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public class CommandBuildPart implements CompatCommand {
+public class CommandBuildPart implements ICommand {
 
     @Override
     public String getName() {
@@ -45,7 +43,7 @@ public class CommandBuildPart implements CompatCommand {
             String partname = args[0];
             BuildingPart part = AssetRegistries.PARTS.get(partname);
             if (part == null) {
-                ChatTools.addChatMessage(sender, new TextComponentString("Cannot find part '" + partname + "'!"));
+                sender.sendMessage(new TextComponentString("Cannot find part '" + partname + "'!"));
                 return;
             }
 

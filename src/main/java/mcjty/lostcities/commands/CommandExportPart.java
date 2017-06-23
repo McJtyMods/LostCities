@@ -3,8 +3,6 @@ package mcjty.lostcities.commands;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import mcjty.lib.compat.CompatCommand;
-import mcjty.lib.tools.ChatTools;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
@@ -27,7 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
 
-public class CommandExportPart implements CompatCommand {
+public class CommandExportPart implements ICommand {
 
     @Override
     public String getName() {
@@ -123,7 +121,7 @@ public class CommandExportPart implements CompatCommand {
             writer.print(gson.toJson(array));
             writer.flush();
         } catch (FileNotFoundException e) {
-            ChatTools.addChatMessage(sender, new TextComponentString("Error writing to file '" + args[0] + "'!"));
+            sender.sendMessage(new TextComponentString("Error writing to file '" + args[0] + "'!"));
         } catch (Exception e) {
             e.printStackTrace();
         }

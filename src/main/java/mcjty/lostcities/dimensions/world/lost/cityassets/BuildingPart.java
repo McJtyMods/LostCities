@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import net.minecraft.block.state.IBlockState;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;

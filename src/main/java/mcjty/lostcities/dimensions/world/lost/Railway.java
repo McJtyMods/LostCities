@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.QualityRandom;
 

@@ -1,10 +1,8 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.apache.commons.lang3.StringUtils;
 
 public class MultiBuilding implements IAsset {
 

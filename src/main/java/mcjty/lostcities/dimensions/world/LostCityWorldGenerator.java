@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockSapling;

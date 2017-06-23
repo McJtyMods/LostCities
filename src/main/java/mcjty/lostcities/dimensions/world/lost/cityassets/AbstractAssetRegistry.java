@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
