@@ -144,6 +144,8 @@ public class LostCityConfiguration {
         profile.WATERLEVEL_OFFSET = 70;
         profile.GENERATE_LAKES = false;
         profile.GENERATE_OCEANMONUMENTS = false;
+        profile.VINE_CHANCE = 0.003f;
+        profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.01f;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         standardProfiles.put(profile.getName(), profile);
 
