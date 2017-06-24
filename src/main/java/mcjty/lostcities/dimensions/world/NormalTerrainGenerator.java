@@ -2,7 +2,6 @@ package mcjty.lostcities.dimensions.world;
 
 import mcjty.lib.tools.MathTools;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.ChunkProviderSettings;

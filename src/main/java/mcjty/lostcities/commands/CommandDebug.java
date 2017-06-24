@@ -3,7 +3,6 @@ package mcjty.lostcities.commands;
 import mcjty.lib.compat.CompatCommand;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.Highway;
 import mcjty.lostcities.dimensions.world.lost.Railway;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;

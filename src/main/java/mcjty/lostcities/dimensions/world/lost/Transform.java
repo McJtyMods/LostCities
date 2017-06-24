@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import net.minecraft.block.BlockRailBase;
-import net.minecraft.block.state.IBlockState;
 
 public enum Transform {
     ROTATE_NONE(net.minecraft.util.Rotation.NONE),
