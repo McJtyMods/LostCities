@@ -42,6 +42,7 @@ public class BuildingInfo {
     public final BuildingPart[] floorTypes;
     public final boolean[] connectionAtX;
     public final boolean[] connectionAtZ;
+    public final boolean noLoot;
 
     public final int highwayXLevel;     // 0 or 1 if there is a highway at this chunk
     public final int highwayZLevel;     // 0 or 1 if there is a highway at this chunk
@@ -547,6 +548,7 @@ public class BuildingInfo {
             stairPriority = topleft.stairPriority;
             palette = topleft.palette;
             compiledPalette = topleft.getCompiledPalette();
+            noLoot = topleft.noLoot;
         } else {
             CityStyle cs = getCityStyle();
             if (building2x2Section == 0) {
@@ -594,6 +596,8 @@ public class BuildingInfo {
             stairType = AssetRegistries.PARTS.get(cs.getRandomStair(provider, rand));
             stairPriority = rand.nextFloat();
             createPalette(rand);
+            float r = rand.nextFloat();
+            noLoot = building2x2Section == -1 && r < provider.profile.BUILDING_WITHOUT_LOOT_CHANCE;
         }
 
         floorTypes = new BuildingPart[floors + floorsBelowGround + 1];

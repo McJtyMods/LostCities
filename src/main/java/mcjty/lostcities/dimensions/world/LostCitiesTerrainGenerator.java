@@ -1694,15 +1694,17 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                         b = airChar;        // No torches
                                     }
                                 } else if (b == spawnerChar) {
-                                    if (provider.profile.GENERATE_SPAWNERS) {
+                                    if (provider.profile.GENERATE_SPAWNERS && !info.noLoot) {
                                         String mobid = part.getMobID(info, x, y, z);
                                         info.addSpawnerTodo(new BlockPos(x, oy + y, z), mobid);
                                     } else {
                                         b = airChar;
                                     }
                                 } else if (b == chestChar) {
-                                    String lootTable = part.getLootTable(info, x, y, z);
-                                    info.addChestTodo(new BlockPos(x, oy + y, z), lootTable);
+                                    if (!info.noLoot) {
+                                        String lootTable = part.getLootTable(info, x, y, z);
+                                        info.addChestTodo(new BlockPos(x, oy + y, z), lootTable);
+                                    }
                                 } else if (b == glowstoneChar) {
                                     info.addGenericTodo(new BlockPos(x, oy + y, z));
                                 } else {

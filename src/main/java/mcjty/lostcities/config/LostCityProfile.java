@@ -79,7 +79,7 @@ public class LostCityProfile {
 
     public String[] ALLOWED_BIOME_FACTORS = new String[] { };
 
-
+    public float BUILDING_WITHOUT_LOOT_CHANCE = .2f;
     public float BUILDING_CHANCE = .3f;
     public int BUILDING_MINFLOORS = 0;
     public int BUILDING_MAXFLOORS = 9;
@@ -156,6 +156,8 @@ public class LostCityProfile {
         WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", categoryLostcity, inheritFrom.orElse(this).WATERLEVEL_OFFSET, -100, 100, "How much lower the water level is compared to the ground level (63)");
         WATERLEVEL = GROUNDLEVEL - WATERLEVEL_OFFSET;
 
+
+        BUILDING_WITHOUT_LOOT_CHANCE = cfg.getFloat("buildingWithoutLootChance", categoryLostcity, inheritFrom.orElse(this).BUILDING_WITHOUT_LOOT_CHANCE, 0.0f, 1.0f, "The chance that a building will have no loot and no spawners");
         BUILDING_CHANCE = cfg.getFloat("buildingChance", categoryLostcity, inheritFrom.orElse(this).BUILDING_CHANCE, 0.0f, 1.0f, "The chance that a chunk in a city will have a building. Otherwise it will be a street");
         BUILDING_MINFLOORS = cfg.getInt("buildingMinFloors", categoryLostcity, inheritFrom.orElse(this).BUILDING_MINFLOORS, 0, 30, "The minimum number of floors (above ground) for a building (0 means the first floor only)");
         BUILDING_MAXFLOORS = cfg.getInt("buildingMaxFloors", categoryLostcity, inheritFrom.orElse(this).BUILDING_MAXFLOORS, 0, 30, "A cap for the amount of floors a city can have (above ground)");
