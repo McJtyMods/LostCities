@@ -128,6 +128,17 @@ public class LostCityConfiguration {
         profile.BUILDING_MINFLOORS_CHANCE = 8;
         profile.BUILDING_MAXFLOORS_CHANCE = 15;
         profile.BUILDING_MAXFLOORS = 20;
+        profile.DEBRIS_TO_NEARBYCHUNK_FACTOR = 175;
+        profile.DESTROY_LONE_BLOCKS_FACTOR = 0.08f;
+        profile.DESTROY_OR_MOVE_CHANCE = 0.2f;
+        profile.EXPLOSION_CHANCE = 0.008f;
+        profile.EXPLOSION_MAXHEIGHT = 256;
+        profile.EXPLOSION_MAXRADIUS = 60;
+        profile.EXPLOSION_MINHEIGHT = 130;
+        profile.MINI_EXPLOSION_CHANCE = 0.09f;
+        profile.MINI_EXPLOSION_MAXHEIGHT = 256;
+        profile.MINI_EXPLOSION_MAXRADIUS = 14;
+        profile.MINI_EXPLOSION_MINRADIUS = 3;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("safe");
