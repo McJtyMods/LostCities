@@ -1,5 +1,6 @@
 package mcjty.lostcities.proxy;
 
+import mcjty.lostcities.ForgeEventHandlers;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
@@ -64,6 +65,7 @@ public abstract class CommonProxy {
     }
 
     public void init(FMLInitializationEvent e) {
+        MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
     }
 
     public void postInit(FMLPostInitializationEvent e) {

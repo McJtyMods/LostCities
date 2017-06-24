@@ -21,7 +21,7 @@ public class LostWorldTypeBOP extends WorldType {
 
     @Override
     public IChunkGenerator getChunkGenerator(World world, String generatorOptions) {
-        return new LostCityChunkGenerator(world);
+        return new LostCityChunkGenerator(world, world.getSeed());
     }
 
     private BiomeProvider getInternalBiomeProvider(World world) {

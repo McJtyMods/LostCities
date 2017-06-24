@@ -29,10 +29,14 @@ public class LostCityConfiguration {
 
     public static String[] ADAPTING_WORLDTYPES = new String[] {};
 
-    public static int VERSION = 1;
+    public static int VERSION = 2;
 
     public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
+
+    public static String DIMENSION_PROFILE = "default";
+    public static int DIMENSION_ID = 111;
+    public static boolean DIMENSION_BOP = true;
 
     public static String[] init(Configuration cfg) {
         cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General settings");
@@ -64,7 +68,7 @@ public class LostCityConfiguration {
             ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, mergedAssets.toArray(new String[mergedAssets.size()]), ASSET_COMMENT);
 
 
-            String[] defaultValues = {"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel"};
+            String[] defaultValues = {"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis"};
             profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
                     defaultValues, PROFILES_COMMENT);
             List<String> mergedProfiles = new ArrayList<>();
@@ -86,6 +90,11 @@ public class LostCityConfiguration {
         }
 
         ADAPTING_WORLDTYPES = cfg.getStringList("adaptingWorldTypes", CATEGORY_GENERAL, ADAPTING_WORLDTYPES, WORLDTYPES_COMMENT);
+
+        DIMENSION_PROFILE = cfg.getString("dimensionProfile", CATEGORY_GENERAL, DIMENSION_PROFILE, "The 'profile' to use for generation of the Lost City dimension");
+        DIMENSION_ID = cfg.getInt("dimensionId", CATEGORY_GENERAL, DIMENSION_ID, -10000, 10000, "The 'ID' of the Lost City Dimension. Set to -1 if you don't want this dimension");
+        DIMENSION_BOP = cfg.getBoolean("dimensionBoP", CATEGORY_GENERAL, DIMENSION_BOP, "If true and if Biomes O Plenty is present the dimension will use BoP biomes");
+
         return profileList;
     }
 
@@ -119,6 +128,17 @@ public class LostCityConfiguration {
         profile.BUILDING_MINFLOORS_CHANCE = 8;
         profile.BUILDING_MAXFLOORS_CHANCE = 15;
         profile.BUILDING_MAXFLOORS = 20;
+        profile.DEBRIS_TO_NEARBYCHUNK_FACTOR = 175;
+        profile.DESTROY_LONE_BLOCKS_FACTOR = 0.08f;
+        profile.DESTROY_OR_MOVE_CHANCE = 0.2f;
+        profile.EXPLOSION_CHANCE = 0.008f;
+        profile.EXPLOSION_MAXHEIGHT = 256;
+        profile.EXPLOSION_MAXRADIUS = 60;
+        profile.EXPLOSION_MINHEIGHT = 130;
+        profile.MINI_EXPLOSION_CHANCE = 0.09f;
+        profile.MINI_EXPLOSION_MAXHEIGHT = 256;
+        profile.MINI_EXPLOSION_MAXRADIUS = 14;
+        profile.MINI_EXPLOSION_MINRADIUS = 3;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("safe");
@@ -147,6 +167,11 @@ public class LostCityConfiguration {
         profile.VINE_CHANCE = 0.003f;
         profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.01f;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("atlantis");
+        profile.setDescription("Drowned cities, raised waterlevel");
+        profile.WATERLEVEL_OFFSET = -20;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("chisel");

@@ -3,12 +3,18 @@ package mcjty.lostcities.varia;
 import mcjty.lostcities.dimensions.world.lost.Orientation;
 
 public class ChunkCoord {
+    private final int dimension;
     private final int chunkX;
     private final int chunkZ;
 
-    public ChunkCoord(int chunkX, int chunkZ) {
+    public ChunkCoord(int dimension, int chunkX, int chunkZ) {
+        this.dimension = dimension;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
+    }
+
+    public int getDimension() {
+        return dimension;
     }
 
     public int getChunkX() {
@@ -22,9 +28,9 @@ public class ChunkCoord {
     public ChunkCoord lower(Orientation o) {
         switch (o) {
             case X:
-                return new ChunkCoord(chunkX-1, chunkZ);
+                return new ChunkCoord(dimension, chunkX-1, chunkZ);
             case Z:
-                return new ChunkCoord(chunkX, chunkZ-1);
+                return new ChunkCoord(dimension, chunkX, chunkZ-1);
         }
         throw new IllegalArgumentException("Cannot happen!");
     }
@@ -32,9 +38,9 @@ public class ChunkCoord {
     public ChunkCoord higher(Orientation o) {
         switch (o) {
             case X:
-                return new ChunkCoord(chunkX+1, chunkZ);
+                return new ChunkCoord(dimension, chunkX+1, chunkZ);
             case Z:
-                return new ChunkCoord(chunkX, chunkZ+1);
+                return new ChunkCoord(dimension, chunkX, chunkZ+1);
         }
         throw new IllegalArgumentException("Cannot happen!");
     }
@@ -56,6 +62,7 @@ public class ChunkCoord {
 
         ChunkCoord that = (ChunkCoord) o;
 
+        if (dimension != that.dimension) return false;
         if (chunkX != that.chunkX) return false;
         if (chunkZ != that.chunkZ) return false;
 
@@ -64,7 +71,8 @@ public class ChunkCoord {
 
     @Override
     public int hashCode() {
-        int result = chunkX;
+        int result = dimension;
+        result = 31 * result + chunkX;
         result = 31 * result + chunkZ;
         return result;
     }

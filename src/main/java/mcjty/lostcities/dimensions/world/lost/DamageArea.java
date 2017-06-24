@@ -103,6 +103,10 @@ public class DamageArea {
         return !explosions.isEmpty();
     }
 
+    public List<Explosion> getExplosions() {
+        return explosions;
+    }
+
     // Return true if this subchunk (every 16 blocks) is affected by explosions
     public boolean hasExplosions(int y) {
         AxisAlignedBB box = new AxisAlignedBB(chunkX * 16, y * 16, chunkZ * 16, chunkX * 16 + 15, y * 16 + 15, chunkZ * 16 + 15);

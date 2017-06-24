@@ -1,8 +1,11 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.api.IChunkPrimerFactory;
+import mcjty.lostcities.api.ILostChunkGenerator;
+import mcjty.lostcities.api.ILostChunkInfo;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.DamageArea;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -34,13 +37,14 @@ import java.util.Random;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
-public class LostCityChunkGenerator implements IChunkGenerator {
+public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkGenerator {
 
     public LostCityProfile profile; // Current profile
     public WorldStyle worldStyle;
 
     public Random rand;
     public long seed;
+    public int dimensionId;
 
     public World worldObj;
     public WorldType worldType;
@@ -80,11 +84,11 @@ public class LostCityChunkGenerator implements IChunkGenerator {
     public IChunkPrimerFactory otherGenerator = null;
 
     public LostCityChunkGenerator(World world, IChunkPrimerFactory otherGenerator) {
-        this(world);
+        this(world, world.getSeed());
         this.otherGenerator = otherGenerator;
     }
 
-    public LostCityChunkGenerator(World world) {
+    public LostCityChunkGenerator(World world, long seed) {
 
         {
             caveGenerator = TerrainGen.getModdedMapGen(caveGenerator, CAVE);
@@ -97,7 +101,7 @@ public class LostCityChunkGenerator implements IChunkGenerator {
             oceanMonumentGenerator = (StructureOceanMonument) TerrainGen.getModdedMapGen(oceanMonumentGenerator, OCEAN_MONUMENT);
         }
 
-
+        dimensionId = world.provider.getDimension();
         profile = LostWorldType.getProfile(world);
 
         System.out.println("LostCityChunkGenerator.LostCityChunkGenerator: profile=" + profile.getName());
@@ -110,7 +114,7 @@ public class LostCityChunkGenerator implements IChunkGenerator {
 
         this.worldType = world.getWorldInfo().getTerrainType();
 
-        this.seed = world.getSeed();
+        this.seed = seed;
         this.rand = new Random((seed + 516) * 314);
 
         int waterLevel = (byte) (profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET);
@@ -136,7 +140,7 @@ public class LostCityChunkGenerator implements IChunkGenerator {
 
     // Get a heightmap for a chunk. If needed calculate (and cache) a primer
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
-        ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
+        ChunkCoord key = new ChunkCoord(worldObj.provider.getDimension(), chunkX, chunkZ);
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
         } else if (cachedPrimers.containsKey(key)) {
@@ -161,7 +165,7 @@ public class LostCityChunkGenerator implements IChunkGenerator {
         if (isCity) {
             chunkprimer = new ChunkPrimer();
         } else {
-            ChunkCoord key = new ChunkCoord(chunkX, chunkZ);
+            ChunkCoord key = new ChunkCoord(worldObj.provider.getDimension(), chunkX, chunkZ);
             if (cachedPrimers.containsKey(key)) {
                 // We calculated a primer earlier. Reuse it
                 chunkprimer = cachedPrimers.get(key);
@@ -425,4 +429,14 @@ public class LostCityChunkGenerator implements IChunkGenerator {
         }
     }
 
+
+    @Override
+    public ILostChunkInfo getChunkInfo(int chunkX, int chunkZ) {
+        return BuildingInfo.getBuildingInfo(chunkX, chunkZ, this);
+    }
+
+    @Override
+    public int getRealHeight(int level) {
+        return profile.GROUNDLEVEL + level * 6;
+    }
 }

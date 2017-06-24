@@ -1,10 +1,12 @@
 package mcjty.lostcities.config;
 
+import mcjty.lostcities.LostCities;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -77,7 +79,7 @@ public class LostCityProfile {
 
     public String[] ALLOWED_BIOME_FACTORS = new String[] { };
 
-
+    public float BUILDING_WITHOUT_LOOT_CHANCE = .2f;
     public float BUILDING_CHANCE = .3f;
     public int BUILDING_MINFLOORS = 0;
     public int BUILDING_MAXFLOORS = 9;
@@ -151,9 +153,11 @@ public class LostCityProfile {
                 "Frequency of leafblocks as seen from the sides of buildings");
 
         GROUNDLEVEL = cfg.getInt("groundLevel", categoryLostcity, inheritFrom.orElse(this).GROUNDLEVEL, 2, 256, "Ground level");
-        WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", categoryLostcity, inheritFrom.orElse(this).WATERLEVEL_OFFSET, 1, 30, "How much lower the water level is compared to the ground level (63)");
+        WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", categoryLostcity, inheritFrom.orElse(this).WATERLEVEL_OFFSET, -100, 100, "How much lower the water level is compared to the ground level (63)");
         WATERLEVEL = GROUNDLEVEL - WATERLEVEL_OFFSET;
 
+
+        BUILDING_WITHOUT_LOOT_CHANCE = cfg.getFloat("buildingWithoutLootChance", categoryLostcity, inheritFrom.orElse(this).BUILDING_WITHOUT_LOOT_CHANCE, 0.0f, 1.0f, "The chance that a building will have no loot and no spawners");
         BUILDING_CHANCE = cfg.getFloat("buildingChance", categoryLostcity, inheritFrom.orElse(this).BUILDING_CHANCE, 0.0f, 1.0f, "The chance that a chunk in a city will have a building. Otherwise it will be a street");
         BUILDING_MINFLOORS = cfg.getInt("buildingMinFloors", categoryLostcity, inheritFrom.orElse(this).BUILDING_MINFLOORS, 0, 30, "The minimum number of floors (above ground) for a building (0 means the first floor only)");
         BUILDING_MAXFLOORS = cfg.getInt("buildingMaxFloors", categoryLostcity, inheritFrom.orElse(this).BUILDING_MAXFLOORS, 0, 30, "A cap for the amount of floors a city can have (above ground)");
@@ -296,11 +300,15 @@ public class LostCityProfile {
             biomeFactorMap = new HashMap<>();
             for (String s : CITY_BIOME_FACTORS) {
                 String[] split = StringUtils.split(s, '=');
-                float f = Float.parseFloat(split[1]);
-                String biomeId = split[0];
-                Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
-                if (biome != null) {
-                    biomeFactorMap.put(Biome.REGISTRY.getNameForObject(biome).toString(), f);
+                if (split.length < 2) {
+                    LostCities.logger.error("Badly specified biome factor. Must be <biome>=<factor>!");
+                } else {
+                    float f = Float.parseFloat(split[1]);
+                    String biomeId = split[0];
+                    Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
+                    if (biome != null) {
+                        biomeFactorMap.put(Biome.REGISTRY.getNameForObject(biome).toString(), f);
+                    }
                 }
             }
         }
