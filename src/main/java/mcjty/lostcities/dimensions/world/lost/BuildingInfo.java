@@ -1,5 +1,8 @@
 package mcjty.lostcities.dimensions.world.lost;
 
+import mcjty.lostcities.api.ILostChunkInfo;
+import mcjty.lostcities.api.ILostExplosion;
+import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
@@ -14,10 +17,12 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class BuildingInfo {
+public class BuildingInfo implements ILostChunkInfo {
     public final int chunkX;
     public final int chunkZ;
     public final ChunkCoord coord;
@@ -282,10 +287,6 @@ public class BuildingInfo {
         return provider.profile.GROUNDLEVEL + cityLevel * 6;
     }
 
-    public int getNumFloors() {
-        return floors;
-    }
-
     public BuildingPart getFloor(int l) {
         return floorTypes[l + floorsBelowGround];
     }
@@ -351,7 +352,7 @@ public class BuildingInfo {
         } else if (hasRailway(chunkX, chunkZ, provider)) {
             // We are above a railway. Check if we have room for a building
             Railway.RailChunkInfo info = Railway.getRailChunkType(chunkX, chunkZ, provider);
-            if (info.getType() == Railway.RailChunkType.STATION_UNDERGROUND) {
+            if (info.getType() == RailChunkType.STATION_UNDERGROUND) {
                 b = false;  // No building directly above the underground station
             } else {
                 int maxh = info.getLevel();
@@ -425,16 +426,12 @@ public class BuildingInfo {
         return isCityRaw(chunkX, chunkZ, provider) && !hasHighway(chunkX, chunkZ, provider) && !hasRailway(chunkX, chunkZ, provider);
     }
 
-    public int getMaxHighwayLevel() {
-        return Math.max(getHighwayXLevel(), getHighwayZLevel());
-    }
-
     private static boolean hasHighway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         return Highway.getXHighwayLevel(chunkX, chunkZ, provider) >= 0 || Highway.getZHighwayLevel(chunkX, chunkZ, provider) >= 0;
     }
 
     private static boolean hasRailway(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return Railway.getRailChunkType(chunkX, chunkZ, provider).getType() != Railway.RailChunkType.NONE;
+        return Railway.getRailChunkType(chunkX, chunkZ, provider).getType() != RailChunkType.NONE;
     }
 
     public Railway.RailChunkInfo getRailInfo() {
@@ -1081,11 +1078,11 @@ public class BuildingInfo {
         }
 
         if (adj.hasBuilding && adj.frontType != null && st == BuildingInfo.StreetType.NORMAL && cityLevel < adj.cityLevel + adj.getNumFloors()) {
-            Railway.RailChunkType type = getRailInfo().getType();
-            if (type == Railway.RailChunkType.STATION_UNDERGROUND) {
+            RailChunkType type = getRailInfo().getType();
+            if (type == RailChunkType.STATION_UNDERGROUND) {
                 return false;
             }
-            if (type == Railway.RailChunkType.GOING_DOWN_ONE_FROM_SURFACE) {
+            if (type == RailChunkType.GOING_DOWN_ONE_FROM_SURFACE) {
                 return false;
             }
             if (getMaxHighwayLevel() >= 0) {
@@ -1170,5 +1167,57 @@ public class BuildingInfo {
         NORMAL,
         FULL,
         PARK
+    }
+
+
+    @Override
+    public boolean isCity() {
+        return this.isCity;
+    }
+
+    @Override
+    public String getBuildingType() {
+        return hasBuilding ? buildingType.getName() : null;
+    }
+
+    @Override
+    public int getCityLevel() {
+        return cityLevel;
+    }
+
+    @Override
+    public int getNumFloors() {
+        return floors;
+    }
+
+    @Override
+    public int getNumCellars() {
+        return floorsBelowGround;
+    }
+
+    @Override
+    public float getDamage(int chunkY) {
+        return getDamageArea().getDamage(chunkX * 16 + 8, chunkY * 16 + 8, chunkZ * 16 + 8);
+    }
+
+    @Override
+    public Collection<ILostExplosion> getExplosions() {
+        return getDamageArea().getExplosions().stream().map(explosion -> (ILostExplosion) explosion).collect(Collectors.toList());
+    }
+
+    @Override
+    public int getMaxHighwayLevel() {
+        return Math.max(getHighwayXLevel(), getHighwayZLevel());
+    }
+
+    @Nonnull
+    @Override
+    public RailChunkType getRailType() {
+        return getRailInfo().getType();
+    }
+
+    @Override
+    public int getRailLevel() {
+        return getRailInfo().getLevel();
     }
 }

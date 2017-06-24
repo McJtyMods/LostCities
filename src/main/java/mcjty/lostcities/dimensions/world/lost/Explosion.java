@@ -1,8 +1,9 @@
 package mcjty.lostcities.dimensions.world.lost;
 
+import mcjty.lostcities.api.ILostExplosion;
 import net.minecraft.util.math.BlockPos;
 
-public class Explosion {
+public class Explosion implements ILostExplosion {
     private final int radius;
     private final int sqradius;
     private final BlockPos center;
@@ -13,6 +14,7 @@ public class Explosion {
         sqradius = radius * radius;
     }
 
+    @Override
     public int getRadius() {
         return radius;
     }
@@ -21,6 +23,7 @@ public class Explosion {
         return sqradius;
     }
 
+    @Override
     public BlockPos getCenter() {
         return center;
     }

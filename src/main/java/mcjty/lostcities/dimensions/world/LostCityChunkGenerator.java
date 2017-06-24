@@ -3,8 +3,11 @@ package mcjty.lostcities.dimensions.world;
 import mcjty.lib.compat.CompatChunkGenerator;
 import mcjty.lib.compat.CompatMapGenStructure;
 import mcjty.lostcities.api.IChunkPrimerFactory;
+import mcjty.lostcities.api.ILostChunkGenerator;
+import mcjty.lostcities.api.ILostChunkInfo;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.DamageArea;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -38,7 +41,7 @@ import java.util.Random;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
-public class LostCityChunkGenerator implements CompatChunkGenerator {
+public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkGenerator {
 
     public LostCityProfile profile; // Current profile
     public WorldStyle worldStyle;
@@ -402,5 +405,15 @@ public class LostCityChunkGenerator implements CompatChunkGenerator {
         if (profile.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generate(this.worldObj, x, z, null);
         }
+    }
+
+    @Override
+    public ILostChunkInfo getChunkInfo(int chunkX, int chunkZ) {
+        return BuildingInfo.getBuildingInfo(chunkX, chunkZ, this);
+    }
+
+    @Override
+    public int getRealHeight(int level) {
+        return profile.GROUNDLEVEL + level * 6;
     }
 }

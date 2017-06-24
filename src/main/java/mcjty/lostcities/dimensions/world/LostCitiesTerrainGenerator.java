@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
@@ -193,7 +194,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         Railway.RailChunkInfo railInfo = info.getRailInfo();
-        if (railInfo.getType() != Railway.RailChunkType.NONE) {
+        if (railInfo.getType() != RailChunkType.NONE) {
             generateRailways(primer, info, railInfo);
         }
         generateRailwayDungeons(chunkX, chunkX, primer, info);
@@ -801,8 +802,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (info.railDungeon == null) {
             return;
         }
-        if (info.getZmin().getRailInfo().getType() == Railway.RailChunkType.HORIZONTAL ||
-                info.getZmax().getRailInfo().getType() == Railway.RailChunkType.HORIZONTAL) {
+        if (info.getZmin().getRailInfo().getType() == RailChunkType.HORIZONTAL ||
+                info.getZmax().getRailInfo().getType() == RailChunkType.HORIZONTAL) {
             int height = provider.profile.GROUNDLEVEL + Railway.RAILWAY_LEVEL_OFFSET * 6;
             generatePart(primer, info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0);
         }
@@ -810,7 +811,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateRailways(ChunkPrimer primer, BuildingInfo info, Railway.RailChunkInfo railInfo) {
         int height = provider.profile.GROUNDLEVEL + railInfo.getLevel() * 6;
-        Railway.RailChunkType type = railInfo.getType();
+        RailChunkType type = railInfo.getType();
         BuildingPart part;
         Transform transform = Transform.ROTATE_NONE;
         boolean needsStaircase = false;
@@ -842,8 +843,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 part = AssetRegistries.PARTS.get("rails_horizontal");
 
                 // If the adjacent chunks are also horizontal we take a sample of the blocks around us to see if we are in water
-                Railway.RailChunkType type1 = info.getXmin().getRailInfo().getType();
-                Railway.RailChunkType type2 = info.getXmax().getRailInfo().getType();
+                RailChunkType type1 = info.getXmin().getRailInfo().getType();
+                RailChunkType type2 = info.getXmax().getRailInfo().getType();
                 if (!type1.isStation() && !type2.isStation()) {
                     if (primer.data[Tools.calcIndex(3, height+2, 3)] == liquidChar &&
                             primer.data[Tools.calcIndex(12, height+2, 3)] == liquidChar &&
@@ -900,7 +901,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         generatePart(primer, info, part, transform, 0, height, 0);
 
-        if (type == Railway.RailChunkType.HORIZONTAL) {
+        if (type == RailChunkType.HORIZONTAL) {
             // If there is a rail dungeon north or south we must make a connection here
             if (info.getZmin().railDungeon != null) {
                 for (int z = 0; z < 4; z++) {
@@ -1316,8 +1317,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         Railway.RailChunkInfo railInfo = info.getRailInfo();
         boolean canDoParks = info.getHighwayXLevel() != info.cityLevel && info.getHighwayZLevel() != info.cityLevel
-                && railInfo.getType() != Railway.RailChunkType.STATION_SURFACE
-                && (railInfo.getType() != Railway.RailChunkType.STATION_EXTENSION_SURFACE || railInfo.getLevel() < info.cityLevel);
+                && railInfo.getType() != RailChunkType.STATION_SURFACE
+                && (railInfo.getType() != RailChunkType.STATION_EXTENSION_SURFACE || railInfo.getLevel() < info.cityLevel);
 
         if (canDoParks) {
             int height = info.getCityGroundLevel();
