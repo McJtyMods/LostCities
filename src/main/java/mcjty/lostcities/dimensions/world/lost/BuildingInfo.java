@@ -202,7 +202,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
                 cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
                 for (ChunkPos cp : connectedStreets) {
-                    cityStyleCache.put(new ChunkCoord(coord.getDimension(), cp.chunkXPos, cp.chunkZPos), cityStyle);
+                    cityStyleCache.put(new ChunkCoord(coord.getDimension(), cp.x, cp.z), cityStyle);
                 }
             } else {
                 cityStyle = City.getCityStyle(chunkX, chunkZ, provider);

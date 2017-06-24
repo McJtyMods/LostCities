@@ -5,7 +5,6 @@ import mcjty.lostcities.api.ILostChunkGenerator;
 import mcjty.lostcities.api.ILostChunkInfo;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.DamageArea;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -37,7 +36,7 @@ import java.util.Random;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
-public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkGenerator {
+public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenerator {
 
     public LostCityProfile profile; // Current profile
     public WorldStyle worldStyle;

@@ -1,19 +1,19 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lib.compat.CompatWorldProvider;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.ModDimensions;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 
 import javax.annotation.Nonnull;
 
-public class LostWorldProvider extends CompatWorldProvider {
+public class LostWorldProvider extends WorldProvider {
 
     @Override
     @Nonnull
@@ -30,7 +30,7 @@ public class LostWorldProvider extends CompatWorldProvider {
     @Override
     @Nonnull
     public IChunkGenerator createChunkGenerator() {
-        return new LostCityChunkGenerator(getWorld(), (getWorld().getSeed() >> 3) ^ 34328884229L);
+        return new LostCityChunkGenerator(world, (world.getSeed() >> 3) ^ 34328884229L);
     }
 
     private BiomeProvider getInternalBiomeProvider(World world) {
@@ -49,8 +49,8 @@ public class LostWorldProvider extends CompatWorldProvider {
     }
 
     @Override
-    protected void initialize() {
-        super.initialize();
+    protected void init() {
+        super.init();
 
         LostCityProfile profile = LostCityConfiguration.profiles.get(LostCityConfiguration.DIMENSION_PROFILE);
         if (profile == null) {
@@ -60,7 +60,7 @@ public class LostWorldProvider extends CompatWorldProvider {
         if (LostCities.biomesoplenty && LostCityConfiguration.DIMENSION_BOP) {
             biomeProvider = getInternalBiomeProvider(world);
         } else {
-            biomeProvider = new BiomeProvider(getWorld().getWorldInfo());
+            biomeProvider = new BiomeProvider(world.getWorldInfo());
         }
         if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
             this.biomeProvider = biomeProvider;

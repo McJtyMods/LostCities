@@ -1,6 +1,5 @@
 package mcjty.lostcities.varia;
 
-import mcjty.lib.tools.WorldTools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -42,7 +41,7 @@ public class CustomTeleporter extends Teleporter {
         int oldDimension = player.getEntityWorld().provider.getDimension();
         EntityPlayerMP entityPlayerMP = (EntityPlayerMP) player;
         MinecraftServer server = ((EntityPlayerMP) player).getEntityWorld().getMinecraftServer();
-        WorldServer worldServer = server.worldServerForDimension(dimension);
+        WorldServer worldServer = server.getWorld(dimension);
         player.addExperienceLevel(0);
 
         if (worldServer == null || worldServer.getMinecraftServer() == null){ //Dimension doesn't exist
@@ -54,7 +53,7 @@ public class CustomTeleporter extends Teleporter {
         if (oldDimension == 1) {
             // For some reason teleporting out of the end does weird things.
             player.setPositionAndUpdate(x, y, z);
-            WorldTools.spawnEntity(worldServer, player);
+            worldServer.spawnEntity(player);
             worldServer.updateEntityWithOptionalForce(player, false);
         }
     }
