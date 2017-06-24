@@ -1700,7 +1700,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                     } else {
                                         b = airChar;
                                     }
-                                } else if (b == chestChar || b == glowstoneChar) {
+                                } else if (b == chestChar) {
+                                    String lootTable = part.getLootTable(info, x, y, z);
+                                    info.addChestTodo(new BlockPos(x, oy + y, z), lootTable);
+                                } else if (b == glowstoneChar) {
                                     info.addGenericTodo(new BlockPos(x, oy + y, z));
                                 } else {
                                     IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);

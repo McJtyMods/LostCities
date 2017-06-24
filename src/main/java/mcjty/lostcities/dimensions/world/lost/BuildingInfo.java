@@ -14,6 +14,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class BuildingInfo {
@@ -75,6 +76,7 @@ public class BuildingInfo {
 
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, String>> mobSpawnerTodo = new ArrayList<>();
+    private final List<Pair<BlockPos, String>> chestTodo = new ArrayList<>();
     private final List<BlockPos> genericTodo = new ArrayList<>();
     private final List<Integer> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
@@ -124,12 +126,24 @@ public class BuildingInfo {
         mobSpawnerTodo.add(Pair.of(pos, mobId));
     }
 
+    public void addChestTodo(BlockPos pos, @Nullable String lootTable) {
+        chestTodo.add(Pair.of(pos, lootTable));
+    }
+
     public List<Pair<BlockPos, String>> getMobSpawnerTodo() {
         return mobSpawnerTodo;
     }
 
+    public List<Pair<BlockPos, String>> getChestTodo() {
+        return chestTodo;
+    }
+
     public void clearMobSpawnerTodo() {
         mobSpawnerTodo.clear();
+    }
+
+    public void clearChestTodo() {
+        chestTodo.clear();
     }
 
     public CompiledPalette getCompiledPalette() {

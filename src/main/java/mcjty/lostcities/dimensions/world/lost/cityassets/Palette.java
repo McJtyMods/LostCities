@@ -20,8 +20,9 @@ public class Palette implements IAsset {
 
     private String name;
     final Map<Character, Object> palette = new HashMap<>();
-    final Map<IBlockState, IBlockState> damaged = new HashMap<>();
-    final Map<Character, String> mobIds = new HashMap<>(); // For spawners
+    private final Map<IBlockState, IBlockState> damaged = new HashMap<>();
+    private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
+    private final Map<Character, String> lootTables = new HashMap<>(); // For chests
 
     public Palette() {
     }
@@ -38,6 +39,7 @@ public class Palette implements IAsset {
         palette.putAll(other.palette);
         damaged.putAll(other.damaged);
         mobIds.putAll(other.mobIds);
+        lootTables.putAll(other.lootTables);
     }
 
     @Override
@@ -51,6 +53,10 @@ public class Palette implements IAsset {
 
     public Map<Character, String> getMobIds() {
         return mobIds;
+    }
+
+    public Map<Character, String> getLootTables() {
+        return lootTables;
     }
 
     public Map<Character, Object> getPalette() {
@@ -71,6 +77,9 @@ public class Palette implements IAsset {
             }
             if (o.has("mob")) {
                 mobIds.put(c, o.get("mob").getAsString());
+            }
+            if (o.has("loot")) {
+                lootTables.put(c, o.get("loot").getAsString());
             }
             if (o.has("block")) {
                 String block = o.get("block").getAsString();
@@ -124,6 +133,9 @@ public class Palette implements IAsset {
             }
             if (mobIds.containsKey(entry.getKey())) {
                 o.add("mob", new JsonPrimitive(mobIds.get(entry.getKey())));
+            }
+            if (lootTables.containsKey(entry.getKey())) {
+                o.add("loot", new JsonPrimitive(lootTables.get(entry.getKey())));
             }
             array.add(o);
         }

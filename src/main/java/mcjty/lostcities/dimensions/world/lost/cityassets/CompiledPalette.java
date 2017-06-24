@@ -18,6 +18,7 @@ public class CompiledPalette {
     private final Map<Character, Object> palette = new HashMap<>();
     private final Map<Character, Character> damagedToBlock = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>();
+    private final Map<Character, String> lootTables = new HashMap<>();
 
     public CompiledPalette(Palette... palettes) {
         // First add the straight palette entries
@@ -73,6 +74,10 @@ public class CompiledPalette {
             for (Map.Entry<Character, String> entry : p.getMobIds().entrySet()) {
                 Character c = entry.getKey();
                 mobIds.put(c, entry.getValue());
+            }
+            for (Map.Entry<Character, String> entry : p.getLootTables().entrySet()) {
+                Character c = entry.getKey();
+                lootTables.put(c, entry.getValue());
             }
         }
     }
@@ -137,4 +142,8 @@ public class CompiledPalette {
     }
 
     public String getMobId(Character c) { return mobIds.get(c); }
+
+    public String getLootTable(Character c) {
+        return lootTables.get(c);
+    }
 }

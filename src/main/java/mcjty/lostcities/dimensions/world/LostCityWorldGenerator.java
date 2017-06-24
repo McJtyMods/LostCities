@@ -141,15 +141,24 @@ public class LostCityWorldGenerator implements IWorldGenerator {
         }
         info.clearMobSpawnerTodo();
 
-        for (BlockPos cpos : info.getGenericTodo()) {
-            BlockPos pos = cpos.add(cx, 0, cz);
+
+        for (Pair<BlockPos, String> pair : info.getChestTodo()) {
+            BlockPos pos = pair.getKey().add(cx, 0, cz);
             // Double check that it is still a chest (could be destroyed by explosion)
             IBlockState state = world.getBlockState(pos);
             if (state.getBlock() == Blocks.CHEST) {
                 if (chunkGenerator.profile.GENERATE_LOOT) {
-                    createLootChest(random, world, pos);
+                    createLootChest(random, world, pos, pair.getRight());
                 }
-            } else if (state.getBlock() == Blocks.GLOWSTONE) {
+            }
+        }
+        info.clearChestTodo();
+
+
+        for (BlockPos cpos : info.getGenericTodo()) {
+            BlockPos pos = cpos.add(cx, 0, cz);
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() == Blocks.GLOWSTONE) {
                 world.setBlockState(pos, state, 3);
             }
         }
@@ -157,29 +166,33 @@ public class LostCityWorldGenerator implements IWorldGenerator {
     }
 
 
-    private void createLootChest(Random random, World world, BlockPos pos) {
+    private void createLootChest(Random random, World world, BlockPos pos, String lootTable) {
         world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, EnumFacing.SOUTH));
         TileEntity tileentity = world.getTileEntity(pos);
         if (tileentity instanceof TileEntityChest) {
-            switch (random.nextInt(30)) {
-                case 0:
-                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_DESERT_PYRAMID, random.nextLong());
-                    break;
-                case 1:
-                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_JUNGLE_TEMPLE, random.nextLong());
-                    break;
-                case 2:
-                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_VILLAGE_BLACKSMITH, random.nextLong());
-                    break;
-                case 3:
-                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_ABANDONED_MINESHAFT, random.nextLong());
-                    break;
-                case 4:
-                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_NETHER_BRIDGE, random.nextLong());
-                    break;
-                default:
-                    ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_SIMPLE_DUNGEON, random.nextLong());
-                    break;
+            if (lootTable != null) {
+                ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(lootTable), random.nextLong());
+            } else {
+                switch (random.nextInt(30)) {
+                    case 0:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_DESERT_PYRAMID, random.nextLong());
+                        break;
+                    case 1:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_JUNGLE_TEMPLE, random.nextLong());
+                        break;
+                    case 2:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_VILLAGE_BLACKSMITH, random.nextLong());
+                        break;
+                    case 3:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_ABANDONED_MINESHAFT, random.nextLong());
+                        break;
+                    case 4:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_NETHER_BRIDGE, random.nextLong());
+                        break;
+                    default:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_SIMPLE_DUNGEON, random.nextLong());
+                        break;
+                }
             }
         }
     }
