@@ -52,7 +52,10 @@ public class LostWorldProvider extends CompatWorldProvider {
     protected void initialize() {
         super.initialize();
 
-        LostCityProfile profile = LostWorldType.getProfile(world);
+        LostCityProfile profile = LostCityConfiguration.profiles.get(LostCityConfiguration.DIMENSION_PROFILE);
+        if (profile == null) {
+            profile = LostWorldType.getProfile(world);
+        }
         BiomeProvider biomeProvider;
         if (LostCities.biomesoplenty && LostCityConfiguration.DIMENSION_BOP) {
             biomeProvider = getInternalBiomeProvider(world);
