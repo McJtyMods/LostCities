@@ -1,10 +1,12 @@
 package mcjty.lostcities.config;
 
+import mcjty.lostcities.LostCities;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -296,11 +298,15 @@ public class LostCityProfile {
             biomeFactorMap = new HashMap<>();
             for (String s : CITY_BIOME_FACTORS) {
                 String[] split = StringUtils.split(s, '=');
-                float f = Float.parseFloat(split[1]);
-                String biomeId = split[0];
-                Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
-                if (biome != null) {
-                    biomeFactorMap.put(Biome.REGISTRY.getNameForObject(biome).toString(), f);
+                if (split.length < 2) {
+                    LostCities.logger.error("Badly specified biome factor. Must be <biome>=<factor>!");
+                } else {
+                    float f = Float.parseFloat(split[1]);
+                    String biomeId = split[0];
+                    Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
+                    if (biome != null) {
+                        biomeFactorMap.put(Biome.REGISTRY.getNameForObject(biome).toString(), f);
+                    }
                 }
             }
         }
