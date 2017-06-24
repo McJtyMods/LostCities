@@ -29,7 +29,7 @@ public class LostCityConfiguration {
 
     public static String[] ADAPTING_WORLDTYPES = new String[] {};
 
-    public static int VERSION = 1;
+    public static int VERSION = 2;
 
     public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
@@ -68,7 +68,7 @@ public class LostCityConfiguration {
             ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, mergedAssets.toArray(new String[mergedAssets.size()]), ASSET_COMMENT);
 
 
-            String[] defaultValues = {"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel"};
+            String[] defaultValues = {"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis"};
             profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
                     defaultValues, PROFILES_COMMENT);
             List<String> mergedProfiles = new ArrayList<>();
@@ -167,6 +167,11 @@ public class LostCityConfiguration {
         profile.VINE_CHANCE = 0.003f;
         profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.01f;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("atlantis");
+        profile.setDescription("Drowned cities, raised waterlevel");
+        profile.WATERLEVEL_OFFSET = -20;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("chisel");

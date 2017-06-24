@@ -426,8 +426,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    int index = (x << 12) | (z << 8) + height;
-                    BaseTerrainGenerator.setBlockStateRange(primer, index, index + 15, airChar);
+                    int index = (x << 12) | (z << 8);
+                    if (waterLevel > groundLevel) {
+                        // Special case for drowned city
+                        BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + height, index + waterLevel, airChar);
+                        BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + waterLevel, index + height + 15, airChar);
+                    } else {
+                        BaseTerrainGenerator.setBlockStateRange(primer, index + height, index + height + 15, airChar);
+                    }
                 }
             }
         } else {
@@ -435,8 +441,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    int index = (x << 12) | (z << 8) + height;
-                    BaseTerrainGenerator.setBlockStateRange(primer, index, index + 15, airChar);
+                    int index = (x << 12) | (z << 8);
+                    if (waterLevel > groundLevel) {
+                        // Special case for drowned city
+                        BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + height, index + waterLevel, airChar);
+                        BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + waterLevel, index + height + 15, airChar);
+                    } else {
+                        BaseTerrainGenerator.setBlockStateRange(primer, index + height, index + height + 15, airChar);
+                    }
                 }
             }
         }
@@ -621,7 +633,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int height = minheight;//info.getCityGroundLevel();
                     if (isOcean(provider.biomesForGeneration)) {
                         // We have an ocean biome here. Flatten to a lower level
-                        height = waterLevel + 4;
+                        height = groundLevel - 4;
                     }
 
                     int offset = (int) (Math.sqrt(mindist) * 2);
@@ -646,7 +658,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int height = minheight;//info.getCityGroundLevel();
                     if (isOcean(provider.biomesForGeneration)) {
                         // We have an ocean biome here. Flatten to a lower level
-                        height = waterLevel + 4;
+                        height = groundLevel - 4;
                     }
 
                     int offset = (int) (Math.sqrt(mindist) * 2);
@@ -697,17 +709,25 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             index++;
         }
         int r = rand.nextInt(2);
-        index = (x << 12) | (z << 8) + level + offset + r;
-        for (int y = level + offset + 3; y < 256; y++) {
-            primer.data[index++] = airChar;
+        index = (x << 12) | (z << 8);
+        if (waterLevel > groundLevel) {
+            // Special case for drowned city
+            BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + level + offset + r, index + waterLevel, liquidChar);
+            BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + waterLevel, index + 230, airChar);
+        } else {
+            BaseTerrainGenerator.setBlockStateRange(primer, index + level + offset + r, index + 230, airChar);
         }
     }
 
     private void flattenChunkBorderDownwards(ChunkPrimer primer, int x, int offset, int z, Random rand, int level) {
         int r = rand.nextInt(2);
-        int index = (x << 12) | (z << 8) + level + offset + r;
-        for (int y = level + offset + 3; y < 256; y++) {
-            primer.data[index++] = airChar;
+        int index = (x << 12) | (z << 8);
+        if (waterLevel > groundLevel) {
+            // Special case for drowned city
+            BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + level + offset + r, index + waterLevel, liquidChar);
+            BaseTerrainGenerator.setBlockStateRangeSafe(primer, index + waterLevel + 1, index + 230, airChar);
+        } else {
+            BaseTerrainGenerator.setBlockStateRange(primer, index + level + offset + r, index + 230, airChar);
         }
     }
 
@@ -722,6 +742,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int z = 0; z < 16; ++z) {
                 int index = (x << 12) | (z << 8);
                 BaseTerrainGenerator.setBlockStateRange(primer, index, index + provider.profile.BEDROCK_LAYER, bedrockChar);
+            }
+        }
+
+        if (waterLevel > groundLevel) {
+            // Special case for a high water level
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    int index = (x << 12) | (z << 8);
+                    BaseTerrainGenerator.setBlockStateRange(primer, index + groundLevel, index + waterLevel, liquidChar);
+                }
             }
         }
 
@@ -1162,84 +1192,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return null;
     }
 
-    /// Fix floating blocks after an explosion
-    private void fixAfterExplosion(ChunkPrimer primer, BuildingInfo info, Random rand) {
-        int start = info.getDamageArea().getLowestExplosionHeight();
-        if (start == -1) {
-            // Nothing is affected
-            return;
-        }
-        int end = info.getDamageArea().getHighestExplosionHeight();
-
-        List<Blob> blobs = new ArrayList<>();
-
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                int index = (x << 12) | (z << 8) + start;
-                for (int y = start; y < end; y++) {
-                    char p = primer.data[index];
-                    if (p != airChar && p != liquidChar) {
-                        Blob blob = findBlob(blobs, index);
-                        if (blob == null) {
-                            blob = new Blob(start, end + 6);
-                            blob.scan(info, primer, airChar, liquidChar, new BlockPos(x, y, z));
-                            blobs.add(blob);
-                        }
-                    }
-                    index++;
-                }
-            }
-        }
-
-        // Split large blobs that have very thin connections in Y direction
-        for (Blob blob : blobs) {
-            if (blob.getAvgdamage() > .3f && blob.getCntMindamage() < 10) { // @todo configurable?
-                int y = blob.needsSplitting();
-                if (y != -1) {
-                    Set<Integer> toRemove = blob.cut(y);
-                    for (Integer index : toRemove) {
-                        primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
-                    }
-                }
-            }
-        }
-
-        // Sort all blobs we delete with lowest first
-        blobs.sort((o1, o2) -> {
-            int y1 = o1.destroyOrMoveThis(provider) ? o1.lowestY : 1000;
-            int y2 = o2.destroyOrMoveThis(provider) ? o2.lowestY : 1000;
-            return y1 - y2;
-        });
-
-
-        Blob blocksToMove = new Blob(0, 256);
-        for (Blob blob : blobs) {
-            if (!blob.destroyOrMoveThis(provider)) {
-                // The rest of the blobs doesn't have to be destroyed anymore
-                break;
-            }
-            if (rand.nextFloat() < provider.profile.DESTROY_OR_MOVE_CHANCE || blob.connectedBlocks.size() < provider.profile.DESTROY_SMALL_SECTIONS_SIZE
-                    || blob.connections < 5) {
-                for (Integer index : blob.connectedBlocks) {
-                    primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
-                }
-            } else {
-                blocksToMove.connectedBlocks.addAll(blob.connectedBlocks);
-            }
-        }
-        for (Integer index : blocksToMove.connectedBlocks) {
-            char c = primer.data[index];
-            primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
-            index--;
-            int y = index & 255;
-            while (y > 2 && (blocksToMove.contains(index) || primer.data[index] == airChar || primer.data[index] == liquidChar)) {
-                index--;
-                y--;
-            }
-            index++;
-            primer.data[index] = c;
-        }
-    }
 
     /// Fix floating blocks after an explosion
     private void fixAfterExplosionNew(ChunkPrimer primer, BuildingInfo info, Random rand) {
