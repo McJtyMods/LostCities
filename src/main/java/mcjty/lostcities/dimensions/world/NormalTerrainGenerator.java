@@ -11,7 +11,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.ChunkGeneratorEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
-public class NormalTerrainGenerator implements BaseTerrainGenerator {
+public class NormalTerrainGenerator {
     private World world;
     protected LostCityChunkGenerator provider;
 
