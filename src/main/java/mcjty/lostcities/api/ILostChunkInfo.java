@@ -32,7 +32,9 @@ public interface ILostChunkInfo {
     /**
      * Get the level of the city/landscape at this point. 0 is the lowest level. You can get
      * the real height uwing ILostChunkGenerator.getRealHeight(level).
-     * If there is a building at this chunk then this is the level of the first floor
+     * If there is a building at this chunk then this is the level of the first floor.
+     * If there is no city here then this represents a rough estimate of the height of the
+     * terrain
      */
     int getCityLevel();
 
