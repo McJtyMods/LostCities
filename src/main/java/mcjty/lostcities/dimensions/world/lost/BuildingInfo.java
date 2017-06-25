@@ -571,19 +571,40 @@ public class BuildingInfo implements ILostChunkInfo {
             }
             parkType = AssetRegistries.PARTS.get(cs.getRandomPark(provider, rand));
             float cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
-            int f = provider.profile.BUILDING_MINFLOORS + rand.nextInt((int) (provider.profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (provider.profile.BUILDING_MAXFLOORS_CHANCE - provider.profile.BUILDING_MINFLOORS_CHANCE)));
-            if (f > provider.profile.BUILDING_MAXFLOORS) {
-                f = provider.profile.BUILDING_MAXFLOORS;
-            }
-            floors = f + 1;
-            int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
 
+            int f = provider.profile.BUILDING_MINFLOORS + rand.nextInt((int) (provider.profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (provider.profile.BUILDING_MAXFLOORS_CHANCE - provider.profile.BUILDING_MINFLOORS_CHANCE)));
+            int maxfloors = provider.profile.BUILDING_MAXFLOORS;
+            if (buildingType.getMaxFloors() != -1) {
+                maxfloors = buildingType.getMaxFloors();
+            }
+            f++;
+            if (f > maxfloors) {
+                f = maxfloors;
+            }
+            if (buildingType.getMinFloors() != -1) {
+                if (f < buildingType.getMinFloors()) {
+                    f = buildingType.getMinFloors();
+                }
+            }
+            floors = f;
+
+            int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
             int fb = provider.profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
             if (getMaxHighwayLevel() >= 0) {
                 // If we are above a highway we make sure we can't have too many cellars
                 fb = Math.min(cityLevel-getMaxHighwayLevel()-1, fb);
                 if (fb < 0) {
                     fb = 0;
+                }
+            }
+            if (buildingType.getMaxCellars() != -1) {
+                if (fb > buildingType.getMaxCellars()) {
+                    fb = buildingType.getMaxCellars();
+                }
+            }
+            if (buildingType.getMinCellars() != -1) {
+                if (fb < buildingType.getMinCellars()) {
+                    fb = buildingType.getMinCellars();
                 }
             }
             floorsBelowGround = fb;
