@@ -8,6 +8,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -58,7 +59,8 @@ public class ForgeEventHandlers {
                 CustomTeleporter.teleportToDimension(event.getEntityPlayer(), 0, top);
             } else {
                 event.setResult(Event.Result.DENY);
-                BlockPos top = DimensionManager.getWorld(LostCityConfiguration.DIMENSION_ID).getTopSolidOrLiquidBlock(bedLocation);
+                WorldServer worldServer = event.getEntity().getEntityWorld().getMinecraftServer().worldServerForDimension(LostCityConfiguration.DIMENSION_ID);
+                BlockPos top = worldServer.getTopSolidOrLiquidBlock(bedLocation);
                 CustomTeleporter.teleportToDimension(event.getEntityPlayer(), LostCityConfiguration.DIMENSION_ID, top);
             }
         }
