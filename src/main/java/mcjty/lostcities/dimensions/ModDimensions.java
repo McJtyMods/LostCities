@@ -2,10 +2,12 @@ package mcjty.lostcities.dimensions;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
-import mcjty.lostcities.dimensions.world.*;
+import mcjty.lostcities.dimensions.world.LostWorldProvider;
+import mcjty.lostcities.dimensions.world.LostWorldType;
+import mcjty.lostcities.dimensions.world.LostWorldTypeAdapter;
+import mcjty.lostcities.dimensions.world.LostWorldTypeBOP;
 import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,6 @@ public class ModDimensions {
 
 
     public static void init() {
-        GameRegistry.registerWorldGenerator(new LostCityWorldGenerator(), 1000);
         worldType = new LostWorldType();
         if (LostCities.biomesoplenty) {
             worldTypeBOP = new LostWorldTypeBOP();

@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockSapling;
@@ -7,18 +8,15 @@ import net.minecraft.block.BlockVine;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.MobSpawnerBaseLogic;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.datafix.fixes.EntityId;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,15 +26,6 @@ import java.util.Random;
 import static mcjty.lostcities.dimensions.world.lost.DamageArea.BLOCK_DAMAGE_CHANCE;
 
 public class LostCityWorldGenerator implements IWorldGenerator {
-
-    private static final EntityId FIXER = new EntityId();
-
-    public static String fixEntityId(String id) {
-        NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setString("id", id);
-        nbt = FIXER.fixTagCompound(nbt);
-        return nbt.getString("id");
-    }
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
@@ -145,13 +134,8 @@ public class LostCityWorldGenerator implements IWorldGenerator {
                 if (tileentity instanceof TileEntityMobSpawner) {
                     TileEntityMobSpawner spawner = (TileEntityMobSpawner) tileentity;
                     String id = pair.getValue();
-                    if (!id.contains(":")) {
-                        id = fixEntityId(id);
-                    }
-                    MobSpawnerBaseLogic mobspawnerbaselogic = spawner.getSpawnerBaseLogic();
-                    mobspawnerbaselogic.setEntityId(new ResourceLocation(id));
-                    spawner.markDirty();
-
+                    String fixedId = EntityTools.fixEntityId(id);
+                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation(fixedId), fixedId);
                 }
             }
         }

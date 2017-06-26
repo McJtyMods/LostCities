@@ -41,6 +41,10 @@ public class BuildingPart implements IAsset {
         this.zSize = zSize;
     }
 
+    public Character getMetaChar(String key) {
+        return (Character) metadata.get(key);
+    }
+
     public Integer getMetaInteger(String key) {
         return (Integer) metadata.get(key);
     }
@@ -119,6 +123,10 @@ public class BuildingPart implements IAsset {
                     metadata.put(key, o.get("float").getAsFloat());
                 } else if (o.has("boolean")) {
                     metadata.put(key, o.get("boolean").getAsBoolean());
+                } else if (o.has("char")) {
+                    metadata.put(key, o.get("char").getAsCharacter());
+                } else if (o.has("character")) {
+                    metadata.put(key, o.get("character").getAsCharacter());
                 } else if (o.has("string")) {
                     metadata.put(key, o.get("string").getAsString());
                 }

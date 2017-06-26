@@ -10,7 +10,7 @@ public class ChunkHeightmap {
     private byte heightmap[] = new byte[16*16];
 
     public ChunkHeightmap(ChunkPrimer primer) {
-        char air = (char) Block.BLOCK_STATE_IDS.get(LostCitiesTerrainGenerator.air);
+        char air = LostCitiesTerrainGenerator.airChar;
         for (int x = 0 ; x < 16 ; x++) {
             for (int z = 0 ; z < 16 ; z++) {
                 int index = (x << 12) | (z << 8);

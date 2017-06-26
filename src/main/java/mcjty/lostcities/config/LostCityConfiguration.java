@@ -113,6 +113,7 @@ public class LostCityConfiguration {
         profile.setDescription("Cities are rare");
         profile.CITY_CHANCE = 0.002f;
         profile.HIGHWAY_REQUIRES_TWO_CITIES = false;
+        profile.RAILWAYS_CAN_END = true;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("onlycities");

@@ -3,7 +3,6 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
 import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -126,15 +125,6 @@ public class CompiledPalette {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public static boolean isGlass(Block block) {
-        return block == Blocks.GLASS || block == Blocks.GLASS_PANE || block == Blocks.STAINED_GLASS || block == Blocks.STAINED_GLASS_PANE;
-    }
-
-    public static boolean isGlass(Character block) {
-        return block == LostCitiesTerrainGenerator.glassChar || block == LostCitiesTerrainGenerator.glassPaneChar
-                || block == LostCitiesTerrainGenerator.stainedGlassChar || block == LostCitiesTerrainGenerator.stainedGlassPaneChar;
     }
 
     public Character canBeDamagedToIronBars(Character b) {

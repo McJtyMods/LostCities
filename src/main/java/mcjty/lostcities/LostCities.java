@@ -4,6 +4,7 @@ import mcjty.lostcities.commands.CommandBuildPart;
 import mcjty.lostcities.commands.CommandDebug;
 import mcjty.lostcities.commands.CommandExportBuilding;
 import mcjty.lostcities.commands.CommandExportPart;
+import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.Highway;
 import mcjty.lostcities.dimensions.world.lost.Railway;
@@ -66,6 +67,7 @@ public class LostCities {
         BuildingInfo.cleanCache();
         Highway.cleanCache();
         Railway.cleanCache();
+        BiomeInfo.cleanCache();
     }
 
     @Mod.EventHandler
@@ -73,6 +75,7 @@ public class LostCities {
         BuildingInfo.cleanCache();
         Highway.cleanCache();
         Railway.cleanCache();
+        BiomeInfo.cleanCache();
     }
 
     /**

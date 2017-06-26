@@ -5,6 +5,7 @@ import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.PrimerTools;
 import mcjty.lostcities.varia.Tools;
@@ -28,19 +29,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private static boolean charsSetup = false;
     public static char airChar;
     public static char hardAirChar;
-    public static char bricksChar;
     public static char glowstoneChar;
     public static char baseChar;
-    public static char wallChar;
     public static char liquidChar;
     public static char leavesChar;
     public static char ironbarsChar;
-    public static char ladderChar;
     public static char grassChar;
-    public static char glassChar;
-    public static char glassPaneChar;
-    public static char stainedGlassChar;
-    public static char stainedGlassPaneChar;
     public static char bedrockChar;
     public static char endportalChar;
     public static char endportalFrameChar;
@@ -49,19 +43,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char diamondBlockChar;
     public static char spawnerChar;
     public static char chestChar;
-    public static IBlockState air;
-    public static IBlockState hardAir;  // Used in parts to carve out
-    public static IBlockState water;
 
     private static Set<Character> rotatableChars = null;
     private static Set<Character> railChars = null;
+    private static Set<Character> glassChars = null;
     private static Set<Character> charactersNeedingTodo = null;
 
-    private static IBlockState baseBlock;
     private Character street;
     private Character streetBase;
     private Character street2;
-    private Character styledBricks;
     private int streetBorder;
 
 //    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(ISLANDS);
@@ -80,7 +70,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     // Use this random when it doesn't really matter i fit is generated the same every time
     public static Random globalRandom = new Random();
 
-    private static Set<Character> getRailChars() {
+    public static Set<Character> getRailChars() {
         if (railChars == null) {
             railChars = new HashSet<>();
             addStates(Blocks.RAIL, railChars);
@@ -89,7 +79,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return railChars;
     }
 
-    private static Set<Character> getCharactersNeedingTodo() {
+    public static Set<Character> getGlassChars() {
+        if (glassChars == null) {
+            glassChars = new HashSet<>();
+            addStates(Blocks.GLASS, glassChars);
+            addStates(Blocks.STAINED_GLASS, glassChars);
+            addStates(Blocks.GLASS_PANE, glassChars);
+            addStates(Blocks.STAINED_GLASS_PANE, glassChars);
+        }
+        return glassChars;
+    }
+
+    public static Set<Character> getCharactersNeedingTodo() {
         if (charactersNeedingTodo == null) {
             charactersNeedingTodo = new HashSet<>();
             charactersNeedingTodo.add(torchChar);
@@ -106,7 +107,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return charactersNeedingTodo;
     }
 
-    private static Set<Character> getRotatableChars() {
+    public static Set<Character> getRotatableChars() {
         if (rotatableChars == null) {
             rotatableChars = new HashSet<>();
             addStates(Blocks.ACACIA_STAIRS, rotatableChars);
@@ -141,25 +142,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public static void setupChars() {
         if (!charsSetup) {
-            baseBlock = Blocks.STONE.getDefaultState();
-            air = Blocks.AIR.getDefaultState();
-            hardAir = Blocks.COMMAND_BLOCK.getDefaultState();
-            water = Blocks.WATER.getDefaultState();
-            airChar = (char) Block.BLOCK_STATE_IDS.get(air);
-            hardAirChar = (char) Block.BLOCK_STATE_IDS.get(hardAir);
-            bricksChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONEBRICK.getDefaultState());
+            airChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.AIR.getDefaultState());
+            hardAirChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COMMAND_BLOCK.getDefaultState());
             glowstoneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLOWSTONE.getDefaultState());
-            wallChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COBBLESTONE_WALL.getDefaultState());
-            baseChar = (char) Block.BLOCK_STATE_IDS.get(baseBlock);
-            liquidChar = (char) Block.BLOCK_STATE_IDS.get(water);
+            baseChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONE.getDefaultState());
+            liquidChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.WATER.getDefaultState());
             leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false));
             ironbarsChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.IRON_BARS.getDefaultState());
-            ladderChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LADDER.getDefaultState());
             grassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRASS.getDefaultState());
-            glassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS.getDefaultState());
-            glassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS_PANE.getDefaultState());
-            stainedGlassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS.getDefaultState());
-            stainedGlassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS_PANE.getDefaultState());
             bedrockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.BEDROCK.getDefaultState());
             endportalChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL.getDefaultState());
             endportalFrameChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL_FRAME.getDefaultState());
@@ -181,10 +171,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         streetBase = info.getCompiledPalette().get(info.getCityStyle().getStreetBaseBlock());
         street2 = info.getCompiledPalette().get(info.getCityStyle().getStreetVariantBlock());
         streetBorder = (16 - info.getCityStyle().getStreetWidth()) / 2;
-
-
-        // @todo This should not be hardcoded here
-        styledBricks = info.getCompiledPalette().get('#');
 
         if (info.isCity) {
             doCityChunk(chunkX, chunkZ, primer, info);
@@ -439,12 +425,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private void generateHighwayPart(ChunkPrimer primer, BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix) {
         int highwayGroundLevel = provider.profile.GROUNDLEVEL + level * 6;
 
+        BuildingPart part;
         if (info.isTunnel(level)) {
             // We know we need a tunnel
-            generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), transform, 0, highwayGroundLevel, 0);
+            part = AssetRegistries.PARTS.get("highway_tunnel" + suffix);
+            generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
-            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_open" + suffix), transform, 0, highwayGroundLevel, 0);
+            part = AssetRegistries.PARTS.get("highway_open" + suffix);
+            int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -459,7 +448,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         } else {
-            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge" + suffix), transform, 0, highwayGroundLevel, 0);
+            part = AssetRegistries.PARTS.get("highway_bridge" + suffix);
+            int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -475,37 +465,28 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        // Make sure the bridge is supported if needed
-        if (transform == Transform.ROTATE_NONE) {
-            int index = highwayGroundLevel - 1; // (coordinate 0,0)
+        Character support = part.getMetaChar("support");
+        if (support != null) {
+            char sup = info.getCompiledPalette().get(support);
+            int x1 = transform.rotateX(0, 15);
+            int z1 = transform.rotateZ(0, 15);
+            int index1 = (x1 << 12) | (z1 << 8) + highwayGroundLevel - 1;
+            int x2 = transform.rotateX(0, 0);
+            int z2 = transform.rotateZ(0, 0);
+
+            int index2 = (x2 << 12) | (z2 << 8) + highwayGroundLevel - 1;
             for (int y = 0; y < 40; y++) {
                 boolean done = false;
-                if (primer.data[index] == airChar || primer.data[index] == liquidChar) {
-                    primer.data[index] = bricksChar;
+                if (primer.data[index1] == airChar || primer.data[index1] == liquidChar) {
+                    primer.data[index1] = sup;
                     done = true;
                 }
-                if (primer.data[index + (15 << 8)] == airChar || primer.data[index + (15 << 8)] == liquidChar) {
-                    primer.data[index + (15 << 8)] = bricksChar;
+                if (primer.data[index2] == airChar || primer.data[index2] == liquidChar) {
+                    primer.data[index2] = sup;
                     done = true;
                 }
-                index--;
-                if (!done) {
-                    break;
-                }
-            }
-        } else {
-            int index = highwayGroundLevel - 1; // (coordinate 0,0)
-            for (int y = 0; y < 40; y++) {
-                boolean done = false;
-                if (primer.data[index] == airChar || primer.data[index] == liquidChar) {
-                    primer.data[index] = bricksChar;
-                    done = true;
-                }
-                if (primer.data[index + (15 << 12)] == airChar || primer.data[index + (15 << 12)] == liquidChar) {
-                    primer.data[index + (15 << 12)] = bricksChar;
-                    done = true;
-                }
-                index--;
+                index1--;
+                index2--;
                 if (!done) {
                     break;
                 }
@@ -549,54 +530,59 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
-        BuildingInfo minDir = orientation.getMinDir().get(info);
-        BuildingInfo maxDir = orientation.getMaxDir().get(info);
-        if (minDir.hasBridge(provider, orientation) != null && maxDir.hasBridge(provider, orientation) != null) {
-            // Needs support
-            for (int y = waterLevel - 10; y <= groundLevel; y++) {
-                setBridgeSupport(primer, 7, y, 7);
-                setBridgeSupport(primer, 7, y, 8);
-                setBridgeSupport(primer, 8, y, 7);
-                setBridgeSupport(primer, 8, y, 8);
-            }
-        }
-        if (minDir.hasBridge(provider, orientation) == null) {
-            // Connection to the side section
-            if (orientation == Orientation.X) {
-                int x = 0;
-                for (int z = 6; z <= 9; z++) {
-                    int index = (x << 12) | (z << 8) + groundLevel;
-                    primer.data[index] = bricksChar;
-                }
-            } else {
-                int z = 0;
-                for (int x = 6; x <= 9; x++) {
-                    int index = (x << 12) | (z << 8) + groundLevel;
-                    primer.data[index] = bricksChar;
+
+        Character support = bt.getMetaChar("support");
+        if (support != null) {
+            char sup = info.getCompiledPalette().get(support);
+            BuildingInfo minDir = orientation.getMinDir().get(info);
+            BuildingInfo maxDir = orientation.getMaxDir().get(info);
+            if (minDir.hasBridge(provider, orientation) != null && maxDir.hasBridge(provider, orientation) != null) {
+                // Needs support
+                for (int y = waterLevel - 10; y <= groundLevel; y++) {
+                    setBridgeSupport(primer, 7, y, 7, sup);
+                    setBridgeSupport(primer, 7, y, 8, sup);
+                    setBridgeSupport(primer, 8, y, 7, sup);
+                    setBridgeSupport(primer, 8, y, 8, sup);
                 }
             }
-        }
-        if (maxDir.hasBridge(provider, orientation) == null) {
-            // Connection to the side section
-            if (orientation == Orientation.X) {
-                int x = 15;
-                for (int z = 6; z <= 9; z++) {
-                    int index = (x << 12) | (z << 8) + groundLevel;
-                    primer.data[index] = bricksChar;
+            if (minDir.hasBridge(provider, orientation) == null) {
+                // Connection to the side section
+                if (orientation == Orientation.X) {
+                    int x = 0;
+                    for (int z = 6; z <= 9; z++) {
+                        int index = (x << 12) | (z << 8) + groundLevel;
+                        primer.data[index] = sup;
+                    }
+                } else {
+                    int z = 0;
+                    for (int x = 6; x <= 9; x++) {
+                        int index = (x << 12) | (z << 8) + groundLevel;
+                        primer.data[index] = sup;
+                    }
                 }
-            } else {
-                int z = 15;
-                for (int x = 6; x <= 9; x++) {
-                    int index = (x << 12) | (z << 8) + groundLevel;
-                    primer.data[index] = bricksChar;
+            }
+            if (maxDir.hasBridge(provider, orientation) == null) {
+                // Connection to the side section
+                if (orientation == Orientation.X) {
+                    int x = 15;
+                    for (int z = 6; z <= 9; z++) {
+                        int index = (x << 12) | (z << 8) + groundLevel;
+                        primer.data[index] = sup;
+                    }
+                } else {
+                    int z = 15;
+                    for (int x = 6; x <= 9; x++) {
+                        int index = (x << 12) | (z << 8) + groundLevel;
+                        primer.data[index] = sup;
+                    }
                 }
             }
         }
     }
 
-    private void setBridgeSupport(ChunkPrimer primer, int x, int y, int z) {
+    private void setBridgeSupport(ChunkPrimer primer, int x, int y, int z, char sup) {
         int index = (x << 12) | (z << 8) + y;
-        primer.data[index] = bricksChar;
+        primer.data[index] = sup;
     }
 
     private void debugClearChunk(int chunkX, int chunkZ, ChunkPrimer primer) {
@@ -701,9 +687,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private static Biome[] biomesForBiomeCheck = null;
 
-    public static boolean isWaterBiome(LostCityChunkGenerator provider, int chunkX, int chunkZ) {
-        biomesForBiomeCheck = provider.worldObj.getBiomeProvider().getBiomesForGeneration(biomesForBiomeCheck, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-        return isWaterBiome(biomesForBiomeCheck[55]) || isWaterBiome(biomesForBiomeCheck[54]) || isWaterBiome(biomesForBiomeCheck[56]);
+    public static boolean isWaterBiome(LostCityChunkGenerator provider, ChunkCoord coord) {
+        BiomeInfo biomeInfo = BiomeInfo.getBiomeInfo(provider, coord);
+        Biome[] biomes = biomeInfo.getBiomes();
+        return isWaterBiome(biomes[55]) || isWaterBiome(biomes[54]) || isWaterBiome(biomes[56]);
 //        return isWaterBiome(biomes);
     }
 
@@ -839,6 +826,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             case STATION_EXTENSION_UNDERGROUND:
                 part = AssetRegistries.PARTS.get("station_underground");
                 break;
+            case RAILS_END_HERE:
+                part = AssetRegistries.PARTS.get("rails_horizontal_end");
+                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
+                    transform = Transform.MIRROR_X;
+                }
+                break;
             case HORIZONTAL:
                 part = AssetRegistries.PARTS.get("rails_horizontal");
 
@@ -901,47 +894,50 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         generatePart(primer, info, part, transform, 0, height, 0);
 
+        Character railMainBlock = info.getCityStyle().getRailMainBlock();
+        char rail = info.getCompiledPalette().get(railMainBlock);
+
         if (type == RailChunkType.HORIZONTAL) {
             // If there is a rail dungeon north or south we must make a connection here
             if (info.getZmin().railDungeon != null) {
                 for (int z = 0; z < 4; z++) {
-                    primer.data[Tools.calcIndex(6, height + 1, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(6, height + 1, z)] = rail;
                     primer.data[Tools.calcIndex(6, height + 2, z)] = airChar;
                     primer.data[Tools.calcIndex(6, height + 3, z)] = airChar;
-                    primer.data[Tools.calcIndex(7, height + 1, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(7, height + 1, z)] = rail;
                     primer.data[Tools.calcIndex(7, height + 2, z)] = airChar;
                     primer.data[Tools.calcIndex(7, height + 3, z)] = airChar;
                 }
                 for (int z = 0; z < 3; z++) {
-                    primer.data[Tools.calcIndex(5, height + 2, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(5, height + 3, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(5, height + 4, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(6, height + 4, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(7, height + 4, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 2, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 3, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 4, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(5, height + 2, z)] = rail;
+                    primer.data[Tools.calcIndex(5, height + 3, z)] = rail;
+                    primer.data[Tools.calcIndex(5, height + 4, z)] = rail;
+                    primer.data[Tools.calcIndex(6, height + 4, z)] = rail;
+                    primer.data[Tools.calcIndex(7, height + 4, z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 2, z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 3, z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 4, z)] = rail;
                 }
             }
 
             if (info.getZmax().railDungeon != null) {
                 for (int z = 0; z < 5; z++) {
-                    primer.data[Tools.calcIndex(6, height + 1, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(6, height + 1, 15 - z)] = rail;
                     primer.data[Tools.calcIndex(6, height + 2, 15 - z)] = airChar;
                     primer.data[Tools.calcIndex(6, height + 3, 15 - z)] = airChar;
-                    primer.data[Tools.calcIndex(7, height + 1, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(7, height + 1, 15 - z)] = rail;
                     primer.data[Tools.calcIndex(7, height + 2, 15 - z)] = airChar;
                     primer.data[Tools.calcIndex(7, height + 3, 15 - z)] = airChar;
                 }
                 for (int z = 0; z < 4; z++) {
-                    primer.data[Tools.calcIndex(5, height + 2, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(5, height + 3, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(5, height + 4, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(6, height + 4, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(7, height + 4, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 2, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 3, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 4, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(5, height + 2, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(5, height + 3, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(5, height + 4, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(6, height + 4, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(7, height + 4, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 2, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 3, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 4, 15 - z)] = rail;
                 }
             }
         }
@@ -960,14 +956,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (railInfo.getRails() == 1) {
                         for (int x = 0 ; x < 16 ; x++) {
                             index = (x << 12) | (5 << 8) + height + 1;
-                            primer.data[index] = bricksChar;
+                            primer.data[index] = rail;
                             index = (x << 12) | (9 << 8) + height + 1;
-                            primer.data[index] = bricksChar;
+                            primer.data[index] = rail;
                         }
                     } else {
                         for (int x = 0 ; x < 16 ; x++) {
                             index = (x << 12) | (7 << 8) + height + 1;
-                            primer.data[index] = bricksChar;
+                            primer.data[index] = rail;
                         }
                     }
                     break;
@@ -979,11 +975,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             for (int y = height + 1 ; y < height + part.getSliceCount() ; y++) {
                                 index = (x << 12) | (5 << 8) + y;
                                 if (getRailChars().contains(primer.data[index])) {
-                                    primer.data[index] = bricksChar;
+                                    primer.data[index] = rail;
                                 }
                                 index = (x << 12) | (9 << 8) + y;
                                 if (getRailChars().contains(primer.data[index])) {
-                                    primer.data[index] = bricksChar;
+                                    primer.data[index] = rail;
                                 }
                             }
                         }
@@ -992,7 +988,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             for (int y = height + 1 ; y < height + part.getSliceCount() ; y++) {
                                 index = (x << 12) | (7 << 8) + y;
                                 if (getRailChars().contains(primer.data[index])) {
-                                    primer.data[index] = bricksChar;
+                                    primer.data[index] = rail;
                                 }
                             }
                         }
@@ -1326,10 +1322,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             BuildingInfo.StreetType streetType = info.streetType;
             boolean elevated = info.isElevatedParkSection();
             if (elevated) {
+                Character elevationBlock = info.getCityStyle().getParkElevationBlock();
+                char elevation = info.getCompiledPalette().get(elevationBlock);
                 streetType = BuildingInfo.StreetType.PARK;
                 for (int x = 0; x < 16; ++x) {
                     for (int z = 0; z < 16; ++z) {
-                        primer.data[(x << 12) | (z << 8) + height] = bricksChar;
+                        primer.data[(x << 12) | (z << 8) + height] = elevation;
                     }
                 }
                 height++;
@@ -1402,6 +1400,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         char railxC = (char) Block.BLOCK_STATE_IDS.get(railx);
         IBlockState railz = Blocks.RAIL.getDefaultState();
         char railzC = (char) Block.BLOCK_STATE_IDS.get(railz);
+
+        Character corridorRoofBlock = info.getCityStyle().getCorridorRoofBlock();
+        char roof = info.getCompiledPalette().get(corridorRoofBlock);
+        Character corridorGlassBlock = info.getCityStyle().getCorridorGlassBlock();
+        char glass = info.getCompiledPalette().get(corridorGlassBlock);
+
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int index = (x << 12) | (z << 8);
@@ -1421,12 +1425,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     primer.data[index + (height++)] = airChar;
 
                     if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
-                        primer.data[index + (height++)] = glassChar;
+                        primer.data[index + (height++)] = glass;
                         info.addGenericTodo(new BlockPos(x , height, z));
                         primer.data[index + (height++)] = glowstoneChar;
                     } else {
-                        primer.data[index + (height++)] = bricksChar;
-                        primer.data[index + (height++)] = bricksChar;
+                        primer.data[index + (height++)] = roof;
+                        primer.data[index + (height++)] = roof;
                     }
 //                            BaseTerrainGenerator.setBlockStateRange(primer, index + height, index + info.getCityGroundLevel(), baseChar);
                 } else {
@@ -1606,17 +1610,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateOceanBorder(ChunkPrimer primer, BuildingInfo info, boolean xRail, boolean zRail, boolean canDoParks, int x, int z) {
+        Character borderBlock = info.getCityStyle().getBorderBlock();
+        char border = info.getCompiledPalette().get(borderBlock);
+        Character wallBlock = info.getCityStyle().getWallBlock();
+        char wall = info.getCompiledPalette().get(wallBlock);
+
         int index = (x << 12) | (z << 8);
         if (xRail || zRail) {
             if (groundLevel < info.getCityGroundLevel()) {
-                PrimerTools.setBlockStateRange(primer, index + groundLevel, index + info.getCityGroundLevel()+1, bricksChar);
+                PrimerTools.setBlockStateRange(primer, index + groundLevel, index + info.getCityGroundLevel()+1, border);
             }
         } else {
-            PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER + 30, index + info.getCityGroundLevel()+1, bricksChar);
+            PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER + 30, index + info.getCityGroundLevel()+1, border);
         }
         if (canDoParks) {
             if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
-                primer.data[index + info.getCityGroundLevel()+1] = wallChar;
+                primer.data[index + info.getCityGroundLevel()+1] = wall;
             } else {
                 primer.data[index + info.getCityGroundLevel()+1] = airChar;
             }
@@ -1697,21 +1706,21 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 } else if (b == spawnerChar) {
                                     if (provider.profile.GENERATE_SPAWNERS && !info.noLoot) {
                                         String mobid = part.getMobID(info, x, y, z);
-                                        info.addSpawnerTodo(new BlockPos(x, oy + y, z), mobid);
+                                        info.getTodoChunk(rx, rz).addSpawnerTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz), mobid);
                                     } else {
                                         b = airChar;
                                     }
                                 } else if (b == chestChar) {
                                     if (!info.noLoot) {
                                         String lootTable = part.getLootTable(info, x, y, z);
-                                        info.addChestTodo(new BlockPos(x, oy + y, z), lootTable);
+                                        info.getTodoChunk(rx, rz).addChestTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz), lootTable);
                                     }
                                 } else if (b == glowstoneChar) {
-                                    info.addGenericTodo(new BlockPos(x, oy + y, z));
+                                    info.getTodoChunk(rx, rz).addGenericTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                 } else {
                                     IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
                                     if (bs.getBlock() == Blocks.SAPLING) {
-                                        info.addSaplingTodo(new BlockPos(x, oy + y, z));
+                                        info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                     }
                                 }
                             }
@@ -1738,6 +1747,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateDebrisFromChunk(ChunkPrimer primer, Random rand, BuildingInfo adjacentInfo, BiFunction<Integer, Integer, Float> locationFactor) {
         if (adjacentInfo.hasBuilding) {
+            char filler = adjacentInfo.getCompiledPalette().get(adjacentInfo.getBuilding().getFillerBlock());
             float damageFactor = adjacentInfo.getDamageArea().getDamageFactor();
             if (damageFactor > .5f) {
                 // An estimate of the amount of blocks
@@ -1762,7 +1772,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 b = ironbarsChar;
                                 break;
                             default:
-                                b = adjacentInfo.getCompiledPalette().get('#');   // @todo hardcoded!
+                                b = filler;     // Filler from adjacent building
                                 break;
                         }
                         primer.data[index] = b;
@@ -1791,12 +1801,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private void generateBuilding(ChunkPrimer primer, BuildingInfo info) {
         int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * 6;
 
+        char filler = info.getCompiledPalette().get(info.getBuilding().getFillerBlock());
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int index = (x << 12) | (z << 8);
                 PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel, baseChar);
                 if (primer.data[index] == airChar) {
-                    primer.data[index + lowestLevel] = styledBricks;      // There is nothing below so we fill this with bricks
+                    primer.data[index + lowestLevel] = filler;      // There is nothing below so we fill this with the filler
                 }
             }
         }
@@ -1816,19 +1827,19 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         if (info.floorsBelowGround > 0) {
-            // Underground we replace the glass with solid bricks
+            // Underground we replace the glass with the filler
             for (int x = 0 ; x < 16 ; x++) {
                 int index = (x << 12) | (0 << 8);
                 // Use safe version because this may end up being lower
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmin().getCityGroundLevel())+1, styledBricks);
+                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmin().getCityGroundLevel())+1, filler);
                 index = (x << 12) | (15 << 8);
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmax().getCityGroundLevel())+1, styledBricks);
+                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmax().getCityGroundLevel())+1, filler);
             }
             for (int z = 1 ; z < 15 ; z++) {
                 int index = (0 << 12) | (z << 8);
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmin().getCityGroundLevel())+1, styledBricks);
+                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmin().getCityGroundLevel())+1, filler);
                 index = (15 << 12) | (z << 8);
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmax().getCityGroundLevel())+1, styledBricks);
+                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmax().getCityGroundLevel())+1, filler);
             }
         }
 
@@ -1848,119 +1859,117 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateDoors(ChunkPrimer primer, BuildingInfo info, int height, int f) {
 
-        if (info.chunkX == 331 && info.chunkZ == 59) {
-            System.out.println("LostCitiesTerrainGenerator.generateDoors");
-        }
+        char filler = info.getCompiledPalette().get(info.getBuilding().getFillerBlock());
 
         if (info.hasConnectionAtX(f + info.floorsBelowGround)) {
             int x = 0;
             int index = (x << 12) | (6 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (9 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             if (hasConnectionWithBuilding(f, info, info.getXmin())) {
                 index = (x << 12) | (7 << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
                 index = (x << 12) | (8 << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
             } else if (hasConnectionToTopOrOutside(f, info, info.getXmin())) {
                 index = (x << 12) | (7 << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.EAST);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.EAST);
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
                 index = (x << 12) | (8 << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, false, EnumFacing.EAST);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, false, EnumFacing.EAST);
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
             }
         }
         if (hasConnectionWithBuildingMax(f, info, info.getXmax(), Orientation.X)) {
             int x = 15;
             int index = (x << 12) | (6 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (9 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (7 << 8);
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
             index = (x << 12) | (8 << 8);
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
         } else if (hasConnectionToTopOrOutside(f, info, info.getXmax()) && (info.getXmax().hasConnectionAtXFromStreet(f + info.getXmax().floorsBelowGround))) {
             int x = 15;
             int index = (x << 12) | (6 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (9 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (7 << 8);
             primer.data[index + height] = getDoor(info.doorBlock, false, false, EnumFacing.WEST);
             primer.data[index + height + 1] = getDoor(info.doorBlock, true, false, EnumFacing.WEST);
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
             index = (x << 12) | (8 << 8);
             primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.WEST);
             primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.WEST);
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
         }
         if (info.hasConnectionAtZ(f + info.floorsBelowGround)) {
             int z = 0;
             int index = (6 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (9 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             if (hasConnectionWithBuilding(f, info, info.getZmin())) {
                 index = (7 << 12) | (z << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
                 index = (8 << 12) | (z << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
             } else if (hasConnectionToTopOrOutside(f, info, info.getZmin())) {
                 index = (7 << 12) | (z << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.NORTH);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.NORTH);
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
                 index = (8 << 12) | (z << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, false, EnumFacing.NORTH);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, false, EnumFacing.NORTH);
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
             }
         }
         if (hasConnectionWithBuildingMax(f, info, info.getZmax(), Orientation.Z)) {
             int z = 15;
             int index = (6 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (9 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (7 << 12) | (z << 8);
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
             index = (8 << 12) | (z << 8);
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
         } else if (hasConnectionToTopOrOutside(f, info, info.getZmax()) && (info.getZmax().hasConnectionAtZFromStreet(f + info.getZmax().floorsBelowGround))) {
             int z = 15;
             int index = (6 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (9 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (7 << 12) | (z << 8);
             primer.data[index + height] = getDoor(info.doorBlock, false, false, EnumFacing.SOUTH);
             primer.data[index + height + 1] = getDoor(info.doorBlock, true, false, EnumFacing.SOUTH);
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
             index = (8 << 12) | (z << 8);
             primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.SOUTH);
             primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.SOUTH);
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
         }
     }
 

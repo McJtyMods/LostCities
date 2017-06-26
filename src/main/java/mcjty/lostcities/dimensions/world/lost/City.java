@@ -3,6 +3,7 @@ package mcjty.lostcities.dimensions.world.lost;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CityStyle;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
@@ -18,14 +19,14 @@ import java.util.Random;
  */
 public class City {
 
-    private static boolean isCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static boolean isCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Random rand = new Random(provider.seed + chunkZ * 797003437L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
         return rand.nextFloat() < provider.profile.CITY_CHANCE;
     }
 
-    private static float getCityRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static float getCityRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Random rand = new Random(provider.seed + chunkZ * 100001653L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
@@ -33,7 +34,7 @@ public class City {
     }
 
     // Call this on a city center to get the style of that city
-    private static String getCityStyleForCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static String getCityStyleForCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Random rand = new Random(provider.seed + chunkZ * 899809363L + chunkX * 256203221L);
         rand.nextFloat();
         rand.nextFloat();
@@ -67,8 +68,6 @@ public class City {
         return AssetRegistries.CITYSTYLES.get(Tools.getRandomFromList(provider, rand, styles));
     }
 
-    private static Biome[] biomesForCityFactor = null;
-
     public static float getCityFactor(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         long seed = provider.seed;
         float factor = 0;
@@ -87,15 +86,15 @@ public class City {
         }
 
         Float foundFactor = null;
-        biomesForCityFactor = provider.worldObj.getBiomeProvider().getBiomesForGeneration(biomesForCityFactor, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
 
-        if (biomesForCityFactor[55].getBaseHeight() > 4 || biomesForCityFactor[54].getBaseHeight() > 4 || biomesForCityFactor[56].getBaseHeight() > 4
-                || biomesForCityFactor[5].getBaseHeight() > 4 || biomesForCityFactor[95].getBaseHeight() > 4) {
+        if (biomes[55].getBaseHeight() > 4 || biomes[54].getBaseHeight() > 4 || biomes[56].getBaseHeight() > 4
+                || biomes[5].getBaseHeight() > 4 || biomes[95].getBaseHeight() > 4) {
             return 0;   // These biomes are too high
         }
 
 
-        for (Biome biome : biomesForCityFactor) {
+        for (Biome biome : biomes) {
             Map<String, Float> map = provider.profile.getBiomeFactorMap();
             ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
             Float f = map.get(object.toString());

@@ -241,11 +241,23 @@
     "type": "citystyle",
     "name": "citystyle_desert",
     "style": "desert",
-    "street": {
+    "streetblocks": {
       "width": 8,
+      "border": "y",
+      "wall": "w",
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
+    },
+    "parkblocks": {
+      "elevation": "x"
+    },
+    "corridorblocks": {
+      "roof": "y",
+      "glass": "+"
+    },
+    "railblocks": {
+      "railmain": "y"
     },
     "buildings": [
       {
@@ -388,11 +400,23 @@
     "type": "citystyle",
     "name": "citystyle_standard",
     "style": "standard",
-    "street": {
+    "streetblocks": {
       "width": 8,
+      "border": "y",
+      "wall": "w",
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
+    },
+    "parkblocks": {
+      "elevation": "x"
+    },
+    "corridorblocks": {
+      "roof": "x",
+      "glass": "+"
+    },
+    "railblocks": {
+      "railmain": "y"
     },
     "buildings": [
       {
@@ -535,11 +559,23 @@
     "type": "citystyle",
     "name": "citystyle_chisel_desert",
     "style": "desert_chisel",
-    "street": {
+    "streetblocks": {
       "width": 8,
+      "border": "y",
+      "wall": "w",
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
+    },
+    "parkblocks": {
+      "elevation": "x"
+    },
+    "corridorblocks": {
+      "roof": "x",
+      "glass": "+"
+    },
+    "railblocks": {
+      "railmain": "y"
     },
     "buildings": [
       {
@@ -682,11 +718,23 @@
     "type": "citystyle",
     "name": "citystyle_chisel_standard",
     "style": "standard_chisel",
-    "street": {
+    "streetblocks": {
       "width": 8,
+      "border": "y",
+      "wall": "w",
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
+    },
+    "parkblocks": {
+      "elevation": "x"
+    },
+    "corridorblocks": {
+      "roof": "x",
+      "glass": "+"
+    },
+    "railblocks": {
+      "railmain": "y"
     },
     "buildings": [
       {
@@ -1532,12 +1580,18 @@
     "name": "bridge_open",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
         "                ",
         "                ",
         "                ",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
@@ -1546,7 +1600,7 @@
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "                ",
         "                ",
         "                "
@@ -1555,7 +1609,7 @@
         "                ",
         "                ",
         "                ",
-        "wwww#wwwwwww#www",
+        "wwwwvwwwwwwwvwww",
         "                ",
         "                ",
         "                ",
@@ -1564,7 +1618,7 @@
         "                ",
         "                ",
         "                ",
-        "wwww#wwwwwww#www",
+        "wwwwvwwwwwwwvwww",
         "                ",
         "                ",
         "                "
@@ -1612,12 +1666,18 @@
     "name": "bridge_covered",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
         "                ",
         "                ",
         "                ",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
@@ -1626,7 +1686,7 @@
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "                ",
         "                ",
         "                "
@@ -1635,7 +1695,7 @@
         "                ",
         "                ",
         "                ",
-        "wwww#wwwwwww#www",
+        "wwwwvwwwwwwwvwww",
         "    T       T   ",
         "                ",
         "                ",
@@ -1644,7 +1704,7 @@
         "                ",
         "                ",
         "    T       T   ",
-        "wwww#wwwwwww#www",
+        "wwwwvwwwwwwwvwww",
         "                ",
         "                ",
         "                "
@@ -1725,7 +1785,7 @@
         "                ",
         "                ",
         "                ",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
@@ -1734,7 +1794,7 @@
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "                ",
         "                ",
         "                "
@@ -8406,6 +8466,7 @@
   {
     "type": "building",
     "name": "center00",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8432,6 +8493,7 @@
   {
     "type": "building",
     "name": "center11",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8458,6 +8520,7 @@
   {
     "type": "building",
     "name": "building1",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8516,6 +8579,7 @@
   {
     "type": "building",
     "name": "center10",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8554,6 +8618,7 @@
   {
     "type": "building",
     "name": "building2",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8592,6 +8657,7 @@
   {
     "type": "building",
     "name": "building3",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8630,6 +8696,7 @@
   {
     "type": "building",
     "name": "building4",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8664,6 +8731,7 @@
   {
     "type": "building",
     "name": "center01",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8694,6 +8762,7 @@
   {
     "type": "building",
     "name": "library00",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8712,6 +8781,7 @@
   {
     "type": "building",
     "name": "library11",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8742,6 +8812,7 @@
   {
     "type": "building",
     "name": "library10",
+    "filler": "#",
     "parts": [
       {
         "top": false,
@@ -8784,6 +8855,7 @@
   {
     "type": "building",
     "name": "library01",
+    "filler": "#",
     "parts": [
       {
         "top": false,

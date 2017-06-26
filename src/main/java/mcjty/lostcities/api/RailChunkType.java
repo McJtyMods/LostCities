@@ -15,7 +15,8 @@ public enum RailChunkType {
     HORIZONTAL(false),
     THREE_SPLIT(false),
     VERTICAL(false),
-    DOUBLE_BEND(false);
+    DOUBLE_BEND(false),
+    RAILS_END_HERE(false);
 
     private final boolean isStation;
 

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -14,6 +15,12 @@ import java.util.function.Predicate;
 public class Building implements IAsset {
 
     private String name;
+
+    private int minFloors = -1;         // -1 means default from level
+    private int minCellars = -1;        // -1 means default frmo level
+    private int maxFloors = -1;         // -1 means default from level
+    private int maxCellars = -1;        // -1 means default frmo level
+    private char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
 
     private final List<Pair<Predicate<LevelInfo>, String>> parts = new ArrayList<>();
     private final List<String> partNames = new ArrayList<>();
@@ -34,9 +41,29 @@ public class Building implements IAsset {
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
+
+        if (object.getAsJsonObject().has("minfloors")) {
+            minFloors = object.getAsJsonObject().get("minfloors").getAsInt();
+        }
+        if (object.getAsJsonObject().has("mincellars")) {
+            minCellars = object.getAsJsonObject().get("mincellars").getAsInt();
+        }
+        if (object.getAsJsonObject().has("maxfloors")) {
+            maxFloors = object.getAsJsonObject().get("maxfloors").getAsInt();
+        }
+        if (object.getAsJsonObject().has("maxcellars")) {
+            maxCellars = object.getAsJsonObject().get("maxcellars").getAsInt();
+        }
+        if (object.getAsJsonObject().has("filler")) {
+            fillerBlock = object.getAsJsonObject().get("filler").getAsCharacter();
+        } else {
+            throw new RuntimeException("'filler' is required for building '" + name + "'!");
+        }
+
         JsonArray partArray = object.get("parts").getAsJsonArray();
         parts.clear();
         partNames.clear();
+
         for (JsonElement element : partArray) {
             String partName = element.getAsJsonObject().get("part").getAsString();
             Predicate<LevelInfo> test = levelInfo -> true;
@@ -46,6 +73,39 @@ public class Building implements IAsset {
                     test = levelInfo -> levelInfo.isTopOfBuilding();
                 } else {
                     test = levelInfo -> !levelInfo.isTopOfBuilding();
+                }
+            }
+            if (element.getAsJsonObject().has("ground")) {
+                boolean ground = element.getAsJsonObject().get("ground").getAsBoolean();
+                if (ground) {
+                    test = levelInfo -> levelInfo.isGroundFloor();
+                } else {
+                    test = levelInfo -> !levelInfo.isGroundFloor();
+                }
+            }
+            if (element.getAsJsonObject().has("cellar")) {
+                boolean cellar = element.getAsJsonObject().get("cellar").getAsBoolean();
+                if (cellar) {
+                    test = levelInfo -> levelInfo.isCellar();
+                } else {
+                    test = levelInfo -> !levelInfo.isCellar();
+                }
+            }
+            if (element.getAsJsonObject().has("level")) {
+                int level = element.getAsJsonObject().get("level").getAsInt();
+                test = levelInfo -> levelInfo.isLevel(level);
+            }
+            if (element.getAsJsonObject().has("range")) {
+                String range = element.getAsJsonObject().get("range").getAsString();
+                String[] split = StringUtils.split(range, ',');
+                try {
+                    int l1 = Integer.parseInt(split[0]);
+                    int l2 = Integer.parseInt(split[1]);
+                    test = levelInfo -> levelInfo.isRange(l1, l2);
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("Bad range specification: <l1>,<l2>!");
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    throw new RuntimeException("Bad range specification: <l1>,<l2>!");
                 }
             }
             addPart(test, partName);
@@ -77,12 +137,32 @@ public class Building implements IAsset {
         return this;
     }
 
+    public int getMaxFloors() {
+        return maxFloors;
+    }
+
+    public int getMaxCellars() {
+        return maxCellars;
+    }
+
+    public int getMinFloors() {
+        return minFloors;
+    }
+
+    public int getMinCellars() {
+        return minCellars;
+    }
+
     public String getPartName(int index) {
         return partNames.get(index);
     }
 
     public int getPartCount() {
         return partNames.size();
+    }
+
+    public char getFillerBlock() {
+        return fillerBlock;
     }
 
     public String getRandomPart(Random random, LevelInfo info) {
@@ -133,6 +213,18 @@ public class Building implements IAsset {
 
         public boolean isTopOfBuilding() {
             return floor >= floorsAboveGround;
+        }
+
+        public boolean isCellar() {
+            return floor < 0;
+        }
+
+        public boolean isLevel(int l) {
+            return level == l;
+        }
+
+        public boolean isRange(int l1, int l2) {
+            return level >= l1 && level <= l2;
         }
     }
 }
