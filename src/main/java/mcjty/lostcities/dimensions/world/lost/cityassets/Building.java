@@ -41,9 +41,29 @@ public class Building implements IAsset {
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
+
+        if (object.getAsJsonObject().has("minfloors")) {
+            minFloors = object.getAsJsonObject().get("minfloors").getAsInt();
+        }
+        if (object.getAsJsonObject().has("mincellars")) {
+            minCellars = object.getAsJsonObject().get("mincellars").getAsInt();
+        }
+        if (object.getAsJsonObject().has("maxfloors")) {
+            maxFloors = object.getAsJsonObject().get("maxfloors").getAsInt();
+        }
+        if (object.getAsJsonObject().has("maxcellars")) {
+            maxCellars = object.getAsJsonObject().get("maxcellars").getAsInt();
+        }
+        if (object.getAsJsonObject().has("filler")) {
+            fillerBlock = object.getAsJsonObject().get("filler").getAsCharacter();
+        } else {
+            throw new RuntimeException("'filler' is required for building '" + name + "'!");
+        }
+
         JsonArray partArray = object.get("parts").getAsJsonArray();
         parts.clear();
         partNames.clear();
+
         for (JsonElement element : partArray) {
             String partName = element.getAsJsonObject().get("part").getAsString();
             Predicate<LevelInfo> test = levelInfo -> true;
@@ -87,23 +107,6 @@ public class Building implements IAsset {
                 } catch (ArrayIndexOutOfBoundsException e) {
                     throw new RuntimeException("Bad range specification: <l1>,<l2>!");
                 }
-            }
-            if (element.getAsJsonObject().has("minfloors")) {
-                minFloors = element.getAsJsonObject().get("minfloors").getAsInt();
-            }
-            if (element.getAsJsonObject().has("mincellars")) {
-                minCellars = element.getAsJsonObject().get("mincellars").getAsInt();
-            }
-            if (element.getAsJsonObject().has("maxfloors")) {
-                maxFloors = element.getAsJsonObject().get("maxfloors").getAsInt();
-            }
-            if (element.getAsJsonObject().has("maxcellars")) {
-                maxCellars = element.getAsJsonObject().get("maxcellars").getAsInt();
-            }
-            if (element.getAsJsonObject().has("filler")) {
-                fillerBlock = element.getAsJsonObject().get("filler").getAsCharacter();
-            } else {
-                throw new RuntimeException("'filler' is required for building '" + name + "'!");
             }
             addPart(test, partName);
         }

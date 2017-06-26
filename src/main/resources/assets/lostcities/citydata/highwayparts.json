@@ -4,9 +4,15 @@
     "name": "highway_open",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
-        "xxxxxxxxxxxxxxxx",
+        "vvvvvvvvvvvvvvvv",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
@@ -21,7 +27,7 @@
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
-        "xxxxxxxxxxxxxxxx"
+        "vvvvvvvvvvvvvvvv"
       ],
       [
         "w~~~~~~~~~~~~~~~",
@@ -239,6 +245,12 @@
     "name": "highway_open_bi",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
         "RRRRRRRuuRRRRRRR",
@@ -474,9 +486,15 @@
     "name": "highway_bridge",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
-        "xxxxxxxxxxxxxxxx",
+        "vvvvvvvvvvvvvvvv",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
@@ -491,10 +509,10 @@
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
-        "xxxxxxxxxxxxxxxx"
+        "vvvvvvvvvvvvvvvv"
       ],
       [
-        "x:::::::::::::::",
+        "v:::::::::::::::",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -509,7 +527,7 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "x:::::::::::::::"
+        "v:::::::::::::::"
       ],
       [
         "w~~~~~~~~~~~~~~~",
@@ -644,9 +662,15 @@
     "name": "highway_bridge_bi",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
-        "xRRRRRRuuRRRRRRx",
+        "vRRRRRRuuRRRRRRv",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
@@ -661,10 +685,10 @@
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
-        "xRRRRRRuuRRRRRRx"
+        "vRRRRRRuuRRRRRRv"
       ],
       [
-        "x~~~~~~~~~~~~~~~",
+        "v~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -679,7 +703,7 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "x~~~~~~~~~~~~~~~"
+        "v~~~~~~~~~~~~~~~"
       ],
       [
         "w~~~~~~~~~~~~~~~",
@@ -814,9 +838,15 @@
     "name": "highway_tunnel",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
-        "xxxxxxxxxxxxxxxx",
+        "vvvvvvvvvvvvvvvv",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
@@ -831,10 +861,10 @@
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
         "RRRRRRRRRRRRRRRR",
-        "xxxxxxxxxxxxxxxx"
+        "vvvvvvvvvvvvvvvv"
       ],
       [
-        "xxxxxxxxxxxxxxxx",
+        "vvvvvvvvvvvvvvvv",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -849,10 +879,10 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "xxxxxxxxxxxxxxxx"
+        "vvvvvvvvvvvvvvvv"
       ],
       [
-        "xxxxxxxxxxxxxxxx",
+        "vvvvvvvvvvvvvvvv",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -867,10 +897,10 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "xxxxxxxxxxxxxxxx"
+        "vvvvvvvvvvvvvvvv"
       ],
       [
-        "xxxxxxxxxxxxxxxx",
+        "vvvvvvvvvvvvvvvv",
         "~~~~~~~~T~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -885,11 +915,11 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~T~~~~~~~",
-        "xxxxxxxxxxxxxxxx"
+        "vvvvvvvvvvvvvvvv"
       ],
       [
         "                ",
-        "xxxxxxxxxxxxxxxx",
+        "vvvvvvvvvvvvvvvv",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -902,24 +932,24 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "xxxxxxxxxxxxxxxx",
+        "vvvvvvvvvvvvvvvv",
         "                "
       ],
       [
         "                ",
         "                ",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
         "                ",
         "                "
       ]
@@ -930,9 +960,15 @@
     "name": "highway_tunnel_bi",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
-        "xRRRRRRuuRRRRRRx",
+        "vRRRRRRuuRRRRRRv",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
@@ -947,10 +983,10 @@
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
         "RRRRRRRuuRRRRRRR",
-        "xRRRRRRuuRRRRRRx"
+        "vRRRRRRuuRRRRRRv"
       ],
       [
-        "x~~~~~~~~~~~~~~x",
+        "v~~~~~~~~~~~~~~v",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -965,10 +1001,10 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "x~~~~~~~~~~~~~~x"
+        "v~~~~~~~~~~~~~~v"
       ],
       [
-        "x~~~~~~~~~~~~~~x",
+        "v~~~~~~~~~~~~~~v",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -983,10 +1019,10 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "x~~~~~~~~~~~~~~x"
+        "v~~~~~~~~~~~~~~v"
       ],
       [
-        "x~~~~~~~~~~~~~~x",
+        "v~~~~~~~~~~~~~~v",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -1001,11 +1037,11 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "x~~~~~~~~~~~~~~x"
+        "v~~~~~~~~~~~~~~v"
       ],
       [
-        " x~~~~~~~~~~~~x ",
-        "x~~~~~~~~~~~~~~x",
+        " v~~~~~~~~~~~~v ",
+        "v~~~~~~~~~~~~~~v",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
@@ -1018,26 +1054,26 @@
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
         "~~~~~~~~~~~~~~~~",
-        "x~~~~~~~~~~~~~~x",
-        " x~~~~~~~~~~~~x "
+        "v~~~~~~~~~~~~~~v",
+        " v~~~~~~~~~~~~v "
       ],
       [
-        "  xxxxxxxxxxxx  ",
-        "  xxxxxxxxxxxx  ",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "xxxxxxxxxxxxxxxx",
-        "  xxxxxxxxxxxx  ",
-        "  xxxxxxxxxxxx  "
+        "  vvvvvvvvvvvv  ",
+        "  vvvvvvvvvvvv  ",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "vvvvvvvvvvvvvvvv",
+        "  vvvvvvvvvvvv  ",
+        "  vvvvvvvvvvvv  "
       ]
     ]
   }

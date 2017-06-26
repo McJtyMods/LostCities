@@ -285,6 +285,24 @@
         "damaged": "minecraft:iron_bars"
       },
       {
+        "char": "v",
+        "blocks": [
+          {
+            "factor": 0.06,
+            "block": "minecraft:stonebrick@2"
+          },
+          {
+            "factor": 0.05,
+            "block": "minecraft:stonebrick@1"
+          },
+          {
+            "factor": 2.0,
+            "block": "minecraft:stonebrick"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
+      },
+      {
         "char": "x",
         "block": "minecraft:stonebrick"
       },

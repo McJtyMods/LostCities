@@ -435,12 +435,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private void generateHighwayPart(ChunkPrimer primer, BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix) {
         int highwayGroundLevel = provider.profile.GROUNDLEVEL + level * 6;
 
+        BuildingPart part;
         if (info.isTunnel(level)) {
             // We know we need a tunnel
-            generatePart(primer, info, AssetRegistries.PARTS.get("highway_tunnel" + suffix), transform, 0, highwayGroundLevel, 0);
+            part = AssetRegistries.PARTS.get("highway_tunnel" + suffix);
+            generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
-            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_open" + suffix), transform, 0, highwayGroundLevel, 0);
+            part = AssetRegistries.PARTS.get("highway_open" + suffix);
+            int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -455,7 +458,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         } else {
-            int height = generatePart(primer, info, AssetRegistries.PARTS.get("highway_bridge" + suffix), transform, 0, highwayGroundLevel, 0);
+            part = AssetRegistries.PARTS.get("highway_bridge" + suffix);
+            int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -471,37 +475,28 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        // Make sure the bridge is supported if needed
-        if (transform == Transform.ROTATE_NONE) {
-            int index = highwayGroundLevel - 1; // (coordinate 0,0)
+        Character support = part.getMetaChar("support");
+        if (support != null) {
+            char sup = info.getCompiledPalette().get(support);
+            int x1 = transform.rotateX(0, 15);
+            int z1 = transform.rotateZ(0, 15);
+            int index1 = (x1 << 12) | (z1 << 8) + highwayGroundLevel - 1;
+            int x2 = transform.rotateX(0, 0);
+            int z2 = transform.rotateZ(0, 0);
+
+            int index2 = (x2 << 12) | (z2 << 8) + highwayGroundLevel - 1;
             for (int y = 0; y < 40; y++) {
                 boolean done = false;
-                if (primer.data[index] == airChar || primer.data[index] == liquidChar) {
-                    primer.data[index] = bricksChar;
+                if (primer.data[index1] == airChar || primer.data[index1] == liquidChar) {
+                    primer.data[index1] = sup;
                     done = true;
                 }
-                if (primer.data[index + (15 << 8)] == airChar || primer.data[index + (15 << 8)] == liquidChar) {
-                    primer.data[index + (15 << 8)] = bricksChar;
+                if (primer.data[index2] == airChar || primer.data[index2] == liquidChar) {
+                    primer.data[index2] = sup;
                     done = true;
                 }
-                index--;
-                if (!done) {
-                    break;
-                }
-            }
-        } else {
-            int index = highwayGroundLevel - 1; // (coordinate 0,0)
-            for (int y = 0; y < 40; y++) {
-                boolean done = false;
-                if (primer.data[index] == airChar || primer.data[index] == liquidChar) {
-                    primer.data[index] = bricksChar;
-                    done = true;
-                }
-                if (primer.data[index + (15 << 12)] == airChar || primer.data[index + (15 << 12)] == liquidChar) {
-                    primer.data[index + (15 << 12)] = bricksChar;
-                    done = true;
-                }
-                index--;
+                index1--;
+                index2--;
                 if (!done) {
                     break;
                 }
