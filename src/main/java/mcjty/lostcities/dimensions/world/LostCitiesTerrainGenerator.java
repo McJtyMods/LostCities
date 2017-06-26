@@ -904,47 +904,50 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         generatePart(primer, info, part, transform, 0, height, 0);
 
+        Character railMainBlock = info.getCityStyle().getRailMainBlock();
+        char rail = info.getCompiledPalette().get(railMainBlock);
+
         if (type == RailChunkType.HORIZONTAL) {
             // If there is a rail dungeon north or south we must make a connection here
             if (info.getZmin().railDungeon != null) {
                 for (int z = 0; z < 4; z++) {
-                    primer.data[Tools.calcIndex(6, height + 1, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(6, height + 1, z)] = rail;
                     primer.data[Tools.calcIndex(6, height + 2, z)] = airChar;
                     primer.data[Tools.calcIndex(6, height + 3, z)] = airChar;
-                    primer.data[Tools.calcIndex(7, height + 1, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(7, height + 1, z)] = rail;
                     primer.data[Tools.calcIndex(7, height + 2, z)] = airChar;
                     primer.data[Tools.calcIndex(7, height + 3, z)] = airChar;
                 }
                 for (int z = 0; z < 3; z++) {
-                    primer.data[Tools.calcIndex(5, height + 2, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(5, height + 3, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(5, height + 4, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(6, height + 4, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(7, height + 4, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 2, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 3, z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 4, z)] = bricksChar;
+                    primer.data[Tools.calcIndex(5, height + 2, z)] = rail;
+                    primer.data[Tools.calcIndex(5, height + 3, z)] = rail;
+                    primer.data[Tools.calcIndex(5, height + 4, z)] = rail;
+                    primer.data[Tools.calcIndex(6, height + 4, z)] = rail;
+                    primer.data[Tools.calcIndex(7, height + 4, z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 2, z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 3, z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 4, z)] = rail;
                 }
             }
 
             if (info.getZmax().railDungeon != null) {
                 for (int z = 0; z < 5; z++) {
-                    primer.data[Tools.calcIndex(6, height + 1, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(6, height + 1, 15 - z)] = rail;
                     primer.data[Tools.calcIndex(6, height + 2, 15 - z)] = airChar;
                     primer.data[Tools.calcIndex(6, height + 3, 15 - z)] = airChar;
-                    primer.data[Tools.calcIndex(7, height + 1, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(7, height + 1, 15 - z)] = rail;
                     primer.data[Tools.calcIndex(7, height + 2, 15 - z)] = airChar;
                     primer.data[Tools.calcIndex(7, height + 3, 15 - z)] = airChar;
                 }
                 for (int z = 0; z < 4; z++) {
-                    primer.data[Tools.calcIndex(5, height + 2, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(5, height + 3, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(5, height + 4, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(6, height + 4, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(7, height + 4, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 2, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 3, 15 - z)] = bricksChar;
-                    primer.data[Tools.calcIndex(8, height + 4, 15 - z)] = bricksChar;
+                    primer.data[Tools.calcIndex(5, height + 2, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(5, height + 3, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(5, height + 4, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(6, height + 4, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(7, height + 4, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 2, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 3, 15 - z)] = rail;
+                    primer.data[Tools.calcIndex(8, height + 4, 15 - z)] = rail;
                 }
             }
         }
@@ -963,14 +966,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (railInfo.getRails() == 1) {
                         for (int x = 0 ; x < 16 ; x++) {
                             index = (x << 12) | (5 << 8) + height + 1;
-                            primer.data[index] = bricksChar;
+                            primer.data[index] = rail;
                             index = (x << 12) | (9 << 8) + height + 1;
-                            primer.data[index] = bricksChar;
+                            primer.data[index] = rail;
                         }
                     } else {
                         for (int x = 0 ; x < 16 ; x++) {
                             index = (x << 12) | (7 << 8) + height + 1;
-                            primer.data[index] = bricksChar;
+                            primer.data[index] = rail;
                         }
                     }
                     break;
@@ -982,11 +985,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             for (int y = height + 1 ; y < height + part.getSliceCount() ; y++) {
                                 index = (x << 12) | (5 << 8) + y;
                                 if (getRailChars().contains(primer.data[index])) {
-                                    primer.data[index] = bricksChar;
+                                    primer.data[index] = rail;
                                 }
                                 index = (x << 12) | (9 << 8) + y;
                                 if (getRailChars().contains(primer.data[index])) {
-                                    primer.data[index] = bricksChar;
+                                    primer.data[index] = rail;
                                 }
                             }
                         }
@@ -995,7 +998,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             for (int y = height + 1 ; y < height + part.getSliceCount() ; y++) {
                                 index = (x << 12) | (7 << 8) + y;
                                 if (getRailChars().contains(primer.data[index])) {
-                                    primer.data[index] = bricksChar;
+                                    primer.data[index] = rail;
                                 }
                             }
                         }

@@ -30,6 +30,7 @@ public class CityStyle implements IAsset {
     private Character streetBlock;
     private Character streetBaseBlock;
     private Character streetVariantBlock;
+    private Character railMainBlock;
 
     public CityStyle(JsonObject object) {
         readFromJSon(object);
@@ -64,6 +65,10 @@ public class CityStyle implements IAsset {
         return streetVariantBlock;
     }
 
+    public Character getRailMainBlock() {
+        return railMainBlock;
+    }
+
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
@@ -74,6 +79,10 @@ public class CityStyle implements IAsset {
             streetVariantBlock = s.get("streetvariant").getAsCharacter();
             streetBaseBlock = s.get("streetbase").getAsCharacter();
             streetWidth = s.get("width").getAsInt();
+        }
+        if (object.has("rails")) {
+            JsonObject s = object.get("rails").getAsJsonObject();
+            railMainBlock = s.get("railmain").getAsCharacter();
         }
         JsonArray array = getArraySafe(object, "buildings");
         for (JsonElement element : array) {

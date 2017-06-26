@@ -247,6 +247,9 @@
       "streetbase": "b",
       "streetvariant": "B"
     },
+    "rails": {
+      "railmain": "y"
+    },
     "buildings": [
       {
         "factor": 0.4,
@@ -393,6 +396,9 @@
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
+    },
+    "rails": {
+      "railmain": "y"
     },
     "buildings": [
       {
@@ -541,6 +547,9 @@
       "streetbase": "b",
       "streetvariant": "B"
     },
+    "rails": {
+      "railmain": "y"
+    },
     "buildings": [
       {
         "factor": 0.4,
@@ -687,6 +696,9 @@
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
+    },
+    "rails": {
+      "railmain": "y"
     },
     "buildings": [
       {
