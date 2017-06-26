@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.api.ILostChunkInfo;
+import mcjty.lostcities.api.ILostCityInfo;
 import mcjty.lostcities.api.ILostExplosion;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
@@ -1254,5 +1255,13 @@ public class BuildingInfo implements ILostChunkInfo {
     @Override
     public int getRailLevel() {
         return getRailInfo().getLevel();
+    }
+
+    @Nullable
+    @Override
+    public ILostCityInfo getCityInfo() {
+//        if ()
+        // @todo
+        return null;
     }
 }

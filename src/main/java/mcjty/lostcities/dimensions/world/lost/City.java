@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class City {
 
-    private static boolean isCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static boolean isCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Random rand = new Random(provider.seed + chunkZ * 797003437L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();

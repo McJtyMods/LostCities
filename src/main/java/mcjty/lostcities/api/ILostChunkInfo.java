@@ -1,14 +1,22 @@
 package mcjty.lostcities.api;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 public interface ILostChunkInfo {
 
     /**
-     * Return true if this chunk represents a city (building or street)
+     * Return true if this chunk represents a part of a city (building or street)
      */
     boolean isCity();
+
+    /**
+     * If this chunk hosts the center of a city then this will retrieve the city information
+     * of that city.
+     */
+    @Nullable
+    ILostCityInfo getCityInfo();
 
     /**
      * Return the name of the building if there is a building here (name from asset registry)
