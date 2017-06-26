@@ -43,16 +43,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char diamondBlockChar;
     public static char spawnerChar;
     public static char chestChar;
-    public static IBlockState air;
-    public static IBlockState hardAir;  // Used in parts to carve out
-    public static IBlockState water;
 
     private static Set<Character> rotatableChars = null;
     private static Set<Character> railChars = null;
     private static Set<Character> glassChars = null;
     private static Set<Character> charactersNeedingTodo = null;
 
-    private static IBlockState baseBlock;
     private Character street;
     private Character streetBase;
     private Character street2;
@@ -146,15 +142,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public static void setupChars() {
         if (!charsSetup) {
-            baseBlock = Blocks.STONE.getDefaultState();
-            air = Blocks.AIR.getDefaultState();
-            hardAir = Blocks.COMMAND_BLOCK.getDefaultState();
-            water = Blocks.WATER.getDefaultState();
-            airChar = (char) Block.BLOCK_STATE_IDS.get(air);
-            hardAirChar = (char) Block.BLOCK_STATE_IDS.get(hardAir);
+            airChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.AIR.getDefaultState());
+            hardAirChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COMMAND_BLOCK.getDefaultState());
             glowstoneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLOWSTONE.getDefaultState());
-            baseChar = (char) Block.BLOCK_STATE_IDS.get(baseBlock);
-            liquidChar = (char) Block.BLOCK_STATE_IDS.get(water);
+            baseChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONE.getDefaultState());
+            liquidChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.WATER.getDefaultState());
             leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false));
             ironbarsChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.IRON_BARS.getDefaultState());
             grassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRASS.getDefaultState());
