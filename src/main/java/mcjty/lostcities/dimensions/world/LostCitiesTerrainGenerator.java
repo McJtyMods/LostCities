@@ -839,6 +839,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             case STATION_EXTENSION_UNDERGROUND:
                 part = AssetRegistries.PARTS.get("station_underground");
                 break;
+            case RAILS_END_HERE:
+                part = AssetRegistries.PARTS.get("rails_horizontal_end");
+                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
+                    transform = Transform.MIRROR_X;
+                }
+                break;
             case HORIZONTAL:
                 part = AssetRegistries.PARTS.get("rails_horizontal");
 
@@ -1649,6 +1655,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                              Transform transform,
                              int ox, int oy, int oz) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
+        if (part == null) {
+            System.out.println("LostCitiesTerrainGenerator.generatePart");
+        }
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
                 char[] vs = part.getVSlice(x, z);
