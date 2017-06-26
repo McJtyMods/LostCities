@@ -59,7 +59,7 @@ public class ForgeEventHandlers {
                 CustomTeleporter.teleportToDimension(event.getEntityPlayer(), 0, top);
             } else {
                 event.setResult(Event.Result.DENY);
-                WorldServer worldServer = event.getEntity().getEntityWorld().getMinecraftServer().worldServerForDimension(LostCityConfiguration.DIMENSION_ID);
+                WorldServer worldServer = event.getEntity().getEntityWorld().getMinecraftServer().getWorld(LostCityConfiguration.DIMENSION_ID);
                 BlockPos top = worldServer.getTopSolidOrLiquidBlock(bedLocation);
                 CustomTeleporter.teleportToDimension(event.getEntityPlayer(), LostCityConfiguration.DIMENSION_ID, top);
             }

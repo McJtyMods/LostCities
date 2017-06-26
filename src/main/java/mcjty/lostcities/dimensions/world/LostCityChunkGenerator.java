@@ -1,7 +1,5 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lib.compat.CompatChunkGenerator;
-import mcjty.lib.compat.CompatMapGenStructure;
 import mcjty.lostcities.api.IChunkPrimerFactory;
 import mcjty.lostcities.api.ILostChunkGenerator;
 import mcjty.lostcities.api.ILostChunkInfo;
@@ -20,11 +18,14 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.MobSpawnerBaseLogic;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.datafix.fixes.EntityId;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -326,6 +327,16 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         }
     }
 
+    private static final EntityId FIXER = new EntityId();
+
+    public static String fixEntityId(String id) {
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setString("id", id);
+        nbt = FIXER.fixTagCompound(nbt);
+        return nbt.getString("id");
+    }
+
+
     private void generateLootSpawners(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator chunkGenerator) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, chunkGenerator);
 
@@ -337,8 +348,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                 if (tileentity instanceof TileEntityMobSpawner) {
                     TileEntityMobSpawner spawner = (TileEntityMobSpawner) tileentity;
                     String id = pair.getValue();
-                    String fixedId = EntityTools.fixEntityId(id);
-                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation(fixedId), fixedId);
+                    String fixedId = fixEntityId(id);
+                    MobSpawnerBaseLogic mobspawnerbaselogic = spawner.getSpawnerBaseLogic();
+                    mobspawnerbaselogic.setEntityId(new ResourceLocation(id));
+                    spawner.markDirty();
                 }
             }
         }
