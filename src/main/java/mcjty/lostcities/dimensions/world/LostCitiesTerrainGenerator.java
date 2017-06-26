@@ -540,54 +540,59 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
-        BuildingInfo minDir = orientation.getMinDir().get(info);
-        BuildingInfo maxDir = orientation.getMaxDir().get(info);
-        if (minDir.hasBridge(provider, orientation) != null && maxDir.hasBridge(provider, orientation) != null) {
-            // Needs support
-            for (int y = waterLevel - 10; y <= groundLevel; y++) {
-                setBridgeSupport(primer, 7, y, 7);
-                setBridgeSupport(primer, 7, y, 8);
-                setBridgeSupport(primer, 8, y, 7);
-                setBridgeSupport(primer, 8, y, 8);
-            }
-        }
-        if (minDir.hasBridge(provider, orientation) == null) {
-            // Connection to the side section
-            if (orientation == Orientation.X) {
-                int x = 0;
-                for (int z = 6; z <= 9; z++) {
-                    int index = (x << 12) | (z << 8) + groundLevel;
-                    primer.data[index] = bricksChar;
-                }
-            } else {
-                int z = 0;
-                for (int x = 6; x <= 9; x++) {
-                    int index = (x << 12) | (z << 8) + groundLevel;
-                    primer.data[index] = bricksChar;
+
+        Character support = bt.getMetaChar("support");
+        if (support != null) {
+            char sup = info.getCompiledPalette().get(support);
+            BuildingInfo minDir = orientation.getMinDir().get(info);
+            BuildingInfo maxDir = orientation.getMaxDir().get(info);
+            if (minDir.hasBridge(provider, orientation) != null && maxDir.hasBridge(provider, orientation) != null) {
+                // Needs support
+                for (int y = waterLevel - 10; y <= groundLevel; y++) {
+                    setBridgeSupport(primer, 7, y, 7, sup);
+                    setBridgeSupport(primer, 7, y, 8, sup);
+                    setBridgeSupport(primer, 8, y, 7, sup);
+                    setBridgeSupport(primer, 8, y, 8, sup);
                 }
             }
-        }
-        if (maxDir.hasBridge(provider, orientation) == null) {
-            // Connection to the side section
-            if (orientation == Orientation.X) {
-                int x = 15;
-                for (int z = 6; z <= 9; z++) {
-                    int index = (x << 12) | (z << 8) + groundLevel;
-                    primer.data[index] = bricksChar;
+            if (minDir.hasBridge(provider, orientation) == null) {
+                // Connection to the side section
+                if (orientation == Orientation.X) {
+                    int x = 0;
+                    for (int z = 6; z <= 9; z++) {
+                        int index = (x << 12) | (z << 8) + groundLevel;
+                        primer.data[index] = sup;
+                    }
+                } else {
+                    int z = 0;
+                    for (int x = 6; x <= 9; x++) {
+                        int index = (x << 12) | (z << 8) + groundLevel;
+                        primer.data[index] = sup;
+                    }
                 }
-            } else {
-                int z = 15;
-                for (int x = 6; x <= 9; x++) {
-                    int index = (x << 12) | (z << 8) + groundLevel;
-                    primer.data[index] = bricksChar;
+            }
+            if (maxDir.hasBridge(provider, orientation) == null) {
+                // Connection to the side section
+                if (orientation == Orientation.X) {
+                    int x = 15;
+                    for (int z = 6; z <= 9; z++) {
+                        int index = (x << 12) | (z << 8) + groundLevel;
+                        primer.data[index] = sup;
+                    }
+                } else {
+                    int z = 15;
+                    for (int x = 6; x <= 9; x++) {
+                        int index = (x << 12) | (z << 8) + groundLevel;
+                        primer.data[index] = sup;
+                    }
                 }
             }
         }
     }
 
-    private void setBridgeSupport(ChunkPrimer primer, int x, int y, int z) {
+    private void setBridgeSupport(ChunkPrimer primer, int x, int y, int z, char sup) {
         int index = (x << 12) | (z << 8) + y;
-        primer.data[index] = bricksChar;
+        primer.data[index] = sup;
     }
 
     private void debugClearChunk(int chunkX, int chunkZ, ChunkPrimer primer) {

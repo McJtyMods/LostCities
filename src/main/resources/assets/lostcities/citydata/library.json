@@ -1532,12 +1532,18 @@
     "name": "bridge_open",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
         "                ",
         "                ",
         "                ",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
@@ -1546,7 +1552,7 @@
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "                ",
         "                ",
         "                "
@@ -1555,7 +1561,7 @@
         "                ",
         "                ",
         "                ",
-        "wwww#wwwwwww#www",
+        "wwwwvwwwwwwwvwww",
         "                ",
         "                ",
         "                ",
@@ -1564,7 +1570,7 @@
         "                ",
         "                ",
         "                ",
-        "wwww#wwwwwww#www",
+        "wwwwvwwwwwwwvwww",
         "                ",
         "                ",
         "                "
@@ -1612,12 +1618,18 @@
     "name": "bridge_covered",
     "xsize": 16,
     "zsize": 16,
+    "meta": [
+      {
+        "key": "support",
+        "char": "v"
+      }
+    ],
     "slices": [
       [
         "                ",
         "                ",
         "                ",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
@@ -1626,7 +1638,7 @@
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "                ",
         "                ",
         "                "
@@ -1635,7 +1647,7 @@
         "                ",
         "                ",
         "                ",
-        "wwww#wwwwwww#www",
+        "wwwwvwwwwwwwvwww",
         "    T       T   ",
         "                ",
         "                ",
@@ -1644,7 +1656,7 @@
         "                ",
         "                ",
         "    T       T   ",
-        "wwww#wwwwwww#www",
+        "wwwwvwwwwwwwvwww",
         "                ",
         "                ",
         "                "
@@ -1725,7 +1737,7 @@
         "                ",
         "                ",
         "                ",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
@@ -1734,7 +1746,7 @@
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
         "SSSSSSSSSSSSSSSS",
-        "################",
+        "vvvvvvvvvvvvvvvv",
         "                ",
         "                ",
         "                "
