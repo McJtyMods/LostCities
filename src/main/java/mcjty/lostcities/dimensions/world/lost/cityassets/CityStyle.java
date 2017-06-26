@@ -32,6 +32,7 @@ public class CityStyle implements IAsset {
     private Character streetVariantBlock;
     private Character parkElevationBlock;
     private Character corridorRoofBlock;
+    private Character corridorGlassBlock;
     private Character railMainBlock;
     private Character borderBlock;
     private Character wallBlock;
@@ -81,6 +82,10 @@ public class CityStyle implements IAsset {
         return corridorRoofBlock;
     }
 
+    public Character getCorridorGlassBlock() {
+        return corridorGlassBlock;
+    }
+
     public Character getBorderBlock() {
         return borderBlock;
     }
@@ -113,6 +118,7 @@ public class CityStyle implements IAsset {
         if (object.has("corridorblocks")) {
             JsonObject s = object.get("corridorblocks").getAsJsonObject();
             corridorRoofBlock = s.get("roof").getAsCharacter();
+            corridorGlassBlock = s.get("glass").getAsCharacter();
         }
         JsonArray array = getArraySafe(object, "buildings");
         for (JsonElement element : array) {

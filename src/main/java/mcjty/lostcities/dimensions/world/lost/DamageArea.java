@@ -53,7 +53,7 @@ public class DamageArea {
             return b;
         }
 
-        if (CompiledPalette.isGlass(b)) {
+        if (LostCitiesTerrainGenerator.getGlassChars().contains(b)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }
         if (provider.rand.nextFloat() <= damage) {

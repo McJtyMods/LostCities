@@ -253,7 +253,8 @@
       "elevation": "x"
     },
     "corridorblocks": {
-      "roof": "y"
+      "roof": "y",
+      "glass": "+"
     },
     "railblocks": {
       "railmain": "y"
@@ -411,7 +412,8 @@
       "elevation": "x"
     },
     "corridorblocks": {
-      "roof": "x"
+      "roof": "x",
+      "glass": "+"
     },
     "railblocks": {
       "railmain": "y"
@@ -569,7 +571,8 @@
       "elevation": "x"
     },
     "corridorblocks": {
-      "roof": "x"
+      "roof": "x",
+      "glass": "+"
     },
     "railblocks": {
       "railmain": "y"
@@ -727,7 +730,8 @@
       "elevation": "x"
     },
     "corridorblocks": {
-      "roof": "x"
+      "roof": "x",
+      "glass": "+"
     },
     "railblocks": {
       "railmain": "y"

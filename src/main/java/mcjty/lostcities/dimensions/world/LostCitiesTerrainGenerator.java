@@ -34,12 +34,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char liquidChar;
     public static char leavesChar;
     public static char ironbarsChar;
-    public static char ladderChar;
     public static char grassChar;
-    public static char glassChar;
-    public static char glassPaneChar;
-    public static char stainedGlassChar;
-    public static char stainedGlassPaneChar;
     public static char bedrockChar;
     public static char endportalChar;
     public static char endportalFrameChar;
@@ -54,6 +49,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private static Set<Character> rotatableChars = null;
     private static Set<Character> railChars = null;
+    private static Set<Character> glassChars = null;
     private static Set<Character> charactersNeedingTodo = null;
 
     private static IBlockState baseBlock;
@@ -78,7 +74,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     // Use this random when it doesn't really matter i fit is generated the same every time
     public static Random globalRandom = new Random();
 
-    private static Set<Character> getRailChars() {
+    public static Set<Character> getRailChars() {
         if (railChars == null) {
             railChars = new HashSet<>();
             addStates(Blocks.RAIL, railChars);
@@ -87,7 +83,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return railChars;
     }
 
-    private static Set<Character> getCharactersNeedingTodo() {
+    public static Set<Character> getGlassChars() {
+        if (glassChars == null) {
+            glassChars = new HashSet<>();
+            addStates(Blocks.GLASS, glassChars);
+            addStates(Blocks.STAINED_GLASS, glassChars);
+            addStates(Blocks.GLASS_PANE, glassChars);
+            addStates(Blocks.STAINED_GLASS_PANE, glassChars);
+        }
+        return glassChars;
+    }
+
+    public static Set<Character> getCharactersNeedingTodo() {
         if (charactersNeedingTodo == null) {
             charactersNeedingTodo = new HashSet<>();
             charactersNeedingTodo.add(torchChar);
@@ -104,7 +111,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return charactersNeedingTodo;
     }
 
-    private static Set<Character> getRotatableChars() {
+    public static Set<Character> getRotatableChars() {
         if (rotatableChars == null) {
             rotatableChars = new HashSet<>();
             addStates(Blocks.ACACIA_STAIRS, rotatableChars);
@@ -150,12 +157,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             liquidChar = (char) Block.BLOCK_STATE_IDS.get(water);
             leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false));
             ironbarsChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.IRON_BARS.getDefaultState());
-            ladderChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LADDER.getDefaultState());
             grassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRASS.getDefaultState());
-            glassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS.getDefaultState());
-            glassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS_PANE.getDefaultState());
-            stainedGlassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS.getDefaultState());
-            stainedGlassPaneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STAINED_GLASS_PANE.getDefaultState());
             bedrockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.BEDROCK.getDefaultState());
             endportalChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL.getDefaultState());
             endportalFrameChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL_FRAME.getDefaultState());
@@ -1406,8 +1408,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         char railxC = (char) Block.BLOCK_STATE_IDS.get(railx);
         IBlockState railz = Blocks.RAIL.getDefaultState();
         char railzC = (char) Block.BLOCK_STATE_IDS.get(railz);
+
         Character corridorRoofBlock = info.getCityStyle().getCorridorRoofBlock();
         char roof = info.getCompiledPalette().get(corridorRoofBlock);
+        Character corridorGlassBlock = info.getCityStyle().getCorridorGlassBlock();
+        char glass = info.getCompiledPalette().get(corridorGlassBlock);
+
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int index = (x << 12) | (z << 8);
@@ -1427,7 +1433,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     primer.data[index + (height++)] = airChar;
 
                     if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
-                        primer.data[index + (height++)] = glassChar;
+                        primer.data[index + (height++)] = glass;
                         info.addGenericTodo(new BlockPos(x , height, z));
                         primer.data[index + (height++)] = glowstoneChar;
                     } else {
