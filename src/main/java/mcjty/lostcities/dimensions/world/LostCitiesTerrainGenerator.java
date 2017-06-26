@@ -29,10 +29,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private static boolean charsSetup = false;
     public static char airChar;
     public static char hardAirChar;
-    public static char bricksChar;
     public static char glowstoneChar;
     public static char baseChar;
-    public static char wallChar;
     public static char liquidChar;
     public static char leavesChar;
     public static char ironbarsChar;
@@ -147,9 +145,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             water = Blocks.WATER.getDefaultState();
             airChar = (char) Block.BLOCK_STATE_IDS.get(air);
             hardAirChar = (char) Block.BLOCK_STATE_IDS.get(hardAir);
-            bricksChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONEBRICK.getDefaultState());
             glowstoneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLOWSTONE.getDefaultState());
-            wallChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COBBLESTONE_WALL.getDefaultState());
             baseChar = (char) Block.BLOCK_STATE_IDS.get(baseBlock);
             liquidChar = (char) Block.BLOCK_STATE_IDS.get(water);
             leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false));
@@ -1332,10 +1328,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             BuildingInfo.StreetType streetType = info.streetType;
             boolean elevated = info.isElevatedParkSection();
             if (elevated) {
+                Character elevationBlock = info.getCityStyle().getParkElevationBlock();
+                char elevation = info.getCompiledPalette().get(elevationBlock);
                 streetType = BuildingInfo.StreetType.PARK;
                 for (int x = 0; x < 16; ++x) {
                     for (int z = 0; z < 16; ++z) {
-                        primer.data[(x << 12) | (z << 8) + height] = bricksChar;
+                        primer.data[(x << 12) | (z << 8) + height] = elevation;
                     }
                 }
                 height++;
@@ -1408,6 +1406,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         char railxC = (char) Block.BLOCK_STATE_IDS.get(railx);
         IBlockState railz = Blocks.RAIL.getDefaultState();
         char railzC = (char) Block.BLOCK_STATE_IDS.get(railz);
+        Character corridorRoofBlock = info.getCityStyle().getCorridorRoofBlock();
+        char roof = info.getCompiledPalette().get(corridorRoofBlock);
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int index = (x << 12) | (z << 8);
@@ -1431,8 +1431,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         info.addGenericTodo(new BlockPos(x , height, z));
                         primer.data[index + (height++)] = glowstoneChar;
                     } else {
-                        primer.data[index + (height++)] = bricksChar;
-                        primer.data[index + (height++)] = bricksChar;
+                        primer.data[index + (height++)] = roof;
+                        primer.data[index + (height++)] = roof;
                     }
 //                            BaseTerrainGenerator.setBlockStateRange(primer, index + height, index + info.getCityGroundLevel(), baseChar);
                 } else {
@@ -1612,17 +1612,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateOceanBorder(ChunkPrimer primer, BuildingInfo info, boolean xRail, boolean zRail, boolean canDoParks, int x, int z) {
+        Character borderBlock = info.getCityStyle().getBorderBlock();
+        char border = info.getCompiledPalette().get(borderBlock);
+        Character wallBlock = info.getCityStyle().getWallBlock();
+        char wall = info.getCompiledPalette().get(wallBlock);
+
         int index = (x << 12) | (z << 8);
         if (xRail || zRail) {
             if (groundLevel < info.getCityGroundLevel()) {
-                PrimerTools.setBlockStateRange(primer, index + groundLevel, index + info.getCityGroundLevel()+1, bricksChar);
+                PrimerTools.setBlockStateRange(primer, index + groundLevel, index + info.getCityGroundLevel()+1, border);
             }
         } else {
-            PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER + 30, index + info.getCityGroundLevel()+1, bricksChar);
+            PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER + 30, index + info.getCityGroundLevel()+1, border);
         }
         if (canDoParks) {
             if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
-                primer.data[index + info.getCityGroundLevel()+1] = wallChar;
+                primer.data[index + info.getCityGroundLevel()+1] = wall;
             } else {
                 primer.data[index + info.getCityGroundLevel()+1] = airChar;
             }

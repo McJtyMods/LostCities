@@ -30,7 +30,11 @@ public class CityStyle implements IAsset {
     private Character streetBlock;
     private Character streetBaseBlock;
     private Character streetVariantBlock;
+    private Character parkElevationBlock;
+    private Character corridorRoofBlock;
     private Character railMainBlock;
+    private Character borderBlock;
+    private Character wallBlock;
 
     public CityStyle(JsonObject object) {
         readFromJSon(object);
@@ -69,20 +73,46 @@ public class CityStyle implements IAsset {
         return railMainBlock;
     }
 
+    public Character getParkElevationBlock() {
+        return parkElevationBlock;
+    }
+
+    public Character getCorridorRoofBlock() {
+        return corridorRoofBlock;
+    }
+
+    public Character getBorderBlock() {
+        return borderBlock;
+    }
+
+    public Character getWallBlock() {
+        return wallBlock;
+    }
+
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
         style = object.get("style").getAsString();
-        if (object.has("street")) {
-            JsonObject s = object.get("street").getAsJsonObject();
+        if (object.has("streetblocks")) {
+            JsonObject s = object.get("streetblocks").getAsJsonObject();
+            borderBlock = s.get("border").getAsCharacter();
+            wallBlock = s.get("wall").getAsCharacter();
             streetBlock = s.get("street").getAsCharacter();
             streetVariantBlock = s.get("streetvariant").getAsCharacter();
             streetBaseBlock = s.get("streetbase").getAsCharacter();
             streetWidth = s.get("width").getAsInt();
         }
-        if (object.has("rails")) {
-            JsonObject s = object.get("rails").getAsJsonObject();
+        if (object.has("railblocks")) {
+            JsonObject s = object.get("railblocks").getAsJsonObject();
             railMainBlock = s.get("railmain").getAsCharacter();
+        }
+        if (object.has("parkblocks")) {
+            JsonObject s = object.get("parkblocks").getAsJsonObject();
+            parkElevationBlock = s.get("elevation").getAsCharacter();
+        }
+        if (object.has("corridorblocks")) {
+            JsonObject s = object.get("corridorblocks").getAsJsonObject();
+            corridorRoofBlock = s.get("roof").getAsCharacter();
         }
         JsonArray array = getArraySafe(object, "buildings");
         for (JsonElement element : array) {
@@ -154,7 +184,7 @@ public class CityStyle implements IAsset {
         s.add("streetvariant", new JsonPrimitive(streetVariantBlock));
         s.add("streetbase", new JsonPrimitive(streetBaseBlock));
         s.add("width", new JsonPrimitive(streetWidth));
-        object.add("street", s);
+        object.add("streetblocks", s);
 
         JsonArray array = new JsonArray();
         for (Pair<Float, String> pair : buildingSelector) {

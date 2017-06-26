@@ -241,13 +241,21 @@
     "type": "citystyle",
     "name": "citystyle_desert",
     "style": "desert",
-    "street": {
+    "streetblocks": {
       "width": 8,
+      "border": "y",
+      "wall": "w",
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
     },
-    "rails": {
+    "parkblocks": {
+      "elevation": "x"
+    },
+    "corridorblocks": {
+      "roof": "y"
+    },
+    "railblocks": {
       "railmain": "y"
     },
     "buildings": [
@@ -391,13 +399,21 @@
     "type": "citystyle",
     "name": "citystyle_standard",
     "style": "standard",
-    "street": {
+    "streetblocks": {
       "width": 8,
+      "border": "y",
+      "wall": "w",
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
     },
-    "rails": {
+    "parkblocks": {
+      "elevation": "x"
+    },
+    "corridorblocks": {
+      "roof": "x"
+    },
+    "railblocks": {
       "railmain": "y"
     },
     "buildings": [
@@ -541,13 +557,21 @@
     "type": "citystyle",
     "name": "citystyle_chisel_desert",
     "style": "desert_chisel",
-    "street": {
+    "streetblocks": {
       "width": 8,
+      "border": "y",
+      "wall": "w",
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
     },
-    "rails": {
+    "parkblocks": {
+      "elevation": "x"
+    },
+    "corridorblocks": {
+      "roof": "x"
+    },
+    "railblocks": {
       "railmain": "y"
     },
     "buildings": [
@@ -691,13 +715,21 @@
     "type": "citystyle",
     "name": "citystyle_chisel_standard",
     "style": "standard_chisel",
-    "street": {
+    "streetblocks": {
       "width": 8,
+      "border": "y",
+      "wall": "w",
       "street": "S",
       "streetbase": "b",
       "streetvariant": "B"
     },
-    "rails": {
+    "parkblocks": {
+      "elevation": "x"
+    },
+    "corridorblocks": {
+      "roof": "x"
+    },
+    "railblocks": {
       "railmain": "y"
     },
     "buildings": [
