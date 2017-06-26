@@ -5,6 +5,7 @@ import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.PrimerTools;
 import mcjty.lostcities.varia.Tools;
@@ -701,9 +702,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private static Biome[] biomesForBiomeCheck = null;
 
-    public static boolean isWaterBiome(LostCityChunkGenerator provider, int chunkX, int chunkZ) {
-        biomesForBiomeCheck = provider.worldObj.getBiomeProvider().getBiomesForGeneration(biomesForBiomeCheck, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
-        return isWaterBiome(biomesForBiomeCheck[55]) || isWaterBiome(biomesForBiomeCheck[54]) || isWaterBiome(biomesForBiomeCheck[56]);
+    public static boolean isWaterBiome(LostCityChunkGenerator provider, ChunkCoord coord) {
+        BiomeInfo biomeInfo = BiomeInfo.getBiomeInfo(provider, coord);
+        Biome[] biomes = biomeInfo.getBiomes();
+        return isWaterBiome(biomes[55]) || isWaterBiome(biomes[54]) || isWaterBiome(biomes[56]);
 //        return isWaterBiome(biomes);
     }
 

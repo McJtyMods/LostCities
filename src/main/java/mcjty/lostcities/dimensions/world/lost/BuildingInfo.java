@@ -686,8 +686,6 @@ public class BuildingInfo implements ILostChunkInfo {
         return Highway.getZHighwayLevel(chunkX, chunkZ, provider);
     }
 
-    private static Biome[] biomesForCityLevel = null;
-
     /**
      * This function does not use the cache. So safe to use when the cache is building
      */
@@ -697,12 +695,12 @@ public class BuildingInfo implements ILostChunkInfo {
             return getLevelBasedOnHeight(height, provider);
         } else {
             // @todo: average out nearby biomes?
-            biomesForCityLevel = provider.worldObj.getBiomeProvider().getBiomesForGeneration(biomesForCityLevel, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+            Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
             float h = 0.0f;
-            for (Biome biome : biomesForCityLevel) {
+            for (Biome biome : biomes) {
                 h += biome.getBaseHeight();
             }
-            h /= biomesForCityLevel.length;
+            h /= biomes.length;
 
             // deep ocean = -1.8
             // ocean = -1
@@ -988,7 +986,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private boolean isSuitableForBridge(LostCityChunkGenerator provider, BuildingInfo i) {
-        return i.cityLevel < cityLevel || LostCitiesTerrainGenerator.isWaterBiome(provider, i.chunkX, i.chunkZ);
+        return i.cityLevel < cityLevel || LostCitiesTerrainGenerator.isWaterBiome(provider, i.coord);
     }
 
 

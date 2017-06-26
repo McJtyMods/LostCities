@@ -7,6 +7,7 @@ import mcjty.lostcities.api.IChunkPrimerFactory;
 import mcjty.lostcities.api.ILostChunkGenerator;
 import mcjty.lostcities.api.ILostChunkInfo;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
@@ -148,7 +149,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
             // For ATG, experimental
             otherGenerator.fillChunk(chunkX, chunkZ, chunkprimer);
         } else {
-            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
+            this.biomesForGeneration = BiomeInfo.getBiomeInfo(this, new ChunkCoord(dimensionId, chunkX, chunkZ)).getBiomes();
             terrainGenerator.doCoreChunk(chunkX, chunkZ, chunkprimer);
         }
         return chunkprimer;
