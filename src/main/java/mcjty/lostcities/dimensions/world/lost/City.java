@@ -26,7 +26,7 @@ public class City {
         return rand.nextFloat() < provider.profile.CITY_CHANCE;
     }
 
-    private static float getCityRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static float getCityRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Random rand = new Random(provider.seed + chunkZ * 100001653L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
@@ -34,7 +34,7 @@ public class City {
     }
 
     // Call this on a city center to get the style of that city
-    private static String getCityStyleForCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static String getCityStyleForCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         Random rand = new Random(provider.seed + chunkZ * 899809363L + chunkX * 256203221L);
         rand.nextFloat();
         rand.nextFloat();

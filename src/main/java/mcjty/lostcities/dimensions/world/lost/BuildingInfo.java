@@ -1260,8 +1260,20 @@ public class BuildingInfo implements ILostChunkInfo {
     @Nullable
     @Override
     public ILostCityInfo getCityInfo() {
-//        if ()
-        // @todo
-        return null;
+        if (City.isCityCenter(chunkX, chunkZ, provider)) {
+            return new ILostCityInfo() {
+                @Override
+                public float getCityRadius() {
+                    return City.getCityRadius(chunkX, chunkZ, provider);
+                }
+
+                @Override
+                public String getCityStyle() {
+                    return City.getCityStyleForCityCenter(chunkX, chunkZ, provider);
+                }
+            };
+        } else {
+            return null;
+        }
     }
 }
