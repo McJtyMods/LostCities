@@ -62,7 +62,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private Character street;
     private Character streetBase;
     private Character street2;
-    private Character styledBricks;
     private int streetBorder;
 
 //    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(ISLANDS);
@@ -182,10 +181,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         streetBase = info.getCompiledPalette().get(info.getCityStyle().getStreetBaseBlock());
         street2 = info.getCompiledPalette().get(info.getCityStyle().getStreetVariantBlock());
         streetBorder = (16 - info.getCityStyle().getStreetWidth()) / 2;
-
-
-        // @todo This should not be hardcoded here
-        styledBricks = info.getCompiledPalette().get('#');
 
         if (info.isCity) {
             doCityChunk(chunkX, chunkZ, primer, info);
@@ -1746,6 +1741,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateDebrisFromChunk(ChunkPrimer primer, Random rand, BuildingInfo adjacentInfo, BiFunction<Integer, Integer, Float> locationFactor) {
         if (adjacentInfo.hasBuilding) {
+            char filler = adjacentInfo.getCompiledPalette().get(adjacentInfo.getBuilding().getFillerBlock());
             float damageFactor = adjacentInfo.getDamageArea().getDamageFactor();
             if (damageFactor > .5f) {
                 // An estimate of the amount of blocks
@@ -1770,7 +1766,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 b = ironbarsChar;
                                 break;
                             default:
-                                b = adjacentInfo.getCompiledPalette().get('#');   // @todo hardcoded!
+                                b = filler;     // Filler from adjacent building
                                 break;
                         }
                         primer.data[index] = b;
@@ -1799,12 +1795,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private void generateBuilding(ChunkPrimer primer, BuildingInfo info) {
         int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * 6;
 
+        char filler = info.getCompiledPalette().get(info.getBuilding().getFillerBlock());
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int index = (x << 12) | (z << 8);
                 PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel, baseChar);
                 if (primer.data[index] == airChar) {
-                    primer.data[index + lowestLevel] = styledBricks;      // There is nothing below so we fill this with bricks
+                    primer.data[index + lowestLevel] = filler;      // There is nothing below so we fill this with the filler
                 }
             }
         }
@@ -1824,19 +1821,19 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         if (info.floorsBelowGround > 0) {
-            // Underground we replace the glass with solid bricks
+            // Underground we replace the glass with the filler
             for (int x = 0 ; x < 16 ; x++) {
                 int index = (x << 12) | (0 << 8);
                 // Use safe version because this may end up being lower
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmin().getCityGroundLevel())+1, styledBricks);
+                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmin().getCityGroundLevel())+1, filler);
                 index = (x << 12) | (15 << 8);
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmax().getCityGroundLevel())+1, styledBricks);
+                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmax().getCityGroundLevel())+1, filler);
             }
             for (int z = 1 ; z < 15 ; z++) {
                 int index = (0 << 12) | (z << 8);
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmin().getCityGroundLevel())+1, styledBricks);
+                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmin().getCityGroundLevel())+1, filler);
                 index = (15 << 12) | (z << 8);
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmax().getCityGroundLevel())+1, styledBricks);
+                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmax().getCityGroundLevel())+1, filler);
             }
         }
 
@@ -1856,119 +1853,117 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateDoors(ChunkPrimer primer, BuildingInfo info, int height, int f) {
 
-        if (info.chunkX == 331 && info.chunkZ == 59) {
-            System.out.println("LostCitiesTerrainGenerator.generateDoors");
-        }
+        char filler = info.getCompiledPalette().get(info.getBuilding().getFillerBlock());
 
         if (info.hasConnectionAtX(f + info.floorsBelowGround)) {
             int x = 0;
             int index = (x << 12) | (6 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (9 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             if (hasConnectionWithBuilding(f, info, info.getXmin())) {
                 index = (x << 12) | (7 << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
                 index = (x << 12) | (8 << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
             } else if (hasConnectionToTopOrOutside(f, info, info.getXmin())) {
                 index = (x << 12) | (7 << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.EAST);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.EAST);
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
                 index = (x << 12) | (8 << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, false, EnumFacing.EAST);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, false, EnumFacing.EAST);
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
             }
         }
         if (hasConnectionWithBuildingMax(f, info, info.getXmax(), Orientation.X)) {
             int x = 15;
             int index = (x << 12) | (6 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (9 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (7 << 8);
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
             index = (x << 12) | (8 << 8);
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
         } else if (hasConnectionToTopOrOutside(f, info, info.getXmax()) && (info.getXmax().hasConnectionAtXFromStreet(f + info.getXmax().floorsBelowGround))) {
             int x = 15;
             int index = (x << 12) | (6 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (9 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (x << 12) | (7 << 8);
             primer.data[index + height] = getDoor(info.doorBlock, false, false, EnumFacing.WEST);
             primer.data[index + height + 1] = getDoor(info.doorBlock, true, false, EnumFacing.WEST);
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
             index = (x << 12) | (8 << 8);
             primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.WEST);
             primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.WEST);
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
         }
         if (info.hasConnectionAtZ(f + info.floorsBelowGround)) {
             int z = 0;
             int index = (6 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (9 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             if (hasConnectionWithBuilding(f, info, info.getZmin())) {
                 index = (7 << 12) | (z << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
                 index = (8 << 12) | (z << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
             } else if (hasConnectionToTopOrOutside(f, info, info.getZmin())) {
                 index = (7 << 12) | (z << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.NORTH);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.NORTH);
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
                 index = (8 << 12) | (z << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, false, EnumFacing.NORTH);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, false, EnumFacing.NORTH);
-                primer.data[index + height + 2] = styledBricks;
+                primer.data[index + height + 2] = filler;
             }
         }
         if (hasConnectionWithBuildingMax(f, info, info.getZmax(), Orientation.Z)) {
             int z = 15;
             int index = (6 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (9 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (7 << 12) | (z << 8);
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
             index = (8 << 12) | (z << 8);
             primer.data[index + height] = airChar;
             primer.data[index + height + 1] = airChar;
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
         } else if (hasConnectionToTopOrOutside(f, info, info.getZmax()) && (info.getZmax().hasConnectionAtZFromStreet(f + info.getZmax().floorsBelowGround))) {
             int z = 15;
             int index = (6 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (9 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, styledBricks);
+            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             index = (7 << 12) | (z << 8);
             primer.data[index + height] = getDoor(info.doorBlock, false, false, EnumFacing.SOUTH);
             primer.data[index + height + 1] = getDoor(info.doorBlock, true, false, EnumFacing.SOUTH);
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
             index = (8 << 12) | (z << 8);
             primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.SOUTH);
             primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.SOUTH);
-            primer.data[index + height + 2] = styledBricks;
+            primer.data[index + height + 2] = filler;
         }
     }
 

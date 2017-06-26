@@ -307,7 +307,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return floorTypes[l + floorsBelowGround];
     }
 
-    private Building getBuilding() {
+    public Building getBuilding() {
         return buildingType;
     }
 

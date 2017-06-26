@@ -20,6 +20,7 @@ public class Building implements IAsset {
     private int minCellars = -1;        // -1 means default frmo level
     private int maxFloors = -1;         // -1 means default from level
     private int maxCellars = -1;        // -1 means default frmo level
+    private char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
 
     private final List<Pair<Predicate<LevelInfo>, String>> parts = new ArrayList<>();
     private final List<String> partNames = new ArrayList<>();
@@ -99,6 +100,11 @@ public class Building implements IAsset {
             if (element.getAsJsonObject().has("maxcellars")) {
                 maxCellars = element.getAsJsonObject().get("maxcellars").getAsInt();
             }
+            if (element.getAsJsonObject().has("filler")) {
+                fillerBlock = element.getAsJsonObject().get("filler").getAsCharacter();
+            } else {
+                throw new RuntimeException("'filler' is required for building '" + name + "'!");
+            }
             addPart(test, partName);
         }
     }
@@ -150,6 +156,10 @@ public class Building implements IAsset {
 
     public int getPartCount() {
         return partNames.size();
+    }
+
+    public char getFillerBlock() {
+        return fillerBlock;
     }
 
     public String getRandomPart(Random random, LevelInfo info) {
