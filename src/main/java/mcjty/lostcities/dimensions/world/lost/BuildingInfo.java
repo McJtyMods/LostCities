@@ -166,6 +166,22 @@ public class BuildingInfo implements ILostChunkInfo {
         return damageArea;
     }
 
+    /**
+     * Based on which part of the chunk we have something for we find the correct
+     * info object where we have to add the todo.
+     */
+    public BuildingInfo getTodoChunk(int x, int z) {
+        if (x >= 8 && z >= 8) {
+            return this;
+        } else if (x < 8 && z >= 8) {
+            return getXmin();
+        } else if (x >= 8 && z < 8) {
+            return getZmin();
+        } else {
+            return getXmin().getZmin();
+        }
+    }
+
     public Set<ChunkPos> findConnectedStreets() {
         Set<ChunkPos> streets = new HashSet<>();
         Queue<ChunkPos> todo = new ArrayDeque<>();

@@ -2,19 +2,29 @@ package mcjty.lostcities.dimensions.world;
 
 import mcjty.lib.compat.CompatChunkGenerator;
 import mcjty.lib.compat.CompatMapGenStructure;
+import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.api.IChunkPrimerFactory;
 import mcjty.lostcities.api.ILostChunkGenerator;
 import mcjty.lostcities.api.ILostChunkInfo;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.DamageArea;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import mcjty.lostcities.varia.ChunkCoord;
+import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockFalling;
+import net.minecraft.block.BlockSapling;
+import net.minecraft.block.BlockVine;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.tileentity.TileEntityMobSpawner;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -30,9 +40,11 @@ import net.minecraft.world.gen.MapGenRavine;
 import net.minecraft.world.gen.feature.WorldGenDungeons;
 import net.minecraft.world.gen.feature.WorldGenLakes;
 import net.minecraft.world.gen.structure.*;
+import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.List;
@@ -235,6 +247,161 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
         return chunk;
     }
 
+    private void generateTrees(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator provider) {
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+        for (BlockPos pos : info.getSaplingTodo()) {
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() == Blocks.SAPLING) {
+                ((BlockSapling)Blocks.SAPLING).generateTree(world, pos, state, random);
+            }
+        }
+        info.clearSaplingTodo();
+    }
+
+    private void generateVines(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator provider) {
+        int cx = chunkX * 16;
+        int cz = chunkZ * 16;
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+
+        if (info.hasBuilding) {
+            BuildingInfo adjacent = info.getXmax();
+            int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
+            for (int z = 0; z < 15; z++) {
+                for (int y = bottom; y < (info.getMaxHeight()); y++) {
+                    if (random.nextFloat() < provider.profile.VINE_CHANCE) {
+                        createVineStrip(random, world, bottom, BlockVine.WEST, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
+                    }
+                }
+            }
+        }
+        if (info.getXmax().hasBuilding) {
+            BuildingInfo adjacent = info.getXmax();
+            int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? info.getMaxHeight() : (info.getCityGroundLevel() + 3));
+            for (int z = 0; z < 15; z++) {
+                for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
+                    if (random.nextFloat() < provider.profile.VINE_CHANCE) {
+                        createVineStrip(random, world, bottom, BlockVine.EAST, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
+                    }
+                }
+            }
+        }
+
+        if (info.hasBuilding) {
+            BuildingInfo adjacent = info.getZmax();
+            int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
+            for (int x = 0; x < 15; x++) {
+                for (int y = bottom; y < (info.getMaxHeight()); y++) {
+                    if (random.nextFloat() < provider.profile.VINE_CHANCE) {
+                        createVineStrip(random, world, bottom, BlockVine.NORTH, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
+                    }
+                }
+            }
+        }
+        if (info.getZmax().hasBuilding) {
+            BuildingInfo adjacent = info.getZmax();
+            int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? info.getMaxHeight() : (info.getCityGroundLevel() + 3));
+            for (int x = 0; x < 15; x++) {
+                for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
+                    if (random.nextFloat() < provider.profile.VINE_CHANCE) {
+                        createVineStrip(random, world, bottom, BlockVine.SOUTH, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
+                    }
+                }
+            }
+        }
+    }
+
+    private void createVineStrip(Random random, World world, int bottom, PropertyBool direction, BlockPos pos, BlockPos vineHolderPos) {
+        if (world.isAirBlock(vineHolderPos)) {
+            return;
+        }
+        if (!world.isAirBlock(pos)) {
+            return;
+        }
+        world.setBlockState(pos, Blocks.VINE.getDefaultState().withProperty(direction, true));
+        pos = pos.down();
+        while (pos.getY() >= bottom && random.nextFloat() < .8f) {
+            if (!world.isAirBlock(pos)) {
+                return;
+            }
+            world.setBlockState(pos, Blocks.VINE.getDefaultState().withProperty(direction, true));
+            pos = pos.down();
+        }
+    }
+
+    private void generateLootSpawners(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator chunkGenerator) {
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, chunkGenerator);
+
+        for (Pair<BlockPos, String> pair : info.getMobSpawnerTodo()) {
+            BlockPos pos = pair.getKey();
+            // Double check that it is still a spawner (could be destroyed by explosion)
+            if (world.getBlockState(pos).getBlock() == Blocks.MOB_SPAWNER) {
+                TileEntity tileentity = world.getTileEntity(pos);
+                if (tileentity instanceof TileEntityMobSpawner) {
+                    TileEntityMobSpawner spawner = (TileEntityMobSpawner) tileentity;
+                    String id = pair.getValue();
+                    String fixedId = EntityTools.fixEntityId(id);
+                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation(fixedId), fixedId);
+                }
+            }
+        }
+        info.clearMobSpawnerTodo();
+
+
+        for (Pair<BlockPos, String> pair : info.getChestTodo()) {
+            BlockPos pos = pair.getKey();
+            // Double check that it is still a chest (could be destroyed by explosion)
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() == Blocks.CHEST) {
+                if (chunkGenerator.profile.GENERATE_LOOT) {
+                    createLootChest(random, world, pos, pair.getRight());
+                }
+            }
+        }
+        info.clearChestTodo();
+
+
+        for (BlockPos pos : info.getGenericTodo()) {
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() == Blocks.GLOWSTONE) {
+                world.setBlockState(pos, state, 3);
+            }
+        }
+        info.clearGenericTodo();
+    }
+
+
+    private void createLootChest(Random random, World world, BlockPos pos, String lootTable) {
+        world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, EnumFacing.SOUTH));
+        TileEntity tileentity = world.getTileEntity(pos);
+        if (tileentity instanceof TileEntityChest) {
+            if (lootTable != null) {
+                ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(lootTable), random.nextLong());
+            } else {
+                switch (random.nextInt(30)) {
+                    case 0:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_DESERT_PYRAMID, random.nextLong());
+                        break;
+                    case 1:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_JUNGLE_TEMPLE, random.nextLong());
+                        break;
+                    case 2:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_VILLAGE_BLACKSMITH, random.nextLong());
+                        break;
+                    case 3:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_ABANDONED_MINESHAFT, random.nextLong());
+                        break;
+                    case 4:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_NETHER_BRIDGE, random.nextLong());
+                        break;
+                    default:
+                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_SIMPLE_DUNGEON, random.nextLong());
+                        break;
+                }
+            }
+        }
+    }
+
+
     @Override
     public void populate(int chunkX, int chunkZ) {
         BlockFalling.fallInstantly = true;
@@ -335,6 +502,10 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
                 }
             }
         }
+
+        generateTrees(rand, chunkX, chunkZ, w, this);
+        generateVines(rand, chunkX, chunkZ, w, this);
+        generateLootSpawners(rand, chunkX, chunkZ, w, this);
 
         MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Post(this, w, rand, chunkX, chunkZ, flag));
 

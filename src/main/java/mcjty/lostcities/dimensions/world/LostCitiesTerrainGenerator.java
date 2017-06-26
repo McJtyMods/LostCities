@@ -1655,9 +1655,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                              Transform transform,
                              int ox, int oy, int oz) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
-        if (part == null) {
-            System.out.println("LostCitiesTerrainGenerator.generatePart");
-        }
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
                 char[] vs = part.getVSlice(x, z);
@@ -1706,21 +1703,21 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 } else if (b == spawnerChar) {
                                     if (provider.profile.GENERATE_SPAWNERS && !info.noLoot) {
                                         String mobid = part.getMobID(info, x, y, z);
-                                        info.addSpawnerTodo(new BlockPos(x, oy + y, z), mobid);
+                                        info.getTodoChunk(rx, rz).addSpawnerTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz), mobid);
                                     } else {
                                         b = airChar;
                                     }
                                 } else if (b == chestChar) {
                                     if (!info.noLoot) {
                                         String lootTable = part.getLootTable(info, x, y, z);
-                                        info.addChestTodo(new BlockPos(x, oy + y, z), lootTable);
+                                        info.getTodoChunk(rx, rz).addChestTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz), lootTable);
                                     }
                                 } else if (b == glowstoneChar) {
-                                    info.addGenericTodo(new BlockPos(x, oy + y, z));
+                                    info.getTodoChunk(rx, rz).addGenericTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                 } else {
                                     IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
                                     if (bs.getBlock() == Blocks.SAPLING) {
-                                        info.addSaplingTodo(new BlockPos(x, oy + y, z));
+                                        info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                     }
                                 }
                             }
