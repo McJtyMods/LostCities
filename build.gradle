@@ -44,8 +44,7 @@ repositories {
     }
 }
 
-version = "1.12-0.0.9beta"
-version = "1.1x-0.0.10beta"
+version = "1.12-0.0.10beta"
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
@@ -57,9 +56,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.12-14.21.0.2359"
+    version = "1.12-14.21.0.2373"
     runDir = "run"
-    mappings = "snapshot_20170624"
+    mappings = "snapshot_20170626"
     useDepAts = true
 }
 
@@ -76,8 +75,8 @@ artifacts {
 
 dependencies {
     deobfCompile "mezz.jei:jei_1.12:4.7.0.67"
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.9-3"
-    deobfCompile "com.github.mcjty:intwheel:1.12-1.2.6"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.10-4"
+    deobfCompile "com.github.mcjty:intwheel:1.12-1.2.7"
     //deobfCompile "mcp.mobius.waila:Hwyla:1.8.10-B23_1.11:api"
     //deobfCompile "mcjty.theoneprobe:TheOneProbe:1.1x-1.4.7-57"
     //deobfCompile "team.chisel:Chisel:MC1.11.2-0.0.10.14"
