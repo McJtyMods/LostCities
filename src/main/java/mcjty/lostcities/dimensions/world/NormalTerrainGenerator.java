@@ -1,6 +1,8 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lib.tools.MathTools;
+import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
+import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -70,21 +72,21 @@ public class NormalTerrainGenerator {
 //        this.field_185985_d = ctx.getForest();
     }
 
-    public void generateHeightmap(int chunkX4, int chunkY4, int chunkZ4) {
+    public void generateHeightmap(int chunkX, int chunkZ) {
+        int chunkX4 = chunkX * 4;
+        int chunkZ4 = chunkZ * 4;
         ChunkProviderSettings settings = provider.getSettings();
         this.depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion, chunkX4, chunkZ4, 5, 5, (double)settings.depthNoiseScaleX, (double)settings.depthNoiseScaleZ, (double)settings.depthNoiseScaleExponent);
         float f = settings.coordinateScale;
         float f1 = settings.heightScale;
-        this.mainNoiseRegion = this.mainPerlinNoise.generateNoiseOctaves(this.mainNoiseRegion, chunkX4, chunkY4, chunkZ4, 5, 33, 5, (double)(f / settings.mainNoiseScaleX), (double)(f1 / settings.mainNoiseScaleY), (double)(f / settings.mainNoiseScaleZ));
-        this.minLimitRegion = this.minLimitPerlinNoise.generateNoiseOctaves(this.minLimitRegion, chunkX4, chunkY4, chunkZ4, 5, 33, 5, (double)f, (double)f1, (double)f);
-        this.maxLimitRegion = this.maxLimitPerlinNoise.generateNoiseOctaves(this.maxLimitRegion, chunkX4, chunkY4, chunkZ4, 5, 33, 5, (double)f, (double)f1, (double)f);
+        this.mainNoiseRegion = this.mainPerlinNoise.generateNoiseOctaves(this.mainNoiseRegion, chunkX4, 0, chunkZ4, 5, 33, 5, (double)(f / settings.mainNoiseScaleX), (double)(f1 / settings.mainNoiseScaleY), (double)(f / settings.mainNoiseScaleZ));
+        this.minLimitRegion = this.minLimitPerlinNoise.generateNoiseOctaves(this.minLimitRegion, chunkX4, 0, chunkZ4, 5, 33, 5, (double)f, (double)f1, (double)f);
+        this.maxLimitRegion = this.maxLimitPerlinNoise.generateNoiseOctaves(this.maxLimitRegion, chunkX4, 0, chunkZ4, 5, 33, 5, (double)f, (double)f1, (double)f);
 
         int i = 0;
         int j = 0;
 
-        if (provider.biomesForGeneration == null) {
-            return;
-        }
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
 
         float biomeDepthOffSet = provider.getSettings().biomeDepthOffSet;
         float biomeDepthWeight = provider.getSettings().biomeDepthWeight;
@@ -96,12 +98,12 @@ public class NormalTerrainGenerator {
                 float f2 = 0.0F;
                 float f3 = 0.0F;
                 float f4 = 0.0F;
-                Biome biome = provider.biomesForGeneration[k + 2 + (l + 2) * 10];
+                Biome biome = biomes[k + 2 + (l + 2) * 10];
                 float biomeBaseHeight = biome.getBaseHeight();
 
                 for (int j1 = -2; j1 <= 2; ++j1) {
                     for (int k1 = - 2; k1 <=  2; ++k1) {
-                        Biome biome1 = provider.biomesForGeneration[k + j1 + 2 + (l + k1 + 2) * 10];
+                        Biome biome1 = biomes[k + j1 + 2 + (l + k1 + 2) * 10];
                         float biome1BaseHeight = biome1.getBaseHeight();
 
                         float baseHeight = biomeDepthOffSet + biome1BaseHeight * biomeDepthWeight;

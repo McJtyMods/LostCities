@@ -247,7 +247,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 //            return;
 //        }
 
-        generateHeightmap(chunkX * 4, 0, chunkZ * 4);
+        generateHeightmap(chunkX, chunkZ);
         for (int x4 = 0; x4 < 4; ++x4) {
             int l = x4 * 5;
             int i1 = (x4 + 1) * 5;
@@ -585,23 +585,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         primer.data[index] = sup;
     }
 
-    private void debugClearChunk(int chunkX, int chunkZ, ChunkPrimer primer) {
-        int cx = chunkX * 16;
-        int cz = chunkZ * 16;
-
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                int index = (x << 12) | (z << 8);
-                for (int y = 255; y >= 0; y--) {
-                    primer.data[index + y] = airChar;
-                }
-            }
-        }
-    }
-
     private void flattenChunkToCityBorder(int chunkX, int chunkZ, ChunkPrimer primer) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
+
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
 
         List<GeometryTools.AxisAlignedBB2D> boxes = new ArrayList<>();
         List<GeometryTools.AxisAlignedBB2D> boxesDownwards = new ArrayList<>();
@@ -639,7 +627,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         }
                     }
                     int height = minheight;//info.getCityGroundLevel();
-                    if (isOcean(provider.biomesForGeneration)) {
+                    if (isOcean(biomes)) {
                         // We have an ocean biome here. Flatten to a lower level
                         height = groundLevel - 4;
                     }
@@ -664,7 +652,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         }
                     }
                     int height = minheight;//info.getCityGroundLevel();
-                    if (isOcean(provider.biomesForGeneration)) {
+                    if (isOcean(biomes)) {
                         // We have an ocean biome here. Flatten to a lower level
                         height = groundLevel - 4;
                     }
@@ -685,22 +673,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return true;
     }
 
-    private static Biome[] biomesForBiomeCheck = null;
-
     public static boolean isWaterBiome(LostCityChunkGenerator provider, ChunkCoord coord) {
         BiomeInfo biomeInfo = BiomeInfo.getBiomeInfo(provider, coord);
         Biome[] biomes = biomeInfo.getBiomes();
         return isWaterBiome(biomes[55]) || isWaterBiome(biomes[54]) || isWaterBiome(biomes[56]);
-//        return isWaterBiome(biomes);
-    }
-
-    public static boolean isWaterBiome(Biome[] biomes) {
-        for (Biome biome : biomes) {
-            if (!isWaterBiome(biome)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private static boolean isWaterBiome(Biome biome) {
