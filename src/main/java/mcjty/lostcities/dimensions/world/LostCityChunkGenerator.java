@@ -67,7 +67,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
     private ChunkGeneratorSettings settings = null;
 
-    public Biome[] biomesForGeneration;
+    private Biome[] biomesForGeneration;
 
     private MapGenBase caveGenerator = new MapGenCaves();
 
@@ -147,7 +147,6 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
             // For ATG, experimental
             otherGenerator.fillChunk(chunkX, chunkZ, chunkprimer);
         } else {
-            this.biomesForGeneration = BiomeInfo.getBiomeInfo(this, new ChunkCoord(dimensionId, chunkX, chunkZ)).getBiomes();
             terrainGenerator.doCoreChunk(chunkX, chunkZ, chunkprimer);
         }
         return chunkprimer;
