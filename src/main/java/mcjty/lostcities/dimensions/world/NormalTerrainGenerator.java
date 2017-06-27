@@ -1,5 +1,7 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
+import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -73,8 +75,6 @@ public class NormalTerrainGenerator {
     public void generateHeightmap(int chunkX, int chunkZ) {
         int chunkX4 = chunkX * 4;
         int chunkZ4 = chunkZ * 4;
-        ChunkProviderSettings settings = provider.getSettings();
-    public void generateHeightmap(int chunkX4, int chunkY4, int chunkZ4) {
         ChunkGeneratorSettings settings = provider.getSettings();
         this.depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion, chunkX4, chunkZ4, 5, 5, (double)settings.depthNoiseScaleX, (double)settings.depthNoiseScaleZ, (double)settings.depthNoiseScaleExponent);
         float f = settings.coordinateScale;
