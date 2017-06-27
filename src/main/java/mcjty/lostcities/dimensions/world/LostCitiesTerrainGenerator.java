@@ -18,6 +18,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.gen.NoiseGeneratorPerlin;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -54,6 +55,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private Character street2;
     private int streetBorder;
 
+    private NoiseGeneratorPerlin rubbleNoise;
+    private NoiseGeneratorPerlin ruinNoise;
+
+    public static final boolean doRuins = false;
+
+
 //    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(ISLANDS);
 
 
@@ -61,6 +68,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         super(provider);
         this.groundLevel = provider.profile.GROUNDLEVEL;
         this.waterLevel = provider.profile.WATERLEVEL;
+        this.rubbleNoise = new NoiseGeneratorPerlin(provider.rand, 4);
+        this.ruinNoise = new NoiseGeneratorPerlin(provider.rand, 4);
 
         // @todo
 //        islandTerrainGenerator.setup(provider.worldObj, provider);
@@ -732,6 +741,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             generateStreet(primer, info, rand);
         }
 
+        if (doRuins) {
+            generateRuins(primer, info);
+        }
+
         int levelX = info.getHighwayXLevel();
         int levelZ = info.getHighwayZLevel();
         if (building) {
@@ -744,6 +757,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             } else {
                 generateHighways(chunkX, chunkZ, primer, info);
             }
+        }
+
+        if (doRuins) {
+            generateRubble(primer, chunkX, chunkZ, info.getCityGroundLevel());
         }
     }
 
@@ -1252,6 +1269,59 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
+    private double[] rubbleBuffer = new double[256];
+
+    private void generateRubble(ChunkPrimer primer, int chunkX, int chunkZ, int height) {
+        double d0 = 0.03125D;
+        this.rubbleBuffer = this.rubbleNoise.getRegion(this.rubbleBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
+
+        for (int x = 0; x < 16; ++x) {
+            for (int z = 0; z < 16; ++z) {
+                double v = rubbleBuffer[x + z * 16];
+                if (v > 0) {
+                    int index = (x << 12) | (z << 8) + height;
+                    if (primer.data[index-1] != airChar && primer.data[index-1] != liquidChar) {
+                        for (int i = 0; i < v; i++) {
+                            if (primer.data[index] == airChar || primer.data[index] == liquidChar) {
+                                primer.data[index] = baseChar;
+                            }
+                            index++;
+                        }
+                        if (primer.data[index-1] == baseChar && provider.rand.nextFloat() < .3f) {
+                            primer.data[index] = leavesChar;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private double[] ruinBuffer = new double[256];
+
+    private void generateRuins(ChunkPrimer primer, BuildingInfo info) {
+        int chunkX = info.chunkX;
+        int chunkZ = info.chunkZ;
+        double d0 = 0.03125D;
+        this.ruinBuffer = this.ruinNoise.getRegion(this.ruinBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
+
+        for (int x = 0; x < 16; ++x) {
+            for (int z = 0; z < 16; ++z) {
+                double v = ruinBuffer[x + z * 16];
+                int height = info.getCityGroundLevel() + 1 + (int) v;
+                int index = (x << 12) | (z << 8) + height;
+                while (height > 0) {
+                    Character damage = info.getCompiledPalette().canBeDamagedToIronBars(primer.data[index - 1]);
+                    if ((damage != null || primer.data[index-1] == ironbarsChar) && provider.rand.nextFloat() < .3f) {
+                        primer.data[index++] = ironbarsChar;
+                    } else {
+                        primer.data[index++] = airChar;
+                    }
+                    height--;
+                }
+            }
+        }
+    }
+
     private void generateStreet(ChunkPrimer primer, BuildingInfo info, Random rand) {
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -1262,15 +1332,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         boolean xRail = info.hasXCorridor();
         boolean zRail = info.hasZCorridor();
+        for (int x = 0; x < 16; ++x) {
+            for (int z = 0; z < 16; ++z) {
+                int index = (x << 12) | (z << 8);
+                PrimerTools.setBlockStateRange(primer, index + groundLevel - 5, index + info.getCityGroundLevel(), baseChar);
+            }
+        }
         if (xRail || zRail) {
             generateCorridors(primer, info, xRail, zRail);
-        } else {
-            for (int x = 0; x < 16; ++x) {
-                for (int z = 0; z < 16; ++z) {
-                    int index = (x << 12) | (z << 8);
-                    PrimerTools.setBlockStateRange(primer, index + groundLevel - 5, index + info.getCityGroundLevel(), baseChar);
-                }
-            }
         }
 
         Railway.RailChunkInfo railInfo = info.getRailInfo();
