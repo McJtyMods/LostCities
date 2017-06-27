@@ -152,11 +152,14 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("ancient");
         profile.setDescription("Ancient jungle city, vines and leafs, small damage");
         profile.THICKNESS_OF_RANDOM_LEAFBLOCKS = 6;
-        profile.CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
-        profile.VINE_CHANCE = 0.09f;
+        profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.0f; // @todo .1f; (replace with rubblelayer?)
+        profile.VINE_CHANCE = 0.0f; // @todo 0.09f;
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = .44f;
         profile.MINI_EXPLOSION_MAXRADIUS = 10;
+        profile.RUBBLELAYER = true;
+        profile.RUBBLE_DIRT_SCALE = 2.0f;
+        profile.RUBBLE_LEAVE_SCALE = 2.0f;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=1", "ocean=8", "beach=20", "river=5" };
         standardProfiles.put(profile.getName(), profile);
 
