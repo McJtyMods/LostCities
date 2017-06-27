@@ -438,13 +438,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     int index = (x << 12) | (z << 8);
-                    if (waterLevel > groundLevel) {
-                        // Special case for drowned city
-                        PrimerTools.setBlockStateRangeSafe(primer, index + height, index + waterLevel, airChar);
-                        PrimerTools.setBlockStateRangeSafe(primer, index + waterLevel, index + height + 15, airChar);
-                    } else {
-                        PrimerTools.setBlockStateRange(primer, index + height, index + height + 15, airChar);
-                    }
+                    clearRange(primer, index, height, height+15);
                 }
             }
         } else {
@@ -454,13 +448,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     int index = (x << 12) | (z << 8);
-                    if (waterLevel > groundLevel) {
-                        // Special case for drowned city
-                        PrimerTools.setBlockStateRangeSafe(primer, index + height, index + waterLevel, airChar);
-                        PrimerTools.setBlockStateRangeSafe(primer, index + waterLevel, index + height + 15, airChar);
-                    } else {
-                        PrimerTools.setBlockStateRange(primer, index + height, index + height + 15, airChar);
-                    }
+                    clearRange(primer, index, height, height+15);
                 }
             }
         }
@@ -491,6 +479,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     break;
                 }
             }
+        }
+    }
+
+    private void clearRange(ChunkPrimer primer, int index, int height1, int height2) {
+        if (waterLevel > groundLevel) {
+            // Special case for drowned city
+            PrimerTools.setBlockStateRangeSafe(primer, index + height1, index + waterLevel, liquidChar);
+            PrimerTools.setBlockStateRangeSafe(primer, index + waterLevel, index + height2, airChar);
+        } else {
+            PrimerTools.setBlockStateRange(primer, index + height1, index + height2, airChar);
         }
     }
 
@@ -695,25 +693,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         int r = rand.nextInt(2);
         index = (x << 12) | (z << 8);
-        if (waterLevel > groundLevel) {
-            // Special case for drowned city
-            PrimerTools.setBlockStateRangeSafe(primer, index + level + offset + r, index + waterLevel, liquidChar);
-            PrimerTools.setBlockStateRangeSafe(primer, index + waterLevel, index + 230, airChar);
-        } else {
-            PrimerTools.setBlockStateRange(primer, index + level + offset + r, index + 230, airChar);
-        }
+        clearRange(primer, index, level + offset + r, 230);
     }
 
     private void flattenChunkBorderDownwards(ChunkPrimer primer, int x, int offset, int z, Random rand, int level) {
         int r = rand.nextInt(2);
         int index = (x << 12) | (z << 8);
-        if (waterLevel > groundLevel) {
-            // Special case for drowned city
-            PrimerTools.setBlockStateRangeSafe(primer, index + level + offset + r, index + waterLevel, liquidChar);
-            PrimerTools.setBlockStateRangeSafe(primer, index + waterLevel + 1, index + 230, airChar);
-        } else {
-            PrimerTools.setBlockStateRange(primer, index + level + offset + r, index + 230, airChar);
-        }
+        clearRange(primer, index, level + offset + r, 230);
     }
 
     private void doCityChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
@@ -1671,7 +1657,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         // We don't replace the world where the part is empty (air)
                         if (b != airChar) {
                             if (b == hardAirChar) {
-                                b = airChar;
+                                b = (oy+y) < waterLevel ? liquidChar : airChar;
                             } else if (getCharactersNeedingTodo().contains(b)) {
                                 if (b == torchChar) {
                                     if (provider.profile.GENERATE_LIGHTING) {
