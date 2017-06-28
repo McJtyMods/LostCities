@@ -59,8 +59,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private NoiseGeneratorPerlin leavesNoise;
     private NoiseGeneratorPerlin ruinNoise;
 
-    public static final boolean doRuins = false;
-
 
 //    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(ISLANDS);
 
@@ -743,7 +741,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             generateStreet(primer, info, rand);
         }
 
-        if (doRuins) {
+        if (provider.profile.RUINS) {
             generateRuins(primer, info);
         }
 
@@ -1274,39 +1272,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private double[] rubbleBuffer = new double[256];
     private double[] leavesBuffer = new double[256];
 
-//    public double[] getRegion(double[] p_151599_1_, double p_151599_2_, double p_151599_4_, int p_151599_6_, int p_151599_7_, double p_151599_8_, double p_151599_10_, double p_151599_12_)
-//    {
-//        return this.getRegion(p_151599_1_, p_151599_2_, p_151599_4_, p_151599_6_, p_151599_7_, p_151599_8_, p_151599_10_, p_151599_12_, 0.5D);
-//    }
-//
-//    public double[] getRegion(double[] data, double chunkX16, double chunkZ16, int dimX, int dimZ, double divX16, double divZ16, double scale, double p_151600_14_)
-//    {
-//        if (data != null && data.length >= dimX * dimZ)
-//        {
-//            for (int i = 0; i < data.length; ++i)
-//            {
-//                data[i] = 0.0D;
-//            }
-//        }
-//        else
-//        {
-//            data = new double[dimX * dimZ];
-//        }
-//
-//        double d1 = 1.0D;
-//        double d0 = 1.0D;
-//
-//        for (int j = 0; j < this.levels; ++j)
-//        {
-//            this.noiseLevels[j].add(data, chunkX16, chunkZ16, dimX, dimZ, divX16 * d0 * d1, divZ16 * d0 * d1, 0.55D / d1);
-//            d0 *= scale;
-//            d1 *= p_151600_14_;
-//        }
-//
-//        return data;
-//    }
-
-
     private void generateRubble(ChunkPrimer primer, int chunkX, int chunkZ, BuildingInfo info) {
         this.rubbleBuffer = this.rubbleNoise.getRegion(this.rubbleBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
         this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
@@ -1325,9 +1290,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             }
                             index++;
                         }
-//                        if (primer.data[index-1] == baseChar && provider.rand.nextFloat() < .3f) {
-//                            primer.data[index] = leavesChar;
-//                        }
                     }
                     if (primer.data[index-1] == baseChar) {
                         for (int i = 0 ; i < vl ; i++) {
@@ -1383,23 +1345,46 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private double[] ruinBuffer = new double[256];
 
     private void generateRuins(ChunkPrimer primer, BuildingInfo info) {
+        if (info.ruinHeight < 0) {
+            return;
+        }
+
         int chunkX = info.chunkX;
         int chunkZ = info.chunkZ;
         double d0 = 0.03125D;
         this.ruinBuffer = this.ruinNoise.getRegion(this.ruinBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
+        boolean doLeaves = provider.profile.RUBBLELAYER;
+        if (doLeaves) {
+            this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
+        }
+
+        int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * 6.0f));
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 double v = ruinBuffer[x + z * 16];
-                int height = info.getCityGroundLevel() + 1 + (int) v;
+                int height = baseheight + (int) v;
                 int index = (x << 12) | (z << 8) + height;
                 height = info.getMaxHeight()+5 - height;
+                int vl = 0;
+                if (doLeaves) {
+                    vl = (int) (leavesBuffer[x + z * 16] / provider.profile.RUBBLE_LEAVE_SCALE);
+                }
                 while (height > 0) {
-                    Character damage = info.getCompiledPalette().canBeDamagedToIronBars(primer.data[index - 1]);
-                    if ((damage != null || primer.data[index-1] == ironbarsChar) && provider.rand.nextFloat() < .3f) {
+                    Character damage = info.getCompiledPalette().canBeDamagedToIronBars(primer.data[index]);
+                    if ((damage != null || primer.data[index-1] == ironbarsChar) && primer.data[index-1] != airChar && primer.data[index-1] != liquidChar && provider.rand.nextFloat() < .2f) {
                         primer.data[index++] = ironbarsChar;
                     } else {
-                        primer.data[index++] = airChar;
+                        if (vl > 0) {
+                            while (primer.data[index-1] == airChar || primer.data[index-1] == liquidChar) {
+                                index--;
+                                height++;   // Make sure we keep on filling with air a bit longer because we are lowering here
+                            }
+                            primer.data[index++] = leavesChar;
+                            vl--;
+                        } else {
+                            primer.data[index++] = airChar;
+                        }
                     }
                     height--;
                 }

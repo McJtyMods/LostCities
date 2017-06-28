@@ -106,12 +106,14 @@ public class LostCityConfiguration {
         profile.setDescription("Like default but no explosion damage");
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
+        profile.RUINS = false;
         profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("rarecities");
         profile.setDescription("Cities are rare");
         profile.CITY_CHANCE = 0.002f;
+        profile.RUINS = false;
         profile.HIGHWAY_REQUIRES_TWO_CITIES = false;
         profile.RAILWAYS_CAN_END = true;
         standardProfiles.put(profile.getName(), profile);
@@ -140,6 +142,7 @@ public class LostCityConfiguration {
         profile.MINI_EXPLOSION_MAXHEIGHT = 256;
         profile.MINI_EXPLOSION_MAXRADIUS = 14;
         profile.MINI_EXPLOSION_MINRADIUS = 3;
+        profile.RUIN_CHANCE = 0.01f;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("safe");
@@ -150,16 +153,19 @@ public class LostCityConfiguration {
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("ancient");
-        profile.setDescription("Ancient jungle city, vines and leafs, small damage");
+        profile.setDescription("Ancient jungle city, vines and leafs, ruined buildings");
         profile.THICKNESS_OF_RANDOM_LEAFBLOCKS = 6;
         profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.0f; // @todo .1f; (replace with rubblelayer?)
-        profile.VINE_CHANCE = 0.0f; // @todo 0.09f;
+        profile.VINE_CHANCE = 0.1f;
         profile.EXPLOSION_CHANCE = 0;
-        profile.MINI_EXPLOSION_CHANCE = .44f;
-        profile.MINI_EXPLOSION_MAXRADIUS = 10;
+        profile.MINI_EXPLOSION_CHANCE = 0;
+//        profile.MINI_EXPLOSION_MAXRADIUS = 10;
         profile.RUBBLELAYER = true;
         profile.RUBBLE_DIRT_SCALE = 2.0f;
         profile.RUBBLE_LEAVE_SCALE = 2.0f;
+        profile.RUINS = true;
+        profile.RUIN_CHANCE = 0.9f;
+        profile.RUIN_MINLEVEL_PERCENT = 0.0f;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=1", "ocean=8", "beach=20", "river=5" };
         standardProfiles.put(profile.getName(), profile);
 
@@ -176,6 +182,7 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("atlantis");
         profile.setDescription("Drowned cities, raised waterlevel");
         profile.WATERLEVEL_OFFSET = -20;
+        profile.RUIN_CHANCE = 0.1f;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("chisel");

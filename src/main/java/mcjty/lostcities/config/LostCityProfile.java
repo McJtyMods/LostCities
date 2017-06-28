@@ -30,9 +30,14 @@ public class LostCityProfile {
     public float CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
     public int THICKNESS_OF_RANDOM_LEAFBLOCKS = 2;
 
-    public boolean RUBBLELAYER = false;
+    public boolean RUBBLELAYER = true;
     public float RUBBLE_DIRT_SCALE = 4.0f;
     public float RUBBLE_LEAVE_SCALE = 4.0f;
+
+    public boolean RUINS = true;
+    public float RUIN_CHANCE = 0.05f;
+    public float RUIN_MINLEVEL_PERCENT = 0.8f;
+    public float RUIN_MAXLEVEL_PERCENT = 1.0f;
 
     public int GROUNDLEVEL = 71;
     public int WATERLEVEL_OFFSET = 8;
@@ -163,6 +168,15 @@ public class LostCityProfile {
                 "The scale of the dirt layer. Smaller values make the layer larger");
         RUBBLE_LEAVE_SCALE = cfg.getFloat("rubbleLeaveScale", categoryLostcity, inheritFrom.orElse(this).RUBBLE_LEAVE_SCALE, 0.01f, 100.0f,
                 "The scale of the leave layer. Smaller values make the layer larger");
+
+        RUINS = cfg.getBoolean("ruins", categoryLostcity, inheritFrom.orElse(this).RUINS,
+                "If true there is a chance a building is ruined from the top (not caused by explosion damage)");
+        RUIN_CHANCE = cfg.getFloat("ruinChance", categoryLostcity, inheritFrom.orElse(this).RUIN_CHANCE, 0.0f, 1.0f,
+                "If ruines are enabled this gives the chance that a building is ruined");
+        RUIN_MINLEVEL_PERCENT = cfg.getFloat("ruinMinlevelPercent", categoryLostcity, inheritFrom.orElse(this).RUIN_MINLEVEL_PERCENT, 0.0f, 1.0f,
+                "If a building is ruined this indicates the minimum start height for the ruin destruction layer");
+        RUIN_MAXLEVEL_PERCENT = cfg.getFloat("ruinMaxlevelPercent", categoryLostcity, inheritFrom.orElse(this).RUIN_MAXLEVEL_PERCENT, 0.0f, 1.0f,
+                "If a building is ruined this indicates the maximum start height for the ruin destruction layer");
 
         GROUNDLEVEL = cfg.getInt("groundLevel", categoryLostcity, inheritFrom.orElse(this).GROUNDLEVEL, 2, 256, "Ground level");
         WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", categoryLostcity, inheritFrom.orElse(this).WATERLEVEL_OFFSET, -100, 100, "How much lower the water level is compared to the ground level (63)");
