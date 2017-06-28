@@ -49,7 +49,7 @@ def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
 }
-group= "mcjty.lostcities" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group= "com.github.mcjty" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "lostcities"
 
 sourceCompatibility = 1.8
@@ -107,5 +107,50 @@ processResources
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+
+task("uploadJars", dependsOn: "reobf") {
+    description = "uploads JARs"
+    if (System.getenv("local_maven") != null) {
+        apply plugin: 'maven'
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    repository(url: "file://" + System.getenv("local_maven"))
+                    pom {
+                        groupId = project.group
+                        version = project.version
+                        artifactId = project.archivesBaseName
+                        project {
+                            name project.archivesBaseName
+                            packaging 'jar'
+                            description 'LostCities'
+                            scm {
+                                url 'https://github.com/McJty/LostCities'
+                                connection 'scm:git:git@github.com:McJty/LostCities.git'
+                                developerConnection 'scm:git:git@github.com:McJty/LostCities.git'
+                            }
+                            issueManagement {
+                                system 'github'
+                                url 'https://github.com/McJty/McJtyLib/issues'
+                            }
+                            licenses {
+                                license {
+                                    name 'MIT'
+                                    distribution 'repo'
+                                }
+                            }
+                            developers {
+                                developer {
+                                    id 'McJty'
+                                    name 'McJty'
+                                    roles { role 'developer' }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
