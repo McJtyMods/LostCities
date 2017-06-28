@@ -305,6 +305,17 @@ public class BuildingInfo implements ILostChunkInfo {
         return provider.profile.GROUNDLEVEL + cityLevel * 6;
     }
 
+    /**
+     * Get the city ground level but lower the level outside cities
+     */
+    public int getCityGroundLevelOutsideLower() {
+        if (isCity) {
+            return provider.profile.GROUNDLEVEL + cityLevel * 6;
+        } else {
+            return provider.profile.GROUNDLEVEL + cityLevel * 6 -1;
+        }
+    }
+
     public BuildingPart getFloor(int l) {
         return floorTypes[l + floorsBelowGround];
     }

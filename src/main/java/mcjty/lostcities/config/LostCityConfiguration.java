@@ -107,6 +107,7 @@ public class LostCityConfiguration {
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
         profile.RUINS = false;
+        profile.RUBBLELAYER = false;
         profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
         standardProfiles.put(profile.getName(), profile);
 

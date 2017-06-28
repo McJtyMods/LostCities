@@ -1293,7 +1293,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
                     if (primer.data[index-1] == baseChar) {
                         for (int i = 0 ; i < vl ; i++) {
-                            primer.data[index++] = leavesChar;
+                            if (primer.data[index] == airChar || primer.data[index] == liquidChar) {
+                                primer.data[index++] = leavesChar;
+                            }
                         }
                     }
                 }
@@ -1304,31 +1306,31 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private int getInterpolatedHeight(BuildingInfo info, int x, int z) {
         if (x < 8 && z < 8) {
             // First quadrant
-            float h00 = info.getXmin().getZmin().getCityGroundLevel();
-            float h10 = info.getZmin().getCityGroundLevel();
-            float h01 = info.getXmin().getCityGroundLevel();
-            float h11 = info.getCityGroundLevel();
+            float h00 = info.getXmin().getZmin().getCityGroundLevelOutsideLower();
+            float h10 = info.getZmin().getCityGroundLevelOutsideLower();
+            float h01 = info.getXmin().getCityGroundLevelOutsideLower();
+            float h11 = info.getCityGroundLevelOutsideLower();
             return bipolate(h00, h10, h01, h11, x + 8, z + 8);
         } else if (x >= 8 && z < 8) {
             // Second quadrant
-            float h00 = info.getZmin().getCityGroundLevel();
-            float h10 = info.getXmax().getZmin().getCityGroundLevel();
-            float h01 = info.getCityGroundLevel();
-            float h11 = info.getXmax().getCityGroundLevel();
+            float h00 = info.getZmin().getCityGroundLevelOutsideLower();
+            float h10 = info.getXmax().getZmin().getCityGroundLevelOutsideLower();
+            float h01 = info.getCityGroundLevelOutsideLower();
+            float h11 = info.getXmax().getCityGroundLevelOutsideLower();
             return bipolate(h00, h10, h01, h11, x - 8, z + 8);
         } else if (x < 8 && z >= 8) {
             // Third quadrant
-            float h00 = info.getXmin().getCityGroundLevel();
-            float h10 = info.getCityGroundLevel();
-            float h01 = info.getXmin().getZmax().getCityGroundLevel();
-            float h11 = info.getZmax().getCityGroundLevel();
+            float h00 = info.getXmin().getCityGroundLevelOutsideLower();
+            float h10 = info.getCityGroundLevelOutsideLower();
+            float h01 = info.getXmin().getZmax().getCityGroundLevelOutsideLower();
+            float h11 = info.getZmax().getCityGroundLevelOutsideLower();
             return bipolate(h00, h10, h01, h11, x + 8, z - 8);
         } else {
             // Fourth quadrant
-            float h00 = info.getCityGroundLevel();
-            float h10 = info.getXmax().getCityGroundLevel();
-            float h01 = info.getZmax().getCityGroundLevel();
-            float h11 = info.getXmax().getZmax().getCityGroundLevel();
+            float h00 = info.getCityGroundLevelOutsideLower();
+            float h10 = info.getXmax().getCityGroundLevelOutsideLower();
+            float h01 = info.getZmax().getCityGroundLevelOutsideLower();
+            float h11 = info.getXmax().getZmax().getCityGroundLevelOutsideLower();
             return bipolate(h00, h10, h01, h11, x - 8, z - 8);
         }
     }
