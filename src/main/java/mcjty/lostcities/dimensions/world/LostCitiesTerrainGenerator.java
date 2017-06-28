@@ -1278,9 +1278,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
-                double vr = rubbleBuffer[x + z * 16] / provider.profile.RUBBLE_DIRT_SCALE;
-                double vl = leavesBuffer[x + z * 16] / provider.profile.RUBBLE_LEAVE_SCALE;
-                if (vr > 0 || vl > 0) {
+                double vr = provider.profile.RUBBLE_DIRT_SCALE < 0.01f ? 0 : rubbleBuffer[x + z * 16] / provider.profile.RUBBLE_DIRT_SCALE;
+                double vl = provider.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesBuffer[x + z * 16] / provider.profile.RUBBLE_LEAVE_SCALE;
+                if (vr > .5 || vl > .5) {
                     int height = getInterpolatedHeight(info, x, z);
                     int index = (x << 12) | (z << 8) + height;
                     if (primer.data[index-1] != airChar && primer.data[index-1] != liquidChar) {
@@ -1370,7 +1370,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 height = info.getMaxHeight()+5 - height;
                 int vl = 0;
                 if (doLeaves) {
-                    vl = (int) (leavesBuffer[x + z * 16] / provider.profile.RUBBLE_LEAVE_SCALE);
+                    vl = (int) (provider.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesBuffer[x + z * 16] / provider.profile.RUBBLE_LEAVE_SCALE);
                 }
                 while (height > 0) {
                     Character damage = info.getCompiledPalette().canBeDamagedToIronBars(primer.data[index]);
@@ -1831,7 +1831,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 } else {
                                     IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
                                     if (bs.getBlock() == Blocks.SAPLING) {
-                                        info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
+                                        if (provider.profile.AVOID_FOLIAGE) {
+                                            b = airChar;
+                                        } else {
+                                            info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
+                                        }
                                     }
                                 }
                             }

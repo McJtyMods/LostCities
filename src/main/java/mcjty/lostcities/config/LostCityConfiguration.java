@@ -178,6 +178,14 @@ public class LostCityConfiguration {
         profile.GENERATE_OCEANMONUMENTS = false;
         profile.VINE_CHANCE = 0.003f;
         profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.01f;
+        profile.RUBBLELAYER = true;
+        profile.RUBBLE_DIRT_SCALE = 2.0f;
+        profile.RUBBLE_LEAVE_SCALE = 0.0f;
+        profile.RUINS = true;
+        profile.RUIN_CHANCE = 0.5f;
+        profile.RUIN_MINLEVEL_PERCENT = 0.5f;
+        profile.RUIN_MAXLEVEL_PERCENT = 0.9f;
+        profile.AVOID_FOLIAGE = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         standardProfiles.put(profile.getName(), profile);
 

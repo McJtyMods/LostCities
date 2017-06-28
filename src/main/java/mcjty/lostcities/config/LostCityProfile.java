@@ -29,10 +29,11 @@ public class LostCityProfile {
     public float VINE_CHANCE = 0.009f;
     public float CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
     public int THICKNESS_OF_RANDOM_LEAFBLOCKS = 2;
+    public boolean AVOID_FOLIAGE = false;
 
     public boolean RUBBLELAYER = true;
-    public float RUBBLE_DIRT_SCALE = 4.0f;
-    public float RUBBLE_LEAVE_SCALE = 4.0f;
+    public float RUBBLE_DIRT_SCALE = 3.0f;
+    public float RUBBLE_LEAVE_SCALE = 6.0f;
 
     public boolean RUINS = true;
     public float RUIN_CHANCE = 0.05f;
@@ -161,13 +162,15 @@ public class LostCityProfile {
         CHANCE_OF_RANDOM_LEAFBLOCKS = cfg.getFloat("randomLeafBlockChance", categoryLostcity, inheritFrom.orElse(this).CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f, "Chance that leafblocks will be generated at the border of a building and a street");
         THICKNESS_OF_RANDOM_LEAFBLOCKS = cfg.getInt("randomLeafBlockThickness", categoryLostcity, inheritFrom.orElse(this).THICKNESS_OF_RANDOM_LEAFBLOCKS, 1, 8,
                 "Frequency of leafblocks as seen from the sides of buildings");
+        AVOID_FOLIAGE = cfg.getBoolean("avoidFoliage", categoryLostcity, inheritFrom.orElse(this).AVOID_FOLIAGE,
+                "If this is true then parks will have no generated foliage (trees currently)");
 
         RUBBLELAYER = cfg.getBoolean("rubbleLayer", categoryLostcity, inheritFrom.orElse(this).RUBBLELAYER,
                 "If this is true an alternative way to generate dirt/stone/sand + leave blocks is used that makes the city appear more overgrown");
-        RUBBLE_DIRT_SCALE = cfg.getFloat("rubbleDirtScale", categoryLostcity, inheritFrom.orElse(this).RUBBLE_DIRT_SCALE, 0.01f, 100.0f,
-                "The scale of the dirt layer. Smaller values make the layer larger");
-        RUBBLE_LEAVE_SCALE = cfg.getFloat("rubbleLeaveScale", categoryLostcity, inheritFrom.orElse(this).RUBBLE_LEAVE_SCALE, 0.01f, 100.0f,
-                "The scale of the leave layer. Smaller values make the layer larger");
+        RUBBLE_DIRT_SCALE = cfg.getFloat("rubbleDirtScale", categoryLostcity, inheritFrom.orElse(this).RUBBLE_DIRT_SCALE, 0.0f, 100.0f,
+                "The scale of the dirt layer. Smaller values make the layer larger. Use 0 to disable");
+        RUBBLE_LEAVE_SCALE = cfg.getFloat("rubbleLeaveScale", categoryLostcity, inheritFrom.orElse(this).RUBBLE_LEAVE_SCALE, 0.0f, 100.0f,
+                "The scale of the leave layer. Smaller values make the layer larger. Use 0 to disable");
 
         RUINS = cfg.getBoolean("ruins", categoryLostcity, inheritFrom.orElse(this).RUINS,
                 "If true there is a chance a building is ruined from the top (not caused by explosion damage)");
