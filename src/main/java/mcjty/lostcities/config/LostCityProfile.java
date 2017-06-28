@@ -29,6 +29,16 @@ public class LostCityProfile {
     public float VINE_CHANCE = 0.009f;
     public float CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
     public int THICKNESS_OF_RANDOM_LEAFBLOCKS = 2;
+    public boolean AVOID_FOLIAGE = false;
+
+    public boolean RUBBLELAYER = true;
+    public float RUBBLE_DIRT_SCALE = 3.0f;
+    public float RUBBLE_LEAVE_SCALE = 6.0f;
+
+    public boolean RUINS = true;
+    public float RUIN_CHANCE = 0.05f;
+    public float RUIN_MINLEVEL_PERCENT = 0.8f;
+    public float RUIN_MAXLEVEL_PERCENT = 1.0f;
 
     public int GROUNDLEVEL = 71;
     public int WATERLEVEL_OFFSET = 8;
@@ -152,6 +162,24 @@ public class LostCityProfile {
         CHANCE_OF_RANDOM_LEAFBLOCKS = cfg.getFloat("randomLeafBlockChance", categoryLostcity, inheritFrom.orElse(this).CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f, "Chance that leafblocks will be generated at the border of a building and a street");
         THICKNESS_OF_RANDOM_LEAFBLOCKS = cfg.getInt("randomLeafBlockThickness", categoryLostcity, inheritFrom.orElse(this).THICKNESS_OF_RANDOM_LEAFBLOCKS, 1, 8,
                 "Frequency of leafblocks as seen from the sides of buildings");
+        AVOID_FOLIAGE = cfg.getBoolean("avoidFoliage", categoryLostcity, inheritFrom.orElse(this).AVOID_FOLIAGE,
+                "If this is true then parks will have no generated foliage (trees currently)");
+
+        RUBBLELAYER = cfg.getBoolean("rubbleLayer", categoryLostcity, inheritFrom.orElse(this).RUBBLELAYER,
+                "If this is true an alternative way to generate dirt/stone/sand + leave blocks is used that makes the city appear more overgrown");
+        RUBBLE_DIRT_SCALE = cfg.getFloat("rubbleDirtScale", categoryLostcity, inheritFrom.orElse(this).RUBBLE_DIRT_SCALE, 0.0f, 100.0f,
+                "The scale of the dirt layer. Smaller values make the layer larger. Use 0 to disable");
+        RUBBLE_LEAVE_SCALE = cfg.getFloat("rubbleLeaveScale", categoryLostcity, inheritFrom.orElse(this).RUBBLE_LEAVE_SCALE, 0.0f, 100.0f,
+                "The scale of the leave layer. Smaller values make the layer larger. Use 0 to disable");
+
+        RUINS = cfg.getBoolean("ruins", categoryLostcity, inheritFrom.orElse(this).RUINS,
+                "If true there is a chance a building is ruined from the top (not caused by explosion damage)");
+        RUIN_CHANCE = cfg.getFloat("ruinChance", categoryLostcity, inheritFrom.orElse(this).RUIN_CHANCE, 0.0f, 1.0f,
+                "If ruines are enabled this gives the chance that a building is ruined");
+        RUIN_MINLEVEL_PERCENT = cfg.getFloat("ruinMinlevelPercent", categoryLostcity, inheritFrom.orElse(this).RUIN_MINLEVEL_PERCENT, 0.0f, 1.0f,
+                "If a building is ruined this indicates the minimum start height for the ruin destruction layer");
+        RUIN_MAXLEVEL_PERCENT = cfg.getFloat("ruinMaxlevelPercent", categoryLostcity, inheritFrom.orElse(this).RUIN_MAXLEVEL_PERCENT, 0.0f, 1.0f,
+                "If a building is ruined this indicates the maximum start height for the ruin destruction layer");
 
         GROUNDLEVEL = cfg.getInt("groundLevel", categoryLostcity, inheritFrom.orElse(this).GROUNDLEVEL, 2, 256, "Ground level");
         WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", categoryLostcity, inheritFrom.orElse(this).WATERLEVEL_OFFSET, -100, 100, "How much lower the water level is compared to the ground level (63)");

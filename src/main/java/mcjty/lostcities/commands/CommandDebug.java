@@ -48,6 +48,7 @@ public class CommandDebug implements ICommand {
             System.out.println("info.chunkX = " + info.chunkX);
             System.out.println("info.chunkZ = " + info.chunkZ);
             System.out.println("info.getCityStyle() = " + info.getCityStyle().getName());
+            System.out.println("info.ruinHeight = " + info.ruinHeight);
             System.out.println("info.getHighwayXLevel() = " + info.getHighwayXLevel());
             System.out.println("info.getHighwayZLevel() = " + info.getHighwayZLevel());
             Railway.RailChunkInfo railInfo = Railway.getRailChunkType(info.chunkX, info.chunkZ, info.provider);

@@ -49,6 +49,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public final boolean[] connectionAtX;
     public final boolean[] connectionAtZ;
     public final boolean noLoot;
+    public final float ruinHeight;      // The height (as a percentage between 0 and 1) at which we focus the ruin layer. Set to -1 if this building is not ruined
 
     public final int highwayXLevel;     // 0 or 1 if there is a highway at this chunk
     public final int highwayZLevel;     // 0 or 1 if there is a highway at this chunk
@@ -302,6 +303,17 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public int getCityGroundLevel() {
         return provider.profile.GROUNDLEVEL + cityLevel * 6;
+    }
+
+    /**
+     * Get the city ground level but lower the level outside cities
+     */
+    public int getCityGroundLevelOutsideLower() {
+        if (isCity) {
+            return provider.profile.GROUNDLEVEL + cityLevel * 6;
+        } else {
+            return provider.profile.GROUNDLEVEL + cityLevel * 6 -1;
+        }
     }
 
     public BuildingPart getFloor(int l) {
@@ -563,6 +575,7 @@ public class BuildingInfo implements ILostChunkInfo {
             palette = topleft.palette;
             compiledPalette = topleft.getCompiledPalette();
             noLoot = topleft.noLoot;
+            ruinHeight = topleft.ruinHeight;
         } else {
             CityStyle cs = getCityStyle();
             if (building2x2Section == 0) {
@@ -633,6 +646,12 @@ public class BuildingInfo implements ILostChunkInfo {
             createPalette(rand);
             float r = rand.nextFloat();
             noLoot = building2x2Section == -1 && r < provider.profile.BUILDING_WITHOUT_LOOT_CHANCE;
+            r = rand.nextFloat();
+            if (rand.nextFloat() < provider.profile.RUIN_CHANCE) {
+                ruinHeight = provider.profile.RUIN_MINLEVEL_PERCENT + (provider.profile.RUIN_MAXLEVEL_PERCENT - provider.profile.RUIN_MINLEVEL_PERCENT) * r;
+            } else {
+                ruinHeight = -1;
+            }
         }
 
         floorTypes = new BuildingPart[floors + floorsBelowGround + 1];
