@@ -194,7 +194,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (railInfo.getType() != RailChunkType.NONE) {
             generateRailways(primer, info, railInfo);
         }
-        generateRailwayDungeons(chunkX, chunkX, primer, info);
+        generateRailwayDungeons(primer, info);
 
         fixTorches(primer, info);
 
@@ -440,11 +440,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (info.isTunnel(level)) {
             // We know we need a tunnel
             part = AssetRegistries.PARTS.get("highway_tunnel" + suffix);
-            generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0);
+            generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0, true);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
             part = AssetRegistries.PARTS.get("highway_open" + suffix);
-            int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0);
+            int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0, true);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -454,7 +454,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         } else {
             part = AssetRegistries.PARTS.get("highway_bridge" + suffix);
-            int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0);
+            int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0, true);
             // Clear a bit more above the highway
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -766,14 +766,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void generateRailwayDungeons(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
+    private void generateRailwayDungeons(ChunkPrimer primer, BuildingInfo info) {
         if (info.railDungeon == null) {
             return;
         }
         if (info.getZmin().getRailInfo().getType() == RailChunkType.HORIZONTAL ||
                 info.getZmax().getRailInfo().getType() == RailChunkType.HORIZONTAL) {
             int height = provider.profile.GROUNDLEVEL + Railway.RAILWAY_LEVEL_OFFSET * 6;
-            generatePart(primer, info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0);
+            generatePart(primer, info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0, false);
         }
     }
 
@@ -873,7 +873,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 part = AssetRegistries.PARTS.get("rails_flat");
                 break;
         }
-        generatePart(primer, info, part, transform, 0, height, 0);
+        generatePart(primer, info, part, transform, 0, height, 0, false);
 
         Character railMainBlock = info.getCityStyle().getRailMainBlock();
         char rail = info.getCompiledPalette().get(railMainBlock);
@@ -988,11 +988,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             part = AssetRegistries.PARTS.get("station_staircase");
             for (int i = railInfo.getLevel() + 1 ; i < info.cityLevel ; i++) {
                 height = provider.profile.GROUNDLEVEL + i * 6;
-                generatePart(primer, info, part, transform, 0, height, 0);
+                generatePart(primer, info, part, transform, 0, height, 0, false);
             }
             height = provider.profile.GROUNDLEVEL + info.cityLevel * 6;
             part = AssetRegistries.PARTS.get("station_staircase_surface");
-            generatePart(primer, info, part, transform, 0, height, 0);
+            generatePart(primer, info, part, transform, 0, height, 0, false);
         }
     }
 
@@ -1019,7 +1019,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     throw new RuntimeException("Cannot happen!");
             }
 
-            generatePart(primer, info, stairs, transform, 0, oy, 0);
+            generatePart(primer, info, stairs, transform, 0, oy, 0, false);
         }
     }
 
@@ -1468,7 +1468,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 } else {
                     part = info.fountainType;
                 }
-                generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0);
+                generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0, false);
             }
 
             generateRandomVegetation(primer, info, rand, height);
@@ -1507,7 +1507,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateFrontPart(ChunkPrimer primer, BuildingInfo info, int height, BuildingInfo adj, Transform rot) {
         if (info.hasFrontPartFrom(adj)) {
-            generatePart(primer, adj, adj.frontType, rot, 0, height, 0);
+            generatePart(primer, adj, adj.frontType, rot, 0, height, 0, false);
         }
     }
 
@@ -1770,9 +1770,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         return needOpening;
     }
 
+    /**
+     * Generate a port. If 'airWaterLevel' is true then 'hard air' blocks are replaced with water below the waterLevel.
+     * Otherwise they are replaced with air.
+     */
     private int generatePart(ChunkPrimer primer, BuildingInfo info, BuildingPart part,
                              Transform transform,
-                             int ox, int oy, int oz) {
+                             int ox, int oy, int oz, boolean airWaterLevel) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
@@ -1811,7 +1815,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         // We don't replace the world where the part is empty (air)
                         if (b != airChar) {
                             if (b == hardAirChar) {
-                                b = (oy+y) < waterLevel ? liquidChar : airChar;
+                                if (airWaterLevel) {
+                                    b = (oy + y) < waterLevel ? liquidChar : airChar;
+                                } else {
+                                    b = airChar;
+                                }
                             } else if (getCharactersNeedingTodo().contains(b)) {
                                 if (b == torchChar) {
                                     if (provider.profile.GENERATE_LIGHTING) {
@@ -1931,7 +1939,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int height = lowestLevel;
         for (int f = -info.floorsBelowGround; f <= info.getNumFloors(); f++) {
             BuildingPart part = info.getFloor(f);
-            generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0);
+            generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0, false);
 
             // Check for doors
             boolean isTop = f == info.getNumFloors();   // The top does not need generated doors
