@@ -1904,7 +1904,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private boolean isHigherThenNearbyStreetChunk(BuildingInfo info, BuildingInfo adjacent) {
-        return adjacent.isCity && !adjacent.hasBuilding && adjacent.cityLevel < info.cityLevel;
+        if (!adjacent.isCity) {
+            return false;
+        }
+        if (adjacent.hasBuilding) {
+            return adjacent.cityLevel + adjacent.getNumFloors() < info.cityLevel;
+        } else {
+            return adjacent.cityLevel < info.cityLevel;
+        }
     }
 
     private void generateBuilding(ChunkPrimer primer, BuildingInfo info) {
