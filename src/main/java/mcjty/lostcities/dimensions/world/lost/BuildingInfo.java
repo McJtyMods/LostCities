@@ -1017,12 +1017,13 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isOcean(Biome[] biomes) {
+        int cnt = 0;
         for (Biome biome : biomes) {
             if (biome == Biomes.OCEAN || biome == Biomes.DEEP_OCEAN || biome == Biomes.FROZEN_OCEAN) {
-                return true;
+                cnt++;
             }
         }
-        return false;
+        return (cnt * 100 / biomes.length) > 50;
     }
 
 
