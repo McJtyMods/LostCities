@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class LostWorldTypeAdapter extends WorldType {
 
     public LostWorldTypeAdapter(String other) {
-        super("lostcities_" + other);
+        super("lc_" + other);
         this.otherWorldtype = other;
     }
 
