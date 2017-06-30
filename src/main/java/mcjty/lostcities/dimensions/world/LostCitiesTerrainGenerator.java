@@ -1477,25 +1477,25 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (doBorder(info, Direction.XMIN)) {
             int x = 0;
             for (int z = 0 ; z < 16 ; z++) {
-                generateOceanBorder(primer, info, xRail, zRail, canDoParks, x, z);
+                generateOceanBorder(primer, info, canDoParks, x, z);
             }
         }
         if (doBorder(info, Direction.XMAX)) {
             int x = 15;
             for (int z = 0 ; z < 16 ; z++) {
-                generateOceanBorder(primer, info, xRail, zRail, canDoParks, x, z);
+                generateOceanBorder(primer, info, canDoParks, x, z);
             }
         }
         if (doBorder(info, Direction.ZMIN)) {
             int z = 0;
             for (int x = 0 ; x < 16 ; x++) {
-                generateOceanBorder(primer, info, xRail, zRail, canDoParks, x, z);
+                generateOceanBorder(primer, info, canDoParks, x, z);
             }
         }
         if (doBorder(info, Direction.ZMAX)) {
             int z = 15;
             for (int x = 0 ; x < 16 ; x++) {
-                generateOceanBorder(primer, info, xRail, zRail, canDoParks, x, z);
+                generateOceanBorder(primer, info, canDoParks, x, z);
             }
         }
     }
@@ -1543,7 +1543,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         primer.data[index + (height++)] = roof;
                         primer.data[index + (height++)] = roof;
                     }
-//                            BaseTerrainGenerator.setBlockStateRange(primer, index + height, index + info.getCityGroundLevel(), baseChar);
                 } else {
                     PrimerTools.setBlockStateRange(primer, index + groundLevel - 5, index + info.getCityGroundLevel(), baseChar);
                 }
@@ -1720,20 +1719,19 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void generateOceanBorder(ChunkPrimer primer, BuildingInfo info, boolean xRail, boolean zRail, boolean canDoParks, int x, int z) {
+    private void generateOceanBorder(ChunkPrimer primer, BuildingInfo info, boolean canDoParks, int x, int z) {
         Character borderBlock = info.getCityStyle().getBorderBlock();
-        char border = info.getCompiledPalette().get(borderBlock);
         Character wallBlock = info.getCityStyle().getWallBlock();
         char wall = info.getCompiledPalette().get(wallBlock);
 
         int index = (x << 12) | (z << 8);
-        if (xRail || zRail) {
-            if (groundLevel < info.getCityGroundLevel()) {
-                PrimerTools.setBlockStateRange(primer, index + groundLevel, index + info.getCityGroundLevel()+1, border);
-            }
-        } else {
-            PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER + 30, index + info.getCityGroundLevel()+1, border);
+        int y = groundLevel-6; // We do the ocean border 6 lower then groundlevel
+        while (y <= info.getCityGroundLevel()) {
+            char border = info.getCompiledPalette().get(borderBlock);   // Do this here because it can be randomized
+            primer.data[index + y] = border;
+            y++;
         }
+
         if (canDoParks) {
             if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
                 primer.data[index + info.getCityGroundLevel()+1] = wall;
