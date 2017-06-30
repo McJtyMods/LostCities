@@ -1929,12 +1929,24 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private void generateBuilding(ChunkPrimer primer, BuildingInfo info) {
         int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * 6;
 
+        Character borderBlock = info.getCityStyle().getBorderBlock();
         char filler = info.getCompiledPalette().get(info.getBuilding().getFillerBlock());
+
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int index = (x << 12) | (z << 8);
-                PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel, baseChar);
-                if (primer.data[index] == airChar) {
+                if (isSide(x, z)) {
+                    // Below every building we have a thin layer of 'border' block because that looks nicer
+                    PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel-10, baseChar);
+                    int y = lowestLevel-10;
+                    while (y < lowestLevel) {
+                        primer.data[index + y] = info.getCompiledPalette().get(borderBlock);
+                        y++;
+                    }
+                } else {
+                    PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel, baseChar);
+                }
+                if (primer.data[index + lowestLevel] == airChar) {
                     primer.data[index + lowestLevel] = filler;      // There is nothing below so we fill this with the filler
                 }
             }
