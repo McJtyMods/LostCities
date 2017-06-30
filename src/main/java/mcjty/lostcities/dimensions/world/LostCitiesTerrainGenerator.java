@@ -592,14 +592,43 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         primer.data[index] = sup;
     }
 
+    /**
+     * Get the lowest height of a corner of four chunks
+     * info: reference to the bottom-right chunk. The 0,0 position of this chunk is the reference
+     */
+    private int getHeightAt00Corner(BuildingInfo info) {
+        int h = getHeightForChunk(info);
+        h = Math.min(h, getHeightForChunk(info.getXmin()));
+        h = Math.min(h, getHeightForChunk(info.getZmin()));
+        h = Math.min(h, getHeightForChunk(info.getXmin().getZmin()));
+        return h;
+    }
+
+    private int getHeightForChunk(BuildingInfo info) {
+        if (info.isCity) {
+            return info.getCityGroundLevel();
+        } else {
+            if (info.isOcean()) {
+                return groundLevel-4;
+            } else {
+                return info.getCityGroundLevel();
+            }
+        }
+    }
+
     private void flattenChunkToCityBorder(int chunkX, int chunkZ, ChunkPrimer primer) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
 
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+        float h00 = getHeightAt00Corner(info);
+        float h10 = getHeightAt00Corner(info.getXmax());
+        float h01 = getHeightAt00Corner(info.getZmax());
+        float h11 = getHeightAt00Corner(info.getXmax().getZmax());
 
         List<GeometryTools.AxisAlignedBB2D> boxes = new ArrayList<>();
         List<GeometryTools.AxisAlignedBB2D> boxesDownwards = new ArrayList<>();
+
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 if (x != 0 || z != 0) {
@@ -608,7 +637,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     BuildingInfo info2 = BuildingInfo.getBuildingInfo(ccx, ccz, provider);
                     if (info2.isCity) {
                         GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
-                        box.height = info2.getCityGroundLevel();
                         boxes.add(box);
                     } else if (info2.getMaxHighwayLevel() >= 0 && !info2.isTunnel(info2.getMaxHighwayLevel())) {
                         // There is a highway but no tunnel. So we need to smooth downwards
@@ -623,20 +651,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     double mindist = 1000000000.0;
-                    int minheight = 1000000000;
+                    int height = bipolate(h11, h01, h10, h00, x, z);
+//                    int height = bipolate(h00, h10, h01, h11, x, z);
                     for (GeometryTools.AxisAlignedBB2D box : boxes) {
                         double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
                         if (dist < mindist) {
                             mindist = dist;
                         }
-                        if (box.height < minheight) {
-                            minheight = box.height;
-                        }
-                    }
-                    int height = minheight;//info.getCityGroundLevel();
-                    if (isOcean(biomes)) {
-                        // We have an ocean biome here. Flatten to a lower level
-                        height = groundLevel - 4;
                     }
 
                     int offset = (int) (Math.sqrt(mindist) * 2);
@@ -659,25 +680,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         }
                     }
                     int height = minheight;//info.getCityGroundLevel();
-                    if (isOcean(biomes)) {
-                        // We have an ocean biome here. Flatten to a lower level
-                        height = groundLevel - 4;
-                    }
 
                     int offset = (int) (Math.sqrt(mindist) * 2);
                     flattenChunkBorderDownwards(primer, x, offset, z, provider.rand, height);
                 }
             }
         }
-    }
-
-    public static boolean isOcean(Biome[] biomes) {
-        for (Biome biome : biomes) {
-            if (biome != Biomes.OCEAN && biome != Biomes.DEEP_OCEAN && biome != Biomes.FROZEN_OCEAN) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public static boolean isWaterBiome(LostCityChunkGenerator provider, ChunkCoord coord) {

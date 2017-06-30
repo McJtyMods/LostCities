@@ -12,6 +12,7 @@ import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
 import mcjty.lostcities.varia.QualityRandom;
 import net.minecraft.block.Block;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -71,6 +72,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private DamageArea damageArea = null;
     private Palette palette = null;
     private CompiledPalette compiledPalette = null;
+    private Boolean isOcean = null;
 
     private boolean xBridgeTypeCalculated = false;
     private boolean zBridgeTypeCalculated = false;
@@ -1004,6 +1006,25 @@ public class BuildingInfo implements ILostChunkInfo {
 
         return bt;
     }
+
+    public boolean isOcean() {
+        if (isOcean != null) {
+            return isOcean;
+        }
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
+        isOcean = isOcean(biomes);
+        return isOcean;
+    }
+
+    private static boolean isOcean(Biome[] biomes) {
+        for (Biome biome : biomes) {
+            if (biome == Biomes.OCEAN || biome == Biomes.DEEP_OCEAN || biome == Biomes.FROZEN_OCEAN) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private boolean isSuitableForBridge(LostCityChunkGenerator provider, BuildingInfo i) {
         return i.cityLevel < cityLevel || LostCitiesTerrainGenerator.isWaterBiome(provider, i.coord);
