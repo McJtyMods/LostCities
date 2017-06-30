@@ -1477,25 +1477,25 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (doBorder(info, Direction.XMIN)) {
             int x = 0;
             for (int z = 0 ; z < 16 ; z++) {
-                generateOceanBorder(primer, info, canDoParks, x, z);
+                generateBorder(primer, info, canDoParks, x, z);
             }
         }
         if (doBorder(info, Direction.XMAX)) {
             int x = 15;
             for (int z = 0 ; z < 16 ; z++) {
-                generateOceanBorder(primer, info, canDoParks, x, z);
+                generateBorder(primer, info, canDoParks, x, z);
             }
         }
         if (doBorder(info, Direction.ZMIN)) {
             int z = 0;
             for (int x = 0 ; x < 16 ; x++) {
-                generateOceanBorder(primer, info, canDoParks, x, z);
+                generateBorder(primer, info, canDoParks, x, z);
             }
         }
         if (doBorder(info, Direction.ZMAX)) {
             int z = 15;
             for (int x = 0 ; x < 16 ; x++) {
-                generateOceanBorder(primer, info, canDoParks, x, z);
+                generateBorder(primer, info, canDoParks, x, z);
             }
         }
     }
@@ -1513,9 +1513,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         char railzC = (char) Block.BLOCK_STATE_IDS.get(railz);
 
         Character corridorRoofBlock = info.getCityStyle().getCorridorRoofBlock();
-        char roof = info.getCompiledPalette().get(corridorRoofBlock);
         Character corridorGlassBlock = info.getCityStyle().getCorridorGlassBlock();
-        char glass = info.getCompiledPalette().get(corridorGlassBlock);
+        CompiledPalette palette = info.getCompiledPalette();
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -1536,10 +1535,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     primer.data[index + (height++)] = airChar;
 
                     if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
+                        char glass = palette.get(corridorGlassBlock);
                         primer.data[index + (height++)] = glass;
                         info.addGenericTodo(new BlockPos(x , height, z));
                         primer.data[index + (height++)] = glowstoneChar;
                     } else {
+                        char roof = palette.get(corridorRoofBlock);
                         primer.data[index + (height++)] = roof;
                         primer.data[index + (height++)] = roof;
                     }
@@ -1719,18 +1720,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void generateOceanBorder(ChunkPrimer primer, BuildingInfo info, boolean canDoParks, int x, int z) {
+    private void generateBorder(ChunkPrimer primer, BuildingInfo info, boolean canDoParks, int x, int z) {
         Character borderBlock = info.getCityStyle().getBorderBlock();
         Character wallBlock = info.getCityStyle().getWallBlock();
         char wall = info.getCompiledPalette().get(wallBlock);
 
         int index = (x << 12) | (z << 8);
         int y = groundLevel-6; // We do the ocean border 6 lower then groundlevel
-        while (y <= info.getCityGroundLevel()) {
-            char border = info.getCompiledPalette().get(borderBlock);   // Do this here because it can be randomized
-            primer.data[index + y] = border;
-            y++;
-        }
+        setBlocksFromPalette(primer, index + y, index + info.getCityGroundLevel()+1, info.getCompiledPalette(), borderBlock);
 
         if (canDoParks) {
             if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
@@ -1742,25 +1739,28 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private boolean borderNeedsConnectionToAdjacentChunk(BuildingInfo info, int x, int z) {
-        boolean needOpening = false;
         for (Direction direction : Direction.VALUES) {
-            BuildingInfo adjacent = direction.get(info);
-            if (direction.atSide(x, z) && adjacent.getActualStairDirection() == direction.getOpposite()) {
-                BuildingPart stairType = adjacent.stairType;
-                Integer z1 = stairType.getMetaInteger("z1");
-                Integer z2 = stairType.getMetaInteger("z2");
-                Transform transform = direction.getOpposite().getRotation();
-                int xx1 = transform.rotateX(15, z1);
-                int zz1 = transform.rotateZ(15, z1);
-                int xx2 = transform.rotateX(15, z2);
-                int zz2 = transform.rotateZ(15, z2);
-                if (x >= Math.min(xx1, xx2) && x <= Math.max(xx1, xx2) && z >= Math.min(zz1, zz2) && z <= Math.max(zz1, zz2)) {
-                    needOpening = true;
-                    break;
+            if (direction.atSide(x, z)) {
+                BuildingInfo adjacent = direction.get(info);
+                if (adjacent.getActualStairDirection() == direction.getOpposite()) {
+                    BuildingPart stairType = adjacent.stairType;
+                    Integer z1 = stairType.getMetaInteger("z1");
+                    Integer z2 = stairType.getMetaInteger("z2");
+                    Transform transform = direction.getOpposite().getRotation();
+                    int xx1 = transform.rotateX(15, z1);
+                    int zz1 = transform.rotateZ(15, z1);
+                    int xx2 = transform.rotateX(15, z2);
+                    int zz2 = transform.rotateZ(15, z2);
+                    if (x >= Math.min(xx1, xx2) && x <= Math.max(xx1, xx2) && z >= Math.min(zz1, zz2) && z <= Math.max(zz1, zz2)) {
+                        return true;
+                    }
+                }
+                if (adjacent.hasBridge(provider, direction.getOrientation()) != null) {
+                    return true;
                 }
             }
         }
-        return needOpening;
+        return false;
     }
 
     /**
@@ -1907,7 +1907,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         BuildingInfo adjacent = direction.get(info);
         if (isHigherThenNearbyStreetChunk(info, adjacent)) {
             return true;
-        } else if (!adjacent.isCity && adjacent.hasBridge(provider, direction.getOrientation()) == null) {
+        } else if (!adjacent.isCity) {
             if (adjacent.cityLevel <= info.cityLevel) {
                 return true;
             }
@@ -1926,11 +1926,23 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
+    private void setBlocksFromPalette(ChunkPrimer primer, int start, int end, CompiledPalette palette, char character) {
+        if (palette.isSimple(character)) {
+            char b = palette.get(character);
+            PrimerTools.setBlockStateRangeSafe(primer, start, end, b);
+        } else {
+            while (start < end) {
+                primer.data[start++] = palette.get(character);
+            }
+        }
+    }
+
     private void generateBuilding(ChunkPrimer primer, BuildingInfo info) {
         int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * 6;
 
         Character borderBlock = info.getCityStyle().getBorderBlock();
-        char filler = info.getCompiledPalette().get(info.getBuilding().getFillerBlock());
+        CompiledPalette palette = info.getCompiledPalette();
+        char fillerBlock = info.getBuilding().getFillerBlock();
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -1940,13 +1952,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel-10, baseChar);
                     int y = lowestLevel-10;
                     while (y < lowestLevel) {
-                        primer.data[index + y] = info.getCompiledPalette().get(borderBlock);
+                        primer.data[index + y] = palette.get(borderBlock);
                         y++;
                     }
                 } else {
                     PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel, baseChar);
                 }
                 if (primer.data[index + lowestLevel] == airChar) {
+                    char filler = palette.get(fillerBlock);
                     primer.data[index + lowestLevel] = filler;      // There is nothing below so we fill this with the filler
                 }
             }
@@ -1971,15 +1984,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int x = 0 ; x < 16 ; x++) {
                 int index = (x << 12) | (0 << 8);
                 // Use safe version because this may end up being lower
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmin().getCityGroundLevel())+1, filler);
+                setBlocksFromPalette(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmin().getCityGroundLevel())+1, palette, fillerBlock);
                 index = (x << 12) | (15 << 8);
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmax().getCityGroundLevel())+1, filler);
+                setBlocksFromPalette(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getZmax().getCityGroundLevel())+1, palette, fillerBlock);
             }
             for (int z = 1 ; z < 15 ; z++) {
                 int index = (0 << 12) | (z << 8);
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmin().getCityGroundLevel())+1, filler);
+                setBlocksFromPalette(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmin().getCityGroundLevel())+1, palette, fillerBlock);
                 index = (15 << 12) | (z << 8);
-                PrimerTools.setBlockStateRangeSafe(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmax().getCityGroundLevel())+1, filler);
+                setBlocksFromPalette(primer, index + lowestLevel, index + Math.min(info.getCityGroundLevel(), info.getXmax().getCityGroundLevel())+1, palette, fillerBlock);
             }
         }
 
