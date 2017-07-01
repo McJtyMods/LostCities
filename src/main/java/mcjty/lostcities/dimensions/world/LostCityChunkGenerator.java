@@ -71,7 +71,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
 
     private Biome[] biomesForGeneration;
 
-    private MapGenBase caveGenerator = new MapGenCaves();
+    private MapGenBase caveGenerator;
 
     // Sometimes we have to precalculate primers for a chunk before the
     // chunk is generated. In that case we cache them here so that when the
@@ -108,6 +108,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
     public LostCityChunkGenerator(World world, long seed) {
 
         {
+            caveGenerator = new LostGenCaves(this);
             caveGenerator = TerrainGen.getModdedMapGen(caveGenerator, CAVE);
             strongholdGenerator = (MapGenStronghold) TerrainGen.getModdedMapGen(strongholdGenerator, STRONGHOLD);
 

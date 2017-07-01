@@ -109,6 +109,7 @@ public class LostCityConfiguration {
         profile.RUINS = false;
         profile.RUBBLELAYER = false;
         profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
+        profile.MAX_CAVE_HEIGHT = 64;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("rarecities");

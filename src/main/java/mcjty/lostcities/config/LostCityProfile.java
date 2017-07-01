@@ -120,6 +120,8 @@ public class LostCityProfile {
     public boolean GENERATE_LAKES = true;
     public boolean GENERATE_DUNGEONS = true;
 
+    public int MAX_CAVE_HEIGHT = 128;
+
     public boolean PREVENT_VILLAGES_IN_CITIES = true;
     public boolean PREVENT_LAKES_RAVINES_IN_CITIES = false;
 
@@ -298,6 +300,7 @@ public class LostCityProfile {
         GENERATE_MINESHAFTS = cfg.get(categoryStructures, "generateMineshafts", inheritFrom.orElse(this).GENERATE_MINESHAFTS, "Generate mineshafts").getBoolean();
         GENERATE_LAKES = cfg.get(categoryStructures, "generateLakes", inheritFrom.orElse(this).GENERATE_LAKES, "Generate lakes (lava/water)").getBoolean();
         GENERATE_DUNGEONS = cfg.get(categoryStructures, "generateDungeons", inheritFrom.orElse(this).GENERATE_DUNGEONS, "Generate dungeons").getBoolean();
+        MAX_CAVE_HEIGHT = cfg.getInt(categoryStructures, "maxCaveHeight", inheritFrom.orElse(this).MAX_CAVE_HEIGHT, 20, 240, "Maximum height at which vanilla caves can generate. Default is 128. Lower this if you don't want the caves to damage buildings");
 
         PREVENT_VILLAGES_IN_CITIES = cfg.get(categoryStructures, "preventVillagesInCities", inheritFrom.orElse(this).PREVENT_VILLAGES_IN_CITIES, "If true then an attempt will be made to prevent villages in cities. " +
                 "Note that enabling this option will likely require a low city " +
