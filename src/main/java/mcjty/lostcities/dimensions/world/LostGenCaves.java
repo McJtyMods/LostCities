@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.MapGenCaves;
 
@@ -14,34 +13,39 @@ public class LostGenCaves extends MapGenCaves {
     }
 
     /**
-     * Digs out the current block, default implementation removes stone, filler, and top block
-     * Sets the block to lava if y is less then 10, and air other wise.
-     * If setting to air, it also checks to see if we've broken the surface and if so
-     * tries to make the floor the biome's top block
-     *
-     * @param data     Block data array
-     * @param x        local X position
-     * @param y        local Y position
-     * @param z        local Z position
-     * @param chunkX   Chunk X position
-     * @param chunkZ   Chunk Y position
-     * @param foundTop True if we've encountered the biome's top block. Ideally if we've broken the surface.
+     * Recursively called by generate()
      */
-    protected void digBlock(ChunkPrimer data, int x, int y, int z, int chunkX, int chunkZ, boolean foundTop, IBlockState state, IBlockState up) {
-        net.minecraft.world.biome.Biome biome = world.getBiome(new BlockPos(x + chunkX * 16, 0, z + chunkZ * 16));
-        IBlockState top = biome.topBlock;
-        IBlockState filler = biome.fillerBlock;
+    @Override
+    protected void recursiveGenerate(World worldIn, int chunkX, int chunkZ, int originalX, int originalZ, ChunkPrimer chunkPrimerIn) {
+        int i = this.rand.nextInt(this.rand.nextInt(this.rand.nextInt(15) + 1) + 1);
 
-        if (this.canReplaceBlock(state, up) || state.getBlock() == top.getBlock() || state.getBlock() == filler.getBlock()) {
-            if (y - 1 < 10) {
-                data.setBlockState(x, y, z, BLK_LAVA);
-            } else {
-                data.setBlockState(x, y, z, BLK_AIR);
+        if (this.rand.nextInt(7) != 0) {
+            i = 0;
+        }
 
-                if (foundTop && data.getBlockState(x, y - 1, z).getBlock() == filler.getBlock()) {
-                    data.setBlockState(x, y - 1, z, top.getBlock().getDefaultState());
+        for (int j = 0; j < i; ++j) {
+            double d0 = (double) (chunkX * 16 + this.rand.nextInt(16));
+            double d1 = (double) this.rand.nextInt(this.rand.nextInt(provider.profile.MAX_CAVE_HEIGHT - 8) + 8);
+            double d2 = (double) (chunkZ * 16 + this.rand.nextInt(16));
+            int k = 1;
+
+            if (this.rand.nextInt(4) == 0) {
+                this.addRoom(this.rand.nextLong(), originalX, originalZ, chunkPrimerIn, d0, d1, d2);
+                k += this.rand.nextInt(4);
+            }
+
+            for (int l = 0; l < k; ++l) {
+                float f = this.rand.nextFloat() * ((float) Math.PI * 2F);
+                float f1 = (this.rand.nextFloat() - 0.5F) * 2.0F / 8.0F;
+                float f2 = this.rand.nextFloat() * 2.0F + this.rand.nextFloat();
+
+                if (this.rand.nextInt(10) == 0) {
+                    f2 *= this.rand.nextFloat() * this.rand.nextFloat() * 3.0F + 1.0F;
                 }
+
+                this.addTunnel(this.rand.nextLong(), originalX, originalZ, chunkPrimerIn, d0, d1, d2, f2, f, f1, 0, 0, 1.0D);
             }
         }
     }
 }
+
