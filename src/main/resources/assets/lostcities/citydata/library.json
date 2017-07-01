@@ -4756,6 +4756,12 @@
     "name": "top1x1_5",
     "xsize": 16,
     "zsize": 16,
+    "palette": [
+      {
+        "char": "o",
+        "block": "minecraft:planks"
+      }
+    ],
     "slices": [
       [
         "                ",

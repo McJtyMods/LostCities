@@ -27,6 +27,8 @@ public class BuildingPart implements IAsset {
     // Optimized version of this part which is organized in xSize*ySize vertical strings
     private char[][] vslices = null;
 
+    private Palette localPalette = null;
+
 
     private Map<String, Object> metadata = new HashMap<>();
 
@@ -96,6 +98,10 @@ public class BuildingPart implements IAsset {
         return getVslices()[z*xSize + x];
     }
 
+    public Palette getLocalPalette() {
+        return localPalette;
+    }
+
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
@@ -111,6 +117,11 @@ public class BuildingPart implements IAsset {
                 slice += el.getAsString();
             }
             slices[i++] = slice;
+        }
+        if (object.has("palette")) {
+            JsonArray palette = object.get("palette").getAsJsonArray();
+            localPalette = new Palette();
+            localPalette.parsePaletteArray(palette);
         }
         if (object.has("meta")) {
             JsonArray metaArray = object.get("meta").getAsJsonArray();

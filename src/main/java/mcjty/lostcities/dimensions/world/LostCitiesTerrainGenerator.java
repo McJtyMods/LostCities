@@ -5,6 +5,7 @@ import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
+import mcjty.lostcities.dimensions.world.lost.cityassets.Palette;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.PrimerTools;
@@ -1775,6 +1776,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                              Transform transform,
                              int ox, int oy, int oz, boolean airWaterLevel) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
+        CompiledPalette compiledInternalPalette = null;
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
                 char[] vs = part.getVSlice(x, z);
@@ -1787,7 +1789,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         char c = vs[y];
                         Character b = compiledPalette.get(c);
                         if (b == null) {
-                            throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
+                            if (compiledInternalPalette == null) {
+                                Palette localPalette = part.getLocalPalette();
+                                if (localPalette != null) {
+                                    compiledInternalPalette = new CompiledPalette(localPalette);
+                                    b = compiledInternalPalette.get(c);
+                                }
+                            } else {
+                                b = compiledInternalPalette.get(c);
+                            }
+                            if (b == null) {
+                                throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
+                            }
                         }
                         if (transform != Transform.ROTATE_NONE) {
                             if (getRotatableChars().contains(b)) {

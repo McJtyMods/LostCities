@@ -564,10 +564,6 @@
         "block": "minecraft:iron_bars"
       },
       {
-        "char": "o",
-        "block": "minecraft:planks"
-      },
-      {
         "char": "A",
         "block": "minecraft:stone_brick_stairs@1"
       },
