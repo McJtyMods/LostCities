@@ -1380,7 +1380,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 double v = ruinBuffer[x + z * 16];
                 int height = baseheight + (int) v;
                 int index = (x << 12) | (z << 8) + height;
-                height = info.getMaxHeight()+5 - height;
+                height = info.getMaxHeight()+10 - height;
                 int vl = 0;
                 if (doLeaves) {
                     vl = (int) (provider.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesBuffer[x + z * 16] / provider.profile.RUBBLE_LEAVE_SCALE);
