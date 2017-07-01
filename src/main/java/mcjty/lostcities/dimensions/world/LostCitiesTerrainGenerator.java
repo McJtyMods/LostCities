@@ -113,8 +113,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.DARK_OAK)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.JUNGLE)));
-//            addStates(Blocks.STONE_STAIRS, charactersNeedingTodo);
-//            addStates(Blocks.BRICK_STAIRS, charactersNeedingTodo);
         }
         return charactersNeedingTodo;
     }
@@ -2022,11 +2020,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         if (info.hasConnectionAtX(f + info.floorsBelowGround)) {
             int x = 0;
-            int index = (x << 12) | (6 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
-            index = (x << 12) | (9 << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             if (hasConnectionWithBuilding(f, info, info.getXmin())) {
+                int index = (x << 12) | (6 << 8);
+                PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
+                index = (x << 12) | (9 << 8);
+                PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
                 index = (x << 12) | (7 << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
@@ -2036,6 +2034,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 primer.data[index + height + 1] = airChar;
                 primer.data[index + height + 2] = filler;
             } else if (hasConnectionToTopOrOutside(f, info, info.getXmin())) {
+                int index = (x << 12) | (6 << 8);
+                PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
+                index = (x << 12) | (9 << 8);
+                PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
                 index = (x << 12) | (7 << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.EAST);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.EAST);
@@ -2077,11 +2079,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         if (info.hasConnectionAtZ(f + info.floorsBelowGround)) {
             int z = 0;
-            int index = (6 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
-            index = (9 << 12) | (z << 8);
-            PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
             if (hasConnectionWithBuilding(f, info, info.getZmin())) {
+                int index = (6 << 12) | (z << 8);
+                PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
+                index = (9 << 12) | (z << 8);
+                PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
                 index = (7 << 12) | (z << 8);
                 primer.data[index + height] = airChar;
                 primer.data[index + height + 1] = airChar;
@@ -2091,6 +2093,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 primer.data[index + height + 1] = airChar;
                 primer.data[index + height + 2] = filler;
             } else if (hasConnectionToTopOrOutside(f, info, info.getZmin())) {
+                int index = (6 << 12) | (z << 8);
+                PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
+                index = (9 << 12) | (z << 8);
+                PrimerTools.setBlockStateRange(primer, index + height, index + height + 3, filler);
                 index = (7 << 12) | (z << 8);
                 primer.data[index + height] = getDoor(info.doorBlock, false, true, EnumFacing.NORTH);
                 primer.data[index + height + 1] = getDoor(info.doorBlock, true, true, EnumFacing.NORTH);
