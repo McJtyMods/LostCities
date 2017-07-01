@@ -115,9 +115,8 @@ public class CompiledPalette {
             Object o = palette.get(c);
             if (o instanceof Character) {
                 return (Character) o;
-            } else if (o instanceof IBlockState) {
-                //return (IBlockState) o;
-                throw new RuntimeException("BAH!");
+            } else if (o == null) {
+                return null;
             } else {
                 Pair<Float, Character>[] randomBlocks = (Pair<Float, Character>[]) o;
                 float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();

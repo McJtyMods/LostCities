@@ -325,10 +325,6 @@
         "block": "minecraft:stonebrick"
       },
       {
-        "char": "o",
-        "block": "minecraft:stonebrick"
-      },
-      {
         "char": "_",
         "block": "minecraft:stone_slab"
       },
@@ -393,10 +389,6 @@
       {
         "char": ":",
         "block": "minecraft:iron_bars"
-      },
-      {
-        "char": "o",
-        "block": "minecraft:planks"
       },
       {
         "char": "A",
