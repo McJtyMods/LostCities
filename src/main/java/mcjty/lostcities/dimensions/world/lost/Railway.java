@@ -105,13 +105,8 @@ public class Railway {
         int mx = Math.floorMod(chunkX + 1, 20);       // The +1 to avoid having them on highways
         int mz = Math.floorMod(chunkZ + 1, 20);
         if (mx == 0 && mz == 10) {
-            int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
-            if (cityLevel > 2) {
-                // We are too high here. We need an underground station
-                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 3);
-            }
             if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider)) {
-                // There is no city here. So no station either. But we still need a railway. A station at this
+                // There is no city here. So no station. But we still need a railway. A station at this
                 // point will get a three line rail through it
                 if (provider.profile.RAILWAYS_CAN_END) {
                     // Check if there are stations at either side
@@ -129,14 +124,14 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 3);
             }
-            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 3, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 3);
-        }
-        if (mx == 10 && mz == 0) {
             int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
             if (cityLevel > 2) {
                 // We are too high here. We need an underground station
-                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 2);
+                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 3);
             }
+            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 3, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 3);
+        }
+        if (mx == 10 && mz == 0) {
             if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider)) {
                 // There is no city here. So no station either. But we still need a railway. A station at this
                 // point will get a two line rail through it
@@ -156,14 +151,14 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 2);
             }
-            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 2, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 2);
-        }
-        if (mx == 10 && mz == 10) {
             int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
             if (cityLevel > 2) {
                 // We are too high here. We need an underground station
-                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 1);
+                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 2);
             }
+            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 2, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 2);
+        }
+        if (mx == 10 && mz == 10) {
             if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider)) {
                 // There is no city here. So no station either. But we still need a railway. A station at this
                 // point will get a single line rail through it
@@ -182,6 +177,11 @@ public class Railway {
                     }
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 1);
+            }
+            int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
+            if (cityLevel > 2) {
+                // We are too high here. We need an underground station
+                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 1);
             }
             return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 1, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 1);
         }

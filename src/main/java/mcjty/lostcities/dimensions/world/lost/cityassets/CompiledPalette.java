@@ -102,6 +102,14 @@ public class CompiledPalette {
         }
     }
 
+    /**
+     * Return true if this is a simple character that can have only one value in the palette
+     */
+    public boolean isSimple(char c) {
+        Object o = palette.get(c);
+        return o instanceof Character;
+    }
+
     public Character get(char c) {
         try {
             Object o = palette.get(c);
