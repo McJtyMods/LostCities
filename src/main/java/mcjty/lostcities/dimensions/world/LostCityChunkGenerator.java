@@ -516,8 +516,10 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
     public boolean generateStructures(Chunk chunkIn, int x, int z) {
         boolean flag = false;
 
-        if (chunkIn.getInhabitedTime() < 3600L) {
-            flag |= this.oceanMonumentGenerator.generateStructure(this.worldObj, this.rand, new ChunkPos(x, z));
+        if (profile.GENERATE_OCEANMONUMENTS) {
+            if (chunkIn.getInhabitedTime() < 3600L) {
+                flag |= this.oceanMonumentGenerator.generateStructure(this.worldObj, this.rand, new ChunkPos(x, z));
+            }
         }
 
         return flag;
@@ -531,11 +533,15 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
     private List getDefaultCreatures(EnumCreatureType creatureType, BlockPos pos) {
         Biome Biome = this.worldObj.getBiomeForCoordsBody(pos);
         if (creatureType == EnumCreatureType.MONSTER) {
-            if (this.scatteredFeatureGenerator.isInsideStructure(pos)) {
-                return this.scatteredFeatureGenerator.getScatteredFeatureSpawnList();
+            if (profile.GENERATE_SCATTERED) {
+                if (this.scatteredFeatureGenerator.isInsideStructure(pos)) {
+                    return this.scatteredFeatureGenerator.getScatteredFeatureSpawnList();
+                }
             }
-            if (this.oceanMonumentGenerator.isPositionInStructure(this.worldObj, pos)) {
-                return this.oceanMonumentGenerator.getScatteredFeatureSpawnList();
+            if (profile.GENERATE_OCEANMONUMENTS) {
+                if (this.oceanMonumentGenerator.isPositionInStructure(this.worldObj, pos)) {
+                    return this.oceanMonumentGenerator.getScatteredFeatureSpawnList();
+                }
             }
         }
 
