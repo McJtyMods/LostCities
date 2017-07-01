@@ -113,8 +113,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.DARK_OAK)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.JUNGLE)));
-            addStates(Blocks.STONE_STAIRS, charactersNeedingTodo);
-            addStates(Blocks.BRICK_STAIRS, charactersNeedingTodo);
+//            addStates(Blocks.STONE_STAIRS, charactersNeedingTodo);
+//            addStates(Blocks.BRICK_STAIRS, charactersNeedingTodo);
         }
         return charactersNeedingTodo;
     }
@@ -1848,8 +1848,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                         } else {
                                             info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                         }
-                                    } else if (bs.getBlock() instanceof BlockStairs) {
-//@todo
                                     }
                                 }
                             }

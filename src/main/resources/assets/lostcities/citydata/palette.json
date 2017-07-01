@@ -573,7 +573,7 @@
       },
       {
         "char": "t",
-        "block": "minecraft:stone_brick_stairs"
+        "block": "minecraft:stone_brick_stairs@0"
       },
       {
         "char": "z",
