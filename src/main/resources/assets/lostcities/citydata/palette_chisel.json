@@ -395,6 +395,22 @@
         "block": "minecraft:iron_bars"
       },
       {
+        "char": "o",
+        "block": "minecraft:planks"
+      },
+      {
+        "char": "A",
+        "block": "minecraft:stone_brick_stairs@1"
+      },
+      {
+        "char": "t",
+        "block": "minecraft:stone_brick_stairs@0"
+      },
+      {
+        "char": "z",
+        "block": "minecraft:stone_brick_stairs@3"
+      },
+      {
         "char": "c",
         "block": "minecraft:stone_brick_stairs@2"
       },
