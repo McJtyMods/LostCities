@@ -124,12 +124,7 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 3);
             }
-            int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
-            if (cityLevel > 2) {
-                // We are too high here. We need an underground station
-                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 3);
-            }
-            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 3, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 3);
+            return getStationType(chunkX, chunkZ, provider, r, 3, rand.nextFloat() < .5f ? "station_open" : "station_openroof");
         }
         if (mx == 10 && mz == 0) {
             if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider)) {
@@ -151,12 +146,7 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 2);
             }
-            int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
-            if (cityLevel > 2) {
-                // We are too high here. We need an underground station
-                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 2);
-            }
-            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 2, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 2);
+            return getStationType(chunkX, chunkZ, provider, r, 2, rand.nextFloat() < .5f ? "station_open" : "station_openroof");
         }
         if (mx == 10 && mz == 10) {
             if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider)) {
@@ -178,12 +168,7 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 1);
             }
-            int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
-            if (cityLevel > 2) {
-                // We are too high here. We need an underground station
-                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 1);
-            }
-            return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, 1, rand.nextFloat() < .5f ? "station_open" : "station_openroof") : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, 1);
+            return getStationType(chunkX, chunkZ, provider, r, 1, rand.nextFloat() < .5f ? "station_open" : "station_openroof");
         }
         if (mx == 0 && mz == 0) {
             return RailChunkInfo.NOTHING;
@@ -197,7 +182,7 @@ public class Railway {
                 if (direction == BI || adjacent.getType() == RAILS_END_HERE) {
                     direction = WEST;
                 }
-                return testAdjacentRailChunk(r, adjacent, direction);
+                return testAdjacentRailChunk(r, adjacent, direction, chunkX - 1, chunkZ, provider);
             }
             if ((mx >= 1 && mx <= 4 && mz != 0) || (mx >= 11 && mx <= 14)) {
                 RailChunkInfo adjacent = getRailChunkType(chunkX - 1, chunkZ, provider);
@@ -205,7 +190,7 @@ public class Railway {
                 if (direction == BI || adjacent.getType() == RAILS_END_HERE) {
                     direction = EAST;
                 }
-                return testAdjacentRailChunk(r, adjacent, direction);
+                return testAdjacentRailChunk(r, adjacent, direction, chunkX + 1, chunkZ, provider);
             }
             if (mz == 0 && mx == 5) {
                 if (provider.profile.RAILWAYS_CAN_END) {
@@ -287,6 +272,34 @@ public class Railway {
         return RailChunkInfo.NOTHING;
     }
 
+    private static RailChunkInfo getStationType(int chunkX, int chunkZ, LostCityChunkGenerator provider, float r, int rails, String part) {
+        int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
+        if (cityLevel > 2) {
+            // We are too high here. We need an underground station
+            return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+        }
+        // If there is a highway exactly at this spot we cannot have a station. @todo? How to solve this
+        int highwayX = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
+        int highwayZ = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
+        if ((highwayX != -1 && cityLevel >= highwayX) || (highwayZ != -1 && cityLevel >= highwayZ)) {
+            // @todo Problem! We cannot have a station here! At least we cannot get stairs to the top here
+            // Because this is very rare we just generate an underground station because that looks reasonable
+            return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+        } else {
+            // Check if there is a highway directly adjacent (east/west) to the station. In that case we go to underground station mode
+            highwayZ = Highway.getZHighwayLevel(chunkX-1, chunkZ, provider);
+            if (highwayZ != -1 && cityLevel >= highwayZ) {
+                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+            }
+            highwayZ = Highway.getZHighwayLevel(chunkX+1, chunkZ, provider);
+            if (highwayZ != -1 && cityLevel >= highwayZ) {
+                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+            }
+        }
+
+        return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, rails, part) : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+    }
+
     public static RailChunkInfo getRailChunkType(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         ChunkCoord key = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
         if (railInfo.containsKey(key)) {
@@ -297,11 +310,18 @@ public class Railway {
         return info;
     }
 
-    private static RailChunkInfo testAdjacentRailChunk(float r, RailChunkInfo adjacent, RailDirection direction) {
+    private static RailChunkInfo testAdjacentRailChunk(float r, RailChunkInfo adjacent, RailDirection direction, int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         switch (adjacent.getType()) {
             case NONE:
                 return RailChunkInfo.NOTHING;
             case STATION_SURFACE:
+                // chunkX actually points to the next chunk. If there is a highway there we want to avoid that and go down this level already
+                int highwayX = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
+                int highwayZ = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
+                if ((highwayX != -1 && adjacent.getLevel() == highwayX) || (highwayZ != -1 && adjacent.getLevel() == highwayZ)) {
+                    // We have a highway there so go down here by setting r to 1
+                    r = 1;
+                }
                 if (r < .4f) {
                     return new RailChunkInfo(STATION_EXTENSION_SURFACE, direction, adjacent.getLevel(), adjacent.getRails());
                 } else if ((adjacent.getLevel() & 1) == 0) {
