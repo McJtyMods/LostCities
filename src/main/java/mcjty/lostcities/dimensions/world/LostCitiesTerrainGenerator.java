@@ -760,16 +760,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         int levelX = info.getHighwayXLevel();
         int levelZ = info.getHighwayZLevel();
-        if (building) {
-            if (levelX >= 0 || levelZ >= 0) {
-                generateHighways(chunkX, chunkZ, primer, info);
-            }
-        } else {
-            if (levelX < 0 && levelZ < 0) {
+        if (!building) {
+            Railway.RailChunkInfo railInfo = info.getRailInfo();
+            if (levelX < 0 && levelZ < 0 && !railInfo.getType().isSurface()) {
                 generateStreetDecorations(primer, info);
-            } else {
-                generateHighways(chunkX, chunkZ, primer, info);
             }
+        }
+        if (levelX >= 0 || levelZ >= 0) {
+            generateHighways(chunkX, chunkZ, primer, info);
         }
 
         if (provider.profile.RUBBLELAYER) {
