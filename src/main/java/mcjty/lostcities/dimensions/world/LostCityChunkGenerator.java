@@ -4,7 +4,6 @@ import mcjty.lostcities.api.IChunkPrimerFactory;
 import mcjty.lostcities.api.ILostChunkGenerator;
 import mcjty.lostcities.api.ILostChunkInfo;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
@@ -34,7 +33,10 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.*;
+import net.minecraft.world.gen.ChunkGeneratorSettings;
+import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.gen.MapGenBase;
+import net.minecraft.world.gen.MapGenRavine;
 import net.minecraft.world.gen.feature.WorldGenDungeons;
 import net.minecraft.world.gen.feature.WorldGenLakes;
 import net.minecraft.world.gen.structure.*;
@@ -128,7 +130,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
         String generatorOptions = profile.GENERATOR_OPTIONS;
         if (generatorOptions != null && !generatorOptions.isEmpty()) {
-            this.settings = ChunkProviderSettings.Factory.jsonToFactory(generatorOptions).build();
+            this.settings = ChunkGeneratorSettings.Factory.jsonToFactory(generatorOptions).build();
         }
 
         this.worldObj = world;
