@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import org.apache.commons.lang3.tuple.Pair;
@@ -17,16 +18,6 @@ public class CompiledPalette {
     private final Map<Character, Character> damagedToBlock = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>();
     private final Map<Character, String> lootTables = new HashMap<>();
-
-    private static int g_seed = 123456789;
-    private static int fastrand() {
-        g_seed = (214013*g_seed+2531011);
-        return (g_seed>>16)&0x7FFF;
-    }
-    private static int fastrand128() {
-        g_seed = (214013*g_seed+2531011);
-        return (g_seed>>16)&0x7F;
-    }
 
 
     public CompiledPalette(CompiledPalette other, Palette... palettes) {
@@ -155,7 +146,7 @@ public class CompiledPalette {
                 return null;
             } else {
                 char[] randomBlocks = (char[]) o;
-                return randomBlocks[fastrand128()];
+                return randomBlocks[LostCitiesTerrainGenerator.fastrand128()];
             }
         } catch (Exception e) {
             e.printStackTrace();
