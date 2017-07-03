@@ -81,22 +81,72 @@
         "block": "minecraft:redstone_torch@5"
       },
       {
+        "char": "P",
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:sapling"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      },
+      {
+        "char": "p",
+        "blocks": [
+          {
+            "random": 30,
+            "block": "minecraft:red_flower"
+          },
+          {
+            "random": 30,
+            "block": "minecraft:yellow_flower"
+          },
+          {
+            "random": 15,
+            "block": "minecraft:sapling"
+          },
+          {
+            "random": 15,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "random": 15,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      },
+      {
         "char": "!",
         "blocks": [
           {
-            "factor": 25,
+            "random": 25,
             "block": "minecraft:diamond_block"
           },
           {
-            "factor": 25,
+            "random": 25,
             "block": "minecraft:gold_block"
           },
           {
-            "factor": 25,
+            "random": 25,
             "block": "minecraft:emerald_block"
           },
           {
-            "factor": 1000,
+            "random": 1000,
             "block": "minecraft:iron_block"
           }
         ]
@@ -105,31 +155,31 @@
         "char": "F",
         "blocks": [
           {
-            "factor": 25,
+            "random": 25,
             "block": "minecraft:furnace"
           },
           {
-            "factor": 20,
+            "random": 20,
             "block": "minecraft:crafting_table"
           },
           {
-            "factor": 7,
+            "random": 7,
             "block": "minecraft:brewing_stand"
           },
           {
-            "factor": 6,
+            "random": 6,
             "block": "minecraft:anvil"
           },
           {
-            "factor": 5,
+            "random": 5,
             "block": "minecraft:cauldron"
           },
           {
-            "factor": 2,
+            "random": 2,
             "block": "minecraft:enchanting_table"
           },
           {
-            "factor": 1000,
+            "random": 1000,
             "block": "minecraft:web"
           }
         ]
@@ -138,11 +188,11 @@
         "char": "%",
         "blocks": [
           {
-            "factor": 40,
+            "random": 40,
             "block": "minecraft:web"
           },
           {
-            "factor": 1000,
+            "random": 1000,
             "block": "minecraft:air"
           }
         ]

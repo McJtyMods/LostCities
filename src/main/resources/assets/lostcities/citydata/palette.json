@@ -149,15 +149,15 @@
         "char": "#",
         "blocks": [
           {
-            "factor": 9,
+            "random": 9,
             "block": "minecraft:stonebrick@2"
           },
           {
-            "factor": 8,
+            "random": 8,
             "block": "minecraft:stonebrick@1"
           },
           {
-            "factor": 1000,
+            "random": 1000,
             "block": "minecraft:stonebrick"
           }
         ],
@@ -447,15 +447,15 @@
         "char": "v",
         "blocks": [
           {
-            "factor": 9,
+            "random": 9,
             "block": "minecraft:stonebrick@2"
           },
           {
-            "factor": 8,
+            "random": 8,
             "block": "minecraft:stonebrick@1"
           },
           {
-            "factor": 1000,
+            "random": 1000,
             "block": "minecraft:stonebrick"
           }
         ],
@@ -465,15 +465,15 @@
         "char": "y",
         "blocks": [
           {
-            "factor": 9,
+            "random": 9,
             "block": "minecraft:stonebrick@2"
           },
           {
-            "factor": 8,
+            "random": 8,
             "block": "minecraft:stonebrick@1"
           },
           {
-            "factor": 1000,
+            "random": 1000,
             "block": "minecraft:stonebrick"
           }
         ],
@@ -483,15 +483,15 @@
         "char": "x",
         "blocks": [
           {
-            "factor": 9,
+            "random": 9,
             "block": "minecraft:stonebrick@2"
           },
           {
-            "factor": 8,
+            "random": 8,
             "block": "minecraft:stonebrick@1"
           },
           {
-            "factor": 1000,
+            "random": 1000,
             "block": "minecraft:stonebrick"
           }
         ],
@@ -504,56 +504,6 @@
       {
         "char": "=",
         "block": "minecraft:stone_slab@8"
-      },
-      {
-        "char": "p",
-        "blocks": [
-          {
-            "factor": 30,
-            "block": "minecraft:red_flower"
-          },
-          {
-            "factor": 30,
-            "block": "minecraft:yellow_flower"
-          },
-          {
-            "factor": 15,
-            "block": "minecraft:sapling"
-          },
-          {
-            "factor": 15,
-            "block": "minecraft:sapling@1"
-          },
-          {
-            "factor": 15,
-            "block": "minecraft:sapling@2"
-          },
-          {
-            "factor": 1000,
-            "block": "minecraft:sapling@4"
-          }
-        ]
-      },
-      {
-        "char": "P",
-        "blocks": [
-          {
-            "factor": 32,
-            "block": "minecraft:sapling"
-          },
-          {
-            "factor": 32,
-            "block": "minecraft:sapling@1"
-          },
-          {
-            "factor": 32,
-            "block": "minecraft:sapling@2"
-          },
-          {
-            "factor": 1000,
-            "block": "minecraft:sapling@4"
-          }
-        ]
       },
       {
         "char": "w",

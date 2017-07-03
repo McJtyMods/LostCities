@@ -100,7 +100,7 @@ public class Palette implements IAsset {
                 List<Pair<Integer, IBlockState>> blocks = new ArrayList<>();
                 for (JsonElement el : array) {
                     JsonObject ob = el.getAsJsonObject();
-                    Integer f = ob.get("factor").getAsInt();
+                    Integer f = ob.get("random").getAsInt();
                     String block = ob.get("block").getAsString();
                     IBlockState state = Tools.stringToState(block);
                     blocks.add(Pair.of(f, state));
