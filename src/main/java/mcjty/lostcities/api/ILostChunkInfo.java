@@ -65,8 +65,18 @@ public interface ILostChunkInfo {
      * the damage of the center of the subchunk
      * If this returns 0 there was no damage
      * Anything above 1 will completely destroy blocks
+     * Note that this damage is independent from the ruin system. Use getRuinLevel()
+     * to detect that.
      */
     float getDamage(int chunkY);
+
+    /**
+     * If ruins are enabled this will return the average height level at which the
+     * building in this chunk will be ruined. Actual destruction of blocks occurs
+     * randomly around this level. If this returns -1 the building is not ruined (but
+     * it can still be damaged by explosions).
+     */
+    int getRuinLevel();
 
     /**
      * Get all explosions that affect this chunk (this includes explosions outside the current

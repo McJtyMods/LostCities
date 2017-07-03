@@ -81,22 +81,72 @@
         "block": "minecraft:redstone_torch@5"
       },
       {
+        "char": "P",
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:sapling"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      },
+      {
+        "char": "p",
+        "blocks": [
+          {
+            "random": 30,
+            "block": "minecraft:red_flower"
+          },
+          {
+            "random": 30,
+            "block": "minecraft:yellow_flower"
+          },
+          {
+            "random": 15,
+            "block": "minecraft:sapling"
+          },
+          {
+            "random": 15,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "random": 15,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      },
+      {
         "char": "!",
         "blocks": [
           {
-            "factor": 0.2,
+            "random": 25,
             "block": "minecraft:diamond_block"
           },
           {
-            "factor": 0.2,
+            "random": 25,
             "block": "minecraft:gold_block"
           },
           {
-            "factor": 0.2,
+            "random": 25,
             "block": "minecraft:emerald_block"
           },
           {
-            "factor": 1,
+            "random": 1000,
             "block": "minecraft:iron_block"
           }
         ]
@@ -105,32 +155,32 @@
         "char": "F",
         "blocks": [
           {
-            "factor": 0.7,
-            "block": "minecraft:web"
-          },
-          {
-            "factor": 0.1,
+            "random": 25,
             "block": "minecraft:furnace"
           },
           {
-            "factor": 0.1,
+            "random": 20,
             "block": "minecraft:crafting_table"
           },
           {
-            "factor": 0.3,
+            "random": 7,
             "block": "minecraft:brewing_stand"
           },
           {
-            "factor": 0.3,
+            "random": 6,
             "block": "minecraft:anvil"
           },
           {
-            "factor": 0.2,
+            "random": 5,
             "block": "minecraft:cauldron"
           },
           {
-            "factor": 1,
+            "random": 2,
             "block": "minecraft:enchanting_table"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:web"
           }
         ]
       },
@@ -138,11 +188,11 @@
         "char": "%",
         "blocks": [
           {
-            "factor": 0.3,
+            "random": 40,
             "block": "minecraft:web"
           },
           {
-            "factor": 2.0,
+            "random": 1000,
             "block": "minecraft:air"
           }
         ]
@@ -237,10 +287,12 @@
       }
     ]
   },
+
+
+
   {
     "type": "citystyle",
-    "name": "citystyle_desert",
-    "style": "desert",
+    "name": "citystyle_common",
     "streetblocks": {
       "width": 8,
       "border": "y",
@@ -253,7 +305,7 @@
       "elevation": "x"
     },
     "corridorblocks": {
-      "roof": "y",
+      "roof": "x",
       "glass": "+"
     },
     "railblocks": {
@@ -403,508 +455,33 @@
         "dungeon": "rail_dungeon2"
       }
     ]
+  },
+
+  {
+    "type": "citystyle",
+    "name": "citystyle_desert",
+    "style": "desert",
+    "inherit": "citystyle_common"
   },
   {
     "type": "citystyle",
     "name": "citystyle_standard",
     "style": "standard",
-    "streetblocks": {
-      "width": 8,
-      "border": "y",
-      "wall": "w",
-      "street": "S",
-      "streetbase": "b",
-      "streetvariant": "B"
-    },
-    "parkblocks": {
-      "elevation": "x"
-    },
-    "corridorblocks": {
-      "roof": "x",
-      "glass": "+"
-    },
-    "railblocks": {
-      "railmain": "y"
-    },
-    "buildings": [
-      {
-        "factor": 0.4,
-        "building": "building1"
-      },
-      {
-        "factor": 0.4,
-        "building": "building2"
-      },
-      {
-        "factor": 0.2,
-        "building": "building3"
-      },
-      {
-        "factor": 0.2,
-        "building": "building4"
-      }
-    ],
-    "multibuildings": [
-      {
-        "factor": 0.3,
-        "multibuilding": "multi1"
-      },
-      {
-        "factor": 0.3,
-        "multibuilding": "multi2"
-      },
-      {
-        "factor": 0.2,
-        "multibuilding": "multi3"
-      },
-      {
-        "factor": 0.2,
-        "multibuilding": "multi4"
-      },
-      {
-        "factor": 0.1,
-        "multibuilding": "library"
-      },
-      {
-        "factor": 0.1,
-        "multibuilding": "center"
-      }
-    ],
-    "bridges": [
-      {
-        "factor": 1.0,
-        "bridge": "bridge_open"
-      },
-      {
-        "factor": 1.0,
-        "bridge": "bridge_covered"
-      }
-    ],
-    "fronts": [
-      {
-        "factor": 1.0,
-        "front": "building_front1"
-      },
-      {
-        "factor": 1.0,
-        "front": "building_front2"
-      },
-      {
-        "factor": 1.0,
-        "front": "building_front3"
-      }
-    ],
-    "stairs": [
-      {
-        "factor": 1.0,
-        "stair": "stairs1"
-      },
-      {
-        "factor": 1.0,
-        "stair": "stairs2"
-      },
-      {
-        "factor": 1.0,
-        "stair": "stairsnormal"
-      },
-      {
-        "factor": 1.0,
-        "stair": "stairsbig"
-      }
-    ],
-    "fountains": [
-      {
-        "factor": 1.0,
-        "fountain": "fountain1"
-      },
-      {
-        "factor": 1.0,
-        "fountain": "fountain2"
-      },
-      {
-        "factor": 1.0,
-        "fountain": "fountain3"
-      }
-    ],
-    "parks": [
-      {
-        "factor": 1.0,
-        "park": "park_pool"
-      },
-      {
-        "factor": 1.0,
-        "park": "park_plants"
-      },
-      {
-        "factor": 1.0,
-        "park": "park_trees"
-      },
-      {
-        "factor": 1.0,
-        "park": "park_plants_pillars"
-      },
-      {
-        "factor": 0.8,
-        "park": "park_fountain1"
-      },
-      {
-        "factor": 0.8,
-        "park": "park_fountain2"
-      },
-      {
-        "factor": 0.3,
-        "park": "park_building"
-      },
-      {
-        "factor": 0.3,
-        "park": "park_building2"
-      }
-    ],
-    "raildungeons": [
-      {
-        "factor": 1.0,
-        "dungeon": "rail_dungeon1"
-      },
-      {
-        "factor": 1.0,
-        "dungeon": "rail_dungeon2"
-      }
-    ]
+    "inherit": "citystyle_common"
   },
   {
     "type": "citystyle",
     "name": "citystyle_chisel_desert",
     "style": "desert_chisel",
-    "streetblocks": {
-      "width": 8,
-      "border": "y",
-      "wall": "w",
-      "street": "S",
-      "streetbase": "b",
-      "streetvariant": "B"
-    },
-    "parkblocks": {
-      "elevation": "x"
-    },
-    "corridorblocks": {
-      "roof": "x",
-      "glass": "+"
-    },
-    "railblocks": {
-      "railmain": "y"
-    },
-    "buildings": [
-      {
-        "factor": 0.4,
-        "building": "building1"
-      },
-      {
-        "factor": 0.4,
-        "building": "building2"
-      },
-      {
-        "factor": 0.2,
-        "building": "building3"
-      },
-      {
-        "factor": 0.2,
-        "building": "building4"
-      }
-    ],
-    "multibuildings": [
-      {
-        "factor": 0.3,
-        "multibuilding": "multi1"
-      },
-      {
-        "factor": 0.3,
-        "multibuilding": "multi2"
-      },
-      {
-        "factor": 0.2,
-        "multibuilding": "multi3"
-      },
-      {
-        "factor": 0.2,
-        "multibuilding": "multi4"
-      },
-      {
-        "factor": 0.1,
-        "multibuilding": "library"
-      },
-      {
-        "factor": 0.1,
-        "multibuilding": "center"
-      }
-    ],
-    "bridges": [
-      {
-        "factor": 1.0,
-        "bridge": "bridge_open"
-      },
-      {
-        "factor": 1.0,
-        "bridge": "bridge_covered"
-      }
-    ],
-    "fronts": [
-      {
-        "factor": 1.0,
-        "front": "building_front1"
-      },
-      {
-        "factor": 1.0,
-        "front": "building_front2"
-      },
-      {
-        "factor": 1.0,
-        "front": "building_front3"
-      }
-    ],
-    "stairs": [
-      {
-        "factor": 1.0,
-        "stair": "stairs1"
-      },
-      {
-        "factor": 1.0,
-        "stair": "stairs2"
-      },
-      {
-        "factor": 1.0,
-        "stair": "stairsnormal"
-      },
-      {
-        "factor": 1.0,
-        "stair": "stairsbig"
-      }
-    ],
-    "fountains": [
-      {
-        "factor": 1.0,
-        "fountain": "fountain1"
-      },
-      {
-        "factor": 1.0,
-        "fountain": "fountain2"
-      },
-      {
-        "factor": 1.0,
-        "fountain": "fountain3"
-      }
-    ],
-    "parks": [
-      {
-        "factor": 1.0,
-        "park": "park_pool"
-      },
-      {
-        "factor": 1.0,
-        "park": "park_plants"
-      },
-      {
-        "factor": 1.0,
-        "park": "park_trees"
-      },
-      {
-        "factor": 1.0,
-        "park": "park_plants_pillars"
-      },
-      {
-        "factor": 0.8,
-        "park": "park_fountain1"
-      },
-      {
-        "factor": 0.8,
-        "park": "park_fountain2"
-      },
-      {
-        "factor": 0.3,
-        "park": "park_building"
-      },
-      {
-        "factor": 0.3,
-        "park": "park_building2"
-      }
-    ],
-    "raildungeons": [
-      {
-        "factor": 1.0,
-        "dungeon": "rail_dungeon1"
-      },
-      {
-        "factor": 1.0,
-        "dungeon": "rail_dungeon2"
-      }
-    ]
+    "inherit": "citystyle_common"
   },
   {
     "type": "citystyle",
     "name": "citystyle_chisel_standard",
     "style": "standard_chisel",
-    "streetblocks": {
-      "width": 8,
-      "border": "y",
-      "wall": "w",
-      "street": "S",
-      "streetbase": "b",
-      "streetvariant": "B"
-    },
-    "parkblocks": {
-      "elevation": "x"
-    },
-    "corridorblocks": {
-      "roof": "x",
-      "glass": "+"
-    },
-    "railblocks": {
-      "railmain": "y"
-    },
-    "buildings": [
-      {
-        "factor": 0.4,
-        "building": "building1"
-      },
-      {
-        "factor": 0.4,
-        "building": "building2"
-      },
-      {
-        "factor": 0.2,
-        "building": "building3"
-      },
-      {
-        "factor": 0.2,
-        "building": "building4"
-      }
-    ],
-    "multibuildings": [
-      {
-        "factor": 0.3,
-        "multibuilding": "multi1"
-      },
-      {
-        "factor": 0.3,
-        "multibuilding": "multi2"
-      },
-      {
-        "factor": 0.2,
-        "multibuilding": "multi3"
-      },
-      {
-        "factor": 0.2,
-        "multibuilding": "multi4"
-      },
-      {
-        "factor": 0.1,
-        "multibuilding": "library"
-      },
-      {
-        "factor": 0.1,
-        "multibuilding": "center"
-      }
-    ],
-    "bridges": [
-      {
-        "factor": 1.0,
-        "bridge": "bridge_open"
-      },
-      {
-        "factor": 1.0,
-        "bridge": "bridge_covered"
-      }
-    ],
-    "fronts": [
-      {
-        "factor": 1.0,
-        "front": "building_front1"
-      },
-      {
-        "factor": 1.0,
-        "front": "building_front2"
-      },
-      {
-        "factor": 1.0,
-        "front": "building_front3"
-      }
-    ],
-    "stairs": [
-      {
-        "factor": 1.0,
-        "stair": "stairs1"
-      },
-      {
-        "factor": 1.0,
-        "stair": "stairs2"
-      },
-      {
-        "factor": 1.0,
-        "stair": "stairsnormal"
-      },
-      {
-        "factor": 1.0,
-        "stair": "stairsbig"
-      }
-    ],
-    "fountains": [
-      {
-        "factor": 1.0,
-        "fountain": "fountain1"
-      },
-      {
-        "factor": 1.0,
-        "fountain": "fountain2"
-      },
-      {
-        "factor": 1.0,
-        "fountain": "fountain3"
-      }
-    ],
-    "parks": [
-      {
-        "factor": 1.0,
-        "park": "park_pool"
-      },
-      {
-        "factor": 1.0,
-        "park": "park_plants"
-      },
-      {
-        "factor": 1.0,
-        "park": "park_trees"
-      },
-      {
-        "factor": 1.0,
-        "park": "park_plants_pillars"
-      },
-      {
-        "factor": 0.8,
-        "park": "park_fountain1"
-      },
-      {
-        "factor": 0.8,
-        "park": "park_fountain2"
-      },
-      {
-        "factor": 0.3,
-        "park": "park_building"
-      },
-      {
-        "factor": 0.3,
-        "park": "park_building2"
-      }
-    ],
-    "raildungeons": [
-      {
-        "factor": 1.0,
-        "dungeon": "rail_dungeon1"
-      },
-      {
-        "factor": 1.0,
-        "dungeon": "rail_dungeon2"
-      }
-    ]
+    "inherit": "citystyle_common"
   },
+
   {
     "type": "part",
     "name": "building_front1",
@@ -5229,6 +4806,12 @@
     "name": "top1x1_5",
     "xsize": 16,
     "zsize": 16,
+    "palette": [
+      {
+        "char": "o",
+        "block": "minecraft:planks"
+      }
+    ],
     "slices": [
       [
         "                ",

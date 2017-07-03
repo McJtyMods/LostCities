@@ -97,7 +97,38 @@ public class CityStyle implements IAsset {
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
-        style = object.get("style").getAsString();
+
+        if (object.has("inherit")) {
+            String inherit = object.get("inherit").getAsString();
+            CityStyle inheritFrom = AssetRegistries.CITYSTYLES.get(inherit);
+            if (inheritFrom == null) {
+                throw new RuntimeException("Cannot find citystyle '" + inherit + "' to inherit from!");
+            }
+            style = inheritFrom.getStyle();
+            buildingSelector.addAll(inheritFrom.buildingSelector);
+            bridgeSelector.addAll(inheritFrom.bridgeSelector);
+            parkSelector.addAll(inheritFrom.parkSelector);
+            fountainSelector.addAll(inheritFrom.fountainSelector);
+            stairSelector.addAll(inheritFrom.stairSelector);
+            frontSelector.addAll(inheritFrom.frontSelector);
+            railDungeonSelector.addAll(inheritFrom.railDungeonSelector);
+            multiBuildingSelector.addAll(inheritFrom.multiBuildingSelector);
+            streetWidth = inheritFrom.streetWidth;
+            streetBlock = inheritFrom.streetBlock;
+            streetBaseBlock = inheritFrom.streetBaseBlock;
+            streetVariantBlock = inheritFrom.streetVariantBlock;
+            parkElevationBlock = inheritFrom.parkElevationBlock;
+            corridorRoofBlock = inheritFrom.corridorRoofBlock;
+            corridorGlassBlock = inheritFrom.corridorGlassBlock;
+            railMainBlock = inheritFrom.railMainBlock;
+            borderBlock = inheritFrom.borderBlock;
+            wallBlock = inheritFrom.wallBlock;
+        }
+
+        if (object.has("style")) {
+            style = object.get("style").getAsString();
+        }
+
         if (object.has("streetblocks")) {
             JsonObject s = object.get("streetblocks").getAsJsonObject();
             borderBlock = s.get("border").getAsCharacter();

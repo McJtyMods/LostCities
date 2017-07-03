@@ -67,6 +67,10 @@ public class Palette implements IAsset {
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
         JsonArray paletteArray = object.get("palette").getAsJsonArray();
+        parsePaletteArray(paletteArray);
+    }
+
+    public void parsePaletteArray(JsonArray paletteArray) {
         for (JsonElement element : paletteArray) {
             JsonObject o = element.getAsJsonObject();
             Object value = null;
@@ -93,10 +97,10 @@ public class Palette implements IAsset {
                 palette.put(c, value);
             } else if (o.has("blocks")) {
                 JsonArray array = o.get("blocks").getAsJsonArray();
-                List<Pair<Float, IBlockState>> blocks = new ArrayList<>();
+                List<Pair<Integer, IBlockState>> blocks = new ArrayList<>();
                 for (JsonElement el : array) {
                     JsonObject ob = el.getAsJsonObject();
-                    Float f = ob.get("factor").getAsFloat();
+                    Integer f = ob.get("random").getAsInt();
                     String block = ob.get("block").getAsString();
                     IBlockState state = Tools.stringToState(block);
                     blocks.add(Pair.of(f, state));
@@ -148,7 +152,8 @@ public class Palette implements IAsset {
         return this;
     }
 
-    public Palette addMappingViaState(char c, Pair<Float, IBlockState>... randomBlocks) {
+    @SafeVarargs
+    private final Palette addMappingViaState(char c, Pair<Integer, IBlockState>... randomBlocks) {
         palette.put(c, randomBlocks);
         return this;
     }

@@ -69,7 +69,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
     private Biome[] biomesForGeneration;
 
-    private MapGenBase caveGenerator = new MapGenCaves();
+    private MapGenBase caveGenerator;
 
     // Sometimes we have to precalculate primers for a chunk before the
     // chunk is generated. In that case we cache them here so that when the
@@ -106,6 +106,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
     public LostCityChunkGenerator(World world, long seed) {
 
         {
+            caveGenerator = new LostGenCaves(this);
             caveGenerator = TerrainGen.getModdedMapGen(caveGenerator, CAVE);
             strongholdGenerator = (MapGenStronghold) TerrainGen.getModdedMapGen(strongholdGenerator, STRONGHOLD);
 
@@ -123,6 +124,11 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         worldStyle = AssetRegistries.WORLDSTYLES.get(profile.getWorldStyle());
         if (worldStyle == null) {
             throw new RuntimeException("Unknown worldstyle '" + profile.getWorldStyle() + "'!");
+        }
+
+        String generatorOptions = profile.GENERATOR_OPTIONS;
+        if (generatorOptions != null && !generatorOptions.isEmpty()) {
+            this.settings = ChunkProviderSettings.Factory.jsonToFactory(generatorOptions).build();
         }
 
         this.worldObj = world;
@@ -526,8 +532,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
     public boolean generateStructures(Chunk chunkIn, int x, int z) {
         boolean flag = false;
 
-        if (chunkIn.getInhabitedTime() < 3600L) {
-            flag |= this.oceanMonumentGenerator.generateStructure(this.worldObj, this.rand, new ChunkPos(x, z));
+        if (profile.GENERATE_OCEANMONUMENTS) {
+            if (chunkIn.getInhabitedTime() < 3600L) {
+                flag |= this.oceanMonumentGenerator.generateStructure(this.worldObj, this.rand, new ChunkPos(x, z));
+            }
         }
 
         return flag;
@@ -541,11 +549,15 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
     private List getDefaultCreatures(EnumCreatureType creatureType, BlockPos pos) {
         Biome Biome = this.worldObj.getBiomeForCoordsBody(pos);
         if (creatureType == EnumCreatureType.MONSTER) {
-            if (this.scatteredFeatureGenerator.isInsideStructure(pos)) {
-                return this.scatteredFeatureGenerator.getScatteredFeatureSpawnList();
+            if (profile.GENERATE_SCATTERED) {
+                if (this.scatteredFeatureGenerator.isInsideStructure(pos)) {
+                    return this.scatteredFeatureGenerator.getScatteredFeatureSpawnList();
+                }
             }
-            if (this.oceanMonumentGenerator.isPositionInStructure(this.worldObj, pos)) {
-                return this.oceanMonumentGenerator.getScatteredFeatureSpawnList();
+            if (profile.GENERATE_OCEANMONUMENTS) {
+                if (this.oceanMonumentGenerator.isPositionInStructure(this.worldObj, pos)) {
+                    return this.oceanMonumentGenerator.getScatteredFeatureSpawnList();
+                }
             }
         }
 

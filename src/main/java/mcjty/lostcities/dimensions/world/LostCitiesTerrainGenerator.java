@@ -5,6 +5,7 @@ import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
+import mcjty.lostcities.dimensions.world.lost.cityassets.Palette;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.PrimerTools;
@@ -25,6 +26,7 @@ import java.util.function.BiFunction;
 
 public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
+    private static int g_seed = 123456789;
     private final int groundLevel;
     private final int waterLevel;
     private static boolean charsSetup = false;
@@ -34,6 +36,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char baseChar;
     public static char liquidChar;
     public static char leavesChar;
+    public static char leaves2Char;
+    public static char leaves3Char;
     public static char ironbarsChar;
     public static char grassChar;
     public static char bedrockChar;
@@ -59,6 +63,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private NoiseGeneratorPerlin leavesNoise;
     private NoiseGeneratorPerlin ruinNoise;
 
+    private static char randomLeafs[] = null;
+
 
 //    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(ISLANDS);
 
@@ -75,10 +81,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 //        islandTerrainGenerator.setup(provider.worldObj, provider);
     }
 
-
-    // Use this random when it doesn't really matter i fit is generated the same every time
-    public static Random globalRandom = new Random();
-
+    public static char getRandomLeaf() {
+        if (randomLeafs == null) {
+            randomLeafs = new char[128];
+            int i = 0;
+            for ( ; i < 20 ; i++) {
+                randomLeafs[i] = leaves2Char;
+            }
+            for ( ; i < 40 ; i++) {
+                randomLeafs[i] = leaves3Char;
+            }
+            for ( ; i < randomLeafs.length ; i++) {
+                randomLeafs[i] = leavesChar;
+            }
+        }
+        return randomLeafs[fastrand128()];
+    }
 
     public static Set<Character> getRailChars() {
         if (railChars == null) {
@@ -157,7 +175,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             glowstoneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLOWSTONE.getDefaultState());
             baseChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONE.getDefaultState());
             liquidChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.WATER.getDefaultState());
-            leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState().withProperty(BlockLeaves.DECAYABLE, false));
+
+            leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
+                    .withProperty(BlockLeaves.DECAYABLE, false));
+            leaves2Char = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
+                    .withProperty(BlockLeaves.DECAYABLE, false)
+                    .withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE));
+            leaves3Char = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
+                    .withProperty(BlockLeaves.DECAYABLE, false)
+                    .withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE));
+
             ironbarsChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.IRON_BARS.getDefaultState());
             grassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRASS.getDefaultState());
             bedrockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.BEDROCK.getDefaultState());
@@ -170,6 +197,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             chestChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.CHEST.getDefaultState());
             charsSetup = true;
         }
+    }
+
+    private static int fastrand() {
+        g_seed = (214013*g_seed+2531011);
+        return (g_seed>>16)&0x7FFF;
+    }
+
+    public static int fastrand128() {
+        g_seed = (214013*g_seed+2531011);
+        return (g_seed>>16)&0x7F;
     }
 
     // Note that for normal chunks this is called with a pre-filled in landscape primer
@@ -759,16 +796,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         int levelX = info.getHighwayXLevel();
         int levelZ = info.getHighwayZLevel();
-        if (building) {
-            if (levelX >= 0 || levelZ >= 0) {
-                generateHighways(chunkX, chunkZ, primer, info);
-            }
-        } else {
-            if (levelX < 0 && levelZ < 0) {
+        if (!building) {
+            Railway.RailChunkInfo railInfo = info.getRailInfo();
+            if (levelX < 0 && levelZ < 0 && !railInfo.getType().isSurface()) {
                 generateStreetDecorations(primer, info);
-            } else {
-                generateHighways(chunkX, chunkZ, primer, info);
             }
+        }
+        if (levelX >= 0 || levelZ >= 0) {
+            generateHighways(chunkX, chunkZ, primer, info);
         }
 
         if (provider.profile.RUBBLELAYER) {
@@ -1306,7 +1341,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (primer.data[index-1] == baseChar) {
                         for (int i = 0 ; i < vl ; i++) {
                             if (primer.data[index] == airChar || primer.data[index] == liquidChar) {
-                                primer.data[index++] = leavesChar;
+                                primer.data[index++] = getRandomLeaf();
                             }
                         }
                     }
@@ -1379,7 +1414,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 double v = ruinBuffer[x + z * 16];
                 int height = baseheight + (int) v;
                 int index = (x << 12) | (z << 8) + height;
-                height = info.getMaxHeight()+5 - height;
+                height = info.getMaxHeight()+10 - height;
                 int vl = 0;
                 if (doLeaves) {
                     vl = (int) (provider.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesBuffer[x + z * 16] / provider.profile.RUBBLE_LEAVE_SCALE);
@@ -1394,7 +1429,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 index--;
                                 height++;   // Make sure we keep on filling with air a bit longer because we are lowering here
                             }
-                            primer.data[index++] = leavesChar;
+                            primer.data[index++] = getRandomLeaf();
                             vl--;
                         } else {
                             primer.data[index++] = airChar;
@@ -1567,7 +1602,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     float v = Math.min(.8f, provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - x));
                     int cnt = 0;
                     while (rand.nextFloat() < v && cnt < 30) {
-                        primer.data[index++] = leavesChar;
+                        primer.data[index++] = getRandomLeaf();
                         cnt++;
                     }
                 }
@@ -1584,7 +1619,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     float v = Math.min(.8f, provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 14 + provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS));
                     int cnt = 0;
                     while (rand.nextFloat() < v && cnt < 30) {
-                        primer.data[index++] = leavesChar;
+                        primer.data[index++] = getRandomLeaf();
                         cnt++;
                     }
                 }
@@ -1601,7 +1636,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     float v = Math.min(.8f, provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - z));
                     int cnt = 0;
                     while (rand.nextFloat() < v && cnt < 30) {
-                        primer.data[index++] = leavesChar;
+                        primer.data[index++] = getRandomLeaf();
                         cnt++;
                     }
                 }
@@ -1618,7 +1653,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     float v = provider.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 14 + provider.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS);
                     int cnt = 0;
                     while (rand.nextFloat() < v && cnt < 30) {
-                        primer.data[index++] = leavesChar;
+                        primer.data[index++] = getRandomLeaf();
                         cnt++;
                     }
                 }
@@ -1775,6 +1810,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                              Transform transform,
                              int ox, int oy, int oz, boolean airWaterLevel) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
+        boolean combinedWithPart = false;
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
                 char[] vs = part.getVSlice(x, z);
@@ -1787,7 +1823,17 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         char c = vs[y];
                         Character b = compiledPalette.get(c);
                         if (b == null) {
-                            throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
+                            if (!combinedWithPart) {
+                                Palette localPalette = part.getLocalPalette();
+                                combinedWithPart = true;
+                                if (localPalette != null) {
+                                    compiledPalette = new CompiledPalette(compiledPalette, localPalette);
+                                    b = compiledPalette.get(c);
+                                }
+                            }
+                            if (b == null) {
+                                throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
+                            }
                         }
                         if (transform != Transform.ROTATE_NONE) {
                             if (getRotatableChars().contains(b)) {

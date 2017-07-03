@@ -19,7 +19,30 @@ public class CompiledPalette {
     private final Map<Character, String> mobIds = new HashMap<>();
     private final Map<Character, String> lootTables = new HashMap<>();
 
+
+    public CompiledPalette(CompiledPalette other, Palette... palettes) {
+        this.palette.putAll(other.palette);
+        this.damagedToBlock.putAll(other.damagedToBlock);
+        this.mobIds.putAll(other.mobIds);
+        this.lootTables.putAll(other.lootTables);
+        addPalettes(palettes);
+    }
+
     public CompiledPalette(Palette... palettes) {
+        addPalettes(palettes);
+    }
+
+    private int addEntries(char[] randomBlocks, int idx, char c, int cnt) {
+        for (int i = 0 ; i < cnt ; i++) {
+            if (idx >= randomBlocks.length) {
+                return idx;
+            }
+            randomBlocks[idx++] = c;
+        }
+        return idx;
+    }
+
+    public void addPalettes(Palette[] palettes) {
         // First add the straight palette entries
         for (Palette p : palettes) {
             for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {
@@ -27,10 +50,14 @@ public class CompiledPalette {
                 if (value instanceof IBlockState) {
                     palette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
                 } else if (value instanceof Pair[]) {
-                    Pair<Float, IBlockState>[] r = (Pair<Float, IBlockState>[]) value;
-                    Pair<Float, Character>[] randomBlocks = new Pair[r.length];
-                    for (int i = 0 ; i < r.length ; i++) {
-                        randomBlocks[i] = Pair.of(r[i].getLeft(), (char) Block.BLOCK_STATE_IDS.get(r[i].getRight()));
+                    Pair<Integer, IBlockState>[] r = (Pair<Integer, IBlockState>[]) value;
+                    char[] randomBlocks = new char[128];
+                    int idx = 0;
+                    for (Pair<Integer, IBlockState> pair : r) {
+                        idx = addEntries(randomBlocks, idx, (char) Block.BLOCK_STATE_IDS.get(pair.getRight()), pair.getLeft());
+                        if (idx >= randomBlocks.length) {
+                            break;
+                        }
                     }
                     palette.put(entry.getKey(), randomBlocks);
                 } else if (!(value instanceof String)) {
@@ -93,8 +120,8 @@ public class CompiledPalette {
             } else if (o instanceof Character) {
                 return Block.BLOCK_STATE_IDS.getByValue((Character) o);
             } else {
-                Pair<Float, Character>[] randomBlocks = (Pair<Float, Character>[]) o;
-                return Block.BLOCK_STATE_IDS.getByValue(randomBlocks[0].getRight());
+                char[] randomBlocks = (char[]) o;
+                return Block.BLOCK_STATE_IDS.getByValue(randomBlocks[0]);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,19 +142,11 @@ public class CompiledPalette {
             Object o = palette.get(c);
             if (o instanceof Character) {
                 return (Character) o;
-            } else if (o instanceof IBlockState) {
-                //return (IBlockState) o;
-                throw new RuntimeException("BAH!");
+            } else if (o == null) {
+                return null;
             } else {
-                Pair<Float, Character>[] randomBlocks = (Pair<Float, Character>[]) o;
-                float r = LostCitiesTerrainGenerator.globalRandom.nextFloat();
-                for (Pair<Float, Character> pair : randomBlocks) {
-                    r -= pair.getKey();
-                    if (r <= 0) {
-                        return pair.getRight();
-                    }
-                }
-                return LostCitiesTerrainGenerator.airChar;
+                char[] randomBlocks = (char[]) o;
+                return randomBlocks[LostCitiesTerrainGenerator.fastrand128()];
             }
         } catch (Exception e) {
             e.printStackTrace();
