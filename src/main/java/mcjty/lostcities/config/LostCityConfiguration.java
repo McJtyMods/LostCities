@@ -29,7 +29,7 @@ public class LostCityConfiguration {
 
     public static String[] ADAPTING_WORLDTYPES = new String[] {};
 
-    public static int VERSION = 2;
+    public static int VERSION = 3;
 
     public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
@@ -68,7 +68,7 @@ public class LostCityConfiguration {
             ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, mergedAssets.toArray(new String[mergedAssets.size()]), ASSET_COMMENT);
 
 
-            String[] defaultValues = {"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis"};
+            String[] defaultValues = {"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
             profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
                     defaultValues, PROFILES_COMMENT);
             List<String> mergedProfiles = new ArrayList<>();
@@ -85,7 +85,7 @@ public class LostCityConfiguration {
             ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, ASSET_COMMENT);
 
             profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                    new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "chisel"}, PROFILES_COMMENT);
+                    new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"}, PROFILES_COMMENT);
 
         }
 
@@ -199,6 +199,11 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("chisel");
         profile.setDescription("Use Chisel blocks (only if chisel is available!)");
         profile.setWorldStyle("chisel");
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("realistic");
+        profile.setDescription("Realistic worldgen (similar to Quark's)");
+        profile.GENERATOR_OPTIONS = "{\"profile\":\"default\",\"coordinateScale\":175.0,\"heightScale\":75.0,\"lowerLimitScale\":512.0,\"upperLimitScale\":512.0,\"depthNoiseScaleX\":200.0,\"depthNoiseScaleZ\":200.0,\"depthNoiseScaleExponent\":0.5,\"mainNoiseScaleX\":165.0,\"mainNoiseScaleY\":106.61267,\"mainNoiseScaleZ\":165.0,\"baseSize\":8.267606,\"stretchY\":13.387607,\"biomeDepthWeight\":1.2,\"biomeDepthOffset\":0.2,\"biomeScaleWeight\":3.4084506,\"biomeScaleOffset\":0.0,\"seaLevel\":63,\"useCaves\":true,\"useDungeons\":true,\"dungeonChance\":7,\"useStrongholds\":true,\"useVillages\":true,\"useMineShafts\":true,\"useTemples\":true,\"useMonuments\":true,\"useRavines\":true,\"useWaterLakes\":true,\"waterLakeChance\":49,\"useLavaLakes\":true,\"lavaLakeChance\":80,\"useLavaOceans\":false,\"fixedBiome\":-1,\"biomeSize\":4,\"riverSize\":5,\"dirtSize\":33,\"dirtCount\":10,\"dirtMinHeight\":0,\"dirtMaxHeight\":256,\"gravelSize\":33,\"gravelCount\":8,\"gravelMinHeight\":0,\"gravelMaxHeight\":256,\"graniteSize\":33,\"graniteCount\":10,\"graniteMinHeight\":0,\"graniteMaxHeight\":80,\"dioriteSize\":33,\"dioriteCount\":10,\"dioriteMinHeight\":0,\"dioriteMaxHeight\":80,\"andesiteSize\":33,\"andesiteCount\":10,\"andesiteMinHeight\":0,\"andesiteMaxHeight\":80,\"coalSize\":17,\"coalCount\":20,\"coalMinHeight\":0,\"coalMaxHeight\":128,\"ironSize\":9,\"ironCount\":20,\"ironMinHeight\":0,\"ironMaxHeight\":64,\"goldSize\":9,\"goldCount\":2,\"goldMinHeight\":0,\"goldMaxHeight\":32,\"redstoneSize\":8,\"redstoneCount\":8,\"redstoneMinHeight\":0,\"redstoneMaxHeight\":16,\"diamondSize\":8,\"diamondCount\":1,\"diamondMinHeight\":0,\"diamondMaxHeight\":16,\"lapisSize\":7,\"lapisCount\":1,\"lapisCenterHeight\":16,\"lapisSpread\":16}";
         standardProfiles.put(profile.getName(), profile);
 
 

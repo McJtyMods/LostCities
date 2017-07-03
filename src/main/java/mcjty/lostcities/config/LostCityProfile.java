@@ -88,6 +88,8 @@ public class LostCityProfile {
     public String[] CITY_BIOME_FACTORS = new String[] { "river=0", "frozen_river=0", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.4" };
     public Map<String, Float> biomeFactorMap = null;
 
+    public String GENERATOR_OPTIONS = "";
+
     public String[] ALLOWED_BIOME_FACTORS = new String[] { };
 
     public float BUILDING_WITHOUT_LOOT_CHANCE = .2f;
@@ -241,6 +243,9 @@ public class LostCityProfile {
 
         ALLOWED_BIOME_FACTORS = cfg.getStringList("allowedBiomeFactors", categoryCities, inheritFrom.orElse(this).ALLOWED_BIOME_FACTORS,
                 "List of biomes that are allowed in the world. Empty list is default all biomes. The factor controls how much that biome is favored over the others (higher means less favored!)");
+
+        GENERATOR_OPTIONS = cfg.getString("generatorOptions", categoryCities, inheritFrom.orElse(this).GENERATOR_OPTIONS,
+                "A json with generator options for the chunk generator");
     }
 
     private void initCities(Configuration cfg) {

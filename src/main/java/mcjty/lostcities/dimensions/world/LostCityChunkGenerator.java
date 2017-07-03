@@ -128,6 +128,11 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
             throw new RuntimeException("Unknown worldstyle '" + profile.getWorldStyle() + "'!");
         }
 
+        String generatorOptions = profile.GENERATOR_OPTIONS;
+        if (generatorOptions != null && !generatorOptions.isEmpty()) {
+            this.settings = ChunkProviderSettings.Factory.jsonToFactory(generatorOptions).build();
+        }
+
         this.worldObj = world;
 
         this.worldType = world.getWorldInfo().getTerrainType();
