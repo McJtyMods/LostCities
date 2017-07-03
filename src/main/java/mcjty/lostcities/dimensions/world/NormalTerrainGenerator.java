@@ -88,10 +88,10 @@ public class NormalTerrainGenerator {
 
         Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
 
-        float biomeDepthOffSet = provider.getSettings().biomeDepthOffSet;
-        float biomeDepthWeight = provider.getSettings().biomeDepthWeight;
-        float biomeScaleOffset = provider.getSettings().biomeScaleOffset;
-        float biomeScaleWeight = provider.getSettings().biomeScaleWeight;
+        float biomeDepthOffSet = settings.biomeDepthOffSet;
+        float biomeDepthWeight = settings.biomeDepthWeight;
+        float biomeScaleOffset = settings.biomeScaleOffset;
+        float biomeScaleWeight = settings.biomeScaleWeight;
 
         for (int k = 0; k < 5; ++k) {
             for (int l = 0; l < 5; ++l) {
@@ -154,18 +154,18 @@ public class NormalTerrainGenerator {
                 double d13 = f3;
                 double d14 = f2;
                 d13 += d12 * 0.2D;
-                d13 = d13 * 8.5D / 8.0D;
-                double d5 = 8.5D + d13 * 4.0D;
+                d13 = d13 * settings.baseSize / 8.0D;
+                double d5 = settings.baseSize + d13 * 4.0D;
 
                 for (int j2 = 0; j2 < 33; ++j2) {
-                    double d6 = (j2 - d5) * 12.0D * 128.0D / 256.0D / d14;
+                    double d6 = (j2 - d5) * settings.stretchY * 128.0D / 256.0D / d14;
 
                     if (d6 < 0.0D) {
                         d6 *= 4.0D;
                     }
 
-                    double d7 = this.minLimitRegion[i] / 512.0D;
-                    double d8 = this.maxLimitRegion[i] / 512.0D;
+                    double d7 = this.minLimitRegion[i] / settings.lowerLimitScale;
+                    double d8 = this.maxLimitRegion[i] / settings.upperLimitScale;
                     double d9 = (this.mainNoiseRegion[i] / 10.0D + 1.0D) / 2.0D;
                     double d10 = MathTools.clamp(d7, d8, d9) - d6;
 

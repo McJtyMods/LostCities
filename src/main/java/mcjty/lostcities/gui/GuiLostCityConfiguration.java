@@ -11,8 +11,7 @@ import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class GuiLostCityConfiguration extends GuiScreen {
 
@@ -51,7 +50,16 @@ public class GuiLostCityConfiguration extends GuiScreen {
         int y = 8;
         int num = -1;
         int cnt = 0;
-        for (Map.Entry<String, LostCityProfile> entry : LostCityConfiguration.profiles.entrySet()) {
+
+        List<String> profileKeys = new ArrayList<>(LostCityConfiguration.profiles.keySet());
+        profileKeys.sort(new Comparator<String>() {
+            @Override
+            public int compare(String s, String t1) {
+                return s.compareTo(t1);
+            }
+        });
+        for (String key : profileKeys) {
+            LostCityProfile profile = LostCityConfiguration.profiles.get(key);
             num++;
             if (num < page*8) {
                 continue;
@@ -60,16 +68,16 @@ public class GuiLostCityConfiguration extends GuiScreen {
                 break;
             }
             cnt++;
-            GuiButton button = new GuiButton(id, 10, y, 90, 20, entry.getKey());
-            if (profileName.equals(entry.getValue().getName())) {
+            GuiButton button = new GuiButton(id, 10, y, 90, 20, key);
+            if (profileName.equals(profile.getName())) {
                 button.packedFGColour = 0xffffff00;
             }
             this.buttonList.add(button);
-            actionHandler.put(id, () -> setProfile(entry.getValue()));
+            actionHandler.put(id, () -> setProfile(profile));
             id++;
 
             GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 110, y, 230, 20, 0xffffffff);
-            label.addLine(entry.getValue().getDescription());
+            label.addLine(profile.getDescription());
             this.labelList.add(label);
             y += 22;
         }
