@@ -1317,4 +1317,15 @@ public class BuildingInfo implements ILostChunkInfo {
             return null;
         }
     }
+
+    @Override
+    public int getRuinLevel() {
+        if (!provider.profile.RUINS) {
+            return -1;
+        }
+        if (ruinHeight < 0) {
+            return -1;
+        }
+        return (int) (getCityGroundLevel() + 1 + (ruinHeight * getNumFloors() * 6.0f));
+    }
 }
