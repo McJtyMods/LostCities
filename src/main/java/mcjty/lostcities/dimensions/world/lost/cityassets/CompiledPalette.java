@@ -19,7 +19,19 @@ public class CompiledPalette {
     private final Map<Character, String> mobIds = new HashMap<>();
     private final Map<Character, String> lootTables = new HashMap<>();
 
+    public CompiledPalette(CompiledPalette other, Palette... palettes) {
+        this.palette.putAll(other.palette);
+        this.damagedToBlock.putAll(other.damagedToBlock);
+        this.mobIds.putAll(other.mobIds);
+        this.lootTables.putAll(other.lootTables);
+        addPalettes(palettes);
+    }
+
     public CompiledPalette(Palette... palettes) {
+        addPalettes(palettes);
+    }
+
+    public void addPalettes(Palette[] palettes) {
         // First add the straight palette entries
         for (Palette p : palettes) {
             for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {

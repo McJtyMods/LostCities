@@ -1774,7 +1774,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                              Transform transform,
                              int ox, int oy, int oz, boolean airWaterLevel) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
-        CompiledPalette compiledInternalPalette = null;
+        boolean combinedWithPart = false;
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
                 char[] vs = part.getVSlice(x, z);
@@ -1787,14 +1787,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         char c = vs[y];
                         Character b = compiledPalette.get(c);
                         if (b == null) {
-                            if (compiledInternalPalette == null) {
+                            if (!combinedWithPart) {
                                 Palette localPalette = part.getLocalPalette();
+                                combinedWithPart = true;
                                 if (localPalette != null) {
-                                    compiledInternalPalette = new CompiledPalette(localPalette);
-                                    b = compiledInternalPalette.get(c);
+                                    compiledPalette = new CompiledPalette(compiledPalette, localPalette);
+                                    b = compiledPalette.get(c);
                                 }
-                            } else {
-                                b = compiledInternalPalette.get(c);
                             }
                             if (b == null) {
                                 throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
