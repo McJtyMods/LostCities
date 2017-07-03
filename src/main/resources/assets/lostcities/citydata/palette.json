@@ -149,15 +149,15 @@
         "char": "#",
         "blocks": [
           {
-            "factor": 0.06,
+            "factor": 9,
             "block": "minecraft:stonebrick@2"
           },
           {
-            "factor": 0.05,
+            "factor": 8,
             "block": "minecraft:stonebrick@1"
           },
           {
-            "factor": 2.0,
+            "factor": 1000,
             "block": "minecraft:stonebrick"
           }
         ],
@@ -447,15 +447,15 @@
         "char": "v",
         "blocks": [
           {
-            "factor": 0.06,
+            "factor": 9,
             "block": "minecraft:stonebrick@2"
           },
           {
-            "factor": 0.05,
+            "factor": 8,
             "block": "minecraft:stonebrick@1"
           },
           {
-            "factor": 2.0,
+            "factor": 1000,
             "block": "minecraft:stonebrick"
           }
         ],
@@ -465,15 +465,15 @@
         "char": "y",
         "blocks": [
           {
-            "factor": 0.06,
+            "factor": 9,
             "block": "minecraft:stonebrick@2"
           },
           {
-            "factor": 0.05,
+            "factor": 8,
             "block": "minecraft:stonebrick@1"
           },
           {
-            "factor": 2.0,
+            "factor": 1000,
             "block": "minecraft:stonebrick"
           }
         ],
@@ -483,15 +483,15 @@
         "char": "x",
         "blocks": [
           {
-            "factor": 0.06,
+            "factor": 9,
             "block": "minecraft:stonebrick@2"
           },
           {
-            "factor": 0.05,
+            "factor": 8,
             "block": "minecraft:stonebrick@1"
           },
           {
-            "factor": 2.0,
+            "factor": 1000,
             "block": "minecraft:stonebrick"
           }
         ],
@@ -509,27 +509,27 @@
         "char": "p",
         "blocks": [
           {
-            "factor": 0.3,
+            "factor": 30,
             "block": "minecraft:red_flower"
           },
           {
-            "factor": 0.3,
+            "factor": 30,
             "block": "minecraft:yellow_flower"
           },
           {
-            "factor": 0.1,
+            "factor": 15,
             "block": "minecraft:sapling"
           },
           {
-            "factor": 0.1,
+            "factor": 15,
             "block": "minecraft:sapling@1"
           },
           {
-            "factor": 0.1,
+            "factor": 15,
             "block": "minecraft:sapling@2"
           },
           {
-            "factor": 2.0,
+            "factor": 1000,
             "block": "minecraft:sapling@4"
           }
         ]
@@ -538,19 +538,19 @@
         "char": "P",
         "blocks": [
           {
-            "factor": 0.25,
+            "factor": 32,
             "block": "minecraft:sapling"
           },
           {
-            "factor": 0.25,
+            "factor": 32,
             "block": "minecraft:sapling@1"
           },
           {
-            "factor": 0.25,
+            "factor": 32,
             "block": "minecraft:sapling@2"
           },
           {
-            "factor": 2.0,
+            "factor": 1000,
             "block": "minecraft:sapling@4"
           }
         ]

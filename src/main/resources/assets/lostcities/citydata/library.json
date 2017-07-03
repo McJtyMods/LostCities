@@ -84,19 +84,19 @@
         "char": "!",
         "blocks": [
           {
-            "factor": 0.2,
+            "factor": 25,
             "block": "minecraft:diamond_block"
           },
           {
-            "factor": 0.2,
+            "factor": 25,
             "block": "minecraft:gold_block"
           },
           {
-            "factor": 0.2,
+            "factor": 25,
             "block": "minecraft:emerald_block"
           },
           {
-            "factor": 1,
+            "factor": 1000,
             "block": "minecraft:iron_block"
           }
         ]
@@ -105,32 +105,32 @@
         "char": "F",
         "blocks": [
           {
-            "factor": 0.7,
-            "block": "minecraft:web"
-          },
-          {
-            "factor": 0.1,
+            "factor": 25,
             "block": "minecraft:furnace"
           },
           {
-            "factor": 0.1,
+            "factor": 20,
             "block": "minecraft:crafting_table"
           },
           {
-            "factor": 0.3,
+            "factor": 7,
             "block": "minecraft:brewing_stand"
           },
           {
-            "factor": 0.3,
+            "factor": 6,
             "block": "minecraft:anvil"
           },
           {
-            "factor": 0.2,
+            "factor": 5,
             "block": "minecraft:cauldron"
           },
           {
-            "factor": 1,
+            "factor": 2,
             "block": "minecraft:enchanting_table"
+          },
+          {
+            "factor": 1000,
+            "block": "minecraft:web"
           }
         ]
       },
@@ -138,11 +138,11 @@
         "char": "%",
         "blocks": [
           {
-            "factor": 0.3,
+            "factor": 40,
             "block": "minecraft:web"
           },
           {
-            "factor": 2.0,
+            "factor": 1000,
             "block": "minecraft:air"
           }
         ]

@@ -97,10 +97,10 @@ public class Palette implements IAsset {
                 palette.put(c, value);
             } else if (o.has("blocks")) {
                 JsonArray array = o.get("blocks").getAsJsonArray();
-                List<Pair<Float, IBlockState>> blocks = new ArrayList<>();
+                List<Pair<Integer, IBlockState>> blocks = new ArrayList<>();
                 for (JsonElement el : array) {
                     JsonObject ob = el.getAsJsonObject();
-                    Float f = ob.get("factor").getAsFloat();
+                    Integer f = ob.get("factor").getAsInt();
                     String block = ob.get("block").getAsString();
                     IBlockState state = Tools.stringToState(block);
                     blocks.add(Pair.of(f, state));
@@ -153,7 +153,7 @@ public class Palette implements IAsset {
     }
 
     @SafeVarargs
-    private final Palette addMappingViaState(char c, Pair<Float, IBlockState>... randomBlocks) {
+    private final Palette addMappingViaState(char c, Pair<Integer, IBlockState>... randomBlocks) {
         palette.put(c, randomBlocks);
         return this;
     }
