@@ -374,6 +374,10 @@
       {
         "factor": 0.1,
         "multibuilding": "center"
+      },
+      {
+        "factor": 0.04,
+        "multibuilding": "townhall"
       }
     ],
     "bridges": [
@@ -2150,6 +2154,254 @@
       }
     ]
   },
+
+  {
+    "type": "building",
+    "name": "town00",
+    "filler": "#",
+    "parts": [
+      {
+        "cellar": true,
+        "part": "town00_c"
+      },
+      {
+        "top": false,
+        "ground": true,
+        "cellar": false,
+        "part": "town00_0"
+      },
+      {
+        "top": false,
+        "ground": false,
+        "cellar": false,
+        "part": "town00_1"
+      },
+      {
+        "top": true,
+        "part": "top_center00_1"
+      },
+      {
+        "top": true,
+        "part": "top_center00_2"
+      }
+    ],
+    "parts2": [
+      {
+        "top": false,
+        "part": "town00_in_1"
+      },
+      {
+        "top": false,
+        "part": "town00_in_2"
+      },
+      {
+        "top": false,
+        "part": "town00_in_3"
+      }
+    ]
+  },
+  {
+    "type": "building",
+    "name": "town01",
+    "filler": "#",
+    "parts": [
+      {
+        "cellar": true,
+        "part": "town01_c"
+      },
+      {
+        "top": false,
+        "ground": true,
+        "cellar": false,
+        "part": "town01_0"
+      },
+      {
+        "top": false,
+        "ground": false,
+        "cellar": false,
+        "part": "town01_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_2"
+      },
+      {
+        "top": true,
+        "part": "top_center_3"
+      },
+      {
+        "top": true,
+        "part": "top_center_4"
+      }
+    ],
+    "parts2": [
+      {
+        "top": false,
+        "part": "town01_in_1"
+      },
+      {
+        "top": false,
+        "part": "town_in_1"
+      },
+      {
+        "top": false,
+        "part": "town_in_2"
+      },
+      {
+        "top": false,
+        "part": "town_in_3"
+      },
+      {
+        "top": false,
+        "part": "town_in_4"
+      },
+      {
+        "top": false,
+        "part": "town_in_5"
+      },
+      {
+        "top": false,
+        "part": "town_in_6"
+      }
+    ]
+  },
+  {
+    "type": "building",
+    "name": "town10",
+    "filler": "#",
+    "parts": [
+      {
+        "cellar": true,
+        "part": "town10_c"
+      },
+      {
+        "top": false,
+        "ground": true,
+        "cellar": false,
+        "part": "town10_0"
+      },
+      {
+        "top": false,
+        "ground": false,
+        "cellar": false,
+        "part": "town10_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_2"
+      },
+      {
+        "top": true,
+        "part": "top_center_3"
+      },
+      {
+        "top": true,
+        "part": "top_center_4"
+      }
+    ],
+    "parts2": [
+      {
+        "top": false,
+        "part": "town_in_1"
+      },
+      {
+        "top": false,
+        "part": "town_in_2"
+      },
+      {
+        "top": false,
+        "part": "town_in_3"
+      },
+      {
+        "top": false,
+        "part": "town_in_4"
+      },
+      {
+        "top": false,
+        "part": "town_in_5"
+      },
+      {
+        "top": false,
+        "part": "town_in_6"
+      }
+    ]
+  },
+  {
+    "type": "building",
+    "name": "town11",
+    "filler": "#",
+    "parts": [
+      {
+        "cellar": true,
+        "part": "town11_c"
+      },
+      {
+        "top": false,
+        "ground": true,
+        "cellar": false,
+        "part": "town11_0"
+      },
+      {
+        "top": false,
+        "ground": false,
+        "cellar": false,
+        "part": "town11_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_2"
+      },
+      {
+        "top": true,
+        "part": "top_center_3"
+      },
+      {
+        "top": true,
+        "part": "top_center_4"
+      }
+    ],
+    "parts2": [
+      {
+        "top": false,
+        "part": "town_in_1"
+      },
+      {
+        "top": false,
+        "part": "town_in_2"
+      },
+      {
+        "top": false,
+        "part": "town_in_3"
+      },
+      {
+        "top": false,
+        "part": "town_in_4"
+      },
+      {
+        "top": false,
+        "part": "town_in_5"
+      },
+      {
+        "top": false,
+        "part": "town_in_6"
+      }
+    ]
+  },
+
+
+
   {
     "type": "building",
     "name": "building1",
@@ -2602,6 +2854,22 @@
       [
         "center10",
         "center11"
+      ]
+    ]
+  },
+  {
+    "type": "multibuilding",
+    "name": "townhall",
+    "dimx": 2,
+    "dimz": 2,
+    "buildings": [
+      [
+        "town00",
+        "town01"
+      ],
+      [
+        "town10",
+        "town11"
       ]
     ]
   },

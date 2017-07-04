@@ -2019,6 +2019,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         for (int f = -info.floorsBelowGround; f <= info.getNumFloors(); f++) {
             BuildingPart part = info.getFloor(f);
             generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+            part = info.getFloorPart2(f);
+            if (part != null) {
+                generatePart(primer, info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+            }
 
             // Check for doors
             boolean isTop = f == info.getNumFloors();   // The top does not need generated doors

@@ -23,7 +23,7 @@ public class Building implements IAsset {
     private char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
 
     private final List<Pair<Predicate<LevelInfo>, String>> parts = new ArrayList<>();
-    private final List<String> partNames = new ArrayList<>();
+    private final List<Pair<Predicate<LevelInfo>, String>> parts2 = new ArrayList<>();
 
     public Building(JsonObject object) {
         readFromJSon(object);
@@ -36,6 +36,13 @@ public class Building implements IAsset {
     @Override
     public String getName() {
         return name;
+    }
+
+    private Predicate<LevelInfo> combine(Predicate<LevelInfo> orig, Predicate<LevelInfo> newTest) {
+        if (orig == null) {
+            return newTest;
+        }
+        return levelInfo -> orig.test(levelInfo) && newTest.test(levelInfo);
     }
 
     @Override
@@ -60,40 +67,46 @@ public class Building implements IAsset {
             throw new RuntimeException("'filler' is required for building '" + name + "'!");
         }
 
-        JsonArray partArray = object.get("parts").getAsJsonArray();
-        parts.clear();
-        partNames.clear();
+        readParts(object, this.parts, "parts");
+        readParts(object, this.parts2, "parts2");
+    }
 
+    public void readParts(JsonObject object, List<Pair<Predicate<LevelInfo>, String>> p, String partSection) {
+        p.clear();
+        if (!object.has(partSection)) {
+            return;
+        }
+        JsonArray partArray = object.get(partSection).getAsJsonArray();
         for (JsonElement element : partArray) {
             String partName = element.getAsJsonObject().get("part").getAsString();
-            Predicate<LevelInfo> test = levelInfo -> true;
+            Predicate<LevelInfo> test = null;
             if (element.getAsJsonObject().has("top")) {
                 boolean top = element.getAsJsonObject().get("top").getAsBoolean();
                 if (top) {
-                    test = levelInfo -> levelInfo.isTopOfBuilding();
+                    test = combine(test, levelInfo -> levelInfo.isTopOfBuilding());
                 } else {
-                    test = levelInfo -> !levelInfo.isTopOfBuilding();
+                    test = combine(test, levelInfo -> !levelInfo.isTopOfBuilding());
                 }
             }
             if (element.getAsJsonObject().has("ground")) {
                 boolean ground = element.getAsJsonObject().get("ground").getAsBoolean();
                 if (ground) {
-                    test = levelInfo -> levelInfo.isGroundFloor();
+                    test = combine(test, levelInfo -> levelInfo.isGroundFloor());
                 } else {
-                    test = levelInfo -> !levelInfo.isGroundFloor();
+                    test = combine(test, levelInfo -> !levelInfo.isGroundFloor());
                 }
             }
             if (element.getAsJsonObject().has("cellar")) {
                 boolean cellar = element.getAsJsonObject().get("cellar").getAsBoolean();
                 if (cellar) {
-                    test = levelInfo -> levelInfo.isCellar();
+                    test = combine(test, levelInfo -> levelInfo.isCellar());
                 } else {
-                    test = levelInfo -> !levelInfo.isCellar();
+                    test = combine(test, levelInfo -> !levelInfo.isCellar());
                 }
             }
             if (element.getAsJsonObject().has("level")) {
                 int level = element.getAsJsonObject().get("level").getAsInt();
-                test = levelInfo -> levelInfo.isLevel(level);
+                test = combine(test, levelInfo -> levelInfo.isLevel(level));
             }
             if (element.getAsJsonObject().has("range")) {
                 String range = element.getAsJsonObject().get("range").getAsString();
@@ -101,14 +114,14 @@ public class Building implements IAsset {
                 try {
                     int l1 = Integer.parseInt(split[0]);
                     int l2 = Integer.parseInt(split[1]);
-                    test = levelInfo -> levelInfo.isRange(l1, l2);
+                    test = combine(test, levelInfo -> levelInfo.isRange(l1, l2));
                 } catch (NumberFormatException e) {
                     throw new RuntimeException("Bad range specification: <l1>,<l2>!");
                 } catch (ArrayIndexOutOfBoundsException e) {
                     throw new RuntimeException("Bad range specification: <l1>,<l2>!");
                 }
             }
-            addPart(test, partName);
+            addPart(test, partName, p);
         }
     }
 
@@ -129,11 +142,12 @@ public class Building implements IAsset {
     }
 
 
-    public Building addPart(Predicate<LevelInfo> test, String partName) {
-        parts.add(Pair.of(test, partName));
-        if (!partNames.contains(partName)) {
-            partNames.add(partName);
+    public Building addPart(Predicate<LevelInfo> test, String partName,
+                            List<Pair<Predicate<LevelInfo>, String>> parts) {
+        if (test == null) {
+            test = levelInfo -> true;
         }
+        parts.add(Pair.of(test, partName));
         return this;
     }
 
@@ -153,14 +167,6 @@ public class Building implements IAsset {
         return minCellars;
     }
 
-    public String getPartName(int index) {
-        return partNames.get(index);
-    }
-
-    public int getPartCount() {
-        return partNames.size();
-    }
-
     public char getFillerBlock() {
         return fillerBlock;
     }
@@ -168,6 +174,19 @@ public class Building implements IAsset {
     public String getRandomPart(Random random, LevelInfo info) {
         List<String> partNames = new ArrayList<>();
         for (Pair<Predicate<LevelInfo>, String> pair : parts) {
+            if (pair.getLeft().test(info)) {
+                partNames.add(pair.getRight());
+            }
+        }
+        if (partNames.isEmpty()) {
+            return null;
+        }
+        return partNames.get(random.nextInt(partNames.size()));
+    }
+
+    public String getRandomPart2(Random random, LevelInfo info) {
+        List<String> partNames = new ArrayList<>();
+        for (Pair<Predicate<LevelInfo>, String> pair : parts2) {
             if (pair.getLeft().test(info)) {
                 partNames.add(pair.getRight());
             }
