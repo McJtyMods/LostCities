@@ -47,6 +47,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private final int floors;
     public final int floorsBelowGround;
     public final BuildingPart[] floorTypes;
+    public final BuildingPart[] floorTypes2;
     public final boolean[] connectionAtX;
     public final boolean[] connectionAtZ;
     public final boolean noLoot;
@@ -322,6 +323,10 @@ public class BuildingInfo implements ILostChunkInfo {
         return floorTypes[l + floorsBelowGround];
     }
 
+    public BuildingPart getFloorPart2(int l) {
+        return floorTypes2[l + floorsBelowGround];
+    }
+
     public Building getBuilding() {
         return buildingType;
     }
@@ -582,6 +587,7 @@ public class BuildingInfo implements ILostChunkInfo {
             CityStyle cs = getCityStyle();
             if (building2x2Section == 0) {
                 multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(cs.getRandomMultiBuilding(provider, rand));
+//                System.out.println("multiBuilding.getName() = " + multiBuilding.getName() + " at " + chunkX*16 + "," + chunkZ*16);
                 buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(0, 0));
             } else {
                 multiBuilding = null;
@@ -657,12 +663,16 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         floorTypes = new BuildingPart[floors + floorsBelowGround + 1];
+        floorTypes2 = new BuildingPart[floors + floorsBelowGround + 1];
+
         connectionAtX = new boolean[floors + floorsBelowGround + 1];
         connectionAtZ = new boolean[floors + floorsBelowGround + 1];
         Building building = getBuilding();
         for (int i = 0; i <= floors + floorsBelowGround; i++) {
             String randomPart = building.getRandomPart(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));
             floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
+            randomPart = building.getRandomPart2(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));
+            floorTypes2[i] = AssetRegistries.PARTS.get(randomPart);
             connectionAtX[i] = isCity(chunkX - 1, chunkZ, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
             connectionAtZ[i] = isCity(chunkX, chunkZ - 1, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
         }

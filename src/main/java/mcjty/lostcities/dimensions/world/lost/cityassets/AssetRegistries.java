@@ -38,7 +38,6 @@ public class AssetRegistries {
     public static void load(InputStream inputstream, String filename) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, "UTF-8"));
-            System.out.println("AssetRegistries.load");
             JsonParser parser = new JsonParser();
             JsonElement element = parser.parse(br);
             for (JsonElement entry : element.getAsJsonArray()) {

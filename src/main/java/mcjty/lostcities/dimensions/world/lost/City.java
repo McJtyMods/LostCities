@@ -86,14 +86,16 @@ public class City {
         }
 
         Float foundFactor = null;
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
-
-        if (biomes[55].getBaseHeight() > 4 || biomes[54].getBaseHeight() > 4 || biomes[56].getBaseHeight() > 4
-                || biomes[5].getBaseHeight() > 4 || biomes[95].getBaseHeight() > 4) {
-            return 0;   // These biomes are too high
+        for (int cx = -1 ; cx <= 1 ; cx++) {
+            for (int cz = -1 ; cz <= 1 ; cz++) {
+                Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX + cx, chunkZ + cz)).getBiomes();
+                if (isTooHighForBuilding(biomes)) {
+                    return 0;
+                }
+            }
         }
 
-
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
         for (Biome biome : biomes) {
             Map<String, Float> map = provider.profile.getBiomeFactorMap();
             ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
@@ -115,6 +117,11 @@ public class City {
             return 1;
         }
         return factor;
+    }
+
+    public static boolean isTooHighForBuilding(Biome[] biomes) {
+        return biomes[55].getBaseHeight() > 4 || biomes[54].getBaseHeight() > 4 || biomes[56].getBaseHeight() > 4
+                || biomes[5].getBaseHeight() > 4 || biomes[95].getBaseHeight() > 4;
     }
 
 }

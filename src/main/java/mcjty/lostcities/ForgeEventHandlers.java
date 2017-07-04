@@ -3,6 +3,7 @@ package mcjty.lostcities;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.varia.CustomTeleporter;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
@@ -28,6 +29,9 @@ public class ForgeEventHandlers {
         }
         BlockPos bedLocation = event.getPos();
         IBlockState state = world.getBlockState(bedLocation);
+        if (!(state.getBlock() instanceof BlockBed)) {
+            return;
+        }
         EnumFacing direction = Blocks.BED.getBedDirection(state, world, bedLocation);
         Block b1 = world.getBlockState(bedLocation.down()).getBlock();
         Block b2 = world.getBlockState(bedLocation.offset(direction.getOpposite()).down()).getBlock();

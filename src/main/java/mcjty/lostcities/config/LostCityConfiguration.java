@@ -28,13 +28,14 @@ public class LostCityConfiguration {
             "/assets/lostcities/citydata/palette_chisel_desert.json",
             "/assets/lostcities/citydata/highwayparts.json",
             "/assets/lostcities/citydata/railparts.json",
+            "/assets/lostcities/citydata/buildingparts.json",
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
     };
 
     public static String[] ADAPTING_WORLDTYPES = new String[] {};
 
-    public static int VERSION = 3;
+    public static int VERSION = 4;
 
     public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();

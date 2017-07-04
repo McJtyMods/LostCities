@@ -56,6 +56,8 @@ public class CommandDebug implements ICommand {
             System.out.println("railInfo.getLevel() = " + railInfo.getLevel());
             System.out.println("railInfo.getDirection() = " + railInfo.getDirection());
             System.out.println("railInfo.getRails() = " + railInfo.getRails());
+            System.out.println("info.getChestTodo().size() = " + info.getChestTodo().size());
+            System.out.println("info.getMobSpawnerTodo().size() = " + info.getMobSpawnerTodo().size());
         }
     }
 
