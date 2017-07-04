@@ -47,10 +47,7 @@ import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
@@ -178,6 +175,10 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
         }
     }
 
+
+    private static Set<ChunkCoord> providedChunks = new HashSet<>();
+
+
     @Override
     public Chunk provideChunk(int chunkX, int chunkZ) {
         LostCitiesTerrainGenerator.setupChars();
@@ -250,6 +251,9 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
         }
 
         chunk.generateSkylightMap();
+
+        providedChunks.add(new ChunkCoord(dimensionId, chunkX, chunkZ));
+
         return chunk;
     }
 

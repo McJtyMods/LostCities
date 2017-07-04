@@ -376,7 +376,7 @@
         "multibuilding": "center"
       },
       {
-        "factor": 0.04,
+        "factor": 0.08,
         "multibuilding": "townhall"
       }
     ],
