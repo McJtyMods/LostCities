@@ -180,9 +180,6 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
     }
 
 
-    private static Set<ChunkCoord> providedChunks = new HashSet<>();
-
-
     @Override
     public Chunk generateChunk(int chunkX, int chunkZ) {
         LostCitiesTerrainGenerator.setupChars();
@@ -255,8 +252,6 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         }
 
         chunk.generateSkylightMap();
-
-        providedChunks.add(new ChunkCoord(dimensionId, chunkX, chunkZ));
 
         return chunk;
     }
