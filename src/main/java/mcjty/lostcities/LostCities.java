@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
         acceptableRemoteVersions = "*")
 public class LostCities {
     public static final String MODID = "lostcities";
-    public static final String VERSION = "0.0.14beta";
+    public static final String VERSION = "0.0.15beta";
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
 
     @SidedProxy(clientSide="mcjty.lostcities.proxy.ClientProxy", serverSide="mcjty.lostcities.proxy.ServerProxy")
