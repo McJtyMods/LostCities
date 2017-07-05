@@ -7,9 +7,9 @@ import mcjty.lostcities.api.IChunkPrimerFactory;
 import mcjty.lostcities.api.ILostChunkGenerator;
 import mcjty.lostcities.api.ILostChunkInfo;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.dimensions.world.lost.cityassets.ConditionContext;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.block.BlockChest;
@@ -36,18 +36,19 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.ChunkProviderSettings;
 import net.minecraft.world.gen.MapGenBase;
-import net.minecraft.world.gen.MapGenCaves;
 import net.minecraft.world.gen.MapGenRavine;
 import net.minecraft.world.gen.feature.WorldGenDungeons;
 import net.minecraft.world.gen.feature.WorldGenLakes;
 import net.minecraft.world.gen.structure.*;
-import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
@@ -353,13 +354,13 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
         info.clearMobSpawnerTodo();
 
 
-        for (Pair<BlockPos, String> pair : info.getChestTodo()) {
+        for (Pair<BlockPos, BuildingInfo.ChestTodo> pair : info.getChestTodo()) {
             BlockPos pos = pair.getKey();
             // Double check that it is still a chest (could be destroyed by explosion)
             IBlockState state = world.getBlockState(pos);
             if (state.getBlock() == Blocks.CHEST) {
                 if (chunkGenerator.profile.GENERATE_LOOT) {
-                    createLootChest(random, world, pos, pair.getRight());
+                    createLootChest(info, random, world, pos, pair.getRight());
                 }
             }
         }
@@ -376,33 +377,21 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
     }
 
 
-    private void createLootChest(Random random, World world, BlockPos pos, String lootTable) {
+    private void createLootChest(BuildingInfo info, Random random, World world, BlockPos pos, BuildingInfo.ChestTodo todo) {
         world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, EnumFacing.SOUTH));
         TileEntity tileentity = world.getTileEntity(pos);
         if (tileentity instanceof TileEntityChest) {
-            if (lootTable != null) {
-                ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(lootTable), random.nextLong());
-            } else {
-                switch (random.nextInt(30)) {
-                    case 0:
-                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_DESERT_PYRAMID, random.nextLong());
-                        break;
-                    case 1:
-                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_JUNGLE_TEMPLE, random.nextLong());
-                        break;
-                    case 2:
-                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_VILLAGE_BLACKSMITH, random.nextLong());
-                        break;
-                    case 3:
-                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_ABANDONED_MINESHAFT, random.nextLong());
-                        break;
-                    case 4:
-                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_NETHER_BRIDGE, random.nextLong());
-                        break;
-                    default:
-                        ((TileEntityChest) tileentity).setLootTable(LootTableList.CHESTS_SIMPLE_DUNGEON, random.nextLong());
-                        break;
+            if (todo != null) {
+                String lootTable = todo.getLootCondition();
+                int level = (pos.getY() - profile.GROUNDLEVEL) / 6;
+                int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
+                ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
+                        todo.getPart());
+                String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);
+                if (randomValue.startsWith("lost")) {
+                    System.out.println("pos: " + pos.getX() + "," + pos.getY() + "," + pos.getZ() + ": floor = " + floor + " -> " + randomValue);
                 }
+                ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
             }
         }
     }

@@ -45,7 +45,7 @@ public class Tools {
         }
     }
 
-    public static String getRandomFromList(LostCityChunkGenerator provider, Random random, List<Pair<Float, String>> list) {
+    public static String getRandomFromList(Random random, List<Pair<Float, String>> list) {
         if (list.isEmpty()) {
             return null;
         }

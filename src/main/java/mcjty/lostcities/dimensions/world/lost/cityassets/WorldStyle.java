@@ -109,7 +109,7 @@ public class WorldStyle implements IAsset {
             }
         }
 
-        return Tools.getRandomFromList(provider, random, ct);
+        return Tools.getRandomFromList(random, ct);
     }
 
     private static class Info {

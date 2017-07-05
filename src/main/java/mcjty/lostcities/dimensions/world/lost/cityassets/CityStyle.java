@@ -298,35 +298,35 @@ public class CityStyle implements IAsset {
         return object;
     }
 
-    public String getRandomStair(LostCityChunkGenerator provider, Random random) {
-        return Tools.getRandomFromList(provider, random, stairSelector);
+    public String getRandomStair(Random random) {
+        return Tools.getRandomFromList(random, stairSelector);
     }
 
-    public String getRandomFront(LostCityChunkGenerator provider, Random random) {
-        return Tools.getRandomFromList(provider, random, frontSelector);
+    public String getRandomFront(Random random) {
+        return Tools.getRandomFromList(random, frontSelector);
     }
 
-    public String getRandomRailDungeon(LostCityChunkGenerator provider, Random random) {
-        return Tools.getRandomFromList(provider, random, railDungeonSelector);
+    public String getRandomRailDungeon(Random random) {
+        return Tools.getRandomFromList(random, railDungeonSelector);
     }
 
-    public String getRandomPark(LostCityChunkGenerator provider, Random random) {
-        return Tools.getRandomFromList(provider, random, parkSelector);
+    public String getRandomPark(Random random) {
+        return Tools.getRandomFromList(random, parkSelector);
     }
 
-    public String getRandomBridge(LostCityChunkGenerator provider, Random random) {
-        return Tools.getRandomFromList(provider, random, bridgeSelector);
+    public String getRandomBridge(Random random) {
+        return Tools.getRandomFromList(random, bridgeSelector);
     }
 
-    public String getRandomFountain(LostCityChunkGenerator provider, Random random) {
-        return Tools.getRandomFromList(provider, random, fountainSelector);
+    public String getRandomFountain(Random random) {
+        return Tools.getRandomFromList(random, fountainSelector);
     }
 
-    public String getRandomBuilding(LostCityChunkGenerator provider, Random random) {
-        return Tools.getRandomFromList(provider, random, buildingSelector);
+    public String getRandomBuilding(Random random) {
+        return Tools.getRandomFromList(random, buildingSelector);
     }
 
-    public String getRandomMultiBuilding(LostCityChunkGenerator provider, Random random) {
-        return Tools.getRandomFromList(provider, random, multiBuildingSelector);
+    public String getRandomMultiBuilding(Random random) {
+        return Tools.getRandomFromList(random, multiBuildingSelector);
     }
 }

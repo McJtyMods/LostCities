@@ -8,6 +8,7 @@ import java.io.*;
 
 public class AssetRegistries {
 
+    public static final AbstractAssetRegistry<Condition> CONDITIONS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<WorldStyle> WORLDSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<BuildingPart> PARTS = new AbstractAssetRegistry<>();
@@ -18,6 +19,7 @@ public class AssetRegistries {
 
     public static final void reset() {
         System.out.println("AssetRegistries.reset");
+        CONDITIONS.reset();
         WORLDSTYLES.reset();
         PARTS.reset();
         BUILDINGS.reset();
@@ -45,6 +47,8 @@ public class AssetRegistries {
                 String type = object.get("type").getAsString();
                 if ("style".equals(type)) {
                     STYLES.register(new Style(object));
+                } else if ("condition".equals(type)) {
+                    CONDITIONS.register(new Condition(object));
                 } else if ("palette".equals(type)) {
                     PALETTES.register(new Palette(object));
                 } else if ("citystyle".equals(type)) {

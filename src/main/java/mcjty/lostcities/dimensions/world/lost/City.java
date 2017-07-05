@@ -65,7 +65,7 @@ public class City {
         if (styles.isEmpty()) {
             return AssetRegistries.CITYSTYLES.get(provider.worldStyle.getRandomCityStyle(provider, chunkX, chunkZ, rand));
         }
-        return AssetRegistries.CITYSTYLES.get(Tools.getRandomFromList(provider, rand, styles));
+        return AssetRegistries.CITYSTYLES.get(Tools.getRandomFromList(rand, styles));
     }
 
     public static float getCityFactor(int chunkX, int chunkZ, LostCityChunkGenerator provider) {

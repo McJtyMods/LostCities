@@ -236,7 +236,8 @@
       },
       {
         "char": "C",
-        "block": "minecraft:chest"
+        "block": "minecraft:chest",
+        "loot": "chestloot"
       },
       {
         "char": "G",

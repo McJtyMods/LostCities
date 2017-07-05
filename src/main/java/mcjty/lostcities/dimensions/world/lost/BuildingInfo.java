@@ -87,10 +87,28 @@ public class BuildingInfo implements ILostChunkInfo {
 
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, String>> mobSpawnerTodo = new ArrayList<>();
-    private final List<Pair<BlockPos, String>> chestTodo = new ArrayList<>();
+    private final List<Pair<BlockPos, ChestTodo>> chestTodo = new ArrayList<>();
     private final List<BlockPos> genericTodo = new ArrayList<>();
     private final List<Integer> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
+
+    public static class ChestTodo {
+        private final String lootCondition; // A reference to a condition for the loot table
+        private final String part;
+
+        public ChestTodo(String lootCondition, String part) {
+            this.lootCondition = lootCondition;
+            this.part = part;
+        }
+
+        public String getLootCondition() {
+            return lootCondition;
+        }
+
+        public String getPart() {
+            return part;
+        }
+    }
 
     // BuildingInfo cache
     private static Map<ChunkCoord, BuildingInfo> buildingInfoMap = new HashMap<>();
@@ -137,7 +155,7 @@ public class BuildingInfo implements ILostChunkInfo {
         mobSpawnerTodo.add(Pair.of(pos, mobId));
     }
 
-    public void addChestTodo(BlockPos pos, @Nullable String lootTable) {
+    public void addChestTodo(BlockPos pos, @Nullable ChestTodo lootTable) {
         chestTodo.add(Pair.of(pos, lootTable));
     }
 
@@ -145,7 +163,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return mobSpawnerTodo;
     }
 
-    public List<Pair<BlockPos, String>> getChestTodo() {
+    public List<Pair<BlockPos, ChestTodo>> getChestTodo() {
         return chestTodo;
     }
 
@@ -586,12 +604,12 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             CityStyle cs = getCityStyle();
             if (building2x2Section == 0) {
-                multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(cs.getRandomMultiBuilding(provider, rand));
+                multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(cs.getRandomMultiBuilding(rand));
 //                System.out.println("multiBuilding.getName() = " + multiBuilding.getName() + " at " + chunkX*16 + "," + chunkZ*16);
                 buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(0, 0));
             } else {
                 multiBuilding = null;
-                buildingType = AssetRegistries.BUILDINGS.get(cs.getRandomBuilding(provider, rand));
+                buildingType = AssetRegistries.BUILDINGS.get(cs.getRandomBuilding(rand));
             }
 
             highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
@@ -603,11 +621,11 @@ public class BuildingInfo implements ILostChunkInfo {
                 streetType = StreetType.NORMAL;
             }
             if (rand.nextFloat() < provider.profile.FOUNTAIN_CHANCE) {
-                fountainType = AssetRegistries.PARTS.get(cs.getRandomFountain(provider, rand));
+                fountainType = AssetRegistries.PARTS.get(cs.getRandomFountain(rand));
             } else {
                 fountainType = null;
             }
-            parkType = AssetRegistries.PARTS.get(cs.getRandomPark(provider, rand));
+            parkType = AssetRegistries.PARTS.get(cs.getRandomPark(rand));
             float cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
 
             int f = provider.profile.BUILDING_MINFLOORS + rand.nextInt((int) (provider.profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (provider.profile.BUILDING_MAXFLOORS_CHANCE - provider.profile.BUILDING_MINFLOORS_CHANCE)));
@@ -648,8 +666,8 @@ public class BuildingInfo implements ILostChunkInfo {
             floorsBelowGround = fb;
 
             doorBlock = getRandomDoor(rand);
-            bridgeType = AssetRegistries.PARTS.get(cs.getRandomBridge(provider, rand));
-            stairType = AssetRegistries.PARTS.get(cs.getRandomStair(provider, rand));
+            bridgeType = AssetRegistries.PARTS.get(cs.getRandomBridge(rand));
+            stairType = AssetRegistries.PARTS.get(cs.getRandomStair(rand));
             stairPriority = rand.nextFloat();
             createPalette(rand);
             float r = rand.nextFloat();
@@ -669,9 +687,10 @@ public class BuildingInfo implements ILostChunkInfo {
         connectionAtZ = new boolean[floors + floorsBelowGround + 1];
         Building building = getBuilding();
         for (int i = 0; i <= floors + floorsBelowGround; i++) {
-            String randomPart = building.getRandomPart(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));
+            ConditionContext conditionContext = new ConditionContext(cityLevel + i - floorsBelowGround, i - floorsBelowGround, floorsBelowGround, floors, null);
+            String randomPart = building.getRandomPart(rand, conditionContext);
             floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
-            randomPart = building.getRandomPart2(rand, new Building.LevelInfo(0 /*todo*/, i - floorsBelowGround, floorsBelowGround, floors));
+            randomPart = building.getRandomPart2(rand, conditionContext);
             floorTypes2[i] = AssetRegistries.PARTS.get(randomPart);
             connectionAtX[i] = isCity(chunkX - 1, chunkZ, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
             connectionAtZ[i] = isCity(chunkX, chunkZ - 1, provider) && (rand.nextFloat() < provider.profile.BUILDING_DOORWAYCHANCE);
@@ -695,7 +714,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
         if (rand.nextFloat() < provider.profile.RAILWAY_DUNGEON_CHANCE) {
             if (!hasBuilding || (Railway.RAILWAY_LEVEL_OFFSET < (cityLevel - floorsBelowGround))) {
-                railDungeon = AssetRegistries.PARTS.get(getCityStyle().getRandomRailDungeon(provider, rand));
+                railDungeon = AssetRegistries.PARTS.get(getCityStyle().getRandomRailDungeon(rand));
             } else {
                 railDungeon = null;
             }
@@ -704,7 +723,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         if (rand.nextFloat() < provider.profile.BUILDING_FRONTCHANCE) {
-            frontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(provider, rand));
+            frontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand));
         } else {
             frontType = null;
         }
