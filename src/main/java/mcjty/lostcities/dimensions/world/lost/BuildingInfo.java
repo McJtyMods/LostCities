@@ -86,11 +86,29 @@ public class BuildingInfo implements ILostChunkInfo {
     private Direction actualStairDirection;
 
     // A list of todo's for mob spawners and other things
-    private final List<Pair<BlockPos, String>> mobSpawnerTodo = new ArrayList<>();
+    private final List<Pair<BlockPos, MobTodo>> mobSpawnerTodo = new ArrayList<>();
     private final List<Pair<BlockPos, ChestTodo>> chestTodo = new ArrayList<>();
     private final List<BlockPos> genericTodo = new ArrayList<>();
     private final List<Integer> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
+
+    public static class MobTodo {
+        private final String mobCondition;
+        private final String part;
+
+        public MobTodo(String mobCondition, String part) {
+            this.part = part;
+            this.mobCondition = mobCondition;
+        }
+
+        public String getMobCondition() {
+            return mobCondition;
+        }
+
+        public String getPart() {
+            return part;
+        }
+    }
 
     public static class ChestTodo {
         private final String lootCondition; // A reference to a condition for the loot table
@@ -151,7 +169,7 @@ public class BuildingInfo implements ILostChunkInfo {
         genericTodo.clear();
     }
 
-    public void addSpawnerTodo(BlockPos pos, String mobId) {
+    public void addSpawnerTodo(BlockPos pos, MobTodo mobId) {
         mobSpawnerTodo.add(Pair.of(pos, mobId));
     }
 
@@ -159,7 +177,7 @@ public class BuildingInfo implements ILostChunkInfo {
         chestTodo.add(Pair.of(pos, lootTable));
     }
 
-    public List<Pair<BlockPos, String>> getMobSpawnerTodo() {
+    public List<Pair<BlockPos, MobTodo>> getMobSpawnerTodo() {
         return mobSpawnerTodo;
     }
 

@@ -657,9 +657,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private void flattenChunkToCityBorder(int chunkX, int chunkZ, ChunkPrimer primer) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
-        if (chunkX == -298 && chunkZ == -261) {
-            System.out.println("LostCitiesTerrainGenerator.flattenChunkToCityBorder");
-        }
 
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
         float h00 = getHeightAt00Corner(info);
@@ -1873,7 +1870,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 } else if (b == spawnerChar) {
                                     if (provider.profile.GENERATE_SPAWNERS && !info.noLoot) {
                                         String mobid = part.getMobID(info, x, y, z);
-                                        info.getTodoChunk(rx, rz).addSpawnerTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz), mobid);
+                                        info.getTodoChunk(rx, rz).addSpawnerTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
+                                                new BuildingInfo.MobTodo(mobid, part.getName()));
                                     } else {
                                         b = airChar;
                                     }

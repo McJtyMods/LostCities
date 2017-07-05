@@ -6,27 +6,12 @@
       {
         "char": "1",
         "block": "minecraft:mob_spawner",
-        "mob": "Zombie"
-      },
-      {
-        "char": "2",
-        "block": "minecraft:mob_spawner",
-        "mob": "Skeleton"
-      },
-      {
-        "char": "3",
-        "block": "minecraft:mob_spawner",
-        "mob": "Spider"
+        "mob": "easymobs"
       },
       {
         "char": "4",
         "block": "minecraft:mob_spawner",
-        "mob": "Blaze"
-      },
-      {
-        "char": "5",
-        "block": "minecraft:mob_spawner",
-        "mob": "Witch"
+        "mob": "hardmobs"
       },
       {
         "char": "T",

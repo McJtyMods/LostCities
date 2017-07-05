@@ -1,6 +1,38 @@
 [
   {
     "type": "condition",
+    "name": "easymobs",
+    "values": [
+      {
+        "factor": 1,
+        "value": "Zombie"
+      },
+      {
+        "factor": 1,
+        "value": "Skeleton"
+      },
+      {
+        "factor": 1,
+        "value": "Spider"
+      }
+    ]
+  },
+  {
+    "type": "condition",
+    "name": "hardmobs",
+    "values": [
+      {
+        "factor": 1,
+        "value": "Blaze"
+      },
+      {
+        "factor": 1,
+        "value": "Witch"
+      }
+    ]
+  },
+  {
+    "type": "condition",
     "name": "chestloot",
     "values": [
       {

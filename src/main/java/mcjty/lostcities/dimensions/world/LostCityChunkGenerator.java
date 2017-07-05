@@ -9,6 +9,7 @@ import mcjty.lostcities.api.ILostChunkInfo;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.dimensions.world.lost.cityassets.Condition;
 import mcjty.lostcities.dimensions.world.lost.cityassets.ConditionContext;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -338,15 +339,28 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
     private void generateLootSpawners(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator chunkGenerator) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, chunkGenerator);
 
-        for (Pair<BlockPos, String> pair : info.getMobSpawnerTodo()) {
+        for (Pair<BlockPos, BuildingInfo.MobTodo> pair : info.getMobSpawnerTodo()) {
             BlockPos pos = pair.getKey();
             // Double check that it is still a spawner (could be destroyed by explosion)
             if (world.getBlockState(pos).getBlock() == Blocks.MOB_SPAWNER) {
                 TileEntity tileentity = world.getTileEntity(pos);
                 if (tileentity instanceof TileEntityMobSpawner) {
                     TileEntityMobSpawner spawner = (TileEntityMobSpawner) tileentity;
-                    String id = pair.getValue();
-                    String fixedId = EntityTools.fixEntityId(id);
+                    BuildingInfo.MobTodo todo = pair.getValue();
+                    String condition = todo.getMobCondition();
+                    Condition cnd = AssetRegistries.CONDITIONS.get(condition);
+                    if (cnd == null) {
+                        throw new RuntimeException("Cannot find condition '" + condition + "'!");
+                    }
+                    int level = (pos.getY() - profile.GROUNDLEVEL) / 6;
+                    int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
+                    ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
+                            todo.getPart());
+                    String randomValue = cnd.getRandomValue(random, conditionContext);
+                    if (randomValue == null) {
+                        throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
+                    }
+                    String fixedId = EntityTools.fixEntityId(randomValue);
                     EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation(fixedId), fixedId);
                 }
             }
