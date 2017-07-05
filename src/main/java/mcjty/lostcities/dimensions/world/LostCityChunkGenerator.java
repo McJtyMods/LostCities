@@ -180,6 +180,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
     }
 
 
+
     @Override
     public Chunk generateChunk(int chunkX, int chunkZ) {
         LostCitiesTerrainGenerator.setupChars();
