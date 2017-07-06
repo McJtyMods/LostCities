@@ -52,7 +52,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.*;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
@@ -359,11 +358,6 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                 TileEntity tileentity = world.getTileEntity(pos);
                 if (tileentity instanceof TileEntityMobSpawner) {
                     TileEntityMobSpawner spawner = (TileEntityMobSpawner) tileentity;
-                    String id = pair.getValue();
-                    String fixedId = fixEntityId(id);
-                    MobSpawnerBaseLogic mobspawnerbaselogic = spawner.getSpawnerBaseLogic();
-                    mobspawnerbaselogic.setEntityId(new ResourceLocation(id));
-                    spawner.markDirty();
                     BuildingInfo.ConditionTodo todo = pair.getValue();
                     String condition = todo.getCondition();
                     Condition cnd = AssetRegistries.CONDITIONS.get(condition);
@@ -378,8 +372,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                     if (randomValue == null) {
                         throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
                     }
-                    String fixedId = EntityTools.fixEntityId(randomValue);
-                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation(fixedId), fixedId);
+                    String fixedId = fixEntityId(randomValue);
+                    MobSpawnerBaseLogic mobspawnerbaselogic = spawner.getSpawnerBaseLogic();
+                    mobspawnerbaselogic.setEntityId(new ResourceLocation(fixedId));
+                    spawner.markDirty();
                 }
             }
         }
