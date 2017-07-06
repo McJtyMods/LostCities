@@ -12,13 +12,15 @@ public class ConditionContext {
     private final int floorsBelowGround;    // 0 means nothing below ground
     private final int floorsAboveGround;    // 1 means 1 floor above ground
     private final String part;
+    private final String building;
 
-    public ConditionContext(int level, int floor, int floorsBelowGround, int floorsAboveGround, String part) {
+    public ConditionContext(int level, int floor, int floorsBelowGround, int floorsAboveGround, String part, String building) {
         this.level = level;
         this.floor = floor;
         this.floorsBelowGround = floorsBelowGround;
         this.floorsAboveGround = floorsAboveGround;
         this.part = part;
+        this.building = building;
     }
 
     private static Predicate<ConditionContext> combine(Predicate<ConditionContext> orig, Predicate<ConditionContext> newTest) {
@@ -50,6 +52,10 @@ public class ConditionContext {
         if (obj.has("inpart")) {
             String part = obj.get("inpart").getAsString();
             test = combine(test, context -> part.equals(context.getPart()));
+        }
+        if (obj.has("inbuilding")) {
+            String building = obj.get("inbuilding").getAsString();
+            test = combine(test, context -> building.equals(context.getBuilding()));
         }
         if (obj.has("cellar")) {
             boolean cellar = obj.get("cellar").getAsBoolean();
@@ -120,5 +126,9 @@ public class ConditionContext {
 
     public String getPart() {
         return part;
+    }
+
+    public String getBuilding() {
+        return building;
     }
 }

@@ -1871,7 +1871,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                     if (provider.profile.GENERATE_SPAWNERS && !info.noLoot) {
                                         String mobid = part.getMobID(info, x, y, z);
                                         info.getTodoChunk(rx, rz).addSpawnerTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
-                                                new BuildingInfo.MobTodo(mobid, part.getName()));
+                                                new BuildingInfo.ConditionTodo(mobid, part.getName(), info));
                                     } else {
                                         b = airChar;
                                     }
@@ -1879,7 +1879,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                     if (!info.noLoot) {
                                         String lootTable = part.getLootTable(info, x, y, z);
                                         info.getTodoChunk(rx, rz).addChestTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
-                                                new BuildingInfo.ChestTodo(lootTable, part.getName()));
+                                                new BuildingInfo.ConditionTodo(lootTable, part.getName(), info));
                                     }
                                 } else if (b == glowstoneChar) {
                                     info.getTodoChunk(rx, rz).addGenericTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));

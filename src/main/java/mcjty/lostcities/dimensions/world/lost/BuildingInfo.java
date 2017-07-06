@@ -86,45 +86,37 @@ public class BuildingInfo implements ILostChunkInfo {
     private Direction actualStairDirection;
 
     // A list of todo's for mob spawners and other things
-    private final List<Pair<BlockPos, MobTodo>> mobSpawnerTodo = new ArrayList<>();
-    private final List<Pair<BlockPos, ChestTodo>> chestTodo = new ArrayList<>();
+    private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
+    private final List<Pair<BlockPos, ConditionTodo>> chestTodo = new ArrayList<>();
     private final List<BlockPos> genericTodo = new ArrayList<>();
     private final List<Integer> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
 
-    public static class MobTodo {
-        private final String mobCondition;
+    public static class ConditionTodo {
+        private final String condition;
         private final String part;
+        private final String building;
 
-        public MobTodo(String mobCondition, String part) {
-            this.part = part;
-            this.mobCondition = mobCondition;
+        public ConditionTodo(String condition, String part, BuildingInfo info) {
+            this.part = part == null ? "<none>" : part;
+            this.condition = condition;
+            if (info.hasBuilding) {
+                this.building = info.getBuildingType();
+            } else {
+                this.building = "<none>";
+            }
         }
 
-        public String getMobCondition() {
-            return mobCondition;
+        public String getCondition() {
+            return condition;
         }
 
         public String getPart() {
             return part;
         }
-    }
 
-    public static class ChestTodo {
-        private final String lootCondition; // A reference to a condition for the loot table
-        private final String part;
-
-        public ChestTodo(String lootCondition, String part) {
-            this.lootCondition = lootCondition;
-            this.part = part;
-        }
-
-        public String getLootCondition() {
-            return lootCondition;
-        }
-
-        public String getPart() {
-            return part;
+        public String getBuilding() {
+            return building;
         }
     }
 
@@ -169,19 +161,19 @@ public class BuildingInfo implements ILostChunkInfo {
         genericTodo.clear();
     }
 
-    public void addSpawnerTodo(BlockPos pos, MobTodo mobId) {
+    public void addSpawnerTodo(BlockPos pos, ConditionTodo mobId) {
         mobSpawnerTodo.add(Pair.of(pos, mobId));
     }
 
-    public void addChestTodo(BlockPos pos, @Nullable ChestTodo lootTable) {
+    public void addChestTodo(BlockPos pos, @Nullable ConditionTodo lootTable) {
         chestTodo.add(Pair.of(pos, lootTable));
     }
 
-    public List<Pair<BlockPos, MobTodo>> getMobSpawnerTodo() {
+    public List<Pair<BlockPos, ConditionTodo>> getMobSpawnerTodo() {
         return mobSpawnerTodo;
     }
 
-    public List<Pair<BlockPos, ChestTodo>> getChestTodo() {
+    public List<Pair<BlockPos, ConditionTodo>> getChestTodo() {
         return chestTodo;
     }
 
@@ -691,7 +683,7 @@ public class BuildingInfo implements ILostChunkInfo {
         connectionAtZ = new boolean[floors + floorsBelowGround + 1];
         Building building = getBuilding();
         for (int i = 0; i <= floors + floorsBelowGround; i++) {
-            ConditionContext conditionContext = new ConditionContext(cityLevel + i - floorsBelowGround, i - floorsBelowGround, floorsBelowGround, floors, null);
+            ConditionContext conditionContext = new ConditionContext(cityLevel + i - floorsBelowGround, i - floorsBelowGround, floorsBelowGround, floors, "<none>", building.getName());
             String randomPart = building.getRandomPart(rand, conditionContext);
             floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
             randomPart = building.getRandomPart2(rand, conditionContext);

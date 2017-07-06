@@ -339,15 +339,15 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
     private void generateLootSpawners(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator chunkGenerator) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, chunkGenerator);
 
-        for (Pair<BlockPos, BuildingInfo.MobTodo> pair : info.getMobSpawnerTodo()) {
+        for (Pair<BlockPos, BuildingInfo.ConditionTodo> pair : info.getMobSpawnerTodo()) {
             BlockPos pos = pair.getKey();
             // Double check that it is still a spawner (could be destroyed by explosion)
             if (world.getBlockState(pos).getBlock() == Blocks.MOB_SPAWNER) {
                 TileEntity tileentity = world.getTileEntity(pos);
                 if (tileentity instanceof TileEntityMobSpawner) {
                     TileEntityMobSpawner spawner = (TileEntityMobSpawner) tileentity;
-                    BuildingInfo.MobTodo todo = pair.getValue();
-                    String condition = todo.getMobCondition();
+                    BuildingInfo.ConditionTodo todo = pair.getValue();
+                    String condition = todo.getCondition();
                     Condition cnd = AssetRegistries.CONDITIONS.get(condition);
                     if (cnd == null) {
                         throw new RuntimeException("Cannot find condition '" + condition + "'!");
@@ -355,7 +355,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
                     int level = (pos.getY() - profile.GROUNDLEVEL) / 6;
                     int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
                     ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
-                            todo.getPart());
+                            todo.getPart(), todo.getBuilding());
                     String randomValue = cnd.getRandomValue(random, conditionContext);
                     if (randomValue == null) {
                         throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
@@ -368,7 +368,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
         info.clearMobSpawnerTodo();
 
 
-        for (Pair<BlockPos, BuildingInfo.ChestTodo> pair : info.getChestTodo()) {
+        for (Pair<BlockPos, BuildingInfo.ConditionTodo> pair : info.getChestTodo()) {
             BlockPos pos = pair.getKey();
             // Double check that it is still a chest (could be destroyed by explosion)
             IBlockState state = world.getBlockState(pos);
@@ -391,16 +391,16 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
     }
 
 
-    private void createLootChest(BuildingInfo info, Random random, World world, BlockPos pos, BuildingInfo.ChestTodo todo) {
+    private void createLootChest(BuildingInfo info, Random random, World world, BlockPos pos, BuildingInfo.ConditionTodo todo) {
         world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, EnumFacing.SOUTH));
         TileEntity tileentity = world.getTileEntity(pos);
         if (tileentity instanceof TileEntityChest) {
             if (todo != null) {
-                String lootTable = todo.getLootCondition();
+                String lootTable = todo.getCondition();
                 int level = (pos.getY() - profile.GROUNDLEVEL) / 6;
                 int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
                 ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
-                        todo.getPart());
+                        todo.getPart(), todo.getBuilding());
                 String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);
                 ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
             }
