@@ -36,6 +36,10 @@ public class AbstractAssetRegistry<T extends IAsset> {
         return t;
     }
 
+    public Iterable<T> getIterable() {
+        return assets.values();
+    }
+
     public int getCount() {
         return assets.size();
     }

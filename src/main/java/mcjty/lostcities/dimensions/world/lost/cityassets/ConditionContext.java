@@ -13,14 +13,18 @@ public class ConditionContext {
     private final int floorsAboveGround;    // 1 means 1 floor above ground
     private final String part;
     private final String building;
+    private final int chunkX;
+    private final int chunkZ;
 
-    public ConditionContext(int level, int floor, int floorsBelowGround, int floorsAboveGround, String part, String building) {
+    public ConditionContext(int level, int floor, int floorsBelowGround, int floorsAboveGround, String part, String building, int chunkX, int chunkZ) {
         this.level = level;
         this.floor = floor;
         this.floorsBelowGround = floorsBelowGround;
         this.floorsAboveGround = floorsAboveGround;
         this.part = part;
         this.building = building;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
     }
 
     private static Predicate<ConditionContext> combine(Predicate<ConditionContext> orig, Predicate<ConditionContext> newTest) {
@@ -48,6 +52,14 @@ public class ConditionContext {
             } else {
                 test = combine(test, levelInfo -> !levelInfo.isGroundFloor());
             }
+        }
+        if (obj.has("chunkx")) {
+            int chunkX = obj.get("chunkx").getAsInt();
+            test = combine(test, context -> chunkX == context.getChunkX());
+        }
+        if (obj.has("chunkz")) {
+            int chunkZ = obj.get("chunkz").getAsInt();
+            test = combine(test, context -> chunkZ == context.getChunkZ());
         }
         if (obj.has("inpart")) {
             String part = obj.get("inpart").getAsString();
@@ -130,5 +142,13 @@ public class ConditionContext {
 
     public String getBuilding() {
         return building;
+    }
+
+    public int getChunkX() {
+        return chunkX;
+    }
+
+    public int getChunkZ() {
+        return chunkZ;
     }
 }

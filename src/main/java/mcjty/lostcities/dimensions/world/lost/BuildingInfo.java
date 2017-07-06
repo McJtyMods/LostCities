@@ -401,6 +401,12 @@ public class BuildingInfo implements ILostChunkInfo {
     private static boolean checkBuildingPossibility(int chunkX, int chunkZ, LostCityChunkGenerator provider, int section, int cityLevel, Random rand) {
         boolean b;
         float bc = rand.nextFloat();
+
+        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+        if (predefinedBuilding != null) {
+            return true;    // We don't need other tests
+        }
+
         if (section >= 0) {
             // Part of multi-building. We have checked everything above
             b = true;
@@ -478,6 +484,10 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+            return true;    // We don't need other tests. This is the top-left of a multibuilding
+        }
         if (isMultiBuildingCandidate(chunkX, chunkZ, provider)) {
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
             return rand.nextFloat() < provider.profile.BUILDING2X2_CHANCE;
@@ -537,6 +547,10 @@ public class BuildingInfo implements ILostChunkInfo {
                 !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, provider) &&
                 !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, provider)
                 ) {
+            PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+            if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+                return true;    // We don't need other tests. This is the top-left of a multibuilding
+            }
             return isMultiBuildingCandidate(chunkX + 1, chunkZ, provider) && isMultiBuildingCandidate(chunkX + 1, chunkZ + 1, provider) && isMultiBuildingCandidate(chunkX, chunkZ + 1, provider);
         } else {
             return false;
@@ -614,12 +628,21 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             CityStyle cs = getCityStyle();
             if (building2x2Section == 0) {
-                multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(cs.getRandomMultiBuilding(rand));
-//                System.out.println("multiBuilding.getName() = " + multiBuilding.getName() + " at " + chunkX*16 + "," + chunkZ*16);
+                String name = cs.getRandomMultiBuilding(rand);
+                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+                if (predefinedBuilding != null) {
+                    name = predefinedBuilding.getBuilding();
+                }
+                multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(name);
                 buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(0, 0));
             } else {
                 multiBuilding = null;
-                buildingType = AssetRegistries.BUILDINGS.get(cs.getRandomBuilding(rand));
+                String name = cs.getRandomBuilding(rand);
+                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+                if (predefinedBuilding != null) {
+                    name = predefinedBuilding.getBuilding();
+                }
+                buildingType = AssetRegistries.BUILDINGS.get(name);
             }
 
             highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
@@ -683,7 +706,8 @@ public class BuildingInfo implements ILostChunkInfo {
         connectionAtZ = new boolean[floors + floorsBelowGround + 1];
         Building building = getBuilding();
         for (int i = 0; i <= floors + floorsBelowGround; i++) {
-            ConditionContext conditionContext = new ConditionContext(cityLevel + i - floorsBelowGround, i - floorsBelowGround, floorsBelowGround, floors, "<none>", building.getName());
+            ConditionContext conditionContext = new ConditionContext(cityLevel + i - floorsBelowGround, i - floorsBelowGround, floorsBelowGround, floors, "<none>", building.getName(),
+                    chunkX, chunkZ);
             String randomPart = building.getRandomPart(rand, conditionContext);
             floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
             randomPart = building.getRandomPart2(rand, conditionContext);

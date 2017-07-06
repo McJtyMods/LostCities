@@ -16,6 +16,7 @@ public class AssetRegistries {
     public static final AbstractAssetRegistry<MultiBuilding> MULTI_BUILDINGS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Style> STYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Palette> PALETTES = new AbstractAssetRegistry<>();
+    public static final AbstractAssetRegistry<PredefinedCity> PREDEFINED_CITIES = new AbstractAssetRegistry<>();
 
     public static final void reset() {
         System.out.println("AssetRegistries.reset");
@@ -27,6 +28,7 @@ public class AssetRegistries {
         MULTI_BUILDINGS.reset();
         STYLES.reset();
         PALETTES.reset();
+        PREDEFINED_CITIES.reset();
     }
 
     public static void load(File file) {
@@ -61,6 +63,8 @@ public class AssetRegistries {
                     MULTI_BUILDINGS.register(new MultiBuilding(object));
                 } else if ("worldstyle".equals(type)) {
                     WORLDSTYLES.register(new WorldStyle(object));
+                } else if ("city".equals(type)) {
+                    PREDEFINED_CITIES.register(new PredefinedCity(object));
                 } else {
                     throw new RuntimeException("Unknown type '" + type + " in " + filename + "'!");
                 }

@@ -355,7 +355,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
                     int level = (pos.getY() - profile.GROUNDLEVEL) / 6;
                     int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
                     ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
-                            todo.getPart(), todo.getBuilding());
+                            todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ);
                     String randomValue = cnd.getRandomValue(random, conditionContext);
                     if (randomValue == null) {
                         throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
@@ -400,7 +400,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
                 int level = (pos.getY() - profile.GROUNDLEVEL) / 6;
                 int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
                 ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
-                        todo.getPart(), todo.getBuilding());
+                        todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ);
                 String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);
                 ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
             }

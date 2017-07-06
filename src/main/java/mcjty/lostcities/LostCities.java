@@ -4,10 +4,7 @@ import mcjty.lostcities.commands.CommandBuildPart;
 import mcjty.lostcities.commands.CommandDebug;
 import mcjty.lostcities.commands.CommandExportBuilding;
 import mcjty.lostcities.commands.CommandExportPart;
-import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
-import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.Highway;
-import mcjty.lostcities.dimensions.world.lost.Railway;
+import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -69,18 +66,20 @@ public class LostCities {
         event.registerServerCommand(new CommandExportBuilding());
         event.registerServerCommand(new CommandExportPart());
         event.registerServerCommand(new CommandBuildPart());
-        BuildingInfo.cleanCache();
-        Highway.cleanCache();
-        Railway.cleanCache();
-        BiomeInfo.cleanCache();
+        cleanCaches();
     }
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
+        cleanCaches();
+    }
+
+    private void cleanCaches() {
         BuildingInfo.cleanCache();
         Highway.cleanCache();
         Railway.cleanCache();
         BiomeInfo.cleanCache();
+        City.cleanCache();
     }
 
     /**
