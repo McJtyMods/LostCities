@@ -26,6 +26,11 @@ public class CityStyle implements IAsset {
     private String style;
 
     private Integer streetWidth;
+    private Integer minFloorCount;
+    private Integer minCellarCount;
+    private Integer maxFloorCount;
+    private Integer maxCellarCount;
+
     private Character streetBlock;
     private Character streetBaseBlock;
     private Character streetVariantBlock;
@@ -58,6 +63,22 @@ public class CityStyle implements IAsset {
 
     public int getStreetWidth() {
         return streetWidth;
+    }
+
+    public Integer getMinFloorCount() {
+        return minFloorCount;
+    }
+
+    public Integer getMinCellarCount() {
+        return minCellarCount;
+    }
+
+    public Integer getMaxFloorCount() {
+        return maxFloorCount;
+    }
+
+    public Integer getMaxCellarCount() {
+        return maxCellarCount;
     }
 
     public Character getStreetBlock() {
@@ -118,6 +139,18 @@ public class CityStyle implements IAsset {
                 multiBuildingSelector.addAll(inheritFrom.multiBuildingSelector);
                 if (streetWidth == null) {
                     streetWidth = inheritFrom.streetWidth;
+                }
+                if (minFloorCount == null) {
+                    minFloorCount = inheritFrom.minFloorCount;
+                }
+                if (minCellarCount == null) {
+                    minCellarCount = inheritFrom.minCellarCount;
+                }
+                if (maxFloorCount == null) {
+                    maxFloorCount = inheritFrom.maxFloorCount;
+                }
+                if (maxCellarCount == null) {
+                    maxCellarCount = inheritFrom.maxCellarCount;
                 }
                 if (streetBlock == null) {
                     streetBlock = inheritFrom.streetBlock;
@@ -181,6 +214,21 @@ public class CityStyle implements IAsset {
             }
             if (s.has("width")) {
                 streetWidth = s.get("width").getAsInt();
+            }
+        }
+        if (object.has("buildingsettings")) {
+            JsonObject s = object.get("buildingsettings").getAsJsonObject();
+            if (s.has("maxfloors")) {
+                maxFloorCount = s.get("maxfloors").getAsInt();
+            }
+            if (s.has("maxcellars")) {
+                maxCellarCount = s.get("maxcellars").getAsInt();
+            }
+            if (s.has("minfloors")) {
+                minFloorCount = s.get("minfloors").getAsInt();
+            }
+            if (s.has("mincellars")) {
+                minCellarCount = s.get("mincellars").getAsInt();
             }
         }
         if (object.has("railblocks")) {

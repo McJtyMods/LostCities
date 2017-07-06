@@ -646,39 +646,25 @@ public class BuildingInfo implements ILostChunkInfo {
             parkType = AssetRegistries.PARTS.get(cs.getRandomPark(rand));
             float cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
 
+            int maxfloors = getMaxfloors(provider, cs);
             int f = provider.profile.BUILDING_MINFLOORS + rand.nextInt((int) (provider.profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (provider.profile.BUILDING_MAXFLOORS_CHANCE - provider.profile.BUILDING_MINFLOORS_CHANCE)));
-            int maxfloors = provider.profile.BUILDING_MAXFLOORS;
-            if (buildingType.getMaxFloors() != -1) {
-                maxfloors = buildingType.getMaxFloors();
-            }
             f++;
             if (f > maxfloors) {
                 f = maxfloors;
             }
-            if (buildingType.getMinFloors() != -1) {
-                if (f < buildingType.getMinFloors()) {
-                    f = buildingType.getMinFloors();
-                }
+            int minfloors = getMinfloors(provider, cs);
+            if (f < minfloors) {
+                f = minfloors;
             }
             floors = f;
 
-            int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
+            int maxcellars = getMaxcellars(provider, cs);
             int fb = provider.profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
             if (getMaxHighwayLevel() >= 0) {
                 // If we are above a highway we make sure we can't have too many cellars
                 fb = Math.min(cityLevel-getMaxHighwayLevel()-1, fb);
                 if (fb < 0) {
                     fb = 0;
-                }
-            }
-            if (buildingType.getMaxCellars() != -1) {
-                if (fb > buildingType.getMaxCellars()) {
-                    fb = buildingType.getMaxCellars();
-                }
-            }
-            if (buildingType.getMinCellars() != -1) {
-                if (fb < buildingType.getMinCellars()) {
-                    fb = buildingType.getMinCellars();
                 }
             }
             floorsBelowGround = fb;
@@ -745,6 +731,45 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             frontType = null;
         }
+    }
+
+    private int getMaxcellars(LostCityChunkGenerator provider, CityStyle cs) {
+        int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
+        if (buildingType.getMaxCellars() != -1) {
+            maxcellars = Math.min(maxcellars, buildingType.getMaxCellars());
+        }
+        if (buildingType.getMinCellars() != -1) {
+            maxcellars = Math.max(maxcellars, buildingType.getMinCellars());
+        }
+        if (cs.getMaxCellarCount() != null) {
+            maxcellars = Math.min(maxcellars, cs.getMaxCellarCount());
+        }
+        if (cs.getMinCellarCount() != null) {
+            maxcellars = Math.max(maxcellars, cs.getMinCellarCount());
+        }
+        return maxcellars;
+    }
+
+    private int getMinfloors(LostCityChunkGenerator provider, CityStyle cs) {
+        int minfloors = provider.profile.BUILDING_MINFLOORS + 1;    // +1 because this doesn't count the top
+        if (buildingType.getMinFloors() != -1) {
+            minfloors = Math.max(minfloors, buildingType.getMinFloors());
+        }
+        if (cs.getMinFloorCount() != null) {
+            minfloors = Math.max(minfloors, cs.getMinFloorCount());
+        }
+        return minfloors;
+    }
+
+    private int getMaxfloors(LostCityChunkGenerator provider, CityStyle cs) {
+        int maxfloors = provider.profile.BUILDING_MAXFLOORS;
+        if (buildingType.getMaxFloors() != -1) {
+            maxfloors = Math.min(maxfloors, buildingType.getMaxFloors());
+        }
+        if (cs.getMaxFloorCount() != null) {
+            maxfloors = Math.min(maxfloors, cs.getMaxFloorCount());
+        }
+        return maxfloors;
     }
 
     public int getHighwayXLevel() {

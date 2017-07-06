@@ -287,13 +287,19 @@
     ]
   },
 
-
+  {
+    "type": "citystyle",
+    "name": "citystyle_config",
+    "streetblocks": {
+      "width": 8
+    }
+  },
 
   {
     "type": "citystyle",
     "name": "citystyle_common",
+    "inherit": "citystyle_config",
     "streetblocks": {
-      "width": 8,
       "border": "y",
       "wall": "w",
       "street": "S",
