@@ -62,10 +62,13 @@ public class City {
                 }
             }
         }
+        String cityStyleName;
         if (styles.isEmpty()) {
-            return AssetRegistries.CITYSTYLES.get(provider.worldStyle.getRandomCityStyle(provider, chunkX, chunkZ, rand));
+            cityStyleName = provider.worldStyle.getRandomCityStyle(provider, chunkX, chunkZ, rand);
+        } else {
+            cityStyleName = Tools.getRandomFromList(rand, styles);
         }
-        return AssetRegistries.CITYSTYLES.get(Tools.getRandomFromList(rand, styles));
+        return AssetRegistries.CITYSTYLES.get(cityStyleName);
     }
 
     public static float getCityFactor(int chunkX, int chunkZ, LostCityChunkGenerator provider) {

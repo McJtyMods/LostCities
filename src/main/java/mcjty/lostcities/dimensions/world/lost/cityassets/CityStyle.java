@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.varia.Tools;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -26,7 +25,7 @@ public class CityStyle implements IAsset {
     private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
     private String style;
 
-    private int streetWidth;
+    private Integer streetWidth;
     private Character streetBlock;
     private Character streetBaseBlock;
     private Character streetVariantBlock;
@@ -36,6 +35,9 @@ public class CityStyle implements IAsset {
     private Character railMainBlock;
     private Character borderBlock;
     private Character wallBlock;
+
+    private String inherit;
+    private boolean resolveInherit = false;
 
     public CityStyle(JsonObject object) {
         readFromJSon(object);
@@ -95,34 +97,65 @@ public class CityStyle implements IAsset {
     }
 
     @Override
+    public void init() {
+        if (!resolveInherit) {
+            resolveInherit = true;
+            if (inherit != null) {
+                CityStyle inheritFrom = AssetRegistries.CITYSTYLES.get(inherit);
+                if (inheritFrom == null) {
+                    throw new RuntimeException("Cannot find citystyle '" + inherit + "' to inherit from!");
+                }
+                if (style == null) {
+                    style = inheritFrom.getStyle();
+                }
+                buildingSelector.addAll(inheritFrom.buildingSelector);
+                bridgeSelector.addAll(inheritFrom.bridgeSelector);
+                parkSelector.addAll(inheritFrom.parkSelector);
+                fountainSelector.addAll(inheritFrom.fountainSelector);
+                stairSelector.addAll(inheritFrom.stairSelector);
+                frontSelector.addAll(inheritFrom.frontSelector);
+                railDungeonSelector.addAll(inheritFrom.railDungeonSelector);
+                multiBuildingSelector.addAll(inheritFrom.multiBuildingSelector);
+                if (streetWidth == null) {
+                    streetWidth = inheritFrom.streetWidth;
+                }
+                if (streetBlock == null) {
+                    streetBlock = inheritFrom.streetBlock;
+                }
+                if (streetBaseBlock == null) {
+                    streetBaseBlock = inheritFrom.streetBaseBlock;
+                }
+                if (streetVariantBlock == null) {
+                    streetVariantBlock = inheritFrom.streetVariantBlock;
+                }
+                if (parkElevationBlock == null) {
+                    parkElevationBlock = inheritFrom.parkElevationBlock;
+                }
+                if (corridorRoofBlock == null) {
+                    corridorRoofBlock = inheritFrom.corridorRoofBlock;
+                }
+                if (corridorGlassBlock == null) {
+                    corridorGlassBlock = inheritFrom.corridorGlassBlock;
+                }
+                if (railMainBlock == null) {
+                    railMainBlock = inheritFrom.railMainBlock;
+                }
+                if (borderBlock == null) {
+                    borderBlock = inheritFrom.borderBlock;
+                }
+                if (wallBlock == null) {
+                    wallBlock = inheritFrom.wallBlock;
+                }
+            }
+        }
+    }
+
+    @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
 
         if (object.has("inherit")) {
-            String inherit = object.get("inherit").getAsString();
-            CityStyle inheritFrom = AssetRegistries.CITYSTYLES.get(inherit);
-            if (inheritFrom == null) {
-                throw new RuntimeException("Cannot find citystyle '" + inherit + "' to inherit from!");
-            }
-            style = inheritFrom.getStyle();
-            buildingSelector.addAll(inheritFrom.buildingSelector);
-            bridgeSelector.addAll(inheritFrom.bridgeSelector);
-            parkSelector.addAll(inheritFrom.parkSelector);
-            fountainSelector.addAll(inheritFrom.fountainSelector);
-            stairSelector.addAll(inheritFrom.stairSelector);
-            frontSelector.addAll(inheritFrom.frontSelector);
-            railDungeonSelector.addAll(inheritFrom.railDungeonSelector);
-            multiBuildingSelector.addAll(inheritFrom.multiBuildingSelector);
-            streetWidth = inheritFrom.streetWidth;
-            streetBlock = inheritFrom.streetBlock;
-            streetBaseBlock = inheritFrom.streetBaseBlock;
-            streetVariantBlock = inheritFrom.streetVariantBlock;
-            parkElevationBlock = inheritFrom.parkElevationBlock;
-            corridorRoofBlock = inheritFrom.corridorRoofBlock;
-            corridorGlassBlock = inheritFrom.corridorGlassBlock;
-            railMainBlock = inheritFrom.railMainBlock;
-            borderBlock = inheritFrom.borderBlock;
-            wallBlock = inheritFrom.wallBlock;
+            inherit = object.get("inherit").getAsString();
         }
 
         if (object.has("style")) {
@@ -131,12 +164,24 @@ public class CityStyle implements IAsset {
 
         if (object.has("streetblocks")) {
             JsonObject s = object.get("streetblocks").getAsJsonObject();
-            borderBlock = s.get("border").getAsCharacter();
-            wallBlock = s.get("wall").getAsCharacter();
-            streetBlock = s.get("street").getAsCharacter();
-            streetVariantBlock = s.get("streetvariant").getAsCharacter();
-            streetBaseBlock = s.get("streetbase").getAsCharacter();
-            streetWidth = s.get("width").getAsInt();
+            if (s.has("border")) {
+                borderBlock = s.get("border").getAsCharacter();
+            }
+            if (s.has("wall")) {
+                wallBlock = s.get("wall").getAsCharacter();
+            }
+            if (s.has("street")) {
+                streetBlock = s.get("street").getAsCharacter();
+            }
+            if (s.has("streetvariant")) {
+                streetVariantBlock = s.get("streetvariant").getAsCharacter();
+            }
+            if (s.has("streetbase")) {
+                streetBaseBlock = s.get("streetbase").getAsCharacter();
+            }
+            if (s.has("width")) {
+                streetWidth = s.get("width").getAsInt();
+            }
         }
         if (object.has("railblocks")) {
             JsonObject s = object.get("railblocks").getAsJsonObject();
@@ -148,60 +193,37 @@ public class CityStyle implements IAsset {
         }
         if (object.has("corridorblocks")) {
             JsonObject s = object.get("corridorblocks").getAsJsonObject();
-            corridorRoofBlock = s.get("roof").getAsCharacter();
-            corridorGlassBlock = s.get("glass").getAsCharacter();
+            if (s.has("roof")) {
+                corridorRoofBlock = s.get("roof").getAsCharacter();
+            }
+            if (s.has("glass")) {
+                corridorGlassBlock = s.get("glass").getAsCharacter();
+            }
         }
-        JsonArray array = getArraySafe(object, "buildings");
+        parseArraySafe(object, buildingSelector, "buildings", "building");
+        parseArraySafe(object, multiBuildingSelector, "multibuildings", "multibuilding");
+        parseArraySafe(object, parkSelector, "parks", "park");
+        parseArraySafe(object, fountainSelector, "fountains", "fountain");
+        parseArraySafe(object, stairSelector, "stairs", "stair");
+        parseArraySafe(object, frontSelector, "fronts", "front");
+        parseArraySafe(object, bridgeSelector, "bridges", "bridge");
+        parseArraySafe(object, railDungeonSelector, "raildungeons", "dungeon");
+    }
+
+    private void parseArraySafe(JsonObject object, List<Pair<Float, String>> selector, String arrayName, String elName) {
+        JsonArray array = getArraySafe(object, arrayName);
         for (JsonElement element : array) {
-            float factor = element.getAsJsonObject().get("factor").getAsFloat();
-            String building = element.getAsJsonObject().get("building").getAsString();
-            buildingSelector.add(Pair.of(factor, building));
-        }
-        array = getArraySafe(object, "multibuildings");
-        for (JsonElement element : array) {
-            float factor = element.getAsJsonObject().get("factor").getAsFloat();
-            String building = element.getAsJsonObject().get("multibuilding").getAsString();
-            multiBuildingSelector.add(Pair.of(factor, building));
-        }
-        array = getArraySafe(object, "parks");
-        for (JsonElement element : array) {
-            float factor = element.getAsJsonObject().get("factor").getAsFloat();
-            String park = element.getAsJsonObject().get("park").getAsString();
-            parkSelector.add(Pair.of(factor, park));
-        }
-        array = getArraySafe(object, "fountains");
-        for (JsonElement element : array) {
-            float factor = element.getAsJsonObject().get("factor").getAsFloat();
-            String fountain = element.getAsJsonObject().get("fountain").getAsString();
-            fountainSelector.add(Pair.of(factor, fountain));
-        }
-        array = getArraySafe(object, "stairs");
-        for (JsonElement element : array) {
-            float factor = element.getAsJsonObject().get("factor").getAsFloat();
-            String fountain = element.getAsJsonObject().get("stair").getAsString();
-            stairSelector.add(Pair.of(factor, fountain));
-        }
-        array = getArraySafe(object, "fronts");
-        for (JsonElement element : array) {
-            float factor = element.getAsJsonObject().get("factor").getAsFloat();
-            String fountain = element.getAsJsonObject().get("front").getAsString();
-            frontSelector.add(Pair.of(factor, fountain));
-        }
-        array = getArraySafe(object, "bridges");
-        for (JsonElement element : array) {
-            float factor = element.getAsJsonObject().get("factor").getAsFloat();
-            String fountain = element.getAsJsonObject().get("bridge").getAsString();
-            bridgeSelector.add(Pair.of(factor, fountain));
-        }
-        array = getArraySafe(object, "raildungeons");
-        for (JsonElement element : array) {
-            float factor = element.getAsJsonObject().get("factor").getAsFloat();
-            String fountain = element.getAsJsonObject().get("dungeon").getAsString();
-            railDungeonSelector.add(Pair.of(factor, fountain));
+            if (element.getAsJsonObject().has("clear")) {
+                selector.clear();
+            } else {
+                float factor = element.getAsJsonObject().get("factor").getAsFloat();
+                String el = element.getAsJsonObject().get(elName).getAsString();
+                selector.add(Pair.of(factor, el));
+            }
         }
     }
 
-    public JsonArray getArraySafe(JsonObject object, String key) {
+    private JsonArray getArraySafe(JsonObject object, String key) {
         if (object.has(key)) {
             return object.get(key).getAsJsonArray();
         } else {
