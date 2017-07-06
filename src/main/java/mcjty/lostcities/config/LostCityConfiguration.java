@@ -22,6 +22,7 @@ public class LostCityConfiguration {
     public static final String[] DEFAULT_PROFILES = new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
 
     public static String[] ASSETS = new String[] {
+            "/assets/lostcities/citydata/conditions.json",
             "/assets/lostcities/citydata/palette.json",
             "/assets/lostcities/citydata/palette_desert.json",
             "/assets/lostcities/citydata/palette_chisel.json",
@@ -35,7 +36,7 @@ public class LostCityConfiguration {
 
     public static String[] ADAPTING_WORLDTYPES = new String[] {};
 
-    public static int VERSION = 4;
+    public static int VERSION = 5;
 
     public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();

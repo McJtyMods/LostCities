@@ -1,0 +1,84 @@
+[
+  {
+    "type": "condition",
+    "name": "easymobs",
+    "values": [
+      {
+        "factor": 1,
+        "value": "Zombie"
+      },
+      {
+        "factor": 1,
+        "value": "Skeleton"
+      },
+      {
+        "factor": 1,
+        "value": "Spider"
+      }
+    ]
+  },
+  {
+    "type": "condition",
+    "name": "hardmobs",
+    "values": [
+      {
+        "factor": 1,
+        "value": "Blaze"
+      },
+      {
+        "factor": 1,
+        "value": "Witch"
+      }
+    ]
+  },
+  {
+    "type": "condition",
+    "name": "chestloot",
+    "values": [
+      {
+        "factor": 8,
+        "value": "lostcities:chests/lostcitychest",
+        "range": "4,100"
+      },
+      {
+        "factor": 8,
+        "value": "lostcities:chests/lostcitychest",
+        "range": "-100,-3"
+      },
+      {
+        "factor": 20,
+        "value": "lostcities:chests/raildungeonchest",
+        "inpart": "rail_dungeon1"
+      },
+      {
+        "factor": 20,
+        "value": "lostcities:chests/raildungeonchest",
+        "inpart": "rail_dungeon2"
+      },
+      {
+        "factor": 2,
+        "value": "minecraft:chests/nether_bridge"
+      },
+      {
+        "factor": 2,
+        "value": "minecraft:chests/abandoned_mineshaft"
+      },
+      {
+        "factor": 2,
+        "value": "minecraft:chests/village_blacksmith"
+      },
+      {
+        "factor": 2,
+        "value": "minecraft:chests/desert_pyramid"
+      },
+      {
+        "factor": 2,
+        "value": "minecraft:chests/jungle_temple"
+      },
+      {
+        "factor": 20,
+        "value": "minecraft:chests/simple_dungeon"
+      }
+    ]
+  }
+]

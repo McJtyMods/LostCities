@@ -1,7 +1,7 @@
 {
   "pools": [
     {
-      "name": "lostcities:lostcitychest",
+      "name": "lostcities:raildungeonchest",
       "rolls": {
         "min": 2,
         "max": 4
@@ -9,7 +9,7 @@
       "entries": [
         {
           "type": "item",
-          "name": "minecraft:diamond_sword",
+          "name": "minecraft:diamond_axe",
           "functions": [
             {
               "function": "set_count",
@@ -37,13 +37,27 @@
         },
         {
           "type": "item",
+          "name": "minecraft:iron_ingot",
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 3,
+                "max": 10
+              }
+            }
+          ],
+          "weight": 5
+        },
+        {
+          "type": "item",
           "name": "minecraft:diamond",
           "functions": [
             {
               "function": "set_count",
               "count": {
-                "min": 1,
-                "max": 5
+                "min": 2,
+                "max": 9
               }
             }
           ],
@@ -56,8 +70,8 @@
             {
               "function": "set_count",
               "count": {
-                "min": 1,
-                "max": 3
+                "min": 2,
+                "max": 5
               }
             }
           ],

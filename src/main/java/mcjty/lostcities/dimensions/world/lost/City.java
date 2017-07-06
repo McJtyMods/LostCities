@@ -3,23 +3,62 @@ package mcjty.lostcities.dimensions.world.lost;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CityStyle;
+import mcjty.lostcities.dimensions.world.lost.cityassets.PredefinedCity;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * A city is defined as a big sphere. Buildings are where the radius is less then 70%
  */
 public class City {
 
+    private static Map<ChunkCoord, PredefinedCity> predefinedCityMap = null;
+    private static Map<ChunkCoord, PredefinedCity.PredefinedBuilding> predefinedBuildingMap = null;
+
+    public static void cleanCache() {
+        predefinedCityMap = null;
+        predefinedBuildingMap = null;
+    }
+
+    private static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (predefinedCityMap == null) {
+            predefinedCityMap = new HashMap<>();
+            for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
+                predefinedCityMap.put(new ChunkCoord(city.getDimension(), city.getChunkX(), city.getChunkZ()), city);
+            }
+        }
+        if (predefinedCityMap.isEmpty()) {
+            return null;
+        }
+        return predefinedCityMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+    }
+
+    public static PredefinedCity.PredefinedBuilding getPredefinedBuilding(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (predefinedBuildingMap == null) {
+            predefinedBuildingMap = new HashMap<>();
+            for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
+                for (PredefinedCity.PredefinedBuilding building : city.getPredefinedBuildings()) {
+                    predefinedBuildingMap.put(new ChunkCoord(city.getDimension(),
+                            city.getChunkX() + building.getRelChunkX(), city.getChunkZ() + building.getRelChunkZ()), building);
+                }
+            }
+        }
+        if (predefinedBuildingMap.isEmpty()) {
+            return null;
+        }
+        return predefinedBuildingMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+    }
+
     public static boolean isCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider);
+        if (city != null) {
+            return true;
+        }
         Random rand = new Random(provider.seed + chunkZ * 797003437L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
@@ -27,6 +66,10 @@ public class City {
     }
 
     public static float getCityRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider);
+        if (city != null) {
+            return city.getRadius();
+        }
         Random rand = new Random(provider.seed + chunkZ * 100001653L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
@@ -35,6 +78,13 @@ public class City {
 
     // Call this on a city center to get the style of that city
     public static String getCityStyleForCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider);
+        if (city != null) {
+            if (city.getCityStyle() != null) {
+                return city.getCityStyle();
+            }
+            // Otherwise we chose a random city style
+        }
         Random rand = new Random(provider.seed + chunkZ * 899809363L + chunkX * 256203221L);
         rand.nextFloat();
         rand.nextFloat();
@@ -62,13 +112,35 @@ public class City {
                 }
             }
         }
+        String cityStyleName;
         if (styles.isEmpty()) {
-            return AssetRegistries.CITYSTYLES.get(provider.worldStyle.getRandomCityStyle(provider, chunkX, chunkZ, rand));
+            cityStyleName = provider.worldStyle.getRandomCityStyle(provider, chunkX, chunkZ, rand);
+        } else {
+            cityStyleName = Tools.getRandomFromList(rand, styles);
         }
-        return AssetRegistries.CITYSTYLES.get(Tools.getRandomFromList(provider, rand, styles));
+        return AssetRegistries.CITYSTYLES.get(cityStyleName);
     }
 
     public static float getCityFactor(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        // If we have a predefined building here we force a high city factor
+
+        PredefinedCity.PredefinedBuilding predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ, provider);
+        if (predefinedBuilding != null) {
+            return 1.0f;
+        }
+        predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ, provider);
+        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+            return 1.0f;
+        }
+        predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ-1, provider);
+        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+            return 1.0f;
+        }
+        predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ-1, provider);
+        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+            return 1.0f;
+        }
+
         long seed = provider.seed;
         float factor = 0;
         int offset = (provider.profile.CITY_MAXRADIUS+15) / 16;

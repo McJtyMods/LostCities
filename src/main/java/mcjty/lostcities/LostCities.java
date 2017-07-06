@@ -64,18 +64,20 @@ public class LostCities {
         event.registerServerCommand(new CommandExportBuilding());
         event.registerServerCommand(new CommandExportPart());
         event.registerServerCommand(new CommandBuildPart());
-        BuildingInfo.cleanCache();
-        Highway.cleanCache();
-        Railway.cleanCache();
-        BiomeInfo.cleanCache();
+        cleanCaches();
     }
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
+        cleanCaches();
+    }
+
+    private void cleanCaches() {
         BuildingInfo.cleanCache();
         Highway.cleanCache();
         Railway.cleanCache();
         BiomeInfo.cleanCache();
+        City.cleanCache();
     }
 
     /**
