@@ -50,7 +50,7 @@ public class LostCityProfile {
     public float HIGHWAY_SECONDARYPERLIN_SCALE = 10.0f;
     public float HIGHWAY_PERLIN_FACTOR = 2.0f;
 
-    public float RAILWAY_DUNGEON_CHANCE = .02f;
+    public float RAILWAY_DUNGEON_CHANCE = .01f;
     public boolean RAILWAYS_CAN_END = false;
 
     public float DESTROY_LONE_BLOCKS_FACTOR = .05f;
