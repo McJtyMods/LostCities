@@ -132,15 +132,15 @@
         "char": "!",
         "blocks": [
           {
-            "random": 25,
+            "random": 15,
             "block": "minecraft:diamond_block"
           },
           {
-            "random": 25,
+            "random": 20,
             "block": "minecraft:gold_block"
           },
           {
-            "random": 25,
+            "random": 15,
             "block": "minecraft:emerald_block"
           },
           {
