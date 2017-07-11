@@ -627,9 +627,9 @@ public class BuildingInfo implements ILostChunkInfo {
             ruinHeight = topleft.ruinHeight;
         } else {
             CityStyle cs = getCityStyle();
+            PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
             if (building2x2Section == 0) {
                 String name = cs.getRandomMultiBuilding(rand);
-                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
                 if (predefinedBuilding != null) {
                     name = predefinedBuilding.getBuilding();
                 }
@@ -638,7 +638,6 @@ public class BuildingInfo implements ILostChunkInfo {
             } else {
                 multiBuilding = null;
                 String name = cs.getRandomBuilding(rand);
-                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
                 if (predefinedBuilding != null) {
                     name = predefinedBuilding.getBuilding();
                 }
@@ -692,7 +691,7 @@ public class BuildingInfo implements ILostChunkInfo {
             float r = rand.nextFloat();
             noLoot = building2x2Section == -1 && r < provider.profile.BUILDING_WITHOUT_LOOT_CHANCE;
             r = rand.nextFloat();
-            if (rand.nextFloat() < provider.profile.RUIN_CHANCE) {
+            if (rand.nextFloat() < provider.profile.RUIN_CHANCE && (predefinedBuilding == null || !predefinedBuilding.isPreventRuins())) {
                 ruinHeight = provider.profile.RUIN_MINLEVEL_PERCENT + (provider.profile.RUIN_MAXLEVEL_PERCENT - provider.profile.RUIN_MINLEVEL_PERCENT) * r;
             } else {
                 ruinHeight = -1;

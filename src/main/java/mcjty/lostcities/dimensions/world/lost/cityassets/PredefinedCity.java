@@ -53,9 +53,10 @@ public class PredefinedCity implements IAsset {
                 building = o.get("multibuilding").getAsString();
                 multi = true;
             }
+            boolean preventRuins = o.has("preventruins") && o.get("preventruins").getAsBoolean();
             int relChunkX = o.get("chunkx").getAsInt();
             int relChunkZ = o.get("chunkz").getAsInt();
-            PredefinedBuilding b = new PredefinedBuilding(building, relChunkX, relChunkZ, multi);
+            PredefinedBuilding b = new PredefinedBuilding(building, relChunkX, relChunkZ, multi, preventRuins);
             predefinedBuildings.add(b);
         }
     }
@@ -105,12 +106,14 @@ public class PredefinedCity implements IAsset {
         private final int relChunkX;
         private final int relChunkZ;
         private final boolean multi;
+        private final boolean preventRuins;
 
-        public PredefinedBuilding(String building, int relChunkX, int relChunkZ, boolean multi) {
+        public PredefinedBuilding(String building, int relChunkX, int relChunkZ, boolean multi, boolean preventRuins) {
             this.building = building;
             this.relChunkX = relChunkX;
             this.relChunkZ = relChunkZ;
             this.multi = multi;
+            this.preventRuins = preventRuins;
         }
 
         public String getBuilding() {
@@ -127,6 +130,10 @@ public class PredefinedCity implements IAsset {
 
         public boolean isMulti() {
             return multi;
+        }
+
+        public boolean isPreventRuins() {
+            return preventRuins;
         }
     }
 }
