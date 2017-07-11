@@ -42,6 +42,7 @@ public class LostCityConfiguration {
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
 
     public static String DIMENSION_PROFILE = "default";
+    public static String DEFAULT_PROFILE = "default";
     public static int DIMENSION_ID = 111;
     public static boolean DIMENSION_BOP = true;
 
@@ -99,6 +100,7 @@ public class LostCityConfiguration {
         ADAPTING_WORLDTYPES = cfg.getStringList("adaptingWorldTypes", CATEGORY_GENERAL, ADAPTING_WORLDTYPES, WORLDTYPES_COMMENT);
 
         DIMENSION_PROFILE = cfg.getString("dimensionProfile", CATEGORY_GENERAL, DIMENSION_PROFILE, "The 'profile' to use for generation of the Lost City dimension");
+        DEFAULT_PROFILE = cfg.getString("defaultProfile", CATEGORY_GENERAL, DEFAULT_PROFILE, "The default 'profile' to use for the overworld");
         DIMENSION_ID = cfg.getInt("dimensionId", CATEGORY_GENERAL, DIMENSION_ID, -10000, 10000, "The 'ID' of the Lost City Dimension. Set to -1 if you don't want this dimension");
         DIMENSION_BOP = cfg.getBoolean("dimensionBoP", CATEGORY_GENERAL, DIMENSION_BOP, "If true and if Biomes O Plenty is present the dimension will use BoP biomes");
 

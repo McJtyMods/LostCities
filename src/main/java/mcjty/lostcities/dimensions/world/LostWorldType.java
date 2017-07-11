@@ -29,9 +29,9 @@ public class LostWorldType extends WorldType {
         String generatorOptions = world.getWorldInfo().getGeneratorOptions();
         LostCityProfile p;
         if (generatorOptions == null || generatorOptions.trim().isEmpty()) {
-            p = LostCityConfiguration.profiles.get("default");
+            p = LostCityConfiguration.profiles.get(LostCityConfiguration.DEFAULT_PROFILE);
             if (p == null) {
-                throw new RuntimeException("Something went wrong! Profile '" + "default" + "' is missing!");
+                throw new RuntimeException("Something went wrong! Profile '" + LostCityConfiguration.DEFAULT_PROFILE + "' is missing!");
             }
         } else {
             JsonParser parser = new JsonParser();
@@ -40,7 +40,7 @@ public class LostWorldType extends WorldType {
             if (parsed.getAsJsonObject().has("profile")) {
                 profileName = parsed.getAsJsonObject().get("profile").getAsString();
             } else {
-                profileName = "default";
+                profileName = LostCityConfiguration.DEFAULT_PROFILE;
             }
             p = LostCityConfiguration.profiles.get(profileName);
             if (p == null) {
