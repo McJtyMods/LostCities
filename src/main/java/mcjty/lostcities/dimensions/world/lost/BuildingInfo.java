@@ -406,6 +406,10 @@ public class BuildingInfo implements ILostChunkInfo {
         if (predefinedBuilding != null) {
             return true;    // We don't need other tests
         }
+        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
+        if (predefinedStreet != null) {
+            return false;   // No building here
+        }
 
         if (section >= 0) {
             // Part of multi-building. We have checked everything above
@@ -488,6 +492,10 @@ public class BuildingInfo implements ILostChunkInfo {
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             return true;    // We don't need other tests. This is the top-left of a multibuilding
         }
+        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
+        if (predefinedStreet != null) {
+            return false;   // There is a street here so no building
+        }
         if (isMultiBuildingCandidate(chunkX, chunkZ, provider)) {
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
             return rand.nextFloat() < provider.profile.BUILDING2X2_CHANCE;
@@ -550,6 +558,10 @@ public class BuildingInfo implements ILostChunkInfo {
             PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
             if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
                 return true;    // We don't need other tests. This is the top-left of a multibuilding
+            }
+            PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
+            if (predefinedStreet != null) {
+                return false;   // There is a street here so no building
             }
             return isMultiBuildingCandidate(chunkX + 1, chunkZ, provider) && isMultiBuildingCandidate(chunkX + 1, chunkZ + 1, provider) && isMultiBuildingCandidate(chunkX, chunkZ + 1, provider);
         } else {

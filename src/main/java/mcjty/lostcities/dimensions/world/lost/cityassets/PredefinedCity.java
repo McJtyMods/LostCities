@@ -17,6 +17,7 @@ public class PredefinedCity implements IAsset {
     private int radius;
     private String cityStyle;
     private final List<PredefinedBuilding> predefinedBuildings = new ArrayList<>();
+    private final List<PredefinedStreet> predefinedStreets = new ArrayList<>();
 
     public PredefinedCity(JsonObject object) {
         readFromJSon(object);
@@ -59,6 +60,14 @@ public class PredefinedCity implements IAsset {
             PredefinedBuilding b = new PredefinedBuilding(building, relChunkX, relChunkZ, multi, preventRuins);
             predefinedBuildings.add(b);
         }
+        JsonArray streets = getArraySafe(object, "streets");
+        for (JsonElement element : streets) {
+            JsonObject o = element.getAsJsonObject();
+            int relChunkX = o.get("chunkx").getAsInt();
+            int relChunkZ = o.get("chunkz").getAsInt();
+            PredefinedStreet b = new PredefinedStreet(relChunkX, relChunkZ);
+            predefinedStreets.add(b);
+        }
     }
 
     private JsonArray getArraySafe(JsonObject object, String key) {
@@ -81,6 +90,10 @@ public class PredefinedCity implements IAsset {
         return predefinedBuildings;
     }
 
+    public List<PredefinedStreet> getPredefinedStreets() {
+        return predefinedStreets;
+    }
+
     public int getDimension() {
         return dimension;
     }
@@ -99,6 +112,24 @@ public class PredefinedCity implements IAsset {
 
     public String getCityStyle() {
         return cityStyle;
+    }
+
+    public static class PredefinedStreet {
+        private final int relChunkX;
+        private final int relChunkZ;
+
+        public PredefinedStreet(int relChunkX, int relChunkZ) {
+            this.relChunkX = relChunkX;
+            this.relChunkZ = relChunkZ;
+        }
+
+        public int getRelChunkX() {
+            return relChunkX;
+        }
+
+        public int getRelChunkZ() {
+            return relChunkZ;
+        }
     }
 
     public static class PredefinedBuilding {
