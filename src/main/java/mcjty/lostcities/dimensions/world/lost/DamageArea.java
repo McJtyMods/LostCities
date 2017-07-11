@@ -27,6 +27,10 @@ public class DamageArea {
         this.chunkZ = chunkZ;
         chunkBox = new AxisAlignedBB(chunkX * 16, 0, chunkZ * 16, chunkX * 16 + 15, 256, chunkZ * 16 + 15);
 
+        Random rand = new Random(seed + chunkZ * 295075153L + chunkX * 899826547L);
+        rand.nextFloat();
+        rand.nextFloat();
+
         int offset = (Math.max(provider.profile.EXPLOSION_MAXRADIUS, provider.profile.MINI_EXPLOSION_MAXRADIUS)+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
@@ -34,13 +38,19 @@ public class DamageArea {
                     Explosion explosion = getExplosionAt(cx, cz, provider);
                     if (explosion != null) {
                         if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
-                            explosions.add(explosion);
+                            Float chance = BuildingInfo.getBuildingInfo(cx, cz, provider).getCityStyle().getExplosionChance();
+                            if (chance == null || rand.nextFloat() < chance) {
+                                explosions.add(explosion);
+                            }
                         }
                     }
                     explosion = getMiniExplosionAt(cx, cz, provider);
                     if (explosion != null) {
                         if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
-                            explosions.add(explosion);
+                            Float chance = BuildingInfo.getBuildingInfo(cx, cz, provider).getCityStyle().getExplosionChance();
+                            if (chance == null || rand.nextFloat() < chance) {
+                                explosions.add(explosion);
+                            }
                         }
                     }
                 }
