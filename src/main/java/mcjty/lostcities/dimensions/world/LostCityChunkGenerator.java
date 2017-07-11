@@ -392,7 +392,10 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
 
 
     private void createLootChest(BuildingInfo info, Random random, World world, BlockPos pos, BuildingInfo.ConditionTodo todo) {
-        world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, EnumFacing.SOUTH));
+//        world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, EnumFacing.SOUTH));
+        if (random.nextFloat() < profile.CHEST_WITHOUT_LOOT_CHANCE) {
+            return;
+        }
         TileEntity tileentity = world.getTileEntity(pos);
         if (tileentity instanceof TileEntityChest) {
             if (todo != null) {
