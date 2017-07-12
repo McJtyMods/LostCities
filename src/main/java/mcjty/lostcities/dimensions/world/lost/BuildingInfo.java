@@ -544,6 +544,12 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+            // Regardless of other conditions, this is the top left of a multibuilding
+            return true;
+        }
+
         if (isCandidateForTopLeftOf2x2Building(chunkX, chunkZ, provider) &&
                 !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ, provider) &&
                 !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider) &&
@@ -555,10 +561,6 @@ public class BuildingInfo implements ILostChunkInfo {
                 !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, provider) &&
                 !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, provider)
                 ) {
-            PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
-            if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
-                return true;    // We don't need other tests. This is the top-left of a multibuilding
-            }
             PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
             if (predefinedStreet != null) {
                 return false;   // There is a street here so no building
