@@ -50,7 +50,7 @@ public class LostCityProfile {
     public float HIGHWAY_SECONDARYPERLIN_SCALE = 10.0f;
     public float HIGHWAY_PERLIN_FACTOR = 2.0f;
 
-    public float RAILWAY_DUNGEON_CHANCE = .02f;
+    public float RAILWAY_DUNGEON_CHANCE = .01f;
     public boolean RAILWAYS_CAN_END = false;
 
     public float DESTROY_LONE_BLOCKS_FACTOR = .05f;
@@ -92,6 +92,7 @@ public class LostCityProfile {
 
     public String[] ALLOWED_BIOME_FACTORS = new String[] { };
 
+    public float CHEST_WITHOUT_LOOT_CHANCE = .2f;
     public float BUILDING_WITHOUT_LOOT_CHANCE = .2f;
     public float BUILDING_CHANCE = .3f;
     public int BUILDING_MINFLOORS = 0;
@@ -190,6 +191,7 @@ public class LostCityProfile {
         WATERLEVEL = GROUNDLEVEL - WATERLEVEL_OFFSET;
 
 
+        CHEST_WITHOUT_LOOT_CHANCE = cfg.getFloat("chestWithoutLootChance", categoryLostcity, inheritFrom.orElse(this).CHEST_WITHOUT_LOOT_CHANCE, 0.0f, 1.0f, "The chance that a chest will have no loot");
         BUILDING_WITHOUT_LOOT_CHANCE = cfg.getFloat("buildingWithoutLootChance", categoryLostcity, inheritFrom.orElse(this).BUILDING_WITHOUT_LOOT_CHANCE, 0.0f, 1.0f, "The chance that a building will have no loot and no spawners");
         BUILDING_CHANCE = cfg.getFloat("buildingChance", categoryLostcity, inheritFrom.orElse(this).BUILDING_CHANCE, 0.0f, 1.0f, "The chance that a chunk in a city will have a building. Otherwise it will be a street");
         BUILDING_MINFLOORS = cfg.getInt("buildingMinFloors", categoryLostcity, inheritFrom.orElse(this).BUILDING_MINFLOORS, 0, 30, "The minimum number of floors (above ground) for a building (0 means the first floor only)");

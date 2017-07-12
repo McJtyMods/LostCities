@@ -17,6 +17,7 @@ public class PredefinedCity implements IAsset {
     private int radius;
     private String cityStyle;
     private final List<PredefinedBuilding> predefinedBuildings = new ArrayList<>();
+    private final List<PredefinedStreet> predefinedStreets = new ArrayList<>();
 
     public PredefinedCity(JsonObject object) {
         readFromJSon(object);
@@ -53,10 +54,19 @@ public class PredefinedCity implements IAsset {
                 building = o.get("multibuilding").getAsString();
                 multi = true;
             }
+            boolean preventRuins = o.has("preventruins") && o.get("preventruins").getAsBoolean();
             int relChunkX = o.get("chunkx").getAsInt();
             int relChunkZ = o.get("chunkz").getAsInt();
-            PredefinedBuilding b = new PredefinedBuilding(building, relChunkX, relChunkZ, multi);
+            PredefinedBuilding b = new PredefinedBuilding(building, relChunkX, relChunkZ, multi, preventRuins);
             predefinedBuildings.add(b);
+        }
+        JsonArray streets = getArraySafe(object, "streets");
+        for (JsonElement element : streets) {
+            JsonObject o = element.getAsJsonObject();
+            int relChunkX = o.get("chunkx").getAsInt();
+            int relChunkZ = o.get("chunkz").getAsInt();
+            PredefinedStreet b = new PredefinedStreet(relChunkX, relChunkZ);
+            predefinedStreets.add(b);
         }
     }
 
@@ -80,6 +90,10 @@ public class PredefinedCity implements IAsset {
         return predefinedBuildings;
     }
 
+    public List<PredefinedStreet> getPredefinedStreets() {
+        return predefinedStreets;
+    }
+
     public int getDimension() {
         return dimension;
     }
@@ -100,17 +114,37 @@ public class PredefinedCity implements IAsset {
         return cityStyle;
     }
 
+    public static class PredefinedStreet {
+        private final int relChunkX;
+        private final int relChunkZ;
+
+        public PredefinedStreet(int relChunkX, int relChunkZ) {
+            this.relChunkX = relChunkX;
+            this.relChunkZ = relChunkZ;
+        }
+
+        public int getRelChunkX() {
+            return relChunkX;
+        }
+
+        public int getRelChunkZ() {
+            return relChunkZ;
+        }
+    }
+
     public static class PredefinedBuilding {
         private final String building;
         private final int relChunkX;
         private final int relChunkZ;
         private final boolean multi;
+        private final boolean preventRuins;
 
-        public PredefinedBuilding(String building, int relChunkX, int relChunkZ, boolean multi) {
+        public PredefinedBuilding(String building, int relChunkX, int relChunkZ, boolean multi, boolean preventRuins) {
             this.building = building;
             this.relChunkX = relChunkX;
             this.relChunkZ = relChunkZ;
             this.multi = multi;
+            this.preventRuins = preventRuins;
         }
 
         public String getBuilding() {
@@ -127,6 +161,10 @@ public class PredefinedCity implements IAsset {
 
         public boolean isMulti() {
             return multi;
+        }
+
+        public boolean isPreventRuins() {
+            return preventRuins;
         }
     }
 }

@@ -19,10 +19,12 @@ public class City {
 
     private static Map<ChunkCoord, PredefinedCity> predefinedCityMap = null;
     private static Map<ChunkCoord, PredefinedCity.PredefinedBuilding> predefinedBuildingMap = null;
+    private static Map<ChunkCoord, PredefinedCity.PredefinedStreet> predefinedStreetMap = null;
 
     public static void cleanCache() {
         predefinedCityMap = null;
         predefinedBuildingMap = null;
+        predefinedStreetMap = null;
     }
 
     private static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
@@ -52,6 +54,22 @@ public class City {
             return null;
         }
         return predefinedBuildingMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+    }
+
+    public static PredefinedCity.PredefinedStreet getPredefinedStreet(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (predefinedStreetMap == null) {
+            predefinedStreetMap = new HashMap<>();
+            for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
+                for (PredefinedCity.PredefinedStreet street : city.getPredefinedStreets()) {
+                    predefinedStreetMap.put(new ChunkCoord(city.getDimension(),
+                            city.getChunkX() + street.getRelChunkX(), city.getChunkZ() + street.getRelChunkZ()), street);
+                }
+            }
+        }
+        if (predefinedStreetMap.isEmpty()) {
+            return null;
+        }
+        return predefinedStreetMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
     }
 
     public static boolean isCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
@@ -128,6 +146,11 @@ public class City {
         if (predefinedBuilding != null) {
             return 1.0f;
         }
+        PredefinedCity.PredefinedStreet predefinedStreet = getPredefinedStreet(chunkX, chunkZ, provider);
+        if (predefinedStreet != null) {
+            return 1.0f;
+        }
+
         predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ, provider);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             return 1.0f;

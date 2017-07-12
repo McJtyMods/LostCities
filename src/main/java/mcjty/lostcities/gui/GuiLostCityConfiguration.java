@@ -28,7 +28,7 @@ public class GuiLostCityConfiguration extends GuiScreen {
     @Override
     public void initGui() {
         JsonParser parser = new JsonParser();
-        String profileName = "default";
+        String profileName = LostCityConfiguration.DEFAULT_PROFILE;
         if (parent.chunkProviderSettingsJson != null && !parent.chunkProviderSettingsJson.trim().isEmpty()) {
             JsonElement parsed = parser.parse(parent.chunkProviderSettingsJson);
             if (parsed.getAsJsonObject().has("profile")) {

@@ -406,6 +406,10 @@ public class BuildingInfo implements ILostChunkInfo {
         if (predefinedBuilding != null) {
             return true;    // We don't need other tests
         }
+        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
+        if (predefinedStreet != null) {
+            return false;   // No building here
+        }
 
         if (section >= 0) {
             // Part of multi-building. We have checked everything above
@@ -488,6 +492,10 @@ public class BuildingInfo implements ILostChunkInfo {
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             return true;    // We don't need other tests. This is the top-left of a multibuilding
         }
+        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
+        if (predefinedStreet != null) {
+            return false;   // There is a street here so no building
+        }
         if (isMultiBuildingCandidate(chunkX, chunkZ, provider)) {
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
             return rand.nextFloat() < provider.profile.BUILDING2X2_CHANCE;
@@ -536,6 +544,12 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+            // Regardless of other conditions, this is the top left of a multibuilding
+            return true;
+        }
+
         if (isCandidateForTopLeftOf2x2Building(chunkX, chunkZ, provider) &&
                 !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ, provider) &&
                 !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider) &&
@@ -547,9 +561,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, provider) &&
                 !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, provider)
                 ) {
-            PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
-            if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
-                return true;    // We don't need other tests. This is the top-left of a multibuilding
+            PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
+            if (predefinedStreet != null) {
+                return false;   // There is a street here so no building
             }
             return isMultiBuildingCandidate(chunkX + 1, chunkZ, provider) && isMultiBuildingCandidate(chunkX + 1, chunkZ + 1, provider) && isMultiBuildingCandidate(chunkX, chunkZ + 1, provider);
         } else {
@@ -627,9 +641,9 @@ public class BuildingInfo implements ILostChunkInfo {
             ruinHeight = topleft.ruinHeight;
         } else {
             CityStyle cs = getCityStyle();
+            PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
             if (building2x2Section == 0) {
                 String name = cs.getRandomMultiBuilding(rand);
-                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
                 if (predefinedBuilding != null) {
                     name = predefinedBuilding.getBuilding();
                 }
@@ -638,7 +652,6 @@ public class BuildingInfo implements ILostChunkInfo {
             } else {
                 multiBuilding = null;
                 String name = cs.getRandomBuilding(rand);
-                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
                 if (predefinedBuilding != null) {
                     name = predefinedBuilding.getBuilding();
                 }
@@ -692,7 +705,7 @@ public class BuildingInfo implements ILostChunkInfo {
             float r = rand.nextFloat();
             noLoot = building2x2Section == -1 && r < provider.profile.BUILDING_WITHOUT_LOOT_CHANCE;
             r = rand.nextFloat();
-            if (rand.nextFloat() < provider.profile.RUIN_CHANCE) {
+            if (rand.nextFloat() < provider.profile.RUIN_CHANCE && (predefinedBuilding == null || !predefinedBuilding.isPreventRuins())) {
                 ruinHeight = provider.profile.RUIN_MINLEVEL_PERCENT + (provider.profile.RUIN_MAXLEVEL_PERCENT - provider.profile.RUIN_MINLEVEL_PERCENT) * r;
             } else {
                 ruinHeight = -1;

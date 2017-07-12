@@ -31,6 +31,8 @@ public class CityStyle implements IAsset {
     private Integer maxFloorCount;
     private Integer maxCellarCount;
 
+    private Float explosionChance;
+
     private Character streetBlock;
     private Character streetBaseBlock;
     private Character streetVariantBlock;
@@ -59,6 +61,10 @@ public class CityStyle implements IAsset {
 
     public String getStyle() {
         return style;
+    }
+
+    public Float getExplosionChance() {
+        return explosionChance;
     }
 
     public int getStreetWidth() {
@@ -137,6 +143,9 @@ public class CityStyle implements IAsset {
                 frontSelector.addAll(inheritFrom.frontSelector);
                 railDungeonSelector.addAll(inheritFrom.railDungeonSelector);
                 multiBuildingSelector.addAll(inheritFrom.multiBuildingSelector);
+                if (explosionChance == null) {
+                    explosionChance = inheritFrom.explosionChance;
+                }
                 if (streetWidth == null) {
                     streetWidth = inheritFrom.streetWidth;
                 }
@@ -193,6 +202,10 @@ public class CityStyle implements IAsset {
 
         if (object.has("style")) {
             style = object.get("style").getAsString();
+        }
+
+        if (object.has("explosionchance")) {
+            explosionChance = object.get("explosionchance").getAsFloat();
         }
 
         if (object.has("streetblocks")) {
