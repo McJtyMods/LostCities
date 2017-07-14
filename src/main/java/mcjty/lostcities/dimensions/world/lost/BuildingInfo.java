@@ -347,6 +347,10 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
+    public boolean isValidFloor(int l) {
+        return (l + floorsBelowGround) >= 0 && (l + floorsBelowGround) < floorTypes.length;
+    }
+
     public BuildingPart getFloor(int l) {
         return floorTypes[l + floorsBelowGround];
     }
@@ -1284,7 +1288,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (level < 0 || level >= connectionAtX.length) {
             return false;
         }
-        if (floorTypes[level].getMetaBoolean("dontconnect")) {
+        if (level < floorTypes.length && floorTypes[level].getMetaBoolean("dontconnect")) {
             return false;       // No connection supported
         }
         if (getXmin().hasFrontPartFrom(this)) {
@@ -1304,9 +1308,6 @@ public class BuildingInfo implements ILostChunkInfo {
         if (level < 0 || level >= connectionAtX.length) {
             return false;
         }
-        if (floorTypes[level].getMetaBoolean("dontconnect")) {
-            return false;       // No connection supported
-        }
         if (hasFrontPartFrom(getXmin())) {
             return true;
         }
@@ -1323,6 +1324,9 @@ public class BuildingInfo implements ILostChunkInfo {
         }
         if (level < 0 || level >= connectionAtZ.length) {
             return false;
+        }
+        if (level < floorTypes.length && floorTypes[level].getMetaBoolean("dontconnect")) {
+            return false;       // No connection supported
         }
         if (getZmin().hasFrontPartFrom(this)) {
             return true;

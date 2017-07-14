@@ -279,6 +279,10 @@
         "block": "minecraft:glass"
       },
       {
+        "char": "`",
+        "block": "minecraft:glass_pane"
+      },
+      {
         "char": "a",
         "block": "minecraft:glass"
       }
@@ -291,6 +295,10 @@
       {
         "char": "+",
         "block": "minecraft:glass"
+      },
+      {
+        "char": "`",
+        "block": "minecraft:glass_pane"
       },
       {
         "char": "a",
@@ -307,6 +315,10 @@
         "block": "minecraft:stained_glass"
       },
       {
+        "char": "`",
+        "block": "minecraft:stained_glass_pane"
+      },
+      {
         "char": "a",
         "block": "minecraft:stained_glass"
       }
@@ -319,6 +331,10 @@
       {
         "char": "+",
         "block": "minecraft:stained_glass"
+      },
+      {
+        "char": "`",
+        "block": "minecraft:stained_glass_pane"
       },
       {
         "char": "a",
@@ -335,6 +351,10 @@
         "block": "minecraft:stained_glass@7"
       },
       {
+        "char": "`",
+        "block": "minecraft:stained_glass_pane@7"
+      },
+      {
         "char": "a",
         "block": "minecraft:stained_glass@7"
       }
@@ -347,6 +367,10 @@
       {
         "char": "+",
         "block": "minecraft:stained_glass@7"
+      },
+      {
+        "char": "`",
+        "block": "minecraft:stained_glass_pane@7"
       },
       {
         "char": "a",
@@ -363,6 +387,10 @@
         "block": "minecraft:stained_glass@11"
       },
       {
+        "char": "`",
+        "block": "minecraft:stained_glass_pane@11"
+      },
+      {
         "char": "a",
         "block": "minecraft:stained_glass@11"
       }
@@ -375,6 +403,10 @@
       {
         "char": "+",
         "block": "minecraft:stained_glass@11"
+      },
+      {
+        "char": "`",
+        "block": "minecraft:stained_glass_pane@11"
       },
       {
         "char": "a",
@@ -391,6 +423,10 @@
         "block": "minecraft:stained_glass@3"
       },
       {
+        "char": "`",
+        "block": "minecraft:stained_glass_pane@3"
+      },
+      {
         "char": "a",
         "block": "minecraft:stained_glass@3"
       }
@@ -403,6 +439,10 @@
       {
         "char": "+",
         "block": "minecraft:stained_glass@3"
+      },
+      {
+        "char": "`",
+        "block": "minecraft:stained_glass_pane@3"
       },
       {
         "char": "a",

@@ -50,8 +50,9 @@ public class BuildingPart implements IAsset {
     public Integer getMetaInteger(String key) {
         return (Integer) metadata.get(key);
     }
-    public Boolean getMetaBoolean(String key) {
-        return (Boolean) metadata.get(key);
+    public boolean getMetaBoolean(String key) {
+        Object o = metadata.get(key);
+        return o instanceof Boolean ? (Boolean) o : false;
     }
     public Float getMetaFloat(String key) {
         return (Float) metadata.get(key);

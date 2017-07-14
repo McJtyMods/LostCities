@@ -2237,8 +2237,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private boolean hasConnectionWithBuildingMax(int localLevel, BuildingInfo info, BuildingInfo info2, Orientation x) {
+        if (info.isValidFloor(localLevel) && info.getFloor(localLevel).getMetaBoolean("dontconnect")) {
+            return false;
+        }
         int globalLevel = info.localToGlobal(localLevel);
         int localAdjacent = info2.globalToLocal(globalLevel);
+        if (info2.isValidFloor(localAdjacent) && info2.getFloor(localAdjacent).getMetaBoolean("dontconnect")) {
+            return false;
+        }
         int level = localAdjacent + info2.floorsBelowGround;
         return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.floorsBelowGround)) && info2.hasConnectionAt(level, x);
     }
