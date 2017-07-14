@@ -1284,6 +1284,9 @@ public class BuildingInfo implements ILostChunkInfo {
         if (level < 0 || level >= connectionAtX.length) {
             return false;
         }
+        if (floorTypes[level].getMetaBoolean("dontconnect")) {
+            return false;       // No connection supported
+        }
         if (getXmin().hasFrontPartFrom(this)) {
             return true;
         }
@@ -1300,6 +1303,9 @@ public class BuildingInfo implements ILostChunkInfo {
         }
         if (level < 0 || level >= connectionAtX.length) {
             return false;
+        }
+        if (floorTypes[level].getMetaBoolean("dontconnect")) {
+            return false;       // No connection supported
         }
         if (hasFrontPartFrom(getXmin())) {
             return true;
