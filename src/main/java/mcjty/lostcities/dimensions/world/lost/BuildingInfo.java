@@ -625,7 +625,7 @@ public class BuildingInfo implements ILostChunkInfo {
             noLoot = topleft.noLoot;
             ruinHeight = topleft.ruinHeight;
         } else {
-            CityStyle cs = getCityStyle();
+            CityStyle cs = cityInfo.cityStyle;
             PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
             if (building2x2Section == 0) {
                 String name = cs.getRandomMultiBuilding(rand);
