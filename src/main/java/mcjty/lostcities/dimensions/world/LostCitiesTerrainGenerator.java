@@ -802,7 +802,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         if (provider.profile.RUBBLELAYER) {
-            generateRubble(primer, chunkX, chunkZ, info);
+            if (!info.hasBuilding || info.ruinHeight >= 0) {
+                generateRubble(primer, chunkX, chunkZ, info);
+            }
         }
     }
 
