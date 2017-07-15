@@ -2,10 +2,7 @@ package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.dimensions.world.lost.*;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
-import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
-import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
-import mcjty.lostcities.dimensions.world.lost.cityassets.Palette;
+import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.PrimerTools;
@@ -214,10 +211,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
         // @todo this setup is not very clean
-        street = info.getCompiledPalette().get(info.getCityStyle().getStreetBlock());
-        streetBase = info.getCompiledPalette().get(info.getCityStyle().getStreetBaseBlock());
-        street2 = info.getCompiledPalette().get(info.getCityStyle().getStreetVariantBlock());
-        streetBorder = (16 - info.getCityStyle().getStreetWidth()) / 2;
+        CityStyle cityStyle = info.getCityStyle();
+        street = info.getCompiledPalette().get(cityStyle.getStreetBlock());
+        streetBase = info.getCompiledPalette().get(cityStyle.getStreetBaseBlock());
+        street2 = info.getCompiledPalette().get(cityStyle.getStreetVariantBlock());
+        streetBorder = (16 - cityStyle.getStreetWidth()) / 2;
 
         if (info.isCity) {
             doCityChunk(chunkX, chunkZ, primer, info);

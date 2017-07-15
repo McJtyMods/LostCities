@@ -123,7 +123,6 @@ public class BuildingInfo implements ILostChunkInfo {
     // BuildingInfo cache
     private static Map<ChunkCoord, BuildingInfo> buildingInfoMap = new HashMap<>();
     private static Map<ChunkCoord, CityInfo> cityInfoMap = new HashMap<>();
-    private static Map<ChunkCoord, CityStyle> cityStyleCache = new HashMap<>();
 
     public void addSaplingTodo(BlockPos pos) {
         saplingTodo.add(pos);
@@ -215,51 +214,8 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
-    public Set<ChunkPos> findConnectedStreets() {
-        Set<ChunkPos> streets = new HashSet<>();
-        Queue<ChunkPos> todo = new ArrayDeque<>();
-        todo.add(new ChunkPos(chunkX, chunkZ));
-        while (!todo.isEmpty()) {
-            ChunkPos cp = todo.poll();
-            if (isCity(cp.chunkXPos, cp.chunkZPos, provider) && !hasBuilding(cp.chunkXPos, cp.chunkZPos, provider) && !streets.contains(cp) && streets.size() < 20) {
-                streets.add(cp);
-                todo.add(new ChunkPos(cp.chunkXPos-1, cp.chunkZPos));
-                todo.add(new ChunkPos(cp.chunkXPos+1, cp.chunkZPos));
-                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos-1));
-                todo.add(new ChunkPos(cp.chunkXPos, cp.chunkZPos+1));
-            }
-        }
-        return streets;
-    }
-
     public Style getOutsideStyle() {
         return AssetRegistries.STYLES.get(provider.worldStyle.getOutsideStyle());
-    }
-
-    public CityStyle getCityStyle() {
-        if (!cityStyleCache.containsKey(coord)) {
-            CityStyle cityStyle;
-            // If this is a street we find all other street chunks connected to this and pick the cityStyle
-            // that represents the majority. This is to prevent streets from switching style randomly if two
-            // different styled cities mix
-            if (isCity && !hasBuilding) {
-                Set<ChunkPos> connectedStreets = findConnectedStreets();
-                Counter<String> counter = new Counter<>();
-                for (ChunkPos cp : connectedStreets) {
-                    cityStyle = City.getCityStyle(cp.chunkXPos, cp.chunkZPos, provider);
-                    counter.add(cityStyle.getName());
-                }
-                cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
-                for (ChunkPos cp : connectedStreets) {
-                    cityStyleCache.put(new ChunkCoord(coord.getDimension(), cp.chunkXPos, cp.chunkZPos), cityStyle);
-                }
-            } else {
-                cityStyle = City.getCityStyle(chunkX, chunkZ, provider);
-                cityStyleCache.put(coord, cityStyle);
-            }
-            return cityStyle;
-        }
-        return cityStyleCache.get(coord);
     }
 
     private void createPalette(Random rand) {
@@ -363,6 +319,10 @@ public class BuildingInfo implements ILostChunkInfo {
         return buildingType;
     }
 
+    public CityStyle getCityStyle() {
+        return getCityInfo(chunkX, chunkZ, provider).cityStyle;
+    }
+
     public static CityInfo getCityInfo(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         ChunkCoord key = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
         if (cityInfoMap.containsKey(key)) {
@@ -380,6 +340,28 @@ public class BuildingInfo implements ILostChunkInfo {
             }
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
             cityInfo.hasBuilding = cityInfo.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, cityInfo.section, cityInfo.cityLevel, rand);
+
+            ChunkCoord coord = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
+            CityStyle cityStyle;
+            // If this is a street we find all other chunks connected to this and pick the cityStyle
+            // that represents the majority. This is to prevent streets from switching style randomly if two
+            // different styled cities mix
+            if (cityInfo.isCity && !cityInfo.hasBuilding) {
+                Counter<String> counter = new Counter<>();
+                for (int cx = -1 ; cx <= 1 ; cx++) {
+                    for (int cz = -1 ; cz <= 1 ; cz++) {
+                        cityStyle = City.getCityStyle(coord.getChunkX()+cx, coord.getChunkZ()+cz, provider);
+                        counter.add(cityStyle.getName());
+                        if (cx == 0 && cz == 0) {
+                            counter.add(cityStyle.getName());   // Add this chunk again for a bias
+                        }
+                    }
+                }
+                cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
+            } else {
+                cityStyle = City.getCityStyle(chunkX, chunkZ, provider);
+            }
+            cityInfo.cityStyle = cityStyle;
 
             cityInfoMap.put(key, cityInfo);
             return cityInfo;
@@ -578,7 +560,6 @@ public class BuildingInfo implements ILostChunkInfo {
     public static void cleanCache() {
         buildingInfoMap.clear();
         cityInfoMap.clear();
-        cityStyleCache.clear();
     }
 
     public static BuildingInfo getBuildingInfo(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
