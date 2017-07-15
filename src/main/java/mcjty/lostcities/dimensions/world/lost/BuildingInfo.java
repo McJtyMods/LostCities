@@ -363,6 +363,46 @@ public class BuildingInfo implements ILostChunkInfo {
             }
             cityInfo.cityStyle = cityStyle;
 
+
+            if (cityInfo.section >= 1) {
+                CityInfo topleft = getTopLeftCityInfo(cityInfo, chunkX, chunkZ, provider);
+                cityInfo.multiBuilding = topleft.multiBuilding;
+                if (cityInfo.multiBuilding != null) {
+                    switch (cityInfo.section) {
+                        case 1:
+                            cityInfo.buildingType = AssetRegistries.BUILDINGS.get(cityInfo.multiBuilding.get(1, 0));
+                            break;
+                        case 2:
+                            cityInfo.buildingType = AssetRegistries.BUILDINGS.get(cityInfo.multiBuilding.get(0, 1));
+                            break;
+                        case 3:
+                            cityInfo.buildingType = AssetRegistries.BUILDINGS.get(cityInfo.multiBuilding.get(1, 1));
+                            break;
+                        default:
+                            throw new RuntimeException("What 2!");
+                    }
+                } else {
+                    cityInfo.buildingType = topleft.buildingType;
+                }
+            } else {
+                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+                if (cityInfo.section == 0) {
+                    String name = cityStyle.getRandomMultiBuilding(rand);
+                    if (predefinedBuilding != null) {
+                        name = predefinedBuilding.getBuilding();
+                    }
+                    cityInfo.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(name);
+                    cityInfo.buildingType = AssetRegistries.BUILDINGS.get(cityInfo.multiBuilding.get(0, 0));
+                } else {
+                    cityInfo.multiBuilding = null;
+                    String name = cityStyle.getRandomBuilding(rand);
+                    if (predefinedBuilding != null) {
+                        name = predefinedBuilding.getBuilding();
+                    }
+                    cityInfo.buildingType = AssetRegistries.BUILDINGS.get(name);
+                }
+            }
+
             cityInfoMap.put(key, cityInfo);
             return cityInfo;
         }
@@ -584,6 +624,8 @@ public class BuildingInfo implements ILostChunkInfo {
         building2x2Section = cityInfo.section;
         hasBuilding = cityInfo.hasBuilding;
         cityLevel = cityInfo.cityLevel;
+        buildingType = cityInfo.buildingType;
+        multiBuilding = cityInfo.multiBuilding;
 
         Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
         rand.nextFloat();       // Compatibility?
@@ -591,24 +633,6 @@ public class BuildingInfo implements ILostChunkInfo {
         // In a 2x2 building we copy all information from the top-left chunk
         if (building2x2Section >= 1) {
             BuildingInfo topleft = calculateTopLeft();
-            multiBuilding = topleft.multiBuilding;
-            if (multiBuilding != null) {
-                switch (building2x2Section) {
-                    case 1:
-                        buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(1, 0));
-                        break;
-                    case 2:
-                        buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(0, 1));
-                        break;
-                    case 3:
-                        buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(1, 1));
-                        break;
-                    default:
-                        throw new RuntimeException("What 2!");
-                }
-            } else {
-                buildingType = topleft.buildingType;
-            }
             highwayXLevel = topleft.highwayXLevel;
             highwayZLevel = topleft.highwayZLevel;
             streetType = topleft.streetType;
@@ -627,22 +651,6 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             CityStyle cs = cityInfo.cityStyle;
             PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
-            if (building2x2Section == 0) {
-                String name = cs.getRandomMultiBuilding(rand);
-                if (predefinedBuilding != null) {
-                    name = predefinedBuilding.getBuilding();
-                }
-                multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(name);
-                buildingType = AssetRegistries.BUILDINGS.get(multiBuilding.get(0, 0));
-            } else {
-                multiBuilding = null;
-                String name = cs.getRandomBuilding(rand);
-                if (predefinedBuilding != null) {
-                    name = predefinedBuilding.getBuilding();
-                }
-                buildingType = AssetRegistries.BUILDINGS.get(name);
-            }
-
             highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
             highwayZLevel = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
 
