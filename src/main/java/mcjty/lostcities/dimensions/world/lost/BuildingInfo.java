@@ -339,14 +339,14 @@ public class BuildingInfo implements ILostChunkInfo {
                 cityInfo.cityLevel = getCityLevel(chunkX, chunkZ, provider);
             }
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
-            cityInfo.hasBuilding = cityInfo.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, cityInfo.section, cityInfo.cityLevel, rand);
+            cityInfo.couldHaveBuilding = cityInfo.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, cityInfo.section, cityInfo.cityLevel, rand);
 
             ChunkCoord coord = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
             CityStyle cityStyle;
-            // If this is a street we find all other chunks connected to this and pick the cityStyle
+            // If this is a street we find other chunks connected to this and pick the cityStyle
             // that represents the majority. This is to prevent streets from switching style randomly if two
             // different styled cities mix
-            if (cityInfo.isCity && !cityInfo.hasBuilding) {
+            if (cityInfo.isCity && !cityInfo.couldHaveBuilding) {
                 Counter<String> counter = new Counter<>();
                 for (int cx = -1 ; cx <= 1 ; cx++) {
                     for (int cz = -1 ; cz <= 1 ; cz++) {
@@ -418,10 +418,6 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public static boolean isCity(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         return getCityInfo(chunkX, chunkZ, provider).isCity;
-    }
-
-    public static boolean hasBuilding(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return getCityInfo(chunkX, chunkZ, provider).hasBuilding;
     }
 
     private static boolean checkBuildingPossibility(int chunkX, int chunkZ, LostCityChunkGenerator provider, int section, int cityLevel, Random rand) {
@@ -622,13 +618,26 @@ public class BuildingInfo implements ILostChunkInfo {
 
         isCity = cityInfo.isCity;
         building2x2Section = cityInfo.section;
-        hasBuilding = cityInfo.hasBuilding;
         cityLevel = cityInfo.cityLevel;
         buildingType = cityInfo.buildingType;
         multiBuilding = cityInfo.multiBuilding;
 
         Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
         rand.nextFloat();       // Compatibility?
+
+        boolean b = cityInfo.couldHaveBuilding;
+        if (b && building2x2Section < 0) {
+            if (rand.nextFloat() < getCityInfo(chunkX - 1, chunkZ, provider).buildingType.getPrefersLonely()) {
+                b = false;
+            } else if (rand.nextFloat() < getCityInfo(chunkX + 1, chunkZ, provider).buildingType.getPrefersLonely()) {
+                b = false;
+            } else if (rand.nextFloat() < getCityInfo(chunkX, chunkZ - 1, provider).buildingType.getPrefersLonely()) {
+                b = false;
+            } else if (rand.nextFloat() < getCityInfo(chunkX, chunkZ + 1, provider).buildingType.getPrefersLonely()) {
+                b = false;
+            }
+        }
+        hasBuilding = b;
 
         // In a 2x2 building we copy all information from the top-left chunk
         if (building2x2Section >= 1) {

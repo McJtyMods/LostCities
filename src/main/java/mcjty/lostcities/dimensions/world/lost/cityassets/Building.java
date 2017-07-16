@@ -20,6 +20,7 @@ public class Building implements IAsset {
     private int maxFloors = -1;         // -1 means default from level
     private int maxCellars = -1;        // -1 means default frmo level
     private char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
+    private float prefersLonely = 0.0f; // The chance this this building is alone. If 1.0f this building wants to be alone all the time
 
     private final List<Pair<Predicate<ConditionContext>, String>> parts = new ArrayList<>();
     private final List<Pair<Predicate<ConditionContext>, String>> parts2 = new ArrayList<>();
@@ -41,20 +42,23 @@ public class Building implements IAsset {
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
 
-        if (object.getAsJsonObject().has("minfloors")) {
-            minFloors = object.getAsJsonObject().get("minfloors").getAsInt();
+        if (object.has("minfloors")) {
+            minFloors = object.get("minfloors").getAsInt();
         }
-        if (object.getAsJsonObject().has("mincellars")) {
-            minCellars = object.getAsJsonObject().get("mincellars").getAsInt();
+        if (object.has("mincellars")) {
+            minCellars = object.get("mincellars").getAsInt();
         }
-        if (object.getAsJsonObject().has("maxfloors")) {
-            maxFloors = object.getAsJsonObject().get("maxfloors").getAsInt();
+        if (object.has("maxfloors")) {
+            maxFloors = object.get("maxfloors").getAsInt();
         }
-        if (object.getAsJsonObject().has("maxcellars")) {
-            maxCellars = object.getAsJsonObject().get("maxcellars").getAsInt();
+        if (object.has("maxcellars")) {
+            maxCellars = object.get("maxcellars").getAsInt();
         }
-        if (object.getAsJsonObject().has("filler")) {
-            fillerBlock = object.getAsJsonObject().get("filler").getAsCharacter();
+        if (object.has("preferslonely")) {
+            prefersLonely = object.get("preferslonely").getAsFloat();
+        }
+        if (object.has("filler")) {
+            fillerBlock = object.get("filler").getAsCharacter();
         } else {
             throw new RuntimeException("'filler' is required for building '" + name + "'!");
         }
@@ -97,6 +101,10 @@ public class Building implements IAsset {
                             List<Pair<Predicate<ConditionContext>, String>> parts) {
         parts.add(Pair.of(test, partName));
         return this;
+    }
+
+    public float getPrefersLonely() {
+        return prefersLonely;
     }
 
     public int getMaxFloors() {

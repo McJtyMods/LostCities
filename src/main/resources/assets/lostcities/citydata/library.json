@@ -2161,6 +2161,7 @@
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
+    "preferslonely": 0.9,
     "parts": [
       {
         "floor": 0,
@@ -2204,6 +2205,7 @@
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
+    "preferslonely": 0.9,
     "parts": [
       {
         "floor": 0,
