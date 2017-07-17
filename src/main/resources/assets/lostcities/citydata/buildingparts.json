@@ -9676,12 +9676,6 @@
     "name": "shopping11_in_1",
     "xsize": 16,
     "zsize": 16,
-    "palette": [
-      {
-        "char": "Y",
-        "block": "minecraft:standing_banner"
-      }
-    ],
     "slices": [
       [
         "                ",
@@ -9744,12 +9738,6 @@
     "name": "shopping11_in_2",
     "xsize": 16,
     "zsize": 16,
-    "palette": [
-      {
-        "char": "Y",
-        "block": "minecraft:standing_banner"
-      }
-    ],
     "slices": [
       [
         "                ",
@@ -9774,10 +9762,28 @@
         "                ",
         "                ",
         "                ",
-        "  Y Y Y         ",
+        "  . . .         ",
         "                ",
         "                ",
-        "  Y Y Y         ",
+        "  . . .         ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "                "
+      ],
+      [
+        "                ",
+        "                ",
+        "                ",
+        "                ",
+        "  - - -         ",
+        "                ",
+        "                ",
+        "  - - -         ",
         "                ",
         "                ",
         "                ",
@@ -9795,12 +9801,6 @@
     "name": "shopping11_in_3",
     "xsize": 16,
     "zsize": 16,
-    "palette": [
-      {
-        "char": "Y",
-        "block": "minecraft:standing_banner"
-      }
-    ],
     "slices": [
       [
         "                ",
@@ -11428,7 +11428,7 @@
         "       `  `    a",
         "       `  `    a",
         "       `  `    #",
-        "       T       #",
+        "               #",
         "a#aa#aa#aa#aa###"
       ],
       [
@@ -12876,7 +12876,7 @@
         "#      `  `    a",
         "#      `  `    a",
         "#      `  `    #",
-        "#      T       #",
+        "#              #",
         "##aa#aa#aa#aa###"
       ],
       [
