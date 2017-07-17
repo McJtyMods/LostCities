@@ -7,6 +7,7 @@ import net.minecraft.block.BlockBed;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -14,6 +15,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class ForgeEventHandlers {
 
@@ -36,7 +38,8 @@ public class ForgeEventHandlers {
         Block b1 = world.getBlockState(bedLocation.down()).getBlock();
         Block b2 = world.getBlockState(bedLocation.offset(direction.getOpposite()).down()).getBlock();
 
-        if (b1 == Blocks.DIAMOND_BLOCK && b2 == Blocks.DIAMOND_BLOCK) {
+        Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LostCityConfiguration.SPECIAL_BED_BLOCK));
+        if (b1 == b && b2 == b) {
             // Check if the bed is surrounded by 6 skulls
             if (world.getBlockState(bedLocation.offset(direction)).getBlock() != Blocks.SKULL) {
                 return;
