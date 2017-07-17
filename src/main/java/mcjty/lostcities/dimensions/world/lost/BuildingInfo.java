@@ -15,7 +15,6 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -1250,6 +1249,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     // Call this from the street reference with the (potential building) as 'adj'
+    // 'streetLevel' is the cityLevel at the position of the street
     public boolean hasFrontPartFrom(BuildingInfo adj) {
         BuildingInfo.StreetType st = streetType;
         boolean elevated = isElevatedParkSection();
@@ -1266,6 +1266,11 @@ public class BuildingInfo implements ILostChunkInfo {
                 return false;
             }
             if (getMaxHighwayLevel() >= 0) {
+                return false;
+            }
+
+            int local = adj.globalToLocal(cityLevel);
+            if (adj.isValidFloor(local) && adj.getFloor(local).getMetaBoolean("dontconnect")) {
                 return false;
             }
         } else {
