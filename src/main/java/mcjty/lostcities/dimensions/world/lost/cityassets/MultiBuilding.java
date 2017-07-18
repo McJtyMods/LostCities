@@ -3,8 +3,9 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityMultiBuilding;
 
-public class MultiBuilding implements IAsset {
+public class MultiBuilding implements ILostCityMultiBuilding {
 
     private String name;
     private int dimX;
@@ -27,8 +28,19 @@ public class MultiBuilding implements IAsset {
         return this;
     }
 
-    public String get(int x, int z) {
+    @Override
+    public String getBuilding(int x, int z) {
         return buildings[x][z];
+    }
+
+    @Override
+    public int getDimX() {
+        return dimX;
+    }
+
+    @Override
+    public int getDimZ() {
+        return dimZ;
     }
 
     @Override
@@ -51,7 +63,6 @@ public class MultiBuilding implements IAsset {
         }
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("multibuilding"));

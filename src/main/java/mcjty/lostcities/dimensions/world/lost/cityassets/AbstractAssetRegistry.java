@@ -1,13 +1,14 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
-import com.google.gson.JsonArray;
+import mcjty.lostcities.api.ILostCityAsset;
+import mcjty.lostcities.api.ILostCityAssetRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AbstractAssetRegistry<T extends IAsset> {
+public class AbstractAssetRegistry<T extends ILostCityAsset> implements ILostCityAssetRegistry<T>  {
 
     private final Map<String, T> assets = new HashMap<>();
     private final List<String> assetNames = new ArrayList<>();
@@ -17,6 +18,11 @@ public class AbstractAssetRegistry<T extends IAsset> {
         assetNames.add(building.getName());
     }
 
+    public <S extends ILostCityAsset> ILostCityAssetRegistry<S> cast() {
+        return (ILostCityAssetRegistry<S>) this;
+    }
+
+    @Override
     public T get(String name) {
         if (name == null) {
             return null;
@@ -36,6 +42,7 @@ public class AbstractAssetRegistry<T extends IAsset> {
         return t;
     }
 
+    @Override
     public Iterable<T> getIterable() {
         return assets.values();
     }
@@ -50,11 +57,5 @@ public class AbstractAssetRegistry<T extends IAsset> {
 
     public void reset() {
         assets.clear();
-    }
-
-    public void writeToJson(JsonArray array) {
-        for (Map.Entry<String, T> entry : assets.entrySet()) {
-            array.add(entry.getValue().writeToJSon());
-        }
     }
 }

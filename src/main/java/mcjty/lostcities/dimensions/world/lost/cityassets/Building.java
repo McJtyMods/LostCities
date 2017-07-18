@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityBuilding;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
-public class Building implements IAsset {
+public class Building implements ILostCityBuilding {
 
     private String name;
 
@@ -20,6 +21,7 @@ public class Building implements IAsset {
     private int maxFloors = -1;         // -1 means default from level
     private int maxCellars = -1;        // -1 means default frmo level
     private char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
+    private float prefersLonely = 0.0f; // The chance this this building is alone. If 1.0f this building wants to be alone all the time
 
     private final List<Pair<Predicate<ConditionContext>, String>> parts = new ArrayList<>();
     private final List<Pair<Predicate<ConditionContext>, String>> parts2 = new ArrayList<>();
@@ -41,20 +43,23 @@ public class Building implements IAsset {
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
 
-        if (object.getAsJsonObject().has("minfloors")) {
-            minFloors = object.getAsJsonObject().get("minfloors").getAsInt();
+        if (object.has("minfloors")) {
+            minFloors = object.get("minfloors").getAsInt();
         }
-        if (object.getAsJsonObject().has("mincellars")) {
-            minCellars = object.getAsJsonObject().get("mincellars").getAsInt();
+        if (object.has("mincellars")) {
+            minCellars = object.get("mincellars").getAsInt();
         }
-        if (object.getAsJsonObject().has("maxfloors")) {
-            maxFloors = object.getAsJsonObject().get("maxfloors").getAsInt();
+        if (object.has("maxfloors")) {
+            maxFloors = object.get("maxfloors").getAsInt();
         }
-        if (object.getAsJsonObject().has("maxcellars")) {
-            maxCellars = object.getAsJsonObject().get("maxcellars").getAsInt();
+        if (object.has("maxcellars")) {
+            maxCellars = object.get("maxcellars").getAsInt();
         }
-        if (object.getAsJsonObject().has("filler")) {
-            fillerBlock = object.getAsJsonObject().get("filler").getAsCharacter();
+        if (object.has("preferslonely")) {
+            prefersLonely = object.get("preferslonely").getAsFloat();
+        }
+        if (object.has("filler")) {
+            fillerBlock = object.get("filler").getAsCharacter();
         } else {
             throw new RuntimeException("'filler' is required for building '" + name + "'!");
         }
@@ -76,7 +81,6 @@ public class Building implements IAsset {
         }
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("building"));
@@ -99,22 +103,32 @@ public class Building implements IAsset {
         return this;
     }
 
+    @Override
+    public float getPrefersLonely() {
+        return prefersLonely;
+    }
+
+    @Override
     public int getMaxFloors() {
         return maxFloors;
     }
 
+    @Override
     public int getMaxCellars() {
         return maxCellars;
     }
 
+    @Override
     public int getMinFloors() {
         return minFloors;
     }
 
+    @Override
     public int getMinCellars() {
         return minCellars;
     }
 
+    @Override
     public char getFillerBlock() {
         return fillerBlock;
     }

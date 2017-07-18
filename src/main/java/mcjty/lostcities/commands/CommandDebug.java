@@ -47,7 +47,7 @@ public class CommandDebug implements ICommand {
             System.out.println("info.isCity = " + info.isCity);
             System.out.println("info.chunkX = " + info.chunkX);
             System.out.println("info.chunkZ = " + info.chunkZ);
-            System.out.println("info.getCityStyle() = " + info.getCityStyle().getName());
+            System.out.println("info.getCityStyle() = " + info.getChunkCharacteristics(info.chunkX, info.chunkZ, info.provider).cityStyle.getName());
             System.out.println("info.ruinHeight = " + info.ruinHeight);
             System.out.println("info.getHighwayXLevel() = " + info.getHighwayXLevel());
             System.out.println("info.getHighwayZLevel() = " + info.getHighwayZLevel());

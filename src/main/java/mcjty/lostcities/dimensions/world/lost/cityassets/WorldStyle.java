@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -15,7 +16,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class WorldStyle implements IAsset {
+public class WorldStyle implements ILostCityAsset {
 
     private String name;
     private String outsideStyle;
@@ -79,7 +80,6 @@ public class WorldStyle implements IAsset {
         return outsideStyle;
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("worldstyle"));

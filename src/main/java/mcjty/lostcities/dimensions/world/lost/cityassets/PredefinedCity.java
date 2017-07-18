@@ -4,11 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityAsset;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PredefinedCity implements IAsset {
+public class PredefinedCity implements ILostCityAsset {
 
     private String name;
     private int dimension;
@@ -78,7 +79,6 @@ public class PredefinedCity implements IAsset {
         }
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("city"));

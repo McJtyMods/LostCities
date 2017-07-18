@@ -1,11 +1,9 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.dimensions.world.lost.*;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
-import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
-import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
-import mcjty.lostcities.dimensions.world.lost.cityassets.Palette;
+import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.PrimerTools;
@@ -20,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -214,10 +213,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
         // @todo this setup is not very clean
-        street = info.getCompiledPalette().get(info.getCityStyle().getStreetBlock());
-        streetBase = info.getCompiledPalette().get(info.getCityStyle().getStreetBaseBlock());
-        street2 = info.getCompiledPalette().get(info.getCityStyle().getStreetVariantBlock());
-        streetBorder = (16 - info.getCityStyle().getStreetWidth()) / 2;
+        CityStyle cityStyle = info.getCityStyle();
+        street = info.getCompiledPalette().get(cityStyle.getStreetBlock());
+        streetBase = info.getCompiledPalette().get(cityStyle.getStreetBaseBlock());
+        street2 = info.getCompiledPalette().get(cityStyle.getStreetVariantBlock());
+        streetBorder = (16 - cityStyle.getStreetWidth()) / 2;
 
         if (info.isCity) {
             doCityChunk(chunkX, chunkZ, primer, info);
@@ -239,11 +239,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         // primer vs generating it here
         provider.rand.setSeed(chunkX * 257017164707L + chunkZ * 101754694003L);
 
-        if (info.getDamageArea().hasExplosions()) {
-            breakBlocksForDamage(chunkX, chunkZ, primer, info);
-            fixAfterExplosionNew(primer, info, provider.rand);
+        LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.worldObj, provider, chunkX, chunkZ, primer);
+        if (!MinecraftForge.EVENT_BUS.post(event)) {
+            if (info.getDamageArea().hasExplosions()) {
+                breakBlocksForDamage(chunkX, chunkZ, primer, info);
+                fixAfterExplosionNew(primer, info, provider.rand);
+            }
+            generateDebris(primer, provider.rand, info);
         }
-        generateDebris(primer, provider.rand, info);
     }
 
     private void fixTorches(ChunkPrimer primer, BuildingInfo info) {
@@ -781,11 +784,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        if (building) {
-            generateBuilding(primer, info);
-        } else {
-            generateStreet(primer, info, rand);
+        LostCityEvent.PreGenCityChunkEvent event = new LostCityEvent.PreGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, primer);
+        if (!MinecraftForge.EVENT_BUS.post(event)) {
+            if (building) {
+                generateBuilding(primer, info);
+            } else {
+                generateStreet(primer, info, rand);
+            }
         }
+        LostCityEvent.PostGenCityChunkEvent postevent = new LostCityEvent.PostGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, primer);
+        MinecraftForge.EVENT_BUS.post(postevent);
 
         if (provider.profile.RUINS) {
             generateRuins(primer, info);
@@ -804,7 +812,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         if (provider.profile.RUBBLELAYER) {
-            generateRubble(primer, chunkX, chunkZ, info);
+            if (!info.hasBuilding || info.ruinHeight >= 0) {
+                generateRubble(primer, chunkX, chunkZ, info);
+            }
         }
     }
 
@@ -2237,8 +2247,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private boolean hasConnectionWithBuildingMax(int localLevel, BuildingInfo info, BuildingInfo info2, Orientation x) {
+        if (info.isValidFloor(localLevel) && info.getFloor(localLevel).getMetaBoolean("dontconnect")) {
+            return false;
+        }
         int globalLevel = info.localToGlobal(localLevel);
         int localAdjacent = info2.globalToLocal(globalLevel);
+        if (info2.isValidFloor(localAdjacent) && info2.getFloor(localAdjacent).getMetaBoolean("dontconnect")) {
+            return false;
+        }
         int level = localAdjacent + info2.floorsBelowGround;
         return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.floorsBelowGround)) && info2.hasConnectionAt(level, x);
     }

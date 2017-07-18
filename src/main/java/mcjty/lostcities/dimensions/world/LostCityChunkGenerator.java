@@ -10,7 +10,6 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.Condition;
 import mcjty.lostcities.dimensions.world.lost.cityassets.ConditionContext;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import mcjty.lostcities.varia.ChunkCoord;
-import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.BlockVine;
@@ -24,7 +23,6 @@ import net.minecraft.tileentity.MobSpawnerBaseLogic;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityMobSpawner;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.fixes.EntityId;
 import net.minecraft.util.math.BlockPos;
@@ -642,5 +640,20 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
     @Override
     public int getRealHeight(int level) {
         return profile.GROUNDLEVEL + level * 6;
+    }
+
+    @Override
+    public ILostCityAssetRegistry<ILostCityBuilding> getBuildings() {
+        return AssetRegistries.BUILDINGS.cast();
+    }
+
+    @Override
+    public ILostCityAssetRegistry<ILostCityMultiBuilding> getMultiBuildings() {
+        return AssetRegistries.MULTI_BUILDINGS.cast();
+    }
+
+    @Override
+    public ILostCityAssetRegistry<ILostCityCityStyle> getCityStyles() {
+        return AssetRegistries.CITYSTYLES.cast();
     }
 }

@@ -66,6 +66,10 @@
         "block": "minecraft:redstone_torch@5"
       },
       {
+        "char": "Z",
+        "block": "minecraft:glass"
+      },
+      {
         "char": "P",
         "blocks": [
           {
@@ -370,6 +374,14 @@
       {
         "factor": 0.08,
         "multibuilding": "townhall"
+      },
+      {
+        "factor": 0.25,
+        "multibuilding": "shopping"
+      },
+      {
+        "factor": 0.2,
+        "multibuilding": "shopping_open"
       }
     ],
     "bridges": [
@@ -2146,6 +2158,508 @@
       }
     ]
   },
+  {
+    "type": "building",
+    "name": "shopping00",
+    "filler": "#",
+    "maxcellars": 0,
+    "minfloors": 4,
+    "maxfloors": 6,
+    "preferslonely": 0.9,
+    "parts": [
+      {
+        "floor": 0,
+        "part": "shopping00_0"
+      },
+      {
+        "floor": 1,
+        "part": "shopping00_1"
+      },
+      {
+        "floor": 2,
+        "part": "shopping00_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping00_r1"
+      },
+      {
+        "top": true,
+        "part": "top_center_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_2"
+      },
+      {
+        "top": true,
+        "part": "top_center_3"
+      },
+      {
+        "top": true,
+        "part": "top_center_4"
+      }
+    ]
+  },
+  {
+    "type": "building",
+    "name": "shopping01",
+    "filler": "#",
+    "maxcellars": 0,
+    "minfloors": 4,
+    "maxfloors": 6,
+    "preferslonely": 0.9,
+    "parts": [
+      {
+        "floor": 0,
+        "part": "shopping01_0"
+      },
+      {
+        "floor": 1,
+        "part": "shopping01_1"
+      },
+      {
+        "floor": 2,
+        "part": "shopping01_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping01_r1"
+      },
+      {
+        "top": true,
+        "part": "top_center_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_2"
+      },
+      {
+        "top": true,
+        "part": "top_center_3"
+      },
+      {
+        "top": true,
+        "part": "top_center_4"
+      }
+    ],
+    "parts2": [
+      {
+        "floor": 0,
+        "part": "shopping01_in_1"
+      },
+      {
+        "floor": 0,
+        "part": "shopping01_in_2"
+      },
+      {
+        "floor": 0,
+        "part": "shopping01_in_3"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping01_in_1"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping01_in_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping01_in_3"
+      }
+    ]
+  },
+  {
+    "type": "building",
+    "name": "shopping10",
+    "filler": "#",
+    "maxcellars": 0,
+    "minfloors": 4,
+    "maxfloors": 6,
+    "parts": [
+      {
+        "floor": 0,
+        "part": "shopping10_0"
+      },
+      {
+        "floor": 1,
+        "part": "shopping10_1"
+      },
+      {
+        "floor": 2,
+        "part": "shopping10_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping10_r1"
+      },
+      {
+        "top": true,
+        "part": "top_center_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_2"
+      },
+      {
+        "top": true,
+        "part": "top_center_3"
+      },
+      {
+        "top": true,
+        "part": "top_center_4"
+      }
+    ],
+    "parts2": [
+      {
+        "floor": 0,
+        "part": "shopping10_in_1"
+      },
+      {
+        "floor": 0,
+        "part": "shopping10_in_2"
+      },
+      {
+        "floor": 0,
+        "part": "shopping10_in_3"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping10_in_1"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping10_in_2"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping10_in_3"
+      }
+    ]
+  },
+  {
+    "type": "building",
+    "name": "shopping11",
+    "filler": "#",
+    "maxcellars": 0,
+    "minfloors": 4,
+    "maxfloors": 6,
+    "parts": [
+      {
+        "floor": 0,
+        "part": "shopping11_0"
+      },
+      {
+        "floor": 1,
+        "part": "shopping11_1"
+      },
+      {
+        "floor": 2,
+        "part": "shopping11_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping11_r1"
+      },
+      {
+        "top": true,
+        "part": "shopping11_top"
+      }
+    ],
+    "parts2": [
+      {
+        "floor": 0,
+        "part": "shopping11_in_1"
+      },
+      {
+        "floor": 0,
+        "part": "shopping11_in_2"
+      },
+      {
+        "floor": 0,
+        "part": "shopping11_in_3"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping11_in_1"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping11_in_2"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping11_in_3"
+      }
+    ]
+  },
+
+
+  {
+    "type": "building",
+    "name": "shopping_open00",
+    "filler": "#",
+    "maxcellars": 0,
+    "minfloors": 4,
+    "maxfloors": 6,
+    "preferslonely": 0.9,
+    "parts": [
+      {
+        "floor": 0,
+        "part": "shopping_open00_0"
+      },
+      {
+        "floor": 1,
+        "part": "shopping_open00_1"
+      },
+      {
+        "floor": 2,
+        "part": "shopping_open00_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping00_r1"
+      },
+      {
+        "top": true,
+        "part": "top_center_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_2"
+      },
+      {
+        "top": true,
+        "part": "top_center_3"
+      },
+      {
+        "top": true,
+        "part": "top_center_4"
+      }
+    ]
+  },
+  {
+    "type": "building",
+    "name": "shopping_open01",
+    "filler": "#",
+    "maxcellars": 0,
+    "minfloors": 4,
+    "maxfloors": 6,
+    "preferslonely": 0.9,
+    "parts": [
+      {
+        "floor": 0,
+        "part": "shopping_open01_0"
+      },
+      {
+        "floor": 1,
+        "part": "shopping_open01_1"
+      },
+      {
+        "floor": 2,
+        "part": "shopping_open01_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping01_r1"
+      },
+      {
+        "top": true,
+        "part": "top_center_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_2"
+      },
+      {
+        "top": true,
+        "part": "top_center_3"
+      },
+      {
+        "top": true,
+        "part": "top_center_4"
+      }
+    ],
+    "parts2": [
+      {
+        "floor": 0,
+        "part": "shopping01_in_1"
+      },
+      {
+        "floor": 0,
+        "part": "shopping01_in_2"
+      },
+      {
+        "floor": 0,
+        "part": "shopping01_in_3"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping01_in_1"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping01_in_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping01_in_3"
+      }
+    ]
+  },
+  {
+    "type": "building",
+    "name": "shopping_open10",
+    "filler": "#",
+    "maxcellars": 0,
+    "minfloors": 4,
+    "maxfloors": 6,
+    "parts": [
+      {
+        "floor": 0,
+        "part": "shopping_open10_0"
+      },
+      {
+        "floor": 1,
+        "part": "shopping_open10_1"
+      },
+      {
+        "floor": 2,
+        "part": "shopping_open10_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping10_r1"
+      },
+      {
+        "top": true,
+        "part": "top_center_1"
+      },
+      {
+        "top": true,
+        "part": "top_center_2"
+      },
+      {
+        "top": true,
+        "part": "top_center_3"
+      },
+      {
+        "top": true,
+        "part": "top_center_4"
+      }
+    ],
+    "parts2": [
+      {
+        "floor": 0,
+        "part": "shopping10_in_1"
+      },
+      {
+        "floor": 0,
+        "part": "shopping10_in_2"
+      },
+      {
+        "floor": 0,
+        "part": "shopping10_in_3"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping10_in_1"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping10_in_2"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping10_in_3"
+      }
+    ]
+  },
+  {
+    "type": "building",
+    "name": "shopping_open11",
+    "filler": "#",
+    "maxcellars": 0,
+    "minfloors": 4,
+    "maxfloors": 6,
+    "parts": [
+      {
+        "floor": 0,
+        "part": "shopping_open11_0"
+      },
+      {
+        "floor": 1,
+        "part": "shopping_open11_1"
+      },
+      {
+        "floor": 2,
+        "part": "shopping_open11_2"
+      },
+      {
+        "top": false,
+        "range": "3,100",
+        "part": "shopping11_r1"
+      },
+      {
+        "top": true,
+        "part": "shopping11_top"
+      }
+    ],
+    "parts2": [
+      {
+        "floor": 0,
+        "part": "shopping11_in_1"
+      },
+      {
+        "floor": 0,
+        "part": "shopping11_in_2"
+      },
+      {
+        "floor": 0,
+        "part": "shopping11_in_3"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping11_in_1"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping11_in_2"
+      },
+      {
+        "top": false,
+        "range": "2,100",
+        "part": "shopping11_in_3"
+      }
+    ]
+  },
+
+
 
   {
     "type": "building",
@@ -2862,6 +3376,38 @@
       [
         "town10",
         "town11"
+      ]
+    ]
+  },
+  {
+    "type": "multibuilding",
+    "name": "shopping",
+    "dimx": 2,
+    "dimz": 2,
+    "buildings": [
+      [
+        "shopping00",
+        "shopping01"
+      ],
+      [
+        "shopping10",
+        "shopping11"
+      ]
+    ]
+  },
+  {
+    "type": "multibuilding",
+    "name": "shopping_open",
+    "dimx": 2,
+    "dimz": 2,
+    "buildings": [
+      [
+        "shopping_open00",
+        "shopping_open01"
+      ],
+      [
+        "shopping_open10",
+        "shopping_open11"
       ]
     ]
   },

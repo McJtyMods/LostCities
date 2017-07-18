@@ -1,8 +1,11 @@
 package mcjty.lostcities.config;
 
 import mcjty.lostcities.LostCities;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.*;
 
@@ -45,6 +48,8 @@ public class LostCityConfiguration {
     public static String DEFAULT_PROFILE = "default";
     public static int DIMENSION_ID = 111;
     public static boolean DIMENSION_BOP = true;
+
+    public static String SPECIAL_BED_BLOCK = Blocks.DIAMOND_BLOCK.getRegistryName().toString();
 
     public static String[] init(Configuration cfg) {
         cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General settings");
@@ -103,6 +108,7 @@ public class LostCityConfiguration {
         DEFAULT_PROFILE = cfg.getString("defaultProfile", CATEGORY_GENERAL, DEFAULT_PROFILE, "The default 'profile' to use for the overworld");
         DIMENSION_ID = cfg.getInt("dimensionId", CATEGORY_GENERAL, DIMENSION_ID, -10000, 10000, "The 'ID' of the Lost City Dimension. Set to -1 if you don't want this dimension");
         DIMENSION_BOP = cfg.getBoolean("dimensionBoP", CATEGORY_GENERAL, DIMENSION_BOP, "If true and if Biomes O Plenty is present the dimension will use BoP biomes");
+        SPECIAL_BED_BLOCK = cfg.getString("specialBedBlock", CATEGORY_GENERAL, SPECIAL_BED_BLOCK, "Block to put underneath a bed so that it qualifies as a teleporter bed");
 
         return profileList;
     }

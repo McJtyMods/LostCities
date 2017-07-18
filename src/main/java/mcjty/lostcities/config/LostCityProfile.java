@@ -62,15 +62,15 @@ public class LostCityProfile {
     public boolean GENERATE_LOOT = true;
     public boolean GENERATE_LIGHTING = false;
 
-    public float EXPLOSION_CHANCE = .005f;
-    public int EXPLOSION_MINRADIUS = 17;
-    public int EXPLOSION_MAXRADIUS = 50;
+    public float EXPLOSION_CHANCE = .002f;
+    public int EXPLOSION_MINRADIUS = 15;
+    public int EXPLOSION_MAXRADIUS = 35;
     public int EXPLOSION_MINHEIGHT = 75;
     public int EXPLOSION_MAXHEIGHT = 90;
 
-    public float MINI_EXPLOSION_CHANCE = .07f;
+    public float MINI_EXPLOSION_CHANCE = .03f;
     public int MINI_EXPLOSION_MINRADIUS = 5;
-    public int MINI_EXPLOSION_MAXRADIUS = 15;
+    public int MINI_EXPLOSION_MAXRADIUS = 12;
     public int MINI_EXPLOSION_MINHEIGHT = 60;
     public int MINI_EXPLOSION_MAXHEIGHT = 100;
 
