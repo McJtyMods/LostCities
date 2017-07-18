@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Style implements IAsset {
+public class Style implements ILostCityAsset {
 
     private String name;
 
@@ -40,7 +41,6 @@ public class Style implements IAsset {
         }
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("style"));

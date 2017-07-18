@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
 import net.minecraft.block.state.IBlockState;
 import org.apache.commons.lang3.tuple.Pair;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  * A palette of materials as used by building parts
  */
-public class Palette implements IAsset {
+public class Palette implements ILostCityAsset {
 
     private String name;
     final Map<Character, Object> palette = new HashMap<>();
@@ -115,7 +116,6 @@ public class Palette implements IAsset {
         }
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("palette"));

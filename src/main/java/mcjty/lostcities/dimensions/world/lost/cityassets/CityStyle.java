@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityCityStyle;
 import mcjty.lostcities.varia.Tools;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class CityStyle implements IAsset {
+public class CityStyle implements ILostCityCityStyle {
 
     private String name;
 
@@ -59,66 +60,82 @@ public class CityStyle implements IAsset {
         return name;
     }
 
+    @Override
     public String getStyle() {
         return style;
     }
 
+    @Override
     public Float getExplosionChance() {
         return explosionChance;
     }
 
+    @Override
     public int getStreetWidth() {
         return streetWidth;
     }
 
+    @Override
     public Integer getMinFloorCount() {
         return minFloorCount;
     }
 
+    @Override
     public Integer getMinCellarCount() {
         return minCellarCount;
     }
 
+    @Override
     public Integer getMaxFloorCount() {
         return maxFloorCount;
     }
 
+    @Override
     public Integer getMaxCellarCount() {
         return maxCellarCount;
     }
 
+    @Override
     public Character getStreetBlock() {
         return streetBlock;
     }
 
+    @Override
     public Character getStreetBaseBlock() {
         return streetBaseBlock;
     }
 
+    @Override
     public Character getStreetVariantBlock() {
         return streetVariantBlock;
     }
 
+    @Override
     public Character getRailMainBlock() {
         return railMainBlock;
     }
 
+    @Override
     public Character getParkElevationBlock() {
         return parkElevationBlock;
     }
 
+    @Override
     public Character getCorridorRoofBlock() {
         return corridorRoofBlock;
     }
 
+    @Override
     public Character getCorridorGlassBlock() {
         return corridorGlassBlock;
     }
 
+    @Override
     public Character getBorderBlock() {
         return borderBlock;
     }
 
+    @Override
     public Character getWallBlock() {
         return wallBlock;
     }
@@ -292,7 +309,6 @@ public class CityStyle implements IAsset {
         }
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("citystyle"));

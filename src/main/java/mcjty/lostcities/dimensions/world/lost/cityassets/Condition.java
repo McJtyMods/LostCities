@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
-public class Condition implements IAsset {
+public class Condition implements ILostCityAsset {
 
     private String name;
 
@@ -44,7 +45,6 @@ public class Condition implements IAsset {
         }
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("condition"));

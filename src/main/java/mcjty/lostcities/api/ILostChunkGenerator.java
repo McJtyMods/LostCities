@@ -23,4 +23,8 @@ public interface ILostChunkGenerator {
      * empty space will be at getRealHeight()+1
      */
     int getRealHeight(int level);
+
+    ILostCityAssetRegistry<ILostCityBuilding> getBuildings();
+    ILostCityAssetRegistry<ILostCityMultiBuilding> getMultiBuildings();
+    ILostCityAssetRegistry<ILostCityCityStyle> getCityStyles();
 }

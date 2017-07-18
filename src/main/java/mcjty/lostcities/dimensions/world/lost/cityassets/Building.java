@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityBuilding;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
-public class Building implements IAsset {
+public class Building implements ILostCityBuilding {
 
     private String name;
 
@@ -80,7 +81,6 @@ public class Building implements IAsset {
         }
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("building"));
@@ -103,26 +103,32 @@ public class Building implements IAsset {
         return this;
     }
 
+    @Override
     public float getPrefersLonely() {
         return prefersLonely;
     }
 
+    @Override
     public int getMaxFloors() {
         return maxFloors;
     }
 
+    @Override
     public int getMaxCellars() {
         return maxCellars;
     }
 
+    @Override
     public int getMinFloors() {
         return minFloors;
     }
 
+    @Override
     public int getMinCellars() {
         return minCellars;
     }
 
+    @Override
     public char getFillerBlock() {
         return fillerBlock;
     }

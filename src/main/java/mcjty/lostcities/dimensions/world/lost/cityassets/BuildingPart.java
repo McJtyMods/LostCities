@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,7 +14,7 @@ import java.util.Map;
 /**
  * A structure part
  */
-public class BuildingPart implements IAsset {
+public class BuildingPart implements ILostCityAsset {
 
     private String name;
 
@@ -146,7 +147,6 @@ public class BuildingPart implements IAsset {
         }
     }
 
-    @Override
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();
         object.add("type", new JsonPrimitive("part"));

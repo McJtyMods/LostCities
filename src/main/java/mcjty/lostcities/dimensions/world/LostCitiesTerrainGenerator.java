@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
@@ -17,6 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -237,11 +239,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         // primer vs generating it here
         provider.rand.setSeed(chunkX * 257017164707L + chunkZ * 101754694003L);
 
-        if (info.getDamageArea().hasExplosions()) {
-            breakBlocksForDamage(chunkX, chunkZ, primer, info);
-            fixAfterExplosionNew(primer, info, provider.rand);
+        LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.worldObj, provider, chunkX, chunkZ, primer);
+        if (!MinecraftForge.EVENT_BUS.post(event)) {
+            if (info.getDamageArea().hasExplosions()) {
+                breakBlocksForDamage(chunkX, chunkZ, primer, info);
+                fixAfterExplosionNew(primer, info, provider.rand);
+            }
+            generateDebris(primer, provider.rand, info);
         }
-        generateDebris(primer, provider.rand, info);
     }
 
     private void fixTorches(ChunkPrimer primer, BuildingInfo info) {
@@ -779,11 +784,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        if (building) {
-            generateBuilding(primer, info);
-        } else {
-            generateStreet(primer, info, rand);
+        LostCityEvent.PreGenCityChunkEvent event = new LostCityEvent.PreGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, primer);
+        if (!MinecraftForge.EVENT_BUS.post(event)) {
+            if (building) {
+                generateBuilding(primer, info);
+            } else {
+                generateStreet(primer, info, rand);
+            }
         }
+        LostCityEvent.PostGenCityChunkEvent postevent = new LostCityEvent.PostGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, primer);
+        MinecraftForge.EVENT_BUS.post(postevent);
 
         if (provider.profile.RUINS) {
             generateRuins(primer, info);
