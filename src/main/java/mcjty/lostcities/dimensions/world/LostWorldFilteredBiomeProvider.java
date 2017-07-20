@@ -52,7 +52,7 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
     }
 
     private Biome translate(Biome biome) {
-        if (!translationMap.containsKey(biome.getBiomeName())) {
+        if (!translationMap.containsKey(biome.biomeName)) {
             parseAllowedBiomes();
 
             Biome bestFit = null;
@@ -68,9 +68,9 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
             if (bestFit == null) {
                 bestFit = Biomes.PLAINS;
             }
-            translationMap.put(biome.getBiomeName(), bestFit);
+            translationMap.put(biome.biomeName, bestFit);
         }
-        return translationMap.get(biome.getBiomeName());
+        return translationMap.get(biome.biomeName);
     }
 
     private static double calculateBiomeDistance(Biome a, Biome b) {
