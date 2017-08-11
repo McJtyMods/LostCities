@@ -26,6 +26,12 @@ public class LostWorldType extends WorldType {
     }
 
     public static LostCityProfile getProfile(World world) {
+        if (world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
+            LostCityProfile profile = LostCityConfiguration.profiles.get(LostCityConfiguration.DIMENSION_PROFILE);
+            if (profile != null) {
+                return profile;
+            }
+        }
         String generatorOptions = world.getWorldInfo().getGeneratorOptions();
         LostCityProfile p;
         if (generatorOptions == null || generatorOptions.trim().isEmpty()) {
