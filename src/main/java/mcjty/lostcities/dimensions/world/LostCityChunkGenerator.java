@@ -83,6 +83,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
     private MapGenVillage villageGenerator = new MapGenVillage();
     private MapGenMineshaft mineshaftGenerator = new MapGenMineshaft();
     private MapGenScatteredFeature scatteredFeatureGenerator = new MapGenScatteredFeature();
+    private LostWoodlandMansion woodlandMansionGenerator = new LostWoodlandMansion(this);
 
     public ChunkGeneratorSettings getSettings() {
         if (settings == null) {
@@ -182,24 +183,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         LostCitiesTerrainGenerator.setupChars();
         boolean isCity = BuildingInfo.isCity(chunkX, chunkZ, this);
 
-        ChunkPrimer chunkprimer;
-        if (isCity) {
-            chunkprimer = new ChunkPrimer();
-        } else {
-            ChunkCoord key = new ChunkCoord(worldObj.provider.getDimension(), chunkX, chunkZ);
-            if (cachedPrimers.containsKey(key)) {
-                // We calculated a primer earlier. Reuse it
-                chunkprimer = cachedPrimers.get(key);
-                cachedPrimers.remove(key);
-            } else {
-                chunkprimer = generatePrimer(chunkX, chunkZ);
-            }
-            // Calculate the chunk heightmap in case we need it later
-            if (!cachedHeightmaps.containsKey(key)) {
-                // We might need this later
-                cachedHeightmaps.put(key, new ChunkHeightmap(chunkprimer));
-            }
-        }
+        ChunkPrimer chunkprimer = getChunkPrimer(chunkX, chunkZ, isCity);
 
         terrainGenerator.generate(chunkX, chunkZ, chunkprimer);
 
@@ -241,6 +225,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
             this.oceanMonumentGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
         }
 
+        if (profile.GENERATE_MANSIONS) {
+            this.woodlandMansionGenerator.generate(this.worldObj, chunkX, chunkZ, chunkprimer);
+        }
+
         Chunk chunk = new Chunk(this.worldObj, chunkprimer, chunkX, chunkZ);
         byte[] abyte = chunk.getBiomeArray();
 
@@ -251,6 +239,28 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         chunk.generateSkylightMap();
 
         return chunk;
+    }
+
+    public ChunkPrimer getChunkPrimer(int chunkX, int chunkZ, boolean isCity) {
+        ChunkPrimer chunkprimer;
+        if (isCity) {
+            chunkprimer = new ChunkPrimer();
+        } else {
+            ChunkCoord key = new ChunkCoord(worldObj.provider.getDimension(), chunkX, chunkZ);
+            if (cachedPrimers.containsKey(key)) {
+                // We calculated a primer earlier. Reuse it
+                chunkprimer = cachedPrimers.get(key);
+                cachedPrimers.remove(key);
+            } else {
+                chunkprimer = generatePrimer(chunkX, chunkZ);
+            }
+            // Calculate the chunk heightmap in case we need it later
+            if (!cachedHeightmaps.containsKey(key)) {
+                // We might need this later
+                cachedHeightmaps.put(key, new ChunkHeightmap(chunkprimer));
+            }
+        }
+        return chunkprimer;
     }
 
     private void generateTrees(Random random, int chunkX, int chunkZ, World world, LostCityChunkGenerator provider) {
@@ -459,6 +469,9 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         if (profile.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generateStructure(w, this.rand, cp);
         }
+        if (profile.GENERATE_MANSIONS) {
+            this.woodlandMansionGenerator.generateStructure(w, this.rand, cp);
+        }
 
         int k1;
         int l1;
@@ -574,6 +587,8 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
             return this.strongholdGenerator.getNearestStructurePos(worldIn, position, findUnexplored);
         } else if ("Monument".equals(structureName) && this.oceanMonumentGenerator != null) {
             return this.oceanMonumentGenerator.getNearestStructurePos(worldIn, position, findUnexplored);
+        } else if ("LostMansion".equals(structureName) && this.woodlandMansionGenerator != null) {
+            return this.woodlandMansionGenerator.getNearestStructurePos(worldIn, position, findUnexplored);
         } else if ("Village".equals(structureName) && this.villageGenerator != null) {
             return this.villageGenerator.getNearestStructurePos(worldIn, position, findUnexplored);
         } else if ("Mineshaft".equals(structureName) && this.mineshaftGenerator != null) {
@@ -610,22 +625,30 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         if (profile.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generate(this.worldObj, x, z, null);
         }
+
+        if (profile.GENERATE_MANSIONS) {
+            this.woodlandMansionGenerator.generate(this.worldObj, x, z, null);
+        }
+    }
+
+    public boolean hasMansion(int chunkX, int chunkZ) {
+        return woodlandMansionGenerator != null && woodlandMansionGenerator.hasStructure(worldObj, chunkX, chunkZ);
     }
 
     @Override
-    public boolean isInsideStructure(World p_193414_1_, String p_193414_2_, BlockPos p_193414_3_) {
-        if ("Stronghold".equals(p_193414_2_) && this.strongholdGenerator != null) {
-            return this.strongholdGenerator.isInsideStructure(p_193414_3_);
-//        } else if ("Mansion".equals(p_193414_2_) && this.woodlandMansionGenerator != null) {
-//            return this.woodlandMansionGenerator.isInsideStructure(p_193414_3_);
-        } else if ("Monument".equals(p_193414_2_) && this.oceanMonumentGenerator != null) {
-            return this.oceanMonumentGenerator.isInsideStructure(p_193414_3_);
-        } else if ("Village".equals(p_193414_2_) && this.villageGenerator != null) {
-            return this.villageGenerator.isInsideStructure(p_193414_3_);
-        } else if ("Mineshaft".equals(p_193414_2_) && this.mineshaftGenerator != null) {
-            return this.mineshaftGenerator.isInsideStructure(p_193414_3_);
+    public boolean isInsideStructure(World world, String structureName, BlockPos blockPos) {
+        if ("Stronghold".equals(structureName) && this.strongholdGenerator != null) {
+            return this.strongholdGenerator.isInsideStructure(blockPos);
+        } else if ("LostMansion".equals(structureName) && this.woodlandMansionGenerator != null) {
+            return this.woodlandMansionGenerator.isInsideStructure(blockPos);
+        } else if ("Monument".equals(structureName) && this.oceanMonumentGenerator != null) {
+            return this.oceanMonumentGenerator.isInsideStructure(blockPos);
+        } else if ("Village".equals(structureName) && this.villageGenerator != null) {
+            return this.villageGenerator.isInsideStructure(blockPos);
+        } else if ("Mineshaft".equals(structureName) && this.mineshaftGenerator != null) {
+            return this.mineshaftGenerator.isInsideStructure(blockPos);
         } else {
-            return "Temple".equals(p_193414_2_) && this.scatteredFeatureGenerator != null ? this.scatteredFeatureGenerator.isInsideStructure(p_193414_3_) : false;
+            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null ? this.scatteredFeatureGenerator.isInsideStructure(blockPos) : false;
         }
     }
 

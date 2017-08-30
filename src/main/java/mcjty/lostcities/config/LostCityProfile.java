@@ -120,6 +120,7 @@ public class LostCityProfile {
     public boolean GENERATE_STRONGHOLDS = true;
     public boolean GENERATE_SCATTERED = true;
     public boolean GENERATE_OCEANMONUMENTS = true;
+    public boolean GENERATE_MANSIONS = true;
     public boolean GENERATE_LAKES = true;
     public boolean GENERATE_DUNGEONS = true;
 
@@ -299,6 +300,7 @@ public class LostCityProfile {
 
     private void initStructures(Configuration cfg) {
         GENERATE_OCEANMONUMENTS = cfg.get(categoryStructures, "generateOceanMonuments", inheritFrom.orElse(this).GENERATE_OCEANMONUMENTS, "Generate ocean monuments").getBoolean();
+        GENERATE_MANSIONS = cfg.get(categoryStructures, "generateMansions", inheritFrom.orElse(this).GENERATE_MANSIONS, "Generate mansions").getBoolean();
         GENERATE_SCATTERED = cfg.get(categoryStructures, "generateScattered", inheritFrom.orElse(this).GENERATE_SCATTERED, "Generate scattered features (swamphunts, desert temples, ...)").getBoolean();
         GENERATE_STRONGHOLDS = cfg.get(categoryStructures, "generateStrongholds", inheritFrom.orElse(this).GENERATE_STRONGHOLDS, "Generate strongholds").getBoolean();
         GENERATE_VILLAGES = cfg.get(categoryStructures, "generateVillages", inheritFrom.orElse(this).GENERATE_VILLAGES, "Generate villages").getBoolean();

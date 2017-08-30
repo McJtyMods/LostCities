@@ -2,11 +2,9 @@ package mcjty.lostcities.dimensions;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
-import mcjty.lostcities.dimensions.world.LostWorldProvider;
-import mcjty.lostcities.dimensions.world.LostWorldType;
-import mcjty.lostcities.dimensions.world.LostWorldTypeAdapter;
-import mcjty.lostcities.dimensions.world.LostWorldTypeBOP;
+import mcjty.lostcities.dimensions.world.*;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.common.DimensionManager;
 
 import java.util.ArrayList;
@@ -34,6 +32,9 @@ public class ModDimensions {
             lostDimensionType = DimensionType.register(LostCities.MODID, "_lost", LostCityConfiguration.DIMENSION_ID, LostWorldProvider.class, false);
             DimensionManager.registerDimension(LostCityConfiguration.DIMENSION_ID, lostDimensionType);
         }
+
+        MapGenStructureIO.registerStructure(LostWoodlandMansion.Start.class, "LostMansion");
+
     }
 
 }

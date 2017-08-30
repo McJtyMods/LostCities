@@ -164,6 +164,26 @@ public class City {
             return 1.0f;
         }
 
+        for (int cx = -4 ; cx <= 4 ; cx++) {
+            for (int cz = -4 ; cz <= 4 ; cz++) {
+                if (provider.hasMansion(chunkX+cx, chunkZ+cz)) {
+                    return 0.0f;
+                }
+            }
+        }
+//        if (provider.isInsideStructure(provider.worldObj, "LostMansion", new BlockPos(chunkX*16, 50, chunkZ*16))) {
+//            return 0.0f;
+//        }
+//        if (provider.isInsideStructure(provider.worldObj, "LostMansion", new BlockPos(chunkX*16+15, 50, chunkZ*16))) {
+//            return 0.0f;
+//        }
+//        if (provider.isInsideStructure(provider.worldObj, "LostMansion", new BlockPos(chunkX*16, 50, chunkZ*16+15))) {
+//            return 0.0f;
+//        }
+//        if (provider.isInsideStructure(provider.worldObj, "LostMansion", new BlockPos(chunkX*16+15, 50, chunkZ*16+15))) {
+//            return 0.0f;
+//        }
+
         long seed = provider.seed;
         float factor = 0;
         int offset = (provider.profile.CITY_MAXRADIUS+15) / 16;
