@@ -1,8 +1,5 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lib.compat.CompatChunkGenerator;
-import mcjty.lib.compat.CompatMapGenStructure;
-import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
