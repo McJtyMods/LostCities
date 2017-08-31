@@ -171,18 +171,6 @@ public class City {
                 }
             }
         }
-//        if (provider.isInsideStructure(provider.worldObj, "LostMansion", new BlockPos(chunkX*16, 50, chunkZ*16))) {
-//            return 0.0f;
-//        }
-//        if (provider.isInsideStructure(provider.worldObj, "LostMansion", new BlockPos(chunkX*16+15, 50, chunkZ*16))) {
-//            return 0.0f;
-//        }
-//        if (provider.isInsideStructure(provider.worldObj, "LostMansion", new BlockPos(chunkX*16, 50, chunkZ*16+15))) {
-//            return 0.0f;
-//        }
-//        if (provider.isInsideStructure(provider.worldObj, "LostMansion", new BlockPos(chunkX*16+15, 50, chunkZ*16+15))) {
-//            return 0.0f;
-//        }
 
         long seed = provider.seed;
         float factor = 0;
