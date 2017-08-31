@@ -172,6 +172,14 @@ public class City {
             }
         }
 
+        for (int cx = -2 ; cx <= 2 ; cx++) {
+            for (int cz = -2 ; cz <= 2 ; cz++) {
+                if (provider.hasOceanMonument(chunkX+cx, chunkZ+cz)) {
+                    return 0.0f;
+                }
+            }
+        }
+
         long seed = provider.seed;
         float factor = 0;
         int offset = (provider.profile.CITY_MAXRADIUS+15) / 16;

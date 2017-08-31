@@ -1,8 +1,12 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lib.compat.CompatChunkGenerator;
+import mcjty.lib.compat.CompatMapGenStructure;
+import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.LostStructureOceanMonument;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Condition;
 import mcjty.lostcities.dimensions.world.lost.cityassets.ConditionContext;
@@ -79,7 +83,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
     private Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
 
     private MapGenStronghold strongholdGenerator = new MapGenStronghold();
-    private StructureOceanMonument oceanMonumentGenerator = new StructureOceanMonument();
+    private StructureOceanMonument oceanMonumentGenerator = new LostStructureOceanMonument();
     private MapGenVillage villageGenerator = new MapGenVillage();
     private MapGenMineshaft mineshaftGenerator = new MapGenMineshaft();
     private MapGenScatteredFeature scatteredFeatureGenerator = new MapGenScatteredFeature();
@@ -652,6 +656,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         }
     }
 
+
+    public boolean hasOceanMonument(int chunkX, int chunkZ) {
+        return oceanMonumentGenerator instanceof LostStructureOceanMonument && ((LostStructureOceanMonument) oceanMonumentGenerator).hasStructure(worldObj, chunkX, chunkZ);
+    }
 
     @Override
     public ILostChunkInfo getChunkInfo(int chunkX, int chunkZ) {
