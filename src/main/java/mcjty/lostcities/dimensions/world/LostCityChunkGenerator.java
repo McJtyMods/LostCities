@@ -6,6 +6,7 @@ import mcjty.lib.tools.EntityTools;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.LostStructureOceanMonument;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Condition;
 import mcjty.lostcities.dimensions.world.lost.cityassets.ConditionContext;
@@ -77,7 +78,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
     private Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
 
     private MapGenStronghold strongholdGenerator = new MapGenStronghold();
-    private StructureOceanMonument oceanMonumentGenerator = new StructureOceanMonument();
+    private StructureOceanMonument oceanMonumentGenerator = new LostStructureOceanMonument();
     private MapGenVillage villageGenerator = new MapGenVillage();
     private MapGenMineshaft mineshaftGenerator = new MapGenMineshaft();
     private MapGenScatteredFeature scatteredFeatureGenerator = new MapGenScatteredFeature();
@@ -554,10 +555,17 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
     }
 
     @Override
-    public BlockPos clGetStrongholdGen(World worldIn, String structureName, BlockPos position) {
-        return "Stronghold".equals(structureName) && this.strongholdGenerator != null
-                ? CompatMapGenStructure.getClosestStrongholdPos(this.strongholdGenerator, worldIn, position)
-                : null;
+    public BlockPos clGetStrongholdGen(World worldIn, String structureName, BlockPos blockPos) {
+        return ("Stronghold".equals(structureName) && this.strongholdGenerator != null
+                ? CompatMapGenStructure.getClosestStrongholdPos(this.strongholdGenerator, worldIn, blockPos)
+                : ("Monument".equals(structureName) && this.oceanMonumentGenerator != null
+                ? CompatMapGenStructure.getClosestStrongholdPos(this.oceanMonumentGenerator, worldIn, blockPos)
+                : ("Village".equals(structureName) && this.villageGenerator != null
+                ? CompatMapGenStructure.getClosestStrongholdPos(this.villageGenerator, worldIn, blockPos)
+                : ("Mineshaft".equals(structureName) && this.mineshaftGenerator != null
+                ? CompatMapGenStructure.getClosestStrongholdPos(this.mineshaftGenerator, worldIn, blockPos)
+                : ("Temple".equals(structureName) && this.scatteredFeatureGenerator != null
+                ? CompatMapGenStructure.getClosestStrongholdPos(this.scatteredFeatureGenerator, worldIn, blockPos) : null)))));
     }
 
     @Override
@@ -587,6 +595,10 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
         if (profile.GENERATE_OCEANMONUMENTS) {
             this.oceanMonumentGenerator.generate(this.worldObj, x, z, null);
         }
+    }
+
+    public boolean hasOceanMonument(int chunkX, int chunkZ) {
+        return oceanMonumentGenerator instanceof LostStructureOceanMonument && ((LostStructureOceanMonument) oceanMonumentGenerator).hasStructure(worldObj, chunkX, chunkZ);
     }
 
     @Override
