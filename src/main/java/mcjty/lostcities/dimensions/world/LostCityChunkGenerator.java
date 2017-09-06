@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
@@ -384,8 +385,6 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                     MobSpawnerBaseLogic mobspawnerbaselogic = spawner.getSpawnerBaseLogic();
                     mobspawnerbaselogic.setEntityId(new ResourceLocation(fixedId));
                     spawner.markDirty();
-                    String fixedId = EntityTools.fixEntityId(randomValue);
-                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation(fixedId), fixedId);
                     if (LostCityConfiguration.DEBUG) {
                         LostCities.logger.debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
                     }
