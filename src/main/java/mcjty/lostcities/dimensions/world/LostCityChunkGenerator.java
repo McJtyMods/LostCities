@@ -403,6 +403,7 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
                         todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ);
                 String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);
                 ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
+                tileentity.markDirty();
             }
         }
     }
