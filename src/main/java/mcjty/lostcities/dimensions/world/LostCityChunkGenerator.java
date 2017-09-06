@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.api.*;
+import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.LostStructureOceanMonument;
@@ -383,6 +384,11 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                     MobSpawnerBaseLogic mobspawnerbaselogic = spawner.getSpawnerBaseLogic();
                     mobspawnerbaselogic.setEntityId(new ResourceLocation(fixedId));
                     spawner.markDirty();
+                    String fixedId = EntityTools.fixEntityId(randomValue);
+                    EntityTools.setSpawnerEntity(world, spawner, new ResourceLocation(fixedId), fixedId);
+                    if (LostCityConfiguration.DEBUG) {
+                        LostCities.logger.debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
+                    }
                 }
             }
         }
@@ -427,6 +433,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                         todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ);
                 String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);
                 ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
+                tileentity.markDirty();
+                if (LostCityConfiguration.DEBUG) {
+                    LostCities.logger.debug("createLootChest: loot=" + randomValue + " pos=" + pos.toString());
+                }
             }
         }
     }
