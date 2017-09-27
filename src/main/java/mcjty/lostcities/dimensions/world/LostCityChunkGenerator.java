@@ -407,6 +407,9 @@ public class LostCityChunkGenerator implements CompatChunkGenerator, ILostChunkG
                 ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
                         todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ);
                 String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);
+                if (randomValue == null) {
+                    throw new RuntimeException("Condition '" + lootTable + "' did not return a table under certain conditions!");
+                }
                 ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
                 tileentity.markDirty();
                 if (LostCityConfiguration.DEBUG) {
