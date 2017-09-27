@@ -339,7 +339,7 @@ public class IslandTerrainGenerator {
                                 }
 
                                 if (height < 63 && (block == air)) { // @todo configure height!
-                                    if (Biome.getFloatTemperature(new BlockPos(x, height, z)) < 0.15F) {
+                                    if (Biome.getTemperature(new BlockPos(x, height, z)) < 0.15F) {
                                         block = (char) Block.BLOCK_STATE_IDS.get(Blocks.ICE.getDefaultState());
                                     } else {
                                         block = baseLiquid;

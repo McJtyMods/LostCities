@@ -580,12 +580,12 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         if (creatureType == EnumCreatureType.MONSTER) {
             if (profile.GENERATE_SCATTERED) {
                 if (this.scatteredFeatureGenerator.isInsideStructure(pos)) {
-                    return this.scatteredFeatureGenerator.getScatteredFeatureSpawnList();
+                    return this.scatteredFeatureGenerator.getMonsters();
                 }
             }
             if (profile.GENERATE_OCEANMONUMENTS) {
                 if (this.oceanMonumentGenerator.isPositionInStructure(this.worldObj, pos)) {
-                    return this.oceanMonumentGenerator.getScatteredFeatureSpawnList();
+                    return this.oceanMonumentGenerator.getMonsters();
                 }
             }
         }

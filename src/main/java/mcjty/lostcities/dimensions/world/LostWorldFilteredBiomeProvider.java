@@ -78,7 +78,7 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
             return -1000;
         }
         float dr = a.getRainfall() - b.getRainfall();
-        float dt = a.getTemperature() - b.getTemperature();
+        float dt = a.getDefaultTemperature() - b.getDefaultTemperature();
         float dv = a.getHeightVariation() - b.getHeightVariation();
         float dh = a.getBaseHeight() - b.getBaseHeight();
 
