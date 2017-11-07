@@ -1864,8 +1864,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         }
                         // We don't replace the world where the part is empty (air)
                         if (b != airChar) {
-                            if (b == hardAirChar) {
-                                if (airWaterLevel) {
+                            if (b == liquidChar) {
+                                if (provider.profile.AVOID_WATER) {
+                                    b = airChar;
+                                }
+                            } else if (b == hardAirChar) {
+                                if (airWaterLevel && !provider.profile.AVOID_WATER) {
                                     b = (oy + y) < waterLevel ? liquidChar : airChar;
                                 } else {
                                     b = airChar;

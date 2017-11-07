@@ -61,6 +61,7 @@ public class LostCityProfile {
     public boolean GENERATE_SPAWNERS = true;
     public boolean GENERATE_LOOT = true;
     public boolean GENERATE_LIGHTING = false;
+    public boolean AVOID_WATER = false;
 
     public float EXPLOSION_CHANCE = .002f;
     public int EXPLOSION_MINRADIUS = 15;
@@ -242,6 +243,8 @@ public class LostCityProfile {
                 "If true the chests in the buildings will contain loot");
         GENERATE_LIGHTING = cfg.getBoolean("generateLigthing", categoryLostcity, inheritFrom.orElse(this).GENERATE_LIGHTING,
                 "If true then there will be minimal lighting in the buildings");
+        AVOID_WATER = cfg.getBoolean("avoidWater", categoryLostcity, inheritFrom.orElse(this).AVOID_WATER,
+                "If true then all water will be avoided (replaced with air)");
 
         ALLOWED_BIOME_FACTORS = cfg.getStringList("allowedBiomeFactors", categoryCities, inheritFrom.orElse(this).ALLOWED_BIOME_FACTORS,
                 "List of biomes that are allowed in the world. Empty list is default all biomes. The factor controls how much that biome is favored over the others (higher means less favored!)");
