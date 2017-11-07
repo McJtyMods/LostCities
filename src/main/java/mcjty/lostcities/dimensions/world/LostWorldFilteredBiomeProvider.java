@@ -116,7 +116,14 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
     }
 
     public boolean areBiomesViable(int x, int z, int radius, List<Biome> allowed) {
-        return true;
+        boolean result = false;
+        Biome[] biomeList = getBiomes(null, x, z, radius, radius);
+        for (int i = 0 ; i < biomeList.length ; i++) {
+            if ( allowed.contains(biomeList[i]) ) {
+                result = true;
+            }
+        }
+        return result;
     }
 
     public boolean isFixedBiome() {
