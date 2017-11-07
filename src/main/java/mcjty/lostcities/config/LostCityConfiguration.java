@@ -194,6 +194,7 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("wasteland");
         profile.setDescription("Wasteland, no water, bare land (can use BOP biomes)");
         profile.WATERLEVEL_OFFSET = 70;
+        profile.AVOID_WATER = true;
         profile.GENERATE_LAKES = false;
         profile.GENERATE_OCEANMONUMENTS = false;
         profile.VINE_CHANCE = 0.003f;
