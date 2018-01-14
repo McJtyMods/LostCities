@@ -327,8 +327,8 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             LostChunkCharacteristics lostChunkCharacteristics = new LostChunkCharacteristics();
 
-            float cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
-            lostChunkCharacteristics.isCity = cityFactor > provider.profile.CITY_THRESSHOLD;
+            lostChunkCharacteristics.cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
+            lostChunkCharacteristics.isCity = lostChunkCharacteristics.cityFactor > provider.profile.CITY_THRESSHOLD;
             lostChunkCharacteristics.section = getMultiBuildingSection(chunkX, chunkZ, provider);
             if (lostChunkCharacteristics.section > 0) {
                 lostChunkCharacteristics.cityLevel = getTopLeftCityInfo(lostChunkCharacteristics, chunkX, chunkZ, provider).cityLevel;

@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.dimensions.world.lost.*;
@@ -22,6 +23,8 @@ import net.minecraftforge.common.MinecraftForge;
 
 import java.util.*;
 import java.util.function.BiFunction;
+
+import static mcjty.lostcities.dimensions.world.IslandTerrainGenerator.ISLANDS;
 
 public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
@@ -65,7 +68,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private static char randomLeafs[] = null;
 
 
-//    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(ISLANDS);
+    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(ISLANDS);
 
 
     public LostCitiesTerrainGenerator(LostCityChunkGenerator provider) {
@@ -77,7 +80,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         this.ruinNoise = new NoiseGeneratorPerlin(provider.rand, 4);
 
         // @todo
-//        islandTerrainGenerator.setup(provider.worldObj, provider);
+        islandTerrainGenerator.setup(provider.worldObj, provider);
     }
 
     public static char getRandomLeaf() {
@@ -214,6 +217,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         // @todo this setup is not very clean
         CityStyle cityStyle = info.getCityStyle();
+
+        LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(chunkX, chunkZ, provider);
+
         street = info.getCompiledPalette().get(cityStyle.getStreetBlock());
         streetBase = info.getCompiledPalette().get(cityStyle.getStreetBaseBlock());
         street2 = info.getCompiledPalette().get(cityStyle.getStreetVariantBlock());
@@ -247,6 +253,29 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
             generateDebris(primer, provider.rand, info);
         }
+
+//        if (provider.profile.FLOATING) {
+//            // cityFactor -> 0: 128
+//            // cityFactor -> .1: 10
+//            // cityFactor -> .2: 20
+//            // cityFactor -> .3: 30
+//            float offset = characteristics.cityFactor * 200 - 30;
+//            if (offset > 30) {
+//                offset = 30;
+//            }
+//            int to = (int) (info.getCityGroundLevel() - offset);
+//            if (to > 0 && to < 255) {
+//                for (int x = 0; x < 16; x++) {
+//                    for (int z = 0; z < 16; z++) {
+//                        int index = (x << 12) | (z << 8);
+//                        clearRange(primer, index, 0, to);
+//                    }
+//                }
+//            }
+//        }
+
+
+
     }
 
     private void fixTorches(ChunkPrimer primer, BuildingInfo info) {
@@ -281,21 +310,20 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         info.clearTorchTodo();
     }
 
-
-//    @Override
-//    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
-//        if (islandTerrainGenerator != null) {
-//            islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
-//        } else {
-//            super.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
-//        }
-//    }
+    @Override
+    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
+        if (provider.profile.FLOATING) {
+            islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+        } else {
+            super.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+        }
+    }
 
     public void doCoreChunk(int chunkX, int chunkZ, ChunkPrimer primer) {
-//        if (islandTerrainGenerator != null) {
-//            islandTerrainGenerator.generate(chunkX, chunkZ, primer);
-//            return;
-//        }
+        if (provider.profile.FLOATING) {
+            islandTerrainGenerator.generate(chunkX, chunkZ, primer);
+            return;
+        }
 
         generateHeightmap(chunkX, chunkZ);
         for (int x4 = 0; x4 < 4; ++x4) {
@@ -688,42 +716,44 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
-        if (!boxes.isEmpty()) {
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    double mindist = 1000000000.0;
-                    int height = bipolate(h11, h01, h10, h00, x, z);
+        if (!provider.profile.FLOATING) {
+            if (!boxes.isEmpty()) {
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        double mindist = 1000000000.0;
+                        int height = bipolate(h11, h01, h10, h00, x, z);
 //                    int height = bipolate(h00, h10, h01, h11, x, z);
-                    for (GeometryTools.AxisAlignedBB2D box : boxes) {
-                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
-                        if (dist < mindist) {
-                            mindist = dist;
+                        for (GeometryTools.AxisAlignedBB2D box : boxes) {
+                            double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
+                            if (dist < mindist) {
+                                mindist = dist;
+                            }
                         }
-                    }
 
-                    int offset = (int) (Math.sqrt(mindist) * 2);
-                    flattenChunkBorder(primer, x, offset, z, provider.rand, height);
+                        int offset = (int) (Math.sqrt(mindist) * 2);
+                        flattenChunkBorder(primer, x, offset, z, provider.rand, height);
+                    }
                 }
             }
-        }
-        if (!boxesDownwards.isEmpty()) {
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    double mindist = 1000000000.0;
-                    int minheight = 1000000000;
-                    for (GeometryTools.AxisAlignedBB2D box : boxesDownwards) {
-                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
-                        if (dist < mindist) {
-                            mindist = dist;
+            if (!boxesDownwards.isEmpty()) {
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        double mindist = 1000000000.0;
+                        int minheight = 1000000000;
+                        for (GeometryTools.AxisAlignedBB2D box : boxesDownwards) {
+                            double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
+                            if (dist < mindist) {
+                                mindist = dist;
+                            }
+                            if (box.height < minheight) {
+                                minheight = box.height;
+                            }
                         }
-                        if (box.height < minheight) {
-                            minheight = box.height;
-                        }
-                    }
-                    int height = minheight;//info.getCityGroundLevel();
+                        int height = minheight;//info.getCityGroundLevel();
 
-                    int offset = (int) (Math.sqrt(mindist) * 2);
-                    flattenChunkBorderDownwards(primer, x, offset, z, provider.rand, height);
+                        int offset = (int) (Math.sqrt(mindist) * 2);
+                        flattenChunkBorderDownwards(primer, x, offset, z, provider.rand, height);
+                    }
                 }
             }
         }
@@ -1945,10 +1975,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int x = rand.nextInt(16);
                     int z = rand.nextInt(16);
                     if (rand.nextFloat() < locationFactor.apply(x, z)) {
-                        int index = (x << 12) | (z << 8) + h;
-                        while (primer.data[index] == airChar || primer.data[index] == liquidChar) {
-                            index--;
+                        int index = (x << 12) | (z << 8);
+                        while (h > 0 && (primer.data[index+h] == airChar || primer.data[index+h] == liquidChar)) {
+                            h--;
                         }
+                        // Fix for FLOATING // @todo!
+                        index = index+h;
                         index++;
                         Character b;
                         switch (rand.nextInt(5)) {

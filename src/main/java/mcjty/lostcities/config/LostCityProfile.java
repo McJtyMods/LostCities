@@ -127,6 +127,8 @@ public class LostCityProfile {
 
     public int MAX_CAVE_HEIGHT = 128;
 
+    public boolean FLOATING = true; // @todo config
+
     public boolean PREVENT_VILLAGES_IN_CITIES = true;
     public boolean PREVENT_LAKES_RAVINES_IN_CITIES = false;
 
