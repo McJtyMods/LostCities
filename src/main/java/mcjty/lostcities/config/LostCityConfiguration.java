@@ -39,7 +39,7 @@ public class LostCityConfiguration {
 
     public static String[] ADAPTING_WORLDTYPES = new String[] {};
 
-    public static int VERSION = 5;
+    public static int VERSION = 6;
 
     public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
