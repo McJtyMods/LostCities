@@ -127,7 +127,7 @@ public class LostCityProfile {
 
     public int MAX_CAVE_HEIGHT = 128;
 
-    public boolean FLOATING = true; // @todo config
+    public boolean FLOATING = false;
 
     public boolean PREVENT_VILLAGES_IN_CITIES = true;
     public boolean PREVENT_LAKES_RAVINES_IN_CITIES = false;
@@ -173,6 +173,9 @@ public class LostCityProfile {
                 "Frequency of leafblocks as seen from the sides of buildings");
         AVOID_FOLIAGE = cfg.getBoolean("avoidFoliage", categoryLostcity, inheritFrom.orElse(this).AVOID_FOLIAGE,
                 "If this is true then parks will have no generated foliage (trees currently)");
+
+        FLOATING = cfg.getBoolean("floating", categoryLostcity, inheritFrom.orElse(this).FLOATING,
+                "If this is true cities are floating on islands");
 
         RUBBLELAYER = cfg.getBoolean("rubbleLayer", categoryLostcity, inheritFrom.orElse(this).RUBBLELAYER,
                 "If this is true an alternative way to generate dirt/stone/sand + leave blocks is used that makes the city appear more overgrown");

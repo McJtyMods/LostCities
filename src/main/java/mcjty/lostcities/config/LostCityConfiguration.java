@@ -22,7 +22,7 @@ public class LostCityConfiguration {
             "to work with. The worldtype has to support the IChunkPrimerFactory API for this to work";
     public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
 
-    public static final String[] DEFAULT_PROFILES = new String[]{"default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
+    public static final String[] DEFAULT_PROFILES = new String[]{"default", "nodamage", "rarecities", "floating", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
 
     public static String[] ASSETS = new String[] {
             "/assets/lostcities/citydata/conditions.json",
@@ -129,6 +129,13 @@ public class LostCityConfiguration {
         profile.RUBBLELAYER = false;
         profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
         profile.MAX_CAVE_HEIGHT = 64;
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("floating");
+        profile.setDescription("Cities on floating islands");
+        profile.CITY_CHANCE = 0.01f;
+        profile.FLOATING = true;
+        profile.WATERLEVEL_OFFSET = 70;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("rarecities");
