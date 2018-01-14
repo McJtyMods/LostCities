@@ -42,7 +42,6 @@ public class LostCityProfile {
 
     public int GROUNDLEVEL = 71;
     public int WATERLEVEL_OFFSET = 8;
-    public int WATERLEVEL = -1;
 
     public boolean HIGHWAY_REQUIRES_TWO_CITIES = true;
     public int HIGHWAY_LEVEL_FROM_CITIES_MODE = 0;
@@ -195,7 +194,6 @@ public class LostCityProfile {
 
         GROUNDLEVEL = cfg.getInt("groundLevel", categoryLostcity, inheritFrom.orElse(this).GROUNDLEVEL, 2, 256, "Ground level");
         WATERLEVEL_OFFSET = cfg.getInt("waterLevelOffset", categoryLostcity, inheritFrom.orElse(this).WATERLEVEL_OFFSET, -100, 100, "How much lower the water level is compared to the ground level (63)");
-        WATERLEVEL = GROUNDLEVEL - WATERLEVEL_OFFSET;
 
 
         CHEST_WITHOUT_LOOT_CHANCE = cfg.getFloat("chestWithoutLootChance", categoryLostcity, inheritFrom.orElse(this).CHEST_WITHOUT_LOOT_CHANCE, 0.0f, 1.0f, "The chance that a chest will have no loot");

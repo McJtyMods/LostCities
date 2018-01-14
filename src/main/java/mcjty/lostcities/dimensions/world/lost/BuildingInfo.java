@@ -325,25 +325,28 @@ public class BuildingInfo implements ILostChunkInfo {
         if (cityInfoMap.containsKey(key)) {
             return cityInfoMap.get(key);
         } else {
-            LostChunkCharacteristics lostChunkCharacteristics = new LostChunkCharacteristics();
+            LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
 
-            lostChunkCharacteristics.cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
-            lostChunkCharacteristics.isCity = lostChunkCharacteristics.cityFactor > provider.profile.CITY_THRESSHOLD;
-            lostChunkCharacteristics.section = getMultiBuildingSection(chunkX, chunkZ, provider);
-            if (lostChunkCharacteristics.section > 0) {
-                lostChunkCharacteristics.cityLevel = getTopLeftCityInfo(lostChunkCharacteristics, chunkX, chunkZ, provider).cityLevel;
+            characteristics.cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
+            characteristics.isCity = characteristics.cityFactor > provider.profile.CITY_THRESSHOLD;
+            if (isVoidChunk(chunkX, chunkZ, provider)) {
+                characteristics.isCity = false;    // No city in a void chunk
+            }
+            characteristics.section = getMultiBuildingSection(chunkX, chunkZ, provider);
+            if (characteristics.section > 0) {
+                characteristics.cityLevel = getTopLeftCityInfo(characteristics, chunkX, chunkZ, provider).cityLevel;
             } else {
-                lostChunkCharacteristics.cityLevel = getCityLevel(chunkX, chunkZ, provider);
+                characteristics.cityLevel = getCityLevel(chunkX, chunkZ, provider);
             }
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
-            lostChunkCharacteristics.couldHaveBuilding = lostChunkCharacteristics.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, lostChunkCharacteristics.section, lostChunkCharacteristics.cityLevel, rand);
+            characteristics.couldHaveBuilding = characteristics.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, characteristics.section, characteristics.cityLevel, rand);
 
             ChunkCoord coord = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
             CityStyle cityStyle;
             // If this is a street we find other chunks connected to this and pick the cityStyle
             // that represents the majority. This is to prevent streets from switching style randomly if two
             // different styled cities mix
-            if (lostChunkCharacteristics.isCity && !lostChunkCharacteristics.couldHaveBuilding) {
+            if (characteristics.isCity && !characteristics.couldHaveBuilding) {
                 Counter<String> counter = new Counter<>();
                 for (int cx = -1 ; cx <= 1 ; cx++) {
                     for (int cz = -1 ; cz <= 1 ; cz++) {
@@ -358,54 +361,54 @@ public class BuildingInfo implements ILostChunkInfo {
             } else {
                 cityStyle = City.getCityStyle(chunkX, chunkZ, provider);
             }
-            lostChunkCharacteristics.cityStyle = cityStyle;
+            characteristics.cityStyle = cityStyle;
 
 
-            if (lostChunkCharacteristics.section >= 1) {
-                LostChunkCharacteristics topleft = getTopLeftCityInfo(lostChunkCharacteristics, chunkX, chunkZ, provider);
-                lostChunkCharacteristics.multiBuilding = topleft.multiBuilding;
-                if (lostChunkCharacteristics.multiBuilding != null) {
-                    switch (lostChunkCharacteristics.section) {
+            if (characteristics.section >= 1) {
+                LostChunkCharacteristics topleft = getTopLeftCityInfo(characteristics, chunkX, chunkZ, provider);
+                characteristics.multiBuilding = topleft.multiBuilding;
+                if (characteristics.multiBuilding != null) {
+                    switch (characteristics.section) {
                         case 1:
-                            lostChunkCharacteristics.buildingType = AssetRegistries.BUILDINGS.get(lostChunkCharacteristics.multiBuilding.getBuilding(1, 0));
+                            characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(1, 0));
                             break;
                         case 2:
-                            lostChunkCharacteristics.buildingType = AssetRegistries.BUILDINGS.get(lostChunkCharacteristics.multiBuilding.getBuilding(0, 1));
+                            characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(0, 1));
                             break;
                         case 3:
-                            lostChunkCharacteristics.buildingType = AssetRegistries.BUILDINGS.get(lostChunkCharacteristics.multiBuilding.getBuilding(1, 1));
+                            characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(1, 1));
                             break;
                         default:
                             throw new RuntimeException("What 2!");
                     }
                 } else {
-                    lostChunkCharacteristics.buildingType = topleft.buildingType;
+                    characteristics.buildingType = topleft.buildingType;
                 }
             } else {
                 PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
-                if (lostChunkCharacteristics.section == 0) {
+                if (characteristics.section == 0) {
                     String name = cityStyle.getRandomMultiBuilding(rand);
                     if (predefinedBuilding != null) {
                         name = predefinedBuilding.getBuilding();
                     }
-                    lostChunkCharacteristics.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(name);
-                    lostChunkCharacteristics.buildingType = AssetRegistries.BUILDINGS.get(lostChunkCharacteristics.multiBuilding.getBuilding(0, 0));
+                    characteristics.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(name);
+                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(0, 0));
                 } else {
-                    lostChunkCharacteristics.multiBuilding = null;
+                    characteristics.multiBuilding = null;
                     String name = cityStyle.getRandomBuilding(rand);
                     if (predefinedBuilding != null) {
                         name = predefinedBuilding.getBuilding();
                     }
-                    lostChunkCharacteristics.buildingType = AssetRegistries.BUILDINGS.get(name);
+                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(name);
                 }
             }
 
             LostCityEvent.CharacteristicsEvent event = new LostCityEvent.CharacteristicsEvent(provider.worldObj, provider,
-                    chunkX, chunkZ, lostChunkCharacteristics);
+                    chunkX, chunkZ, characteristics);
             MinecraftForge.EVENT_BUS.post(event);
 
-            cityInfoMap.put(key, lostChunkCharacteristics);
-            return lostChunkCharacteristics;
+            cityInfoMap.put(key, characteristics);
+            return characteristics;
         }
     }
 
@@ -812,6 +815,35 @@ public class BuildingInfo implements ILostChunkInfo {
         return Highway.getZHighwayLevel(chunkX, chunkZ, provider);
     }
 
+
+    /**
+     * Return true if this is a void chunk (only for floating island worldtype). This does
+     * not use the cache so it is safe to use when the cache is building
+     */
+    public static boolean isVoidChunk(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (provider.otherGenerator != null) {
+            return false;   // @todo Not supported yet
+        } else if (provider.profile.FLOATING) {
+            if (provider.getHeightmap(chunkX, chunkZ).getHeight(8, 8) <= 0) {
+                return true;
+            }
+            if (provider.getHeightmap(chunkX, chunkZ).getHeight(3, 3) <= 0) {
+                return true;
+            }
+            if (provider.getHeightmap(chunkX, chunkZ).getHeight(12, 3) <= 0) {
+                return true;
+            }
+            if (provider.getHeightmap(chunkX, chunkZ).getHeight(3, 12) <= 0) {
+                return true;
+            }
+            return provider.getHeightmap(chunkX, chunkZ).getHeight(12, 12) <= 0;
+
+        } else {
+            return false;
+        }
+    }
+
+
     /**
      * This function does not use the cache. So safe to use when the cache is building
      */
@@ -819,6 +851,15 @@ public class BuildingInfo implements ILostChunkInfo {
         if (provider.otherGenerator != null) {
             int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);
             return getLevelBasedOnHeight(height, provider);
+        } else if (provider.profile.FLOATING) {
+            int h0 = provider.getHeightmap(chunkX, chunkZ).getHeight(8, 8);
+            int h1 = provider.getHeightmap(chunkX, chunkZ).getHeight(3, 3);
+            int h2 = provider.getHeightmap(chunkX, chunkZ).getHeight(12, 3);
+            int h3 = provider.getHeightmap(chunkX, chunkZ).getHeight(3, 12);
+            int h4 = provider.getHeightmap(chunkX, chunkZ).getHeight(12, 12);
+            int h = (h0+h1+h2+h3+h4)/5;
+            h -= 12;        // Adjustment to make things look better
+            return getLevelBasedOnHeight(h, provider);
         } else {
             // @todo: average out nearby biomes?
             Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();

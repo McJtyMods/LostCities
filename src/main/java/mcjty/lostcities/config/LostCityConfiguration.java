@@ -133,9 +133,16 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("floating");
         profile.setDescription("Cities on floating islands");
-        profile.CITY_CHANCE = 0.01f;
+        profile.CITY_CHANCE = 0.03f;
         profile.FLOATING = true;
         profile.WATERLEVEL_OFFSET = 70;
+        profile.BUILDING_MAXCELLARS = 2;
+        profile.RAILWAYS_CAN_END = true;
+//        profile.GROUNDLEVEL = 50;
+//        profile.CITY_LEVEL0_HEIGHT = 54;
+//        profile.CITY_LEVEL1_HEIGHT = 62;
+//        profile.CITY_LEVEL2_HEIGHT = 70;
+//        profile.CITY_LEVEL3_HEIGHT = 78;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("rarecities");

@@ -68,14 +68,15 @@ public class DamageArea {
         }
         if (provider.rand.nextFloat() <= damage) {
             Character damaged = palette.canBeDamagedToIronBars(b);
+            int waterlevel = provider.profile.GROUNDLEVEL - provider.profile.WATERLEVEL_OFFSET;
             if (damage < BLOCK_DAMAGE_CHANCE && damaged != null) {
                 if (provider.rand.nextFloat() < .7f) {
                     b = damaged;
                 } else {
-                    b = y < provider.profile.WATERLEVEL ? LostCitiesTerrainGenerator.liquidChar : LostCitiesTerrainGenerator.airChar;
+                    b = y < waterlevel ? LostCitiesTerrainGenerator.liquidChar : LostCitiesTerrainGenerator.airChar;
                 }
             } else {
-                b = y < provider.profile.WATERLEVEL ? LostCitiesTerrainGenerator.liquidChar : LostCitiesTerrainGenerator.airChar;
+                b = y < waterlevel ? LostCitiesTerrainGenerator.liquidChar : LostCitiesTerrainGenerator.airChar;
             }
         }
         return b;

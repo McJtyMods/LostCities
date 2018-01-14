@@ -74,7 +74,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public LostCitiesTerrainGenerator(LostCityChunkGenerator provider) {
         super(provider);
         this.groundLevel = provider.profile.GROUNDLEVEL;
-        this.waterLevel = provider.profile.WATERLEVEL;
+        this.waterLevel = provider.profile.GROUNDLEVEL - provider.profile.WATERLEVEL_OFFSET;
         this.rubbleNoise = new NoiseGeneratorPerlin(provider.rand, 4);
         this.leavesNoise = new NoiseGeneratorPerlin(provider.rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(provider.rand, 4);
@@ -385,7 +385,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
 //        debugClearChunk(chunkX, chunkZ, primer);
-        flattenChunkToCityBorder(chunkX, chunkZ, primer);
+        if (!provider.profile.FLOATING) {
+            flattenChunkToCityBorder(chunkX, chunkZ, primer);
+        }
         generateBridges(primer, info);
         generateHighways(chunkX, chunkZ, primer, info);
     }
@@ -716,44 +718,42 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         }
-        if (!provider.profile.FLOATING) {
-            if (!boxes.isEmpty()) {
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        double mindist = 1000000000.0;
-                        int height = bipolate(h11, h01, h10, h00, x, z);
+        if (!boxes.isEmpty()) {
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    double mindist = 1000000000.0;
+                    int height = bipolate(h11, h01, h10, h00, x, z);
 //                    int height = bipolate(h00, h10, h01, h11, x, z);
-                        for (GeometryTools.AxisAlignedBB2D box : boxes) {
-                            double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
-                            if (dist < mindist) {
-                                mindist = dist;
-                            }
+                    for (GeometryTools.AxisAlignedBB2D box : boxes) {
+                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
+                        if (dist < mindist) {
+                            mindist = dist;
                         }
-
-                        int offset = (int) (Math.sqrt(mindist) * 2);
-                        flattenChunkBorder(primer, x, offset, z, provider.rand, height);
                     }
+
+                    int offset = (int) (Math.sqrt(mindist) * 2);
+                    flattenChunkBorder(primer, x, offset, z, provider.rand, height);
                 }
             }
-            if (!boxesDownwards.isEmpty()) {
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        double mindist = 1000000000.0;
-                        int minheight = 1000000000;
-                        for (GeometryTools.AxisAlignedBB2D box : boxesDownwards) {
-                            double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
-                            if (dist < mindist) {
-                                mindist = dist;
-                            }
-                            if (box.height < minheight) {
-                                minheight = box.height;
-                            }
+        }
+        if (!boxesDownwards.isEmpty()) {
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    double mindist = 1000000000.0;
+                    int minheight = 1000000000;
+                    for (GeometryTools.AxisAlignedBB2D box : boxesDownwards) {
+                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
+                        if (dist < mindist) {
+                            mindist = dist;
                         }
-                        int height = minheight;//info.getCityGroundLevel();
-
-                        int offset = (int) (Math.sqrt(mindist) * 2);
-                        flattenChunkBorderDownwards(primer, x, offset, z, provider.rand, height);
+                        if (box.height < minheight) {
+                            minheight = box.height;
+                        }
                     }
+                    int height = minheight;//info.getCityGroundLevel();
+
+                    int offset = (int) (Math.sqrt(mindist) * 2);
+                    flattenChunkBorderDownwards(primer, x, offset, z, provider.rand, height);
                 }
             }
         }
@@ -797,19 +797,21 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         rand.nextFloat();
         rand.nextFloat();
 
-        for (int x = 0; x < 16; ++x) {
-            for (int z = 0; z < 16; ++z) {
-                int index = (x << 12) | (z << 8);
-                PrimerTools.setBlockStateRange(primer, index, index + provider.profile.BEDROCK_LAYER, bedrockChar);
-            }
-        }
-
-        if (waterLevel > groundLevel) {
-            // Special case for a high water level
+        if (!provider.profile.FLOATING) {
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     int index = (x << 12) | (z << 8);
-                    PrimerTools.setBlockStateRange(primer, index + groundLevel, index + waterLevel, liquidChar);
+                    PrimerTools.setBlockStateRange(primer, index, index + provider.profile.BEDROCK_LAYER, bedrockChar);
+                }
+            }
+
+            if (waterLevel > groundLevel) {
+                // Special case for a high water level
+                for (int x = 0; x < 16; ++x) {
+                    for (int z = 0; z < 16; ++z) {
+                        int index = (x << 12) | (z << 8);
+                        PrimerTools.setBlockStateRange(primer, index + groundLevel, index + waterLevel, liquidChar);
+                    }
                 }
             }
         }
@@ -1479,10 +1481,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateStreet(ChunkPrimer primer, BuildingInfo info, Random rand) {
-        for (int x = 0; x < 16; ++x) {
-            for (int z = 0; z < 16; ++z) {
-                int index = (x << 12) | (z << 8);
-                PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + groundLevel - 5, baseChar);
+        if (!provider.profile.FLOATING) {
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    int index = (x << 12) | (z << 8);
+                    PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + groundLevel - 5, baseChar);
+                }
             }
         }
 
@@ -2044,13 +2048,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 int index = (x << 12) | (z << 8);
                 if (isSide(x, z)) {
                     // Below every building we have a thin layer of 'border' block because that looks nicer
-                    PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel-10, baseChar);
+                    if (!provider.profile.FLOATING) {
+                        PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel - 10, baseChar);
+                    }
                     int y = lowestLevel-10;
                     while (y < lowestLevel) {
                         primer.data[index + y] = palette.get(borderBlock);
                         y++;
                     }
-                } else {
+                } else if (!provider.profile.FLOATING) {
                     PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel, baseChar);
                 }
                 if (primer.data[index + lowestLevel] == airChar) {
