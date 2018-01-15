@@ -57,6 +57,16 @@ public class LostWorldType extends WorldType {
     }
 
     @Override
+    public double getHorizon(World world) {
+        LostCityProfile profile = getProfile(world);
+        if (profile.FLOATING) {
+            return 0;
+        } else {
+            return super.getHorizon(world);
+        }
+    }
+
+    @Override
     public IChunkGenerator getChunkGenerator(World world, String generatorOptions) {
         return new LostCityChunkGenerator(world, world.getSeed());
     }
