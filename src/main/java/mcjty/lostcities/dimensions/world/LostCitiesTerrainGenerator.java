@@ -2048,10 +2048,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 int index = (x << 12) | (z << 8);
                 if (isSide(x, z)) {
                     // Below every building we have a thin layer of 'border' block because that looks nicer
+                    int y;
                     if (!provider.profile.FLOATING) {
                         PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel - 10, baseChar);
+                        y = lowestLevel - 10;
+                    } else {
+                        y = lowestLevel - 3;
                     }
-                    int y = lowestLevel-10;
                     while (y < lowestLevel) {
                         primer.data[index + y] = palette.get(borderBlock);
                         y++;
