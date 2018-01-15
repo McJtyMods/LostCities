@@ -51,6 +51,7 @@ public class LostCityProfile {
 
     public float RAILWAY_DUNGEON_CHANCE = .01f;
     public boolean RAILWAYS_CAN_END = false;
+    public boolean RAILWAYS_ENABLED = true;
 
     public float DESTROY_LONE_BLOCKS_FACTOR = .05f;
     public float DESTROY_OR_MOVE_CHANCE = .4f;
@@ -226,6 +227,8 @@ public class LostCityProfile {
                 "The chance that a chunk next to a railway will have a railway dungeon");
         RAILWAYS_CAN_END = cfg.getBoolean("railwaysCanEnd", categoryLostcity, inheritFrom.orElse(this).RAILWAYS_CAN_END,
                 "If true the a place where a station would have been if there was a city above will have an 'ending' rail part if one side of the 'station' has no connections. Useful in case cities are rare");
+        RAILWAYS_ENABLED = cfg.getBoolean("railwaysEnabled", categoryLostcity, inheritFrom.orElse(this).RAILWAYS_ENABLED,
+                "If true then railways are enabled. If false they are not (but stations will still generate)");
 
         HIGHWAY_REQUIRES_TWO_CITIES = cfg.getBoolean("highwayRequiresTwoCities", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_REQUIRES_TWO_CITIES,
                 "If true then a highway will only generate if both sides have a valid city. If false then one city is sufficient");

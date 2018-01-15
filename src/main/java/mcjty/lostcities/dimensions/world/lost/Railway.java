@@ -306,7 +306,13 @@ public class Railway {
             return railInfo.get(key);
         }
         RailChunkInfo info = getRailChunkTypeInternal(chunkX, chunkZ, provider);
-        railInfo.put(key, info);
+        if (provider.profile.RAILWAYS_ENABLED) {
+            railInfo.put(key, info);
+        } else if (info.getType().isStation()) {
+            railInfo.put(key, info);
+        } else {
+            railInfo.put(key, RailChunkInfo.NOTHING);
+        }
         return info;
     }
 
