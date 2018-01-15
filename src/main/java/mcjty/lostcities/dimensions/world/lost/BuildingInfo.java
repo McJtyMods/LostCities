@@ -416,6 +416,10 @@ public class BuildingInfo implements ILostChunkInfo {
      * Don't use the cache as we're busy building the cache.
      */
     public static boolean isCityRaw(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (isVoidChunk(chunkX, chunkZ, provider)) {
+            // If we have a void chunk then no city here
+            return false;
+        }
         float cityFactor = City.getCityFactor(chunkX, chunkZ, provider);
         return cityFactor > provider.profile.CITY_THRESSHOLD;
     }
