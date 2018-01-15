@@ -144,6 +144,12 @@ public class LostCityConfiguration {
         profile.CITY_LEVEL2_HEIGHT = 70;
         profile.CITY_LEVEL3_HEIGHT = 78;
         profile.RAILWAYS_ENABLED = false;
+        profile.GENERATE_MANSIONS = false;
+        profile.GENERATE_MINESHAFTS = false;
+        profile.GENERATE_OCEANMONUMENTS = false;
+        profile.GENERATE_SCATTERED = false;
+        profile.GENERATE_VILLAGES = false;
+        profile.GENERATE_STRONGHOLDS = false;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("rarecities");
