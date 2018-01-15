@@ -48,6 +48,7 @@ public class LostCityProfile {
     public float HIGHWAY_MAINPERLIN_SCALE = 50.0f;
     public float HIGHWAY_SECONDARYPERLIN_SCALE = 10.0f;
     public float HIGHWAY_PERLIN_FACTOR = 2.0f;
+    public int HIGHWAY_DISTANCE_MASK = 7;
 
     public float RAILWAY_DUNGEON_CHANCE = .01f;
     public boolean RAILWAYS_CAN_END = false;
@@ -234,6 +235,8 @@ public class LostCityProfile {
                 "If true then a highway will only generate if both sides have a valid city. If false then one city is sufficient");
         HIGHWAY_LEVEL_FROM_CITIES_MODE = cfg.getInt("highwayLevelFromCities", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_LEVEL_FROM_CITIES_MODE,
                 0, 3, "0 (take height from top-left city), 1 (take minimum height from both cities), 2 (take maximum height from both cities), 3 (take average height)");
+        HIGHWAY_DISTANCE_MASK = cfg.getInt("highwayDistanceMask", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_DISTANCE_MASK,
+                0, Integer.MAX_VALUE, "Mask to control how far highways can generate. Must be a power of 2 (minus 1). If 0 there are no highways at all");
         HIGHWAY_MAINPERLIN_SCALE = cfg.getFloat("highwayMainPerlinScale", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_MAINPERLIN_SCALE, 1.0f, 1000.0f,
                 "For highways on a certain axis, this value is used to scale the perlin noise generator on the main axis. Increasing this value will increase the frequency of highways but make them smaller");
         HIGHWAY_SECONDARYPERLIN_SCALE = cfg.getFloat("highwaySecondaryPerlinScale", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_SECONDARYPERLIN_SCALE, 1.0f, 1000.0f,

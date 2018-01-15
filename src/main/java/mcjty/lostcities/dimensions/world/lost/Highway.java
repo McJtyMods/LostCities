@@ -57,7 +57,13 @@ public class Highway {
         }
 
         // Highways can only occur at chunkZ that is a multiple of 8
-        if ((cp.getCoord(orientation.getOpposite()) & 7) != 0) {
+        int mask = provider.profile.HIGHWAY_DISTANCE_MASK;
+        if (mask <= 0) {
+            cache.put(cp, -1);
+            return -1;
+        }
+
+        if ((cp.getCoord(orientation.getOpposite()) & mask) != 0) {
             cache.put(cp, -1);
             return -1;
         }
