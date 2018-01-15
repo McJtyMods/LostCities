@@ -142,7 +142,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         this.rand = new Random((seed + 516) * 314);
 
         int waterLevel = (byte) (profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET);
-//        world.setSeaLevel(waterLevel);
+        if (waterLevel <= 0) {
+            waterLevel = 1;
+        }
+        world.setSeaLevel(waterLevel);
 
         terrainGenerator = new LostCitiesTerrainGenerator(this);
         terrainGenerator.setup(world);
