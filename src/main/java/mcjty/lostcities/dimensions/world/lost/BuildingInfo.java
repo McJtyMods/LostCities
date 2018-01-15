@@ -852,13 +852,36 @@ public class BuildingInfo implements ILostChunkInfo {
             int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);
             return getLevelBasedOnHeight(height, provider);
         } else if (provider.profile.FLOATING) {
+            int cnt = 0;
+            int h = 0;
             int h0 = provider.getHeightmap(chunkX, chunkZ).getHeight(8, 8);
+            if (h0 > 1) {
+                h += h0;
+                cnt++;
+            }
             int h1 = provider.getHeightmap(chunkX, chunkZ).getHeight(3, 3);
+            if (h1 > 1) {
+                h += h1;
+                cnt++;
+            }
             int h2 = provider.getHeightmap(chunkX, chunkZ).getHeight(12, 3);
+            if (h2 > 1) {
+                h += h2;
+                cnt++;
+            }
             int h3 = provider.getHeightmap(chunkX, chunkZ).getHeight(3, 12);
+            if (h3 > 1) {
+                h += h3;
+                cnt++;
+            }
             int h4 = provider.getHeightmap(chunkX, chunkZ).getHeight(12, 12);
-            int h = (h0+h1+h2+h3+h4)/5;
-            h -= 12;        // Adjustment to make things look better
+            if (h4 > 1) {
+                h += h4;
+                cnt++;
+            }
+            if (cnt > 0) {
+                h = h / cnt;
+            }
             return getLevelBasedOnHeight(h, provider);
         } else {
             // @todo: average out nearby biomes?

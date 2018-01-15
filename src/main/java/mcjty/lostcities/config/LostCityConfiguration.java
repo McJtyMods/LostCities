@@ -141,10 +141,10 @@ public class LostCityConfiguration {
         profile.RAILWAYS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 15;
         profile.GROUNDLEVEL = 50;
-        profile.CITY_LEVEL0_HEIGHT = 54;
-        profile.CITY_LEVEL1_HEIGHT = 62;
-        profile.CITY_LEVEL2_HEIGHT = 70;
-        profile.CITY_LEVEL3_HEIGHT = 78;
+        profile.CITY_LEVEL0_HEIGHT = 50;
+        profile.CITY_LEVEL1_HEIGHT = 56;
+        profile.CITY_LEVEL2_HEIGHT = 62;
+        profile.CITY_LEVEL3_HEIGHT = 68;
         profile.GENERATE_MANSIONS = false;
         profile.GENERATE_MINESHAFTS = false;
         profile.GENERATE_OCEANMONUMENTS = false;
