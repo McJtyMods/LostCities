@@ -292,6 +292,8 @@ public class IslandTerrainGenerator {
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
         char baseLiquid = air;//@LostCitiesTerrainGenerator.liquidChar;
 
+        int topLevel = 50;
+
         char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
         char topBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
         char block = topBlock;
@@ -305,26 +307,15 @@ public class IslandTerrainGenerator {
         // Index of the bottom of the column.
         int bottomIndex = ((cz * 16) + cx) * 256;
 
-        boolean shallowOcean = false;   // @todo
-        int shallowWaterY = 30;
-
         for (int height = 255; height >= 0; --height) {
             int index = bottomIndex + height;
 
             if (height <= 2) {
-                if (shallowOcean) {
-                    primer.data[index] = LostCitiesTerrainGenerator.bedrockChar;
-                } else {
-                    primer.data[index] = air;
-                }
+                primer.data[index] = air;
             } else {
                 char currentBlock = primer.data[index];
                 if (currentBlock == LostCitiesTerrainGenerator.bedrockChar && height <= 12) {
-                    if (shallowOcean) {
-                        primer.data[index] = baseLiquid;
-                    } else {
-                        primer.data[index] = air;
-                    }
+                    primer.data[index] = air;
                     k = -1;
                 } else {
                     if (currentBlock != air) {
@@ -333,26 +324,26 @@ public class IslandTerrainGenerator {
                                 if (l <= 0) {
                                     block = air;
                                     block1 = baseBlock;
-                                } else if (height >= 59 && height <= 64) {
+                                } else if (height >= (topLevel-4) && height <= (topLevel+1)) {
                                     block = topBlock;
                                     block1 = baseBlock; //Biome.fillerBlock;
                                 }
 
-                                if (height < 63 && (block == air)) { // @todo configure height!
+                                if (height < topLevel && (block == air)) { // @todo configure height!
                                     if (Biome.getTemperature(new BlockPos(x, height, z)) < 0.15F) {
                                         block = (char) Block.BLOCK_STATE_IDS.get(Blocks.ICE.getDefaultState());
                                     } else {
-                                        block = baseLiquid;
+                                        block = baseBlock;  // No liquid since we are floating
                                     }
                                 }
 
                                 k = l;
 
-                                if (height >= 62) {
+                                if (height >= (topLevel-1)) {
                                     primer.data[index] = block;
-                                } else if (height < 56 - l) {
+                                } else if (height < (topLevel-6) - l) {
                                     block = air;
-                                    block1 = baseBlock; //Blocks.STONE;
+                                    block1 = baseBlock;
                                     primer.data[index] = fillerBlock;
                                 } else {
                                     primer.data[index] = block1;
@@ -362,15 +353,12 @@ public class IslandTerrainGenerator {
                                 primer.data[index] = block1;
 
                                 if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
-                                    k = provider.rand.nextInt(4) + Math.max(0, height - 63);
+                                    k = provider.rand.nextInt(4) + Math.max(0, height - topLevel);
                                     block1 = (char) Block.BLOCK_STATE_IDS.get(Blocks.SANDSTONE.getDefaultState());
                                 }
                             }
                         }
                     } else {
-                        if (shallowOcean && height <= shallowWaterY) {
-                            primer.data[index] = baseLiquid;
-                        }
                         k = -1;
                     }
                 }

@@ -1776,7 +1776,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateNormalStreetSection(ChunkPrimer primer, BuildingInfo info, int height) {
-        char defaultStreet = provider.profile.FLOATING ? street2 : streetBase;
+//        char defaultStreet = provider.profile.FLOATING ? street2 : streetBase;
+        char defaultStreet = streetBase;
         char b;
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
