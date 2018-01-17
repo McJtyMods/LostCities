@@ -292,15 +292,16 @@ public class IslandTerrainGenerator {
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
         char baseLiquid = air;//@LostCitiesTerrainGenerator.liquidChar;
 
-        int topLevel = 50;
+        int topLevel = provider.profile.GROUNDLEVEL;
 
         char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
         char topBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
         char block = topBlock;
         char block1 = fillerBlock;
 
-        int k = -1;
-        int l = (int)(noise / 3.0D + 3.0D + provider.rand.nextDouble() * 0.25D);
+        int j = -1;
+        int k = (int)(noise / 3.0D + 3.0D + provider.rand.nextDouble() * 0.25D);
+
         int cx = x & 15;
         int cz = z & 15;
 
@@ -316,20 +317,20 @@ public class IslandTerrainGenerator {
                 char currentBlock = primer.data[index];
                 if (currentBlock == LostCitiesTerrainGenerator.bedrockChar && height <= 12) {
                     primer.data[index] = air;
-                    k = -1;
+                    j = -1;
                 } else {
                     if (currentBlock != air) {
                         if (currentBlock == baseBlock) {
-                            if (k == -1) {
-                                if (l <= 0) {
-                                    block = air;
+                            if (j == -1) {
+                                if (k <= 0) {
+                                    block = baseBlock;
                                     block1 = baseBlock;
                                 } else if (height >= (topLevel-4) && height <= (topLevel+1)) {
                                     block = topBlock;
                                     block1 = baseBlock; //Biome.fillerBlock;
                                 }
 
-                                if (height < topLevel && (block == air)) { // @todo configure height!
+                                if (height < topLevel && (block == air)) {
                                     if (Biome.getTemperature(new BlockPos(x, height, z)) < 0.15F) {
                                         block = (char) Block.BLOCK_STATE_IDS.get(Blocks.ICE.getDefaultState());
                                     } else {
@@ -337,29 +338,29 @@ public class IslandTerrainGenerator {
                                     }
                                 }
 
-                                k = l;
+                                j = k;
 
                                 if (height >= (topLevel-1)) {
                                     primer.data[index] = block;
-                                } else if (height < (topLevel-6) - l) {
+                                } else if (height < (topLevel-6) - k) {
                                     block = air;
                                     block1 = baseBlock;
                                     primer.data[index] = fillerBlock;
                                 } else {
                                     primer.data[index] = block1;
                                 }
-                            } else if (k > 0) {
-                                --k;
+                            } else if (j > 0) {
+                                --j;
                                 primer.data[index] = block1;
 
-                                if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
-                                    k = provider.rand.nextInt(4) + Math.max(0, height - topLevel);
+                                if (j == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
+                                    j = provider.rand.nextInt(4) + Math.max(0, height - topLevel);
                                     block1 = (char) Block.BLOCK_STATE_IDS.get(Blocks.SANDSTONE.getDefaultState());
                                 }
                             }
                         }
                     } else {
-                        k = -1;
+                        j = -1;
                     }
                 }
             }
