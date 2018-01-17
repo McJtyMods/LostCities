@@ -128,7 +128,7 @@ public class LostCityProfile {
 
     public int MAX_CAVE_HEIGHT = 128;
 
-    public boolean FLOATING = false;
+    public LandscapeType LANDSCAPE_TYPE = LandscapeType.DEFAULT;
 
     public boolean PREVENT_VILLAGES_IN_CITIES = true;
     public boolean PREVENT_LAKES_RAVINES_IN_CITIES = false;
@@ -175,8 +175,13 @@ public class LostCityProfile {
         AVOID_FOLIAGE = cfg.getBoolean("avoidFoliage", categoryLostcity, inheritFrom.orElse(this).AVOID_FOLIAGE,
                 "If this is true then parks will have no generated foliage (trees currently)");
 
-        FLOATING = cfg.getBoolean("floating", categoryLostcity, inheritFrom.orElse(this).FLOATING,
-                "If this is true cities are floating on islands");
+        String type = cfg.getString("landscapeType", categoryLostcity, inheritFrom.orElse(this).LANDSCAPE_TYPE.getName(),
+                "Type of landscape",
+                new String[] { LandscapeType.DEFAULT.getName(), LandscapeType.FLOATING.getName(), LandscapeType.SPACE.getName() });
+        LANDSCAPE_TYPE = LandscapeType.getTypeByName(type);
+        if (LANDSCAPE_TYPE == null) {
+            throw new RuntimeException("Bad landscape type: " + type + "!");
+        }
 
         RUBBLELAYER = cfg.getBoolean("rubbleLayer", categoryLostcity, inheritFrom.orElse(this).RUBBLELAYER,
                 "If this is true an alternative way to generate dirt/stone/sand + leave blocks is used that makes the city appear more overgrown");
@@ -370,5 +375,15 @@ public class LostCityProfile {
         return biomeFactorMap;
     }
 
+    public boolean isDefault() {
+        return LANDSCAPE_TYPE == LandscapeType.DEFAULT;
+    }
 
+    public boolean isFloating() {
+        return LANDSCAPE_TYPE == LandscapeType.FLOATING;
+    }
+
+    public boolean isSpace() {
+        return LANDSCAPE_TYPE == LandscapeType.SPACE;
+    }
 }

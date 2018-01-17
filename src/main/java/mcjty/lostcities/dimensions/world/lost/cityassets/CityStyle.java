@@ -43,6 +43,9 @@ public class CityStyle implements ILostCityCityStyle {
     private Character railMainBlock;
     private Character borderBlock;
     private Character wallBlock;
+    private Character sphereBlock;          // Used for 'space' landscape type
+    private Character sphereSideBlock;      // Used for 'space' landscape type
+    private Character sphereGlassBlock;     // Used for 'space' landscape type
 
     private String inherit;
     private boolean resolveInherit = false;
@@ -140,6 +143,18 @@ public class CityStyle implements ILostCityCityStyle {
         return wallBlock;
     }
 
+    public Character getSphereBlock() {
+        return sphereBlock;
+    }
+
+    public Character getSphereSideBlock() {
+        return sphereSideBlock;
+    }
+
+    public Character getSphereGlassBlock() {
+        return sphereGlassBlock;
+    }
+
     @Override
     public void init() {
         if (!resolveInherit) {
@@ -204,6 +219,15 @@ public class CityStyle implements ILostCityCityStyle {
                 }
                 if (wallBlock == null) {
                     wallBlock = inheritFrom.wallBlock;
+                }
+                if (sphereBlock == null) {
+                    sphereBlock = inheritFrom.sphereBlock;
+                }
+                if (sphereSideBlock == null) {
+                    sphereSideBlock = inheritFrom.sphereSideBlock;
+                }
+                if (sphereGlassBlock == null) {
+                    sphereGlassBlock = inheritFrom.sphereGlassBlock;
                 }
             }
         }
@@ -276,6 +300,18 @@ public class CityStyle implements ILostCityCityStyle {
             }
             if (s.has("glass")) {
                 corridorGlassBlock = s.get("glass").getAsCharacter();
+            }
+        }
+        if (object.has("sphereblocks")) {
+            JsonObject s = object.get("sphereblocks").getAsJsonObject();
+            if (s.has("glass")) {
+                sphereGlassBlock = s.get("glass").getAsCharacter();
+            }
+            if (s.has("border")) {
+                sphereSideBlock = s.get("border").getAsCharacter();
+            }
+            if (s.has("inner")) {
+                sphereBlock = s.get("inner").getAsCharacter();
             }
         }
         parseArraySafe(object, buildingSelector, "buildings", "building");

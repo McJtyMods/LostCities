@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
+import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CityStyle;
@@ -72,6 +73,16 @@ public class City {
         return predefinedStreetMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
     }
 
+
+    /**
+     * This returns the center of the city in case we're in a space type world
+     */
+    public static ChunkCoord getCityCenterForSpace(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        int cx = (chunkX & ~0xf) + 8;
+        int cz = (chunkZ & ~0xf) + 8;
+        return new ChunkCoord(provider.dimensionId, cx, cz);
+    }
+
     public static boolean isCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider);
         if (city != null) {
@@ -80,7 +91,13 @@ public class City {
         Random rand = new Random(provider.seed + chunkZ * 797003437L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
-        return rand.nextFloat() < provider.profile.CITY_CHANCE;
+        if (provider.profile.LANDSCAPE_TYPE == LandscapeType.SPACE) {
+            // @todo config
+            // Space cities are spaced evenly
+            return chunkX % 16 == 8 && chunkZ % 16 == 8;
+        } else {
+            return rand.nextFloat() < provider.profile.CITY_CHANCE;
+        }
     }
 
     public static float getCityRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {

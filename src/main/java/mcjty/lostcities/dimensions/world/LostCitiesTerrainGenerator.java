@@ -35,6 +35,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char hardAirChar;
     public static char glowstoneChar;
     public static char baseChar;
+    public static char glassChar;       // @todo: for space: depend on city style
     public static char liquidChar;
     public static char leavesChar;
     public static char leaves2Char;
@@ -68,6 +69,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
 
     private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(ISLANDS);
+    private SpaceTerrainGenerator spaceTerrainGenerator = new SpaceTerrainGenerator();
 
 
     public LostCitiesTerrainGenerator(LostCityChunkGenerator provider) {
@@ -78,8 +80,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         this.leavesNoise = new NoiseGeneratorPerlin(provider.rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(provider.rand, 4);
 
-        // @todo
         islandTerrainGenerator.setup(provider.worldObj, provider);
+        spaceTerrainGenerator.setup(provider.worldObj, provider);
     }
 
     public static char getRandomLeaf() {
@@ -177,6 +179,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             baseChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONE.getDefaultState());
             liquidChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.WATER.getDefaultState());
 
+            // @todo
+            glassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS.getDefaultState());
+
             leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
                     .withProperty(BlockLeaves.DECAYABLE, false));
             leaves2Char = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
@@ -251,7 +256,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             generateDebris(primer, provider.rand, info);
         }
 
-//        if (provider.profile.FLOATING) {
+//        if (provider.profile.isFloating()) {
 //            // cityFactor -> 0: 128
 //            // cityFactor -> .1: 10
 //            // cityFactor -> .2: 20
@@ -309,19 +314,34 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     @Override
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
-        if (provider.profile.FLOATING) {
-            islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
-        } else {
-            super.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+        switch (provider.profile.LANDSCAPE_TYPE) {
+            case DEFAULT:
+                super.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+                break;
+            case FLOATING:
+                islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+                break;
+            case SPACE:
+                spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+                break;
         }
     }
 
     public void doCoreChunk(int chunkX, int chunkZ, ChunkPrimer primer) {
-        if (provider.profile.FLOATING) {
-            islandTerrainGenerator.generate(chunkX, chunkZ, primer);
-            return;
+        switch (provider.profile.LANDSCAPE_TYPE) {
+            case DEFAULT:
+                defaultGenerate(chunkX, chunkZ, primer);
+                break;
+            case FLOATING:
+                islandTerrainGenerator.generate(chunkX, chunkZ, primer);
+                break;
+            case SPACE:
+                spaceTerrainGenerator.generate(chunkX, chunkZ, primer);
+                break;
         }
+    }
 
+    private void defaultGenerate(int chunkX, int chunkZ, ChunkPrimer primer) {
         generateHeightmap(chunkX, chunkZ);
         for (int x4 = 0; x4 < 4; ++x4) {
             int l = x4 * 5;
@@ -382,7 +402,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public void doNormalChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
 //        debugClearChunk(chunkX, chunkZ, primer);
-        if (!provider.profile.FLOATING) {
+        if (provider.profile.isDefault()) {
             flattenChunkToCityBorder(chunkX, chunkZ, primer);
         }
         generateBridges(primer, info);
@@ -796,7 +816,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         rand.nextFloat();
         rand.nextFloat();
 
-        if (!provider.profile.FLOATING) {
+        if (provider.profile.isDefault()) {
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     int index = (x << 12) | (z << 8);
@@ -1480,20 +1500,20 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateStreet(ChunkPrimer primer, BuildingInfo info, ChunkHeightmap heightmap, Random rand) {
-        if (provider.profile.FLOATING) {
+        if (provider.profile.isDefault()) {
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    int index = (x << 12) | (z << 8);
+                    PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + info.getCityGroundLevel(), baseChar);
+                }
+            }
+        } else {
             Character borderBlock = info.getCityStyle().getBorderBlock();
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     int index = (x << 12) | (z << 8);
                     PrimerTools.setBlockStateRange(primer, index + info.getCityGroundLevel() - 2, index + info.getCityGroundLevel(), baseChar);
                     setBlocksFromPalette(primer, index + info.getCityGroundLevel() - 3, index + info.getCityGroundLevel() - 2, info.getCompiledPalette(), borderBlock);
-                }
-            }
-        } else {
-            for (int x = 0; x < 16; ++x) {
-                for (int z = 0; z < 16; ++z) {
-                    int index = (x << 12) | (z << 8);
-                    PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + info.getCityGroundLevel(), baseChar);
                 }
             }
         }
@@ -1581,7 +1601,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        if (provider.profile.FLOATING) {
+        if (provider.profile.isFloating()) {
             Character borderBlock = info.getCityStyle().getBorderBlock();
             Character wallBlock = info.getCityStyle().getWallBlock();
             char wall = info.getCompiledPalette().get(wallBlock);
@@ -1805,7 +1825,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateNormalStreetSection(ChunkPrimer primer, BuildingInfo info, int height) {
-//        char defaultStreet = provider.profile.FLOATING ? street2 : streetBase;
+//        char defaultStreet = provider.profile.isFloating() ? street2 : streetBase;
         char defaultStreet = streetBase;
         char b;
         for (int x = 0; x < 16; ++x) {
@@ -1840,7 +1860,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         int index = (x << 12) | (z << 8);
 
-        if (!provider.profile.FLOATING) {
+        if (provider.profile.isDefault()) {
             int y = groundLevel - 6; // We do the ocean border 6 lower then groundlevel
             setBlocksFromPalette(primer, index + y, index + info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
         }
@@ -2078,7 +2098,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         CompiledPalette palette = info.getCompiledPalette();
         char fillerBlock = info.getBuilding().getFillerBlock();
 
-        if (provider.profile.FLOATING) {
+        if (provider.profile.isFloating()) {
             // For floating worldgen we try to fit the underside of the building better with the island
             // We also remove all blocks from the inside because we generate buildings on top of
             // generated chunks as opposed to blank chunks with non-floating worlds
@@ -2086,12 +2106,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 for (int z = 0; z < 16; ++z) {
                     int index = (x << 12) | (z << 8);
                     int height = heightmap.getHeight(x, z);
-                    if (height > 1 && height < lowestLevel-1) {
+                    if (height > 1 && height < lowestLevel - 1) {
                         PrimerTools.setBlockStateRange(primer, index + height + 1, index + lowestLevel, baseChar);
                     }
                     clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6);
                 }
             }
+        } else if (provider.profile.isSpace()) {
+            // @todo
         } else {
             // For normal worldgen (non floating) we have a thin layer of 'border' blocks because that looks nicer
             for (int x = 0; x < 16; ++x) {
@@ -2104,7 +2126,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             primer.data[index + y] = palette.get(borderBlock);
                             y++;
                         }
-                    } else if (!provider.profile.FLOATING) {
+                    } else if (provider.profile.isDefault()) {
                         PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + lowestLevel, baseChar);
                     }
                     if (primer.data[index + lowestLevel] == airChar) {

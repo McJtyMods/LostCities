@@ -59,7 +59,7 @@ public class LostWorldType extends WorldType {
     @Override
     public double getHorizon(World world) {
         LostCityProfile profile = getProfile(world);
-        if (profile.FLOATING) {
+        if (profile.isFloating()) {
             return 0;
         } else {
             return super.getHorizon(world);

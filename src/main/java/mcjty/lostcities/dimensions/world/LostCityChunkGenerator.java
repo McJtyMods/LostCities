@@ -249,7 +249,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
     public ChunkPrimer getChunkPrimer(int chunkX, int chunkZ, boolean isCity) {
         ChunkPrimer chunkprimer;
-        if (isCity && !profile.FLOATING) {  // Generate a normal chunk if we have a floating city
+        if (isCity && profile.isDefault()) {  // Generate a normal chunk if we have a floating city
             chunkprimer = new ChunkPrimer();
         } else {
             ChunkCoord key = new ChunkCoord(worldObj.provider.getDimension(), chunkX, chunkZ);

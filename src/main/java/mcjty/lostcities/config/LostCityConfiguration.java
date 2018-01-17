@@ -22,7 +22,7 @@ public class LostCityConfiguration {
             "to work with. The worldtype has to support the IChunkPrimerFactory API for this to work";
     public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
 
-    public static final String[] DEFAULT_PROFILES = new String[]{"default", "nodamage", "rarecities", "floating", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
+    public static final String[] DEFAULT_PROFILES = new String[]{"default", "nodamage", "rarecities", "floating", "space", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
 
     public static String[] ASSETS = new String[] {
             "/assets/lostcities/citydata/conditions.json",
@@ -134,7 +134,7 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("floating");
         profile.setDescription("Cities on floating islands");
         profile.CITY_CHANCE = 0.03f;
-        profile.FLOATING = true;
+        profile.LANDSCAPE_TYPE = LandscapeType.FLOATING;
         profile.WATERLEVEL_OFFSET = 70;
         profile.BUILDING_MAXCELLARS = 2;
         profile.RAILWAYS_CAN_END = true;
@@ -151,6 +151,30 @@ public class LostCityConfiguration {
         profile.GENERATE_SCATTERED = false;
         profile.GENERATE_VILLAGES = false;
         profile.GENERATE_STRONGHOLDS = false;
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("space");
+        profile.setDescription("Cities in floating glass bubbles");
+        profile.CITY_CHANCE = 0.03f;
+        profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
+        profile.WATERLEVEL_OFFSET = 70;
+        profile.BUILDING_MAXCELLARS = 2;
+        profile.RAILWAYS_CAN_END = true;
+        profile.RAILWAYS_ENABLED = false;
+        profile.HIGHWAY_DISTANCE_MASK = 0;
+        profile.GROUNDLEVEL = 60;
+        profile.CITY_LEVEL0_HEIGHT = 60;
+        profile.CITY_LEVEL1_HEIGHT = 66;
+        profile.CITY_LEVEL2_HEIGHT = 72;
+        profile.CITY_LEVEL3_HEIGHT = 78;
+        profile.GENERATE_MANSIONS = false;
+        profile.GENERATE_MINESHAFTS = false;
+        profile.GENERATE_OCEANMONUMENTS = false;
+        profile.GENERATE_SCATTERED = false;
+        profile.GENERATE_VILLAGES = false;
+        profile.GENERATE_STRONGHOLDS = false;
+        profile.CITY_MAXRADIUS = 90;
+        profile.GENERATE_LIGHTING = true;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("rarecities");

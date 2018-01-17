@@ -4,6 +4,10 @@
     "name": "common",
     "palette": [
       {
+        "char": "9",
+        "block": "minecraft:stained_hardened_clay@9"
+      },
+      {
         "char": "1",
         "block": "minecraft:mob_spawner",
         "mob": "easymobs"
@@ -319,6 +323,11 @@
     },
     "railblocks": {
       "railmain": "y"
+    },
+    "sphereblocks": {
+      "glass": "Z",
+      "border": "9",
+      "inner": "b"
     },
     "buildings": [
       {

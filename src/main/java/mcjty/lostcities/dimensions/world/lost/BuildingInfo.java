@@ -827,7 +827,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public static boolean isVoidChunk(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         if (provider.otherGenerator != null) {
             return false;   // @todo Not supported yet
-        } else if (provider.profile.FLOATING) {
+        } else if (provider.profile.isFloating()) {
             if (provider.getHeightmap(chunkX, chunkZ).getHeight(8, 8) <= 0) {
                 return true;
             }
@@ -855,7 +855,25 @@ public class BuildingInfo implements ILostChunkInfo {
         if (provider.otherGenerator != null) {
             int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);
             return getLevelBasedOnHeight(height, provider);
-        } else if (provider.profile.FLOATING) {
+        } else if (provider.profile.isSpace()) {
+            ChunkCoord cityCenter = City.getCityCenterForSpace(chunkX, chunkZ, provider);
+            float radius = City.getCityRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+            float dist = (Math.abs(cityCenter.getChunkX()-chunkX) + Math.abs(cityCenter.getChunkZ()-chunkZ))*16.0f/2.0f / radius;
+            Random rand = new Random(provider.seed + chunkZ * 817505771L + chunkX * 217645177L);
+            rand.nextFloat();
+            rand.nextFloat();
+            if (dist < .2f) {
+                return 3 + rand.nextInt(2);
+            } else if (dist < .4f) {
+                return 2 + rand.nextInt(2);
+            } else if (dist < .6f) {
+                return 1 + rand.nextInt(2);
+            } else if (dist < .8f) {
+                return rand.nextInt(2);
+            } else {
+                return 0;
+            }
+        } else if (provider.profile.isFloating()) {
             int cnt = 0;
             int h = 0;
             int h0 = provider.getHeightmap(chunkX, chunkZ).getHeight(8, 8);
@@ -926,19 +944,17 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static int getLevelBasedOnHeight(int height, LostCityChunkGenerator provider) {
-        int cityLevel;
         if (height < provider.profile.CITY_LEVEL0_HEIGHT) {
-            cityLevel = 0;
+            return 0;
         } else if (height < provider.profile.CITY_LEVEL1_HEIGHT) {
-            cityLevel = 1;
+            return 1;
         } else if (height < provider.profile.CITY_LEVEL2_HEIGHT) {
-            cityLevel = 2;
+            return 2;
         } else if (height < provider.profile.CITY_LEVEL3_HEIGHT) {
-            cityLevel = 3;
+            return 3;
         } else {
-            cityLevel = 4;
+            return 4;
         }
-        return cityLevel;
     }
 
     private Block getRandomDoor(Random rand) {
