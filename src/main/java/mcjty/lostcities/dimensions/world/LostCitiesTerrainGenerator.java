@@ -2057,6 +2057,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         if (provider.profile.FLOATING) {
             // For floating worldgen we try to fit the underside of the building better with the island
+            // We also remove all blocks from the inside because we generate buildings on top of
+            // generated chunks as opposed to blank chunks with non-floating worlds
             ChunkHeightmap heightmap = provider.getHeightmap(info.chunkX, info.chunkZ);
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
@@ -2065,6 +2067,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (height > 1 && height < lowestLevel-1) {
                         PrimerTools.setBlockStateRange(primer, index + height + 1, index + lowestLevel, baseChar);
                     }
+                    clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6);
                 }
             }
         } else {

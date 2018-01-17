@@ -299,9 +299,8 @@ public class IslandTerrainGenerator {
         char block = topBlock;
         char block1 = fillerBlock;
 
-        int j = -1;
-        int k = (int)(noise / 3.0D + 3.0D + provider.rand.nextDouble() * 0.25D);
-
+        int k = -1;
+        int l = (int)(noise / 3.0D + 3.0D + provider.rand.nextDouble() * 0.25D);
         int cx = x & 15;
         int cz = z & 15;
 
@@ -317,20 +316,20 @@ public class IslandTerrainGenerator {
                 char currentBlock = primer.data[index];
                 if (currentBlock == LostCitiesTerrainGenerator.bedrockChar && height <= 12) {
                     primer.data[index] = air;
-                    j = -1;
+                    k = -1;
                 } else {
                     if (currentBlock != air) {
                         if (currentBlock == baseBlock) {
-                            if (j == -1) {
-                                if (k <= 0) {
-                                    block = baseBlock;  // Was air in original
-                                    block1 = baseBlock;
+                            if (k == -1) {
+                                if (l <= 0) {
+                                    block = topBlock;
+                                    block1 = fillerBlock;
                                 } else if (height >= (topLevel-4) && height <= (topLevel+1)) {
                                     block = topBlock;
-                                    block1 = baseBlock; //Biome.fillerBlock;
+                                    block1 = fillerBlock; //Biome.fillerBlock;
                                 }
 
-                                if (height < topLevel && (block == air)) {
+                                if (height < topLevel && (block == air)) { // @todo configure height!
                                     if (Biome.getTemperature(new BlockPos(x, height, z)) < 0.15F) {
                                         block = (char) Block.BLOCK_STATE_IDS.get(Blocks.ICE.getDefaultState());
                                     } else {
@@ -338,29 +337,29 @@ public class IslandTerrainGenerator {
                                     }
                                 }
 
-                                j = k;
+                                k = l;
 
                                 if (height >= (topLevel-1)) {
                                     primer.data[index] = block;
-                                } else if (height < (topLevel-6) - k) {
+                                } else if (height < (topLevel-6) - l) {
                                     block = air;
                                     block1 = baseBlock;
                                     primer.data[index] = fillerBlock;
                                 } else {
                                     primer.data[index] = block1;
                                 }
-                            } else if (j > 0) {
-                                --j;
+                            } else if (k > 0) {
+                                --k;
                                 primer.data[index] = block1;
 
-                                if (j == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
-                                    j = provider.rand.nextInt(4) + Math.max(0, height - topLevel);
+                                if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
+                                    k = provider.rand.nextInt(4) + Math.max(0, height - topLevel);
                                     block1 = (char) Block.BLOCK_STATE_IDS.get(Blocks.SANDSTONE.getDefaultState());
                                 }
                             }
                         }
                     } else {
-                        j = -1;
+                        k = -1;
                     }
                 }
             }
