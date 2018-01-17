@@ -7,6 +7,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
+import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import net.minecraft.world.gen.NoiseGeneratorSimplex;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.ChunkGeneratorEvent;
@@ -24,6 +25,8 @@ public class IslandTerrainGenerator {
     private NoiseGeneratorOctaves noiseGen3;
     private NoiseGeneratorOctaves noiseGen4;
     private NoiseGeneratorOctaves noiseGen5;
+
+    private NoiseGeneratorPerlin surfaceNoise;
 
     private double[] stoneNoise = new double[256];
     private double[] noiseData1;
@@ -77,6 +80,8 @@ public class IslandTerrainGenerator {
         this.noiseGen4 = new NoiseGeneratorOctaves(provider.rand, 10);
         this.noiseGen5 = new NoiseGeneratorOctaves(provider.rand, 16);
         this.islandNoise = new NoiseGeneratorSimplex(provider.rand);
+
+        this.surfaceNoise = new NoiseGeneratorPerlin(provider.rand, 4);     // Used only for biome decoration
 
         net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd ctx =
                 new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd(noiseGen1, noiseGen2, noiseGen3, noiseGen4, noiseGen5, islandNoise);
@@ -277,7 +282,8 @@ public class IslandTerrainGenerator {
 //        }
 
         double d0 = 0.03125D;
-        this.stoneNoise = this.noiseGen4.generateNoiseOctaves(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
+//        this.stoneNoise = this.noiseGen4.generateNoiseOctaves(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
+        this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, 0.0625D, 0.0625D, 1.0D);
 
         for (int k = 0; k < 16; ++k) {
             for (int l = 0; l < 16; ++l) {
@@ -322,11 +328,11 @@ public class IslandTerrainGenerator {
                         if (currentBlock == baseBlock) {
                             if (k == -1) {
                                 if (l <= 0) {
-                                    block = topBlock;
-                                    block1 = fillerBlock;
+                                    block = air;
+                                    block1 = baseBlock;
                                 } else if (height >= (topLevel-4) && height <= (topLevel+1)) {
                                     block = topBlock;
-                                    block1 = fillerBlock; //Biome.fillerBlock;
+                                    block1 = fillerBlock;
                                 }
 
                                 if (height < topLevel && (block == air)) { // @todo configure height!
