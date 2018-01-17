@@ -323,7 +323,7 @@ public class IslandTerrainGenerator {
                         if (currentBlock == baseBlock) {
                             if (j == -1) {
                                 if (k <= 0) {
-                                    block = baseBlock;
+                                    block = baseBlock;  // Was air in original
                                     block1 = baseBlock;
                                 } else if (height >= (topLevel-4) && height <= (topLevel+1)) {
                                     block = topBlock;
