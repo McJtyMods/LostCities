@@ -94,7 +94,7 @@ public class City {
         if (provider.profile.LANDSCAPE_TYPE == LandscapeType.SPACE) {
             // @todo config
             // Space cities are spaced evenly
-            return chunkX % 16 == 8 && chunkZ % 16 == 8;
+            return (chunkX & 0xf) == 8 && (chunkZ & 0xf) == 8;
         } else {
             return rand.nextFloat() < provider.profile.CITY_CHANCE;
         }

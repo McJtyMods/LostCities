@@ -862,13 +862,11 @@ public class BuildingInfo implements ILostChunkInfo {
             Random rand = new Random(provider.seed + chunkZ * 817505771L + chunkX * 217645177L);
             rand.nextFloat();
             rand.nextFloat();
-            if (dist < .2f) {
-                return 3 + rand.nextInt(2);
-            } else if (dist < .4f) {
+            if (dist < .3f) {
                 return 2 + rand.nextInt(2);
-            } else if (dist < .6f) {
+            } else if (dist < .5f) {
                 return 1 + rand.nextInt(2);
-            } else if (dist < .8f) {
+            } else if (dist < .25f) {
                 return rand.nextInt(2);
             } else {
                 return 0;

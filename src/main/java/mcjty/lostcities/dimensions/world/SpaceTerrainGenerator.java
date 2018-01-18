@@ -87,45 +87,23 @@ public class SpaceTerrainGenerator {
 
         char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
         char topBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
-        char block = topBlock;
-        char block1 = fillerBlock;
 
         int cx = x & 15;
         int cz = z & 15;
 
         // Index of the bottom of the column.
         int bottomIndex = ((cz * 16) + cx) * 256;
-
-        for (int height = 255; height >= 0; --height) {
-            int index = bottomIndex + height;
-
-            char currentBlock = primer.data[index];
-            if (currentBlock != air) {
-                if (currentBlock == baseBlock) {
-                    if (height >= (topLevel - 4) && height <= (topLevel + 1)) {
-                        block = topBlock;
-                        block1 = fillerBlock;
-                    }
-
-                    if (height < topLevel && (block == air)) {
-                        if (Biome.getTemperature(new BlockPos(x, height, z)) < 0.15F) {
-                            block = (char) Block.BLOCK_STATE_IDS.get(Blocks.ICE.getDefaultState());
-                        } else {
-                            block = baseBlock;  // No liquid since we are floating
-                        }
-                    }
-
-                    if (height >= (topLevel - 1)) {
-                        primer.data[index] = block;
-                    } else if (height < (topLevel - 6)) {
-                        block = air;
-                        block1 = baseBlock;
-                        primer.data[index] = fillerBlock;
-                    } else {
-                        primer.data[index] = block1;
-                    }
-                }
-            }
+        int index = bottomIndex + topLevel;
+        if (primer.data[index] == baseBlock) {
+            primer.data[index] = topBlock;
+        }
+        index--;
+        if (primer.data[index] == baseBlock) {
+            primer.data[index] = fillerBlock;
+        }
+        index--;
+        if (primer.data[index] == baseBlock) {
+            primer.data[index] = fillerBlock;
         }
     }
 }

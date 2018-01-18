@@ -155,7 +155,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("space");
         profile.setDescription("Cities in floating glass bubbles");
-        profile.CITY_CHANCE = 0.03f;
+        profile.CITY_CHANCE = 0.07f;
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.WATERLEVEL_OFFSET = 70;
         profile.BUILDING_MAXCELLARS = 2;
@@ -163,6 +163,7 @@ public class LostCityConfiguration {
         profile.RAILWAYS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 0;
         profile.GROUNDLEVEL = 60;
+        profile.CITY_MAXRADIUS = 90;
         profile.CITY_LEVEL0_HEIGHT = 60;
         profile.CITY_LEVEL1_HEIGHT = 66;
         profile.CITY_LEVEL2_HEIGHT = 72;
@@ -173,7 +174,7 @@ public class LostCityConfiguration {
         profile.GENERATE_SCATTERED = false;
         profile.GENERATE_VILLAGES = false;
         profile.GENERATE_STRONGHOLDS = false;
-        profile.CITY_MAXRADIUS = 90;
+        profile.BUILDING_CHANCE = .3f;
         profile.GENERATE_LIGHTING = true;
         standardProfiles.put(profile.getName(), profile);
 
