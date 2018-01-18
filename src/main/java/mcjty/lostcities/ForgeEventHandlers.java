@@ -1,6 +1,8 @@
 package mcjty.lostcities;
 
 import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.dimensions.world.LostWorldType;
 import mcjty.lostcities.varia.CustomTeleporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
@@ -13,11 +15,76 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
+import java.util.Random;
+
 public class ForgeEventHandlers {
+
+    @SubscribeEvent
+    public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
+        World world = event.getWorld();
+        if (!world.isRemote) {
+            // Potentially set the spawn point
+            LostCityProfile profile = LostWorldType.getProfile(world);
+            switch (profile.LANDSCAPE_TYPE) {
+                case DEFAULT:
+                    break;
+                case FLOATING:
+                case SPACE:
+                    findSafeSpawnPoint(world);
+                    event.setCanceled(true);
+                    break;
+            }
+        }
+
+    }
+
+    private void findSafeSpawnPoint(World world) {
+        Random rand = new Random(world.getSeed());
+        rand.nextFloat();
+        rand.nextFloat();
+        int radius = 200;
+        int attempts = 0;
+        int bottom = world.getWorldType().getMinimumSpawnHeight(world);
+        while (true) {
+            for (int i = 0 ; i < 200 ; i++) {
+                int x = rand.nextInt(radius * 2) - radius;
+                int z = rand.nextInt(radius * 2) - radius;
+                attempts++;
+                for (int y = bottom ; y < 150 ; y++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    IBlockState state = world.getBlockState(pos);
+                    if (state.getBlock().isTopSolid(state) && state.getBlock().isFullCube(state) && state.getBlock().isOpaqueCube(state) && world.isAirBlock(pos.up()) && world.isAirBlock(pos.up(2))) {
+                        world.setSpawnPoint(pos.up());
+                        return;
+                    }
+                }
+            }
+            radius += 100;
+        }
+    }
+
+
+//    @SubscribeEvent
+//    public void onWorldLoad(WorldEvent.Load event) {
+//        World world = event.getWorld();
+//        if (!world.isRemote && world.provider.getDimension() == 0) {
+//            // Potentially set the spawn point
+//            LostCityProfile profile = LostWorldType.getProfile(world);
+//            switch (profile.LANDSCAPE_TYPE) {
+//                case DEFAULT:
+//                    break;
+//                case FLOATING:
+//                case SPACE:
+//                    findSafeSpawnPoint(world);
+//                    break;
+//            }
+//        }
+//    }
 
     @SubscribeEvent
     public void onPlayerSleepInBedEvent(PlayerSleepInBedEvent event) {
