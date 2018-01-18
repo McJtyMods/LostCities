@@ -31,7 +31,7 @@ public class SpaceTerrainGenerator {
         ChunkCoord cityCenter = City.getCityCenterForSpace(chunkX, chunkZ, provider);
         int cx = cityCenter.getChunkX();
         int cz = cityCenter.getChunkZ();
-        float radius = City.getCityRadius(cx, cz, provider) * 1.3f;     // @todo 1.3 should be config
+        float radius = City.getCityRadius(cx, cz, provider) * provider.profile.CITYSPHERE_FACTOR;
         fillSphere(primer, (cx-chunkX)*16+8, provider.profile.GROUNDLEVEL, (cz-chunkZ)*16+8, (int) radius, glassBlock, baseBlock, sideBlock);
     }
 

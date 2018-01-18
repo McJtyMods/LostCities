@@ -1500,24 +1500,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateStreet(ChunkPrimer primer, BuildingInfo info, ChunkHeightmap heightmap, Random rand) {
-        if (provider.profile.isDefault()) {
-            for (int x = 0; x < 16; ++x) {
-                for (int z = 0; z < 16; ++z) {
-                    int index = (x << 12) | (z << 8);
-                    PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + info.getCityGroundLevel(), baseChar);
-                }
-            }
-        } else {
-            Character borderBlock = info.getCityStyle().getBorderBlock();
-            for (int x = 0; x < 16; ++x) {
-                for (int z = 0; z < 16; ++z) {
-                    int index = (x << 12) | (z << 8);
-                    PrimerTools.setBlockStateRange(primer, index + info.getCityGroundLevel() - 2, index + info.getCityGroundLevel(), baseChar);
-                    setBlocksFromPalette(primer, index + info.getCityGroundLevel() - 3, index + info.getCityGroundLevel() - 2, info.getCompiledPalette(), borderBlock);
-                }
-            }
-        }
-
         boolean xRail = info.hasXCorridor();
         boolean zRail = info.hasZCorridor();
         if (xRail || zRail) {
@@ -1601,9 +1583,23 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        if (provider.profile.isFloating()) {
+        if (provider.profile.isDefault()) {
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    int index = (x << 12) | (z << 8);
+                    PrimerTools.setBlockStateRange(primer, index + provider.profile.BEDROCK_LAYER, index + info.getCityGroundLevel(), baseChar);
+                }
+            }
+        } else if (provider.profile.isFloating()) {
             Character borderBlock = info.getCityStyle().getBorderBlock();
             Character wallBlock = info.getCityStyle().getWallBlock();
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    int index = (x << 12) | (z << 8);
+                    PrimerTools.setBlockStateRange(primer, index + info.getCityGroundLevel() - 2, index + info.getCityGroundLevel(), baseChar);
+                    setBlocksFromPalette(primer, index + info.getCityGroundLevel() - 3, index + info.getCityGroundLevel() - 2, info.getCompiledPalette(), borderBlock);
+                }
+            }
             char wall = info.getCompiledPalette().get(wallBlock);
             for (int i1 = 0 ; i1 < 16 ; i1++) {
                 for (int i2 = 0 ; i2 < 16 ; i2 += 15) {
@@ -1617,7 +1613,20 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
                 }
             }
+        } else if (provider.profile.isSpace()) {
+            Character borderBlock = info.getCityStyle().getBorderBlock();
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    int index = (x << 12) | (z << 8);
+                    if (isSide(x, z)) {
+                        setBlocksFromPalette(primer, index + groundLevel, index + info.getCityGroundLevel(), info.getCompiledPalette(), borderBlock);
+                    } else {
+                        PrimerTools.setBlockStateRange(primer, index + groundLevel, index + info.getCityGroundLevel(), baseChar);
+                    }
+                }
+            }
         }
+
     }
 
     private void generateBorderFloating(ChunkPrimer primer, BuildingInfo info, ChunkHeightmap heightmap, Character borderBlock, char wall, int x, int z) {
@@ -1863,6 +1872,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (provider.profile.isDefault()) {
             int y = groundLevel - 6; // We do the ocean border 6 lower then groundlevel
             setBlocksFromPalette(primer, index + y, index + info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+        } else if (provider.profile.isSpace()) {
+            setBlocksFromPalette(primer, index + info.getCityGroundLevel(), index + info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
         }
         if (canDoParks) {
             if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
@@ -2113,7 +2124,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
         } else if (provider.profile.isSpace()) {
-            // @todo
+            if (lowestLevel > groundLevel) {
+                for (int x = 0; x < 16; ++x) {
+                    for (int z = 0; z < 16; ++z) {
+                        int index = (x << 12) | (z << 8);
+                        if (isSide(x, z)) {
+                            setBlocksFromPalette(primer, index + groundLevel, index + lowestLevel, info.getCompiledPalette(), borderBlock);
+                        } else {
+                            PrimerTools.setBlockStateRange(primer, index + groundLevel, index + lowestLevel, baseChar);
+                        }
+                    }
+                }
+            }
         } else {
             // For normal worldgen (non floating) we have a thin layer of 'border' blocks because that looks nicer
             for (int x = 0; x < 16; ++x) {

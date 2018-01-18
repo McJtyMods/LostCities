@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.api.*;
+import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
@@ -340,6 +341,13 @@ public class BuildingInfo implements ILostChunkInfo {
             }
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
             characteristics.couldHaveBuilding = characteristics.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, characteristics.section, characteristics.cityLevel, rand);
+            if (provider.profile.LANDSCAPE_TYPE == LandscapeType.SPACE && characteristics.section == -1) {
+                // Minimize cities at the edge of the city in an orb
+                float dist = getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
+                if (dist > .8f) {
+                    characteristics.couldHaveBuilding = false;
+                }
+            }
 
             ChunkCoord coord = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
             CityStyle cityStyle;
@@ -856,9 +864,7 @@ public class BuildingInfo implements ILostChunkInfo {
             int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);
             return getLevelBasedOnHeight(height, provider);
         } else if (provider.profile.isSpace()) {
-            ChunkCoord cityCenter = City.getCityCenterForSpace(chunkX, chunkZ, provider);
-            float radius = City.getCityRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
-            float dist = (Math.abs(cityCenter.getChunkX()-chunkX) + Math.abs(cityCenter.getChunkZ()-chunkZ))*16.0f/2.0f / radius;
+            float dist = getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
             Random rand = new Random(provider.seed + chunkZ * 817505771L + chunkX * 217645177L);
             rand.nextFloat();
             rand.nextFloat();
@@ -866,7 +872,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 return 2 + rand.nextInt(2);
             } else if (dist < .5f) {
                 return 1 + rand.nextInt(2);
-            } else if (dist < .25f) {
+            } else if (dist < .7f) {
                 return rand.nextInt(2);
             } else {
                 return 0;
@@ -939,6 +945,16 @@ public class BuildingInfo implements ILostChunkInfo {
             }
             return getLevelBasedOnHeight(height, provider);
         }
+    }
+
+    /**
+     * Given a chunk coordinate return the relative distance (number between 0 and 1) for the neared city.
+     * This only works for space type worlds!
+     */
+    public static float getRelativeDistanceToCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        ChunkCoord cityCenter = City.getCityCenterForSpace(chunkX, chunkZ, provider);
+        float radius = City.getCityRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+        return (Math.abs(cityCenter.getChunkX()-chunkX) + Math.abs(cityCenter.getChunkZ()-chunkZ))*16.0f/2.0f / radius;
     }
 
     private static int getLevelBasedOnHeight(int height, LostCityChunkGenerator provider) {
