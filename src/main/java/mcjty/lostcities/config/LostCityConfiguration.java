@@ -157,9 +157,9 @@ public class LostCityConfiguration {
         profile.setDescription("Cities in floating glass bubbles");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.WATERLEVEL_OFFSET = 70;
-        profile.BUILDING_MAXCELLARS = 2;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
+        profile.RAILWAY_STATIONS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 0;
         profile.RUBBLELAYER = false;
         profile.GROUNDLEVEL = 60;
