@@ -67,7 +67,7 @@ public class CitySphere {
                     // This could be a city center
                     CitySphere sphere = getCitySphere(cx, chunkZ, provider);
                     if (sphere.isEnabled()) {
-                        if (sphere.monorailWestCandidate) {
+                        if (!sphere.monorailWestCandidate) {
                             return false;
                         } else {
                             break;  // No need to continue. We found our city
@@ -81,7 +81,7 @@ public class CitySphere {
                     // This could be a city center
                     CitySphere sphere = getCitySphere(cx, chunkZ, provider);
                     if (sphere.isEnabled()) {
-                        if (sphere.monorailEastCandidate) {
+                        if (!sphere.monorailEastCandidate) {
                             return false;
                         } else {
                             break;  // No need to continue. We found our city
@@ -95,6 +95,13 @@ public class CitySphere {
         }
     }
 
+    /**
+     * chunkX and chunkZ must be the city sphere center
+     */
+    public static float getSphereRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        return City.getCityRadius(chunkX, chunkZ, provider) * provider.profile.CITYSPHERE_FACTOR;
+    }
+
     public static boolean hasVerticalMonorail(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         if ((chunkX & 0xf) == 8) {
             for (int cz = chunkZ+1 ; cz < chunkZ+64 ; cz++) {
@@ -102,7 +109,7 @@ public class CitySphere {
                     // This could be a city center
                     CitySphere sphere = getCitySphere(chunkX, cz, provider);
                     if (sphere.isEnabled()) {
-                        if (sphere.monorailNorthCandidate) {
+                        if (!sphere.monorailNorthCandidate) {
                             return false;
                         } else {
                             break;  // No need to continue. We found our city
@@ -115,7 +122,7 @@ public class CitySphere {
                     // This could be a city center
                     CitySphere sphere = getCitySphere(chunkX, cz, provider);
                     if (sphere.isEnabled()) {
-                        if (sphere.monorailSouthCandidate) {
+                        if (!sphere.monorailSouthCandidate) {
                             return false;
                         } else {
                             break;  // No need to continue. We found our city

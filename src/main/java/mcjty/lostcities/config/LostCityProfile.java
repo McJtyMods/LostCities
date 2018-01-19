@@ -84,7 +84,7 @@ public class LostCityProfile {
     public float CITYSPHERE_FACTOR = 1.2f;
     public float CITYSPHERE_CHANCE = 0.7f;
     public float CITYSPHERE_SURFACE_VARIATION = 1.0f;
-    public float CITYSPHERE_MONORAIL_CHANCE = 0.7f;
+    public float CITYSPHERE_MONORAIL_CHANCE = 0.8f;
     public boolean CITYSPHERE_FLOODED = false;
 
     public int CITY_LEVEL0_HEIGHT = 75;

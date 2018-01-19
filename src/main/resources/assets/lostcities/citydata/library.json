@@ -87,6 +87,10 @@
         ]
       },
       {
+        "char": "Y",
+        "block": "minecraft:stained_glass"
+      },
+      {
         "char": "Z",
         "blocks": [
           {

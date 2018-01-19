@@ -36,7 +36,7 @@ public class SpaceTerrainGenerator {
             this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
             int cx = cityCenter.getChunkX();
             int cz = cityCenter.getChunkZ();
-            float radius = City.getCityRadius(cx, cz, provider) * provider.profile.CITYSPHERE_FACTOR;
+            float radius = CitySphere.getSphereRadius(cx, cz, provider);
             fillSphere(primer, (cx - chunkX) * 16 + 8, provider.profile.GROUNDLEVEL, (cz - chunkZ) * 16 + 8, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), baseLiquid);
         } else if (flooded) {
             this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
@@ -148,9 +148,7 @@ public class SpaceTerrainGenerator {
         int cnt = 0;
         for (int y = topLevel + 20 ; y >= topLevel - 20 ; y--) {
             int index = bottomIndex + y;
-            if (primer.data[index] == air || primer.data[index] == glassBlock) {
-                // Do nothing
-            } else if (primer.data[index] == baseBlock) {
+            if (primer.data[index] == baseBlock) {
                 if (cnt == 0) {
                     primer.data[index] = topBlock;
                 } else if (cnt < 3) {
@@ -159,9 +157,6 @@ public class SpaceTerrainGenerator {
                     break;
                 }
                 cnt++;
-            } else {
-                // Stop
-                break;
             }
         }
     }

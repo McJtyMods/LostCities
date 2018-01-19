@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * A structure part
  */
-public class BuildingPart implements ILostCityAsset {
+public class BuildingPart implements IBuildingPart, ILostCityAsset {
 
     private String name;
 
@@ -71,6 +71,7 @@ public class BuildingPart implements ILostCityAsset {
     /**
      * Vertical slices, organized by z*xSize+x
      */
+    @Override
     public char[][] getVslices() {
         if (vslices == null) {
             vslices = new char[xSize * zSize][];
@@ -96,10 +97,12 @@ public class BuildingPart implements ILostCityAsset {
         return vslices;
     }
 
+    @Override
     public char[] getVSlice(int x, int z) {
         return getVslices()[z*xSize + x];
     }
 
+    @Override
     public Palette getLocalPalette() {
         return localPalette;
     }
@@ -186,6 +189,7 @@ public class BuildingPart implements ILostCityAsset {
         return object;
     }
 
+    @Override
     public int getSliceCount() {
         return slices.length;
     }
@@ -198,10 +202,12 @@ public class BuildingPart implements ILostCityAsset {
         return slices;
     }
 
+    @Override
     public int getXSize() {
         return xSize;
     }
 
+    @Override
     public int getZSize() {
         return zSize;
     }
@@ -210,10 +216,12 @@ public class BuildingPart implements ILostCityAsset {
         return info.getCompiledPalette().get(slices[y].charAt(z * xSize + x));
     }
 
+    @Override
     public String getMobID(BuildingInfo info, int x, int y, int z) {
         return info.getCompiledPalette().getMobId(slices[y].charAt(z * xSize + x));
     }
 
+    @Override
     public String getLootTable(BuildingInfo info, int x, int y, int z) {
         return info.getCompiledPalette().getLootTable(slices[y].charAt(z * xSize + x));
     }

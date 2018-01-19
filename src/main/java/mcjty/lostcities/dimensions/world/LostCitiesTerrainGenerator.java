@@ -240,6 +240,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         generateRailwayDungeons(primer, info);
 
+        if (provider.profile.isSpace()) {
+            generateMonorails(primer, info);
+        }
+
         fixTorches(primer, info);
 
         // We make a new random here because the primer for a normal chunk may have
@@ -277,6 +281,24 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 //        }
 
 
+    }
+
+    private void generateMonorails(ChunkPrimer primer, BuildingInfo info) {
+        Transform transform;
+        if (info.hasHorizontalMonorail()) {
+            transform = Transform.ROTATE_90;
+        } else if (info.hasVerticalMonorail()) {
+            transform = Transform.ROTATE_NONE;
+        } else {
+            return;
+        }
+
+        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(info.chunkX, info.chunkZ, provider);
+        CitySphere sphere = info.getCitySphere();
+        float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+        double sqradiusOffset = (radius-2) * (radius-2);
+        BuildingPart part = AssetRegistries.PARTS.get("monorails_vertical");
+        generatePart(primer, info, part, transform, 0, groundLevel+5, 0, true);
     }
 
     private void fixTorches(ChunkPrimer primer, BuildingInfo info) {
@@ -1903,7 +1925,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
      * Generate a port. If 'airWaterLevel' is true then 'hard air' blocks are replaced with water below the waterLevel.
      * Otherwise they are replaced with air.
      */
-    private int generatePart(ChunkPrimer primer, BuildingInfo info, BuildingPart part,
+    private int generatePart(ChunkPrimer primer, BuildingInfo info, IBuildingPart part,
                              Transform transform,
                              int ox, int oy, int oz, boolean airWaterLevel) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
