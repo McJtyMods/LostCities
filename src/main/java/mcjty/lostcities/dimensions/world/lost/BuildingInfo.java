@@ -32,8 +32,6 @@ public class BuildingInfo implements ILostChunkInfo {
     public final boolean hasBuilding;
     public final int building2x2Section;    // -1 for not, 0 for top left, 1 for top right, 2 for bottom left, 3 for bottom right
 
-    public final CitySphere citySphere;
-
     public final ILostCityMultiBuilding multiBuilding;
     public final ILostCityBuilding buildingType;
     public final BuildingPart fountainType;
@@ -84,6 +82,8 @@ public class BuildingInfo implements ILostChunkInfo {
     private Direction stairDirection;
     private boolean actualStairsCalculated = false;
     private Direction actualStairDirection;
+
+    public CitySphere citySphere;
 
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
@@ -781,19 +781,26 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             frontType = null;
         }
+    }
 
-        // This information is for city spheres. This information is only relevant
-        // in the chunk representing the center of the city
-        if (City.isCitySphereCenterCandidate(chunkX, chunkZ)) {
+    public CitySphere getCitySphere() {
+        if (citySphere == null) {
+            citySphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+            CityStyle cs = getCityStyle();
+
+            ChunkCoord center = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
+            Random rand = new Random(provider.seed + center.getChunkX() * 837971201L + center.getChunkZ() * 961744153L);
+            rand.nextFloat();
+            rand.nextFloat();
+
             Character glass = getCompiledPalette().get(cs.getSphereGlassBlock(), rand);
             Character base = getCompiledPalette().get(cs.getSphereBlock(), rand);
             Character side = getCompiledPalette().get(cs.getSphereSideBlock(), rand);
-            boolean enabled = rand.nextFloat() < provider.profile.CITYSPHERE_CHANCE;
-            citySphere = new CitySphere(enabled, glass, base, side);
-        } else {
-            citySphere = null;
+            citySphere.setBlocks(glass, base, side);
         }
+        return citySphere;
     }
+
 
     private int getMaxcellars(LostCityChunkGenerator provider, CityStyle cs) {
         int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
@@ -967,7 +974,7 @@ public class BuildingInfo implements ILostChunkInfo {
      * This only works for space type worlds!
      */
     public static float getRelativeDistanceToCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        ChunkCoord cityCenter = City.getCityCenterForSpace(chunkX, chunkZ, provider);
+        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
         float radius = City.getCityRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
         return (Math.abs(cityCenter.getChunkX()-chunkX) + Math.abs(cityCenter.getChunkZ()-chunkZ))*16.0f/2.0f / radius;
     }

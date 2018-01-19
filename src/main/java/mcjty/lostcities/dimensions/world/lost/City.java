@@ -74,15 +74,6 @@ public class City {
     }
 
 
-    /**
-     * This returns the center of the city in case we're in a space type world
-     */
-    public static ChunkCoord getCityCenterForSpace(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        int cx = (chunkX & ~0xf) + 8;
-        int cz = (chunkZ & ~0xf) + 8;
-        return new ChunkCoord(provider.dimensionId, cx, cz);
-    }
-
     public static boolean isCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider);
         if (city != null) {
@@ -94,7 +85,11 @@ public class City {
         if (provider.profile.LANDSCAPE_TYPE == LandscapeType.SPACE) {
             // @todo config
             // Space cities are spaced evenly
-            return isCitySphereCenterCandidate(chunkX, chunkZ);
+            boolean candidate = isCitySphereCenterCandidate(chunkX, chunkZ);
+            if (candidate) {
+                return CitySphere.getCitySphere(chunkX, chunkZ, provider).isEnabled();
+            }
+            return false;
         } else {
             return rand.nextFloat() < provider.profile.CITY_CHANCE;
         }

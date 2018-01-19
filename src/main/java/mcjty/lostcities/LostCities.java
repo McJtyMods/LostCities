@@ -76,6 +76,7 @@ public class LostCities {
         Railway.cleanCache();
         BiomeInfo.cleanCache();
         City.cleanCache();
+        CitySphere.cleanCache();
     }
 
     /**

@@ -3,11 +3,8 @@ package mcjty.lostcities.dimensions.world;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.City;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
-import mcjty.lostcities.dimensions.world.lost.cityassets.CityStyle;
 import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -22,11 +19,11 @@ public class SpaceTerrainGenerator {
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
         // Find the city center
-        ChunkCoord cityCenter = City.getCityCenterForSpace(chunkX, chunkZ, provider);
+        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
 
         // Get the city style for the center of the city
         BuildingInfo info = BuildingInfo.getBuildingInfo(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
-        CitySphere sphere = info.citySphere;
+        CitySphere sphere = info.getCitySphere();
         if (sphere.isEnabled()) {
             int cx = cityCenter.getChunkX();
             int cz = cityCenter.getChunkZ();
