@@ -8,23 +8,29 @@ import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.gen.NoiseGeneratorPerlin;
 
 public class SpaceTerrainGenerator {
     private LostCityChunkGenerator provider;
 
+    private NoiseGeneratorPerlin surfaceNoise;
+    private double[] surfaceBuffer = new double[256];
+
     public void setup(World world, LostCityChunkGenerator provider) {
         this.provider = provider;
+        this.surfaceNoise = new NoiseGeneratorPerlin(provider.rand, 4);
+
     }
 
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
-        // Find the city center
+        // Find the city center and get the city style for the center of the city
         ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
-
-        // Get the city style for the center of the city
         BuildingInfo info = BuildingInfo.getBuildingInfo(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
         CitySphere sphere = info.getCitySphere();
         if (sphere.isEnabled()) {
+            this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
+
             int cx = cityCenter.getChunkX();
             int cz = cityCenter.getChunkZ();
             float radius = City.getCityRadius(cx, cz, provider) * provider.profile.CITYSPHERE_FACTOR;
@@ -42,18 +48,19 @@ public class SpaceTerrainGenerator {
             for (int z = 0 ; z < 16 ; z++) {
                 double dzdz = (z-centerz) * (z-centerz);
                 int index = (x * 16 + z) * 256;
+                double vr = provider.profile.CITYSPHERE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / provider.profile.CITYSPHERE_SURFACE_VARIATION;
                 for (int y = Math.max(centery-radius, 0) ; y <= Math.min(centery+radius, 255) ; y++) {
                     double dydy = (y-centery) * (y-centery);
                     double sqdist = dxdx + dydy + dzdz;
                     if (sqdist <= sqradius) {
-                        if (y > centery) {
-                            if (sqdist >= sqradiusOffset) {
+                        if (sqdist >= sqradiusOffset) {
+                            if (y > centery) {
                                 primer.data[index + y] = glass;
+                            } else {
+                                primer.data[index + y] = sideBlock;
                             }
                         } else {
-                            if (sqdist >= sqradiusOffset) {
-                                primer.data[index + y] = sideBlock;
-                            } else {
+                            if (y < centery + vr) {
                                 primer.data[index + y] = block;
                             }
                         }
@@ -65,21 +72,21 @@ public class SpaceTerrainGenerator {
 
 
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
-//        double d0 = 0.03125D;
-//        this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, 0.0625D, 0.0625D, 1.0D);
-//
+        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+        CitySphere sphere = info.getCitySphere();
+
         for (int k = 0; k < 16; ++k) {
             for (int l = 0; l < 16; ++l) {
                 Biome Biome = Biomes[l + k * 16];
-                genBiomeTerrain(Biome, primer, chunkX * 16 + k, chunkZ * 16 + l);
+                genBiomeTerrain(Biome, primer, chunkX * 16 + k, chunkZ * 16 + l, sphere.getGlassBlock());
             }
         }
     }
 
-    public final void genBiomeTerrain(Biome Biome, ChunkPrimer primer, int x, int z) {
+    public final void genBiomeTerrain(Biome Biome, ChunkPrimer primer, int x, int z, char glassBlock) {
         char air = LostCitiesTerrainGenerator.airChar;
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
-        char baseLiquid = air;//@LostCitiesTerrainGenerator.liquidChar;
 
         int topLevel = provider.profile.GROUNDLEVEL;
 
@@ -89,19 +96,26 @@ public class SpaceTerrainGenerator {
         int cx = x & 15;
         int cz = z & 15;
 
-        // Index of the bottom of the column.
         int bottomIndex = ((cz * 16) + cx) * 256;
-        int index = bottomIndex + topLevel;
-        if (primer.data[index] == baseBlock) {
-            primer.data[index] = topBlock;
-        }
-        index--;
-        if (primer.data[index] == baseBlock) {
-            primer.data[index] = fillerBlock;
-        }
-        index--;
-        if (primer.data[index] == baseBlock) {
-            primer.data[index] = fillerBlock;
+
+        int cnt = 0;
+        for (int y = topLevel + 20 ; y >= topLevel - 20 ; y--) {
+            int index = bottomIndex + y;
+            if (primer.data[index] == air || primer.data[index] == glassBlock) {
+                // Do nothing
+            } else if (primer.data[index] == baseBlock) {
+                if (cnt == 0) {
+                    primer.data[index] = topBlock;
+                } else if (cnt < 3) {
+                    primer.data[index] = fillerBlock;
+                } else {
+                    break;
+                }
+                cnt++;
+            } else {
+                // Stop
+                break;
+            }
         }
     }
 }

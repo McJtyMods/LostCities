@@ -83,6 +83,7 @@ public class LostCityProfile {
     public float CITY_THRESSHOLD = .2f;
     public float CITYSPHERE_FACTOR = 1.2f;
     public float CITYSPHERE_CHANCE = 0.7f;
+    public float CITYSPHERE_SURFACE_VARIATION = 1.0f;
 
     public int CITY_LEVEL0_HEIGHT = 75;
     public int CITY_LEVEL1_HEIGHT = 83;
@@ -276,6 +277,7 @@ public class LostCityProfile {
     private void initCities(Configuration cfg) {
         CITYSPHERE_FACTOR = cfg.getFloat("citySphereFactor", categoryCities, inheritFrom.orElse(this).CITYSPHERE_FACTOR, 0.1f, 10.0f, "Only used in 'space' landscape. This factor will be multiplied with the radius of the city to calculate the radius of the outer sphere");
         CITYSPHERE_CHANCE = cfg.getFloat("citySphereChance", categoryCities, inheritFrom.orElse(this).CITYSPHERE_CHANCE, 0.0f, 1.0f, "The chance that a city sphere will be generated");
+        CITYSPHERE_SURFACE_VARIATION = cfg.getFloat("citySphereSurfaceVariation", categoryCities, inheritFrom.orElse(this).CITYSPHERE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface inside a city sphere more varied");
         CITY_CHANCE = cfg.getFloat("cityChance", categoryCities, inheritFrom.orElse(this).CITY_CHANCE, 0.0f, 1.0f, "The chance this chunk will be the center of a city");
         CITY_MINRADIUS = cfg.getInt("cityMinRadius", categoryCities, inheritFrom.orElse(this).CITY_MINRADIUS, 1, 10000, "The minimum radius of a city");
         CITY_MAXRADIUS = cfg.getInt("cityMaxRadius", categoryCities, inheritFrom.orElse(this).CITY_MAXRADIUS, 1, 10000, "The maximum radius of a city");
