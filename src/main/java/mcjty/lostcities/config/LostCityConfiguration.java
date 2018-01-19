@@ -164,7 +164,7 @@ public class LostCityConfiguration {
         profile.RUBBLELAYER = false;
         profile.GROUNDLEVEL = 60;
         profile.CITY_CHANCE = 0.07f;
-        profile.CITY_MAXRADIUS = 100;
+        profile.CITY_MAXRADIUS = 90;
         profile.CITY_THRESSHOLD = .05f;
         profile.CITY_LEVEL0_HEIGHT = 60;
         profile.CITY_LEVEL1_HEIGHT = 66;

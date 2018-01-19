@@ -32,6 +32,11 @@ public class BuildingInfo implements ILostChunkInfo {
     public final boolean hasBuilding;
     public final int building2x2Section;    // -1 for not, 0 for top left, 1 for top right, 2 for bottom left, 3 for bottom right
 
+    // For city spheres
+    public final char glassBlock;
+    public final char baseBlock;
+    public final char sideBlock;
+
     public final ILostCityMultiBuilding multiBuilding;
     public final ILostCityBuilding buildingType;
     public final BuildingPart fountainType;
@@ -655,6 +660,8 @@ public class BuildingInfo implements ILostChunkInfo {
         }
         hasBuilding = b;
 
+        CityStyle cs = (CityStyle) characteristics.cityStyle;
+
         // In a 2x2 building we copy all information from the top-left chunk
         if (building2x2Section >= 1) {
             BuildingInfo topleft = calculateTopLeft();
@@ -674,7 +681,6 @@ public class BuildingInfo implements ILostChunkInfo {
             noLoot = topleft.noLoot;
             ruinHeight = topleft.ruinHeight;
         } else {
-            CityStyle cs = (CityStyle) characteristics.cityStyle;
             PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
             highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider);
             highwayZLevel = Highway.getZHighwayLevel(chunkX, chunkZ, provider);
@@ -778,6 +784,10 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             frontType = null;
         }
+
+        glassBlock = getCompiledPalette().get(cs.getSphereGlassBlock(), rand);
+        baseBlock = getCompiledPalette().get(cs.getSphereBlock(), rand);
+        sideBlock = getCompiledPalette().get(cs.getSphereSideBlock(), rand);
     }
 
     private int getMaxcellars(LostCityChunkGenerator provider, CityStyle cs) {

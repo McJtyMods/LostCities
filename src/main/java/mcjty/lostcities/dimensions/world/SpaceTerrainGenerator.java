@@ -20,19 +20,15 @@ public class SpaceTerrainGenerator {
 
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
-        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
-        CityStyle cityStyle = info.getCityStyle();
-
-        char glassBlock = info.getCompiledPalette().get(cityStyle.getSphereGlassBlock());
-        char baseBlock = info.getCompiledPalette().get(cityStyle.getSphereBlock());
-        char sideBlock = info.getCompiledPalette().get(cityStyle.getSphereSideBlock());
-        char air = LostCitiesTerrainGenerator.airChar;
         // Find the city center
         ChunkCoord cityCenter = City.getCityCenterForSpace(chunkX, chunkZ, provider);
+
+        // Get the city style for the center of the city
+        BuildingInfo info = BuildingInfo.getBuildingInfo(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
         int cx = cityCenter.getChunkX();
         int cz = cityCenter.getChunkZ();
         float radius = City.getCityRadius(cx, cz, provider) * provider.profile.CITYSPHERE_FACTOR;
-        fillSphere(primer, (cx-chunkX)*16+8, provider.profile.GROUNDLEVEL, (cz-chunkZ)*16+8, (int) radius, glassBlock, baseBlock, sideBlock);
+        fillSphere(primer, (cx-chunkX)*16+8, provider.profile.GROUNDLEVEL, (cz-chunkZ)*16+8, (int) radius, info.glassBlock, info.baseBlock, info.sideBlock);
     }
 
     private void fillSphere(ChunkPrimer primer, int centerx, int centery, int centerz, int radius,

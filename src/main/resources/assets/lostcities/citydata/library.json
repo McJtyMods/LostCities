@@ -4,10 +4,6 @@
     "name": "common",
     "palette": [
       {
-        "char": "9",
-        "block": "minecraft:stained_hardened_clay@9"
-      },
-      {
         "char": "1",
         "block": "minecraft:mob_spawner",
         "mob": "easymobs"
@@ -70,8 +66,46 @@
         "block": "minecraft:redstone_torch@5"
       },
       {
+        "char": "9",
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:stained_hardened_clay@9"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:stained_hardened_clay@7"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:concrete@9"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:concrete@7"
+          }
+        ]
+      },
+      {
         "char": "Z",
-        "block": "minecraft:glass"
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:glass"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:stained_glass@7"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:stained_glass@11"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:stained_glass@3"
+          }
+        ]
       },
       {
         "char": "P",

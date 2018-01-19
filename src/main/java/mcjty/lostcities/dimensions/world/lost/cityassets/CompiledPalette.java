@@ -7,6 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -135,6 +136,25 @@ public class CompiledPalette {
     public boolean isSimple(char c) {
         Object o = palette.get(c);
         return o instanceof Character;
+    }
+
+    // Same as get(c) but with a predefined random generator that is predictable
+    public Character get(char c, Random rand) {
+        try {
+            Object o = palette.get(c);
+            if (o instanceof Character) {
+                return (Character) o;
+            } else if (o == null) {
+                return null;
+            } else {
+                char[] randomBlocks = (char[]) o;
+                return randomBlocks[rand.nextInt(128)];
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
     public Character get(char c) {
