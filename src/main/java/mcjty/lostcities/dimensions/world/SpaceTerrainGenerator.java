@@ -19,7 +19,6 @@ public class SpaceTerrainGenerator {
     public void setup(World world, LostCityChunkGenerator provider) {
         this.provider = provider;
         this.surfaceNoise = new NoiseGeneratorPerlin(provider.rand, 4);
-
     }
 
 
@@ -28,20 +27,42 @@ public class SpaceTerrainGenerator {
         ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
         BuildingInfo info = BuildingInfo.getBuildingInfo(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
         CitySphere sphere = info.getCitySphere();
+
+        boolean flooded = provider.profile.CITYSPHERE_FLOODED;
+        Character baseLiquid = flooded ? LostCitiesTerrainGenerator.liquidChar : null;
+        int waterLevel = provider.profile.GROUNDLEVEL - provider.profile.WATERLEVEL_OFFSET;
+
         if (sphere.isEnabled()) {
             this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
-
             int cx = cityCenter.getChunkX();
             int cz = cityCenter.getChunkZ();
             float radius = City.getCityRadius(cx, cz, provider) * provider.profile.CITYSPHERE_FACTOR;
-            fillSphere(primer, (cx - chunkX) * 16 + 8, provider.profile.GROUNDLEVEL, (cz - chunkZ) * 16 + 8, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock());
+            fillSphere(primer, (cx - chunkX) * 16 + 8, provider.profile.GROUNDLEVEL, (cz - chunkZ) * 16 + 8, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), baseLiquid);
+        } else if (flooded) {
+            this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
+            for (int x = 0 ; x < 16 ; x++) {
+                for (int z = 0 ; z < 16 ; z++) {
+                    double vr = provider.profile.CITYSPHERE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / provider.profile.CITYSPHERE_SURFACE_VARIATION;
+                    int index = (x * 16 + z) * 256;
+                    for (int y = 0 ; y <= waterLevel ; y++) {
+                        if (y == 0) {
+                            primer.data[index++] = LostCitiesTerrainGenerator.bedrockChar;
+                        } else if (y <= vr+10) {
+                            primer.data[index++] = LostCitiesTerrainGenerator.baseChar;
+                        } else {
+                            primer.data[index++] = baseLiquid;
+                        }
+                    }
+                }
+            }
         }
     }
 
     private void fillSphere(ChunkPrimer primer, int centerx, int centery, int centerz, int radius,
-                            char glass, char block, char sideBlock) {
+                            char glass, char block, char sideBlock, Character liquidChar) {
         double sqradius = radius * radius;
         double sqradiusOffset = (radius-2) * (radius-2);
+        int waterLevel = provider.profile.GROUNDLEVEL - provider.profile.WATERLEVEL_OFFSET;
 
         for (int x = 0 ; x < 16 ; x++) {
             double dxdx = (x-centerx) * (x-centerx);
@@ -49,19 +70,45 @@ public class SpaceTerrainGenerator {
                 double dzdz = (z-centerz) * (z-centerz);
                 int index = (x * 16 + z) * 256;
                 double vr = provider.profile.CITYSPHERE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / provider.profile.CITYSPHERE_SURFACE_VARIATION;
-                for (int y = Math.max(centery-radius, 0) ; y <= Math.min(centery+radius, 255) ; y++) {
-                    double dydy = (y-centery) * (y-centery);
-                    double sqdist = dxdx + dydy + dzdz;
-                    if (sqdist <= sqradius) {
-                        if (sqdist >= sqradiusOffset) {
-                            if (y > centery) {
-                                primer.data[index + y] = glass;
+                if (liquidChar != null) {
+                    for (int y = 0 ; y <= Math.max(Math.min(centery+radius, 255), waterLevel) ; y++) {
+                        double dydy = (y-centery) * (y-centery);
+                        double sqdist = dxdx + dydy + dzdz;
+                        if (y == 0) {
+                            primer.data[index + y] = LostCitiesTerrainGenerator.bedrockChar;
+                        } else if (sqdist <= sqradius) {
+                            if (sqdist >= sqradiusOffset) {
+                                if (y > centery) {
+                                    primer.data[index + y] = glass;
+                                } else {
+                                    primer.data[index + y] = sideBlock;
+                                }
                             } else {
-                                primer.data[index + y] = sideBlock;
+                                if (y < centery + vr) {
+                                    primer.data[index + y] = block;
+                                }
                             }
-                        } else {
-                            if (y < centery + vr) {
-                                primer.data[index + y] = block;
+                        } else if (y <= vr+10) {
+                            primer.data[index + y] = LostCitiesTerrainGenerator.baseChar;
+                        } else if (y <= waterLevel) {
+                            primer.data[index + y] = liquidChar;
+                        }
+                    }
+                } else {
+                    for (int y = Math.max(centery-radius, 0) ; y <= Math.min(centery+radius, 255) ; y++) {
+                        double dydy = (y-centery) * (y-centery);
+                        double sqdist = dxdx + dydy + dzdz;
+                        if (sqdist <= sqradius) {
+                            if (sqdist >= sqradiusOffset) {
+                                if (y > centery) {
+                                    primer.data[index + y] = glass;
+                                } else {
+                                    primer.data[index + y] = sideBlock;
+                                }
+                            } else {
+                                if (y < centery + vr) {
+                                    primer.data[index + y] = block;
+                                }
                             }
                         }
                     }

@@ -22,7 +22,7 @@ public class LostCityConfiguration {
             "to work with. The worldtype has to support the IChunkPrimerFactory API for this to work";
     public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
 
-    public static final String[] DEFAULT_PROFILES = new String[]{"default", "nodamage", "rarecities", "floating", "space", "biosphere", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
+    public static final String[] DEFAULT_PROFILES = new String[]{"default", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
 
     public static String[] ASSETS = new String[] {
             "/assets/lostcities/citydata/conditions.json",
@@ -32,6 +32,7 @@ public class LostCityConfiguration {
             "/assets/lostcities/citydata/palette_chisel_desert.json",
             "/assets/lostcities/citydata/highwayparts.json",
             "/assets/lostcities/citydata/railparts.json",
+            "/assets/lostcities/citydata/monorailparts.json",
             "/assets/lostcities/citydata/buildingparts.json",
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
@@ -163,6 +164,36 @@ public class LostCityConfiguration {
         profile.HIGHWAY_DISTANCE_MASK = 0;
         profile.RUBBLELAYER = false;
         profile.GROUNDLEVEL = 60;
+        profile.CITY_CHANCE = 0.07f;
+        profile.CITY_MAXRADIUS = 90;
+        profile.CITY_THRESSHOLD = .05f;
+        profile.CITY_LEVEL0_HEIGHT = 60;
+        profile.CITY_LEVEL1_HEIGHT = 66;
+        profile.CITY_LEVEL2_HEIGHT = 72;
+        profile.CITY_LEVEL3_HEIGHT = 78;
+        profile.GENERATE_MANSIONS = false;
+        profile.GENERATE_MINESHAFTS = false;
+        profile.GENERATE_OCEANMONUMENTS = false;
+        profile.GENERATE_SCATTERED = false;
+        profile.GENERATE_VILLAGES = false;
+        profile.GENERATE_STRONGHOLDS = false;
+        profile.BUILDING_CHANCE = .3f;
+        profile.GENERATE_LIGHTING = true;
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("waterbubbles");
+        profile.setDescription("Cities in drowned glass bubbles");
+        profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
+        profile.WATERLEVEL_OFFSET = -30;
+        profile.CITYSPHERE_FLOODED = true;
+        profile.RAILWAYS_CAN_END = true;
+        profile.RAILWAYS_ENABLED = false;
+        profile.RAILWAY_STATIONS_ENABLED = false;
+        profile.HIGHWAY_DISTANCE_MASK = 0;
+        profile.RUBBLELAYER = false;
+        profile.GROUNDLEVEL = 60;
+        profile.EXPLOSION_CHANCE = 0;
+        profile.MINI_EXPLOSION_CHANCE = 0;
         profile.CITY_CHANCE = 0.07f;
         profile.CITY_MAXRADIUS = 90;
         profile.CITY_THRESSHOLD = .05f;

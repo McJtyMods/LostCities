@@ -83,7 +83,9 @@ public class BuildingInfo implements ILostChunkInfo {
     private boolean actualStairsCalculated = false;
     private Direction actualStairDirection;
 
-    public CitySphere citySphere;
+    private CitySphere citySphere;
+    private boolean horizontalMonorail;
+    private boolean verticalMonorail;
 
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
@@ -797,10 +799,22 @@ public class BuildingInfo implements ILostChunkInfo {
             Character base = getCompiledPalette().get(cs.getSphereBlock(), rand);
             Character side = getCompiledPalette().get(cs.getSphereSideBlock(), rand);
             citySphere.setBlocks(glass, base, side);
+
+            horizontalMonorail = CitySphere.hasHorizontalMonorail(chunkX, chunkZ, provider);
+            verticalMonorail = CitySphere.hasVerticalMonorail(chunkX, chunkZ, provider);
         }
         return citySphere;
     }
 
+    public boolean hasHorizontalMonorail() {
+        getCitySphere();
+        return horizontalMonorail;
+    }
+
+    public boolean hasVerticalMonorail() {
+        getCitySphere();
+        return verticalMonorail;
+    }
 
     private int getMaxcellars(LostCityChunkGenerator provider, CityStyle cs) {
         int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
