@@ -35,8 +35,8 @@ public class SpaceTerrainGenerator {
     private void fillSphere(ChunkPrimer primer, int centerx, int centery, int centerz, int radius,
                             char glass, char block, char sideBlock) {
         double sqradius = radius * radius;
+        double sqradiusOffset = (radius-2) * (radius-2);
 
-        // @todo optimize!
         for (int x = 0 ; x < 16 ; x++) {
             double dxdx = (x-centerx) * (x-centerx);
             for (int z = 0 ; z < 16 ; z++) {
@@ -47,11 +47,11 @@ public class SpaceTerrainGenerator {
                     double sqdist = dxdx + dydy + dzdz;
                     if (sqdist <= sqradius) {
                         if (y > centery) {
-                            if (Math.sqrt(sqdist) >= radius-2) {
+                            if (sqdist >= sqradiusOffset) {
                                 primer.data[index + y] = glass;
                             }
                         } else {
-                            if (Math.sqrt(sqdist) >= radius-2) {
+                            if (sqdist >= sqradiusOffset) {
                                 primer.data[index + y] = sideBlock;
                             } else {
                                 primer.data[index + y] = block;
