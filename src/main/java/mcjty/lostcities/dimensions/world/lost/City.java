@@ -94,10 +94,17 @@ public class City {
         if (provider.profile.LANDSCAPE_TYPE == LandscapeType.SPACE) {
             // @todo config
             // Space cities are spaced evenly
-            return (chunkX & 0xf) == 8 && (chunkZ & 0xf) == 8;
+            return isCitySphereCenterCandidate(chunkX, chunkZ);
         } else {
             return rand.nextFloat() < provider.profile.CITY_CHANCE;
         }
+    }
+
+    /**
+     * Return true if this coordinate is potentially a candidate to be a city center
+     */
+    public static boolean isCitySphereCenterCandidate(int chunkX, int chunkZ) {
+        return (chunkX & 0xf) == 8 && (chunkZ & 0xf) == 8;
     }
 
     public static float getCityRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {

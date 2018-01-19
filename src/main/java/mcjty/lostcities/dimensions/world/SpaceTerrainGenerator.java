@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.City;
+import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CityStyle;
 import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.block.Block;
@@ -25,16 +26,20 @@ public class SpaceTerrainGenerator {
 
         // Get the city style for the center of the city
         BuildingInfo info = BuildingInfo.getBuildingInfo(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
-        int cx = cityCenter.getChunkX();
-        int cz = cityCenter.getChunkZ();
-        float radius = City.getCityRadius(cx, cz, provider) * provider.profile.CITYSPHERE_FACTOR;
-        fillSphere(primer, (cx-chunkX)*16+8, provider.profile.GROUNDLEVEL, (cz-chunkZ)*16+8, (int) radius, info.glassBlock, info.baseBlock, info.sideBlock);
+        CitySphere sphere = info.citySphere;
+        if (sphere.isEnabled()) {
+            int cx = cityCenter.getChunkX();
+            int cz = cityCenter.getChunkZ();
+            float radius = City.getCityRadius(cx, cz, provider) * provider.profile.CITYSPHERE_FACTOR;
+            fillSphere(primer, (cx - chunkX) * 16 + 8, provider.profile.GROUNDLEVEL, (cz - chunkZ) * 16 + 8, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock());
+        }
     }
 
     private void fillSphere(ChunkPrimer primer, int centerx, int centery, int centerz, int radius,
                             char glass, char block, char sideBlock) {
         double sqradius = radius * radius;
 
+        // @todo optimize!
         for (int x = 0 ; x < 16 ; x++) {
             double dxdx = (x-centerx) * (x-centerx);
             for (int z = 0 ; z < 16 ; z++) {

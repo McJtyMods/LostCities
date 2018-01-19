@@ -32,10 +32,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public final boolean hasBuilding;
     public final int building2x2Section;    // -1 for not, 0 for top left, 1 for top right, 2 for bottom left, 3 for bottom right
 
-    // For city spheres
-    public final char glassBlock;
-    public final char baseBlock;
-    public final char sideBlock;
+    public final CitySphere citySphere;
 
     public final ILostCityMultiBuilding multiBuilding;
     public final ILostCityBuilding buildingType;
@@ -785,9 +782,17 @@ public class BuildingInfo implements ILostChunkInfo {
             frontType = null;
         }
 
-        glassBlock = getCompiledPalette().get(cs.getSphereGlassBlock(), rand);
-        baseBlock = getCompiledPalette().get(cs.getSphereBlock(), rand);
-        sideBlock = getCompiledPalette().get(cs.getSphereSideBlock(), rand);
+        // This information is for city spheres. This information is only relevant
+        // in the chunk representing the center of the city
+        if (City.isCitySphereCenterCandidate(chunkX, chunkZ)) {
+            Character glass = getCompiledPalette().get(cs.getSphereGlassBlock(), rand);
+            Character base = getCompiledPalette().get(cs.getSphereBlock(), rand);
+            Character side = getCompiledPalette().get(cs.getSphereSideBlock(), rand);
+            boolean enabled = rand.nextFloat() < provider.profile.CITYSPHERE_CHANCE;
+            citySphere = new CitySphere(enabled, glass, base, side);
+        } else {
+            citySphere = null;
+        }
     }
 
     private int getMaxcellars(LostCityChunkGenerator provider, CityStyle cs) {
