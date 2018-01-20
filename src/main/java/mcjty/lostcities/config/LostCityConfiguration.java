@@ -164,6 +164,8 @@ public class LostCityConfiguration {
         profile.HIGHWAY_DISTANCE_MASK = 0;
         profile.RUBBLELAYER = false;
         profile.GROUNDLEVEL = 60;
+        profile.EXPLOSION_CHANCE = 0.0001f;
+        profile.MINI_EXPLOSION_CHANCE = 0.001f;
         profile.CITY_CHANCE = 0.07f;
         profile.CITY_MAXRADIUS = 90;
         profile.CITY_THRESSHOLD = .05f;
@@ -220,6 +222,7 @@ public class LostCityConfiguration {
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 0;
+        profile.CITYSPHERE_MONORAIL_CHANCE = 0.6f;
         profile.RUINS = true;
         profile.RUIN_CHANCE = 0.9f;
         profile.RUIN_MINLEVEL_PERCENT = 0.0f;

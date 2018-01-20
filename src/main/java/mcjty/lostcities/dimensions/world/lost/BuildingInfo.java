@@ -816,6 +816,10 @@ public class BuildingInfo implements ILostChunkInfo {
         return verticalMonorail;
     }
 
+    public boolean hasMonorail() {
+        return hasHorizontalMonorail() || hasVerticalMonorail();
+    }
+
     private int getMaxcellars(LostCityChunkGenerator provider, CityStyle cs) {
         int maxcellars = provider.profile.BUILDING_MAXCELLARS + cityLevel;
         if (buildingType.getMaxCellars() != -1) {

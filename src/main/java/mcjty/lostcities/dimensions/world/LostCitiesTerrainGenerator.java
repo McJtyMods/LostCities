@@ -285,20 +285,39 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateMonorails(ChunkPrimer primer, BuildingInfo info) {
         Transform transform;
-        if (info.hasHorizontalMonorail()) {
+        boolean horiz = info.hasHorizontalMonorail();
+        boolean vert = info.hasVerticalMonorail();
+        if (horiz && vert) {
+            BuildingPart part = AssetRegistries.PARTS.get("monorails_vertical");
+            generatePart(primer, info, part, Transform.ROTATE_NONE, 0, groundLevel+3, 0, true);
+            return;
+        } else if (horiz) {
             transform = Transform.ROTATE_90;
-        } else if (info.hasVerticalMonorail()) {
+        } else if (vert) {
             transform = Transform.ROTATE_NONE;
         } else {
             return;
         }
+        BuildingPart part;
 
-        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(info.chunkX, info.chunkZ, provider);
-        CitySphere sphere = info.getCitySphere();
-        float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
-        double sqradiusOffset = (radius-2) * (radius-2);
-        BuildingPart part = AssetRegistries.PARTS.get("monorails_vertical");
-        generatePart(primer, info, part, transform, 0, groundLevel+5, 0, true);
+        if (CitySphere.isEnclosed(info.chunkX, info.chunkZ, provider)) {
+            // If there is a non enclosed monorail nearby we generate a station
+            if (hasNonStationMonoRail(info.getXmin()) || hasNonStationMonoRail(info.getXmax()) || hasNonStationMonoRail(info.getZmin()) || hasNonStationMonoRail(info.getZmax())) {
+                part = AssetRegistries.PARTS.get("monorails_station");
+                Character borderBlock = info.getCityStyle().getBorderBlock();
+                fillToGround(primer, info, groundLevel+3, borderBlock);
+            } else {
+                return;
+            }
+        } else {
+            part = AssetRegistries.PARTS.get("monorails_vertical");
+        }
+
+        generatePart(primer, info, part, transform, 0, groundLevel+3, 0, true);
+    }
+
+    private boolean hasNonStationMonoRail(BuildingInfo info) {
+        return info.hasMonorail() && !CitySphere.isEnclosed(info.chunkX, info.chunkZ, provider);
     }
 
     private void fixTorches(ChunkPrimer primer, BuildingInfo info) {
