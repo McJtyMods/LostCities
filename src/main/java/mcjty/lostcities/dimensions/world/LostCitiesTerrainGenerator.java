@@ -288,7 +288,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         boolean horiz = info.hasHorizontalMonorail();
         boolean vert = info.hasVerticalMonorail();
         if (horiz && vert) {
-            BuildingPart part = AssetRegistries.PARTS.get("monorails_vertical");
+            BuildingPart part = AssetRegistries.PARTS.get("monorails_both");
             generatePart(primer, info, part, Transform.ROTATE_NONE, 0, groundLevel+3, 0, true);
             return;
         } else if (horiz) {
