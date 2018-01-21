@@ -28,6 +28,9 @@ public class BuildingInfo implements ILostChunkInfo {
     public final ChunkCoord coord;
     public final LostCityChunkGenerator provider;
 
+    public final boolean outsideChunk;  // Only used for citysphere worlds and when this chunk is outside
+    public final int groundLevel;
+
     public final boolean isCity;
     public final boolean hasBuilding;
     public final int building2x2Section;    // -1 for not, 0 for top left, 1 for top right, 2 for bottom left, 3 for bottom right
@@ -283,7 +286,7 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             int m = getMaxHighwayLevel();
             if (m >= 0) {
-                return provider.profile.GROUNDLEVEL + m * 6;
+                return groundLevel + m * 6;
             } else {
                 return getCityGroundLevel();
             }
@@ -291,7 +294,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public int getCityGroundLevel() {
-        return provider.profile.GROUNDLEVEL + cityLevel * 6;
+        return groundLevel + cityLevel * 6;
     }
 
     /**
@@ -299,9 +302,9 @@ public class BuildingInfo implements ILostChunkInfo {
      */
     public int getCityGroundLevelOutsideLower() {
         if (isCity) {
-            return provider.profile.GROUNDLEVEL + cityLevel * 6;
+            return groundLevel + cityLevel * 6;
         } else {
-            return provider.profile.GROUNDLEVEL + cityLevel * 6 -1;
+            return groundLevel + cityLevel * 6 -1;
         }
     }
 
@@ -572,7 +575,7 @@ public class BuildingInfo implements ILostChunkInfo {
         // Get the (possbily cached) heightmap for this chunk
         ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
         // The height at which the highway would be + a thresshold of 3
-        int highwayHeight = provider.profile.GROUNDLEVEL + level * 6 + 3;
+        int highwayHeight = groundLevel + level * 6 + 3;
         // If there are many places in the chunk above this height we will need a tunnel
         int cnt = 0;
         for (int x = 2 ; x < 16 ; x += 3) {
@@ -634,6 +637,8 @@ public class BuildingInfo implements ILostChunkInfo {
         this.chunkZ = chunkZ;
         this.coord = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
 
+        outsideChunk = provider.profile.LANDSCAPE_TYPE == LandscapeType.SPACE && !CitySphere.isPartiallyEnclosed(chunkX, chunkZ, provider);
+
         LostChunkCharacteristics characteristics = getChunkCharacteristics(chunkX, chunkZ, provider);
 
         isCity = characteristics.isCity;
@@ -657,6 +662,14 @@ public class BuildingInfo implements ILostChunkInfo {
                 b = false;
             }
         }
+
+        if (outsideChunk && provider.profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
+            groundLevel = provider.profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL;
+            b = rand.nextFloat() < .07f;        // Chance for a house   // @todo
+        } else {
+            groundLevel = provider.profile.GROUNDLEVEL;
+        }
+
         hasBuilding = b;
 
         CityStyle cs = (CityStyle) characteristics.cityStyle;
@@ -728,9 +741,9 @@ public class BuildingInfo implements ILostChunkInfo {
             float r = rand.nextFloat();
             noLoot = building2x2Section == -1 && r < provider.profile.BUILDING_WITHOUT_LOOT_CHANCE;
             r = rand.nextFloat();
-            if (provider.profile.CITYSPHERE_LANDSCAPE_OUTSIDE && !CitySphere.isPartiallyEnclosed(chunkX, chunkZ, provider)) {
+            if (outsideChunk) {
                 // @todo temporary!!!
-                ruinHeight = .7f;
+                ruinHeight = .2f+ (.6f - .2f) * r;
             } else if (rand.nextFloat() < provider.profile.RUIN_CHANCE && (predefinedBuilding == null || !predefinedBuilding.isPreventRuins())) {
                 ruinHeight = provider.profile.RUIN_MINLEVEL_PERCENT + (provider.profile.RUIN_MAXLEVEL_PERCENT - provider.profile.RUIN_MINLEVEL_PERCENT) * r;
             } else {
