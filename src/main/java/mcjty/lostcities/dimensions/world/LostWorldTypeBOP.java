@@ -45,7 +45,7 @@ public class LostWorldTypeBOP extends WorldType {
         if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
             return getInternalBiomeProvider(world);
         } else {
-            return new LostWorldFilteredBiomeProvider(getInternalBiomeProvider(world), profile.ALLOWED_BIOME_FACTORS);
+            return new LostWorldFilteredBiomeProvider(world, getInternalBiomeProvider(world), profile.ALLOWED_BIOME_FACTORS, profile.CITYSPHERE_ALLOWED_BIOME_FACTORS);
         }
     }
 

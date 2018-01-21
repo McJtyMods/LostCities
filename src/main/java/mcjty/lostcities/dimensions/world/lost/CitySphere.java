@@ -179,6 +179,35 @@ public class CitySphere {
         return true;
     }
 
+    /**
+     * Return true if a given chunk is partially enclosed in a city sphere
+     */
+    public static boolean isPartiallyEnclosed(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
+        CitySphere sphere = getCitySphereAtCenter(cityCenter, provider);
+        if (!sphere.isEnabled()) {
+            return false;
+        }
+        float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+        double sqradiusOffset = (radius-2) * (radius-2);
+        int cx = cityCenter.getChunkX() * 16 + 8;
+        int cz = cityCenter.getChunkZ() * 16 + 8;
+        if (squaredDistance(cx, cz, chunkX*16, chunkZ*16) <= sqradiusOffset) {
+            return true;
+        }
+        if (squaredDistance(cx, cz, chunkX*16+15, chunkZ*16) <= sqradiusOffset) {
+            return true;
+        }
+        if (squaredDistance(cx, cz, chunkX*16, chunkZ*16+15) <= sqradiusOffset) {
+            return true;
+        }
+        if (squaredDistance(cx, cz, chunkX*16+15, chunkZ*16+15) <= sqradiusOffset) {
+            return true;
+        }
+        return false;
+    }
+
+
     private static double squaredDistance(int cx, int cz, int x, int z) {
         return (cx-x)*(cx-x) + (cz-z)*(cz-z);
     }

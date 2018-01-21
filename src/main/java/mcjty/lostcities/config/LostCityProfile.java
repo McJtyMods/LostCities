@@ -6,7 +6,6 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +16,7 @@ public class LostCityProfile {
     public static final String CATEGORY_STRUCTURES = "structures";
     public static final String CATEGORY_EXPLOSIONS = "explosions";
     public static final String CATEGORY_CITIES = "cities";
+    public static final String CATEGORY_CITY_SPHERES = "cityspheres";
 
     private final String name;
     private final Optional<LostCityProfile> inheritFrom;
@@ -85,7 +85,9 @@ public class LostCityProfile {
     public float CITYSPHERE_CHANCE = 0.7f;
     public float CITYSPHERE_SURFACE_VARIATION = 1.0f;
     public float CITYSPHERE_MONORAIL_CHANCE = 0.8f;
-    public boolean CITYSPHERE_FLOODED = false;
+    public boolean CITYSPHERE_LANDSCAPE_OUTSIDE = false;
+    public String[] CITYSPHERE_ALLOWED_BIOME_FACTORS = new String[] { };
+    public int CITYSPHERE_OUTSIDE_GROUNDLEVEL = 10;
 
     public int CITY_LEVEL0_HEIGHT = 75;
     public int CITY_LEVEL1_HEIGHT = 83;
@@ -143,6 +145,7 @@ public class LostCityProfile {
     private String categoryStructures;
     private String categoryExplosions;
     private String categoryCities;
+    private String categoryCitySpheres;
 
     public LostCityProfile(String name) {
         this.name = name;
@@ -159,15 +162,30 @@ public class LostCityProfile {
         categoryStructures = LostCityProfile.CATEGORY_STRUCTURES + "_" + name;
         categoryExplosions = LostCityProfile.CATEGORY_EXPLOSIONS + "_" + name;
         categoryCities = LostCityProfile.CATEGORY_CITIES + "_" + name;
+        categoryCitySpheres = LostCityProfile.CATEGORY_CITY_SPHERES + "_" + name;
         cfg.addCustomCategoryComment(categoryLostcity, "Settings related to the Lost City for the " + name + " profile");
         cfg.addCustomCategoryComment(categoryStructures, "Settings related to structure generation for the " + name + " profile");
         cfg.addCustomCategoryComment(categoryExplosions, "Settings related to explosions and damage for the " + name + " profile");
         cfg.addCustomCategoryComment(categoryCities, "Settings related to city generation for the " + name + " profile");
+        cfg.addCustomCategoryComment(categoryCitySpheres, "Settings related to city sphere generation for the " + name + " profile");
 
         initLostcity(cfg);
         initExplosions(cfg);
         initStructures(cfg);
         initCities(cfg);
+        initCitySpheres(cfg);
+    }
+
+    private void initCitySpheres(Configuration cfg) {
+        CITYSPHERE_FACTOR = cfg.getFloat("citySphereFactor", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_FACTOR, 0.1f, 10.0f, "Only used in 'space' landscape. This factor will be multiplied with the radius of the city to calculate the radius of the outer sphere");
+        CITYSPHERE_CHANCE = cfg.getFloat("citySphereChance", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_CHANCE, 0.0f, 1.0f, "The chance that a city sphere will be generated");
+        CITYSPHERE_SURFACE_VARIATION = cfg.getFloat("citySphereSurfaceVariation", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface inside a city sphere more varied");
+        CITYSPHERE_MONORAIL_CHANCE = cfg.getFloat("citySphereMonorailChance", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_CHANCE, 0.0f, 1.0f, "The chance that a city will have a monorail connection in a certain direction. There will only be an actual connection if there is a city in that direction that also wants a monorail");
+        CITYSPHERE_LANDSCAPE_OUTSIDE = cfg.getBoolean("citySphereLandscapeOutside", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_LANDSCAPE_OUTSIDE,
+                "If this is true then there will be a landscape outside the city spheres");
+        CITYSPHERE_ALLOWED_BIOME_FACTORS = cfg.getStringList("citySphereAllowedBiomeFactors", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_ALLOWED_BIOME_FACTORS,
+                "List of biomes that are allowed in the world outside city spheres. Empty list is default all biomes. The factor controls how much that biome is favored over the others (higher means less favored!)");
+        CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("citySphereOutsideGroundLevel", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_GROUNDLEVEL, 2, 256, "Ground level for outside city spheres");
     }
 
     private void initLostcity(Configuration cfg) {
@@ -277,13 +295,6 @@ public class LostCityProfile {
     }
 
     private void initCities(Configuration cfg) {
-        CITYSPHERE_FACTOR = cfg.getFloat("citySphereFactor", categoryCities, inheritFrom.orElse(this).CITYSPHERE_FACTOR, 0.1f, 10.0f, "Only used in 'space' landscape. This factor will be multiplied with the radius of the city to calculate the radius of the outer sphere");
-        CITYSPHERE_CHANCE = cfg.getFloat("citySphereChance", categoryCities, inheritFrom.orElse(this).CITYSPHERE_CHANCE, 0.0f, 1.0f, "The chance that a city sphere will be generated");
-        CITYSPHERE_SURFACE_VARIATION = cfg.getFloat("citySphereSurfaceVariation", categoryCities, inheritFrom.orElse(this).CITYSPHERE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface inside a city sphere more varied");
-        CITYSPHERE_MONORAIL_CHANCE = cfg.getFloat("citySphereMonorailChance", categoryCities, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_CHANCE, 0.0f, 1.0f, "The chance that a city will have a monorail connection in a certain direction. There will only be an actual connection if there is a city in that direction that also wants a monorail");
-        CITYSPHERE_FLOODED = cfg.getBoolean("citySphereFlooded", categoryCities, inheritFrom.orElse(this).CITYSPHERE_FLOODED,
-                "If this is true the city sphere world will be flooded with water");
-
         CITY_CHANCE = cfg.getFloat("cityChance", categoryCities, inheritFrom.orElse(this).CITY_CHANCE, 0.0f, 1.0f, "The chance this chunk will be the center of a city");
         CITY_MINRADIUS = cfg.getInt("cityMinRadius", categoryCities, inheritFrom.orElse(this).CITY_MINRADIUS, 1, 10000, "The minimum radius of a city");
         CITY_MAXRADIUS = cfg.getInt("cityMaxRadius", categoryCities, inheritFrom.orElse(this).CITY_MAXRADIUS, 1, 10000, "The maximum radius of a city");

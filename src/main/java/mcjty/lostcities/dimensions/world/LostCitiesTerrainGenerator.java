@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
+import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -232,6 +233,17 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         } else {
             // We already have a prefilled core chunk (as generated from doCoreChunk)
             doNormalChunk(chunkX, chunkZ, primer, info);
+            if (provider.profile.LANDSCAPE_TYPE == LandscapeType.SPACE && provider.profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
+                // Generate ruins // @todo configurable!
+                Random rand = new Random(chunkX * 13 + chunkZ * 27);
+                rand.nextFloat();
+                rand.nextFloat();
+                if (rand.nextFloat() < .1f) {
+                    ChunkHeightmap heightmap = provider.getHeightmap(info.chunkX, info.chunkZ);
+                    generateBuilding(primer, info, heightmap, provider.profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL + 0 * 6);
+                    generateRuins(primer, info);
+                }
+            }
         }
 
         Railway.RailChunkInfo railInfo = info.getRailInfo();
@@ -362,7 +374,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
                 break;
             case SPACE:
-                spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+                if (CitySphere.isPartiallyEnclosed(chunkX, chunkZ, provider)) {
+                    spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+                } else {
+                    spaceTerrainGenerator.replaceBlocksForBiomeOutside(chunkX, chunkZ, primer, Biomes);
+                }
                 break;
         }
     }
@@ -878,7 +894,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         LostCityEvent.PreGenCityChunkEvent event = new LostCityEvent.PreGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, primer);
         if (!MinecraftForge.EVENT_BUS.post(event)) {
             if (building) {
-                generateBuilding(primer, info, heightmap);
+                generateBuilding(primer, info, heightmap, info.getCityGroundLevel());
             } else {
                 generateStreet(primer, info, heightmap, rand);
             }
@@ -2133,8 +2149,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void generateBuilding(ChunkPrimer primer, BuildingInfo info, ChunkHeightmap heightmap) {
-        int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * 6;
+    private void generateBuilding(ChunkPrimer primer, BuildingInfo info, ChunkHeightmap heightmap, int groundLevel) {
+        int lowestLevel = groundLevel - info.floorsBelowGround * 6;
 
         Character borderBlock = info.getCityStyle().getBorderBlock();
         CompiledPalette palette = info.getCompiledPalette();

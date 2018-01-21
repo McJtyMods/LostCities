@@ -728,7 +728,10 @@ public class BuildingInfo implements ILostChunkInfo {
             float r = rand.nextFloat();
             noLoot = building2x2Section == -1 && r < provider.profile.BUILDING_WITHOUT_LOOT_CHANCE;
             r = rand.nextFloat();
-            if (rand.nextFloat() < provider.profile.RUIN_CHANCE && (predefinedBuilding == null || !predefinedBuilding.isPreventRuins())) {
+            if (provider.profile.CITYSPHERE_LANDSCAPE_OUTSIDE && !CitySphere.isPartiallyEnclosed(chunkX, chunkZ, provider)) {
+                // @todo temporary!!!
+                ruinHeight = .7f;
+            } else if (rand.nextFloat() < provider.profile.RUIN_CHANCE && (predefinedBuilding == null || !predefinedBuilding.isPreventRuins())) {
                 ruinHeight = provider.profile.RUIN_MINLEVEL_PERCENT + (provider.profile.RUIN_MAXLEVEL_PERCENT - provider.profile.RUIN_MINLEVEL_PERCENT) * r;
             } else {
                 ruinHeight = -1;

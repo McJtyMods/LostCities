@@ -187,7 +187,7 @@ public class LostCityConfiguration {
         profile.setDescription("Cities in drowned glass bubbles");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.WATERLEVEL_OFFSET = -30;
-        profile.CITYSPHERE_FLOODED = true;
+        profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
@@ -214,15 +214,18 @@ public class LostCityConfiguration {
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("biosphere");
-        profile.setDescription("Jungles in floating glass bubbles");
+        profile.setDescription("Jungles in big glass bubbles on a barren landscape");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
+        profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2" };
+        profile.CITYSPHERE_ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
+        profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL = 40;
         profile.WATERLEVEL_OFFSET = 70;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 0;
-        profile.CITYSPHERE_MONORAIL_CHANCE = 0.6f;
+        profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
         profile.RUINS = true;
         profile.RUIN_CHANCE = 0.9f;
         profile.RUIN_MINLEVEL_PERCENT = 0.0f;

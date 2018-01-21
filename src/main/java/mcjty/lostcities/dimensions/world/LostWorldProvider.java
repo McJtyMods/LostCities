@@ -65,7 +65,7 @@ public class LostWorldProvider extends WorldProvider {
         if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
             this.biomeProvider = biomeProvider;
         } else {
-            this.biomeProvider = new LostWorldFilteredBiomeProvider(biomeProvider, profile.ALLOWED_BIOME_FACTORS);
+            this.biomeProvider = new LostWorldFilteredBiomeProvider(world, biomeProvider, profile.ALLOWED_BIOME_FACTORS, profile.CITYSPHERE_ALLOWED_BIOME_FACTORS);
         }
     }
 
