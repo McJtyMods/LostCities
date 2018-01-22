@@ -298,7 +298,7 @@ public class IslandTerrainGenerator {
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
         char baseLiquid = air;//@LostCitiesTerrainGenerator.liquidChar;
 
-        int topLevel = provider.profile.GROUNDLEVEL;
+        int topLevel = provider.getProfile().GROUNDLEVEL;
 
         char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
         char topBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);

@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
+import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
@@ -39,25 +40,25 @@ public class Highway {
      * Returns -1 if there is no highway in X direction that goes through this chunk.
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
-    public static int getXHighwayLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return getHighwayLevel(provider, Highway.xHighwayLevelCache, cp -> hasXHighway(cp, provider), Orientation.X, new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+    public static int getXHighwayLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider, LostCityProfile profile) {
+        return getHighwayLevel(provider, profile, Highway.xHighwayLevelCache, cp -> hasXHighway(cp, profile), Orientation.X, new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
     }
 
     /**
      * Returns -1 if there is no highway in Z direction that goes through this chunk.
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
-    public static int getZHighwayLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return getHighwayLevel(provider, Highway.zHighwayLevelCache, cp -> hasZHighway(cp, provider), Orientation.Z, new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+    public static int getZHighwayLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider, LostCityProfile profile) {
+        return getHighwayLevel(provider, profile, Highway.zHighwayLevelCache, cp -> hasZHighway(cp, profile), Orientation.Z, new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
     }
 
-    private static int getHighwayLevel(LostCityChunkGenerator provider, Map<ChunkCoord, Integer> cache, Function<ChunkCoord, Boolean> hasHighway, Orientation orientation, ChunkCoord cp) {
+    private static int getHighwayLevel(LostCityChunkGenerator provider, LostCityProfile profile, Map<ChunkCoord, Integer> cache, Function<ChunkCoord, Boolean> hasHighway, Orientation orientation, ChunkCoord cp) {
         if (cache.containsKey(cp)) {
             return cache.get(cp);
         }
 
         // Highways can only occur at chunkZ that is a multiple of 8
-        int mask = provider.profile.HIGHWAY_DISTANCE_MASK;
+        int mask = profile.HIGHWAY_DISTANCE_MASK;
         if (mask <= 0) {
             cache.put(cp, -1);
             return -1;
@@ -88,14 +89,14 @@ public class Highway {
             int level = -1;
             if (higher.getCoord(orientation)-lower.getCoord(orientation) >= 5) {
                 boolean valid;
-                if (provider.profile.HIGHWAY_REQUIRES_TWO_CITIES) {
-                    valid = BuildingInfo.isCityRaw(lower.getChunkX(), lower.getChunkZ(), provider) && BuildingInfo.isCityRaw(higher.getChunkX(), higher.getChunkZ(), provider);
+                if (profile.HIGHWAY_REQUIRES_TWO_CITIES) {
+                    valid = BuildingInfo.isCityRaw(lower.getChunkX(), lower.getChunkZ(), provider, profile) && BuildingInfo.isCityRaw(higher.getChunkX(), higher.getChunkZ(), provider, profile);
                 } else {
-                    valid = BuildingInfo.isCityRaw(lower.getChunkX(), lower.getChunkZ(), provider) || BuildingInfo.isCityRaw(higher.getChunkX(), higher.getChunkZ(), provider);
+                    valid = BuildingInfo.isCityRaw(lower.getChunkX(), lower.getChunkZ(), provider, profile) || BuildingInfo.isCityRaw(higher.getChunkX(), higher.getChunkZ(), provider, profile);
                 }
                 if (valid) {
                     // We have at least one city. Valid highway:
-                    switch (provider.profile.HIGHWAY_LEVEL_FROM_CITIES_MODE) {
+                    switch (profile.HIGHWAY_LEVEL_FROM_CITIES_MODE) {
                         case 0:
                             level = BuildingInfo.getCityLevel(lower.getChunkX(), lower.getChunkZ(), provider);
                             break;
@@ -127,14 +128,14 @@ public class Highway {
         return -1;
     }
 
-    private static boolean hasXHighway(ChunkCoord cp, LostCityChunkGenerator provider) {
-        return perlinX.getValue(cp.getChunkX() / provider.profile.HIGHWAY_MAINPERLIN_SCALE, cp.getChunkZ() / provider.profile.HIGHWAY_SECONDARYPERLIN_SCALE)
-                > provider.profile.HIGHWAY_PERLIN_FACTOR;
+    private static boolean hasXHighway(ChunkCoord cp, LostCityProfile profile) {
+        return perlinX.getValue(cp.getChunkX() / profile.HIGHWAY_MAINPERLIN_SCALE, cp.getChunkZ() / profile.HIGHWAY_SECONDARYPERLIN_SCALE)
+                > profile.HIGHWAY_PERLIN_FACTOR;
     }
 
-    private static boolean hasZHighway(ChunkCoord cp, LostCityChunkGenerator provider) {
-        return perlinZ.getValue(cp.getChunkX() / provider.profile.HIGHWAY_SECONDARYPERLIN_SCALE, cp.getChunkZ() / provider.profile.HIGHWAY_MAINPERLIN_SCALE)
-                > provider.profile.HIGHWAY_PERLIN_FACTOR;
+    private static boolean hasZHighway(ChunkCoord cp, LostCityProfile profile) {
+        return perlinZ.getValue(cp.getChunkX() / profile.HIGHWAY_SECONDARYPERLIN_SCALE, cp.getChunkZ() / profile.HIGHWAY_MAINPERLIN_SCALE)
+                > profile.HIGHWAY_PERLIN_FACTOR;
     }
 
 }

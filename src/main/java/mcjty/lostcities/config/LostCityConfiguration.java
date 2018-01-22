@@ -21,8 +21,10 @@ public class LostCityConfiguration {
     public static final String WORLDTYPES_COMMENT = "List of other worldtypes (id) that this mod will try " +
             "to work with. The worldtype has to support the IChunkPrimerFactory API for this to work";
     public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
+    public static final String PRIVATE_PROFILES_COMMENT = "List of privatep profiles that cannot be selected by the player but are only used as a child profile of another one";
 
     public static final String[] DEFAULT_PROFILES = new String[]{"default", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
+    public static final String[] PRIVATE_PROFILES = new String[]{"bio_wasteland"};
 
     public static String[] ASSETS = new String[] {
             "/assets/lostcities/citydata/conditions.json",
@@ -118,11 +120,16 @@ public class LostCityConfiguration {
         return profileList;
     }
 
+    public static String[] getPrivateProfiles(Configuration cfg) {
+        return cfg.getStringList("privateProfiles", CATEGORY_GENERAL,
+                PRIVATE_PROFILES, PRIVATE_PROFILES_COMMENT);
+    }
+
     private static void initStandardProfiles() {
-        LostCityProfile profile = new LostCityProfile("default");
+        LostCityProfile profile = new LostCityProfile("default", true);
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("nodamage");
+        profile = new LostCityProfile("nodamage", true);
         profile.setDescription("Like default but no explosion damage");
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
@@ -132,7 +139,7 @@ public class LostCityConfiguration {
         profile.MAX_CAVE_HEIGHT = 64;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("floating");
+        profile = new LostCityProfile("floating", true);
         profile.setDescription("Cities on floating islands");
         profile.CITY_CHANCE = 0.03f;
         profile.LANDSCAPE_TYPE = LandscapeType.FLOATING;
@@ -154,7 +161,7 @@ public class LostCityConfiguration {
         profile.GENERATE_STRONGHOLDS = false;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("space");
+        profile = new LostCityProfile("space", true);
         profile.setDescription("Cities in floating glass bubbles");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.WATERLEVEL_OFFSET = 70;
@@ -183,7 +190,7 @@ public class LostCityConfiguration {
         profile.GENERATE_LIGHTING = true;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("waterbubbles");
+        profile = new LostCityProfile("waterbubbles", true);
         profile.setDescription("Cities in drowned glass bubbles");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.WATERLEVEL_OFFSET = -30;
@@ -213,19 +220,20 @@ public class LostCityConfiguration {
         profile.GENERATE_LIGHTING = true;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("biosphere");
+        profile = new LostCityProfile("biosphere", true);
         profile.setDescription("Jungles in big glass bubbles on a barren landscape");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2" };
-        profile.CITYSPHERE_ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
+        profile.CITYSPHERE_ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL = 40;
+        profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
+        profile.CITYSPHERE_OUTSIDE_PROFILE = "bio_wasteland";
         profile.WATERLEVEL_OFFSET = 70;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 0;
-        profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
         profile.RUINS = true;
         profile.RUIN_CHANCE = 0.9f;
         profile.RUIN_MINLEVEL_PERCENT = 0.0f;
@@ -249,7 +257,7 @@ public class LostCityConfiguration {
         profile.GENERATE_LIGHTING = true;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("rarecities");
+        profile = new LostCityProfile("rarecities", true);
         profile.setDescription("Cities are rare");
         profile.CITY_CHANCE = 0.002f;
         profile.RUINS = false;
@@ -257,14 +265,14 @@ public class LostCityConfiguration {
         profile.RAILWAYS_CAN_END = true;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("onlycities");
+        profile = new LostCityProfile("onlycities", true);
         profile.setDescription("The entire world is a city");
         profile.CITY_CHANCE = 0.2f;
         profile.CITY_MAXRADIUS = 256;
         profile.CITY_BIOME_FACTORS = new String[] { "river=.5", "frozen_river=.5", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.6" };
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("tallbuildings");
+        profile = new LostCityProfile("tallbuildings", true);
         profile.setDescription("Very tall buildings (performance heavy)");
         profile.BUILDING_MINFLOORS = 4;
         profile.BUILDING_MINFLOORS_CHANCE = 8;
@@ -284,14 +292,14 @@ public class LostCityConfiguration {
         profile.RUIN_CHANCE = 0.01f;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("safe");
+        profile = new LostCityProfile("safe", true);
         profile.setDescription("Safe mode: no spawners, lighting but no loot");
         profile.GENERATE_SPAWNERS = false;
         profile.GENERATE_LIGHTING = true;
         profile.GENERATE_LOOT = false;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("ancient");
+        profile = new LostCityProfile("ancient", true);
         profile.setDescription("Ancient jungle city, vines and leafs, ruined buildings");
         profile.THICKNESS_OF_RANDOM_LEAFBLOCKS = 6;
         profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.05f;
@@ -309,7 +317,7 @@ public class LostCityConfiguration {
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2", "ocean=8", "beaches=20", "river=5" };
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("wasteland");
+        profile = new LostCityProfile("wasteland", true);
         profile.setDescription("Wasteland, no water, bare land (can use BOP biomes)");
         profile.WATERLEVEL_OFFSET = 70;
         profile.AVOID_WATER = true;
@@ -328,18 +336,38 @@ public class LostCityConfiguration {
         profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("atlantis");
+        profile = new LostCityProfile("bio_wasteland", false);
+        profile.setDescription("Private wasteland for biospheres");
+        profile.WATERLEVEL_OFFSET = 70;
+        profile.AVOID_WATER = true;
+        profile.CITY_CHANCE = 0.008f;
+        profile.GENERATE_LAKES = false;
+        profile.GENERATE_OCEANMONUMENTS = false;
+        profile.VINE_CHANCE = 0.0f;
+        profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.0f;
+        profile.RUBBLELAYER = true;
+        profile.RUBBLE_DIRT_SCALE = 2.0f;
+        profile.RUBBLE_LEAVE_SCALE = 0.0f;
+        profile.RUINS = true;
+        profile.RUIN_CHANCE = 1.0f;
+        profile.RUIN_MINLEVEL_PERCENT = 0.1f;
+        profile.RUIN_MAXLEVEL_PERCENT = 0.4f;
+        profile.AVOID_FOLIAGE = true;
+        profile.ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("atlantis", true);
         profile.setDescription("Drowned cities, raised waterlevel");
         profile.WATERLEVEL_OFFSET = -20;
         profile.RUIN_CHANCE = 0.1f;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("chisel");
+        profile = new LostCityProfile("chisel", true);
         profile.setDescription("Use Chisel blocks (only if chisel is available!)");
         profile.setWorldStyle("chisel");
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("realistic");
+        profile = new LostCityProfile("realistic", true);
         profile.setDescription("Realistic worldgen (similar to Quark's)");
         profile.GENERATOR_OPTIONS = "{\"coordinateScale\":175.0,\"heightScale\":75.0,\"lowerLimitScale\":512.0,\"upperLimitScale\":512.0,\"depthNoiseScaleX\":200.0,\"depthNoiseScaleZ\":200.0,\"depthNoiseScaleExponent\":0.5,\"mainNoiseScaleX\":165.0,\"mainNoiseScaleY\":106.61267,\"mainNoiseScaleZ\":165.0,\"baseSize\":8.267606,\"stretchY\":13.387607,\"biomeDepthWeight\":1.2,\"biomeDepthOffset\":0.2,\"biomeScaleWeight\":3.4084506,\"biomeScaleOffset\":0.0,\"seaLevel\":63,\"useCaves\":true,\"useDungeons\":true,\"dungeonChance\":7,\"useStrongholds\":true,\"useVillages\":true,\"useMineShafts\":true,\"useTemples\":true,\"useMonuments\":true,\"useRavines\":true,\"useWaterLakes\":true,\"waterLakeChance\":49,\"useLavaLakes\":true,\"lavaLakeChance\":80,\"useLavaOceans\":false,\"fixedBiome\":-1,\"biomeSize\":4,\"riverSize\":5,\"dirtSize\":33,\"dirtCount\":10,\"dirtMinHeight\":0,\"dirtMaxHeight\":256,\"gravelSize\":33,\"gravelCount\":8,\"gravelMinHeight\":0,\"gravelMaxHeight\":256,\"graniteSize\":33,\"graniteCount\":10,\"graniteMinHeight\":0,\"graniteMaxHeight\":80,\"dioriteSize\":33,\"dioriteCount\":10,\"dioriteMinHeight\":0,\"dioriteMaxHeight\":80,\"andesiteSize\":33,\"andesiteCount\":10,\"andesiteMinHeight\":0,\"andesiteMaxHeight\":80,\"coalSize\":17,\"coalCount\":20,\"coalMinHeight\":0,\"coalMaxHeight\":128,\"ironSize\":9,\"ironCount\":20,\"ironMinHeight\":0,\"ironMaxHeight\":64,\"goldSize\":9,\"goldCount\":2,\"goldMinHeight\":0,\"goldMaxHeight\":32,\"redstoneSize\":8,\"redstoneCount\":8,\"redstoneMinHeight\":0,\"redstoneMaxHeight\":16,\"diamondSize\":8,\"diamondCount\":1,\"diamondMinHeight\":0,\"diamondMaxHeight\":16,\"lapisSize\":7,\"lapisCount\":1,\"lapisCenterHeight\":16,\"lapisSpread\":16}";
         standardProfiles.put(profile.getName(), profile);

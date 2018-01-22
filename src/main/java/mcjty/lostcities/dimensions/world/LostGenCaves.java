@@ -25,7 +25,7 @@ public class LostGenCaves extends MapGenCaves {
 
         for (int j = 0; j < i; ++j) {
             double d0 = (double) (chunkX * 16 + this.rand.nextInt(16));
-            double d1 = (double) this.rand.nextInt(this.rand.nextInt(provider.profile.MAX_CAVE_HEIGHT - 8) + 8);
+            double d1 = (double) this.rand.nextInt(this.rand.nextInt(provider.getProfile().MAX_CAVE_HEIGHT - 8) + 8);
             double d2 = (double) (chunkZ * 16 + this.rand.nextInt(16));
             int k = 1;
 

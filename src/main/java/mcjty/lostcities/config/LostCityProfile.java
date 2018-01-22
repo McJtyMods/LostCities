@@ -20,6 +20,7 @@ public class LostCityProfile {
 
     private final String name;
     private final Optional<LostCityProfile> inheritFrom;
+    private final boolean isPublic;
 
     private String description = "Default generation, common cities, explosions";
     private String worldStyle = "standard";
@@ -88,6 +89,7 @@ public class LostCityProfile {
     public boolean CITYSPHERE_LANDSCAPE_OUTSIDE = false;
     public String[] CITYSPHERE_ALLOWED_BIOME_FACTORS = new String[] { };
     public int CITYSPHERE_OUTSIDE_GROUNDLEVEL = 10;
+    public String CITYSPHERE_OUTSIDE_PROFILE = "";
 
     public int CITY_LEVEL0_HEIGHT = 75;
     public int CITY_LEVEL1_HEIGHT = 83;
@@ -147,14 +149,20 @@ public class LostCityProfile {
     private String categoryCities;
     private String categoryCitySpheres;
 
-    public LostCityProfile(String name) {
+    public LostCityProfile(String name, boolean isPublic) {
         this.name = name;
         this.inheritFrom = Optional.empty();
+        this.isPublic = isPublic;
     }
 
-    public LostCityProfile(String name, LostCityProfile inheritFrom) {
+    public LostCityProfile(String name, LostCityProfile inheritFrom, boolean isPublic) {
         this.name = name;
         this.inheritFrom = Optional.ofNullable(inheritFrom);
+        this.isPublic = isPublic;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
     }
 
     public void init(Configuration cfg) {
@@ -179,13 +187,14 @@ public class LostCityProfile {
     private void initCitySpheres(Configuration cfg) {
         CITYSPHERE_FACTOR = cfg.getFloat("citySphereFactor", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_FACTOR, 0.1f, 10.0f, "Only used in 'space' landscape. This factor will be multiplied with the radius of the city to calculate the radius of the outer sphere");
         CITYSPHERE_CHANCE = cfg.getFloat("citySphereChance", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_CHANCE, 0.0f, 1.0f, "The chance that a city sphere will be generated");
-        CITYSPHERE_SURFACE_VARIATION = cfg.getFloat("citySphereSurfaceVariation", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface inside a city sphere more varied");
-        CITYSPHERE_MONORAIL_CHANCE = cfg.getFloat("citySphereMonorailChance", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_CHANCE, 0.0f, 1.0f, "The chance that a city will have a monorail connection in a certain direction. There will only be an actual connection if there is a city in that direction that also wants a monorail");
-        CITYSPHERE_LANDSCAPE_OUTSIDE = cfg.getBoolean("citySphereLandscapeOutside", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_LANDSCAPE_OUTSIDE,
+        CITYSPHERE_SURFACE_VARIATION = cfg.getFloat("outsideSurfaceVariation", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface inside a city sphere more varied");
+        CITYSPHERE_MONORAIL_CHANCE = cfg.getFloat("monorailChance", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_CHANCE, 0.0f, 1.0f, "The chance that a city will have a monorail connection in a certain direction. There will only be an actual connection if there is a city in that direction that also wants a monorail");
+        CITYSPHERE_LANDSCAPE_OUTSIDE = cfg.getBoolean("landscapeOutside", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_LANDSCAPE_OUTSIDE,
                 "If this is true then there will be a landscape outside the city spheres");
-        CITYSPHERE_ALLOWED_BIOME_FACTORS = cfg.getStringList("citySphereAllowedBiomeFactors", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_ALLOWED_BIOME_FACTORS,
+        CITYSPHERE_ALLOWED_BIOME_FACTORS = cfg.getStringList("outsideAllowedBiomeFactors", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_ALLOWED_BIOME_FACTORS,
                 "List of biomes that are allowed in the world outside city spheres. Empty list is default all biomes. The factor controls how much that biome is favored over the others (higher means less favored!)");
-        CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("citySphereOutsideGroundLevel", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_GROUNDLEVEL, 2, 256, "Ground level for outside city spheres");
+        CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("outsideGroundLevel", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_GROUNDLEVEL, 2, 256, "Ground level for outside city spheres");
+        CITYSPHERE_OUTSIDE_PROFILE = cfg.getString("outsideProfile", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_PROFILE, "An optional profile to use for the outside world");
     }
 
     private void initLostcity(Configuration cfg) {

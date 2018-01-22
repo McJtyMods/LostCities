@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.*;
+import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
@@ -56,7 +57,8 @@ import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
 public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenerator {
 
-    public LostCityProfile profile; // Current profile
+    private LostCityProfile profile; // Current profile
+    private LostCityProfile outsideProfile; // Outside profile: only for citySphere worlds
     public WorldStyle worldStyle;
 
     public Random rand;
@@ -96,6 +98,14 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         return settings;
     }
 
+    public LostCityProfile getProfile() {
+        return profile;
+    }
+
+    public LostCityProfile getOutsideProfile() {
+        return outsideProfile;
+    }
+
     // Holds ravine generator
     private MapGenBase ravineGenerator = new MapGenRavine();
 
@@ -122,6 +132,11 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
         dimensionId = world.provider.getDimension();
         profile = LostWorldType.getProfile(world);
+        if (profile.LANDSCAPE_TYPE == LandscapeType.SPACE && !profile.CITYSPHERE_OUTSIDE_PROFILE.isEmpty()) {
+            outsideProfile = LostCityConfiguration.profiles.get(profile.CITYSPHERE_OUTSIDE_PROFILE);
+        } else {
+            outsideProfile = profile;
+        }
 
         System.out.println("LostCityChunkGenerator.LostCityChunkGenerator: profile=" + profile.getName());
         worldStyle = AssetRegistries.WORLDSTYLES.get(profile.getWorldStyle());

@@ -1,6 +1,8 @@
 package mcjty.lostcities.dimensions.world.lost;
 
+import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.PredefinedCity;
 import mcjty.lostcities.varia.ChunkCoord;
 
 import javax.annotation.Nonnull;
@@ -147,14 +149,22 @@ public class CitySphere {
      * chunkX and chunkZ must be the city sphere center
      */
     public static float getSphereRadius(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        return City.getCityRadius(chunkX, chunkZ, provider) * provider.profile.CITYSPHERE_FACTOR;
+        PredefinedCity city = City.getPredefinedCity(chunkX, chunkZ, provider);
+        LostCityProfile profile = provider.getProfile();
+        if (city != null) {
+            return city.getRadius() * profile.CITYSPHERE_FACTOR;
+        }
+        Random rand = new Random(provider.seed + chunkZ * 100001653L + chunkX * 295075153L);
+        rand.nextFloat();
+        rand.nextFloat();
+        return profile.CITY_MINRADIUS + rand.nextInt(profile.CITY_MAXRADIUS - profile.CITY_MINRADIUS) * profile.CITYSPHERE_FACTOR;
     }
 
 
     /**
      * Return true if a given chunk is fully enclosed in a city sphere
      */
-    public static boolean isEnclosed(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static boolean fullyInsideCitySpere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
         CitySphere sphere = getCitySphereAtCenter(cityCenter, provider);
         if (!sphere.isEnabled()) {
@@ -180,9 +190,9 @@ public class CitySphere {
     }
 
     /**
-     * Return true if a given chunk is partially enclosed in a city sphere
+     * Return true if a given chunk is partially or fully enclosed in a city sphere
      */
-    public static boolean isPartiallyEnclosed(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    public static boolean intersectsWithCitySphere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
         CitySphere sphere = getCitySphereAtCenter(cityCenter, provider);
         if (!sphere.isEnabled()) {
@@ -206,6 +216,37 @@ public class CitySphere {
         }
         return false;
     }
+
+
+    /**
+     * Return true if a given chunk is partially enclosed in a city sphere (i.e. on the sphere border)
+     */
+    public static boolean onCitySphereBorder(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
+        CitySphere sphere = getCitySphereAtCenter(cityCenter, provider);
+        if (!sphere.isEnabled()) {
+            return false;
+        }
+        float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+        double sqradiusOffset = (radius-2) * (radius-2);
+        int cx = cityCenter.getChunkX() * 16 + 8;
+        int cz = cityCenter.getChunkZ() * 16 + 8;
+        int cnt = 0;
+        if (squaredDistance(cx, cz, chunkX*16, chunkZ*16) <= sqradiusOffset) {
+            cnt++;
+        }
+        if (squaredDistance(cx, cz, chunkX*16+15, chunkZ*16) <= sqradiusOffset) {
+            cnt++;
+        }
+        if (squaredDistance(cx, cz, chunkX*16, chunkZ*16+15) <= sqradiusOffset) {
+            cnt++;
+        }
+        if (squaredDistance(cx, cz, chunkX*16+15, chunkZ*16+15) <= sqradiusOffset) {
+            cnt++;
+        }
+        return cnt > 0 && cnt < 4;
+    }
+
 
 
     private static double squaredDistance(int cx, int cz, int x, int z) {
@@ -238,13 +279,13 @@ public class CitySphere {
             // This information is for city spheres. This information is only relevant
             // in the chunk representing the center of the city
             if (isCitySphereCenterCandidate(chunkX, chunkZ)) {
-                boolean enabled = rand.nextFloat() < provider.profile.CITYSPHERE_CHANCE;
+                boolean enabled = rand.nextFloat() < provider.getProfile().CITYSPHERE_CHANCE;
                 citySphere = new CitySphere(enabled);
                 if (enabled) {
-                    citySphere.monorailNorthCandidate = rand.nextFloat() < provider.profile.CITYSPHERE_MONORAIL_CHANCE;
-                    citySphere.monorailSouthCandidate = rand.nextFloat() < provider.profile.CITYSPHERE_MONORAIL_CHANCE;
-                    citySphere.monorailWestCandidate = rand.nextFloat() < provider.profile.CITYSPHERE_MONORAIL_CHANCE;
-                    citySphere.monorailEastCandidate = rand.nextFloat() < provider.profile.CITYSPHERE_MONORAIL_CHANCE;
+                    citySphere.monorailNorthCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
+                    citySphere.monorailSouthCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
+                    citySphere.monorailWestCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
+                    citySphere.monorailEastCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
                 }
             } else {
                 citySphere = new CitySphere(false);

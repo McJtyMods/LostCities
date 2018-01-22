@@ -37,20 +37,24 @@ public abstract class CommonProxy {
         try {
             cfg.load();
             String[] profileList = LostCityConfiguration.init(cfg);
-
-            for (String name : profileList) {
-                LostCityProfile profile = new LostCityProfile(name, LostCityConfiguration.standardProfiles.get(name));
-                Configuration profileCfg = new Configuration(new File(modConfigDir.getPath() + File.separator + "lostcities", "profile_" + name + ".cfg"));
-                profileCfg.load();
-                profile.init(profileCfg);
-                LostCityConfiguration.profiles.put(name, profile);
-                profileConfigs.add(profileCfg);
-            }
-
+            initProfiles(profileList, true);
+            profileList = LostCityConfiguration.getPrivateProfiles(cfg);
+            initProfiles(profileList, false);
         } catch (Exception e1) {
             FMLLog.log(Level.ERROR, e1, "Problem loading config file!");
         } finally {
             saveConfigs();
+        }
+    }
+
+    private void initProfiles(String[] profileList, boolean isPublic) {
+        for (String name : profileList) {
+            LostCityProfile profile = new LostCityProfile(name, LostCityConfiguration.standardProfiles.get(name), isPublic);
+            Configuration profileCfg = new Configuration(new File(modConfigDir.getPath() + File.separator + "lostcities", "profile_" + name + ".cfg"));
+            profileCfg.load();
+            profile.init(profileCfg);
+            LostCityConfiguration.profiles.put(name, profile);
+            profileConfigs.add(profileCfg);
         }
     }
 

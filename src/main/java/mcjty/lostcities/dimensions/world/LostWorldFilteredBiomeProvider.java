@@ -37,7 +37,7 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
     }
 
     private boolean useOutside(int x, int z) {
-        if (getProvider().profile.LANDSCAPE_TYPE == LandscapeType.SPACE && !CitySphere.isPartiallyEnclosed(x>>4, z>>4, getProvider())) {
+        if (getProvider().getProfile().LANDSCAPE_TYPE == LandscapeType.SPACE && !CitySphere.intersectsWithCitySphere(x>>4, z>>4, getProvider())) {
             return true;
         } else {
             return false;
