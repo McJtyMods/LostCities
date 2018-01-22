@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.api.RailChunkType;
+import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -309,7 +310,9 @@ public class Railway {
             return railInfo.get(key);
         }
         RailChunkInfo info = getRailChunkTypeInternal(chunkX, chunkZ, provider);
-        if (info.getType().isStation()) {
+        if (provider.getProfile().LANDSCAPE_TYPE == LandscapeType.SPACE && CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
+            info = RailChunkInfo.NOTHING;
+        } else if (info.getType().isStation()) {
             if (!profile.RAILWAY_STATIONS_ENABLED) {
                 info = RailChunkInfo.NOTHING;
             }
