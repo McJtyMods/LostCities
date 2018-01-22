@@ -76,4 +76,13 @@ public class ChunkCoord {
         result = 31 * result + chunkZ;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "ChunkCoord{" +
+                "dimension=" + dimension +
+                ", chunkX=" + chunkX +
+                ", chunkZ=" + chunkZ +
+                '}';
+    }
 }

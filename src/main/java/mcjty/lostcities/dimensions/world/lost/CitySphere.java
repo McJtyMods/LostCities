@@ -249,7 +249,7 @@ public class CitySphere {
 
 
 
-    private static double squaredDistance(int cx, int cz, int x, int z) {
+    public static double squaredDistance(int cx, int cz, int x, int z) {
         return (cx-x)*(cx-x) + (cz-z)*(cz-z);
     }
 

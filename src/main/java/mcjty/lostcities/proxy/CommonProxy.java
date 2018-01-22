@@ -2,6 +2,7 @@ package mcjty.lostcities.proxy;
 
 import mcjty.lostcities.ForgeEventHandlers;
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.TerrainEventHandlers;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.ModDimensions;
@@ -71,6 +72,7 @@ public abstract class CommonProxy {
 
     public void init(FMLInitializationEvent e) {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
+        MinecraftForge.TERRAIN_GEN_BUS.register(new TerrainEventHandlers());
     }
 
     public void postInit(FMLPostInitializationEvent e) {

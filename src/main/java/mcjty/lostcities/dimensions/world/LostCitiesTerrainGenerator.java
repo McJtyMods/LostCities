@@ -353,20 +353,20 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     @Override
-    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
+    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] biomes) {
         switch (provider.getProfile().LANDSCAPE_TYPE) {
             case DEFAULT:
-                super.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+                super.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
                 break;
             case FLOATING:
-                islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
+                islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
                 break;
             case SPACE:
-                if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
-                    spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, Biomes);
-                } else {
-                    spaceTerrainGenerator.replaceBlocksForBiomeOutside(chunkX, chunkZ, primer, Biomes);
-                }
+//                if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
+                    spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
+//                } else {
+//                    spaceTerrainGenerator.replaceBlocksForBiomeOutside(chunkX, chunkZ, primer, biomes);
+//                }
                 break;
         }
     }

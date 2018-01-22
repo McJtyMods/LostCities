@@ -123,15 +123,13 @@ public class SpaceTerrainGenerator {
         }
     }
 
-
-    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
+    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] biomes) {
         ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
 
         float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
         double sqradiusOffset = (radius-2) * (radius-2);
         int centerx = (cityCenter.getChunkX() - chunkX) * 16 + 8;
         int centerz = (cityCenter.getChunkZ() - chunkZ) * 16 + 8;
-
 
         double d0 = 0.03125D;
         this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
@@ -140,26 +138,13 @@ public class SpaceTerrainGenerator {
             double dxdx = (x-centerx) * (x-centerx);
             for (int z = 0; z < 16; ++z) {
                 double dzdz = (z-centerz) * (z-centerz);
-                Biome Biome = Biomes[z + x * 16];
                 double sqdist = dxdx + dzdz;
+                Biome biome = biomes[z + x * 16];
                 if (sqdist >= sqradiusOffset) {
-//                    Biome.genTerrainBlocks(provider.worldObj, provider.rand, primer, chunkX * 16 + x, chunkZ * 16 + z, this.stoneNoise[z + x * 16]);
+                    genBiomeTerrain(biome, primer, chunkX * 16 + x, chunkZ * 16 + z, provider.getProfile().CITYSPHERE_OUTSIDE_GROUNDLEVEL);
                 } else {
-                    genBiomeTerrain(Biome, primer, chunkX * 16 + x, chunkZ * 16 + z, provider.getProfile().GROUNDLEVEL);
+                    genBiomeTerrain(biome, primer, chunkX * 16 + x, chunkZ * 16 + z, provider.getProfile().GROUNDLEVEL);
                 }
-            }
-        }
-    }
-
-    public void replaceBlocksForBiomeOutside(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
-
-        double d0 = 0.03125D;
-        this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
-
-        for (int x = 0; x < 16; ++x) {
-            for (int z = 0; z < 16; ++z) {
-                Biome Biome = Biomes[z + x * 16];
-                genBiomeTerrain(Biome, primer, chunkX * 16 + x, chunkZ * 16 + z, provider.getProfile().CITYSPHERE_OUTSIDE_GROUNDLEVEL);
             }
         }
     }

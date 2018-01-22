@@ -2,7 +2,9 @@ package mcjty.lostcities.commands;
 
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.dimensions.world.lost.Railway;
+import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -39,7 +41,8 @@ public class CommandDebug implements ICommand {
             EntityPlayer player = (EntityPlayer) sender;
             BlockPos position = player.getPosition();
             ChunkProviderServer chunkProvider = ((WorldServer) player.getEntityWorld()).getChunkProvider();
-            BuildingInfo info = BuildingInfo.getBuildingInfo(position.getX() >> 4, position.getZ() >> 4, (LostCityChunkGenerator) chunkProvider.chunkGenerator);
+            LostCityChunkGenerator provider = (LostCityChunkGenerator) chunkProvider.chunkGenerator;
+            BuildingInfo info = BuildingInfo.getBuildingInfo(position.getX() >> 4, position.getZ() >> 4, provider);
             System.out.println("profile = " + info.profile.getName());
             System.out.println("provider.hasMansion = " + info.provider.hasMansion(info.chunkX, info.chunkZ));
             System.out.println("buildingType = " + info.buildingType.getName());
@@ -61,6 +64,13 @@ public class CommandDebug implements ICommand {
             System.out.println("railInfo.getLevel() = " + railInfo.getLevel());
             System.out.println("railInfo.getDirection() = " + railInfo.getDirection());
             System.out.println("railInfo.getRails() = " + railInfo.getRails());
+
+            ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(info.chunkX, info.chunkZ, provider);
+            CitySphere sphere = CitySphere.getCitySphereAtCenter(cityCenter, provider);
+            float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+            System.out.println("cityCenter = " + cityCenter);
+            System.out.println("sphere.isEnabled() = " + sphere.isEnabled());
+            System.out.println("radius = " + radius);
         }
     }
 

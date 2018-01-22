@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.ChunkGeneratorSettings;
@@ -208,7 +209,8 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
         terrainGenerator.generate(chunkX, chunkZ, chunkprimer);
 
-        this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
+        BiomeProvider biomeProvider = this.worldObj.getBiomeProvider();
+        this.biomesForGeneration = biomeProvider.getBiomes(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
         terrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, chunkprimer, this.biomesForGeneration);
 
         if (profile.GENERATE_CAVES) {
@@ -468,7 +470,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         int x = chunkX * 16;
         int z = chunkZ * 16;
         World w = this.worldObj;
-        Biome Biome = w.getBiomeForCoordsBody(new BlockPos(x + 16, 0, z + 16));
+        Biome biome = w.getBiomeForCoordsBody(new BlockPos(x + 16, 0, z + 16));
         this.rand.setSeed(w.getSeed());
         long i1 = this.rand.nextLong() / 2L * 2L + 1L;
         long j1 = this.rand.nextLong() / 2L * 2L + 1L;
@@ -512,7 +514,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         if (profile.GENERATE_LAKES) {
             boolean isCity = BuildingInfo.isCity(chunkX, chunkZ, this);
             if (!profile.PREVENT_LAKES_RAVINES_IN_CITIES || !isCity) {
-                if (Biome != Biomes.DESERT && Biome != Biomes.DESERT_HILLS && !flag && this.rand.nextInt(4) == 0
+                if (biome != Biomes.DESERT && biome != Biomes.DESERT_HILLS && !flag && this.rand.nextInt(4) == 0
                         && TerrainGen.populate(this, w, rand, chunkX, chunkZ, flag, PopulateChunkEvent.Populate.EventType.LAKE)) {
                     k1 = x + this.rand.nextInt(16) + 8;
                     l1 = this.rand.nextInt(256);
@@ -544,10 +546,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         }
 
         BlockPos pos = new BlockPos(x, 0, z);
-        Biome.decorate(w, this.rand, pos);
+        biome.decorate(w, this.rand, pos);
 
         if (TerrainGen.populate(this, w, rand, chunkX, chunkZ, flag, PopulateChunkEvent.Populate.EventType.ANIMALS)) {
-            WorldEntitySpawner.performWorldGenSpawning(w, Biome, x + 8, z + 8, 16, 16, this.rand);
+            WorldEntitySpawner.performWorldGenSpawning(w, biome, x + 8, z + 8, 16, 16, this.rand);
         }
         x += 8;
         z += 8;
