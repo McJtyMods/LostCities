@@ -312,8 +312,12 @@ public class CitySphere {
      * Given a sphere center, return the actual position of the center
      */
     public static BlockPos getSphereCenterPosition(ChunkCoord center, LostCityChunkGenerator provider) {
-        int cx = center.getChunkX() * 16 + 8;
-        int cz = center.getChunkZ() * 16 + 8;
+        Random rand = new Random(provider.seed + center.getChunkX() * 961744153L + center.getChunkZ() * 837971201L);
+        rand.nextFloat();
+        rand.nextFloat();
+
+        int cx = center.getChunkX() * 16 + rand.nextInt(16) - 8;
+        int cz = center.getChunkZ() * 16 + rand.nextInt(16) - 8;
         return new BlockPos(cx, 0, cz);
     }
 
