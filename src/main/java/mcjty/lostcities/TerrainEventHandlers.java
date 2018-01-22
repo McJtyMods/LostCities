@@ -58,17 +58,17 @@ public class TerrainEventHandlers {
                         LostCityChunkGenerator provider = (LostCityChunkGenerator) worldServer.getChunkProvider().chunkGenerator;
                         int chunkX = (event.getPos().getX()) >> 4;
                         int chunkZ = (event.getPos().getZ()) >> 4;
-                        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
-                        CitySphere sphere = CitySphere.getCitySphereAtCenter(cityCenter, provider);
+                        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
+                        CitySphere sphere = CitySphere.getSphereAtCenter(cityCenter, provider);
                         if (!sphere.isEnabled()) {
                             return;
                         }
-                        float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
-                        double sqradiusOffset = (radius-2) * (radius-2);
-                        int cx = cityCenter.getChunkX() * 16 + 8;
-                        int cz = cityCenter.getChunkZ() * 16 + 8;
                         if (CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
-//                        if (CitySphere.squaredDistance(cx, cz, event.getPos().getX(), event.getPos().getZ()) >= sqradiusOffset) {
+                            float radius = CitySphere.getSphereRadius(cityCenter, provider);
+                            double sqradiusOffset = (radius-2) * (radius-2);
+                            BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
+                            int cx = cc.getX();
+                            int cz = cc.getZ();
                             Biome biome = world.getBiomeForCoordsBody(event.getPos());
                             BiomeDecorator decorator = biome.decorator;
                             int treesPerChunk = decorator.treesPerChunk;

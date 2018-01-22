@@ -5,6 +5,7 @@ import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.block.Block;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -25,7 +26,7 @@ public class SpaceTerrainGenerator {
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
         // Find the city center and get the city style for the center of the city
-        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
+        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
         BuildingInfo info = BuildingInfo.getBuildingInfo(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
         CitySphere sphere = info.getCitySphere();
 
@@ -37,10 +38,11 @@ public class SpaceTerrainGenerator {
 
         if (sphere.isEnabled()) {
             this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
-            int cx = cityCenter.getChunkX();
-            int cz = cityCenter.getChunkZ();
-            float radius = CitySphere.getSphereRadius(cx, cz, provider);
-            fillSphere(primer, (cx - chunkX) * 16 + 8, profile.GROUNDLEVEL, (cz - chunkZ) * 16 + 8, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), baseLiquid);
+            float radius = CitySphere.getSphereRadius(cityCenter, provider);
+            BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
+            int cx = cc.getX() - chunkX * 16;
+            int cz = cc.getZ() - chunkZ * 16;
+            fillSphere(primer, cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), baseLiquid);
         } else if (outsideLandscape) {
             this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
             for (int x = 0 ; x < 16 ; x++) {
@@ -124,12 +126,12 @@ public class SpaceTerrainGenerator {
     }
 
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] biomes) {
-        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
-
-        float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
+        float radius = CitySphere.getSphereRadius(cityCenter, provider);
+        BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
         double sqradiusOffset = (radius-2) * (radius-2);
-        int centerx = (cityCenter.getChunkX() - chunkX) * 16 + 8;
-        int centerz = (cityCenter.getChunkZ() - chunkZ) * 16 + 8;
+        int centerx = cc.getX() - chunkX * 16;
+        int centerz = cc.getZ() - chunkZ * 16;
 
         double d0 = 0.03125D;
         this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);

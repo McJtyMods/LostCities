@@ -47,16 +47,19 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
         if (profile.LANDSCAPE_TYPE == LandscapeType.SPACE && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             int chunkX = (pos.getX()) >> 4;
             int chunkZ = (pos.getZ()) >> 4;
-            ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
-            CitySphere sphere = CitySphere.getCitySphereAtCenter(cityCenter, provider);
+            ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
+            CitySphere sphere = CitySphere.getSphereAtCenter(cityCenter, provider);
             if (sphere.isEnabled()) {
-                float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+                float radius = CitySphere.getSphereRadius(cityCenter, provider);
+                BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
                 double sqradiusOffset = (radius - 2) * (radius - 2);
-                int cx = cityCenter.getChunkX() * 16 + 8;
-                int cz = cityCenter.getChunkZ() * 16 + 8;
+                int cx = cc.getX();
+                int cz = cc.getZ();
                 if (CitySphere.squaredDistance(cx, cz, pos.getX(), pos.getZ()) > sqradiusOffset) {
                     return outsideTranslator.translate(originalBiome);
                 }
+            } else {
+                return outsideTranslator.translate(originalBiome);
             }
         }
         return biomeTranslator.translate(originalBiome);
@@ -67,13 +70,14 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
         if (profile.LANDSCAPE_TYPE == LandscapeType.SPACE && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             int chunkX = (topx) >> 4;
             int chunkZ = (topz) >> 4;
-            ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
-            CitySphere sphere = CitySphere.getCitySphereAtCenter(cityCenter, provider);
+            ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
+            CitySphere sphere = CitySphere.getSphereAtCenter(cityCenter, provider);
             if (sphere.isEnabled()) {
-                float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+                float radius = CitySphere.getSphereRadius(cityCenter, provider);
                 double sqradiusOffset = (radius - 2) * (radius - 2);
-                int cx = cityCenter.getChunkX() * 16 + 8;
-                int cz = cityCenter.getChunkZ() * 16 + 8;
+                BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
+                int cx = cc.getX();
+                int cz = cc.getZ();
                 for (int z = 0; z < height; z++) {
                     for (int x = 0; x < width; x++) {
                         int i = x + z * width;
@@ -84,8 +88,12 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
                         }
                     }
                 }
-                return;
+            } else {
+                for (int i = 0 ; i < biomes.length ; i++) {
+                    biomes[i] = outsideTranslator.translate(biomes[i]);
+                }
             }
+            return;
         }
         for (int i = 0 ; i < biomes.length ; i++) {
             biomes[i] = biomeTranslator.translate(biomes[i]);

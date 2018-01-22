@@ -830,7 +830,7 @@ public class BuildingInfo implements ILostChunkInfo {
             citySphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
             CityStyle cs = getCityStyle();
 
-            ChunkCoord center = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
+            ChunkCoord center = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
             Random rand = new Random(provider.seed + center.getChunkX() * 837971201L + center.getChunkZ() * 961744153L);
             rand.nextFloat();
             rand.nextFloat();
@@ -1050,7 +1050,7 @@ public class BuildingInfo implements ILostChunkInfo {
      * This only works for space type worlds!
      */
     public static float getRelativeDistanceToCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(chunkX, chunkZ, provider);
+        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
         float radius = City.getCityRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
         return (Math.abs(cityCenter.getChunkX()-chunkX) + Math.abs(cityCenter.getChunkZ()-chunkZ))*16.0f/2.0f / radius;
     }

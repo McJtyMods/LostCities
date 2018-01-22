@@ -65,9 +65,9 @@ public class CommandDebug implements ICommand {
             System.out.println("railInfo.getDirection() = " + railInfo.getDirection());
             System.out.println("railInfo.getRails() = " + railInfo.getRails());
 
-            ChunkCoord cityCenter = CitySphere.getCityCenterForSpace(info.chunkX, info.chunkZ, provider);
-            CitySphere sphere = CitySphere.getCitySphereAtCenter(cityCenter, provider);
-            float radius = CitySphere.getSphereRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
+            ChunkCoord cityCenter = CitySphere.getSphereCenter(info.chunkX, info.chunkZ, provider);
+            CitySphere sphere = CitySphere.getSphereAtCenter(cityCenter, provider);
+            float radius = CitySphere.getSphereRadius(cityCenter, provider);
             System.out.println("cityCenter = " + cityCenter);
             System.out.println("sphere.isEnabled() = " + sphere.isEnabled());
             System.out.println("radius = " + radius);
