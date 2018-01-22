@@ -478,6 +478,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Pre(this, w, rand, chunkX, chunkZ, flag));
 
         ChunkPos cp = new ChunkPos(chunkX, chunkZ);
+        LostCityProfile profile = BuildingInfo.getProfile(chunkX, chunkZ, this);
 
         if (profile.GENERATE_MINESHAFTS) {
             this.mineshaftGenerator.generateStructure(w, this.rand, cp);
