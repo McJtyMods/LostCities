@@ -341,6 +341,8 @@ public class LostCityConfiguration {
         profile.WATERLEVEL_OFFSET = 70;
         profile.AVOID_WATER = true;
         profile.CITY_CHANCE = 0.008f;
+        profile.CITY_MINRADIUS = 30;
+        profile.CITY_MAXRADIUS = 80;
         profile.GENERATE_LAKES = false;
         profile.GENERATE_OCEANMONUMENTS = false;
         profile.VINE_CHANCE = 0.0f;
