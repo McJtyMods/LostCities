@@ -38,14 +38,6 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
         return provider;
     }
 
-    private boolean useOutside(int x, int z) {
-        if (getProvider().getProfile().LANDSCAPE_TYPE == LandscapeType.SPACE && !CitySphere.intersectsWithCitySphere(x>>4, z>>4, getProvider())) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
 
     @Override
     public Biome getBiome(BlockPos pos) {
@@ -92,8 +84,11 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
                         }
                     }
                 }
+                return;
             }
-            return;
+        }
+        for (int i = 0 ; i < biomes.length ; i++) {
+            biomes[i] = biomeTranslator.translate(biomes[i]);
         }
     }
 

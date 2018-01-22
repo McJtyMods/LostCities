@@ -45,13 +45,13 @@ public class TerrainEventHandlers {
                 case SAND_PASS2:
                 case SHROOM:
                 case CUSTOM:
+                case GRASS:
                     break;
                 case LAKE_WATER:
                 case REED:
                 case TREE:
                 case LILYPAD:
                 case FLOWERS:
-                case GRASS:
                     LostCityProfile profile = LostWorldType.getProfile(world);
                     if (profile.LANDSCAPE_TYPE == LandscapeType.SPACE && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
                         WorldServer worldServer = (WorldServer) world;
