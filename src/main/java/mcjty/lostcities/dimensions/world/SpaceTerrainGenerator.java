@@ -134,16 +134,17 @@ public class SpaceTerrainGenerator {
         double d0 = 0.03125D;
         this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
 
-        for (int x = 0; x < 16; ++x) {
-            double dxdx = (x-centerx) * (x-centerx);
-            for (int z = 0; z < 16; ++z) {
-                double dzdz = (z-centerz) * (z-centerz);
-                double sqdist = dxdx + dzdz;
-                Biome biome = biomes[z + x * 16];
+        for (int z = 0; z < 16; ++z) {
+            double dzdz = (z-centerz) * (z-centerz);
+            for (int x = 0; x < 16; ++x) {
+                double dxdx = (x-centerx) * (x-centerx);
+                double sqdist = dzdz + dxdx;
+                Biome biome = biomes[x + z * 16];
+                // Even though x and z seems swapped below this code is working nevertheless
                 if (sqdist >= sqradiusOffset) {
-                    genBiomeTerrain(biome, primer, chunkX * 16 + x, chunkZ * 16 + z, provider.getProfile().CITYSPHERE_OUTSIDE_GROUNDLEVEL);
+                    genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, provider.getProfile().CITYSPHERE_OUTSIDE_GROUNDLEVEL);
                 } else {
-                    genBiomeTerrain(biome, primer, chunkX * 16 + x, chunkZ * 16 + z, provider.getProfile().GROUNDLEVEL);
+                    genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, provider.getProfile().GROUNDLEVEL);
                 }
             }
         }
