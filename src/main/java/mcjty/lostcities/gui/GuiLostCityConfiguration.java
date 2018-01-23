@@ -17,10 +17,10 @@ public class GuiLostCityConfiguration extends GuiScreen {
 
     private final GuiCreateWorld parent;
     private Map<Integer, Runnable> actionHandler = new HashMap<>();
+    private Map<Integer, String> profileNames = new HashMap<>();
     private int page = 0;
     private int numpages;
     private GuiMutableLabel pagelabel;
-    private String currentProfile;
 
     public GuiLostCityConfiguration(GuiCreateWorld parent) {
         this.parent = parent;
@@ -44,8 +44,8 @@ public class GuiLostCityConfiguration extends GuiScreen {
     }
 
     private void setupGui(String profileName) {
-        currentProfile = profileName;
         actionHandler.clear();
+        profileNames.clear();
         this.buttonList.clear();
         this.labelList.clear();
         int id = 301;
@@ -54,12 +54,7 @@ public class GuiLostCityConfiguration extends GuiScreen {
         int cnt = 0;
 
         List<String> profileKeys = new ArrayList<>(LostCityConfiguration.profiles.keySet());
-        profileKeys.sort(new Comparator<String>() {
-            @Override
-            public int compare(String s, String t1) {
-                return s.compareTo(t1);
-            }
-        });
+        profileKeys.sort(String::compareTo);
         for (String key : profileKeys) {
             LostCityProfile profile = LostCityConfiguration.profiles.get(key);
             if (profile.isPublic()) {
@@ -77,6 +72,7 @@ public class GuiLostCityConfiguration extends GuiScreen {
                 }
                 this.buttonList.add(button);
                 actionHandler.put(id, () -> setProfile(profile));
+                profileNames.put(id, profile.getName());
                 id++;
 
                 GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 110, y, 230, 20, 0xffffffff);
@@ -112,7 +108,6 @@ public class GuiLostCityConfiguration extends GuiScreen {
     private void setProfile(LostCityProfile profile) {
         parent.chunkProviderSettingsJson = "{ \"profile\": \"" + profile.getName() + "\" }";
         this.mc.displayGuiScreen(parent);
-        currentProfile = profile.getName();
     }
 
     @Override
@@ -133,10 +128,17 @@ public class GuiLostCityConfiguration extends GuiScreen {
             pagelabel.drawLabel(Minecraft.getMinecraft(), mouseX, mouseY);
         }
 
-        LostCityProfile profile = LostCityConfiguration.profiles.get(currentProfile);
-        if (profile.getIcon() != null) {
-            mc.getTextureManager().bindTexture(profile.getIcon());
-            drawTexturedModalRect(0, 0, 0, 0, 64, 64);
+        for (GuiButton button : buttonList) {
+            if (button.isMouseOver()) {
+                String name = profileNames.get(button.id);
+                if (name != null) {
+                    LostCityProfile profile = LostCityConfiguration.profiles.get(name);
+                    if (profile != null && profile.getIcon() != null) {
+                        mc.getTextureManager().bindTexture(profile.getIcon());
+                        drawScaledCustomSizeModalRect(mouseX, mouseY, 0, 0, 128, 128, 64, 64, 128, 128);
+                    }
+                }
+            }
         }
     }
 }

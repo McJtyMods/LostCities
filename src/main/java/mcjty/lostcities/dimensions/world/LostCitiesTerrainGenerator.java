@@ -2017,6 +2017,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                     }
                                 }
                             }
+                            if (index < 0) {
+                                System.out.println("LostCitiesTerrainGenerator.generatePart");
+                            }
                             primer.data[index] = b;
                         }
                         index++;

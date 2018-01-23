@@ -24,7 +24,7 @@ public class LostCityProfile {
 
     private String description = "Default generation, common cities, explosions";
     private String worldStyle = "standard";
-    private String iconFile;
+    private String iconFile = "";
     private ResourceLocation icon;
 
     public int DEBRIS_TO_NEARBYCHUNK_FACTOR = 200;
@@ -163,6 +163,10 @@ public class LostCityProfile {
         this.name = name;
         this.inheritFrom = Optional.ofNullable(inheritFrom);
         this.isPublic = isPublic;
+    }
+
+    public void setIconFile(String iconFile) {
+        this.iconFile = iconFile;
     }
 
     public ResourceLocation getIcon() {
