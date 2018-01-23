@@ -259,28 +259,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
             generateDebris(primer, provider.rand, info);
         }
-
-//        if (info.profile.isFloating()) {
-//            // cityFactor -> 0: 128
-//            // cityFactor -> .1: 10
-//            // cityFactor -> .2: 20
-//            // cityFactor -> .3: 30
-//            float offset = characteristics.cityFactor * 200 - 30;
-//            if (offset > 30) {
-//                offset = 30;
-//            }
-//            int to = (int) (info.getCityGroundLevel() - offset);
-//            if (to > 0 && to < 255) {
-//                for (int x = 0; x < 16; x++) {
-//                    for (int z = 0; z < 16; z++) {
-//                        int index = (x << 12) | (z << 8);
-//                        clearRange(primer, index, 0, to);
-//                    }
-//                }
-//            }
-//        }
-
-
     }
 
     private void generateMonorails(ChunkPrimer primer, BuildingInfo info) {

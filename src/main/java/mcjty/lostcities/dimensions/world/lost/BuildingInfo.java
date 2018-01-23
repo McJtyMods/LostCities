@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.api.*;
-import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
@@ -88,9 +87,8 @@ public class BuildingInfo implements ILostChunkInfo {
     private boolean actualStairsCalculated = false;
     private Direction actualStairDirection;
 
-    private CitySphere citySphere;
-    private boolean horizontalMonorail;
-    private boolean verticalMonorail;
+    private Boolean horizontalMonorail = null;
+    private Boolean verticalMonorail = null;
 
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
@@ -825,34 +823,17 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
-    public CitySphere getCitySphere() {
-        if (citySphere == null) {
-            citySphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
-            CityStyle cs = getCityStyle();
-
-            ChunkCoord center = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
-            Random rand = new Random(provider.seed + center.getChunkX() * 837971201L + center.getChunkZ() * 961744153L);
-            rand.nextFloat();
-            rand.nextFloat();
-
-            Character glass = getCompiledPalette().get(cs.getSphereGlassBlock(), rand);
-            Character base = getCompiledPalette().get(cs.getSphereBlock(), rand);
-            Character side = getCompiledPalette().get(cs.getSphereSideBlock(), rand);
-            citySphere.setBlocks(glass, base, side);
-
-            horizontalMonorail = CitySphere.hasHorizontalMonorail(chunkX, chunkZ, provider);
-            verticalMonorail = CitySphere.hasVerticalMonorail(chunkX, chunkZ, provider);
-        }
-        return citySphere;
-    }
-
     public boolean hasHorizontalMonorail() {
-        getCitySphere();
+        if (horizontalMonorail == null) {
+            horizontalMonorail = CitySphere.hasHorizontalMonorail(chunkX, chunkZ, provider);
+        }
         return horizontalMonorail;
     }
 
     public boolean hasVerticalMonorail() {
-        getCitySphere();
+        if (verticalMonorail == null) {
+            verticalMonorail = CitySphere.hasVerticalMonorail(chunkX, chunkZ, provider);
+        }
         return verticalMonorail;
     }
 
@@ -1050,7 +1031,8 @@ public class BuildingInfo implements ILostChunkInfo {
      * This only works for space type worlds!
      */
     public static float getRelativeDistanceToCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
+        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+        ChunkCoord cityCenter = sphere.getCenter();
         float radius = City.getCityRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
         return (Math.abs(cityCenter.getChunkX()-chunkX) + Math.abs(cityCenter.getChunkZ()-chunkZ))*16.0f/2.0f / radius;
     }

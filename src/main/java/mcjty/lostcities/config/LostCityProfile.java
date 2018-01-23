@@ -82,6 +82,7 @@ public class LostCityProfile {
     public int CITY_MINRADIUS = 50;
     public int CITY_MAXRADIUS = 128;
     public float CITY_THRESSHOLD = .2f;
+
     public float CITYSPHERE_FACTOR = 1.2f;
     public float CITYSPHERE_CHANCE = 0.7f;
     public float CITYSPHERE_SURFACE_VARIATION = 1.0f;
@@ -90,6 +91,7 @@ public class LostCityProfile {
     public boolean CITYSPHERE_LANDSCAPE_OUTSIDE = false;
     public int CITYSPHERE_OUTSIDE_GROUNDLEVEL = 10;
     public String CITYSPHERE_OUTSIDE_PROFILE = "";
+    public boolean CITYSPHERE_ONLY_PREDEFINED = false;
 
     public int CITY_LEVEL0_HEIGHT = 75;
     public int CITY_LEVEL1_HEIGHT = 83;
@@ -192,6 +194,8 @@ public class LostCityProfile {
         CITYSPHERE_MONORAIL_CHANCE = cfg.getFloat("monorailChance", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_CHANCE, 0.0f, 1.0f, "The chance that a city will have a monorail connection in a certain direction. There will only be an actual connection if there is a city in that direction that also wants a monorail");
         CITYSPHERE_LANDSCAPE_OUTSIDE = cfg.getBoolean("landscapeOutside", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_LANDSCAPE_OUTSIDE,
                 "If this is true then there will be a landscape outside the city spheres");
+        CITYSPHERE_ONLY_PREDEFINED = cfg.getBoolean("onlyPredefined", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_ONLY_PREDEFINED,
+                "If this is true then only predefined spheres are generated");
         CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("outsideGroundLevel", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_GROUNDLEVEL, 2, 256, "Ground level for outside city spheres");
         CITYSPHERE_OUTSIDE_PROFILE = cfg.getString("outsideProfile", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_PROFILE, "An optional profile to use for the outside world");
     }

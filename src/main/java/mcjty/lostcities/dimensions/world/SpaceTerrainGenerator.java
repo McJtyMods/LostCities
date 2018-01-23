@@ -25,9 +25,10 @@ public class SpaceTerrainGenerator {
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
         // Find the city center and get the city style for the center of the city
-        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
+        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+        ChunkCoord cityCenter = sphere.getCenter();
         BuildingInfo info = BuildingInfo.getBuildingInfo(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
-        CitySphere sphere = info.getCitySphere();
+        CitySphere.initSphere(sphere, provider);   // Make sure city sphere information is complete
 
         LostCityProfile profile = provider.getProfile();
         boolean outsideLandscape = profile.CITYSPHERE_LANDSCAPE_OUTSIDE;
@@ -38,8 +39,8 @@ public class SpaceTerrainGenerator {
         this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
 
         if (sphere.isEnabled()) {
-            float radius = CitySphere.getSphereRadius(cityCenter, provider);
-            BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
+            float radius = sphere.getRadius();
+            BlockPos cc = sphere.getCenterPos();
             int cx = cc.getX() - chunkX * 16;
             int cz = cc.getZ() - chunkZ * 16;
             fillSphere(primer, cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), baseLiquid);
@@ -126,12 +127,10 @@ public class SpaceTerrainGenerator {
     }
 
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] biomes) {
-        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
-
-        CitySphere sphere = CitySphere.getSphereAtCenter(cityCenter, provider);
+        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
         if (sphere.isEnabled()) {
-            float radius = CitySphere.getSphereRadius(cityCenter, provider);
-            BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
+            float radius = sphere.getRadius();
+            BlockPos cc = sphere.getCenterPos();
             double sqradiusOffset = (radius - 2) * (radius - 2);
             int centerx = cc.getX() - chunkX * 16;
             int centerz = cc.getZ() - chunkZ * 16;

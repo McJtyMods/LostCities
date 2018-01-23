@@ -4,7 +4,6 @@ import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.dimensions.world.lost.Railway;
-import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -65,12 +64,10 @@ public class CommandDebug implements ICommand {
             System.out.println("railInfo.getDirection() = " + railInfo.getDirection());
             System.out.println("railInfo.getRails() = " + railInfo.getRails());
 
-            ChunkCoord cityCenter = CitySphere.getSphereCenter(info.chunkX, info.chunkZ, provider);
-            CitySphere sphere = CitySphere.getSphereAtCenter(cityCenter, provider);
-            float radius = CitySphere.getSphereRadius(cityCenter, provider);
-            System.out.println("cityCenter = " + cityCenter);
+            CitySphere sphere = CitySphere.getCitySphere(info.chunkX, info.chunkZ, provider);
+            System.out.println("sphere.cityCenter = " + sphere.getCenter());
             System.out.println("sphere.isEnabled() = " + sphere.isEnabled());
-            System.out.println("radius = " + radius);
+            System.out.println("sphere.radius = " + sphere.getRadius());
         }
     }
 

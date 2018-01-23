@@ -58,15 +58,14 @@ public class TerrainEventHandlers {
                         LostCityChunkGenerator provider = (LostCityChunkGenerator) worldServer.getChunkProvider().chunkGenerator;
                         int chunkX = (event.getPos().getX()) >> 4;
                         int chunkZ = (event.getPos().getZ()) >> 4;
-                        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
-                        CitySphere sphere = CitySphere.getSphereAtCenter(cityCenter, provider);
+                        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
                         if (!sphere.isEnabled()) {
                             return;
                         }
                         if (CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
-                            float radius = CitySphere.getSphereRadius(cityCenter, provider);
+                            float radius = sphere.getRadius();
                             double sqradiusOffset = (radius-2) * (radius-2);
-                            BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
+                            BlockPos cc = sphere.getCenterPos();
                             int cx = cc.getX();
                             int cz = cc.getZ();
                             Biome biome = world.getBiomeForCoordsBody(event.getPos());

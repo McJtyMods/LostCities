@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world.lost;
 
-import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
@@ -85,21 +84,16 @@ public class City {
         rand.nextFloat();
         if (provider.getProfile().isSpace()) {
             // @todo config
-            // Space cities are spaced evenly
-            boolean candidate = CitySphere.isCitySphereCenterCandidate(chunkX, chunkZ);
-            if (candidate) {
-                if (CitySphere.getCitySphere(chunkX, chunkZ, provider).isEnabled()) {
-                    return rand.nextFloat() < provider.getProfile().CITY_CHANCE;
-                } else {
-                    return rand.nextFloat() < provider.getOutsideProfile().CITY_CHANCE;
-                }
-            } else {
-                if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
-                    return false;
-                } else {
-                    return rand.nextFloat() < provider.getOutsideProfile().CITY_CHANCE;
-                }
+            CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+            if (!sphere.isEnabled()) {
+                // No sphere
+                return rand.nextFloat() < provider.getOutsideProfile().CITY_CHANCE;
             }
+            if (sphere.getCenter().getChunkX() == chunkX && sphere.getCenter().getChunkZ() == chunkZ) {
+                // This chunk is the center of a city
+                return rand.nextFloat() < provider.getProfile().CITY_CHANCE;
+            }
+            return false;
         } else {
             return rand.nextFloat() < provider.getProfile().CITY_CHANCE;
         }

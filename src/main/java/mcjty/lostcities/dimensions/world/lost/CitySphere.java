@@ -1,33 +1,85 @@
 package mcjty.lostcities.dimensions.world.lost;
 
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.dimensions.world.lost.cityassets.CityStyle;
 import mcjty.lostcities.dimensions.world.lost.cityassets.PredefinedCity;
+import mcjty.lostcities.dimensions.world.lost.cityassets.PredefinedSphere;
 import mcjty.lostcities.varia.ChunkCoord;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class CitySphere {
 
     private static Map<ChunkCoord, CitySphere> citySphereCache = new HashMap<>();
+    private static Map<ChunkCoord, PredefinedSphere> predefinedSphereMap = Collections.emptyMap();
 
+    public static final CitySphere EMPTY = new CitySphere(new ChunkCoord(0, 0, 0), 0.0f, new BlockPos(0, 0, 0), false);
+
+    private final ChunkCoord center;
+    private final BlockPos centerPos;
+    private final float radius;
     private final boolean enabled;
+
+    private Biome biome;
 
     private boolean monorailNorthCandidate;
     private boolean monorailSouthCandidate;
     private boolean monorailWestCandidate;
     private boolean monorailEastCandidate;
 
-    private char glassBlock;
-    private char baseBlock;
-    private char sideBlock;
+    private char glassBlock = 0;
+    private char baseBlock = 0;
+    private char sideBlock = 0;
 
-    private CitySphere(boolean enabled) {
+    private CitySphere(ChunkCoord center, float radius, BlockPos centerPos, boolean enabled) {
         this.enabled = enabled;
+        this.center = center;
+        this.radius = radius;
+        this.centerPos = centerPos;
+    }
+
+    public static void initSphere(CitySphere sphere, LostCityChunkGenerator provider) {
+        if (sphere.getBaseBlock() != 0) {
+            return;
+        }
+
+        ChunkCoord center = sphere.getCenter();
+        BuildingInfo info = BuildingInfo.getBuildingInfo(center.getChunkX(), center.getChunkZ(), provider);
+        CityStyle cs = info.getCityStyle();
+
+        Random rand = new Random(info.provider.seed + center.getChunkX() * 837971201L + center.getChunkZ() * 961744153L);
+        rand.nextFloat();
+        rand.nextFloat();
+
+        Character glass = info.getCompiledPalette().get(cs.getSphereGlassBlock(), rand);
+        Character base = info.getCompiledPalette().get(cs.getSphereBlock(), rand);
+        Character side = info.getCompiledPalette().get(cs.getSphereSideBlock(), rand);
+        sphere.setBlocks(glass, base, side);
+    }
+
+    public ChunkCoord getCenter() {
+        return center;
+    }
+
+    public BlockPos getCenterPos() {
+        return centerPos;
+    }
+
+    public float getRadius() {
+        return radius;
+    }
+
+    @Nullable
+    public Biome getBiome() {
+        return biome;
     }
 
     public void setBlocks(char glassBlock, char baseBlock, char sideBlock) {
@@ -54,7 +106,22 @@ public class CitySphere {
 
     public static void cleanCache() {
         citySphereCache.clear();
+        predefinedSphereMap = Collections.emptyMap();
     }
+
+    public static PredefinedSphere getPredefinedSphere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (predefinedSphereMap == null) {
+            predefinedSphereMap = new HashMap<>();
+            for (PredefinedSphere sphere : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
+                predefinedSphereMap.put(new ChunkCoord(sphere.getDimension(), sphere.getChunkX(), sphere.getChunkZ()), sphere);
+            }
+        }
+        if (predefinedSphereMap.isEmpty()) {
+            return null;
+        }
+        return predefinedSphereMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+    }
+
 
     /**
      * Return true if there is a horizontal monorail here. This is the case if this chunk is on a city center multiple
@@ -149,15 +216,12 @@ public class CitySphere {
     /**
      * From the center
      */
-    public static float getSphereRadius(ChunkCoord center, LostCityChunkGenerator provider) {
+    private static float getSphereRadius(ChunkCoord center, LostCityChunkGenerator provider, Random rand) {
         PredefinedCity city = City.getPredefinedCity(center.getChunkX(), center.getChunkZ(), provider);
         LostCityProfile profile = provider.getProfile();
         if (city != null) {
             return city.getRadius() * profile.CITYSPHERE_FACTOR;
         }
-        Random rand = new Random(provider.seed + center.getChunkZ() * 100001653L + center.getChunkX() * 295075153L);
-        rand.nextFloat();
-        rand.nextFloat();
         return profile.CITY_MINRADIUS + rand.nextInt(profile.CITY_MAXRADIUS - profile.CITY_MINRADIUS) * profile.CITYSPHERE_FACTOR;
     }
 
@@ -166,13 +230,12 @@ public class CitySphere {
      * Return true if a given chunk is fully enclosed in a city sphere
      */
     public static boolean fullyInsideCitySpere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
-        CitySphere sphere = getSphereAtCenter(cityCenter, provider);
+        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
         if (!sphere.isEnabled()) {
             return false;
         }
-        float radius = CitySphere.getSphereRadius(cityCenter, provider);
-        BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
+        float radius = sphere.getRadius();
+        BlockPos cc = sphere.getCenterPos();
         double sqradiusOffset = (radius-2) * (radius-2);
         int cx = cc.getX();
         int cz = cc.getZ();
@@ -195,14 +258,17 @@ public class CitySphere {
      * Return true if a given chunk is partially or fully enclosed in a city sphere
      */
     public static boolean intersectsWithCitySphere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
-        CitySphere sphere = getSphereAtCenter(cityCenter, provider);
+        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
         if (!sphere.isEnabled()) {
             return false;
         }
-        float radius = CitySphere.getSphereRadius(cityCenter, provider);
-        BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
-        double sqradiusOffset = (radius-2) * (radius-2);
+        float radius = sphere.getRadius();
+        BlockPos cc = sphere.getCenterPos();
+        return intersectChunkWithSphere(chunkX, chunkZ, radius, cc);
+    }
+
+    private static boolean intersectChunkWithSphere(int chunkX, int chunkZ, float radius, BlockPos cc) {
+        double sqradiusOffset = radius * radius;
         int cx = cc.getX();
         int cz = cc.getZ();
         if (squaredDistance(cx, cz, chunkX*16, chunkZ*16) <= sqradiusOffset) {
@@ -225,14 +291,13 @@ public class CitySphere {
      * Return true if a given chunk is partially enclosed in a city sphere (i.e. on the sphere border)
      */
     public static boolean onCitySphereBorder(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
-        CitySphere sphere = getSphereAtCenter(cityCenter, provider);
+        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
         if (!sphere.isEnabled()) {
             return false;
         }
-        float radius = CitySphere.getSphereRadius(cityCenter, provider);
-        BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
-        double sqradiusOffset = (radius-2) * (radius-2);
+        float radius = sphere.getRadius();
+        BlockPos cc = sphere.getCenterPos();
+        double sqradiusOffset = radius * radius;
         int cx = cc.getX();
         int cz = cc.getZ();
         int cnt = 0;
@@ -258,74 +323,96 @@ public class CitySphere {
     }
 
     /**
-     * Return a (possibly cached) city sphere which affects this chunk. That means it will
-     * go find the city sphere center chunk and get data from that
+     * Return a city sphere for this city center chunk
+     */
+    private static CitySphere getSphereAtCenter(ChunkCoord center, LostCityChunkGenerator provider, @Nullable PredefinedSphere predef) {
+        int chunkX = center.getChunkX();
+        int chunkZ = center.getChunkZ();
+        Random rand = new Random(provider.seed + chunkX * 961744153L + chunkZ * 837971201L);
+        rand.nextFloat();
+        rand.nextFloat();
+        CitySphere citySphere;
+        // This information is for city spheres. This information is only relevant
+        // in the chunk representing the center of the city
+        boolean enabled = rand.nextFloat() < provider.getProfile().CITYSPHERE_CHANCE;
+        float radius = predef != null ? predef.getRadius() : getSphereRadius(center, provider, rand);
+        BlockPos centerPosition = predef != null ? new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()) : getSphereCenterPosition(center, provider, rand);
+        citySphere = new CitySphere(center, radius, centerPosition, enabled);
+        if (enabled) {
+            citySphere.monorailNorthCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
+            citySphere.monorailSouthCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
+            citySphere.monorailWestCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
+            citySphere.monorailEastCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
+            if (predef != null && predef.getBiome() != null) {
+                citySphere.biome = Biome.REGISTRY.getObject(new ResourceLocation(predef.getBiome()));
+                if (citySphere.biome == null) {
+                    LostCities.logger.warn("Could not find biome '" + predef.getBiome() + "'!");
+                }
+            }
+        }
+        return citySphere;
+    }
+
+    /**
+     * Given a chunk coordinate return the nearest city sphere that affects this chunk. This can return city
+     * spheres that are disabled so always test for that! If this returns EMPTY there is no sphere at all
      */
     @Nonnull
     public static CitySphere getCitySphere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        ChunkCoord center = getSphereCenter(chunkX, chunkZ, provider);
-        return getSphereAtCenter(center, provider);
-    }
-
-    /**
-     * Return a (possibly cached) city sphere for this city center chunk
-     */
-    public static CitySphere getSphereAtCenter(ChunkCoord center, LostCityChunkGenerator provider) {
-        int chunkX;
-        int chunkZ;
-        if (!citySphereCache.containsKey(center)) {
-            chunkX = center.getChunkX();
-            chunkZ = center.getChunkZ();
-            Random rand = new Random(provider.seed + chunkX * 961744153L + chunkZ * 837971201L);
-            rand.nextFloat();
-            rand.nextFloat();
-            CitySphere citySphere;
-            // This information is for city spheres. This information is only relevant
-            // in the chunk representing the center of the city
-            if (isCitySphereCenterCandidate(chunkX, chunkZ)) {
-                boolean enabled = rand.nextFloat() < provider.getProfile().CITYSPHERE_CHANCE;
-                citySphere = new CitySphere(enabled);
-                if (enabled) {
-                    citySphere.monorailNorthCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
-                    citySphere.monorailSouthCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
-                    citySphere.monorailWestCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
-                    citySphere.monorailEastCandidate = rand.nextFloat() < provider.getProfile().CITYSPHERE_MONORAIL_CHANCE;
+        ChunkCoord coord = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
+        if (!citySphereCache.containsKey(coord)) {
+            for (Map.Entry<ChunkCoord, PredefinedSphere> entry : predefinedSphereMap.entrySet()) {
+                PredefinedSphere predef = entry.getValue();
+                if (predef.getDimension() == provider.dimensionId) {
+                    if (intersectChunkWithSphere(chunkX, chunkZ, predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
+                        ChunkCoord center = new ChunkCoord(provider.dimensionId, predef.getChunkX(), predef.getChunkZ());
+                        CitySphere sphere = getSphereAtCenter(center, provider, predef);
+                        updateCache(coord, sphere);
+                        return sphere;
+                    }
                 }
-            } else {
-                citySphere = new CitySphere(false);
             }
-            citySphereCache.put(center, citySphere);
+
+            CitySphere sphere;
+            if (provider.getProfile().CITYSPHERE_ONLY_PREDEFINED) {
+                sphere = CitySphere.EMPTY;
+            } else {
+                int cx = (chunkX & ~0xf) + 8;
+                int cz = (chunkZ & ~0xf) + 8;
+                ChunkCoord center = new ChunkCoord(provider.dimensionId, cx, cz);
+                sphere = getSphereAtCenter(center, provider, null);
+            }
+            updateCache(coord, sphere);
+            return sphere;
+        } else {
+            return citySphereCache.get(coord);
         }
-        return citySphereCache.get(center);
     }
 
-    /**
-     * This returns the center of the city in case we're in a space type world
-     */
-    public static ChunkCoord getSphereCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        int cx = (chunkX & ~0xf) + 8;
-        int cz = (chunkZ & ~0xf) + 8;
-        return new ChunkCoord(provider.dimensionId, cx, cz);
+    private static void updateCache(ChunkCoord coord, CitySphere sphere) {
+        citySphereCache.put(coord, sphere);
+        BlockPos centerPos = sphere.getCenterPos();
+        int radius = (int) sphere.getRadius();
+        if (radius < 0.0001f) {
+            citySphereCache.put(sphere.center, sphere);
+            return;
+        }
+        for (int cx = centerPos.getX() - radius-16 ; cx <= centerPos.getX() + radius+16 ; cx += 16) {
+            for (int cz = centerPos.getZ() - radius-16 ; cz <= centerPos.getZ()+radius+16 ; cz += 16) {
+                ChunkCoord cc = new ChunkCoord(sphere.getCenter().getDimension(), cx >> 4, cz >> 4);
+                if (intersectChunkWithSphere(cc.getChunkX(), cc.getChunkZ(), radius, centerPos)) {
+                    citySphereCache.put(cc, sphere);
+                }
+            }
+        }
     }
 
     /**
      * Given a sphere center, return the actual position of the center
      */
-    public static BlockPos getSphereCenterPosition(ChunkCoord center, LostCityChunkGenerator provider) {
-        Random rand = new Random(provider.seed + center.getChunkX() * 961744153L + center.getChunkZ() * 837971201L);
-        rand.nextFloat();
-        rand.nextFloat();
-
+    private static BlockPos getSphereCenterPosition(ChunkCoord center, LostCityChunkGenerator provider, Random rand) {
         int cx = center.getChunkX() * 16 + rand.nextInt(16) - 8;
         int cz = center.getChunkZ() * 16 + rand.nextInt(16) - 8;
         return new BlockPos(cx, 0, cz);
     }
-
-    /**
-     * Return true if this coordinate is potentially a candidate to be a city center
-     */
-    public static boolean isCitySphereCenterCandidate(int chunkX, int chunkZ) {
-        return (chunkX & 0xf) == 8 && (chunkZ & 0xf) == 8;
-    }
-
 }

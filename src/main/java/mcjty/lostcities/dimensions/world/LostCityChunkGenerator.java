@@ -2,7 +2,6 @@ package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.*;
-import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
