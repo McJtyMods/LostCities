@@ -60,26 +60,28 @@ public class GuiLostCityConfiguration extends GuiScreen {
         });
         for (String key : profileKeys) {
             LostCityProfile profile = LostCityConfiguration.profiles.get(key);
-            num++;
-            if (num < page*8) {
-                continue;
-            }
-            if (cnt >= 8) {
-                break;
-            }
-            cnt++;
-            GuiButton button = new GuiButton(id, 10, y, 90, 20, key);
-            if (profileName.equals(profile.getName())) {
-                button.packedFGColour = 0xffffff00;
-            }
-            this.buttonList.add(button);
-            actionHandler.put(id, () -> setProfile(profile));
-            id++;
+            if (profile.isPublic()) {
+                num++;
+                if (num < page * 8) {
+                    continue;
+                }
+                if (cnt >= 8) {
+                    break;
+                }
+                cnt++;
+                GuiButton button = new GuiButton(id, 10, y, 90, 20, key);
+                if (profileName.equals(profile.getName())) {
+                    button.packedFGColour = 0xffffff00;
+                }
+                this.buttonList.add(button);
+                actionHandler.put(id, () -> setProfile(profile));
+                id++;
 
-            GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 110, y, 230, 20, 0xffffffff);
-            label.addLine(profile.getDescription());
-            this.labelList.add(label);
-            y += 22;
+                GuiLabel label = new GuiLabel(Minecraft.getMinecraft().fontRenderer, id++, 110, y, 230, 20, 0xffffffff);
+                label.addLine(profile.getDescription());
+                this.labelList.add(label);
+                y += 22;
+            }
         }
 
 
