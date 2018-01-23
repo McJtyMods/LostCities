@@ -229,6 +229,7 @@ public class LostCityConfiguration {
         profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL = 40;
         profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "bio_wasteland";
+        profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 0.5f;
         profile.WATERLEVEL_OFFSET = 70;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;

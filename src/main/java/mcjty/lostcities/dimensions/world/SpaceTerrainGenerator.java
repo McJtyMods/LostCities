@@ -35,18 +35,18 @@ public class SpaceTerrainGenerator {
         char airChar = LostCitiesTerrainGenerator.airChar;
         int waterLevel = profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
 
+        this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
+
         if (sphere.isEnabled()) {
-            this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
             float radius = CitySphere.getSphereRadius(cityCenter, provider);
             BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
             int cx = cc.getX() - chunkX * 16;
             int cz = cc.getZ() - chunkZ * 16;
             fillSphere(primer, cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), baseLiquid);
         } else if (outsideLandscape) {
-            this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
             for (int x = 0 ; x < 16 ; x++) {
                 for (int z = 0 ; z < 16 ; z++) {
-                    double vr = profile.CITYSPHERE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_SURFACE_VARIATION;
+                    double vr = profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION;
                     int index = (x * 16 + z) * 256;
                     for (int y = 0; y <= Math.max(waterLevel, profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL + 30) ; y++) {
                         if (y == 0) {
@@ -76,6 +76,7 @@ public class SpaceTerrainGenerator {
             for (int z = 0 ; z < 16 ; z++) {
                 double dzdz = (z-centerz) * (z-centerz);
                 int index = (x * 16 + z) * 256;
+                double vo = profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION;
                 double vr = profile.CITYSPHERE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_SURFACE_VARIATION;
                 if (liquidChar != null) {
                     for (int y = 0 ; y <= Math.max(Math.min(centery+radius, 255), waterLevel) ; y++) {
@@ -95,7 +96,7 @@ public class SpaceTerrainGenerator {
                                     primer.data[index + y] = block;
                                 }
                             }
-                        } else if (y <= vr+ profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL) {
+                        } else if (y <= vo + profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL) {
                             primer.data[index + y] = LostCitiesTerrainGenerator.baseChar;
                         } else if (y <= waterLevel) {
                             primer.data[index + y] = liquidChar;

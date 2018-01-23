@@ -85,6 +85,7 @@ public class LostCityProfile {
     public float CITYSPHERE_FACTOR = 1.2f;
     public float CITYSPHERE_CHANCE = 0.7f;
     public float CITYSPHERE_SURFACE_VARIATION = 1.0f;
+    public float CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 1.0f;
     public float CITYSPHERE_MONORAIL_CHANCE = 0.8f;
     public boolean CITYSPHERE_LANDSCAPE_OUTSIDE = false;
     public String[] CITYSPHERE_ALLOWED_BIOME_FACTORS = new String[] { };
@@ -187,7 +188,8 @@ public class LostCityProfile {
     private void initCitySpheres(Configuration cfg) {
         CITYSPHERE_FACTOR = cfg.getFloat("citySphereFactor", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_FACTOR, 0.1f, 10.0f, "Only used in 'space' landscape. This factor will be multiplied with the radius of the city to calculate the radius of the outer sphere");
         CITYSPHERE_CHANCE = cfg.getFloat("citySphereChance", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_CHANCE, 0.0f, 1.0f, "The chance that a city sphere will be generated");
-        CITYSPHERE_SURFACE_VARIATION = cfg.getFloat("outsideSurfaceVariation", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface inside a city sphere more varied");
+        CITYSPHERE_SURFACE_VARIATION = cfg.getFloat("sphereSurfaceVariation", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface inside a city sphere more varied");
+        CITYSPHERE_OUTSIDE_SURFACE_VARIATION = cfg.getFloat("outsideSurfaceVariation", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface outside a city sphere more varied");
         CITYSPHERE_MONORAIL_CHANCE = cfg.getFloat("monorailChance", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_CHANCE, 0.0f, 1.0f, "The chance that a city will have a monorail connection in a certain direction. There will only be an actual connection if there is a city in that direction that also wants a monorail");
         CITYSPHERE_LANDSCAPE_OUTSIDE = cfg.getBoolean("landscapeOutside", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_LANDSCAPE_OUTSIDE,
                 "If this is true then there will be a landscape outside the city spheres");
