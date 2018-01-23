@@ -69,6 +69,11 @@ public class Highway {
             return -1;
         }
 
+        // Disable highways that intersect with cityspheres
+        if (provider.getProfile().isSpace() && CitySphere.intersectsWithCitySphere(cp.getChunkX(), cp.getChunkZ(), provider)) {
+            cache.put(cp, -1);
+            return -1;
+        }
 
         makePerlin(provider.seed);
         if (hasHighway.apply(cp)) {
