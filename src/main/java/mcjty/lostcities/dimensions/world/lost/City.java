@@ -83,7 +83,7 @@ public class City {
         Random rand = new Random(provider.seed + chunkZ * 797003437L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
-        if (provider.getProfile().LANDSCAPE_TYPE == LandscapeType.SPACE) {
+        if (provider.getProfile().isSpace()) {
             // @todo config
             // Space cities are spaced evenly
             boolean candidate = CitySphere.isCitySphereCenterCandidate(chunkX, chunkZ);
@@ -117,7 +117,7 @@ public class City {
         rand.nextFloat();
         rand.nextFloat();
         LostCityProfile profile = provider.getProfile();
-        if (profile.LANDSCAPE_TYPE == LandscapeType.SPACE && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
+        if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
                 return profile.CITY_MINRADIUS + rand.nextInt(profile.CITY_MAXRADIUS - profile.CITY_MINRADIUS);
             } else {

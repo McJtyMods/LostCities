@@ -310,7 +310,7 @@ public class Railway {
             return railInfo.get(key);
         }
         RailChunkInfo info = getRailChunkTypeInternal(chunkX, chunkZ, provider);
-        if (provider.getProfile().LANDSCAPE_TYPE == LandscapeType.SPACE && CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
+        if (provider.getProfile().isSpace() && CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
             info = RailChunkInfo.NOTHING;
         } else if (info.getType().isStation()) {
             if (!profile.RAILWAY_STATIONS_ENABLED) {

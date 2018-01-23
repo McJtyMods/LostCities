@@ -88,7 +88,6 @@ public class LostCityProfile {
     public float CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 1.0f;
     public float CITYSPHERE_MONORAIL_CHANCE = 0.8f;
     public boolean CITYSPHERE_LANDSCAPE_OUTSIDE = false;
-    public String[] CITYSPHERE_ALLOWED_BIOME_FACTORS = new String[] { };
     public int CITYSPHERE_OUTSIDE_GROUNDLEVEL = 10;
     public String CITYSPHERE_OUTSIDE_PROFILE = "";
 
@@ -193,8 +192,6 @@ public class LostCityProfile {
         CITYSPHERE_MONORAIL_CHANCE = cfg.getFloat("monorailChance", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_CHANCE, 0.0f, 1.0f, "The chance that a city will have a monorail connection in a certain direction. There will only be an actual connection if there is a city in that direction that also wants a monorail");
         CITYSPHERE_LANDSCAPE_OUTSIDE = cfg.getBoolean("landscapeOutside", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_LANDSCAPE_OUTSIDE,
                 "If this is true then there will be a landscape outside the city spheres");
-        CITYSPHERE_ALLOWED_BIOME_FACTORS = cfg.getStringList("outsideAllowedBiomeFactors", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_ALLOWED_BIOME_FACTORS,
-                "List of biomes that are allowed in the world outside city spheres. Empty list is default all biomes. The factor controls how much that biome is favored over the others (higher means less favored!)");
         CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("outsideGroundLevel", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_GROUNDLEVEL, 2, 256, "Ground level for outside city spheres");
         CITYSPHERE_OUTSIDE_PROFILE = cfg.getString("outsideProfile", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_PROFILE, "An optional profile to use for the outside world");
     }

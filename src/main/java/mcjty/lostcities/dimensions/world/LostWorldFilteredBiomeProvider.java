@@ -44,7 +44,7 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
         LostCityProfile profile = getProvider().getProfile();
         Biome originalBiome = original.getBiome(pos);
 
-        if (profile.LANDSCAPE_TYPE == LandscapeType.SPACE && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
+        if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             int chunkX = (pos.getX()) >> 4;
             int chunkZ = (pos.getZ()) >> 4;
             ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
@@ -67,7 +67,7 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
 
     private void translateList(Biome[] biomes, int topx, int topz, int width, int height) {
         LostCityProfile profile = getProvider().getProfile();
-        if (profile.LANDSCAPE_TYPE == LandscapeType.SPACE && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
+        if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             int chunkX = (topx) >> 4;
             int chunkZ = (topz) >> 4;
             ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);

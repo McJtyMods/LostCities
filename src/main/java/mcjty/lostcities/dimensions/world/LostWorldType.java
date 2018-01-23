@@ -92,7 +92,13 @@ public class LostWorldType extends WorldType {
         if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
             return super.getBiomeProvider(world);
         } else {
-            return new LostWorldFilteredBiomeProvider(world, super.getBiomeProvider(world), profile.ALLOWED_BIOME_FACTORS, profile.CITYSPHERE_ALLOWED_BIOME_FACTORS);
+            String[] outsideAllowedbiomeFactors = profile.ALLOWED_BIOME_FACTORS;
+            if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE && !profile.CITYSPHERE_OUTSIDE_PROFILE.isEmpty()) {
+                LostCityProfile outProfile = LostCityConfiguration.profiles.get(profile.CITYSPHERE_OUTSIDE_PROFILE);
+                outsideAllowedbiomeFactors = outProfile.ALLOWED_BIOME_FACTORS;
+            }
+            return new LostWorldFilteredBiomeProvider(world, super.getBiomeProvider(world),
+                    profile.ALLOWED_BIOME_FACTORS, outsideAllowedbiomeFactors);
         }
     }
 

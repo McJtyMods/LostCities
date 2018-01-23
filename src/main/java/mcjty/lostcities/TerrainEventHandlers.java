@@ -53,7 +53,7 @@ public class TerrainEventHandlers {
                 case LILYPAD:
                 case FLOWERS:
                     LostCityProfile profile = LostWorldType.getProfile(world);
-                    if (profile.LANDSCAPE_TYPE == LandscapeType.SPACE && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
+                    if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
                         WorldServer worldServer = (WorldServer) world;
                         LostCityChunkGenerator provider = (LostCityChunkGenerator) worldServer.getChunkProvider().chunkGenerator;
                         int chunkX = (event.getPos().getX()) >> 4;

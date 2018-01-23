@@ -225,7 +225,6 @@ public class LostCityConfiguration {
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2" };
-        profile.CITYSPHERE_ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL = 40;
         profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "bio_wasteland";

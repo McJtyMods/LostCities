@@ -65,7 +65,14 @@ public class LostWorldProvider extends WorldProvider {
         if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
             this.biomeProvider = biomeProvider;
         } else {
-            this.biomeProvider = new LostWorldFilteredBiomeProvider(world, biomeProvider, profile.ALLOWED_BIOME_FACTORS, profile.CITYSPHERE_ALLOWED_BIOME_FACTORS);
+            String[] outsideAllowedbiomeFactors = profile.ALLOWED_BIOME_FACTORS;
+            if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE && !profile.CITYSPHERE_OUTSIDE_PROFILE.isEmpty()) {
+                LostCityProfile outProfile = LostCityConfiguration.profiles.get(profile.CITYSPHERE_OUTSIDE_PROFILE);
+                outsideAllowedbiomeFactors = outProfile.ALLOWED_BIOME_FACTORS;
+            }
+            this.biomeProvider = new LostWorldFilteredBiomeProvider(world, biomeProvider,
+                    profile.ALLOWED_BIOME_FACTORS,
+                    outsideAllowedbiomeFactors);
         }
     }
 

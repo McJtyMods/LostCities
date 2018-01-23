@@ -342,7 +342,7 @@ public class BuildingInfo implements ILostChunkInfo {
             characteristics.isCity = characteristics.cityFactor > profile.CITY_THRESSHOLD;
             if (isVoidChunk(chunkX, chunkZ, provider)) {
                 characteristics.isCity = false;    // No city in a void chunk
-            } else if (provider.getProfile().LANDSCAPE_TYPE == LandscapeType.SPACE) {
+            } else if (provider.getProfile().isSpace()) {
                 if (CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
                     characteristics.isCity = false;
                 } else if (!provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE && !CitySphere.fullyInsideCitySpere(chunkX, chunkZ, provider)) {
@@ -357,7 +357,7 @@ public class BuildingInfo implements ILostChunkInfo {
             }
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.seed);
             characteristics.couldHaveBuilding = characteristics.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, profile, characteristics.section, characteristics.cityLevel, rand);
-            if (profile.LANDSCAPE_TYPE == LandscapeType.SPACE && characteristics.section == -1) {
+            if (profile.isSpace() && characteristics.section == -1) {
                 // Minimize cities at the edge of the city in an orb
                 float dist = getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
                 if (dist > .8f) {
@@ -647,7 +647,7 @@ public class BuildingInfo implements ILostChunkInfo {
      * Find the correct profile for this chunk. This takes space sphere worlds into account
      */
     public static LostCityProfile getProfile(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        if (provider.getProfile().LANDSCAPE_TYPE == LandscapeType.SPACE) {
+        if (provider.getProfile().isSpace()) {
             if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
                 return provider.getProfile();
             } else {
@@ -664,7 +664,7 @@ public class BuildingInfo implements ILostChunkInfo {
         this.chunkZ = chunkZ;
         this.coord = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
 
-        outsideChunk = provider.getProfile().LANDSCAPE_TYPE == LandscapeType.SPACE && !CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider);
+        outsideChunk = provider.getProfile().isSpace() && !CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider);
         profile = getProfile(chunkX, chunkZ, provider);
 
         LostChunkCharacteristics characteristics = getChunkCharacteristics(chunkX, chunkZ, provider);
