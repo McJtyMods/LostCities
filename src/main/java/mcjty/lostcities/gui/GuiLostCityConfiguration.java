@@ -20,6 +20,7 @@ public class GuiLostCityConfiguration extends GuiScreen {
     private int page = 0;
     private int numpages;
     private GuiMutableLabel pagelabel;
+    private String currentProfile;
 
     public GuiLostCityConfiguration(GuiCreateWorld parent) {
         this.parent = parent;
@@ -43,6 +44,7 @@ public class GuiLostCityConfiguration extends GuiScreen {
     }
 
     private void setupGui(String profileName) {
+        currentProfile = profileName;
         actionHandler.clear();
         this.buttonList.clear();
         this.labelList.clear();
@@ -110,6 +112,7 @@ public class GuiLostCityConfiguration extends GuiScreen {
     private void setProfile(LostCityProfile profile) {
         parent.chunkProviderSettingsJson = "{ \"profile\": \"" + profile.getName() + "\" }";
         this.mc.displayGuiScreen(parent);
+        currentProfile = profile.getName();
     }
 
     @Override
@@ -128,6 +131,12 @@ public class GuiLostCityConfiguration extends GuiScreen {
             pagelabel.clearLines();
             pagelabel.addLine("" + (page+1) + "/" + numpages);
             pagelabel.drawLabel(Minecraft.getMinecraft(), mouseX, mouseY);
+        }
+
+        LostCityProfile profile = LostCityConfiguration.profiles.get(currentProfile);
+        if (profile.getIcon() != null) {
+            mc.getTextureManager().bindTexture(profile.getIcon());
+            drawTexturedModalRect(0, 0, 0, 0, 64, 64);
         }
     }
 }

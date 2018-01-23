@@ -24,6 +24,8 @@ public class LostCityProfile {
 
     private String description = "Default generation, common cities, explosions";
     private String worldStyle = "standard";
+    private String iconFile;
+    private ResourceLocation icon;
 
     public int DEBRIS_TO_NEARBYCHUNK_FACTOR = 200;
 
@@ -163,6 +165,17 @@ public class LostCityProfile {
         this.isPublic = isPublic;
     }
 
+    public ResourceLocation getIcon() {
+        if (icon != null) {
+            return icon;
+        }
+        if (iconFile == null || iconFile.isEmpty()) {
+            return null;
+        }
+        icon = new ResourceLocation(LostCities.MODID, iconFile);
+        return icon;
+    }
+
     public boolean isPublic() {
         return isPublic;
     }
@@ -202,7 +215,9 @@ public class LostCityProfile {
 
     private void initLostcity(Configuration cfg) {
         description = cfg.getString("description", categoryLostcity, inheritFrom.orElse(this).description, "The description of this profile");
+        description = cfg.getString("description", categoryLostcity, inheritFrom.orElse(this).description, "The description of this profile");
         worldStyle = cfg.getString("worldStyle", categoryLostcity, inheritFrom.orElse(this).worldStyle, "The worldstyle used by this profile (defined in the assets)");
+        iconFile = cfg.getString("icon", categoryLostcity, inheritFrom.orElse(this).iconFile, "The icon to use in the configuration screen (64x64)");
 
         VINE_CHANCE = cfg.getFloat("vineChance", categoryLostcity, inheritFrom.orElse(this).VINE_CHANCE, 0.0f, 1.0f, "The chance that a block on the outside of a building will be covered with a vine");
         CHANCE_OF_RANDOM_LEAFBLOCKS = cfg.getFloat("randomLeafBlockChance", categoryLostcity, inheritFrom.orElse(this).CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f, "Chance that leafblocks will be generated at the border of a building and a street");
