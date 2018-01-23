@@ -88,7 +88,11 @@ public class City {
             // Space cities are spaced evenly
             boolean candidate = CitySphere.isCitySphereCenterCandidate(chunkX, chunkZ);
             if (candidate) {
-                return CitySphere.getCitySphere(chunkX, chunkZ, provider).isEnabled();
+                if (CitySphere.getCitySphere(chunkX, chunkZ, provider).isEnabled()) {
+                    return rand.nextFloat() < provider.getProfile().CITY_CHANCE;
+                } else {
+                    return rand.nextFloat() < provider.getOutsideProfile().CITY_CHANCE;
+                }
             } else {
                 if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
                     return false;

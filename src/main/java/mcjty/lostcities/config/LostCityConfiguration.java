@@ -235,12 +235,13 @@ public class LostCityConfiguration {
         profile.RAILWAY_STATIONS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 0;
         profile.RUINS = true;
-        profile.RUIN_CHANCE = 0.9f;
-        profile.RUIN_MINLEVEL_PERCENT = 0.0f;
+        profile.RUIN_CHANCE = 0.7f;
+        profile.RUIN_MINLEVEL_PERCENT = 0.3f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.8f;
         profile.RUBBLELAYER = false;
         profile.GROUNDLEVEL = 60;
-        profile.CITY_CHANCE = 0.07f;
+        profile.CITYSPHERE_CHANCE = 0.4f;
+        profile.CITY_CHANCE = 0.7f;
         profile.CITY_MAXRADIUS = 90;
         profile.CITY_THRESSHOLD = .05f;
         profile.CITY_LEVEL0_HEIGHT = 60;
