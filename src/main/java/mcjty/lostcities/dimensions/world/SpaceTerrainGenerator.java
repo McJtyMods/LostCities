@@ -15,7 +15,6 @@ public class SpaceTerrainGenerator {
     private LostCityChunkGenerator provider;
 
     private NoiseGeneratorPerlin surfaceNoise;
-    private double[] stoneNoise = new double[256];
     private double[] surfaceBuffer = new double[256];
 
     public void setup(World world, LostCityChunkGenerator provider) {
@@ -127,29 +126,38 @@ public class SpaceTerrainGenerator {
 
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] biomes) {
         ChunkCoord cityCenter = CitySphere.getSphereCenter(chunkX, chunkZ, provider);
-        float radius = CitySphere.getSphereRadius(cityCenter, provider);
-        BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
-        double sqradiusOffset = (radius-2) * (radius-2);
-        int centerx = cc.getX() - chunkX * 16;
-        int centerz = cc.getZ() - chunkZ * 16;
 
-        double d0 = 0.03125D;
-        this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
+        CitySphere sphere = CitySphere.getSphereAtCenter(cityCenter, provider);
+        if (sphere.isEnabled()) {
+            float radius = CitySphere.getSphereRadius(cityCenter, provider);
+            BlockPos cc = CitySphere.getSphereCenterPosition(cityCenter, provider);
+            double sqradiusOffset = (radius - 2) * (radius - 2);
+            int centerx = cc.getX() - chunkX * 16;
+            int centerz = cc.getZ() - chunkZ * 16;
 
-        for (int z = 0; z < 16; ++z) {
-            double dzdz = (z-centerz) * (z-centerz);
-            for (int x = 0; x < 16; ++x) {
-                double dxdx = (x-centerx) * (x-centerx);
-                double sqdist = dzdz + dxdx;
-                Biome biome = biomes[x + z * 16];
-                // Even though x and z seems swapped below this code is working nevertheless
-                if (sqdist >= sqradiusOffset) {
+            for (int z = 0; z < 16; ++z) {
+                double dzdz = (z - centerz) * (z - centerz);
+                for (int x = 0; x < 16; ++x) {
+                    double dxdx = (x - centerx) * (x - centerx);
+                    double sqdist = dzdz + dxdx;
+                    Biome biome = biomes[x + z * 16];
+                    // Even though x and z seems swapped below this code is working nevertheless
+                    if (sqdist >= sqradiusOffset) {
+                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, provider.getProfile().CITYSPHERE_OUTSIDE_GROUNDLEVEL);
+                    } else {
+                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, provider.getProfile().GROUNDLEVEL);
+                    }
+                }
+            }
+        } else {
+            for (int z = 0; z < 16; ++z) {
+                for (int x = 0; x < 16; ++x) {
+                    Biome biome = biomes[x + z * 16];
                     genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, provider.getProfile().CITYSPHERE_OUTSIDE_GROUNDLEVEL);
-                } else {
-                    genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, provider.getProfile().GROUNDLEVEL);
                 }
             }
         }
+
     }
 
     public final void genBiomeTerrain(Biome Biome, ChunkPrimer primer, int x, int z, int topLevel) {

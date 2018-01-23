@@ -362,11 +362,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
                 break;
             case SPACE:
-//                if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
-                    spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
-//                } else {
-//                    spaceTerrainGenerator.replaceBlocksForBiomeOutside(chunkX, chunkZ, primer, biomes);
-//                }
+                spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
                 break;
         }
     }
