@@ -1485,6 +1485,35 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
         }
 
+
+        /*
+        [06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:45]: profile = biosphere
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:46]: provider.hasMansion = false
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:47]: buildingType = building2
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:48]: floors = 3
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:49]: floorsBelowGround = 1
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:50]: cityLevel = 2
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:51]: isCity = true
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:52]: chunkX = 56
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:53]: chunkZ = -135
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:54]: getCityStyle() = citystyle_standard
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:55]: streetType = NORMAL
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:56]: ruinHeight = 0.7517146
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:57]: getHighwayXLevel() = -1
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:58]: getHighwayZLevel() = -1
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:59]: getChestTodo().size() = 0
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:60]: getMobSpawnerTodo().size() = 0
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:63]: reldist = 0.2283511
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:66]: railInfo.getType() = NONE
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:67]: railInfo.getLevel() = 0
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:68]: railInfo.getDirection() = BI
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:69]: railInfo.getRails() = 0
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:72]: sphere.cityCenter = ChunkCoord{dimension=0, chunkX=56, chunkZ=-136}
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:73]: sphere.isEnabled() = true
+[06:23:30] [Server thread/INFO]: [mcjty.lostcities.commands.CommandDebug:execute:74]: sphere.radius = 77.6
+
+         */
+
         int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * 6.0f));
 
         for (int x = 0; x < 16; ++x) {
