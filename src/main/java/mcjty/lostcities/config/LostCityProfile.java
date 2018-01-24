@@ -23,6 +23,7 @@ public class LostCityProfile {
     private final boolean isPublic;
 
     private String description = "Default generation, common cities, explosions";
+    private String extraDescription = "";
     private String worldStyle = "standard";
     private String iconFile = "";
     private ResourceLocation icon;
@@ -219,7 +220,7 @@ public class LostCityProfile {
 
     private void initLostcity(Configuration cfg) {
         description = cfg.getString("description", categoryLostcity, inheritFrom.orElse(this).description, "The description of this profile");
-        description = cfg.getString("description", categoryLostcity, inheritFrom.orElse(this).description, "The description of this profile");
+        extraDescription = cfg.getString("extraDescription", categoryLostcity, inheritFrom.orElse(this).extraDescription, "Additional information");
         worldStyle = cfg.getString("worldStyle", categoryLostcity, inheritFrom.orElse(this).worldStyle, "The worldstyle used by this profile (defined in the assets)");
         iconFile = cfg.getString("icon", categoryLostcity, inheritFrom.orElse(this).iconFile, "The icon to use in the configuration screen (64x64)");
 
@@ -402,6 +403,14 @@ public class LostCityProfile {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getExtraDescription() {
+        return extraDescription;
+    }
+
+    public void setExtraDescription(String extraDescription) {
+        this.extraDescription = extraDescription;
     }
 
     public void setWorldStyle(String worldStyle) {

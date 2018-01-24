@@ -132,6 +132,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("nodamage", true);
         profile.setDescription("Like default but no explosion damage");
+        profile.setExtraDescription("Ruins and rubble are disabled and ravines are disabled in cities");
         profile.setIconFile("textures/gui/icon_nodamage.png");
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
@@ -143,6 +144,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("floating", true);
         profile.setDescription("Cities on floating islands");
+        profile.setExtraDescription("Note! No villages or strongholds in this profile!");
         profile.setIconFile("textures/gui/icon_floating.png");
         profile.CITY_CHANCE = 0.03f;
         profile.LANDSCAPE_TYPE = LandscapeType.FLOATING;
@@ -166,6 +168,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("space", true);
         profile.setDescription("Cities in floating glass bubbles");
+        profile.setExtraDescription("Note! No villages or strongholds in this profile!");
         profile.setIconFile("textures/gui/icon_space.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.WATERLEVEL_OFFSET = 70;
@@ -196,6 +199,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("waterbubbles", true);
         profile.setDescription("Cities in drowned glass bubbles");
+        profile.setExtraDescription("Note! No villages or strongholds in this profile!");
         profile.setIconFile("textures/gui/icon_bubbles.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.WATERLEVEL_OFFSET = -30;
@@ -228,6 +232,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("biosphere", true);
         profile.setDescription("Jungles in big glass bubbles on a barren landscape");
+        profile.setExtraDescription("This profile works best with Biomes O Plenty");
         profile.setIconFile("textures/gui/icon_biosphere.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
@@ -313,6 +318,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("ancient", true);
         profile.setDescription("Ancient jungle city, vines and leafs, ruined buildings");
+        profile.setExtraDescription("Note! This disables many biomes like deserts, plains, extreme hills, ...");
         profile.setIconFile("textures/gui/icon_ancient.png");
         profile.THICKNESS_OF_RANDOM_LEAFBLOCKS = 6;
         profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.05f;
@@ -331,7 +337,8 @@ public class LostCityConfiguration {
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("wasteland", true);
-        profile.setDescription("Wasteland, no water, bare land (can use BOP biomes)");
+        profile.setDescription("Wasteland, no water, bare land");
+        profile.setExtraDescription("This profile works best with Biomes O Plenty");
         profile.setIconFile("textures/gui/icon_wasteland.png");
         profile.WATERLEVEL_OFFSET = 70;
         profile.AVOID_WATER = true;

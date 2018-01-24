@@ -38,9 +38,19 @@ public class GuiLostCityConfiguration extends GuiScreen {
         }
 
         page = 0;
-        numpages = (LostCityConfiguration.profiles.size() + 7) / 8;
+        numpages = (countPublicProfiles() + 7) / 8;
 
         setupGui(profileName);
+    }
+
+    private int countPublicProfiles() {
+        int cnt = 0;
+        for (Map.Entry<String, LostCityProfile> entry : LostCityConfiguration.profiles.entrySet()) {
+            if (entry.getValue().isPublic()) {
+                cnt++;
+            }
+        }
+        return cnt;
     }
 
     private void setupGui(String profileName) {
@@ -134,8 +144,13 @@ public class GuiLostCityConfiguration extends GuiScreen {
                 if (name != null) {
                     LostCityProfile profile = LostCityConfiguration.profiles.get(name);
                     if (profile != null && profile.getIcon() != null) {
+                        int bx = button.x + 95;
+                        int by = button.y + 6;
+                        drawGradientRect(bx-5, by-5, bx + 320, by + 85, 0xffffffff, 0xffffffff);
                         mc.getTextureManager().bindTexture(profile.getIcon());
-                        drawScaledCustomSizeModalRect(mouseX, mouseY, 0, 0, 128, 128, 64, 64, 128, 128);
+                        drawScaledCustomSizeModalRect(bx, by, 0, 0, 128, 128, 80, 80, 128, 128);
+                        String output = profile.getDescription() + "\n" + profile.getExtraDescription();
+                        mc.fontRenderer.drawSplitString(output, bx + 90, by, 220, 0xff000000);
                     }
                 }
             }
