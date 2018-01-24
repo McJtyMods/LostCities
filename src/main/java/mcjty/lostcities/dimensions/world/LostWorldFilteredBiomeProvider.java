@@ -39,6 +39,9 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
 
     @Override
     public Biome getBiome(BlockPos pos) {
+        if (!(world instanceof WorldServer)) {
+            return original.getBiome(pos);
+        }
         LostCityProfile profile = getProvider().getProfile();
         Biome originalBiome = original.getBiome(pos);
 
@@ -65,6 +68,9 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
     }
 
     private void translateList(Biome[] biomes, int topx, int topz, int width, int height) {
+        if (!(world instanceof WorldServer)) {
+            return;
+        }
         LostCityProfile profile = getProvider().getProfile();
         if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             int chunkX = (topx) >> 4;
