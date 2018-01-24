@@ -5,7 +5,9 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.gui.GuiLostCityConfiguration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiCreateWorld;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.IChunkGenerator;
@@ -69,4 +71,29 @@ public class LostWorldTypeBOP extends WorldType {
         mc.displayGuiScreen(new GuiLostCityConfiguration(guiCreateWorld));
     }
 
+    @Override
+    public int getSpawnFuzz(WorldServer world, MinecraftServer server) {
+        LostCityProfile profile = LostWorldType.getProfile(world);
+        switch (profile.LANDSCAPE_TYPE) {
+            case DEFAULT:
+            case FLOATING:
+                return super.getSpawnFuzz(world, server);
+            case SPACE:
+                return 0;
+        }
+        return super.getSpawnFuzz(world, server);
+    }
+
+    @Override
+    public int getMinimumSpawnHeight(World world) {
+        LostCityProfile profile = LostWorldType.getProfile(world);
+        switch (profile.LANDSCAPE_TYPE) {
+            case DEFAULT:
+            case FLOATING:
+                return super.getMinimumSpawnHeight(world);
+            case SPACE:
+                return profile.GROUNDLEVEL;
+        }
+        return super.getMinimumSpawnHeight(world);
+    }
 }
