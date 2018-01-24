@@ -206,7 +206,20 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
         ChunkPrimer chunkprimer = getChunkPrimer(chunkX, chunkZ, isCity);
 
-        terrainGenerator.generate(chunkX, chunkZ, chunkprimer);
+        try {
+            terrainGenerator.generate(chunkX, chunkZ, chunkprimer);
+        } catch (Exception e) {
+            LostCities.logger.error("An exception occured while generating chunk: " + chunkX + "," + chunkZ, e);
+            BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, this);
+            LostCities.logger.error("    Chunk profile: " + info.profile.getName());
+            LostCities.logger.error("    Is City: " + info.isCity());
+            LostCities.logger.error("    Building type: " + info.getBuildingType());
+            LostCities.logger.error("    City level: " + info.getCityLevel());
+            LostCities.logger.error("    City ground level: " + info.getCityGroundLevel());
+            LostCities.logger.error("    Num floors: " + info.getNumFloors());
+            LostCities.logger.error("    Num cellars: " + info.getNumCellars());
+            throw (e);
+        }
 
         BiomeProvider biomeProvider = this.worldObj.getBiomeProvider();
         this.biomesForGeneration = biomeProvider.getBiomes(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
