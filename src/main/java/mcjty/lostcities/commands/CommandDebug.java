@@ -58,6 +58,10 @@ public class CommandDebug implements ICommand {
             System.out.println("getHighwayZLevel() = " + info.getHighwayZLevel());
             System.out.println("getChestTodo().size() = " + info.getChestTodo().size());
             System.out.println("getMobSpawnerTodo().size() = " + info.getMobSpawnerTodo().size());
+
+            float reldist = BuildingInfo.getRelativeDistanceToCityCenter(info.chunkX, info.chunkZ, provider);
+            System.out.println("reldist = " + reldist);
+
             Railway.RailChunkInfo railInfo = Railway.getRailChunkType(info.chunkX, info.chunkZ, info.provider, info.profile);
             System.out.println("railInfo.getType() = " + railInfo.getType());
             System.out.println("railInfo.getLevel() = " + railInfo.getLevel());

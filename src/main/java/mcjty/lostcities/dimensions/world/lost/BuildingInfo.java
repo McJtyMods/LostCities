@@ -358,7 +358,7 @@ public class BuildingInfo implements ILostChunkInfo {
             if (profile.isSpace() && characteristics.section == -1) {
                 // Minimize cities at the edge of the city in an orb
                 float dist = getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
-                if (dist > .8f) {
+                if (dist > .7f) {
                     characteristics.couldHaveBuilding = false;
                 }
             }
@@ -923,7 +923,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public static int getCityLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         if (provider.otherGenerator != null) {
             int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);
-            return getLevelBasedOnHeight(height, provider, provider.getProfile());
+            return getLevelBasedOnHeight(height, provider.getProfile());
         } else if (provider.getProfile().isSpace()) {
             return getCityLevelSpace(chunkX, chunkZ, provider);
         } else if (provider.getProfile().isFloating()) {
@@ -943,9 +943,9 @@ public class BuildingInfo implements ILostChunkInfo {
             rand.nextFloat();
             if (dist < .3f) {
                 return 2 + rand.nextInt(2);
-            } else if (dist < .5f) {
+            } else if (dist < .4f) {
                 return 1 + rand.nextInt(2);
-            } else if (dist < .7f) {
+            } else if (dist < .6f) {
                 return rand.nextInt(2);
             } else {
                 return 0;
@@ -989,7 +989,7 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             height = 100;
         }
-        return getLevelBasedOnHeight(height, provider, profile);
+        return getLevelBasedOnHeight(height, profile);
     }
 
     private static int getCityLevelFloating(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
@@ -1023,21 +1023,24 @@ public class BuildingInfo implements ILostChunkInfo {
         if (cnt > 0) {
             h = h / cnt;
         }
-        return getLevelBasedOnHeight(h, provider, provider.getProfile());
+        return getLevelBasedOnHeight(h, provider.getProfile());
     }
 
     /**
-     * Given a chunk coordinate return the relative distance (number between 0 and 1) for the neared city.
+     * Given a chunk coordinate return the relative distance (number between 0 and 1) for the nearest city sphere.
      * This only works for space type worlds!
      */
     public static float getRelativeDistanceToCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
-        ChunkCoord cityCenter = sphere.getCenter();
-        float radius = City.getCityRadius(cityCenter.getChunkX(), cityCenter.getChunkZ(), provider);
-        return (Math.abs(cityCenter.getChunkX()-chunkX) + Math.abs(cityCenter.getChunkZ()-chunkZ))*16.0f/2.0f / radius;
+        BlockPos centerPos = sphere.getCenterPos();
+        float radius = sphere.getRadius();
+        int cx = chunkX*16+8;
+        int cz = chunkZ*16+8;
+        int sqdist = (cx - centerPos.getX()) * (cx - centerPos.getX()) + (cz - centerPos.getZ()) * (cz - centerPos.getZ());
+        return (float) (Math.sqrt(sqdist) / radius);
     }
 
-    private static int getLevelBasedOnHeight(int height, LostCityChunkGenerator provider, LostCityProfile profile) {
+    private static int getLevelBasedOnHeight(int height, LostCityProfile profile) {
         if (height < profile.CITY_LEVEL0_HEIGHT) {
             return 0;
         } else if (height < profile.CITY_LEVEL1_HEIGHT) {
