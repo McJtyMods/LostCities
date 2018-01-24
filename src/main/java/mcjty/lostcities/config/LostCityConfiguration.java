@@ -422,6 +422,7 @@ public class LostCityConfiguration {
         profile.RUBBLELAYER = true;
         profile.RUBBLE_DIRT_SCALE = 2.0f;
         profile.RUBBLE_LEAVE_SCALE = 0.0f;
+        profile.BUILDING_MAXCELLARS = 2;
         profile.RUINS = true;
         profile.RUIN_CHANCE = 1.0f;
         profile.RUIN_MINLEVEL_PERCENT = 0.1f;
