@@ -241,6 +241,12 @@ public class LostCityConfiguration {
         profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "bio_wasteland";
         profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 0.5f;
+        profile.EXPLOSION_CHANCE = 0.0f;
+        profile.MINI_EXPLOSION_CHANCE = 0.01f;
+        profile.MINI_EXPLOSION_MINHEIGHT = 60;
+        profile.MINI_EXPLOSION_MAXHEIGHT = 75;
+        profile.MINI_EXPLOSION_MINRADIUS = 5;
+        profile.MINI_EXPLOSION_MAXRADIUS = 10;
         profile.WATERLEVEL_OFFSET = 70;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
