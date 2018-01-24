@@ -208,12 +208,13 @@ public class City {
             }
         }
 
-        long seed = provider.seed;
         float factor = 0;
         int offset = (profile.CITY_MAXRADIUS+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
             for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                if (isCityCenter(cx, cz, provider)) {
+                LostCityProfile pro = BuildingInfo.getProfile(cx, cz, provider);
+                // Only count cities that are in the same 'profile' as this one
+                if (pro == profile && isCityCenter(cx, cz, provider)) {
                     float radius = getCityRadius(cx, cz, provider);
                     float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
                     if (sqdist < radius * radius) {
