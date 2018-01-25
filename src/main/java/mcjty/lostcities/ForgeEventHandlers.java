@@ -32,6 +32,7 @@ public class ForgeEventHandlers {
             LostCityProfile profile = LostWorldType.getProfile(world);
             switch (profile.LANDSCAPE_TYPE) {
                 case DEFAULT:
+                case CAVERN:
                     break;
                 case FLOATING:
                 case SPACE:

@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.api.RailChunkType;
-import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.varia.ChunkCoord;

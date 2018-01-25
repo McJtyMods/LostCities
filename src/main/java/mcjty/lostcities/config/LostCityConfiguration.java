@@ -23,7 +23,7 @@ public class LostCityConfiguration {
     public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
     public static final String PRIVATE_PROFILES_COMMENT = "List of privatep profiles that cannot be selected by the player but are only used as a child profile of another one";
 
-    public static final String[] DEFAULT_PROFILES = new String[]{"default", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
+    public static final String[] DEFAULT_PROFILES = new String[]{"default", "cavern", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
     public static final String[] PRIVATE_PROFILES = new String[]{"bio_wasteland", "water_empty"};
 
     public static String[] ASSETS = new String[] {
@@ -42,7 +42,7 @@ public class LostCityConfiguration {
 
     public static String[] ADAPTING_WORLDTYPES = new String[] {};
 
-    public static int VERSION = 6;
+    public static int VERSION = 7;
 
     public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
@@ -128,6 +128,16 @@ public class LostCityConfiguration {
     private static void initStandardProfiles() {
         LostCityProfile profile = new LostCityProfile("default", true);
         profile.setIconFile("textures/gui/icon_default.png");
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("cavern", true);
+        profile.setDescription("This is a cavern type world (like the nether)");
+        profile.setExtraDescription("Warning! This is pretty heavy on performance!");
+        profile.LANDSCAPE_TYPE = LandscapeType.CAVERN;
+        profile.EXPLOSION_CHANCE = 0;
+        profile.MINI_EXPLOSION_CHANCE = 0;
+        profile.GENERATE_LIGHTING = true;
+//        profile.setIconFile("textures/gui/icon_default.png");
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("nodamage", true);

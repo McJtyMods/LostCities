@@ -1,6 +1,7 @@
-package mcjty.lostcities.dimensions.world;
+package mcjty.lostcities.dimensions.world.terraingen;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.varia.ChunkCoord;

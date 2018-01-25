@@ -3,9 +3,9 @@ package mcjty.lostcities.dimensions.world.lost;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
-import mcjty.lostcities.dimensions.world.LostCitiesTerrainGenerator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
+import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
 import mcjty.lostcities.varia.QualityRandom;
@@ -928,11 +928,20 @@ public class BuildingInfo implements ILostChunkInfo {
             return getCityLevelSpace(chunkX, chunkZ, provider);
         } else if (provider.getProfile().isFloating()) {
             return getCityLevelFloating(chunkX, chunkZ, provider);
+        } else if (provider.getProfile().isCavern()) {
+            return getCityLevelCavern(chunkX, chunkZ, provider);
         } else {
             return getCityLevelNormal(chunkX, chunkZ, provider, provider.getProfile());
 
         }
     }
+
+    private static int getCityLevelCavern(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        // @todo for now
+        return getCityLevelNormal(chunkX, chunkZ, provider, provider.getProfile());
+    }
+
+
 
     private static int getCityLevelSpace(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {

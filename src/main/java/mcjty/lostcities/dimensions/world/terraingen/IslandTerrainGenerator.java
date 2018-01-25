@@ -1,5 +1,6 @@
-package mcjty.lostcities.dimensions.world;
+package mcjty.lostcities.dimensions.world.terraingen;
 
+import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -282,7 +283,6 @@ public class IslandTerrainGenerator {
 //        }
 
         double d0 = 0.03125D;
-//        this.stoneNoise = this.noiseGen4.generateNoiseOctaves(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
         this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, 0.0625D, 0.0625D, 1.0D);
 
         for (int k = 0; k < 16; ++k) {

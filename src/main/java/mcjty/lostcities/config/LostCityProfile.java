@@ -233,7 +233,11 @@ public class LostCityProfile {
 
         String type = cfg.getString("landscapeType", categoryLostcity, inheritFrom.orElse(this).LANDSCAPE_TYPE.getName(),
                 "Type of landscape",
-                new String[] { LandscapeType.DEFAULT.getName(), LandscapeType.FLOATING.getName(), LandscapeType.SPACE.getName() });
+                new String[] {
+                        LandscapeType.DEFAULT.getName(),
+                        LandscapeType.FLOATING.getName(),
+                        LandscapeType.SPACE.getName(),
+                        LandscapeType.CAVERN.getName() });
         LANDSCAPE_TYPE = LandscapeType.getTypeByName(type);
         if (LANDSCAPE_TYPE == null) {
             throw new RuntimeException("Bad landscape type: " + type + "!");
@@ -452,4 +456,6 @@ public class LostCityProfile {
     public boolean isSpace() {
         return LANDSCAPE_TYPE == LandscapeType.SPACE;
     }
+
+    public boolean isCavern() { return LANDSCAPE_TYPE == LandscapeType.CAVERN; }
 }

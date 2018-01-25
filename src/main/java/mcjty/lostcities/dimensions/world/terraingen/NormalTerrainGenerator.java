@@ -1,5 +1,6 @@
-package mcjty.lostcities.dimensions.world;
+package mcjty.lostcities.dimensions.world.terraingen;
 
+import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
 import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.util.math.MathHelper;

@@ -1,7 +1,9 @@
-package mcjty.lostcities.dimensions.world;
+package mcjty.lostcities.dimensions.world.terraingen;
 
 import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
+import mcjty.lostcities.dimensions.world.ChunkHeightmap;
+import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -22,8 +24,6 @@ import net.minecraftforge.common.MinecraftForge;
 
 import java.util.*;
 import java.util.function.BiFunction;
-
-import static mcjty.lostcities.dimensions.world.IslandTerrainGenerator.ISLANDS;
 
 public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
@@ -68,7 +68,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private static char randomLeafs[] = null;
 
 
-    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(ISLANDS);
+    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(IslandTerrainGenerator.ISLANDS);
+    private CavernTerrainGenerator cavernTerrainGenerator = new CavernTerrainGenerator();
     private SpaceTerrainGenerator spaceTerrainGenerator = new SpaceTerrainGenerator();
 
 
@@ -81,6 +82,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         this.ruinNoise = new NoiseGeneratorPerlin(provider.rand, 4);
 
         islandTerrainGenerator.setup(provider.worldObj, provider);
+        cavernTerrainGenerator.setup(provider.worldObj, provider);
         spaceTerrainGenerator.setup(provider.worldObj, provider);
     }
 
@@ -344,6 +346,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             case SPACE:
                 spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
                 break;
+            case CAVERN:
+                cavernTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
+                break;
         }
     }
 
@@ -357,6 +362,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 break;
             case SPACE:
                 spaceTerrainGenerator.generate(chunkX, chunkZ, primer);
+                break;
+            case CAVERN:
+                cavernTerrainGenerator.generate(chunkX, chunkZ, primer);
                 break;
         }
     }
@@ -2134,13 +2142,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (height > 1 && height < lowestLevel - 1) {
                         PrimerTools.setBlockStateRange(primer, index + height + 1, index + lowestLevel, baseChar);
                     }
+                    // Also clear the inside of buildings to avoid geometry that doesn't really belong there
                     clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6);
                 }
             }
         } else if (info.profile.isSpace()) {
             fillToGround(primer, info, lowestLevel, borderBlock);
         } else {
-            // For normal worldgen (non floating) we have a thin layer of 'border' blocks because that looks nicer
+            // For normal worldgen (non floating) or cavern we have a thin layer of 'border' blocks because that looks nicer
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     int index = (x << 12) | (z << 8);
@@ -2157,6 +2166,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (primer.data[index + lowestLevel] == airChar) {
                         char filler = palette.get(fillerBlock);
                         primer.data[index + lowestLevel] = filler;      // There is nothing below so we fill this with the filler
+                    }
+
+                    if (info.profile.isCavern()) {
+                        // Also clear the inside of buildings to avoid geometry that doesn't really belong there
+                        clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6);
                     }
                 }
             }

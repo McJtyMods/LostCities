@@ -6,7 +6,8 @@ import java.util.Map;
 public enum LandscapeType {
     DEFAULT("default"),
     FLOATING("floating"),
-    SPACE("space");
+    SPACE("space"),
+    CAVERN("cavern");
 
     private final String name;
 

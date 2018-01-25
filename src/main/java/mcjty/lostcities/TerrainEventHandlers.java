@@ -1,12 +1,10 @@
 package mcjty.lostcities;
 
-import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostBiomeDecorator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.LostWorldType;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
-import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;

@@ -76,6 +76,7 @@ public class LostWorldType extends WorldType {
             case FLOATING:
                 return super.getSpawnFuzz(world, server);
             case SPACE:
+            case CAVERN:
                 return 0;
         }
         return super.getSpawnFuzz(world, server);
@@ -123,6 +124,7 @@ public class LostWorldType extends WorldType {
             case FLOATING:
                 return super.getMinimumSpawnHeight(world);
             case SPACE:
+            case CAVERN:
                 return profile.GROUNDLEVEL;
         }
         return super.getMinimumSpawnHeight(world);
