@@ -5,6 +5,7 @@ import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.dimensions.world.lost.LostStructureOceanMonument;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.Condition;
@@ -409,7 +410,17 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                     int level = (pos.getY() - profile.GROUNDLEVEL) / 6;
                     int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
                     ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
-                            todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ);
+                            todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
+                        @Override
+                        public boolean isSphere() {
+                            return CitySphere.isInSphere(chunkX, chunkZ, pos, LostCityChunkGenerator.this);
+                        }
+
+                        @Override
+                        public String getBiome() {
+                            return world.getBiome(pos).getBiomeName();
+                        }
+                    };
                     String randomValue = cnd.getRandomValue(random, conditionContext);
                     if (randomValue == null) {
                         throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
@@ -462,7 +473,17 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                 int level = (pos.getY() - profile.GROUNDLEVEL) / 6;
                 int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
                 ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
-                        todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ);
+                        todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
+                    @Override
+                    public boolean isSphere() {
+                        return CitySphere.isInSphere(info.chunkX, info.chunkZ, pos, LostCityChunkGenerator.this);
+                    }
+
+                    @Override
+                    public String getBiome() {
+                        return world.getBiome(pos).getBiomeName();
+                    }
+                };
                 String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);
                 if (randomValue == null) {
                     throw new RuntimeException("Condition '" + lootTable + "' did not return a table under certain conditions!");

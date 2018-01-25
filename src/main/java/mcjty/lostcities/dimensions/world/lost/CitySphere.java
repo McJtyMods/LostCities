@@ -65,6 +65,20 @@ public class CitySphere {
         sphere.setBlocks(glass, base, side);
     }
 
+    public static boolean isInSphere(int chunkX, int chunkZ, BlockPos pos, LostCityChunkGenerator provider) {
+        boolean sphere = false;
+        if (provider.getProfile().isSpace()) {
+            CitySphere citySphere = getCitySphere(chunkX, chunkZ, provider);
+            if (citySphere.isEnabled()) {
+                double sqdist = squaredDistance(citySphere.getCenterPos().getX(), citySphere.getCenterPos().getZ(), pos.getX(), pos.getZ());
+                if (sqdist <= citySphere.getRadius() * citySphere.getRadius()) {
+                    sphere = true;
+                }
+            }
+        }
+        return sphere;
+    }
+
     public ChunkCoord getCenter() {
         return center;
     }

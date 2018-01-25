@@ -781,7 +781,22 @@ public class BuildingInfo implements ILostChunkInfo {
         Building building = (Building) getBuilding();
         for (int i = 0; i <= floors + floorsBelowGround; i++) {
             ConditionContext conditionContext = new ConditionContext(cityLevel + i - floorsBelowGround, i - floorsBelowGround, floorsBelowGround, floors, "<none>", building.getName(),
-                    chunkX, chunkZ);
+                    chunkX, chunkZ) {
+                @Override
+                public boolean isBuilding() {
+                    return true;
+                }
+
+                @Override
+                public boolean isSphere() {
+                    return CitySphere.isInSphere(chunkX, chunkZ, new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8), provider);
+                }
+
+                @Override
+                public String getBiome() {
+                    return provider.worldObj.getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).getBiomeName();
+                }
+            };
             String randomPart = building.getRandomPart(rand, conditionContext);
             floorTypes[i] = AssetRegistries.PARTS.get(randomPart);
             randomPart = building.getRandomPart2(rand, conditionContext);

@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Predicate;
 
-public class ConditionContext {
+public abstract class ConditionContext {
     private final int level;        // Global level in world with 0 being to lowest possible level where a building section can be
     private final int floor;        // Level of the building with 0 being the ground floor. floor == floorsAboveGround means the top of the building section
     private final int floorsBelowGround;    // 0 means nothing below ground
@@ -53,6 +53,22 @@ public class ConditionContext {
                 test = combine(test, levelInfo -> !levelInfo.isGroundFloor());
             }
         }
+        if (obj.has("isbuilding")) {
+            boolean ground = obj.get("isbuilding").getAsBoolean();
+            if (ground) {
+                test = combine(test, levelInfo -> levelInfo.isBuilding());
+            } else {
+                test = combine(test, levelInfo -> !levelInfo.isBuilding());
+            }
+        }
+        if (obj.has("issphere")) {
+            boolean ground = obj.get("issphere").getAsBoolean();
+            if (ground) {
+                test = combine(test, levelInfo -> levelInfo.isSphere());
+            } else {
+                test = combine(test, levelInfo -> !levelInfo.isSphere());
+            }
+        }
         if (obj.has("chunkx")) {
             int chunkX = obj.get("chunkx").getAsInt();
             test = combine(test, context -> chunkX == context.getChunkX());
@@ -68,6 +84,10 @@ public class ConditionContext {
         if (obj.has("inbuilding")) {
             String building = obj.get("inbuilding").getAsString();
             test = combine(test, context -> building.equals(context.getBuilding()));
+        }
+        if (obj.has("inbiome")) {
+            String biome = obj.get("inbiome").getAsString();
+            test = combine(test, context -> biome.equals(context.getBiome()));
         }
         if (obj.has("cellar")) {
             boolean cellar = obj.get("cellar").getAsBoolean();
@@ -119,6 +139,14 @@ public class ConditionContext {
     public boolean isGroundFloor() {
         return floor == 0;
     }
+
+    public boolean isBuilding() {
+        return !"<none>".equals(building);
+    }
+
+    public abstract boolean isSphere();
+
+    public abstract String getBiome();
 
     public boolean isTopOfBuilding() {
         return floor >= floorsAboveGround;
