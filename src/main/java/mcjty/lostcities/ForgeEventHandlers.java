@@ -13,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 public class ForgeEventHandlers {
@@ -28,23 +30,35 @@ public class ForgeEventHandlers {
     public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
         World world = event.getWorld();
         if (!world.isRemote) {
-            // Potentially set the spawn point
+
             LostCityProfile profile = LostWorldType.getProfile(world);
+            Biome spawnBiome = null;
+            if (!profile.SPAWN_BIOME.isEmpty()) {
+                spawnBiome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(profile.SPAWN_BIOME));
+                if (spawnBiome == null) {
+                    LostCities.logger.error("Cannot find biome '" + profile.SPAWN_BIOME + "' for the player to spawn in !");
+                }
+            }
+
+            // Potentially set the spawn point
             switch (profile.LANDSCAPE_TYPE) {
                 case DEFAULT:
                 case CAVERN:
+                    if (spawnBiome != null) {
+                        findSafeSpawnPoint(world, spawnBiome);
+                        event.setCanceled(true);
+                    }
                     break;
                 case FLOATING:
                 case SPACE:
-                    findSafeSpawnPoint(world);
+                    findSafeSpawnPoint(world, spawnBiome);
                     event.setCanceled(true);
                     break;
             }
         }
 
     }
-
-    private void findSafeSpawnPoint(World world) {
+    private void findSafeSpawnPoint(World world, @Nullable Biome spawnBiome) {
         Random rand = new Random(world.getSeed());
         rand.nextFloat();
         rand.nextFloat();
@@ -56,6 +70,14 @@ public class ForgeEventHandlers {
                 int x = rand.nextInt(radius * 2) - radius;
                 int z = rand.nextInt(radius * 2) - radius;
                 attempts++;
+
+                if (spawnBiome != null) {
+                    Biome biome = world.getBiome(new BlockPos(x, 128, z));
+                    if (spawnBiome != biome) {
+                        continue;
+                    }
+                }
+
                 for (int y = bottom ; y < 150 ; y++) {
                     BlockPos pos = new BlockPos(x, y, z);
                     IBlockState state = world.getBlockState(pos);
@@ -68,24 +90,6 @@ public class ForgeEventHandlers {
             radius += 100;
         }
     }
-
-
-//    @SubscribeEvent
-//    public void onWorldLoad(WorldEvent.Load event) {
-//        World world = event.getWorld();
-//        if (!world.isRemote && world.provider.getDimension() == 0) {
-//            // Potentially set the spawn point
-//            LostCityProfile profile = LostWorldType.getProfile(world);
-//            switch (profile.LANDSCAPE_TYPE) {
-//                case DEFAULT:
-//                    break;
-//                case FLOATING:
-//                case SPACE:
-//                    findSafeSpawnPoint(world);
-//                    break;
-//            }
-//        }
-//    }
 
     @SubscribeEvent
     public void onPlayerSleepInBedEvent(PlayerSleepInBedEvent event) {

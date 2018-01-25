@@ -1,7 +1,6 @@
 package mcjty.lostcities;
 
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.world.LostBiomeDecorator;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.LostWorldType;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
@@ -11,18 +10,11 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
-import net.minecraftforge.event.terraingen.BiomeEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class TerrainEventHandlers {
-
-//    @SubscribeEvent
-    public void onCreateDecorator(BiomeEvent.CreateDecorator event) {
-        event.setNewBiomeDecorator(new LostBiomeDecorator(event.getOriginalBiomeDecorator()));
-    }
-
 
     @SubscribeEvent
     public void onCreateDecorate(DecorateBiomeEvent.Decorate event) {

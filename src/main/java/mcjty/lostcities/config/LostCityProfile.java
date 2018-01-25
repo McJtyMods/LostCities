@@ -141,6 +141,8 @@ public class LostCityProfile {
     public boolean GENERATE_LAKES = true;
     public boolean GENERATE_DUNGEONS = true;
 
+    public String SPAWN_BIOME = "";
+
     public int MAX_CAVE_HEIGHT = 128;
 
     public LandscapeType LANDSCAPE_TYPE = LandscapeType.DEFAULT;
@@ -224,6 +226,7 @@ public class LostCityProfile {
         worldStyle = cfg.getString("worldStyle", categoryLostcity, inheritFrom.orElse(this).worldStyle, "The worldstyle used by this profile (defined in the assets)");
         iconFile = cfg.getString("icon", categoryLostcity, inheritFrom.orElse(this).iconFile, "The icon to use in the configuration screen (64x64)");
 
+        SPAWN_BIOME = cfg.getString("spawnBiome", categoryLostcity, inheritFrom.orElse(this).SPAWN_BIOME, "When this is set the player will always spawn in the given biome");
         VINE_CHANCE = cfg.getFloat("vineChance", categoryLostcity, inheritFrom.orElse(this).VINE_CHANCE, 0.0f, 1.0f, "The chance that a block on the outside of a building will be covered with a vine");
         CHANCE_OF_RANDOM_LEAFBLOCKS = cfg.getFloat("randomLeafBlockChance", categoryLostcity, inheritFrom.orElse(this).CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f, "Chance that leafblocks will be generated at the border of a building and a street");
         THICKNESS_OF_RANDOM_LEAFBLOCKS = cfg.getInt("randomLeafBlockThickness", categoryLostcity, inheritFrom.orElse(this).THICKNESS_OF_RANDOM_LEAFBLOCKS, 1, 8,

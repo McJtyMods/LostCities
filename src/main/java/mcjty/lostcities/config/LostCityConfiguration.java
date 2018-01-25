@@ -251,6 +251,7 @@ public class LostCityConfiguration {
         profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "bio_wasteland";
         profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 0.5f;
+        profile.SPAWN_BIOME = "jungle";
         profile.EXPLOSION_CHANCE = 0.0f;
         profile.MINI_EXPLOSION_CHANCE = 0.01f;
         profile.MINI_EXPLOSION_MINHEIGHT = 60;
