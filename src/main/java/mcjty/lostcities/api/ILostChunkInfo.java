@@ -88,4 +88,10 @@ public interface ILostChunkInfo {
      * Return the maximum highway level at this chunk. Returns -1 if there is no highway here
      */
     int getMaxHighwayLevel();
+
+    /**
+     * Get a sphere that contains this chunk (if there is one)
+     */
+    @Nullable
+    ILostSphere getSphere();
 }

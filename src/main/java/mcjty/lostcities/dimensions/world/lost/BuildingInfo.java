@@ -1649,4 +1649,10 @@ public class BuildingInfo implements ILostChunkInfo {
         }
         return (int) (getCityGroundLevel() + 1 + (ruinHeight * getNumFloors() * 6.0f));
     }
+
+    @Nullable
+    @Override
+    public ILostSphere getSphere() {
+        return CitySphere.getCitySphere(chunkX, chunkZ, provider);
+    }
 }

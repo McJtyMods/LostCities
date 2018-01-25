@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.api.ILostSphere;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
@@ -16,7 +17,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class CitySphere {
+public class CitySphere implements ILostSphere {
 
     private static Map<ChunkCoord, CitySphere> citySphereCache = new HashMap<>();
     private static Map<ChunkCoord, PredefinedSphere> predefinedSphereMap = Collections.emptyMap();
@@ -79,18 +80,22 @@ public class CitySphere {
         return sphere;
     }
 
+    @Override
     public ChunkCoord getCenter() {
         return center;
     }
 
+    @Override
     public BlockPos getCenterPos() {
         return centerPos;
     }
 
+    @Override
     public float getRadius() {
         return radius;
     }
 
+    @Override
     @Nullable
     public Biome getBiome() {
         return biome;
@@ -102,6 +107,7 @@ public class CitySphere {
         this.sideBlock = sideBlock;
     }
 
+    @Override
     public boolean isEnabled() {
         return enabled;
     }
