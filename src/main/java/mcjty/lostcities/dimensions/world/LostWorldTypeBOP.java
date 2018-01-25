@@ -27,6 +27,17 @@ public class LostWorldTypeBOP extends WorldType {
         return new LostCityChunkGenerator(world, world.getSeed());
     }
 
+    @Override
+    public double getHorizon(World world) {
+        LostCityProfile profile = WorldTypeTools.getProfile(world);
+        if (profile.HORIZON < 0) {
+            return super.getHorizon(world);
+        } else {
+            return profile.HORIZON;
+        }
+    }
+
+
     private BiomeProvider getInternalBiomeProvider(World world) {
         if (biomeProvider == null) {
             for (WorldType type : WorldType.WORLD_TYPES) {

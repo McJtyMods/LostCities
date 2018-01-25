@@ -1,9 +1,12 @@
 package mcjty.lostcities.proxy;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import mcjty.lostcities.ClientEventHandlers;
+import mcjty.lostcities.ForgeEventHandlers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -19,6 +22,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void init(FMLInitializationEvent e) {
         super.init(e);
+        MinecraftForge.EVENT_BUS.register(new ClientEventHandlers());
     }
 
     @Override

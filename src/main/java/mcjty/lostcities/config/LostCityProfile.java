@@ -143,6 +143,9 @@ public class LostCityProfile {
     public boolean GENERATE_DUNGEONS = true;
 
     public float HORIZON = -1f;
+    public float FOG_RED = -1.0f;
+    public float FOG_GREEN = -1.0f;
+    public float FOG_BLUE = -1.0f;
 
     public String SPAWN_BIOME = "";
 
@@ -215,6 +218,9 @@ public class LostCityProfile {
 
     private void initClient(Configuration cfg) {
         HORIZON = cfg.getFloat("horizon", categoryClient, inheritFrom.orElse(this).HORIZON, -1f, 256f, "This is used client-side (but only if the client has this mod) to set the height of the horizon");
+        FOG_RED = cfg.getFloat("fogRed", categoryClient, inheritFrom.orElse(this).FOG_RED, -1f, 1f, "This is used client-side (but only if the client has this mod) for the fog color");
+        FOG_GREEN = cfg.getFloat("fogGreen", categoryClient, inheritFrom.orElse(this).FOG_GREEN, -1f, 1f, "This is used client-side (but only if the client has this mod) for the fog color");
+        FOG_BLUE = cfg.getFloat("fogBlue", categoryClient, inheritFrom.orElse(this).FOG_BLUE, -1f, 1f, "This is used client-side (but only if the client has this mod) for the fog color");
     }
 
     private void initCitySpheres(Configuration cfg) {

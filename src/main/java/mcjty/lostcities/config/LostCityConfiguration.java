@@ -138,6 +138,9 @@ public class LostCityConfiguration {
         profile.setExtraDescription("Warning! This is pretty heavy on performance!");
         profile.LANDSCAPE_TYPE = LandscapeType.CAVERN;
         profile.HORIZON = 128;
+        profile.FOG_RED = 0.0f;
+        profile.FOG_GREEN = 0.0f;
+        profile.FOG_BLUE = 0.0f;
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
         profile.GENERATE_LIGHTING = true;
