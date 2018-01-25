@@ -54,7 +54,7 @@ public class LostWorldProvider extends WorldProvider {
 
         LostCityProfile profile = LostCityConfiguration.profiles.get(LostCityConfiguration.DIMENSION_PROFILE);
         if (profile == null) {
-            profile = LostWorldType.getProfile(world);
+            profile = WorldTypeTools.getProfile(world);
         }
         BiomeProvider biomeProvider;
         if (LostCities.biomesoplenty && LostCityConfiguration.DIMENSION_BOP) {

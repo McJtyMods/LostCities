@@ -2,7 +2,7 @@ package mcjty.lostcities;
 
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.LostWorldType;
+import mcjty.lostcities.dimensions.world.WorldTypeTools;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -42,7 +42,7 @@ public class TerrainEventHandlers {
                 case TREE:
                 case LILYPAD:
                 case FLOWERS:
-                    LostCityProfile profile = LostWorldType.getProfile(world);
+                    LostCityProfile profile = WorldTypeTools.getProfile(world);
                     if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
                         WorldServer worldServer = (WorldServer) world;
                         LostCityChunkGenerator provider = (LostCityChunkGenerator) worldServer.getChunkProvider().chunkGenerator;

@@ -133,7 +133,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         }
 
         dimensionId = world.provider.getDimension();
-        profile = LostWorldType.getProfile(world);
+        profile = WorldTypeTools.getProfile(world);
         if (profile.isSpace() && !profile.CITYSPHERE_OUTSIDE_PROFILE.isEmpty()) {
             outsideProfile = LostCityConfiguration.profiles.get(profile.CITYSPHERE_OUTSIDE_PROFILE);
         } else {

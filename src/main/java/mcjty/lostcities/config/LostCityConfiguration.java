@@ -56,6 +56,9 @@ public class LostCityConfiguration {
 
     public static String SPECIAL_BED_BLOCK = Blocks.DIAMOND_BLOCK.getRegistryName().toString();
 
+
+
+
     public static String[] init(Configuration cfg) {
         cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General settings");
 
@@ -134,6 +137,7 @@ public class LostCityConfiguration {
         profile.setDescription("This is a cavern type world (like the nether)");
         profile.setExtraDescription("Warning! This is pretty heavy on performance!");
         profile.LANDSCAPE_TYPE = LandscapeType.CAVERN;
+        profile.HORIZON = 128;
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
         profile.GENERATE_LIGHTING = true;
@@ -158,6 +162,7 @@ public class LostCityConfiguration {
         profile.setIconFile("textures/gui/icon_floating.png");
         profile.CITY_CHANCE = 0.03f;
         profile.LANDSCAPE_TYPE = LandscapeType.FLOATING;
+        profile.HORIZON = 0;
         profile.WATERLEVEL_OFFSET = 70;
         profile.BUILDING_MAXCELLARS = 2;
         profile.RAILWAYS_CAN_END = true;
@@ -181,6 +186,7 @@ public class LostCityConfiguration {
         profile.setExtraDescription("Note! No villages or strongholds in this profile!");
         profile.setIconFile("textures/gui/icon_space.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
+        profile.HORIZON = 0;
         profile.WATERLEVEL_OFFSET = 70;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
@@ -212,6 +218,7 @@ public class LostCityConfiguration {
         profile.setExtraDescription("Note! No villages or strongholds in this profile!");
         profile.setIconFile("textures/gui/icon_bubbles.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
+        profile.HORIZON = 90;
         profile.WATERLEVEL_OFFSET = -30;
         profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "water_empty";
@@ -245,6 +252,7 @@ public class LostCityConfiguration {
         profile.setExtraDescription("This profile works best with Biomes O Plenty");
         profile.setIconFile("textures/gui/icon_biosphere.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
+        profile.HORIZON = 30;
         profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2" };
         profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL = 40;

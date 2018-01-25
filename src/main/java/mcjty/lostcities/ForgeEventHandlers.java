@@ -2,7 +2,7 @@ package mcjty.lostcities;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.world.LostWorldType;
+import mcjty.lostcities.dimensions.world.WorldTypeTools;
 import mcjty.lostcities.varia.CustomTeleporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
@@ -31,7 +31,7 @@ public class ForgeEventHandlers {
         World world = event.getWorld();
         if (!world.isRemote) {
 
-            LostCityProfile profile = LostWorldType.getProfile(world);
+            LostCityProfile profile = WorldTypeTools.getProfile(world);
             Biome spawnBiome = null;
             if (!profile.SPAWN_BIOME.isEmpty()) {
                 spawnBiome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(profile.SPAWN_BIOME));

@@ -1,7 +1,5 @@
 package mcjty.lostcities.dimensions.world;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.gui.GuiLostCityConfiguration;
@@ -27,50 +25,19 @@ public class LostWorldType extends WorldType {
 
     }
 
-    public static LostCityProfile getProfile(World world) {
-        if (world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
-            LostCityProfile profile = LostCityConfiguration.profiles.get(LostCityConfiguration.DIMENSION_PROFILE);
-            if (profile != null) {
-                return profile;
-            }
-        }
-        String generatorOptions = world.getWorldInfo().getGeneratorOptions();
-        LostCityProfile p;
-        if (generatorOptions == null || generatorOptions.trim().isEmpty()) {
-            p = LostCityConfiguration.profiles.get(LostCityConfiguration.DEFAULT_PROFILE);
-            if (p == null) {
-                throw new RuntimeException("Something went wrong! Profile '" + LostCityConfiguration.DEFAULT_PROFILE + "' is missing!");
-            }
-        } else {
-            JsonParser parser = new JsonParser();
-            JsonElement parsed = parser.parse(generatorOptions);
-            String profileName;
-            if (parsed.getAsJsonObject().has("profile")) {
-                profileName = parsed.getAsJsonObject().get("profile").getAsString();
-            } else {
-                profileName = LostCityConfiguration.DEFAULT_PROFILE;
-            }
-            p = LostCityConfiguration.profiles.get(profileName);
-            if (p == null) {
-                throw new RuntimeException("Something went wrong! Profile '" + profileName + "' is missing!");
-            }
-        }
-        return p;
-    }
-
     @Override
     public double getHorizon(World world) {
-        LostCityProfile profile = getProfile(world);
-        if (profile.isDefault()) {
+        LostCityProfile profile = WorldTypeTools.getProfile(world);
+        if (profile.HORIZON < 0) {
             return super.getHorizon(world);
         } else {
-            return 0;
+            return profile.HORIZON;
         }
     }
 
     @Override
     public int getSpawnFuzz(WorldServer world, MinecraftServer server) {
-        LostCityProfile profile = getProfile(world);
+        LostCityProfile profile = WorldTypeTools.getProfile(world);
         switch (profile.LANDSCAPE_TYPE) {
             case DEFAULT:
             case FLOATING:
@@ -87,11 +54,15 @@ public class LostWorldType extends WorldType {
         return new LostCityChunkGenerator(world, world.getSeed());
     }
 
+    protected BiomeProvider getInternalBiomeProvider(World world) {
+        return super.getBiomeProvider(world);
+    }
+
     @Override
     public BiomeProvider getBiomeProvider(World world) {
-        LostCityProfile profile = getProfile(world);
+        LostCityProfile profile = WorldTypeTools.getProfile(world);
         if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
-            return super.getBiomeProvider(world);
+            return getInternalBiomeProvider(world);
         } else {
             String[] outsideAllowedbiomeFactors = profile.ALLOWED_BIOME_FACTORS;
             if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE && !profile.CITYSPHERE_OUTSIDE_PROFILE.isEmpty()) {
@@ -99,7 +70,8 @@ public class LostWorldType extends WorldType {
                 outsideAllowedbiomeFactors = outProfile.ALLOWED_BIOME_FACTORS;
             }
             return new LostWorldFilteredBiomeProvider(world, super.getBiomeProvider(world),
-                    profile.ALLOWED_BIOME_FACTORS, outsideAllowedbiomeFactors);
+                    profile.ALLOWED_BIOME_FACTORS,
+                    outsideAllowedbiomeFactors);
         }
     }
 
@@ -118,7 +90,7 @@ public class LostWorldType extends WorldType {
 
     @Override
     public int getMinimumSpawnHeight(World world) {
-        LostCityProfile profile = getProfile(world);
+        LostCityProfile profile = WorldTypeTools.getProfile(world);
         switch (profile.LANDSCAPE_TYPE) {
             case DEFAULT:
             case FLOATING:

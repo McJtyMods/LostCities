@@ -17,6 +17,7 @@ public class LostCityProfile {
     public static final String CATEGORY_EXPLOSIONS = "explosions";
     public static final String CATEGORY_CITIES = "cities";
     public static final String CATEGORY_CITY_SPHERES = "cityspheres";
+    public static final String CATEGORY_CLIENT = "client";
 
     private final String name;
     private final Optional<LostCityProfile> inheritFrom;
@@ -141,6 +142,8 @@ public class LostCityProfile {
     public boolean GENERATE_LAKES = true;
     public boolean GENERATE_DUNGEONS = true;
 
+    public float HORIZON = -1f;
+
     public String SPAWN_BIOME = "";
 
     public int MAX_CAVE_HEIGHT = 128;
@@ -155,6 +158,7 @@ public class LostCityProfile {
     private String categoryExplosions;
     private String categoryCities;
     private String categoryCitySpheres;
+    private String categoryClient;
 
     public LostCityProfile(String name, boolean isPublic) {
         this.name = name;
@@ -193,17 +197,24 @@ public class LostCityProfile {
         categoryExplosions = LostCityProfile.CATEGORY_EXPLOSIONS + "_" + name;
         categoryCities = LostCityProfile.CATEGORY_CITIES + "_" + name;
         categoryCitySpheres = LostCityProfile.CATEGORY_CITY_SPHERES + "_" + name;
+        categoryClient = LostCityProfile.CATEGORY_CLIENT + "_" + name;
         cfg.addCustomCategoryComment(categoryLostcity, "Settings related to the Lost City for the " + name + " profile");
         cfg.addCustomCategoryComment(categoryStructures, "Settings related to structure generation for the " + name + " profile");
         cfg.addCustomCategoryComment(categoryExplosions, "Settings related to explosions and damage for the " + name + " profile");
         cfg.addCustomCategoryComment(categoryCities, "Settings related to city generation for the " + name + " profile");
         cfg.addCustomCategoryComment(categoryCitySpheres, "Settings related to city sphere generation for the " + name + " profile");
+        cfg.addCustomCategoryComment(categoryClient, "Client side settings for the " + name + " profile");
 
         initLostcity(cfg);
         initExplosions(cfg);
         initStructures(cfg);
         initCities(cfg);
         initCitySpheres(cfg);
+        initClient(cfg);
+    }
+
+    private void initClient(Configuration cfg) {
+        HORIZON = cfg.getFloat("horizon", categoryClient, inheritFrom.orElse(this).HORIZON, -1f, 256f, "This is used client-side (but only if the client has this mod) to set the height of the horizon");
     }
 
     private void initCitySpheres(Configuration cfg) {
