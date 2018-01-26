@@ -136,6 +136,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.DARK_OAK)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.JUNGLE)));
+            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.RED_FLOWER.getDefaultState()));
+            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.YELLOW_FLOWER.getDefaultState()));
         }
         return charactersNeedingTodo;
     }
@@ -2018,7 +2020,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                     info.getTodoChunk(rx, rz).addGenericTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                 } else {
                                     IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
-                                    if (bs.getBlock() == Blocks.SAPLING) {
+                                    Block block = bs.getBlock();
+                                    if (block instanceof BlockSapling || block instanceof BlockFlower) {
                                         if (info.profile.AVOID_FOLIAGE) {
                                             b = airChar;
                                         } else {

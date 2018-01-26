@@ -372,7 +372,6 @@ public class LostCityConfiguration {
         profile.setExtraDescription("This profile works best with Biomes O Plenty");
         profile.setIconFile("textures/gui/icon_wasteland.png");
         profile.WATERLEVEL_OFFSET = 70;
-        profile.AVOID_WATER = true;
         profile.GENERATE_LAKES = false;
         profile.GENERATE_OCEANMONUMENTS = false;
         profile.VINE_CHANCE = 0.003f;
@@ -384,7 +383,12 @@ public class LostCityConfiguration {
         profile.RUIN_CHANCE = 0.5f;
         profile.RUIN_MINLEVEL_PERCENT = 0.5f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.9f;
+        profile.AVOID_WATER = true;
         profile.AVOID_FOLIAGE = true;
+        profile.AVOID_GENERATED_LAKE_WATER = true;
+        profile.AVOID_GENERATED_LILYPADS = true;
+        profile.AVOID_GENERATED_FLOWERS = true;
+        profile.AVOID_GENERATED_REEDS = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         standardProfiles.put(profile.getName(), profile);
 
@@ -453,6 +457,10 @@ public class LostCityConfiguration {
         profile.RUIN_MINLEVEL_PERCENT = 0.1f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.4f;
         profile.AVOID_FOLIAGE = true;
+        profile.AVOID_GENERATED_LAKE_WATER = true;
+        profile.AVOID_GENERATED_LILYPADS = true;
+        profile.AVOID_GENERATED_FLOWERS = true;
+        profile.AVOID_GENERATED_REEDS = true;
         profile.GENERATE_LAKES = false;
         profile.GENERATE_MANSIONS = false;
         profile.GENERATE_MINESHAFTS = true;

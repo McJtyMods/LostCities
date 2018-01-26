@@ -3,6 +3,7 @@ package mcjty.lostcities;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.WorldTypeTools;
+import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -21,28 +22,68 @@ public class TerrainEventHandlers {
         World world = event.getWorld();
         if (!world.isRemote) {
             switch (event.getType()) {
-                case BIG_SHROOM:
-                case CACTUS:
                 case CLAY:
                 case DEAD_BUSH:
-                case DESERT_WELL:
                 case FOSSIL:
                 case ICE:
                 case LAKE_LAVA:
-                case PUMPKIN:
                 case ROCK:
                 case SAND:
                 case SAND_PASS2:
-                case SHROOM:
                 case CUSTOM:
-                case GRASS:
+                    break;
+                case DESERT_WELL:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_DESERT_WELL) {
+                        event.setResult(Event.Result.DENY);
+                    }
                     break;
                 case LAKE_WATER:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_LAKE_WATER) {
+                        event.setResult(Event.Result.DENY);
+                    }
+                    break;
+                case PUMPKIN:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_PUMPKINS) {
+                        event.setResult(Event.Result.DENY);
+                    }
+                    break;
+                case GRASS:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_GRASS) {
+                        event.setResult(Event.Result.DENY);
+                    }
+                    break;
+                case SHROOM:
+                case BIG_SHROOM:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_MUSHROOMS) {
+                        event.setResult(Event.Result.DENY);
+                    }
+                    break;
+                case CACTUS:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_CACTII) {
+                        event.setResult(Event.Result.DENY);
+                    }
+                    break;
                 case REED:
-                case TREE:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_REEDS) {
+                        event.setResult(Event.Result.DENY);
+                    }
+                    break;
                 case LILYPAD:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_LILYPADS) {
+                        event.setResult(Event.Result.DENY);
+                    }
+                    break;
                 case FLOWERS:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_FLOWERS) {
+                        event.setResult(Event.Result.DENY);
+                    }
+                    break;
+                case TREE:
                     LostCityProfile profile = WorldTypeTools.getProfile(world);
+                    if (profile.AVOID_GENERATED_TREES) {
+                        event.setResult(Event.Result.DENY);
+                        break;
+                    }
                     if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
                         WorldServer worldServer = (WorldServer) world;
                         LostCityChunkGenerator provider = (LostCityChunkGenerator) worldServer.getChunkProvider().chunkGenerator;
@@ -85,5 +126,13 @@ public class TerrainEventHandlers {
                     break;
             }
         }
+    }
+
+    private LostCityProfile getProfile(DecorateBiomeEvent.Decorate event, WorldServer world) {
+        WorldServer worldServer = world;
+        LostCityChunkGenerator provider = (LostCityChunkGenerator) worldServer.getChunkProvider().chunkGenerator;
+        int chunkX = (event.getPos().getX()) >> 4;
+        int chunkZ = (event.getPos().getZ()) >> 4;
+        return BuildingInfo.getProfile(chunkX, chunkZ, provider);
     }
 }

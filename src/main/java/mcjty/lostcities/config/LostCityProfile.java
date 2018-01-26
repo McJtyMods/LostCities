@@ -35,6 +35,16 @@ public class LostCityProfile {
     public float CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
     public int THICKNESS_OF_RANDOM_LEAFBLOCKS = 2;
     public boolean AVOID_FOLIAGE = false;
+    public boolean AVOID_GENERATED_FLOWERS = false;
+    public boolean AVOID_GENERATED_MUSHROOMS = false;
+    public boolean AVOID_GENERATED_REEDS = false;
+    public boolean AVOID_GENERATED_LILYPADS = false;
+    public boolean AVOID_GENERATED_GRASS = false;
+    public boolean AVOID_GENERATED_PUMPKINS = false;
+    public boolean AVOID_GENERATED_CACTII = false;
+    public boolean AVOID_GENERATED_TREES = false;
+    public boolean AVOID_GENERATED_LAKE_WATER = false;
+    public boolean AVOID_GENERATED_DESERT_WELL = false;
 
     public boolean RUBBLELAYER = true;
     public float RUBBLE_DIRT_SCALE = 3.0f;
@@ -249,7 +259,27 @@ public class LostCityProfile {
         THICKNESS_OF_RANDOM_LEAFBLOCKS = cfg.getInt("randomLeafBlockThickness", categoryLostcity, inheritFrom.orElse(this).THICKNESS_OF_RANDOM_LEAFBLOCKS, 1, 8,
                 "Frequency of leafblocks as seen from the sides of buildings");
         AVOID_FOLIAGE = cfg.getBoolean("avoidFoliage", categoryLostcity, inheritFrom.orElse(this).AVOID_FOLIAGE,
-                "If this is true then parks will have no generated foliage (trees currently)");
+                "If this is true then parks will have no foliage (trees and flowers currently)");
+        AVOID_GENERATED_CACTII = cfg.getBoolean("avoidGeneratedCactii", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_CACTII,
+                "This will prevent biomes from generating cactii");
+        AVOID_GENERATED_FLOWERS = cfg.getBoolean("avoidGeneratedFlowers", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_FLOWERS,
+                "This will prevent biomes from generating flowers");
+        AVOID_GENERATED_GRASS = cfg.getBoolean("avoidGeneratedGrass", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_GRASS,
+                "This will prevent biomes from generating grass");
+        AVOID_GENERATED_PUMPKINS = cfg.getBoolean("avoidGeneratedPumpkins", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_PUMPKINS,
+                "This will prevent biomes from generating pumpkins");
+        AVOID_GENERATED_LILYPADS = cfg.getBoolean("avoidGeneratedLilypads", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_LILYPADS,
+                "This will prevent biomes from generating lilypads");
+        AVOID_GENERATED_REEDS = cfg.getBoolean("avoidGeneratedReeds", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_REEDS,
+                "This will prevent biomes from generating reeds");
+        AVOID_GENERATED_TREES = cfg.getBoolean("avoidGeneratedTrees", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_TREES,
+                "This will prevent biomes from generating trees");
+        AVOID_GENERATED_MUSHROOMS = cfg.getBoolean("avoidGeneratedMushrooms", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_MUSHROOMS,
+                "This will prevent biomes from generating mushrooms");
+        AVOID_GENERATED_LAKE_WATER = cfg.getBoolean("avoidGeneratedLakewater", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_LAKE_WATER,
+                "This will prevent the generation of water in lakes");
+        AVOID_GENERATED_DESERT_WELL = cfg.getBoolean("avoidGeneratedDesertWell", categoryLostcity, inheritFrom.orElse(this).AVOID_GENERATED_DESERT_WELL,
+                "This will prevent the generation of desert wells");
 
         String type = cfg.getString("landscapeType", categoryLostcity, inheritFrom.orElse(this).LANDSCAPE_TYPE.getName(),
                 "Type of landscape",
