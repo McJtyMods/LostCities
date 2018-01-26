@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeDecorator;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -21,6 +22,13 @@ public class TerrainEventHandlers {
     public void onCreateDecorate(DecorateBiomeEvent.Decorate event) {
         World world = event.getWorld();
         if (!world.isRemote) {
+            WorldServer worldServer = (WorldServer) world;
+            IChunkGenerator chunkGenerator = worldServer.getChunkProvider().chunkGenerator;
+            if (!(chunkGenerator instanceof LostCityChunkGenerator)) {
+                return;
+            }
+            LostCityChunkGenerator provider = (LostCityChunkGenerator) chunkGenerator;
+
             switch (event.getType()) {
                 case CLAY:
                 case DEAD_BUSH:
@@ -85,8 +93,6 @@ public class TerrainEventHandlers {
                         break;
                     }
                     if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
-                        WorldServer worldServer = (WorldServer) world;
-                        LostCityChunkGenerator provider = (LostCityChunkGenerator) worldServer.getChunkProvider().chunkGenerator;
                         int chunkX = (event.getPos().getX()) >> 4;
                         int chunkZ = (event.getPos().getZ()) >> 4;
                         CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
