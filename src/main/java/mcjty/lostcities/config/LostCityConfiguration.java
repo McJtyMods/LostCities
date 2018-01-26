@@ -1,11 +1,9 @@
 package mcjty.lostcities.config;
 
 import mcjty.lostcities.LostCities;
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.*;
 
@@ -135,7 +133,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("cavern", true);
         profile.setDescription("This is a cavern type world (like the nether)");
-        profile.setExtraDescription("Warning! This is pretty heavy on performance!");
+        profile.setExtraDescription("There are lights in the building but the outside is very dark. Warning! This is pretty heavy on performance!");
         profile.setIconFile("textures/gui/icon_cavern.png");
         profile.LANDSCAPE_TYPE = LandscapeType.CAVERN;
         profile.HORIZON = 128;

@@ -227,6 +227,7 @@ public class CavernTerrainGenerator {
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
         char baseLiquid = LostCitiesTerrainGenerator.liquidChar;
+        int bedrockLayer = provider.getProfile().BEDROCK_LAYER;
 
         byte groundLevel = (byte) provider.getProfile().GROUNDLEVEL;
         double d0 = 0.03125D;
@@ -247,7 +248,7 @@ public class CavernTerrainGenerator {
                 for (int y = 128; y >= 0; --y) {
                     int index = (z * 16 + x) * 256 + y;
 
-                    if (y >= 128 - provider.rand.nextInt(5) || y <= provider.rand.nextInt(5)) {
+                    if (y >= 128 - (provider.rand.nextInt(3)+bedrockLayer) || y <= (provider.rand.nextInt(3) + bedrockLayer)) {
                         primer.data[index] = LostCitiesTerrainGenerator.bedrockChar;
                     } else if (y > 85) {
                         // Don't do anything at this height. We're most likely still processing cavern ceiling
