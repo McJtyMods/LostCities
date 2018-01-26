@@ -40,13 +40,15 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
     @Override
     public Biome getBiome(BlockPos pos) {
         LostCityProfile profile = WorldTypeTools.getProfile(world);
-//        LostCityProfile profile = getProvider().getProfile();
         Biome originalBiome = original.getBiome(pos);
+        if (!(world instanceof WorldServer)) {
+            return originalBiome;
+        }
 
         if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             int chunkX = (pos.getX()) >> 4;
             int chunkZ = (pos.getZ()) >> 4;
-            CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+            CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, getProvider());
             if (sphere.isEnabled()) {
                 float radius = sphere.getRadius();
                 BlockPos cc = sphere.getCenterPos();
@@ -70,11 +72,10 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
             return;
         }
         LostCityProfile profile = WorldTypeTools.getProfile(world);
-//        LostCityProfile profile = getProvider().getProfile();
         if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             int chunkX = (topx) >> 4;
             int chunkZ = (topz) >> 4;
-            CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+            CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, getProvider());
             if (sphere.isEnabled()) {
                 float radius = sphere.getRadius();
                 double sqradiusOffset = (radius - 2) * (radius - 2);
