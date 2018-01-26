@@ -953,7 +953,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
     private static int getCityLevelCavern(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         // @todo for now
-        return getCityLevelNormal(chunkX, chunkZ, provider, provider.getProfile());
+        return getCityLevelFloating(chunkX, chunkZ, provider);
     }
 
 

@@ -136,6 +136,7 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("cavern", true);
         profile.setDescription("This is a cavern type world (like the nether)");
         profile.setExtraDescription("Warning! This is pretty heavy on performance!");
+        profile.setIconFile("textures/gui/icon_cavern.png");
         profile.LANDSCAPE_TYPE = LandscapeType.CAVERN;
         profile.HORIZON = 128;
         profile.FOG_RED = 0.0f;
@@ -143,6 +144,8 @@ public class LostCityConfiguration {
         profile.FOG_BLUE = 0.0f;
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
+        profile.GENERATE_LIGHTING = true;
+        profile.GENERATE_LAKES = false;
         profile.GENERATE_LIGHTING = true;
 //        profile.setIconFile("textures/gui/icon_default.png");
         standardProfiles.put(profile.getName(), profile);

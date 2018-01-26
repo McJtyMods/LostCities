@@ -48,6 +48,7 @@ public class CommandDebug implements ICommand {
             System.out.println("floors = " + info.getNumFloors());
             System.out.println("floorsBelowGround = " + info.floorsBelowGround);
             System.out.println("cityLevel = " + info.cityLevel);
+            System.out.println("cityGroundLevel = " + info.getCityGroundLevel());
             System.out.println("isCity = " + info.isCity);
             System.out.println("chunkX = " + info.chunkX);
             System.out.println("chunkZ = " + info.chunkZ);

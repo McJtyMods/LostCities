@@ -2,6 +2,8 @@ package mcjty.lostcities.dimensions.world.terraingen;
 
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -226,57 +228,74 @@ public class CavernTerrainGenerator {
         char air = LostCitiesTerrainGenerator.airChar;
         char baseLiquid = LostCitiesTerrainGenerator.liquidChar;
 
-        byte b0 = 64;
+        byte groundLevel = (byte) provider.getProfile().GROUNDLEVEL;
         double d0 = 0.03125D;
         this.baseBlockExclusivityNoise = this.netherrackExculsivityNoiseGen.generateNoiseOctaves(this.baseBlockExclusivityNoise, chunkX * 16, chunkZ * 16, 0, 16, 16, 1, d0 * 2.0D, d0 * 2.0D, d0 * 2.0D);
 
-        for (int k = 0; k < 16; ++k) {
-            for (int l = 0; l < 16; ++l) {
-                int i1 = (int)(this.baseBlockExclusivityNoise[k + l * 16] / 3.0D + 3.0D + provider.rand.nextDouble() * 0.25D);
-                int j1 = -1;
-                char block = baseBlock;
+        for (int x = 0; x < 16; ++x) {
+            for (int z = 0; z < 16; ++z) {
+                Biome Biome = Biomes[z + x * 16];
+                char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
+                char topBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
 
-                for (int k1 = 255; k1 >= 0; --k1) {
-                    int l1 = (l * 16 + k) * 256 + k1;
+                int l = (int)(this.baseBlockExclusivityNoise[x + z * 16] / 3.0D + 3.0D + provider.rand.nextDouble() * 0.25D);
+                int k = -1;
+                char block = topBlock;
+                char block1 = fillerBlock;
+                boolean foundAir = false;
 
-                    if (k1 < 1) {
-                        primer.data[l1] = LostCitiesTerrainGenerator.bedrockChar;
-                    } else if (k1 < 255 - provider.rand.nextInt(5) && k1 > provider.rand.nextInt(5)) {
-                        char block2 = primer.data[l1];
+                for (int y = 128; y >= 0; --y) {
+                    int index = (z * 16 + x) * 256 + y;
 
-                        if (block2 != air) {
-                            if (block2 == baseBlock) {
-                                if (j1 == -1) {
-                                    if (i1 <= 0) {
+                    if (y >= 128 - provider.rand.nextInt(5) || y <= provider.rand.nextInt(5)) {
+                        primer.data[index] = LostCitiesTerrainGenerator.bedrockChar;
+                    } else if (y > 85) {
+                        // Don't do anything at this height. We're most likely still processing cavern ceiling
+                    } else if (!foundAir) {
+                        if (primer.data[index] == air) {
+                            foundAir = true;
+                        }
+                    } else {
+                        char currentBlock = primer.data[index];
+
+                        if (currentBlock != air) {
+                            if (currentBlock == baseBlock) {
+                                if (k == -1) {
+                                    if (l <= 0) {
                                         block = air;
-                                    } else if (k1 >= b0 - 4 && k1 <= b0 + 1) {
-                                        block = baseBlock;
+                                        block1 = baseBlock;
+                                    } else if (y >= groundLevel - 6 && y <= groundLevel + 1) {
+                                        block = topBlock;
+                                        block1 = fillerBlock;
                                     }
 
-                                    if (k1 < b0 && block == air) {
+                                    if (y < groundLevel && block == air) {
                                         block = baseLiquid;
                                     }
 
-                                    j1 = i1;
+                                    k = l;
 
-                                    if (k1 >= b0 - 1) {
-                                        primer.data[l1] = block;
+                                    if (y >= groundLevel - 1) {
+                                        primer.data[index] = block;
+                                    } else if (y < (groundLevel-5) -l) {
+                                        block = air;
+                                        block1 = baseBlock;
+                                        primer.data[index] = fillerBlock;
                                     } else {
-                                        primer.data[l1] = baseBlock;
+                                        primer.data[index] = block1;
+                                    }
+                                } else if (k > 0) {
+                                    --k;
+                                    primer.data[index] = block1;
+                                    if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
+                                        k = provider.rand.nextInt(4) + Math.max(0, y - groundLevel);
+                                        block1 = (char) Block.BLOCK_STATE_IDS.get(Blocks.SANDSTONE.getDefaultState());
                                     }
                                 }
-                                else if (j1 > 0) {
-                                    --j1;
-                                    primer.data[l1] = baseBlock;
-                                }
                             }
+                        } else {
+                            k = -1;
                         }
-                        else {
-                            j1 = -1;
-                        }
-//                    } else if (heightsetting == CavernHeight.HEIGHT_256) {
-//                         Only use a bedrock ceiling if the height is 256.
-//                        BaseTerrainGenerator.setBlockState(primer, l1, Blocks.BEDROCK.getDefaultState());
                     }
                 }
             }

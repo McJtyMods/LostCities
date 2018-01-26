@@ -285,23 +285,23 @@ public class IslandTerrainGenerator {
         double d0 = 0.03125D;
         this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, 0.0625D, 0.0625D, 1.0D);
 
-        for (int k = 0; k < 16; ++k) {
-            for (int l = 0; l < 16; ++l) {
-                Biome Biome = Biomes[l + k * 16];
-                genBiomeTerrain(Biome, primer, chunkX * 16 + k, chunkZ * 16 + l, this.stoneNoise[l + k * 16]);
+        for (int x = 0; x < 16; ++x) {
+            for (int z = 0; z < 16; ++z) {
+                Biome Biome = Biomes[z + x * 16];
+                genBiomeTerrain(Biome, primer, chunkX * 16 + x, chunkZ * 16 + z, this.stoneNoise[z + x * 16]);
             }
         }
     }
 
-    public final void genBiomeTerrain(Biome Biome, ChunkPrimer primer, int x, int z, double noise) {
+    public final void genBiomeTerrain(Biome biome, ChunkPrimer primer, int x, int z, double noise) {
         char air = LostCitiesTerrainGenerator.airChar;
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
         char baseLiquid = air;//@LostCitiesTerrainGenerator.liquidChar;
 
         int topLevel = provider.getProfile().GROUNDLEVEL;
 
-        char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
-        char topBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
+        char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(biome.fillerBlock);
+        char topBlock = (char) Block.BLOCK_STATE_IDS.get(biome.topBlock);
         char block = topBlock;
         char block1 = fillerBlock;
 
@@ -336,7 +336,7 @@ public class IslandTerrainGenerator {
                                 }
 
                                 if (height < topLevel && (block == air)) { // @todo configure height!
-                                    if (Biome.getTemperature(new BlockPos(x, height, z)) < 0.15F) {
+                                    if (biome.getTemperature(new BlockPos(x, height, z)) < 0.15F) {
                                         block = (char) Block.BLOCK_STATE_IDS.get(Blocks.ICE.getDefaultState());
                                     } else {
                                         block = baseBlock;  // No liquid since we are floating
