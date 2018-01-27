@@ -562,7 +562,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     int index = (x << 12) | (z << 8);
-                    clearRange(primer, index, height, height + 15);
+                    clearRange(primer, index, height, height + 15, waterLevel > mainGroundLevel);
                 }
             }
         } else {
@@ -572,7 +572,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     int index = (x << 12) | (z << 8);
-                    clearRange(primer, index, height, height + 15);
+                    clearRange(primer, index, height, height + 15, waterLevel > mainGroundLevel);
                 }
             }
         }
@@ -606,8 +606,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void clearRange(ChunkPrimer primer, int index, int height1, int height2) {
-        if (waterLevel > mainGroundLevel) {
+    private void clearRange(ChunkPrimer primer, int index, int height1, int height2, boolean dowater) {
+        if (dowater) {
             // Special case for drowned city
             PrimerTools.setBlockStateRangeSafe(primer, index + height1, index + waterLevel, liquidChar);
             PrimerTools.setBlockStateRangeSafe(primer, index + waterLevel, index + height2, airChar);
@@ -827,13 +827,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         int r = rand.nextInt(2);
         index = (x << 12) | (z << 8);
-        clearRange(primer, index, level + offset + r, 230);
+        clearRange(primer, index, level + offset + r, 230, waterLevel > mainGroundLevel);
     }
 
     private void flattenChunkBorderDownwards(ChunkPrimer primer, int x, int offset, int z, Random rand, int level) {
         int r = rand.nextInt(2);
         int index = (x << 12) | (z << 8);
-        clearRange(primer, index, level + offset + r, 230);
+        clearRange(primer, index, level + offset + r, 230, waterLevel > mainGroundLevel);
     }
 
     private void doCityChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
@@ -2147,11 +2147,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         PrimerTools.setBlockStateRange(primer, index + height + 1, index + lowestLevel, baseChar);
                     }
                     // Also clear the inside of buildings to avoid geometry that doesn't really belong there
-                    clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6);
+                    clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, waterLevel > mainGroundLevel);
                 }
             }
         } else if (info.profile.isSpace()) {
             fillToGround(primer, info, lowestLevel, borderBlock);
+            // Also clear the inside of buildings to avoid geometry that doesn't really belong there
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    int index = (x << 12) | (z << 8);
+                    clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, false);     // Never water in bubbles?
+                }
+            }
         } else {
             // For normal worldgen (non floating) or cavern we have a thin layer of 'border' blocks because that looks nicer
             for (int x = 0; x < 16; ++x) {
@@ -2174,7 +2181,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
                     if (info.profile.isCavern()) {
                         // Also clear the inside of buildings to avoid geometry that doesn't really belong there
-                        clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6);
+                        clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, waterLevel > mainGroundLevel);
                     }
                 }
             }
