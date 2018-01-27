@@ -464,7 +464,7 @@ public class LostCityConfiguration {
         profile.GENERATE_MINESHAFTS = true;
         profile.GENERATE_OCEANMONUMENTS = false;
         profile.GENERATE_SCATTERED = true;
-        profile.GENERATE_VILLAGES = true;
+        profile.GENERATE_VILLAGES = false;
         profile.GENERATE_STRONGHOLDS = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         standardProfiles.put(profile.getName(), profile);

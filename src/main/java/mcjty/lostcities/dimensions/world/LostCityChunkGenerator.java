@@ -223,6 +223,8 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
             throw (e);
         }
 
+        LostCityProfile profile = BuildingInfo.getProfile(chunkX, chunkZ, this);
+
         BiomeProvider biomeProvider = this.worldObj.getBiomeProvider();
         this.biomesForGeneration = biomeProvider.getBiomes(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
         terrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, chunkprimer, this.biomesForGeneration);
