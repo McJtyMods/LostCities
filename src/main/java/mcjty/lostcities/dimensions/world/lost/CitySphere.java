@@ -15,12 +15,13 @@ import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class CitySphere implements ILostSphere {
 
     private static Map<ChunkCoord, CitySphere> citySphereCache = new HashMap<>();
-    private static Map<ChunkCoord, PredefinedSphere> predefinedSphereMap = Collections.emptyMap();
 
     public static final CitySphere EMPTY = new CitySphere(new ChunkCoord(0, 0, 0), 0.0f, new BlockPos(0, 0, 0), false);
 
@@ -126,22 +127,7 @@ public class CitySphere implements ILostSphere {
 
     public static void cleanCache() {
         citySphereCache.clear();
-        predefinedSphereMap = Collections.emptyMap();
     }
-
-    public static PredefinedSphere getPredefinedSphere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        if (predefinedSphereMap == null) {
-            predefinedSphereMap = new HashMap<>();
-            for (PredefinedSphere sphere : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
-                predefinedSphereMap.put(new ChunkCoord(sphere.getDimension(), sphere.getChunkX(), sphere.getChunkZ()), sphere);
-            }
-        }
-        if (predefinedSphereMap.isEmpty()) {
-            return null;
-        }
-        return predefinedSphereMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
-    }
-
 
     /**
      * Return true if there is a horizontal monorail here. This is the case if this chunk is on a city center multiple
@@ -381,8 +367,7 @@ public class CitySphere implements ILostSphere {
     public static CitySphere getCitySphere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         ChunkCoord coord = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
         if (!citySphereCache.containsKey(coord)) {
-            for (Map.Entry<ChunkCoord, PredefinedSphere> entry : predefinedSphereMap.entrySet()) {
-                PredefinedSphere predef = entry.getValue();
+            for (PredefinedSphere predef : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
                 if (predef.getDimension() == provider.dimensionId) {
                     if (intersectChunkWithSphere(chunkX, chunkZ, predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
                         ChunkCoord center = new ChunkCoord(provider.dimensionId, predef.getChunkX(), predef.getChunkZ());
