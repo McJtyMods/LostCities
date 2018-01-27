@@ -4,6 +4,7 @@ import mcjty.lostcities.commands.CommandBuildPart;
 import mcjty.lostcities.commands.CommandDebug;
 import mcjty.lostcities.commands.CommandExportBuilding;
 import mcjty.lostcities.commands.CommandExportPart;
+import mcjty.lostcities.dimensions.world.WorldTypeTools;
 import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Loader;
@@ -77,6 +78,7 @@ public class LostCities {
         BiomeInfo.cleanCache();
         City.cleanCache();
         CitySphere.cleanCache();
+        WorldTypeTools.cleanCache();
     }
 
     /**

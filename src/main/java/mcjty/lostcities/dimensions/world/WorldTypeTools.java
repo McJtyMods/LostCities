@@ -20,6 +20,11 @@ public class WorldTypeTools {
     // To prevent the client from asking the profile to the server too much
     private static long clientTimeout = -1;
 
+    public static void cleanCache() {
+        profileMap.clear();
+        clientTimeout = -1;
+    }
+
     public static LostCityProfile getProfile(World world) {
         if (profileMap.containsKey(world.provider.getDimension())) {
             return profileMap.get(world.provider.getDimension());
