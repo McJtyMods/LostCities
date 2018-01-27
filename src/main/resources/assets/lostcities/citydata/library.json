@@ -15,7 +15,14 @@
       },
       {
         "char": "T",
-        "block": "minecraft:torch"
+        "block": "minecraft:torch",
+        "facing": {
+          "north": 4,
+          "south": 3,
+          "west": 2,
+          "east": 1,
+          "up": 5
+        }
       },
       {
         "char": "h",

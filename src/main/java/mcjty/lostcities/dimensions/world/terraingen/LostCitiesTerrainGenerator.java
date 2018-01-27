@@ -21,6 +21,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import net.minecraftforge.common.MinecraftForge;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -45,7 +46,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char bedrockChar;
     public static char endportalChar;
     public static char endportalFrameChar;
-    public static char torchChar;
     public static char goldBlockChar;
     public static char diamondBlockChar;
     public static char spawnerChar;
@@ -126,7 +126,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static Set<Character> getCharactersNeedingTodo() {
         if (charactersNeedingTodo == null) {
             charactersNeedingTodo = new HashSet<>();
-            charactersNeedingTodo.add(torchChar);
             charactersNeedingTodo.add(spawnerChar);
             charactersNeedingTodo.add(chestChar);
             charactersNeedingTodo.add(glowstoneChar);
@@ -200,7 +199,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             bedrockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.BEDROCK.getDefaultState());
             endportalChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL.getDefaultState());
             endportalFrameChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL_FRAME.getDefaultState());
-            torchChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.TORCH.getDefaultState());
             goldBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GOLD_BLOCK.getDefaultState());
             diamondBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.DIAMOND_BLOCK.getDefaultState());
             spawnerChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.MOB_SPAWNER.getDefaultState());
@@ -305,31 +303,30 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void fixTorches(ChunkPrimer primer, BuildingInfo info) {
-        List<Integer> torches = info.getTorchTodo();
+        List<Pair<Integer, Map<String, Integer>>> torches = info.getTorchTodo();
         if (torches.isEmpty()) {
             return;
         }
 
-        char tn = (char) Block.BLOCK_STATE_IDS.get(Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.NORTH));
-        char ts = (char) Block.BLOCK_STATE_IDS.get(Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.SOUTH));
-        char tw = (char) Block.BLOCK_STATE_IDS.get(Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.WEST));
-        char te = (char) Block.BLOCK_STATE_IDS.get(Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.EAST));
-        char tu = (char) Block.BLOCK_STATE_IDS.get(Blocks.TORCH.getDefaultState().withProperty(BlockTorch.FACING, EnumFacing.UP));
+        for (Pair<Integer, Map<String, Integer>> pair : torches) {
+            int idx = pair.getLeft();
+            Map<String, Integer> map = pair.getRight();
 
-        for (Integer idx : torches) {
-            if (primer.data[idx] == torchChar) {
+            char torch = primer.data[idx];
+            IBlockState torchState = Block.BLOCK_STATE_IDS.getByValue(torch);
+            if (map != null) {
                 int x = (idx >> 12) & 0xf;
                 int z = (idx >> 8) & 0xf;
                 if (primer.data[idx - 1] != airChar) {
-                    primer.data[idx] = tu;
+                    primer.data[idx] = (char) Block.BLOCK_STATE_IDS.get(torchState.getBlock().getStateFromMeta(map.get("up")));
                 } else if (x > 0 && primer.data[idx - (1 << 12)] != airChar) {
-                    primer.data[idx] = te;
+                    primer.data[idx] = (char) Block.BLOCK_STATE_IDS.get(torchState.getBlock().getStateFromMeta(map.get("east")));
                 } else if (x < 15 && primer.data[idx + (1 << 12)] != airChar) {
-                    primer.data[idx] = tw;
+                    primer.data[idx] = (char) Block.BLOCK_STATE_IDS.get(torchState.getBlock().getStateFromMeta(map.get("west")));
                 } else if (z > 0 && primer.data[idx - (1 << 8)] != airChar) {
-                    primer.data[idx] = ts;
+                    primer.data[idx] = (char) Block.BLOCK_STATE_IDS.get(torchState.getBlock().getStateFromMeta(map.get("south")));
                 } else if (z < 15 && primer.data[idx + (1 << 8)] != airChar) {
-                    primer.data[idx] = tn;
+                    primer.data[idx] = (char) Block.BLOCK_STATE_IDS.get(torchState.getBlock().getStateFromMeta(map.get("north")));
                 }
             }
         }
@@ -637,15 +634,17 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateBridge(ChunkPrimer primer, BuildingInfo info, BuildingPart bt, Orientation orientation) {
+        CompiledPalette compiledPalette = info.getCompiledPalette();
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 int index = (x << 12) | (z << 8) + mainGroundLevel + 1;
                 int l = 0;
                 while (l < bt.getSliceCount()) {
-                    Character b = orientation == Orientation.X ? bt.get(info, x, l, z) : bt.get(info, z, l, x); // @todo general rotation system?
-                    if (b == torchChar) {
+                    Character c = orientation == Orientation.X ? bt.getPaletteChar(x, l, z) : bt.getPaletteChar(z, l, x); // @todo general rotation system?
+                    Character b = info.getCompiledPalette().get(c);
+                    if (compiledPalette.getTorchOrientations(c) != null) {
                         if (info.profile.GENERATE_LIGHTING) {
-                            info.addTorchTodo(index);
+                            info.addTorchTodo(index, compiledPalette.getTorchOrientations(c));
                         } else {
                             b = airChar;        // No torch!
                         }
@@ -658,7 +657,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         Character support = bt.getMetaChar("support");
         if (support != null) {
-            char sup = info.getCompiledPalette().get(support);
+            char sup = compiledPalette.get(support);
             BuildingInfo minDir = orientation.getMinDir().get(info);
             BuildingInfo maxDir = orientation.getMaxDir().get(info);
             if (minDir.hasBridge(provider, orientation) != null && maxDir.hasBridge(provider, orientation) != null) {
@@ -1950,6 +1949,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     for (int y = 0; y < len; y++) {
                         char c = vs[y];
                         Character b = compiledPalette.get(c);
+                        Map<String, Integer> orientations = compiledPalette.getTorchOrientations(c);
                         if (b == null) {
                             if (!combinedWithPart) {
                                 Palette localPalette = part.getLocalPalette();
@@ -1957,6 +1957,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 if (localPalette != null) {
                                     compiledPalette = new CompiledPalette(compiledPalette, localPalette);
                                     b = compiledPalette.get(c);
+                                    orientations = compiledPalette.getTorchOrientations(c);
                                 }
                             }
                             if (b == null) {
@@ -1995,14 +1996,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 } else {
                                     b = airChar;
                                 }
+                            } else if (orientations != null) {
+                                if (info.profile.GENERATE_LIGHTING) {
+                                    info.addTorchTodo(index, orientations);
+                                } else {
+                                    b = airChar;        // No torches
+                                }
                             } else if (getCharactersNeedingTodo().contains(b)) {
-                                if (b == torchChar) {
-                                    if (info.profile.GENERATE_LIGHTING) {
-                                        info.addTorchTodo(index);
-                                    } else {
-                                        b = airChar;        // No torches
-                                    }
-                                } else if (b == spawnerChar) {
+                                if (b == spawnerChar) {
                                     if (info.profile.GENERATE_SPAWNERS && !info.noLoot) {
                                         String mobid = part.getMobID(info, x, y, z);
                                         info.getTodoChunk(rx, rz).addSpawnerTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),

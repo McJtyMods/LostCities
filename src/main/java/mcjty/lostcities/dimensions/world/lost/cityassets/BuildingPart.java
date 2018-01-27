@@ -212,6 +212,10 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
         return zSize;
     }
 
+    public Character getPaletteChar(int x, int y, int z) {
+        return slices[y].charAt(z * xSize + x);
+    }
+
     public Character get(BuildingInfo info, int x, int y, int z) {
         return info.getCompiledPalette().get(slices[y].charAt(z * xSize + x));
     }
@@ -224,6 +228,11 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     @Override
     public String getLootTable(BuildingInfo info, int x, int y, int z) {
         return info.getCompiledPalette().getLootTable(slices[y].charAt(z * xSize + x));
+    }
+
+    @Override
+    public Map<String, Integer> getTorchOrientation(BuildingInfo info, int x, int y, int z) {
+        return info.getCompiledPalette().getTorchOrientations(slices[y].charAt(z * xSize + x));
     }
 
     public Character getC(int x, int y, int z) {

@@ -24,6 +24,7 @@ public class Palette implements ILostCityAsset {
     private final Map<IBlockState, IBlockState> damaged = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
     private final Map<Character, String> lootTables = new HashMap<>(); // For chests
+    private final Map<Character, Map<String, Integer>> torchOrientations = new HashMap<>(); // For torches
 
     public Palette() {
     }
@@ -41,6 +42,7 @@ public class Palette implements ILostCityAsset {
         damaged.putAll(other.damaged);
         mobIds.putAll(other.mobIds);
         lootTables.putAll(other.lootTables);
+        torchOrientations.putAll(other.torchOrientations);
     }
 
     @Override
@@ -58,6 +60,10 @@ public class Palette implements ILostCityAsset {
 
     public Map<Character, String> getLootTables() {
         return lootTables;
+    }
+
+    public Map<Character, Map<String, Integer>> getTorchOrientations() {
+        return torchOrientations;
     }
 
     public Map<Character, Object> getPalette() {
@@ -86,6 +92,16 @@ public class Palette implements ILostCityAsset {
             if (o.has("loot")) {
                 lootTables.put(c, o.get("loot").getAsString());
             }
+            if (o.has("facing")) {
+                Map<String, Integer> or = new HashMap<>();
+                JsonObject torchObj = o.get("facing").getAsJsonObject();
+                getOrientation(or, torchObj, "north");
+                getOrientation(or, torchObj, "south");
+                getOrientation(or, torchObj, "west");
+                getOrientation(or, torchObj, "east");
+                getOrientation(or, torchObj, "up");
+                torchOrientations.put(c, or);
+            }
             if (o.has("block")) {
                 String block = o.get("block").getAsString();
                 IBlockState state = Tools.stringToState(block);
@@ -113,6 +129,14 @@ public class Palette implements ILostCityAsset {
             } else {
                 throw new RuntimeException("Illegal palette!");
             }
+        }
+    }
+
+    private void getOrientation(Map<String, Integer> or, JsonObject torchObj, String orientation) {
+        if (torchObj.has(orientation)) {
+            or.put(orientation, torchObj.get(orientation).getAsInt());
+        } else {
+            or.put(orientation, 0);
         }
     }
 

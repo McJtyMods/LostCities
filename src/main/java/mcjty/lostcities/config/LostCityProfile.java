@@ -368,7 +368,7 @@ public class LostCityProfile {
                 "If true then the buildings will be full of spawners");
         GENERATE_LOOT = cfg.getBoolean("generateLoot", categoryLostcity, inheritFrom.orElse(this).GENERATE_LOOT,
                 "If true the chests in the buildings will contain loot");
-        GENERATE_LIGHTING = cfg.getBoolean("generateLigthing", categoryLostcity, inheritFrom.orElse(this).GENERATE_LIGHTING,
+        GENERATE_LIGHTING = cfg.getBoolean("generateLighting", categoryLostcity, inheritFrom.orElse(this).GENERATE_LIGHTING,
                 "If true then there will be minimal lighting in the buildings");
         AVOID_WATER = cfg.getBoolean("avoidWater", categoryLostcity, inheritFrom.orElse(this).AVOID_WATER,
                 "If true then all water will be avoided (replaced with air)");

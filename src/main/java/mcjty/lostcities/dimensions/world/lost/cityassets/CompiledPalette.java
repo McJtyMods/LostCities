@@ -19,6 +19,7 @@ public class CompiledPalette {
     private final Map<Character, Character> damagedToBlock = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>();
     private final Map<Character, String> lootTables = new HashMap<>();
+    private final Map<Character, Map<String, Integer>> torchOrientations = new HashMap<>();
 
 
     public CompiledPalette(CompiledPalette other, Palette... palettes) {
@@ -26,6 +27,7 @@ public class CompiledPalette {
         this.damagedToBlock.putAll(other.damagedToBlock);
         this.mobIds.putAll(other.mobIds);
         this.lootTables.putAll(other.lootTables);
+        this.torchOrientations.putAll(other.torchOrientations);
         addPalettes(palettes);
     }
 
@@ -106,6 +108,10 @@ public class CompiledPalette {
                 Character c = entry.getKey();
                 lootTables.put(c, entry.getValue());
             }
+            for (Map.Entry<Character, Map<String, Integer>> entry : p.getTorchOrientations().entrySet()) {
+                Character c = entry.getKey();
+                torchOrientations.put(c, entry.getValue());
+            }
         }
     }
 
@@ -182,5 +188,13 @@ public class CompiledPalette {
 
     public String getLootTable(Character c) {
         return lootTables.get(c);
+    }
+
+    public Map<String, Integer> getTorchOrientations(Character c) {
+        return torchOrientations.get(c);
+    }
+
+    public Map<Character, Map<String, Integer>> getAllTorchOrientations() {
+        return torchOrientations;
     }
 }

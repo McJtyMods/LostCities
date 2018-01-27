@@ -94,7 +94,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
     private final List<Pair<BlockPos, ConditionTodo>> chestTodo = new ArrayList<>();
     private final List<BlockPos> genericTodo = new ArrayList<>();
-    private final List<Integer> torchTodo = new ArrayList<>();
+    private final List<Pair<Integer, Map<String, Integer>>> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
 
     public static class ConditionTodo {
@@ -141,11 +141,11 @@ public class BuildingInfo implements ILostChunkInfo {
         saplingTodo.clear();
     }
 
-    public void addTorchTodo(int index) {
-        torchTodo.add(index);
+    public void addTorchTodo(int index, Map<String, Integer> orientations) {
+        torchTodo.add(Pair.of(index, orientations));
     }
 
-    public List<Integer> getTorchTodo() {
+    public List<Pair<Integer, Map<String, Integer>>> getTorchTodo() {
         return torchTodo;
     }
 
