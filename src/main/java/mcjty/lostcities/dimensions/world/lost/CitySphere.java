@@ -81,6 +81,20 @@ public class CitySphere implements ILostSphere {
         return sphere;
     }
 
+    /**
+     * Given a chunk coordinate return the relative distance (number between 0 and 1) for the nearest city sphere.
+     * This only works for space type worlds!
+     */
+    public static float getRelativeDistanceToCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
+        BlockPos centerPos = sphere.getCenterPos();
+        float radius = sphere.getRadius();
+        int cx = chunkX*16+8;
+        int cz = chunkZ*16+8;
+        int sqdist = (cx - centerPos.getX()) * (cx - centerPos.getX()) + (cz - centerPos.getZ()) * (cz - centerPos.getZ());
+        return (float) (Math.sqrt(sqdist) / radius);
+    }
+
     @Override
     public ChunkCoord getCenter() {
         return center;

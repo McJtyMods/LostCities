@@ -357,7 +357,7 @@ public class BuildingInfo implements ILostChunkInfo {
             characteristics.couldHaveBuilding = characteristics.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, profile, characteristics.section, characteristics.cityLevel, rand);
             if (profile.isSpace() && characteristics.section == -1) {
                 // Minimize cities at the edge of the city in an orb
-                float dist = getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
+                float dist = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
                 if (dist > .7f) {
                     characteristics.couldHaveBuilding = false;
                 }
@@ -745,6 +745,16 @@ public class BuildingInfo implements ILostChunkInfo {
             if (f < minfloors) {
                 f = minfloors;
             }
+
+            if (provider.getProfile().isSpace() && CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
+                float reldest = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
+                if (reldest > .6f) {
+                    f = Math.max(1, f-2);
+                } else if (reldest > .5f) {
+                    f = Math.max(1, f-1);
+                }
+            }
+
             floors = f;
 
             int maxcellars = getMaxcellars(provider, cs);
@@ -961,7 +971,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private static int getCityLevelSpace(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
         if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
             // In the sphere
-            float dist = getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
+            float dist = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
             Random rand = new Random(provider.seed + chunkZ * 817505771L + chunkX * 217645177L);
             rand.nextFloat();
             rand.nextFloat();
@@ -1048,20 +1058,6 @@ public class BuildingInfo implements ILostChunkInfo {
             h = h / cnt;
         }
         return getLevelBasedOnHeight(h, provider.getProfile());
-    }
-
-    /**
-     * Given a chunk coordinate return the relative distance (number between 0 and 1) for the nearest city sphere.
-     * This only works for space type worlds!
-     */
-    public static float getRelativeDistanceToCityCenter(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
-        BlockPos centerPos = sphere.getCenterPos();
-        float radius = sphere.getRadius();
-        int cx = chunkX*16+8;
-        int cz = chunkZ*16+8;
-        int sqdist = (cx - centerPos.getX()) * (cx - centerPos.getX()) + (cz - centerPos.getZ()) * (cz - centerPos.getZ());
-        return (float) (Math.sqrt(sqdist) / radius);
     }
 
     private static int getLevelBasedOnHeight(int height, LostCityProfile profile) {

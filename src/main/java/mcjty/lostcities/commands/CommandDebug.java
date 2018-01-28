@@ -60,7 +60,7 @@ public class CommandDebug implements ICommand {
             System.out.println("getChestTodo().size() = " + info.getChestTodo().size());
             System.out.println("getMobSpawnerTodo().size() = " + info.getMobSpawnerTodo().size());
 
-            float reldist = BuildingInfo.getRelativeDistanceToCityCenter(info.chunkX, info.chunkZ, provider);
+            float reldist = CitySphere.getRelativeDistanceToCityCenter(info.chunkX, info.chunkZ, provider);
             System.out.println("reldist = " + reldist);
 
             Railway.RailChunkInfo railInfo = Railway.getRailChunkType(info.chunkX, info.chunkZ, info.provider, info.profile);
