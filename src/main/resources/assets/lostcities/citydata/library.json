@@ -36,11 +36,11 @@
 
       {
       "char": "E",
-      "block": "minecraft:rail@5"
+      "block": "minecraft:golden_rail@13"
       },
       {
       "char": "H",
-      "block": "minecraft:rail@4"
+      "block": "minecraft:golden_rail@12"
       },
       {
         "char": "j",
