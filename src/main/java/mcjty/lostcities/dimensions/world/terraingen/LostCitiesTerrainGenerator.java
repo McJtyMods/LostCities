@@ -271,7 +271,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (horiz && vert) {
             if (!CitySphere.intersectsWithCitySphere(info.chunkX, info.chunkZ, provider)) {
                 BuildingPart part = AssetRegistries.PARTS.get("monorails_both");
-                generatePart(primer, info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + 3, 0, true);
+                generatePart(primer, info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + 4, 0, true);
             }
             return;
         } else if (horiz) {
@@ -288,7 +288,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             if (hasNonStationMonoRail(info.getXmin()) || hasNonStationMonoRail(info.getXmax()) || hasNonStationMonoRail(info.getZmin()) || hasNonStationMonoRail(info.getZmax())) {
                 part = AssetRegistries.PARTS.get("monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
-                fillToGround(primer, info, mainGroundLevel +3, borderBlock);
+                fillToGround(primer, info, mainGroundLevel + 4, borderBlock);
             } else {
                 return;
             }
@@ -296,7 +296,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             part = AssetRegistries.PARTS.get("monorails_vertical");
         }
 
-        generatePart(primer, info, part, transform, 0, mainGroundLevel +3, 0, true);
+        generatePart(primer, info, part, transform, 0, mainGroundLevel + 4, 0, true);
     }
 
     private boolean hasNonStationMonoRail(BuildingInfo info) {
