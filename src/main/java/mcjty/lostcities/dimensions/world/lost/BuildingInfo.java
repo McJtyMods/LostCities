@@ -336,19 +336,7 @@ public class BuildingInfo implements ILostChunkInfo {
             LostCityProfile profile = getProfile(chunkX, chunkZ, provider);
             LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
 
-            characteristics.cityFactor = City.getCityFactor(chunkX, chunkZ, provider, profile);
-            characteristics.isCity = characteristics.cityFactor > profile.CITY_THRESSHOLD;
-            if (isVoidChunk(chunkX, chunkZ, provider)) {
-                characteristics.isCity = false;    // No city in a void chunk
-            } else if (provider.getProfile().isSpace()) {
-                if (CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
-                    characteristics.isCity = false;
-                } else if (!provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE && !CitySphere.fullyInsideCitySpere(chunkX, chunkZ, provider)) {
-                    characteristics.isCity = false;
-                } else if (CitySphere.hasMonorailStation(chunkX, chunkZ, provider)) {
-                    characteristics.isCity = false; // No city on same spot as a monorail station
-                }
-            }
+            characteristics.isCity = isCityRaw(chunkX, chunkZ, provider, profile);
             characteristics.section = getMultiBuildingSection(chunkX, chunkZ, provider, profile);
             if (characteristics.section > 0) {
                 characteristics.cityLevel = getTopLeftCityInfo(characteristics, chunkX, chunkZ, provider).cityLevel;
@@ -443,7 +431,16 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isVoidChunk(chunkX, chunkZ, provider)) {
             // If we have a void chunk then no city here
             return false;
+        } else if (provider.getProfile().isSpace()) {
+            if (CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
+                return false;
+            } else if (!provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE && !CitySphere.fullyInsideCitySpere(chunkX, chunkZ, provider)) {
+                return false;
+            } else if (CitySphere.hasMonorailStation(chunkX, chunkZ, provider)) {
+                return false;
+            }
         }
+
         float cityFactor = City.getCityFactor(chunkX, chunkZ, provider, profile);
         return cityFactor > profile.CITY_THRESSHOLD;
     }
