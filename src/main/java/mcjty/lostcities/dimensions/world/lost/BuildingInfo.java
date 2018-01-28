@@ -1595,7 +1595,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
     @Override
     public Collection<ILostExplosion> getExplosions() {
-        return getDamageArea().getExplosions().stream().map(explosion -> (ILostExplosion) explosion).collect(Collectors.toList());
+        return new ArrayList<>(getDamageArea().getExplosions());
     }
 
     @Override
