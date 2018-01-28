@@ -32,6 +32,16 @@
         "char": "k",
         "block": "minecraft:rail"
       },
+
+
+      {
+      "char": "E",
+      "block": "minecraft:rail@5"
+      },
+      {
+      "char": "H",
+      "block": "minecraft:rail@4"
+      },
       {
         "char": "j",
         "block": "minecraft:rail@2"
