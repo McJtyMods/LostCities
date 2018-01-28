@@ -345,6 +345,8 @@ public class BuildingInfo implements ILostChunkInfo {
                     characteristics.isCity = false;
                 } else if (!provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE && !CitySphere.fullyInsideCitySpere(chunkX, chunkZ, provider)) {
                     characteristics.isCity = false;
+                } else if (CitySphere.hasMonorailStation(chunkX, chunkZ, provider)) {
+                    characteristics.isCity = false; // No city on same spot as a monorail station
                 }
             }
             characteristics.section = getMultiBuildingSection(chunkX, chunkZ, provider, profile);
@@ -689,13 +691,13 @@ public class BuildingInfo implements ILostChunkInfo {
             }
         }
 
+        hasBuilding = b;
+
         if (outsideChunk && provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE) {
             groundLevel = provider.getProfile().CITYSPHERE_OUTSIDE_GROUNDLEVEL;
         } else {
             groundLevel = provider.getProfile().GROUNDLEVEL;
         }
-
-        hasBuilding = b;
 
         CityStyle cs = (CityStyle) characteristics.cityStyle;
 

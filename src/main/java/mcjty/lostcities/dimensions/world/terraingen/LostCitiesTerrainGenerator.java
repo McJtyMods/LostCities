@@ -263,6 +263,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
+
     private void generateMonorails(ChunkPrimer primer, BuildingInfo info) {
         Transform transform;
         boolean horiz = info.hasHorizontalMonorail();

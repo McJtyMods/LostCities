@@ -95,6 +95,21 @@ public class CitySphere implements ILostSphere {
         return (float) (Math.sqrt(sqdist) / radius);
     }
 
+    private static boolean hasNonStationMonoRail(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (!fullyInsideCitySpere(chunkX, chunkZ, provider)) {
+            return hasHorizontalMonorail(chunkX, chunkZ, provider) || hasVerticalMonorail(chunkX, chunkZ, provider);
+        }
+        return false;
+    }
+
+    public static boolean hasMonorailStation(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+        if (fullyInsideCitySpere(chunkX, chunkZ, provider)) {
+            // If there is a non enclosed monorail nearby we generate a station
+            return hasNonStationMonoRail(chunkX-1, chunkZ, provider) || hasNonStationMonoRail(chunkX+1, chunkZ, provider) || hasNonStationMonoRail(chunkX, chunkZ-1, provider) || hasNonStationMonoRail(chunkX, chunkZ+1, provider);
+        }
+        return false;
+    }
+
     @Override
     public ChunkCoord getCenter() {
         return center;
