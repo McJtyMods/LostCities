@@ -7,7 +7,9 @@ public enum Transform {
     ROTATE_90(net.minecraft.util.Rotation.CLOCKWISE_90),
     ROTATE_180(net.minecraft.util.Rotation.CLOCKWISE_180),
     ROTATE_270(net.minecraft.util.Rotation.COUNTERCLOCKWISE_90),
-    MIRROR_X(net.minecraft.util.Rotation.CLOCKWISE_180);
+    MIRROR_X(net.minecraft.util.Rotation.CLOCKWISE_180),
+    MIRROR_Z(net.minecraft.util.Rotation.CLOCKWISE_180),
+    MIRROR_90_X(net.minecraft.util.Rotation.CLOCKWISE_90);
 
     private final net.minecraft.util.Rotation mcRotation;
 
@@ -31,6 +33,10 @@ public enum Transform {
                 return ROTATE_270;
             case MIRROR_X:
                 return MIRROR_X;
+            case MIRROR_Z:
+                return MIRROR_Z;
+            case MIRROR_90_X:
+                return MIRROR_90_X;
         }
         throw new IllegalStateException("Cannot happen!");
     }
@@ -47,6 +53,10 @@ public enum Transform {
                 return z;
             case MIRROR_X:
                 return 15-x;
+            case MIRROR_Z:
+                return x;
+            case MIRROR_90_X:
+                return z;
         }
         throw new IllegalStateException("Cannot happen!");
     }
@@ -63,32 +73,10 @@ public enum Transform {
                 return 15-x;
             case MIRROR_X:
                 return z;
-        }
-        throw new IllegalStateException("Cannot happen!");
-    }
-
-    int rotateW(int w, int h) {
-        switch (this) {
-            case ROTATE_NONE:
-            case ROTATE_180:
-            case MIRROR_X:
-                return w;
-            case ROTATE_90:
-            case ROTATE_270:
-                return h;
-        }
-        throw new IllegalStateException("Cannot happen!");
-    }
-
-    int rotateH(int w, int h) {
-        switch (this) {
-            case ROTATE_NONE:
-            case ROTATE_180:
-            case MIRROR_X:
-                return h;
-            case ROTATE_90:
-            case ROTATE_270:
-                return w;
+            case MIRROR_Z:
+                return 15-z;
+            case MIRROR_90_X:
+                return x;
         }
         throw new IllegalStateException("Cannot happen!");
     }
@@ -99,13 +87,15 @@ public enum Transform {
         }
         switch (shape) {
             case NORTH_SOUTH:
-                return (this == ROTATE_90 || this == ROTATE_270) ? BlockRailBase.EnumRailDirection.EAST_WEST : shape;
+                return (this == ROTATE_90 || this == ROTATE_270 || this == MIRROR_90_X) ? BlockRailBase.EnumRailDirection.EAST_WEST : shape;
             case EAST_WEST:
                 return (this == ROTATE_90 || this == ROTATE_270) ? BlockRailBase.EnumRailDirection.NORTH_SOUTH : shape;
             case ASCENDING_EAST:
                 switch (this) {
                     case ROTATE_90:
                         return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
+                    case MIRROR_90_X:
+                        return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
                     case ROTATE_180:
                         return BlockRailBase.EnumRailDirection.ASCENDING_WEST;
                     case ROTATE_270:
@@ -118,6 +108,8 @@ public enum Transform {
                 switch (this) {
                     case ROTATE_90:
                         return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
+                    case MIRROR_90_X:
+                        return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
                     case ROTATE_180:
                         return BlockRailBase.EnumRailDirection.ASCENDING_EAST;
                     case ROTATE_270:
@@ -130,11 +122,15 @@ public enum Transform {
                 switch (this) {
                     case ROTATE_90:
                         return BlockRailBase.EnumRailDirection.ASCENDING_EAST;
+                    case MIRROR_90_X:
+                        return BlockRailBase.EnumRailDirection.ASCENDING_WEST;
                     case ROTATE_180:
                         return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
                     case ROTATE_270:
                         return BlockRailBase.EnumRailDirection.ASCENDING_WEST;
                     case MIRROR_X:
+                        return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
+                    case MIRROR_Z:
                         return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
                 }
                 break;
@@ -142,11 +138,15 @@ public enum Transform {
                 switch (this) {
                     case ROTATE_90:
                         return BlockRailBase.EnumRailDirection.ASCENDING_WEST;
+                    case MIRROR_90_X:
+                        return BlockRailBase.EnumRailDirection.ASCENDING_EAST;
                     case ROTATE_180:
                         return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
                     case ROTATE_270:
                         return BlockRailBase.EnumRailDirection.ASCENDING_EAST;
                     case MIRROR_X:
+                        return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
+                    case MIRROR_Z:
                         return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
                 }
                 break;
@@ -154,48 +154,64 @@ public enum Transform {
                 switch (this) {
                     case ROTATE_90:
                         return BlockRailBase.EnumRailDirection.SOUTH_WEST;
+                    case MIRROR_90_X:
+                        return BlockRailBase.EnumRailDirection.NORTH_EAST;
                     case ROTATE_180:
                         return BlockRailBase.EnumRailDirection.NORTH_WEST;
                     case ROTATE_270:
                         return BlockRailBase.EnumRailDirection.NORTH_EAST;
                     case MIRROR_X:
                         return BlockRailBase.EnumRailDirection.SOUTH_WEST;
+                    case MIRROR_Z:
+                        return BlockRailBase.EnumRailDirection.NORTH_EAST;
                 }
                 break;
             case SOUTH_WEST:
                 switch (this) {
                     case ROTATE_90:
                         return BlockRailBase.EnumRailDirection.NORTH_WEST;
+                    case MIRROR_90_X:
+                        return BlockRailBase.EnumRailDirection.SOUTH_EAST;
                     case ROTATE_180:
                         return BlockRailBase.EnumRailDirection.NORTH_EAST;
                     case ROTATE_270:
                         return BlockRailBase.EnumRailDirection.SOUTH_EAST;
                     case MIRROR_X:
                         return BlockRailBase.EnumRailDirection.SOUTH_EAST;
+                    case MIRROR_Z:
+                        return BlockRailBase.EnumRailDirection.NORTH_WEST;
                 }
                 break;
             case NORTH_WEST:
                 switch (this) {
                     case ROTATE_90:
                         return BlockRailBase.EnumRailDirection.NORTH_EAST;
+                    case MIRROR_90_X:
+                        return BlockRailBase.EnumRailDirection.SOUTH_WEST;
                     case ROTATE_180:
                         return BlockRailBase.EnumRailDirection.SOUTH_EAST;
                     case ROTATE_270:
                         return BlockRailBase.EnumRailDirection.SOUTH_WEST;
                     case MIRROR_X:
                         return BlockRailBase.EnumRailDirection.NORTH_EAST;
+                    case MIRROR_Z:
+                        return BlockRailBase.EnumRailDirection.SOUTH_WEST;
                 }
                 break;
             case NORTH_EAST:
                 switch (this) {
                     case ROTATE_90:
                         return BlockRailBase.EnumRailDirection.SOUTH_EAST;
+                    case MIRROR_90_X:
+                        return BlockRailBase.EnumRailDirection.NORTH_WEST;
                     case ROTATE_180:
                         return BlockRailBase.EnumRailDirection.SOUTH_WEST;
                     case ROTATE_270:
                         return BlockRailBase.EnumRailDirection.NORTH_WEST;
                     case MIRROR_X:
                         return BlockRailBase.EnumRailDirection.NORTH_WEST;
+                    case MIRROR_Z:
+                        return BlockRailBase.EnumRailDirection.SOUTH_EAST;
                 }
                 break;
         }

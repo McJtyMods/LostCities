@@ -285,9 +285,25 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         if (CitySphere.fullyInsideCitySpere(info.chunkX, info.chunkZ, provider)) {
             // If there is a non enclosed monorail nearby we generate a station
-            if (hasNonStationMonoRail(info.getXmin()) || hasNonStationMonoRail(info.getXmax()) || hasNonStationMonoRail(info.getZmin()) || hasNonStationMonoRail(info.getZmax())) {
+            if (hasNonStationMonoRail(info.getXmin())) {
                 part = AssetRegistries.PARTS.get("monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
+                transform = Transform.MIRROR_90_X; // flip
+                fillToGround(primer, info, mainGroundLevel + 4, borderBlock);
+            } else if (hasNonStationMonoRail(info.getXmax())) {
+                part = AssetRegistries.PARTS.get("monorails_station");
+                Character borderBlock = info.getCityStyle().getBorderBlock();
+                transform = Transform.ROTATE_90;
+                fillToGround(primer, info, mainGroundLevel + 4, borderBlock);
+            } else if (hasNonStationMonoRail(info.getZmin())) {
+                part = AssetRegistries.PARTS.get("monorails_station");
+                Character borderBlock = info.getCityStyle().getBorderBlock();
+                transform = Transform.ROTATE_NONE;
+                fillToGround(primer, info, mainGroundLevel + 4, borderBlock);
+            } else if (hasNonStationMonoRail(info.getZmax())) {
+                part = AssetRegistries.PARTS.get("monorails_station");
+                Character borderBlock = info.getCityStyle().getBorderBlock();
+                transform = Transform.MIRROR_Z; // flip
                 fillToGround(primer, info, mainGroundLevel + 4, borderBlock);
             } else {
                 return;
