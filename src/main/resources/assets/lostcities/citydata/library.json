@@ -133,27 +133,6 @@
         ]
       },
       {
-        "char": "P",
-        "blocks": [
-          {
-            "random": 32,
-            "block": "minecraft:sapling"
-          },
-          {
-            "random": 32,
-            "block": "minecraft:sapling@1"
-          },
-          {
-            "random": 32,
-            "block": "minecraft:sapling@2"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:sapling@4"
-          }
-        ]
-      },
-      {
         "char": "p",
         "blocks": [
           {
@@ -1724,6 +1703,29 @@
     "name": "park_trees",
     "xsize": 16,
     "zsize": 16,
+    "palette": [
+      {
+        "char": "P",
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:sapling"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      }
+    ],
     "slices": [
       [
         "                ",
