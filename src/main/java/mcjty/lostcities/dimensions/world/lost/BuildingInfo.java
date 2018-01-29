@@ -1332,6 +1332,9 @@ public class BuildingInfo implements ILostChunkInfo {
 
 
     private boolean isSuitableForBridge(LostCityChunkGenerator provider, BuildingInfo i) {
+        if (provider.getProfile().isSpace() && hasMonorail()) {
+            return false;
+        }
         return i.cityLevel < cityLevel || LostCitiesTerrainGenerator.isWaterBiome(provider, i.coord);
     }
 
