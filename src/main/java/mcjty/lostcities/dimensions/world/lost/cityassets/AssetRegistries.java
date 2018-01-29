@@ -111,16 +111,17 @@ public class AssetRegistries {
 
     private static void printMap(Map<Character, Set<String>> usersPerCharacter, List<Map.Entry<Character, Integer>> map) {
         for (Map.Entry<Character, Integer> entry : map) {
-            System.out.println("    " + entry.getKey() + " : " + entry.getValue());
             Set<String> users = usersPerCharacter.get(entry.getKey());
-            String s = "";
-            if (users.size() < 13) {
-                s += "        ";
+            String s = "    " + entry.getKey() + ": " + entry.getValue() + " Uses";
+            if (users.size() < 10) {
+                s += ", Used by: ";
                 for (String user : users) {
                     s += user + ",";
                 }
-                System.out.println(s);
+            } else {
+                s += ", Used " + users.size() + " times";
             }
+            System.out.println(s);
         }
     }
 
