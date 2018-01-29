@@ -65,6 +65,7 @@ public class LostCityProfile {
     public float HIGHWAY_SECONDARYPERLIN_SCALE = 10.0f;
     public float HIGHWAY_PERLIN_FACTOR = 2.0f;
     public int HIGHWAY_DISTANCE_MASK = 7;
+    public boolean HIGHWAY_SUPPORTS = true;
 
     public float RAILWAY_DUNGEON_CHANCE = .01f;
     public boolean RAILWAYS_CAN_END = false;
@@ -140,6 +141,7 @@ public class LostCityProfile {
     public float BRIDGE_CHANCE = .7f;
     public float FOUNTAIN_CHANCE = .05f;
     public float BUILDING2X2_CHANCE = .03f;
+    public boolean BRIDGE_SUPPORTS = true;
 
     public int BEDROCK_LAYER = 1;
 
@@ -341,6 +343,8 @@ public class LostCityProfile {
                 "There actually being a corridor also depends on the presence of adjacent corridors");
         BRIDGE_CHANCE = cfg.getFloat("bridgeChance", categoryLostcity, inheritFrom.orElse(this).BRIDGE_CHANCE, 0.0f, 1.0f, "The chance that a chunk can possibly contain a bridge. " +
                 "There actually being a bridge also depends on the presence of adjacent bridges and other conditions");
+        BRIDGE_SUPPORTS = cfg.getBoolean("bridgeSupports", categoryLostcity, inheritFrom.orElse(this).BRIDGE_SUPPORTS,
+                "If true bridges get supports when needed. You can disable this if you have bridges that span void chunks");
 
         FOUNTAIN_CHANCE = cfg.getFloat("fountainChance", categoryLostcity, inheritFrom.orElse(this).FOUNTAIN_CHANCE, 0.0f, 1.0f, "The chance that a street section contains a fountain");
 
@@ -365,6 +369,8 @@ public class LostCityProfile {
                 "For highways on a certain axis, this value is used to scale the perlin noise generator on the secondary axis. Increasing this value will increase the variation of nearby highways");
         HIGHWAY_PERLIN_FACTOR = cfg.getFloat("highwayPerlinFactor", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_PERLIN_FACTOR, -100, 100,
                 "The highway perlin noise is compared to this value. Setting this to 0 would give 50% chance of a highway being at a spot. Note that highways only generate on chunks a multiple of 8. Setting this very high will prevent highways from generating");
+        HIGHWAY_SUPPORTS = cfg.getBoolean("highwaySupports", categoryLostcity, inheritFrom.orElse(this).HIGHWAY_SUPPORTS,
+                "If true highways get supports when needed. You can disable this if you have highways that span void chunks");
 
         BEDROCK_LAYER = cfg.getInt("bedrockLayer", categoryLostcity, inheritFrom.orElse(this).BEDROCK_LAYER, 0, 10,
                 "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");

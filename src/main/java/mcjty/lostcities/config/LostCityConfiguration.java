@@ -197,6 +197,8 @@ public class LostCityConfiguration {
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 0;
+        profile.BRIDGE_SUPPORTS = false;
+        profile.HIGHWAY_SUPPORTS = false;
         profile.RUBBLELAYER = false;
         profile.GROUNDLEVEL = 60;
         profile.EXPLOSION_CHANCE = 0.0001f;

@@ -601,7 +601,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         Character support = part.getMetaChar("support");
-        if (support != null) {
+        if (info.profile.HIGHWAY_SUPPORTS && support != null) {
             char sup = info.getCompiledPalette().get(support);
             int x1 = transform.rotateX(0, 15);
             int z1 = transform.rotateZ(0, 15);
@@ -679,7 +679,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         Character support = bt.getMetaChar("support");
-        if (support != null) {
+        if (info.profile.BRIDGE_SUPPORTS && support != null) {
             char sup = compiledPalette.get(support);
             BuildingInfo minDir = orientation.getMinDir().get(info);
             BuildingInfo maxDir = orientation.getMaxDir().get(info);
