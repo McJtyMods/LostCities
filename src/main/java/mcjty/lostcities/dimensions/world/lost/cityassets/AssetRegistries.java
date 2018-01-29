@@ -46,9 +46,9 @@ public class AssetRegistries {
         }
     }
 
-    private static void add(Map<Character, List<String>> map, Character character, String partName) {
+    private static void add(Map<Character, Set<String>> map, Character character, String partName) {
         if (!map.containsKey(character)) {
-            map.put(character, new ArrayList<>());
+            map.put(character, new HashSet<>());
         }
         map.get(character).add(partName);
     }
@@ -56,7 +56,7 @@ public class AssetRegistries {
     public static void showStatistics() {
         Counter<Character> counterLocal = new Counter<>();
         Counter<Character> counterGlobal = new Counter<>();
-        Map<Character, List<String>> usersPerCharacter = new HashMap<>();
+        Map<Character, Set<String>> usersPerCharacter = new HashMap<>();
 
         for (BuildingPart part : PARTS.getIterable()) {
             Palette localPalette = part.getLocalPalette();
@@ -90,10 +90,10 @@ public class AssetRegistries {
         printMap(usersPerCharacter, local);
     }
 
-    private static void printMap(Map<Character, List<String>> usersPerCharacter, List<Map.Entry<Character, Integer>> global) {
+    private static void printMap(Map<Character, Set<String>> usersPerCharacter, List<Map.Entry<Character, Integer>> global) {
         for (Map.Entry<Character, Integer> entry : global) {
             System.out.println("    " + entry.getKey() + " : " + entry.getValue());
-            List<String> users = usersPerCharacter.get(entry.getKey());
+            Set<String> users = usersPerCharacter.get(entry.getKey());
             String s = "";
             if (users.size() < 13) {
                 s += "        ";
