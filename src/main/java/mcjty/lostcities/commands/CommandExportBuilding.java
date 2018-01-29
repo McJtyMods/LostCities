@@ -47,11 +47,9 @@ public class CommandExportBuilding implements ICommand {
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        PrintWriter writer = null;
         try {
             int floors = Integer.parseInt(args[1]);
 
-            writer = new PrintWriter(new File(args[0]));
             JsonArray array = new JsonArray();
 
             EntityPlayer player = (EntityPlayer) sender;
@@ -121,8 +119,10 @@ public class CommandExportBuilding implements ICommand {
 //            AssetRegistries.MULTI_BUILDINGS.writeToJson(array);
 
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            writer.print(gson.toJson(array));
-            writer.flush();
+            try(PrintWriter writer = new PrintWriter(new File(args[0]))) {
+                writer.print(gson.toJson(array));
+                writer.flush();
+            }
         } catch (FileNotFoundException e) {
             sender.sendMessage(new TextComponentString("Error writing to file '" + args[0] + "'!"));
         } catch (Exception e) {

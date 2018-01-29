@@ -20,7 +20,9 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -90,8 +92,11 @@ public abstract class CommonProxy {
         AssetRegistries.reset();
         for (String path : LostCityConfiguration.ASSETS) {
             if (path.startsWith("/")) {
-                InputStream inputstream = LostCities.class.getResourceAsStream(path);
-                AssetRegistries.load(inputstream, path);
+                try(InputStream inputstream = LostCities.class.getResourceAsStream(path)) {
+                    AssetRegistries.load(inputstream, path);
+                } catch (IOException ex) {
+                    throw new UncheckedIOException(ex);
+                }
             } else if (path.startsWith("$")) {
                 File file = new File(modConfigDir.getPath() + File.separator + path.substring(1));
                 AssetRegistries.load(file);

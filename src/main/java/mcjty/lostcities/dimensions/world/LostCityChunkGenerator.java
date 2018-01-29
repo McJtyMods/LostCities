@@ -632,7 +632,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         return getDefaultCreatures(creatureType, pos);
     }
 
-    private List getDefaultCreatures(EnumCreatureType creatureType, BlockPos pos) {
+    private List<Biome.SpawnListEntry> getDefaultCreatures(EnumCreatureType creatureType, BlockPos pos) {
         Biome Biome = this.worldObj.getBiomeForCoordsBody(pos);
         if (creatureType == EnumCreatureType.MONSTER) {
             if (profile.GENERATE_SCATTERED) {

@@ -2,7 +2,6 @@ package mcjty.lostcities.proxy;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lostcities.ClientEventHandlers;
-import mcjty.lostcities.ForgeEventHandlers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;

@@ -1172,7 +1172,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private static class Blob {
+    private static class Blob implements Comparable<Blob> {
         private final int starty;
         private final int endy;
         private final Set<Integer> connectedBlocks = new HashSet<>();
@@ -1329,6 +1329,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             avgdamage /= (float) connectedBlocks.size();
         }
 
+        @Override
+        public int compareTo(Blob o) {
+            return this.lowestY - o.lowestY;
+        }
     }
 
     private Blob findBlob(List<Blob> blobs, int index) {
@@ -1383,20 +1387,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 //            }
 //        }
 
-        // Sort all blobs we delete with lowest first
-        blobs.sort((o1, o2) -> {
-            int y1 = o1.destroyOrMoveThis(provider, info) ? o1.lowestY : 1000;
-            int y2 = o2.destroyOrMoveThis(provider, info) ? o2.lowestY : 1000;
-            return y1 - y2;
-        });
-
-
         Blob blocksToMove = new Blob(0, 256);
-        for (Blob blob : blobs) {
-            if (!blob.destroyOrMoveThis(provider, info)) {
-                // The rest of the blobs doesn't have to be destroyed anymore
-                break;
-            }
+
+        // Sort all blobs we delete with lowest first
+        blobs.stream().filter(blob -> blob.destroyOrMoveThis(provider, info)).sorted().forEachOrdered(blob -> {
             if (rand.nextFloat() < info.profile.DESTROY_OR_MOVE_CHANCE || blob.connectedBlocks.size() < info.profile.DESTROY_SMALL_SECTIONS_SIZE
                     || blob.connections < 5) {
                 for (Integer index : blob.connectedBlocks) {
@@ -1405,7 +1399,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             } else {
                 blocksToMove.connectedBlocks.addAll(blob.connectedBlocks);
             }
-        }
+        });
         for (Integer index : blocksToMove.connectedBlocks) {
             char c = primer.data[index];
             primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;

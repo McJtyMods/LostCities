@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class AssetRegistries {
 
@@ -34,16 +35,17 @@ public class AssetRegistries {
     }
 
     public static void load(File file) {
-        try {
-            load(new FileInputStream(file), file.getName());
+        try(FileInputStream in = new FileInputStream(file)) {
+            load(in, file.getName());
         } catch (FileNotFoundException e) {
             // Not an error
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
     public static void load(InputStream inputstream, String filename) {
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, "UTF-8"));
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8))) {
             JsonParser parser = new JsonParser();
             JsonElement element = parser.parse(br);
             for (JsonElement entry : element.getAsJsonArray()) {
@@ -73,8 +75,8 @@ public class AssetRegistries {
                     throw new RuntimeException("Unknown type '" + type + " in " + filename + "'!");
                 }
             }
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }

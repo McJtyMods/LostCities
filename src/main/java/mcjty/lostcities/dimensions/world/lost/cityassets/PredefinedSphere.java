@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
-import net.minecraft.util.math.BlockPos;
 
 public class PredefinedSphere implements ILostCityAsset {
 

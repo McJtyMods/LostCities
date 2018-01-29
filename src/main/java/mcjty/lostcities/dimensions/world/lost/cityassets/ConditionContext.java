@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import com.google.common.base.Predicates;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +41,7 @@ public abstract class ConditionContext {
         if (obj.has("top")) {
             boolean top = obj.get("top").getAsBoolean();
             if (top) {
-                test = combine(test, levelInfo -> levelInfo.isTopOfBuilding());
+                test = combine(test, ConditionContext::isTopOfBuilding);
             } else {
                 test = combine(test, levelInfo -> !levelInfo.isTopOfBuilding());
             }
@@ -48,7 +49,7 @@ public abstract class ConditionContext {
         if (obj.has("ground")) {
             boolean ground = obj.get("ground").getAsBoolean();
             if (ground) {
-                test = combine(test, levelInfo -> levelInfo.isGroundFloor());
+                test = combine(test, ConditionContext::isGroundFloor);
             } else {
                 test = combine(test, levelInfo -> !levelInfo.isGroundFloor());
             }
@@ -56,7 +57,7 @@ public abstract class ConditionContext {
         if (obj.has("isbuilding")) {
             boolean ground = obj.get("isbuilding").getAsBoolean();
             if (ground) {
-                test = combine(test, levelInfo -> levelInfo.isBuilding());
+                test = combine(test, ConditionContext::isBuilding);
             } else {
                 test = combine(test, levelInfo -> !levelInfo.isBuilding());
             }
@@ -64,7 +65,7 @@ public abstract class ConditionContext {
         if (obj.has("issphere")) {
             boolean ground = obj.get("issphere").getAsBoolean();
             if (ground) {
-                test = combine(test, levelInfo -> levelInfo.isSphere());
+                test = combine(test, ConditionContext::isSphere);
             } else {
                 test = combine(test, levelInfo -> !levelInfo.isSphere());
             }
@@ -92,7 +93,7 @@ public abstract class ConditionContext {
         if (obj.has("cellar")) {
             boolean cellar = obj.get("cellar").getAsBoolean();
             if (cellar) {
-                test = combine(test, levelInfo -> levelInfo.isCellar());
+                test = combine(test, ConditionContext::isCellar);
             } else {
                 test = combine(test, levelInfo -> !levelInfo.isCellar());
             }
@@ -115,7 +116,7 @@ public abstract class ConditionContext {
             }
         }
         if (test == null) {
-            test = levelInfo -> true;
+            test = Predicates.alwaysTrue();
         }
         return test;
     }

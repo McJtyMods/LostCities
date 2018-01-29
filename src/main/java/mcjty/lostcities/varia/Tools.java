@@ -1,6 +1,5 @@
 package mcjty.lostcities.varia;
 
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.ResourceLocation;
