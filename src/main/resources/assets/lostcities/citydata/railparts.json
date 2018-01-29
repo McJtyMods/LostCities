@@ -4,6 +4,7 @@
     "name": "station_staircase_surface",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "                ",
@@ -103,6 +104,7 @@
     "name": "station_staircase",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "                ",
@@ -220,6 +222,7 @@
     "name": "station_underground_stairs",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "yyyyyyyyyyyyyyyy",
@@ -337,6 +340,7 @@
     "name": "station_underground",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "yyyyyyyyyyyyyyyy",
@@ -454,6 +458,7 @@
     "name": "station_openroof",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "yyyyyyyyyyyyyyyy",
@@ -589,6 +594,7 @@
     "name": "station_open",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "yyyyyyyyyyyyyyyy",
@@ -634,6 +640,7 @@
     "name": "rails_3split",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "      yyyyy     ",
@@ -751,6 +758,7 @@
     "name": "rails_vertical_water",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "      yyyyy     ",
@@ -868,6 +876,7 @@
     "name": "rails_vertical",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "      yyyyy     ",
@@ -985,6 +994,7 @@
     "name": "rails_horizontal_water",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "                ",
@@ -1102,6 +1112,7 @@
     "name": "rails_horizontal",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "y              y",
@@ -1219,6 +1230,7 @@
     "name": "rails_horizontal_end",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "y              y",
@@ -1336,6 +1348,7 @@
     "name": "rail_dungeon1",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "yyyyyyyyyyyyyyyy",
@@ -1453,6 +1466,7 @@
     "name": "rail_dungeon2",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "yyyyyyyyyyyyyyyy",
@@ -1570,6 +1584,7 @@
     "name": "rails_flat",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "yyyyyyyyyyyyyyyy",
@@ -1650,6 +1665,7 @@
     "name": "rails_down2",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "                ",
@@ -1983,6 +1999,7 @@
     "name": "rails_down1",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "                ",
@@ -2208,6 +2225,7 @@
     "name": "rails_bend",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "      yyyyy     ",

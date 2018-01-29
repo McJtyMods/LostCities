@@ -94,12 +94,13 @@ public class AssetRegistries {
         for (Map.Entry<Character, Integer> entry : global) {
             System.out.println("    " + entry.getKey() + " : " + entry.getValue());
             List<String> users = usersPerCharacter.get(entry.getKey());
-            if (users.size() < 10) {
-                System.out.print("       ");
+            String s = "";
+            if (users.size() < 13) {
+                s += "        ";
                 for (String user : users) {
-                    System.out.print(user + ",");
+                    s += user + ",";
                 }
-                System.out.println("");
+                System.out.println(s);
             }
         }
     }

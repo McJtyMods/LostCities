@@ -4,6 +4,7 @@
     "name": "monorails_both",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "      YYYYY     ",
@@ -193,6 +194,7 @@
     "name": "monorails_vertical",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "      YYYYY     ",
@@ -382,6 +384,7 @@
     "name": "monorails_station",
     "xsize": 16,
     "zsize": 16,
+    "palette": "rails",
     "slices": [
       [
         "yyyyyyyyyyyyyyyy",
