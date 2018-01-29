@@ -271,7 +271,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (horiz && vert) {
             if (!CitySphere.intersectsWithCitySphere(info.chunkX, info.chunkZ, provider)) {
                 BuildingPart part = AssetRegistries.PARTS.get("monorails_both");
-                generatePart(primer, info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + 4, 0, true);
+                generatePart(primer, info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true);
             }
             return;
         } else if (horiz) {
@@ -289,22 +289,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 part = AssetRegistries.PARTS.get("monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
                 transform = Transform.MIRROR_90_X; // flip
-                fillToGround(primer, info, mainGroundLevel + 4, borderBlock);
+                fillToGround(primer, info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
             } else if (hasNonStationMonoRail(info.getXmax())) {
                 part = AssetRegistries.PARTS.get("monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
                 transform = Transform.ROTATE_90;
-                fillToGround(primer, info, mainGroundLevel + 4, borderBlock);
+                fillToGround(primer, info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
             } else if (hasNonStationMonoRail(info.getZmin())) {
                 part = AssetRegistries.PARTS.get("monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
                 transform = Transform.ROTATE_NONE;
-                fillToGround(primer, info, mainGroundLevel + 4, borderBlock);
+                fillToGround(primer, info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
             } else if (hasNonStationMonoRail(info.getZmax())) {
                 part = AssetRegistries.PARTS.get("monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
                 transform = Transform.MIRROR_Z; // flip
-                fillToGround(primer, info, mainGroundLevel + 4, borderBlock);
+                fillToGround(primer, info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
             } else {
                 return;
             }
@@ -312,7 +312,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             part = AssetRegistries.PARTS.get("monorails_vertical");
         }
 
-        generatePart(primer, info, part, transform, 0, mainGroundLevel + 4, 0, true);
+        generatePart(primer, info, part, transform, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true);
     }
 
     private boolean hasNonStationMonoRail(BuildingInfo info) {

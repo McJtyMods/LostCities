@@ -106,6 +106,7 @@ public class LostCityProfile {
     public int CITYSPHERE_OUTSIDE_GROUNDLEVEL = 10;
     public String CITYSPHERE_OUTSIDE_PROFILE = "";
     public boolean CITYSPHERE_ONLY_PREDEFINED = false;
+    public int CITYSPHERE_MONORAIL_HEIGHT_OFFSET = -2;
 
     public int CITY_LEVEL0_HEIGHT = 75;
     public int CITY_LEVEL1_HEIGHT = 83;
@@ -245,6 +246,7 @@ public class LostCityProfile {
                 "If this is true then only predefined spheres are generated");
         CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("outsideGroundLevel", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_GROUNDLEVEL, 2, 256, "Ground level for outside city spheres");
         CITYSPHERE_OUTSIDE_PROFILE = cfg.getString("outsideProfile", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_PROFILE, "An optional profile to use for the outside world");
+        CITYSPHERE_MONORAIL_HEIGHT_OFFSET = cfg.getInt("monorailOffset", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_HEIGHT_OFFSET, -100, 100, "Offset compared to main height");
     }
 
     private void initLostcity(Configuration cfg) {
