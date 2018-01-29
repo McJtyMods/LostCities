@@ -576,20 +576,26 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             part = AssetRegistries.PARTS.get("highway_open" + suffix);
             int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0, true);
             // Clear a bit more above the highway
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    int index = (x << 12) | (z << 8);
-                    clearRange(primer, index, height, height + 15, waterLevel > mainGroundLevel);
+            if (!info.profile.isCavern()) {
+                int clearheight = 15;
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        int index = (x << 12) | (z << 8);
+                        clearRange(primer, index, height, height + clearheight, waterLevel > mainGroundLevel);
+                    }
                 }
             }
         } else {
             part = AssetRegistries.PARTS.get("highway_bridge" + suffix);
             int height = generatePart(primer, info, part, transform, 0, highwayGroundLevel, 0, true);
             // Clear a bit more above the highway
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    int index = (x << 12) | (z << 8);
-                    clearRange(primer, index, height, height + 15, waterLevel > mainGroundLevel);
+            if (!info.profile.isCavern()) {
+                int clearheight = 15;
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        int index = (x << 12) | (z << 8);
+                        clearRange(primer, index, height, height + clearheight, waterLevel > mainGroundLevel);
+                    }
                 }
             }
         }
