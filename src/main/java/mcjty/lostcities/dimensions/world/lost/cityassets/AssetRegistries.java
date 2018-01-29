@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AssetRegistries {
 
@@ -84,14 +85,32 @@ public class AssetRegistries {
         List<Map.Entry<Character, Integer>> local = new ArrayList<>(counterLocal.getMap().entrySet());
         global.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
         local.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
+        System.out.println("############################################################################");
         System.out.println("Global palette entries");
         printMap(usersPerCharacter, global);
+        System.out.println("----------------------------------------------------------------------------");
         System.out.println("Local palette entries");
         printMap(usersPerCharacter, local);
+        System.out.println("----------------------------------------------------------------------------");
+
+        printChars("Global: ", counterGlobal);
+        printChars("Local: ", counterLocal);
+
+        System.out.println("############################################################################");
     }
 
-    private static void printMap(Map<Character, Set<String>> usersPerCharacter, List<Map.Entry<Character, Integer>> global) {
-        for (Map.Entry<Character, Integer> entry : global) {
+    private static void printChars(String prefix, Counter<Character> counter) {
+        List<Character> chars = new ArrayList<>(counter.getMap().keySet());
+        chars.sort((o1, o2) -> o1.compareTo(o2));
+        String s = "";
+        for (Character character : chars) {
+            s += character;
+        }
+        System.out.println(prefix + s);
+    }
+
+    private static void printMap(Map<Character, Set<String>> usersPerCharacter, List<Map.Entry<Character, Integer>> map) {
+        for (Map.Entry<Character, Integer> entry : map) {
             System.out.println("    " + entry.getKey() + " : " + entry.getValue());
             Set<String> users = usersPerCharacter.get(entry.getKey());
             String s = "";
