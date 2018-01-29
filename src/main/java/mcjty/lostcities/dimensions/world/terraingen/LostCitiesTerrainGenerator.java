@@ -1948,7 +1948,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                              Transform transform,
                              int ox, int oy, int oz, boolean airWaterLevel) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
-        boolean combinedWithPart = false;
+        // Cache the combined palette?
+        Palette localPalette = part.getLocalPalette();
+        if (localPalette != null) {
+            compiledPalette = new CompiledPalette(compiledPalette, localPalette);
+        }
+
+
+//        boolean combinedWithPart = false;
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
                 char[] vs = part.getVSlice(x, z);
@@ -1961,20 +1968,20 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         char c = vs[y];
                         Character b = compiledPalette.get(c);
                         Map<String, Integer> orientations = compiledPalette.getTorchOrientations(c);
-                        if (b == null) {
-                            if (!combinedWithPart) {
-                                Palette localPalette = part.getLocalPalette();
-                                combinedWithPart = true;
-                                if (localPalette != null) {
-                                    compiledPalette = new CompiledPalette(compiledPalette, localPalette);
-                                    b = compiledPalette.get(c);
-                                    orientations = compiledPalette.getTorchOrientations(c);
-                                }
-                            }
+//                        if (b == null) {
+//                            if (!combinedWithPart) {
+//                                Palette localPalette = part.getLocalPalette();
+//                                combinedWithPart = true;
+//                                if (localPalette != null) {
+//                                    compiledPalette = new CompiledPalette(compiledPalette, localPalette);
+//                                    b = compiledPalette.get(c);
+//                                    orientations = compiledPalette.getTorchOrientations(c);
+//                                }
+//                            }
                             if (b == null) {
                                 throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
                             }
-                        }
+//                        }
                         if (transform != Transform.ROTATE_NONE) {
                             if (getRotatableChars().contains(b)) {
                                 IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);

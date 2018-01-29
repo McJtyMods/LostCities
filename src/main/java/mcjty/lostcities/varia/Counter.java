@@ -13,6 +13,10 @@ public class Counter<T> {
         internalMap.put(key, internalMap.get(key)+1);
     }
 
+    public Map<T, Integer> getMap() {
+        return internalMap;
+    }
+
     public int get(T key) {
         if (internalMap.containsKey(key)) {
             return internalMap.get(key);
