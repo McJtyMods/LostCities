@@ -183,6 +183,7 @@ public class LostCityConfiguration {
         profile.GENERATE_SCATTERED = false;
         profile.GENERATE_VILLAGES = false;
         profile.GENERATE_STRONGHOLDS = false;
+        profile.AVOID_GENERATED_FOSSILS = true;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("space", true);
@@ -213,6 +214,7 @@ public class LostCityConfiguration {
         profile.GENERATE_SCATTERED = false;
         profile.GENERATE_VILLAGES = false;
         profile.GENERATE_STRONGHOLDS = false;
+        profile.AVOID_GENERATED_FOSSILS = true;
         profile.BUILDING_CHANCE = .3f;
         profile.GENERATE_LIGHTING = true;
         standardProfiles.put(profile.getName(), profile);

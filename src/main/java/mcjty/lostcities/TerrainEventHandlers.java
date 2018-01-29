@@ -32,13 +32,17 @@ public class TerrainEventHandlers {
             switch (event.getType()) {
                 case CLAY:
                 case DEAD_BUSH:
-                case FOSSIL:
                 case ICE:
                 case LAKE_LAVA:
                 case ROCK:
                 case SAND:
                 case SAND_PASS2:
                 case CUSTOM:
+                    break;
+                case FOSSIL:
+                    if (getProfile(event, (WorldServer) world).AVOID_GENERATED_FOSSILS) {
+                        event.setResult(Event.Result.DENY);
+                    }
                     break;
                 case DESERT_WELL:
                     if (getProfile(event, (WorldServer) world).AVOID_GENERATED_DESERT_WELL) {
