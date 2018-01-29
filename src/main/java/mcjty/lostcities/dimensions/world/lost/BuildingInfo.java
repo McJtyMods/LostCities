@@ -748,9 +748,9 @@ public class BuildingInfo implements ILostChunkInfo {
             if (provider.getProfile().isSpace() && CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
                 float reldest = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
                 if (reldest > .6f) {
-                    f = Math.max(1, f-2);
+                    f = Math.max(minfloors, f-2);
                 } else if (reldest > .5f) {
-                    f = Math.max(1, f-1);
+                    f = Math.max(minfloors, f-1);
                 }
             }
 
