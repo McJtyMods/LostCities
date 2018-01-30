@@ -1630,50 +1630,81 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
 
         if (info.profile.isDefault()) {
+            // Base blocks below streets
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     int index = (x << 12) | (z << 8);
                     PrimerTools.setBlockStateRange(primer, index + info.profile.BEDROCK_LAYER, index + info.getCityGroundLevel(), baseChar);
                 }
             }
-        } else if (info.profile.isFloating()) {
+        } else if (info.profile.isFloating() || info.profile.isCavern()) {
             Character borderBlock = info.getCityStyle().getBorderBlock();
             Character wallBlock = info.getCityStyle().getWallBlock();
+            int offset = info.profile.isFloating() ? 3 : 2;
+            char wall = info.getCompiledPalette().get(wallBlock);
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     int index = (x << 12) | (z << 8);
-                    PrimerTools.setBlockStateRange(primer, index + info.getCityGroundLevel() - 2, index + info.getCityGroundLevel(), baseChar);
-                    setBlocksFromPalette(primer, index + info.getCityGroundLevel() - 3, index + info.getCityGroundLevel() - 2, info.getCompiledPalette(), borderBlock);
+                    PrimerTools.setBlockStateRange(primer, index + info.getCityGroundLevel() - (offset-1), index + info.getCityGroundLevel(), baseChar);
+                    setBlocksFromPalette(primer, index + info.getCityGroundLevel() - offset, index + info.getCityGroundLevel() - (offset-1), info.getCompiledPalette(), borderBlock);
                 }
             }
-            char wall = info.getCompiledPalette().get(wallBlock);
             for (int i1 = 0; i1 < 16; i1++) {
                 for (int i2 = 0; i2 < 16; i2 += 15) {
                     int x = i1;
                     int z = i2;
-                    generateBorderFloating(primer, info, heightmap, borderBlock, wall, x, z);
+                    // @todo fix when adjacent street sections are at same height!
+                    generateBorderFloating(primer, info, heightmap, borderBlock, wall, x, z, offset);
                     if (!isCorner(i1, i2)) {
                         x = i2;
                         z = i1;
-                        generateBorderFloating(primer, info, heightmap, borderBlock, wall, x, z);
+                        generateBorderFloating(primer, info, heightmap, borderBlock, wall, x, z, offset);
                     }
                 }
             }
         } else if (info.profile.isSpace()) {
             Character borderBlock = info.getCityStyle().getBorderBlock();
+            Character wallBlock = info.getCityStyle().getWallBlock();
+            char wall = info.getCompiledPalette().get(wallBlock);
             fillToGround(primer, info, info.getCityGroundLevel(), borderBlock);
+            for (int i1 = 0; i1 < 16; i1++) {
+                for (int i2 = 0; i2 < 16; i2 += 15) {
+                    int x = i1;
+                    int z = i2;
+                    generateBorderFloating(primer, info, heightmap, borderBlock, wall, x, z, 5);
+                    if (!isCorner(i1, i2)) {
+                        x = i2;
+                        z = i1;
+                        generateBorderFloating(primer, info, heightmap, borderBlock, wall, x, z, 5);
+                    }
+                }
+            }
         }
 
     }
 
-    private void generateBorderFloating(ChunkPrimer primer, BuildingInfo info, ChunkHeightmap heightmap, Character borderBlock, char wall, int x, int z) {
+    private void generateBorderFloating(ChunkPrimer primer, BuildingInfo info, ChunkHeightmap heightmap, Character borderBlock, char wall, int x, int z, int offset) {
         int index = (x << 12) | (z << 8);
-        setBlocksFromPalette(primer, index + info.getCityGroundLevel() - 3, index + info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+        setBlocksFromPalette(primer, index + info.getCityGroundLevel() - offset, index + info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
         if (isCorner(x, z)) {
             int height = heightmap.getHeight(x, z);
-            if (height > 1 && height < info.getCityGroundLevel() - 3) {
-                PrimerTools.setBlockStateRangeSafe(primer, index + height + 1, index + info.getCityGroundLevel() - 3, wall);
+            if (height > 1) {
+                // None void
+                int y = info.getCityGroundLevel()-offset-1;
+                while (y > 1 && primer.data[index+y] == airChar) {
+                    primer.data[index+y] = wall;
+                    y--;
+                }
+                while (y > 1 && primer.data[index+y] == liquidChar) {
+                    primer.data[index+y] = baseChar;
+                    y--;
+                }
             }
+
+
+//            if (height > 1 && height < info.getCityGroundLevel() - offset) {
+//                PrimerTools.setBlockStateRangeSafe(primer, index + height + 1, index + info.getCityGroundLevel() - offset, wall);
+//            }
         }
     }
 
