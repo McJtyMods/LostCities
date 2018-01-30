@@ -46,20 +46,25 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
         this.zSize = zSize;
     }
 
+    @Override
     public Character getMetaChar(String key) {
         return (Character) metadata.get(key);
     }
 
+    @Override
     public Integer getMetaInteger(String key) {
         return (Integer) metadata.get(key);
     }
+    @Override
     public boolean getMetaBoolean(String key) {
         Object o = metadata.get(key);
         return o instanceof Boolean ? (Boolean) o : false;
     }
+    @Override
     public Float getMetaFloat(String key) {
         return (Float) metadata.get(key);
     }
+    @Override
     public String getMetaString(String key) {
         return (String) metadata.get(key);
     }

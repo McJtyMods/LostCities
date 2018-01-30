@@ -2016,6 +2016,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             compiledPalette = new CompiledPalette(compiledPalette, localPalette);
         }
 
+        boolean nowater = part.getMetaBoolean("nowater");
 
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
@@ -2059,7 +2060,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                     b = airChar;
                                 }
                             } else if (b == hardAirChar) {
-                                if (airWaterLevel && !info.profile.AVOID_WATER) {
+                                if (airWaterLevel && !info.profile.AVOID_WATER && !nowater) {
                                     b = (oy + y) < waterLevel ? liquidChar : airChar;
                                 } else {
                                     b = airChar;
@@ -2098,9 +2099,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                         }
                                     }
                                 }
-                            }
-                            if (index < 0) {
-                                System.out.println("LostCitiesTerrainGenerator.generatePart");
                             }
                             primer.data[index] = b;
                         }

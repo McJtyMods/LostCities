@@ -187,7 +187,12 @@
         "      YYYYY     "
       ]
     ],
-    "meta": []
+    "meta": [
+      {
+        "key": "nowater",
+        "boolean": true
+      }
+    ]
   },
   {
     "type": "part",
@@ -377,7 +382,12 @@
         "      YYYYY     "
       ]
     ],
-    "meta": []
+    "meta": [
+      {
+        "key": "nowater",
+        "boolean": true
+      }
+    ]
   },
   {
     "type": "part",
@@ -459,6 +469,11 @@
         "wwwwwwwwwwwwwwww"
       ]
     ],
-    "meta": []
+    "meta": [
+      {
+        "key": "nowater",
+        "boolean": true
+      }
+    ]
   }
 ]
