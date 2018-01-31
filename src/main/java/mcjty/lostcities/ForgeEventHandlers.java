@@ -55,10 +55,8 @@ public class ForgeEventHandlers {
                     LostCities.logger.error("Cannot find city '" + profile.SPAWN_CITY + "' for the player to spawn in !");
                 } else {
                     float sqradius = (city.getRadius()-5)*(city.getRadius()-5);
-                    isSuitable = blockPos -> {
-                        return city.getDimension() == world.provider.getDimension() &&
-                                CitySphere.squaredDistance(city.getChunkX()*16+8, city.getChunkZ()*16+8, blockPos.getX(), blockPos.getZ()) < sqradius;
-                    };
+                    isSuitable = blockPos -> city.getDimension() == world.provider.getDimension() &&
+                            CitySphere.squaredDistance(city.getChunkX()*16+8, city.getChunkZ()*16+8, blockPos.getX(), blockPos.getZ()) < sqradius;
                     needsCheck = true;
                 }
             } else if (!profile.SPAWN_SPHERE.isEmpty()) {
@@ -67,12 +65,8 @@ public class ForgeEventHandlers {
                     LostCities.logger.error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
                 } else {
                     float sqradius = (sphere.getRadius()-5)*(sphere.getRadius()-5);
-                    float cx = sphere.getCenterX();
-                    float cz = sphere.getCenterZ();
-                    isSuitable = blockPos -> {
-                        return sphere.getDimension() == world.provider.getDimension() &&
-                                CitySphere.squaredDistance(sphere.getChunkX()*16+8, sphere.getChunkZ()*16+8, blockPos.getX(), blockPos.getZ()) < sqradius;
-                    };
+                    isSuitable = blockPos -> sphere.getDimension() == world.provider.getDimension() &&
+                            CitySphere.squaredDistance(sphere.getChunkX()*16+8, sphere.getChunkZ()*16+8, blockPos.getX(), blockPos.getZ()) < sqradius;
                     needsCheck = true;
                 }
             }
@@ -112,7 +106,7 @@ public class ForgeEventHandlers {
                     continue;
                 }
 
-                for (int y = bottom ; y < 150 ; y++) {
+                for (int y = bottom ; y < 125 ; y++) {
                     BlockPos pos = new BlockPos(x, y, z);
                     if (isValidStandingPosition(world, pos)) {
                         world.setSpawnPoint(pos.up());
