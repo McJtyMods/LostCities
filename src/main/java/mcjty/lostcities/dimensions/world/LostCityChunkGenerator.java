@@ -24,7 +24,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.MobSpawnerBaseLogic;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.tileentity.TileEntityLockableLoot;
 import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.fixes.EntityId;
@@ -440,17 +440,17 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         info.clearMobSpawnerTodo();
 
 
-        for (Pair<BlockPos, BuildingInfo.ConditionTodo> pair : info.getChestTodo()) {
+        for (Pair<BlockPos, BuildingInfo.ConditionTodo> pair : info.getLootTodo()) {
             BlockPos pos = pair.getKey();
-            // Double check that it is still a chest (could be destroyed by explosion)
-            IBlockState state = world.getBlockState(pos);
-            if (state.getBlock() == Blocks.CHEST) {
+            // Double check that it is still something that can hold loot (could be destroyed by explosion)
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileEntityLockableLoot) {
                 if (chunkGenerator.profile.GENERATE_LOOT) {
-                    createLootChest(info, random, world, pos, pair.getRight());
+                    createLoot(info, random, world, pos, pair.getRight());
                 }
             }
         }
-        info.clearChestTodo();
+        info.clearLootTodo();
 
 
         for (BlockPos pos : info.getGenericTodo()) {
@@ -463,13 +463,12 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
     }
 
 
-    private void createLootChest(BuildingInfo info, Random random, World world, BlockPos pos, BuildingInfo.ConditionTodo todo) {
-//        world.setBlockState(pos, Blocks.CHEST.getDefaultState().withProperty(BlockChest.FACING, EnumFacing.SOUTH));
+    private void createLoot(BuildingInfo info, Random random, World world, BlockPos pos, BuildingInfo.ConditionTodo todo) {
         if (random.nextFloat() < profile.CHEST_WITHOUT_LOOT_CHANCE) {
             return;
         }
         TileEntity tileentity = world.getTileEntity(pos);
-        if (tileentity instanceof TileEntityChest) {
+        if (tileentity instanceof TileEntityLockableLoot) {
             if (todo != null) {
                 String lootTable = todo.getCondition();
                 int level = (pos.getY() - profile.GROUNDLEVEL) / 6;
@@ -490,7 +489,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                 if (randomValue == null) {
                     throw new RuntimeException("Condition '" + lootTable + "' did not return a table under certain conditions!");
                 }
-                ((TileEntityChest) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
+                ((TileEntityLockableLoot) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
                 tileentity.markDirty();
                 if (LostCityConfiguration.DEBUG) {
                     LostCities.logger.debug("createLootChest: loot=" + randomValue + " pos=" + pos.toString());

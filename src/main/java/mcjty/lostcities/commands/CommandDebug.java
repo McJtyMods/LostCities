@@ -57,7 +57,7 @@ public class CommandDebug implements ICommand {
             System.out.println("ruinHeight = " + info.ruinHeight);
             System.out.println("getHighwayXLevel() = " + info.getHighwayXLevel());
             System.out.println("getHighwayZLevel() = " + info.getHighwayZLevel());
-            System.out.println("getChestTodo().size() = " + info.getChestTodo().size());
+            System.out.println("getChestTodo().size() = " + info.getLootTodo().size());
             System.out.println("getMobSpawnerTodo().size() = " + info.getMobSpawnerTodo().size());
 
             float reldist = CitySphere.getRelativeDistanceToCityCenter(info.chunkX, info.chunkZ, provider);

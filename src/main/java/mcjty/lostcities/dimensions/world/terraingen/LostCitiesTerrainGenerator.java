@@ -2033,10 +2033,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     for (int y = 0; y < len; y++) {
                         char c = vs[y];
                         Character b = compiledPalette.get(c);
-                        Map<String, Integer> orientations = compiledPalette.getTorchOrientations(c);
                         if (b == null) {
                             throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
                         }
+
+                        Map<String, Integer> orientations = compiledPalette.getTorchOrientations(c);
+                        String loot = compiledPalette.getLootTable(c);
+
+
                         if (transform != Transform.ROTATE_NONE) {
                             if (getRotatableChars().contains(b)) {
                                 IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
@@ -2075,6 +2079,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 } else {
                                     b = airChar;        // No torches
                                 }
+                            } else if (loot != null && !loot.isEmpty()) {
+                                if (!info.noLoot) {
+                                    info.getTodoChunk(rx, rz).addLootTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
+                                            new BuildingInfo.ConditionTodo(loot, part.getName(), info));
+                                }
                             } else if (getCharactersNeedingTodo().contains(b)) {
                                 if (b == spawnerChar) {
                                     if (info.profile.GENERATE_SPAWNERS && !info.noLoot) {
@@ -2087,7 +2096,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 } else if (b == chestChar) {
                                     if (!info.noLoot) {
                                         String lootTable = part.getLootTable(info, x, y, z);
-                                        info.getTodoChunk(rx, rz).addChestTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
+                                        info.getTodoChunk(rx, rz).addLootTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
                                                 new BuildingInfo.ConditionTodo(lootTable, part.getName(), info));
                                     }
                                 } else if (b == glowstoneChar) {

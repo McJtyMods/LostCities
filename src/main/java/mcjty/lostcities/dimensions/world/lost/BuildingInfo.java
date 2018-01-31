@@ -20,7 +20,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class BuildingInfo implements ILostChunkInfo {
     public final int chunkX;
@@ -92,7 +91,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
-    private final List<Pair<BlockPos, ConditionTodo>> chestTodo = new ArrayList<>();
+    private final List<Pair<BlockPos, ConditionTodo>> lootTodo = new ArrayList<>();
     private final List<BlockPos> genericTodo = new ArrayList<>();
     private final List<Pair<Integer, Map<String, Integer>>> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
@@ -169,24 +168,24 @@ public class BuildingInfo implements ILostChunkInfo {
         mobSpawnerTodo.add(Pair.of(pos, mobId));
     }
 
-    public void addChestTodo(BlockPos pos, @Nullable ConditionTodo lootTable) {
-        chestTodo.add(Pair.of(pos, lootTable));
+    public void addLootTodo(BlockPos pos, @Nullable ConditionTodo lootTable) {
+        lootTodo.add(Pair.of(pos, lootTable));
     }
 
     public List<Pair<BlockPos, ConditionTodo>> getMobSpawnerTodo() {
         return mobSpawnerTodo;
     }
 
-    public List<Pair<BlockPos, ConditionTodo>> getChestTodo() {
-        return chestTodo;
+    public List<Pair<BlockPos, ConditionTodo>> getLootTodo() {
+        return lootTodo;
     }
 
     public void clearMobSpawnerTodo() {
         mobSpawnerTodo.clear();
     }
 
-    public void clearChestTodo() {
-        chestTodo.clear();
+    public void clearLootTodo() {
+        lootTodo.clear();
     }
 
     public CompiledPalette getCompiledPalette() {
