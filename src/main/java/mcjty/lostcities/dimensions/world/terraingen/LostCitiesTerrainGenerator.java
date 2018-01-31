@@ -449,6 +449,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (info.profile.isDefault()) {
             flattenChunkToCityBorder(chunkX, chunkZ, primer);
         }
+
+        LostCityEvent.PostGenOutsideChunkEvent postevent = new LostCityEvent.PostGenOutsideChunkEvent(provider.worldObj, provider, chunkX, chunkZ, primer);
+        MinecraftForge.EVENT_BUS.post(postevent);
+
         generateBridges(primer, info);
         generateHighways(chunkX, chunkZ, primer, info);
     }

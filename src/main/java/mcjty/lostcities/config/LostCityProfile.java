@@ -160,8 +160,11 @@ public class LostCityProfile {
     public float FOG_RED = -1.0f;
     public float FOG_GREEN = -1.0f;
     public float FOG_BLUE = -1.0f;
+    public float FOG_DENSITY = -1.0f;
 
     public String SPAWN_BIOME = "";
+    public String SPAWN_CITY = "";
+    public String SPAWN_SPHERE = "";
 
     public int MAX_CAVE_HEIGHT = 128;
 
@@ -235,6 +238,7 @@ public class LostCityProfile {
         FOG_RED = cfg.getFloat("fogRed", categoryClient, inheritFrom.orElse(this).FOG_RED, -1f, 1f, "This is used client-side (but only if the client has this mod) for the fog color");
         FOG_GREEN = cfg.getFloat("fogGreen", categoryClient, inheritFrom.orElse(this).FOG_GREEN, -1f, 1f, "This is used client-side (but only if the client has this mod) for the fog color");
         FOG_BLUE = cfg.getFloat("fogBlue", categoryClient, inheritFrom.orElse(this).FOG_BLUE, -1f, 1f, "This is used client-side (but only if the client has this mod) for the fog color");
+        FOG_DENSITY = cfg.getFloat("fogDensity", categoryClient, inheritFrom.orElse(this).FOG_DENSITY, -1f, 1f, "This is used client-side (but only if the client has this mod) for the fog density");
     }
 
     private void initCitySpheres(Configuration cfg) {
@@ -259,6 +263,9 @@ public class LostCityProfile {
         iconFile = cfg.getString("icon", categoryLostcity, inheritFrom.orElse(this).iconFile, "The icon to use in the configuration screen (64x64)");
 
         SPAWN_BIOME = cfg.getString("spawnBiome", categoryLostcity, inheritFrom.orElse(this).SPAWN_BIOME, "When this is set the player will always spawn in the given biome");
+        SPAWN_CITY = cfg.getString("spawnCity", categoryLostcity, inheritFrom.orElse(this).SPAWN_CITY, "When this is set the player will always spawn in the given predefined city");
+        SPAWN_SPHERE = cfg.getString("spawnSphere", categoryLostcity, inheritFrom.orElse(this).SPAWN_SPHERE, "When this is set the player will always spawn in the given predefined sphere");
+
         VINE_CHANCE = cfg.getFloat("vineChance", categoryLostcity, inheritFrom.orElse(this).VINE_CHANCE, 0.0f, 1.0f, "The chance that a block on the outside of a building will be covered with a vine");
         CHANCE_OF_RANDOM_LEAFBLOCKS = cfg.getFloat("randomLeafBlockChance", categoryLostcity, inheritFrom.orElse(this).CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f, "Chance that leafblocks will be generated at the border of a building and a street");
         THICKNESS_OF_RANDOM_LEAFBLOCKS = cfg.getInt("randomLeafBlockThickness", categoryLostcity, inheritFrom.orElse(this).THICKNESS_OF_RANDOM_LEAFBLOCKS, 1, 8,

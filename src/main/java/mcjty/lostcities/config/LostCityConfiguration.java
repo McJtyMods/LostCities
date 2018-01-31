@@ -140,6 +140,7 @@ public class LostCityConfiguration {
         profile.FOG_RED = 0.0f;
         profile.FOG_GREEN = 0.0f;
         profile.FOG_BLUE = 0.0f;
+        profile.FOG_DENSITY = 0.02f;
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
         profile.GENERATE_LIGHTING = true;

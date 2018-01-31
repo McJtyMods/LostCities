@@ -132,6 +132,32 @@ public class LostCityEvent extends Event {
     }
 
     /**
+     * PostGenOutsideChunkEvent is fired right after generation of a non-building or non-street chunk (i.e. an outside chunk).<br>
+     * This is fired right after generation of the chunk but before highways, subways and other stuff like that.
+     * NOTE! This will NOT be called for city chunks (buildings or street). <br>
+     * <br>
+     * {@link #primer} contains the {@link ChunkPrimer} for this chunk. <br>
+     * <br>
+     * This event is not {@link Cancelable}.<br>
+     * <br>
+     * This event does not have a result. {@link HasResult}<br>
+     * <br>
+     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+     **/
+    public static class PostGenOutsideChunkEvent extends LostCityEvent {
+        private final ChunkPrimer primer;
+
+        public PostGenOutsideChunkEvent(World world, ILostChunkGenerator generator, int chunkX, int chunkZ, ChunkPrimer primer) {
+            super(world, generator, chunkX, chunkZ);
+            this.primer = primer;
+        }
+
+        public ChunkPrimer getPrimer() {
+            return primer;
+        }
+    }
+
+    /**
      * PreExplosionEvent fired after chunk generation but before explosion damage is done.<br>
      * If you cancel this event then no explosion damage will be done. This event is the final chance
      * to modify the chunk before explosion damage is calculated.

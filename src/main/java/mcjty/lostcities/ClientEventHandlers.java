@@ -20,4 +20,13 @@ public class ClientEventHandlers {
             event.setBlue(profile.FOG_BLUE);
         }
     }
+
+    @SubscribeEvent
+    public void onFogDensity(EntityViewRenderEvent.FogDensity event) {
+        LostCityProfile profile = WorldTypeTools.getProfile(event.getEntity().world);
+        if (profile.FOG_DENSITY >= 0) {
+            event.setDensity(profile.FOG_DENSITY);
+            event.setCanceled(true);
+        }
+    }
 }
