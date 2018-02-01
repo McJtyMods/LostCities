@@ -37,6 +37,9 @@ public class ForgeEventHandlers {
         if (!world.isRemote) {
 
             LostCityProfile profile = WorldTypeTools.getProfile(world);
+            if (profile == null) {
+                return;
+            }
 
             Predicate<BlockPos> isSuitable = pos -> true;
             boolean needsCheck = false;
