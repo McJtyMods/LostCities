@@ -58,6 +58,16 @@ public class WorldTypeTools {
         profileMap.put(dimension, LostCityConfiguration.profiles.get(profile));
     }
 
+    public static boolean isLostCities(World world) {
+        if (LostCityConfiguration.DIMENSION_ID != -1 && world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
+            return true;
+        }
+        if (world.provider.getDimension() != 0) {
+            return false;
+        }
+        return world.getWorldType() instanceof LostWorldType || world.getWorldType() instanceof LostWorldTypeBOP;
+    }
+
     private static LostCityProfile getProfileOnServer(World world) {
         if (world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
             LostCityProfile profile = LostCityConfiguration.profiles.get(LostCityConfiguration.DIMENSION_PROFILE);

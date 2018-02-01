@@ -22,6 +22,9 @@ public class TerrainEventHandlers {
     public void onCreateDecorate(DecorateBiomeEvent.Decorate event) {
         World world = event.getWorld();
         if (!world.isRemote) {
+            if (!WorldTypeTools.isLostCities(world)) {
+                return;
+            }
             WorldServer worldServer = (WorldServer) world;
             IChunkGenerator chunkGenerator = worldServer.getChunkProvider().chunkGenerator;
             if (!(chunkGenerator instanceof LostCityChunkGenerator)) {

@@ -35,6 +35,9 @@ public class ForgeEventHandlers {
     public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
         World world = event.getWorld();
         if (!world.isRemote) {
+            if (!WorldTypeTools.isLostCities(world)) {
+                return;
+            }
 
             LostCityProfile profile = WorldTypeTools.getProfile(world);
             if (profile == null) {
