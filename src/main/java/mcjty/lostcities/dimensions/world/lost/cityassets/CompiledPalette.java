@@ -17,17 +17,43 @@ public class CompiledPalette {
 
     private final Map<Character, Object> palette = new HashMap<>();
     private final Map<Character, Character> damagedToBlock = new HashMap<>();
-    private final Map<Character, String> mobIds = new HashMap<>();
-    private final Map<Character, String> lootTables = new HashMap<>();
-    private final Map<Character, Map<String, Integer>> torchOrientations = new HashMap<>();
+//    private final Map<Character, String> mobIds = new HashMap<>();
+//    private final Map<Character, String> lootTables = new HashMap<>();
+//    private final Map<Character, Map<String, Integer>> torchOrientations = new HashMap<>();
+    private final Map<Character, Info> information = new HashMap<>();
+
+    public static class Info {
+        private final String mobId;
+        private final String loot;
+        private final Map<String, Integer> torchOrientations;
+
+        public Info(String mobId, String loot, Map<String, Integer> torchOrientations) {
+            this.mobId = mobId;
+            this.loot = loot;
+            this.torchOrientations = torchOrientations;
+        }
+
+        public String getMobId() {
+            return mobId;
+        }
+
+        public String getLoot() {
+            return loot;
+        }
+
+        public Map<String, Integer> getTorchOrientations() {
+            return torchOrientations;
+        }
+    }
 
 
     public CompiledPalette(CompiledPalette other, Palette... palettes) {
         this.palette.putAll(other.palette);
         this.damagedToBlock.putAll(other.damagedToBlock);
-        this.mobIds.putAll(other.mobIds);
-        this.lootTables.putAll(other.lootTables);
-        this.torchOrientations.putAll(other.torchOrientations);
+        this.information.putAll(other.information);
+//        this.mobIds.putAll(other.mobIds);
+//        this.lootTables.putAll(other.lootTables);
+//        this.torchOrientations.putAll(other.torchOrientations);
         addPalettes(palettes);
     }
 
@@ -102,15 +128,15 @@ public class CompiledPalette {
             }
             for (Map.Entry<Character, String> entry : p.getMobIds().entrySet()) {
                 Character c = entry.getKey();
-                mobIds.put(c, entry.getValue());
+                information.put(c, new Info(entry.getValue(), null, null));
             }
             for (Map.Entry<Character, String> entry : p.getLootTables().entrySet()) {
                 Character c = entry.getKey();
-                lootTables.put(c, entry.getValue());
+                information.put(c, new Info(null, entry.getValue(), null));
             }
             for (Map.Entry<Character, Map<String, Integer>> entry : p.getTorchOrientations().entrySet()) {
                 Character c = entry.getKey();
-                torchOrientations.put(c, entry.getValue());
+                information.put(c, new Info(null, null, entry.getValue()));
             }
         }
     }
@@ -184,17 +210,5 @@ public class CompiledPalette {
         return damagedToBlock.get(b);
     }
 
-    public String getMobId(Character c) { return mobIds.get(c); }
-
-    public String getLootTable(Character c) {
-        return lootTables.get(c);
-    }
-
-    public Map<String, Integer> getTorchOrientations(Character c) {
-        return torchOrientations.get(c);
-    }
-
-    public Map<Character, Map<String, Integer>> getAllTorchOrientations() {
-        return torchOrientations;
-    }
+    public Info getInfo(Character c) { return information.get(c); }
 }

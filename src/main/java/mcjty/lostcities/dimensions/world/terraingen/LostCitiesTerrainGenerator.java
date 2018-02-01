@@ -48,8 +48,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char endportalFrameChar;
     public static char goldBlockChar;
     public static char diamondBlockChar;
-    public static char spawnerChar;
-    public static char chestChar;
 
     private static Set<Character> rotatableChars = null;
     private static Set<Character> railChars = null;
@@ -126,8 +124,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static Set<Character> getCharactersNeedingTodo() {
         if (charactersNeedingTodo == null) {
             charactersNeedingTodo = new HashSet<>();
-            charactersNeedingTodo.add(spawnerChar);
-            charactersNeedingTodo.add(chestChar);
             charactersNeedingTodo.add(glowstoneChar);
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH)));
@@ -201,8 +197,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             endportalFrameChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.END_PORTAL_FRAME.getDefaultState());
             goldBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GOLD_BLOCK.getDefaultState());
             diamondBlockChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.DIAMOND_BLOCK.getDefaultState());
-            spawnerChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.MOB_SPAWNER.getDefaultState());
-            chestChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.CHEST.getDefaultState());
             charsSetup = true;
         }
     }
@@ -669,11 +663,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 while (l < bt.getSliceCount()) {
                     Character c = orientation == Orientation.X ? bt.getPaletteChar(x, l, z) : bt.getPaletteChar(z, l, x); // @todo general rotation system?
                     Character b = info.getCompiledPalette().get(c);
-                    if (compiledPalette.getTorchOrientations(c) != null) {
-                        if (info.profile.GENERATE_LIGHTING) {
-                            info.addTorchTodo(index, compiledPalette.getTorchOrientations(c));
-                        } else {
-                            b = airChar;        // No torch!
+                    CompiledPalette.Info inf = compiledPalette.getInfo(c);
+                    if (inf != null) {
+                        Map<String, Integer> orientations = inf.getTorchOrientations();
+                        if (orientations != null) {
+                            if (info.profile.GENERATE_LIGHTING) {
+                                info.addTorchTodo(index, orientations);
+                            } else {
+                                b = airChar;        // No torch!
+                            }
                         }
                     }
                     primer.data[index++] = b;
@@ -2037,8 +2035,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
                         }
 
-                        Map<String, Integer> orientations = compiledPalette.getTorchOrientations(c);
-                        String loot = compiledPalette.getLootTable(c);
+                        CompiledPalette.Info inf = compiledPalette.getInfo(c);
 
 
                         if (transform != Transform.ROTATE_NONE) {
@@ -2073,33 +2070,30 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 } else {
                                     b = airChar;
                                 }
-                            } else if (orientations != null) {
-                                if (info.profile.GENERATE_LIGHTING) {
-                                    info.addTorchTodo(index, orientations);
-                                } else {
-                                    b = airChar;        // No torches
-                                }
-                            } else if (loot != null && !loot.isEmpty()) {
-                                if (!info.noLoot) {
-                                    info.getTodoChunk(rx, rz).addLootTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
-                                            new BuildingInfo.ConditionTodo(loot, part.getName(), info));
-                                }
-                            } else if (getCharactersNeedingTodo().contains(b)) {
-                                if (b == spawnerChar) {
+                            } else if (inf != null) {
+                                Map<String, Integer> orientations = inf.getTorchOrientations();
+                                if (orientations != null) {
+                                    if (info.profile.GENERATE_LIGHTING) {
+                                        info.addTorchTodo(index, orientations);
+                                    } else {
+                                        b = airChar;        // No torches
+                                    }
+                                } else if (inf.getLoot() != null && !inf.getLoot().isEmpty()) {
+                                    if (!info.noLoot) {
+                                        info.getTodoChunk(rx, rz).addLootTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
+                                                new BuildingInfo.ConditionTodo(inf.getLoot(), part.getName(), info));
+                                    }
+                                } else if (inf.getMobId() != null && !inf.getMobId().isEmpty()) {
                                     if (info.profile.GENERATE_SPAWNERS && !info.noLoot) {
-                                        String mobid = part.getMobID(info, x, y, z);
+                                        String mobid = inf.getMobId();
                                         info.getTodoChunk(rx, rz).addSpawnerTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
                                                 new BuildingInfo.ConditionTodo(mobid, part.getName(), info));
                                     } else {
                                         b = airChar;
                                     }
-                                } else if (b == chestChar) {
-                                    if (!info.noLoot) {
-                                        String lootTable = part.getLootTable(info, x, y, z);
-                                        info.getTodoChunk(rx, rz).addLootTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
-                                                new BuildingInfo.ConditionTodo(lootTable, part.getName(), info));
-                                    }
-                                } else if (b == glowstoneChar) {
+                                }
+                            } else if (getCharactersNeedingTodo().contains(b)) {
+                                if (b == glowstoneChar) {
                                     info.getTodoChunk(rx, rz).addGenericTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                 } else {
                                     IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
