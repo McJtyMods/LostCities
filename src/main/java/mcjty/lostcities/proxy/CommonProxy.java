@@ -10,7 +10,9 @@ import mcjty.lostcities.dimensions.ModDimensions;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.network.PacketHandler;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.FMLLog;
@@ -40,6 +42,8 @@ public abstract class CommonProxy {
         mainConfig = new Configuration(new File(modConfigDir.getPath() + File.separator + "lostcities", "general.cfg"));
         readMainConfig();
         ModDimensions.init();
+        LootTableList.register(new ResourceLocation(LostCities.MODID, "lostcitychest"));
+        LootTableList.register(new ResourceLocation(LostCities.MODID, "raildungeonchest"));
     }
 
     private void readMainConfig() {

@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.config.BiomeSelectionStrategy;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import net.minecraft.util.math.BlockPos;
@@ -21,11 +22,16 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
     private final BiomeTranslator biomeTranslator;
     private final BiomeTranslator outsideTranslator;
 
-    public LostWorldFilteredBiomeProvider(World world, BiomeProvider original, String[] allowedBiomeFactors, String[] outsideBiomeFactors) {
+    public LostWorldFilteredBiomeProvider(World world, BiomeProvider original,
+                                          String[] allowedBiomeFactors,
+                                          BiomeSelectionStrategy strategy,
+                                          String[] outsideBiomeFactors,
+                                          BiomeSelectionStrategy outsideStrategy) {
         this.world = world;
         this.original = original;
-        biomeTranslator = new BiomeTranslator(allowedBiomeFactors);
-        outsideTranslator = new BiomeTranslator(outsideBiomeFactors.length == 0 ? allowedBiomeFactors : outsideBiomeFactors);
+        biomeTranslator = new BiomeTranslator(allowedBiomeFactors, strategy);
+        outsideTranslator = new BiomeTranslator(outsideBiomeFactors.length == 0 ? allowedBiomeFactors : outsideBiomeFactors,
+                outsideStrategy);
     }
 
 

@@ -109,6 +109,7 @@ public class LostCityProfile {
     public String CITYSPHERE_OUTSIDE_PROFILE = "";
     public boolean CITYSPHERE_ONLY_PREDEFINED = false;
     public int CITYSPHERE_MONORAIL_HEIGHT_OFFSET = -2;
+    public boolean CITYSPHERE_SINGLE_BIOME = false;
 
     public int CITY_LEVEL0_HEIGHT = 75;
     public int CITY_LEVEL1_HEIGHT = 83;
@@ -122,6 +123,7 @@ public class LostCityProfile {
     public String GENERATOR_OPTIONS = "";
 
     public String[] ALLOWED_BIOME_FACTORS = new String[] { };
+    public BiomeSelectionStrategy BIOME_SELECTION_STRATEGY = BiomeSelectionStrategy.ORIGINAL;
 
     public float CHEST_WITHOUT_LOOT_CHANCE = .2f;
     public float BUILDING_WITHOUT_LOOT_CHANCE = .2f;
@@ -254,6 +256,8 @@ public class LostCityProfile {
         CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("outsideGroundLevel", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_GROUNDLEVEL, 2, 256, "Ground level for outside city spheres");
         CITYSPHERE_OUTSIDE_PROFILE = cfg.getString("outsideProfile", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_PROFILE, "An optional profile to use for the outside world");
         CITYSPHERE_MONORAIL_HEIGHT_OFFSET = cfg.getInt("monorailOffset", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_HEIGHT_OFFSET, -100, 100, "Offset compared to main height");
+        CITYSPHERE_SINGLE_BIOME = cfg.getBoolean("singleBiome", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_SINGLE_BIOME,
+                "If this is true then every city sphere will be limited to one (random) biome");
     }
 
     private void initLostcity(Configuration cfg) {
@@ -264,7 +268,7 @@ public class LostCityProfile {
 
         SPAWN_BIOME = cfg.getString("spawnBiome", categoryLostcity, inheritFrom.orElse(this).SPAWN_BIOME, "When this is set the player will always spawn in the given biome");
         SPAWN_CITY = cfg.getString("spawnCity", categoryLostcity, inheritFrom.orElse(this).SPAWN_CITY, "When this is set the player will always spawn in the given predefined city");
-        SPAWN_SPHERE = cfg.getString("spawnSphere", categoryLostcity, inheritFrom.orElse(this).SPAWN_SPHERE, "When this is set the player will always spawn in the given predefined sphere");
+        SPAWN_SPHERE = cfg.getString("spawnSphere", categoryLostcity, inheritFrom.orElse(this).SPAWN_SPHERE, "When this is set the player will always spawn in the given predefined sphere. If you use <in> the player will always spawn in a random sphere. If you use <out> the player will always spawn outside a sphere");
 
         VINE_CHANCE = cfg.getFloat("vineChance", categoryLostcity, inheritFrom.orElse(this).VINE_CHANCE, 0.0f, 1.0f, "The chance that a block on the outside of a building will be covered with a vine");
         CHANCE_OF_RANDOM_LEAFBLOCKS = cfg.getFloat("randomLeafBlockChance", categoryLostcity, inheritFrom.orElse(this).CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f, "Chance that leafblocks will be generated at the border of a building and a street");
@@ -391,10 +395,21 @@ public class LostCityProfile {
         AVOID_WATER = cfg.getBoolean("avoidWater", categoryLostcity, inheritFrom.orElse(this).AVOID_WATER,
                 "If true then all water will be avoided (replaced with air)");
 
-        ALLOWED_BIOME_FACTORS = cfg.getStringList("allowedBiomeFactors", categoryCities, inheritFrom.orElse(this).ALLOWED_BIOME_FACTORS,
+        ALLOWED_BIOME_FACTORS = cfg.getStringList("allowedBiomeFactors", categoryLostcity, inheritFrom.orElse(this).ALLOWED_BIOME_FACTORS,
                 "List of biomes that are allowed in the world. Empty list is default all biomes. The factor controls how much that biome is favored over the others (higher means less favored!)");
+        String biomeSelectionStrategy = cfg.getString("biomeSelectionStrategy", categoryLostcity, inheritFrom.orElse(this).BIOME_SELECTION_STRATEGY.getName(),
+                "This is used in combination with allowedBiomeFactors. 'original' is the old strategy. 'randomized' is a new strategy that tries to randomize the biomes better. 'varied' is similar but has a more relaxed biome distance function",
+                new String[] {
+                        BiomeSelectionStrategy.ORIGINAL.getName(),
+                        BiomeSelectionStrategy.RANDOMIZED.getName(),
+                        BiomeSelectionStrategy.VARIED.getName()
+                });
+        BIOME_SELECTION_STRATEGY = BiomeSelectionStrategy.getTypeByName(biomeSelectionStrategy);
+        if (BIOME_SELECTION_STRATEGY == null) {
+            throw new RuntimeException("Bad biome selection strategy: " + biomeSelectionStrategy + "!");
+        }
 
-        GENERATOR_OPTIONS = cfg.getString("generatorOptions", categoryCities, inheritFrom.orElse(this).GENERATOR_OPTIONS,
+        GENERATOR_OPTIONS = cfg.getString("generatorOptions", categoryLostcity, inheritFrom.orElse(this).GENERATOR_OPTIONS,
                 "A json with generator options for the chunk generator");
     }
 

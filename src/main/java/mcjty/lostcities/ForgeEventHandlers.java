@@ -2,6 +2,7 @@ package mcjty.lostcities;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.WorldTypeTools;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
@@ -60,20 +61,37 @@ public class ForgeEventHandlers {
                 if (city == null) {
                     LostCities.logger.error("Cannot find city '" + profile.SPAWN_CITY + "' for the player to spawn in !");
                 } else {
-                    float sqradius = (city.getRadius()-5)*(city.getRadius()-5);
+                    float sqradius = getSqRadius(city.getRadius(), 0.8f);
                     isSuitable = blockPos -> city.getDimension() == world.provider.getDimension() &&
                             CitySphere.squaredDistance(city.getChunkX()*16+8, city.getChunkZ()*16+8, blockPos.getX(), blockPos.getZ()) < sqradius;
                     needsCheck = true;
                 }
             } else if (!profile.SPAWN_SPHERE.isEmpty()) {
-                final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(profile.SPAWN_SPHERE);
-                if (sphere == null) {
-                    LostCities.logger.error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
-                } else {
-                    float sqradius = (sphere.getRadius()-5)*(sphere.getRadius()-5);
-                    isSuitable = blockPos -> sphere.getDimension() == world.provider.getDimension() &&
-                            CitySphere.squaredDistance(sphere.getChunkX()*16+8, sphere.getChunkZ()*16+8, blockPos.getX(), blockPos.getZ()) < sqradius;
+                if ("<in>".equals(profile.SPAWN_SPHERE)) {
+                    LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world);
+                    isSuitable = blockPos -> {
+                        CitySphere sphere = CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, provider);
+                        if (!sphere.isEnabled()) {
+                            return false;
+                        }
+                        float sqradius = getSqRadius((int) sphere.getRadius(), 0.8f);
+                        return sphere.getCenterPos().distanceSq(blockPos) < sqradius;
+                    };
                     needsCheck = true;
+                } else if ("<out>".equals(profile.SPAWN_SPHERE)) {
+                    LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world);
+                    isSuitable = blockPos -> !CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, provider).isEnabled();
+                    needsCheck = true;
+                } else {
+                    final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(profile.SPAWN_SPHERE);
+                    if (sphere == null) {
+                        LostCities.logger.error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
+                    } else {
+                        float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
+                        isSuitable = blockPos -> sphere.getDimension() == world.provider.getDimension() &&
+                                CitySphere.squaredDistance(sphere.getChunkX() * 16 + 8, sphere.getChunkZ() * 16 + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
+                        needsCheck = true;
+                    }
                 }
             }
 
@@ -93,6 +111,10 @@ public class ForgeEventHandlers {
                     break;
             }
         }
+    }
+
+    private int getSqRadius(int radius, float pct) {
+        return (int) ((radius * pct) * (radius * pct));
     }
 
     private void findSafeSpawnPoint(World world, @Nonnull Predicate<BlockPos> isSuitable) {

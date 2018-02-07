@@ -10,7 +10,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeDecorator;
-import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -25,12 +24,10 @@ public class TerrainEventHandlers {
             if (!WorldTypeTools.isLostCities(world)) {
                 return;
             }
-            WorldServer worldServer = (WorldServer) world;
-            IChunkGenerator chunkGenerator = worldServer.getChunkProvider().chunkGenerator;
-            if (!(chunkGenerator instanceof LostCityChunkGenerator)) {
+            LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world);
+            if (provider == null) {
                 return;
             }
-            LostCityChunkGenerator provider = (LostCityChunkGenerator) chunkGenerator;
 
             switch (event.getType()) {
                 case CLAY:

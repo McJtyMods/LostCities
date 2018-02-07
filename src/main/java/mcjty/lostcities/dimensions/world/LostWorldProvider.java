@@ -1,6 +1,7 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.config.BiomeSelectionStrategy;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.ModDimensions;
@@ -66,13 +67,17 @@ public class LostWorldProvider extends WorldProvider {
             this.biomeProvider = biomeProvider;
         } else {
             String[] outsideAllowedbiomeFactors = profile.ALLOWED_BIOME_FACTORS;
+            BiomeSelectionStrategy outsideStrategy = null;
             if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE && !profile.CITYSPHERE_OUTSIDE_PROFILE.isEmpty()) {
                 LostCityProfile outProfile = LostCityConfiguration.profiles.get(profile.CITYSPHERE_OUTSIDE_PROFILE);
                 outsideAllowedbiomeFactors = outProfile.ALLOWED_BIOME_FACTORS;
+                outsideStrategy = outProfile.BIOME_SELECTION_STRATEGY;
             }
             this.biomeProvider = new LostWorldFilteredBiomeProvider(world, biomeProvider,
                     profile.ALLOWED_BIOME_FACTORS,
-                    outsideAllowedbiomeFactors);
+                    profile.BIOME_SELECTION_STRATEGY,
+                    outsideAllowedbiomeFactors,
+                    outsideStrategy);
         }
     }
 

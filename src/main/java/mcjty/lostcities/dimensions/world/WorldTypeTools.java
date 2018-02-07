@@ -8,7 +8,9 @@ import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.network.PacketRequestProfile;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.gen.IChunkGenerator;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +58,21 @@ public class WorldTypeTools {
     public static void setProfileFromServer(int dimension, String profile) {
         System.out.println("FROM SERVER: profile = " + profile + " for " + dimension);
         profileMap.put(dimension, LostCityConfiguration.profiles.get(profile));
+    }
+
+    /**
+     * If possible return the LostCityChunkGenerator that belongs to this world. Return
+     * null if it is not a Lost City world
+     */
+    @Nullable
+    public static LostCityChunkGenerator getLostCityChunkGenerator(World world) {
+        WorldServer worldServer = (WorldServer) world;
+        IChunkGenerator chunkGenerator = worldServer.getChunkProvider().chunkGenerator;
+        // @todo not compatible with Sponge! No clue how to solve atm
+        if (!(chunkGenerator instanceof LostCityChunkGenerator)) {
+            return null;
+        }
+        return (LostCityChunkGenerator) chunkGenerator;
     }
 
     public static boolean isLostCities(World world) {
