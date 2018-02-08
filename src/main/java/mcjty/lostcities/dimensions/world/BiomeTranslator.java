@@ -117,7 +117,7 @@ public class BiomeTranslator {
                     generateTranslationMapOriginal();
                     break;
                 case RANDOMIZED:
-                    generateTranslationMapNG(0.01f);
+                    generateTranslationMapNG(0.2f);
                     break;
                 case VARIED:
                     generateTranslationMapNG(1.0f);
