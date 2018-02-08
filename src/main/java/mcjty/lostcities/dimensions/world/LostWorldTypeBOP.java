@@ -61,16 +61,20 @@ public class LostWorldTypeBOP extends WorldType {
             return getInternalBiomeProvider(world);
         } else {
             String[] outsideAllowedbiomeFactors = profile.ALLOWED_BIOME_FACTORS;
+            String[] outsideManualBiomeMapping = profile.MANUAL_BIOME_MAPPINGS;
             BiomeSelectionStrategy outsideStrategy = null;
             if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE && !profile.CITYSPHERE_OUTSIDE_PROFILE.isEmpty()) {
                 LostCityProfile outProfile = LostCityConfiguration.profiles.get(profile.CITYSPHERE_OUTSIDE_PROFILE);
                 outsideAllowedbiomeFactors = outProfile.ALLOWED_BIOME_FACTORS;
+                outsideManualBiomeMapping = outProfile.MANUAL_BIOME_MAPPINGS;
                 outsideStrategy = outProfile.BIOME_SELECTION_STRATEGY;
             }
             return new LostWorldFilteredBiomeProvider(world, getInternalBiomeProvider(world),
                     profile.ALLOWED_BIOME_FACTORS,
+                    profile.MANUAL_BIOME_MAPPINGS,
                     profile.BIOME_SELECTION_STRATEGY,
                     outsideAllowedbiomeFactors,
+                    outsideManualBiomeMapping,
                     outsideStrategy);
         }
     }

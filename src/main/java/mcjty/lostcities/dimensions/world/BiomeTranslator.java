@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.BiomeSelectionStrategy;
+import mcjty.lostcities.config.LostCityConfiguration;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
@@ -14,22 +15,36 @@ import java.util.*;
 public class BiomeTranslator {
 
     private final String[] allowedBiomeFactors;
+    private final String[] manualBiomeMappings;
     private final BiomeSelectionStrategy strategy;
+    private final Map<String, Biome> translationMap = new HashMap<>();
 
-    public BiomeTranslator(String[] allowedBiomeFactors, BiomeSelectionStrategy strategy) {
+    public BiomeTranslator(String[] allowedBiomeFactors, String[] manualBiomeMappings, BiomeSelectionStrategy strategy) {
         this.allowedBiomeFactors = allowedBiomeFactors;
+        this.manualBiomeMappings = manualBiomeMappings;
         this.strategy = strategy;
     }
 
-    private List<Pair<Float,Biome>> biomes = null;
-    private final Map<String, Biome> translationMap = new HashMap<>();
-
-    private void parseAllowedBiomes() {
-        if (biomes != null) {
-            return;
+    private static List<Pair<String, Biome>> parseManualBiomes(String[] manualBiomeMappings) {
+        List<Pair<String, Biome>> mapping = new ArrayList<>();
+        for (String s : manualBiomeMappings) {
+            String[] split = StringUtils.split(s, '=');
+            String biomeId = split[0];
+            String destBiomeId = split[1];
+            Biome biome = findBiome(biomeId);
+            Biome destBiome = findBiome(destBiomeId);
+            if (biome != null && destBiome != null) {
+                mapping.add(Pair.of(biome.biomeName, destBiome));
+            } else if (biome == null) {
+                LostCities.logger.warn("Could not find biome '" + biomeId + "'!");
+            } else if (destBiome == null) {
+                LostCities.logger.warn("Could not find biome '" + destBiomeId + "'!");
+            }
         }
-        biomes = parseBiomes(allowedBiomeFactors);
+        return mapping;
     }
+
+
 
     public static List<Pair<Float, Biome>> parseBiomes(String[] allowedBiomeFactors) {
         List<Pair<Float, Biome>> biomes = new ArrayList<>();
@@ -37,16 +52,7 @@ public class BiomeTranslator {
             String[] split = StringUtils.split(s, '=');
             float f = Float.parseFloat(split[1]);
             String biomeId = split[0];
-            Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
-            if (biome == null) {
-                for (Biome b : Biome.REGISTRY) {
-                    ResourceLocation registryName = b.getRegistryName();
-                    if (registryName != null && biomeId.equals(registryName.getResourcePath())) {
-                        biome = b;
-                        break;
-                    }
-                }
-            }
+            Biome biome = findBiome(biomeId);
             if (biome != null) {
                 biomes.add(Pair.of(f, biome));
             } else {
@@ -56,7 +62,29 @@ public class BiomeTranslator {
         return biomes;
     }
 
-    private void generateTranslationMapOriginal() {
+    private static Biome findBiome(String biomeId) {
+        Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
+        if (biome == null) {
+            for (Biome b : Biome.REGISTRY) {
+                ResourceLocation registryName = b.getRegistryName();
+                if (registryName != null && biomeId.equals(registryName.getResourcePath())) {
+                    biome = b;
+                    break;
+                }
+            }
+        }
+        return biome;
+    }
+
+    private void dumpTranslationMap() {
+        LostCities.logger.info("Dumping biome mapping");
+        for (Map.Entry<String, Biome> entry : translationMap.entrySet()) {
+            ResourceLocation biomeKey = ForgeRegistries.BIOMES.getKey(entry.getValue());
+            LostCities.logger.info("biome: " + entry.getKey() + " -> " + entry.getValue().biomeName + " (" + biomeKey.toString() + ")");
+        }
+    }
+
+    private void generateTranslationMapOriginal(List<Pair<Float, Biome>> biomes) {
         for (Biome biome : ForgeRegistries.BIOMES) {
             Biome bestFit = null;
             double bestDist = 1000000000.0;
@@ -75,7 +103,7 @@ public class BiomeTranslator {
         }
     }
 
-    private void generateTranslationMapNG(float samenessFactor) {
+    private void generateTranslationMapNG(List<Pair<Float, Biome>> biomes, float samenessFactor) {
         for (Biome biome : ForgeRegistries.BIOMES) {
             List<Biome> bestFit = new ArrayList<>();
             double bestDist = 1000000000.0;
@@ -111,17 +139,24 @@ public class BiomeTranslator {
 
     public Biome translate(Biome biome) {
         if (translationMap.isEmpty()) {
-            parseAllowedBiomes();
+            List<Pair<Float, Biome>> biomes = parseBiomes(allowedBiomeFactors);
             switch (strategy) {
                 case ORIGINAL:
-                    generateTranslationMapOriginal();
+                    generateTranslationMapOriginal(biomes);
                     break;
                 case RANDOMIZED:
-                    generateTranslationMapNG(0.2f);
+                    generateTranslationMapNG(biomes, 0.2f);
                     break;
                 case VARIED:
-                    generateTranslationMapNG(1.0f);
+                    generateTranslationMapNG(biomes, 1.0f);
                     break;
+            }
+            List<Pair<String, Biome>> manualMappings = parseManualBiomes(manualBiomeMappings);
+            for (Pair<String, Biome> pair : manualMappings) {
+                translationMap.put(pair.getKey(), pair.getValue());
+            }
+            if (LostCityConfiguration.DEBUG) {
+                dumpTranslationMap();
             }
         }
         return translationMap.get(biome.biomeName);

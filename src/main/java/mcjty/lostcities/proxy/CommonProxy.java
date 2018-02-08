@@ -109,9 +109,10 @@ public abstract class CommonProxy {
             }
         }
 
-        System.out.println("Asset parts loaded: " + AssetRegistries.PARTS.getCount());
-
-        AssetRegistries.showStatistics();
+        if (LostCityConfiguration.DEBUG) {
+            LostCities.logger.info("Asset parts loaded: " + AssetRegistries.PARTS.getCount());
+            AssetRegistries.showStatistics();
+        }
     }
 
     public World getClientWorld() {

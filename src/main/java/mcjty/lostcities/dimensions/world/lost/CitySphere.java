@@ -395,12 +395,12 @@ public class CitySphere implements ILostSphere {
                     List<Pair<Float, Biome>> pairs = BiomeTranslator.parseBiomes(profile.ALLOWED_BIOME_FACTORS);
                     float total = 0.0f;
                     for (Pair<Float, Biome> pair : pairs) {
-                        total += pair.getKey();
+                        total += 3.0f / pair.getKey();
                     }
                     if (total > 0.001) {
                         float f = rand.nextFloat() * total;
                         for (Pair<Float, Biome> pair : pairs) {
-                            f -= pair.getKey();
+                            f -= 3.0f / pair.getKey();
                             if (f <= 0) {
                                 citySphere.biome = pair.getRight();
                                 break;

@@ -24,13 +24,16 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
 
     public LostWorldFilteredBiomeProvider(World world, BiomeProvider original,
                                           String[] allowedBiomeFactors,
+                                          String[] manualBiomeMappings,
                                           BiomeSelectionStrategy strategy,
                                           String[] outsideBiomeFactors,
+                                          String[] outsideManualBiomeMappings,
                                           BiomeSelectionStrategy outsideStrategy) {
         this.world = world;
         this.original = original;
-        biomeTranslator = new BiomeTranslator(allowedBiomeFactors, strategy);
+        biomeTranslator = new BiomeTranslator(allowedBiomeFactors, manualBiomeMappings, strategy);
         outsideTranslator = new BiomeTranslator(outsideBiomeFactors.length == 0 ? allowedBiomeFactors : outsideBiomeFactors,
+                outsideManualBiomeMappings,
                 outsideStrategy);
     }
 

@@ -3,13 +3,12 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.varia.Counter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AssetRegistries {
 
@@ -85,18 +84,18 @@ public class AssetRegistries {
         List<Map.Entry<Character, Integer>> local = new ArrayList<>(counterLocal.getMap().entrySet());
         global.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
         local.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
-        System.out.println("############################################################################");
-        System.out.println("Global palette entries");
+        LostCities.logger.info("############################################################################");
+        LostCities.logger.info("Global palette entries");
         printMap(usersPerCharacter, global);
-        System.out.println("----------------------------------------------------------------------------");
-        System.out.println("Local palette entries");
+        LostCities.logger.info("----------------------------------------------------------------------------");
+        LostCities.logger.info("Local palette entries");
         printMap(usersPerCharacter, local);
-        System.out.println("----------------------------------------------------------------------------");
+        LostCities.logger.info("----------------------------------------------------------------------------");
 
         printChars("Global: ", counterGlobal);
         printChars("Local: ", counterLocal);
 
-        System.out.println("############################################################################");
+        LostCities.logger.info("############################################################################");
     }
 
     private static void printChars(String prefix, Counter<Character> counter) {
@@ -106,7 +105,7 @@ public class AssetRegistries {
         for (Character character : chars) {
             s += character;
         }
-        System.out.println(prefix + s);
+        LostCities.logger.info(prefix + s);
     }
 
     private static void printMap(Map<Character, Set<String>> usersPerCharacter, List<Map.Entry<Character, Integer>> map) {
@@ -121,7 +120,7 @@ public class AssetRegistries {
             } else {
                 s += ", Used " + users.size() + " times";
             }
-            System.out.println(s);
+            LostCities.logger.info(s);
         }
     }
 

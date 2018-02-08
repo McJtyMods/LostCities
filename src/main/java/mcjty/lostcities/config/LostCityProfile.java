@@ -123,6 +123,7 @@ public class LostCityProfile {
     public String GENERATOR_OPTIONS = "";
 
     public String[] ALLOWED_BIOME_FACTORS = new String[] { };
+    public String[] MANUAL_BIOME_MAPPINGS = new String[] { };
     public BiomeSelectionStrategy BIOME_SELECTION_STRATEGY = BiomeSelectionStrategy.ORIGINAL;
 
     public float CHEST_WITHOUT_LOOT_CHANCE = .2f;
@@ -397,6 +398,9 @@ public class LostCityProfile {
 
         ALLOWED_BIOME_FACTORS = cfg.getStringList("allowedBiomeFactors", categoryLostcity, inheritFrom.orElse(this).ALLOWED_BIOME_FACTORS,
                 "List of biomes that are allowed in the world. Empty list is default all biomes. The factor controls how much that biome is favored over the others (higher means less favored!)");
+        MANUAL_BIOME_MAPPINGS = cfg.getStringList("manualBiomeMappings", categoryLostcity, inheritFrom.orElse(this).MANUAL_BIOME_MAPPINGS,
+                "Use in combination with 'allowedBiomeFactors' to manually map some biomes to others. This is a list of the format oldbiome=newbiome");
+
         String biomeSelectionStrategy = cfg.getString("biomeSelectionStrategy", categoryLostcity, inheritFrom.orElse(this).BIOME_SELECTION_STRATEGY.getName(),
                 "This is used in combination with allowedBiomeFactors. 'original' is the old strategy. 'randomized' is a new strategy that tries to randomize the biomes better. 'varied' is similar but has a more relaxed biome distance function",
                 new String[] {
