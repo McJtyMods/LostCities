@@ -239,10 +239,12 @@ public class City {
         for (Biome biome : biomes) {
             Map<String, Float> map = profile.getBiomeFactorMap();
             ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
-            if (object == null) {
-                throw new RuntimeException("Biome '" + biome.getBiomeName() + "' (" + biome.getBiomeClass().getName() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!");
+            Float f;
+            try {
+                f = map.get(object.toString());
+            } catch(NullPointerException e) {
+                throw new RuntimeException("Biome '" + biome.getBiomeName() + "' (" + biome.getBiomeClass().getName() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
             }
-            Float f = map.get(object.toString());
             if (f != null) {
                 foundFactor = f;
                 break;
