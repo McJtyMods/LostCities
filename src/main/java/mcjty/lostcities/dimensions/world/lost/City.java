@@ -225,7 +225,6 @@ public class City {
             }
         }
 
-        Float foundFactor = null;
         for (int cx = -1 ; cx <= 1 ; cx++) {
             for (int cz = -1 ; cz <= 1 ; cz++) {
                 Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX + cx, chunkZ + cz)).getBiomes();
@@ -235,9 +234,10 @@ public class City {
             }
         }
 
+        float foundFactor = profile.CITY_DEFAULT_BIOME_FACTOR;
         Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
+        Map<String, Float> map = profile.getBiomeFactorMap();
         for (Biome biome : biomes) {
-            Map<String, Float> map = profile.getBiomeFactorMap();
             ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
             Float f;
             try {
@@ -251,17 +251,7 @@ public class City {
             }
         }
 
-        if (foundFactor == null) {
-            factor = factor * profile.CITY_DEFAULT_BIOME_FACTOR;
-        } else {
-            factor = factor * foundFactor;
-        }
-        if (factor < 0) {
-            return 0;
-        } else if (factor > 1) {
-            return 1;
-        }
-        return factor;
+        return Math.min(Math.max(factor * foundFactor, 0), 1);
     }
 
     public static boolean isTooHighForBuilding(Biome[] biomes) {
