@@ -168,6 +168,7 @@ public class LostCityProfile {
     public String SPAWN_BIOME = "";
     public String SPAWN_CITY = "";
     public String SPAWN_SPHERE = "";
+    public boolean SPAWN_NOT_IN_BUILDING = false;
 
     public int MAX_CAVE_HEIGHT = 128;
 
@@ -270,6 +271,7 @@ public class LostCityProfile {
         SPAWN_BIOME = cfg.getString("spawnBiome", categoryLostcity, inheritFrom.orElse(this).SPAWN_BIOME, "When this is set the player will always spawn in the given biome");
         SPAWN_CITY = cfg.getString("spawnCity", categoryLostcity, inheritFrom.orElse(this).SPAWN_CITY, "When this is set the player will always spawn in the given predefined city");
         SPAWN_SPHERE = cfg.getString("spawnSphere", categoryLostcity, inheritFrom.orElse(this).SPAWN_SPHERE, "When this is set the player will always spawn in the given predefined sphere. If you use <in> the player will always spawn in a random sphere. If you use <out> the player will always spawn outside a sphere");
+        SPAWN_NOT_IN_BUILDING = cfg.getBoolean("spawnNotInBuilding", categoryLostcity, inheritFrom.orElse(this).SPAWN_NOT_IN_BUILDING, "If this is true the player will not spawn in a building. This can be used in combination with the other spawn settings");
 
         VINE_CHANCE = cfg.getFloat("vineChance", categoryLostcity, inheritFrom.orElse(this).VINE_CHANCE, 0.0f, 1.0f, "The chance that a block on the outside of a building will be covered with a vine");
         CHANCE_OF_RANDOM_LEAFBLOCKS = cfg.getFloat("randomLeafBlockChance", categoryLostcity, inheritFrom.orElse(this).CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f, "Chance that leafblocks will be generated at the border of a building and a street");

@@ -42,8 +42,6 @@ public abstract class CommonProxy {
         mainConfig = new Configuration(new File(modConfigDir.getPath() + File.separator + "lostcities", "general.cfg"));
         readMainConfig();
         ModDimensions.init();
-        LootTableList.register(new ResourceLocation(LostCities.MODID, "lostcitychest"));
-        LootTableList.register(new ResourceLocation(LostCities.MODID, "raildungeonchest"));
     }
 
     private void readMainConfig() {
@@ -86,6 +84,8 @@ public abstract class CommonProxy {
     public void init(FMLInitializationEvent e) {
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         MinecraftForge.TERRAIN_GEN_BUS.register(new TerrainEventHandlers());
+        LootTableList.register(new ResourceLocation(LostCities.MODID, "lostcitychest"));
+        LootTableList.register(new ResourceLocation(LostCities.MODID, "raildungeonchest"));
     }
 
     public void postInit(FMLPostInitializationEvent e) {

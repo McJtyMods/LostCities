@@ -4,6 +4,7 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.WorldTypeTools;
+import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.PredefinedCity;
@@ -95,6 +96,12 @@ public class ForgeEventHandlers {
                 }
             }
 
+            if (profile.SPAWN_NOT_IN_BUILDING) {
+                LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world);
+                isSuitable = isSuitable.and(blockPos -> isOutsideBuilding(provider, blockPos));
+                needsCheck = true;
+            }
+
             // Potentially set the spawn point
             switch (profile.LANDSCAPE_TYPE) {
                 case DEFAULT:
@@ -111,6 +118,11 @@ public class ForgeEventHandlers {
                     break;
             }
         }
+    }
+
+    private boolean isOutsideBuilding(LostCityChunkGenerator provider, BlockPos pos) {
+        BuildingInfo info = BuildingInfo.getBuildingInfo(pos.getX() >> 4, pos.getZ() >> 4, provider);
+        return !(info.isCity() && info.hasBuilding);
     }
 
     private int getSqRadius(int radius, float pct) {
