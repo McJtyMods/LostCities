@@ -264,7 +264,6 @@ public class LostCityConfiguration {
         profile.HORIZON = 30;
         profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2" };
-        profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL = 40;
         profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "bio_wasteland";
         profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 0.5f;
@@ -275,7 +274,9 @@ public class LostCityConfiguration {
         profile.MINI_EXPLOSION_MAXHEIGHT = 75;
         profile.MINI_EXPLOSION_MINRADIUS = 5;
         profile.MINI_EXPLOSION_MAXRADIUS = 10;
+//        profile.WATERLEVEL_OFFSET = -3;           // @EXP
         profile.WATERLEVEL_OFFSET = 70;
+
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
@@ -287,7 +288,9 @@ public class LostCityConfiguration {
         profile.RUBBLELAYER = false;
         profile.GROUNDLEVEL = 60;
         profile.CITYSPHERE_CHANCE = 0.4f;
+//        profile.CITY_CHANCE = 0.3f;       // @EXP
         profile.CITY_CHANCE = 0.7f;
+
         profile.CITY_MAXRADIUS = 90;
         profile.CITY_THRESSHOLD = .05f;
         profile.CITY_LEVEL0_HEIGHT = 60;
@@ -442,6 +445,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("bio_wasteland", false);
         profile.setDescription("Private wasteland for biospheres");
+        profile.GROUNDLEVEL = 40;
         profile.WATERLEVEL_OFFSET = 70;
         profile.AVOID_WATER = true;
         profile.CITY_CHANCE = 0.008f;

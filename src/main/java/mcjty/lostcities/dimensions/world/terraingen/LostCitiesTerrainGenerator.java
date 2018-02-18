@@ -468,7 +468,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             int height = yy * 16;
                             int index = (x << 12) | (z << 8) + height;
                             for (int y = 0; y < 16; y++) {
-                                primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
+                                primer.data[index] = ((index & 0xff) < info.waterLevel) ? liquidChar : airChar;
                                 index++;
                             }
                         }
@@ -484,7 +484,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         for (int x = 0; x < 16; x++) {
                             for (int z = 0; z < 16; z++) {
                                 char d = primer.data[index];
-                                if (d != airChar || (index & 0xff) < waterLevel) {
+                                if (d != airChar || (index & 0xff) < info.waterLevel) {
                                     float damage = damageArea.getDamage(cx + x, cury, cz + z) * damageFactor;
                                     if (damage >= 0.001) {
                                         Character newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette());
@@ -579,7 +579,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         int index = (x << 12) | (z << 8);
-                        clearRange(primer, index, height, height + clearheight, waterLevel > mainGroundLevel);
+                        clearRange(primer, info, index, height, height + clearheight, info.waterLevel > info.groundLevel);
                     }
                 }
             }
@@ -592,7 +592,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         int index = (x << 12) | (z << 8);
-                        clearRange(primer, index, height, height + clearheight, waterLevel > mainGroundLevel);
+                        clearRange(primer, info, index, height, height + clearheight, info.waterLevel > info.groundLevel);
                     }
                 }
             }
@@ -627,11 +627,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private void clearRange(ChunkPrimer primer, int index, int height1, int height2, boolean dowater) {
+    private void clearRange(ChunkPrimer primer, BuildingInfo info, int index, int height1, int height2, boolean dowater) {
         if (dowater) {
             // Special case for drowned city
-            PrimerTools.setBlockStateRangeSafe(primer, index + height1, index + waterLevel, liquidChar);
-            PrimerTools.setBlockStateRangeSafe(primer, index + waterLevel, index + height2, airChar);
+            PrimerTools.setBlockStateRangeSafe(primer, index + height1, index + info.waterLevel, liquidChar);
+            PrimerTools.setBlockStateRangeSafe(primer, index + info.waterLevel, index + height2, airChar);
         } else {
             PrimerTools.setBlockStateRange(primer, index + height1, index + height2, airChar);
         }
@@ -687,7 +687,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             BuildingInfo maxDir = orientation.getMaxDir().get(info);
             if (minDir.hasBridge(provider, orientation) != null && maxDir.hasBridge(provider, orientation) != null) {
                 // Needs support
-                for (int y = waterLevel - 10; y <= mainGroundLevel; y++) {
+                for (int y = info.waterLevel - 10; y <= info.groundLevel; y++) {
                     setBridgeSupport(primer, 7, y, 7, sup);
                     setBridgeSupport(primer, 7, y, 8, sup);
                     setBridgeSupport(primer, 8, y, 7, sup);
@@ -803,7 +803,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
 
                     int offset = (int) (Math.sqrt(mindist) * 2);
-                    flattenChunkBorder(primer, x, offset, z, provider.rand, height);
+                    flattenChunkBorder(primer, info, x, offset, z, provider.rand, height);
                 }
             }
         }
@@ -824,7 +824,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     int height = minheight;//info.getCityGroundLevel();
 
                     int offset = (int) (Math.sqrt(mindist) * 2);
-                    flattenChunkBorderDownwards(primer, x, offset, z, provider.rand, height);
+                    flattenChunkBorderDownwards(primer, info, x, offset, z, provider.rand, height);
                 }
             }
         }
@@ -841,7 +841,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 && biome != Biomes.RIVER && biome != Biomes.FROZEN_RIVER && biome != Biomes.BEACH && biome != Biomes.COLD_BEACH);
     }
 
-    private void flattenChunkBorder(ChunkPrimer primer, int x, int offset, int z, Random rand, int level) {
+    private void flattenChunkBorder(ChunkPrimer primer, BuildingInfo info, int x, int offset, int z, Random rand, int level) {
         int index = (x << 12) | (z << 8);
         for (int y = 0; y <= (level - offset - rand.nextInt(2)); y++) {
             char b = primer.data[index];
@@ -852,13 +852,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         int r = rand.nextInt(2);
         index = (x << 12) | (z << 8);
-        clearRange(primer, index, level + offset + r, 230, waterLevel > mainGroundLevel);
+        clearRange(primer, info, index, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
-    private void flattenChunkBorderDownwards(ChunkPrimer primer, int x, int offset, int z, Random rand, int level) {
+    private void flattenChunkBorderDownwards(ChunkPrimer primer, BuildingInfo info, int x, int offset, int z, Random rand, int level) {
         int r = rand.nextInt(2);
         int index = (x << 12) | (z << 8);
-        clearRange(primer, index, level + offset + r, 230, waterLevel > mainGroundLevel);
+        clearRange(primer, info, index, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
     private void doCityChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {
@@ -878,12 +878,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 }
             }
 
-            if (waterLevel > mainGroundLevel) {
+            if (info.waterLevel > info.groundLevel) {
                 // Special case for a high water level
                 for (int x = 0; x < 16; ++x) {
                     for (int z = 0; z < 16; ++z) {
                         int index = (x << 12) | (z << 8);
-                        PrimerTools.setBlockStateRange(primer, index + mainGroundLevel, index + waterLevel, liquidChar);
+                        PrimerTools.setBlockStateRange(primer, index + info.groundLevel, index + info.waterLevel, liquidChar);
                     }
                 }
             }
@@ -1402,7 +1402,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             if (rand.nextFloat() < info.profile.DESTROY_OR_MOVE_CHANCE || blob.connectedBlocks.size() < info.profile.DESTROY_SMALL_SECTIONS_SIZE
                     || blob.connections < 5) {
                 for (Integer index : blob.connectedBlocks) {
-                    primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
+                    primer.data[index] = ((index & 0xff) < info.waterLevel) ? liquidChar : airChar;
                 }
             } else {
                 blocksToMove.connectedBlocks.addAll(blob.connectedBlocks);
@@ -1410,7 +1410,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         });
         for (Integer index : blocksToMove.connectedBlocks) {
             char c = primer.data[index];
-            primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
+            primer.data[index] = ((index & 0xff) < info.waterLevel) ? liquidChar : airChar;
             index--;
             int y = index & 255;
             while (y > 2 && (blocksToMove.contains(index) || primer.data[index] == airChar || primer.data[index] == liquidChar)) {
@@ -2066,7 +2066,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 }
                             } else if (b == hardAirChar) {
                                 if (airWaterLevel && !info.profile.AVOID_WATER && !nowater) {
-                                    b = (oy + y) < waterLevel ? liquidChar : airChar;
+                                    b = (oy + y) < info.waterLevel ? liquidChar : airChar;
                                 } else {
                                     b = airChar;
                                 }
@@ -2220,7 +2220,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         PrimerTools.setBlockStateRange(primer, index + height + 1, index + lowestLevel, baseChar);
                     }
                     // Also clear the inside of buildings to avoid geometry that doesn't really belong there
-                    clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, waterLevel > mainGroundLevel);
+                    clearRange(primer, info, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, info.waterLevel > info.groundLevel);
                 }
             }
         } else if (info.profile.isSpace()) {
@@ -2229,7 +2229,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     int index = (x << 12) | (z << 8);
-                    clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, false);     // Never water in bubbles?
+                    clearRange(primer, info, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, false);     // Never water in bubbles?
                 }
             }
         } else {
@@ -2254,7 +2254,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
                     if (info.profile.isCavern()) {
                         // Also clear the inside of buildings to avoid geometry that doesn't really belong there
-                        clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, waterLevel > mainGroundLevel);
+//                        clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, waterLevel > mainGroundLevel);
+                        clearRange(primer, info, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, info.waterLevel > info.groundLevel);
                     }
                 }
             }

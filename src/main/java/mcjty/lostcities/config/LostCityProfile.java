@@ -105,7 +105,6 @@ public class LostCityProfile {
     public float CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 1.0f;
     public float CITYSPHERE_MONORAIL_CHANCE = 0.8f;
     public boolean CITYSPHERE_LANDSCAPE_OUTSIDE = false;
-    public int CITYSPHERE_OUTSIDE_GROUNDLEVEL = 10;
     public String CITYSPHERE_OUTSIDE_PROFILE = "";
     public boolean CITYSPHERE_ONLY_PREDEFINED = false;
     public int CITYSPHERE_MONORAIL_HEIGHT_OFFSET = -2;
@@ -255,7 +254,7 @@ public class LostCityProfile {
                 "If this is true then there will be a landscape outside the city spheres");
         CITYSPHERE_ONLY_PREDEFINED = cfg.getBoolean("onlyPredefined", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_ONLY_PREDEFINED,
                 "If this is true then only predefined spheres are generated");
-        CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("outsideGroundLevel", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_GROUNDLEVEL, 2, 256, "Ground level for outside city spheres");
+//        CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("outsideGroundLevel", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_GROUNDLEVEL, 2, 256, "Ground level for outside city spheres");
         CITYSPHERE_OUTSIDE_PROFILE = cfg.getString("outsideProfile", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_OUTSIDE_PROFILE, "An optional profile to use for the outside world");
         CITYSPHERE_MONORAIL_HEIGHT_OFFSET = cfg.getInt("monorailOffset", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_MONORAIL_HEIGHT_OFFSET, -100, 100, "Offset compared to main height");
         CITYSPHERE_SINGLE_BIOME = cfg.getBoolean("singleBiome", categoryCitySpheres, inheritFrom.orElse(this).CITYSPHERE_SINGLE_BIOME,

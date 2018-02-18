@@ -30,6 +30,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public final boolean outsideChunk;  // Only used for citysphere worlds and when this chunk is outside
     public final int groundLevel;
+    public final int waterLevel;
 
     public final boolean isCity;
     public final boolean hasBuilding;
@@ -690,9 +691,11 @@ public class BuildingInfo implements ILostChunkInfo {
         hasBuilding = b;
 
         if (outsideChunk && provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE) {
-            groundLevel = provider.getProfile().CITYSPHERE_OUTSIDE_GROUNDLEVEL;
+            groundLevel = provider.getOutsideProfile().GROUNDLEVEL;
+            waterLevel = groundLevel - provider.getOutsideProfile().WATERLEVEL_OFFSET;
         } else {
             groundLevel = provider.getProfile().GROUNDLEVEL;
+            waterLevel = groundLevel - provider.getProfile().WATERLEVEL_OFFSET;
         }
 
         CityStyle cs = (CityStyle) characteristics.cityStyle;
