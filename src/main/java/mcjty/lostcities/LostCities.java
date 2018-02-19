@@ -1,5 +1,6 @@
 package mcjty.lostcities;
 
+import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.commands.CommandBuildPart;
 import mcjty.lostcities.commands.CommandDebug;
 import mcjty.lostcities.commands.CommandExportBuilding;
@@ -12,6 +13,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 @Mod(modid = LostCities.MODID, name="The Lost Cities",
         dependencies =
@@ -29,6 +33,8 @@ public class LostCities {
 
     @Mod.Instance("lostcities")
     public static LostCities instance;
+
+    public static LostCitiesImp lostCitiesImp = new LostCitiesImp();
 
     public static boolean chisel = false;
     public static boolean biomesoplenty = false;
@@ -80,6 +86,21 @@ public class LostCities {
         CitySphere.cleanCache();
         WorldTypeTools.cleanCache();
     }
+
+    @Mod.EventHandler
+    public void imcCallback(FMLInterModComms.IMCEvent event) {
+        for (FMLInterModComms.IMCMessage message : event.getMessages()) {
+            if (message.key.equalsIgnoreCase("getLostCities")) {
+                Optional<Function<ILostCities, Void>> value = message.getFunctionValue(ILostCities.class, Void.class);
+                if (value.isPresent()) {
+                    value.get().apply(lostCitiesImp);
+                } else {
+                    logger.warn("Some mod didn't return a valid result with getLostCities!");
+                }
+            }
+        }
+    }
+
 
     /**
      * Handle interaction with other mods, complete your setup based on this.

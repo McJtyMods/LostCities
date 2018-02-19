@@ -120,17 +120,17 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
     public LostCityChunkGenerator(World world, long seed) {
 
-        {
-            caveGenerator = new LostGenCaves(this);
-            caveGenerator = TerrainGen.getModdedMapGen(caveGenerator, CAVE);
-            strongholdGenerator = (MapGenStronghold) TerrainGen.getModdedMapGen(strongholdGenerator, STRONGHOLD);
+        WorldTypeTools.registerChunkGenerator(world.provider.getDimension(), this);
 
-            villageGenerator = (MapGenVillage) TerrainGen.getModdedMapGen(villageGenerator, VILLAGE);
-            mineshaftGenerator = (MapGenMineshaft) TerrainGen.getModdedMapGen(mineshaftGenerator, MINESHAFT);
-            scatteredFeatureGenerator = (MapGenScatteredFeature) TerrainGen.getModdedMapGen(scatteredFeatureGenerator, SCATTERED_FEATURE);
-            ravineGenerator = TerrainGen.getModdedMapGen(ravineGenerator, RAVINE);
-            oceanMonumentGenerator = (StructureOceanMonument) TerrainGen.getModdedMapGen(oceanMonumentGenerator, OCEAN_MONUMENT);
-        }
+        caveGenerator = new LostGenCaves(this);
+        caveGenerator = TerrainGen.getModdedMapGen(caveGenerator, CAVE);
+        strongholdGenerator = (MapGenStronghold) TerrainGen.getModdedMapGen(strongholdGenerator, STRONGHOLD);
+
+        villageGenerator = (MapGenVillage) TerrainGen.getModdedMapGen(villageGenerator, VILLAGE);
+        mineshaftGenerator = (MapGenMineshaft) TerrainGen.getModdedMapGen(mineshaftGenerator, MINESHAFT);
+        scatteredFeatureGenerator = (MapGenScatteredFeature) TerrainGen.getModdedMapGen(scatteredFeatureGenerator, SCATTERED_FEATURE);
+        ravineGenerator = TerrainGen.getModdedMapGen(ravineGenerator, RAVINE);
+        oceanMonumentGenerator = (StructureOceanMonument) TerrainGen.getModdedMapGen(oceanMonumentGenerator, OCEAN_MONUMENT);
 
         dimensionId = world.provider.getDimension();
         profile = WorldTypeTools.getProfile(world);

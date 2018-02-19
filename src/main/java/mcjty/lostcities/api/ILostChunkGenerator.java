@@ -1,12 +1,10 @@
 package mcjty.lostcities.api;
 
 /**
- * The chunk generator for Lost Cities implements this interface. To get access to this you can do:
- * WorldServer world = ...;
- * if (world.getChunkProvider().chunkGenerator instanceof ILostChunkGenerator) {
- *     ILostChunkGenerator lostGenerator = (ILostChunkGenerator) world.getChunkProvider().chunkGenerator;
- *     ...
- * }
+ * The chunk generator for Lost Cities implements this interface. To get access to this you have to
+ * call ILostCities.getLostGenerator(dimensionId);
+ * Note: the old way (using chunkGenerator instanceof ILostChunkGenerator is *not* recommended anymore
+ * as it is not compatible with Sponge!
  */
 public interface ILostChunkGenerator {
 

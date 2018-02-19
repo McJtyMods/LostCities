@@ -442,6 +442,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 //        debugClearChunk(chunkX, chunkZ, primer);
         if (info.profile.isDefault()) {
             flattenChunkToCityBorder(chunkX, chunkZ, primer);
+        } else if (info.profile.isSpace()) {
+            flattenChunkToCityBorderSpace(chunkX, chunkZ, primer);
+
         }
 
         LostCityEvent.PostGenOutsideChunkEvent postevent = new LostCityEvent.PostGenOutsideChunkEvent(provider.worldObj, provider, chunkX, chunkZ, primer);
@@ -758,6 +761,80 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
+    private void flattenChunkToCityBorderSpace(int chunkX, int chunkZ, ChunkPrimer primer) {
+        int cx = chunkX * 16;
+        int cz = chunkZ * 16;
+
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+        float h00 = getHeightAt00Corner(info);
+        float h10 = getHeightAt00Corner(info.getXmax());
+        float h01 = getHeightAt00Corner(info.getZmax());
+        float h11 = getHeightAt00Corner(info.getXmax().getZmax());
+
+        List<GeometryTools.AxisAlignedBB2D> boxes = new ArrayList<>();
+        List<GeometryTools.AxisAlignedBB2D> boxesDownwards = new ArrayList<>();
+
+        ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
+
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                if (x != 0 || z != 0) {
+                    int ccx = chunkX + x;
+                    int ccz = chunkZ + z;
+                    BuildingInfo info2 = BuildingInfo.getBuildingInfo(ccx, ccz, provider);
+                    if (info2.isCity) {
+                        GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
+                        boxes.add(box);
+                    } else if (info2.getMaxHighwayLevel() >= 0 && !info2.isTunnel(info2.getMaxHighwayLevel())) {
+                        // There is a highway but no tunnel. So we need to smooth downwards
+                        GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
+                        box.height = info.groundLevel + info2.getMaxHighwayLevel() * 6;
+                        boxesDownwards.add(box);
+                    }
+                }
+            }
+        }
+        if (!boxes.isEmpty()) {
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    double mindist = 1000000000.0;
+                    int height = bipolate(h11, h01, h10, h00, x, z);
+//                    int height = bipolate(h00, h10, h01, h11, x, z);
+                    for (GeometryTools.AxisAlignedBB2D box : boxes) {
+                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
+                        if (dist < mindist) {
+                            mindist = dist;
+                        }
+                    }
+
+                    int offset = (int) (Math.sqrt(mindist) * 2);
+                    flattenChunkBorderSpace(primer, info, x, offset, z, provider.rand, height, heightmap.getHeight(x, z));
+                }
+            }
+        }
+        if (!boxesDownwards.isEmpty()) {
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    double mindist = 1000000000.0;
+                    int minheight = 1000000000;
+                    for (GeometryTools.AxisAlignedBB2D box : boxesDownwards) {
+                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
+                        if (dist < mindist) {
+                            mindist = dist;
+                        }
+                        if (box.height < minheight) {
+                            minheight = box.height;
+                        }
+                    }
+                    int height = minheight;//info.getCityGroundLevel();
+
+                    int offset = (int) (Math.sqrt(mindist) * 2);
+                    flattenChunkBorderDownwardsSpace(primer, info, x, offset, z, provider.rand, height);
+                }
+            }
+        }
+    }
+
     private void flattenChunkToCityBorder(int chunkX, int chunkZ, ChunkPrimer primer) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
@@ -855,10 +932,28 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         clearRange(primer, info, index, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
+    private void flattenChunkBorderSpace(ChunkPrimer primer, BuildingInfo info, int x, int offset, int z, Random rand, int level, int groundHeight) {
+        int index = (x << 12) | (z << 8) + groundHeight;
+        for (int y = groundHeight ; y <= (level - offset - rand.nextInt(2)); y++) {
+            primer.data[index++] = baseChar;
+        }
+        int r = rand.nextInt(2);
+        index = (x << 12) | (z << 8);
+        // @todo experimental
+        clearRange(primer, info, index, level + offset + r, level + offset + r + 5, info.waterLevel > info.groundLevel);
+    }
+
     private void flattenChunkBorderDownwards(ChunkPrimer primer, BuildingInfo info, int x, int offset, int z, Random rand, int level) {
         int r = rand.nextInt(2);
         int index = (x << 12) | (z << 8);
         clearRange(primer, info, index, level + offset + r, 230, info.waterLevel > info.groundLevel);
+    }
+
+    private void flattenChunkBorderDownwardsSpace(ChunkPrimer primer, BuildingInfo info, int x, int offset, int z, Random rand, int level) {
+        int r = rand.nextInt(2);
+        int index = (x << 12) | (z << 8);
+        // @todo experimental
+        clearRange(primer, info, index, level + offset + r, 10, info.waterLevel > info.groundLevel);
     }
 
     private void doCityChunk(int chunkX, int chunkZ, ChunkPrimer primer, BuildingInfo info) {

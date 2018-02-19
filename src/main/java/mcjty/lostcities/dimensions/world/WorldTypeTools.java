@@ -8,9 +8,9 @@ import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.network.PacketRequestProfile;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.gen.IChunkGenerator;
 
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,12 +19,30 @@ public class WorldTypeTools {
     // A map which maps dimension id to the profile
     private static Map<Integer, LostCityProfile> profileMap = new HashMap<>();
 
+    // This map is constructed dynamically to allow having to avoid having an instanceof
+    // on LostCityChunkGenerator which breaks on sponge
+    private static Map<Integer, WeakReference<LostCityChunkGenerator>> chunkGeneratorMap = new HashMap<>();
+
     // To prevent the client from asking the profile to the server too much
     private static long clientTimeout = -1;
 
     public static void cleanCache() {
         profileMap.clear();
+        chunkGeneratorMap.clear();
         clientTimeout = -1;
+    }
+
+    public static void registerChunkGenerator(Integer dimension, LostCityChunkGenerator chunkGenerator) {
+        chunkGeneratorMap.put(dimension, new WeakReference<LostCityChunkGenerator>(chunkGenerator));
+    }
+
+    @Nullable
+    public static LostCityChunkGenerator getChunkGenerator(int dimension) {
+        if (chunkGeneratorMap.containsKey(dimension)) {
+            WeakReference<LostCityChunkGenerator> reference = chunkGeneratorMap.get(dimension);
+            return reference.get();
+        }
+        return null;
     }
 
     public static LostCityProfile getProfile(World world) {
@@ -66,13 +84,15 @@ public class WorldTypeTools {
      */
     @Nullable
     public static LostCityChunkGenerator getLostCityChunkGenerator(World world) {
-        WorldServer worldServer = (WorldServer) world;
-        IChunkGenerator chunkGenerator = worldServer.getChunkProvider().chunkGenerator;
-        // @todo not compatible with Sponge! No clue how to solve atm
-        if (!(chunkGenerator instanceof LostCityChunkGenerator)) {
-            return null;
-        }
-        return (LostCityChunkGenerator) chunkGenerator;
+        return getChunkGenerator(world.provider.getDimension());
+//        WorldServer worldServer = (WorldServer) world;
+//        IChunkGenerator chunkGenerator = worldServer.getChunkProvider().chunkGenerator;
+//        // @todo not compatible with Sponge! No clue how to solve atm
+//        // XXX
+//        if (!(chunkGenerator instanceof LostCityChunkGenerator)) {
+//            return null;
+//        }
+//        return (LostCityChunkGenerator) chunkGenerator;
     }
 
     public static boolean isLostCities(World world) {
