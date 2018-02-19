@@ -26,14 +26,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 public abstract class CommonProxy {
 
     public static File modConfigDir;
     private Configuration mainConfig;
-    private List<Configuration> profileConfigs = new ArrayList<>();
+    private Map<String, Configuration> profileConfigs = new HashMap<>();
 
     public void preInit(FMLPreInitializationEvent e) {
         PacketHandler.registerMessages("lostcities");
@@ -55,6 +57,8 @@ public abstract class CommonProxy {
             initProfiles(profileList, true);
             profileList = LostCityConfiguration.getPrivateProfiles(cfg);
             initProfiles(profileList, false);
+
+            fixConfigs();
         } catch (Exception e1) {
             FMLLog.log(Level.ERROR, e1, "Problem loading config file!");
         } finally {
@@ -69,15 +73,42 @@ public abstract class CommonProxy {
             profileCfg.load();
             profile.init(profileCfg);
             LostCityConfiguration.profiles.put(name, profile);
-            profileConfigs.add(profileCfg);
+            profileConfigs.put(name, profileCfg);
         }
     }
+
+    private void fixConfigs() {
+        for (Map.Entry<String, LostCityProfile> entry : LostCityConfiguration.profiles.entrySet()) {
+            String name = entry.getKey();
+            LostCityProfile profile = entry.getValue();
+            if (profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL != -1) {
+                // We have to fix this
+                if (!profile.CITYSPHERE_OUTSIDE_PROFILE.isEmpty()) {
+                    String otherName = profile.CITYSPHERE_OUTSIDE_PROFILE;
+                    LostCityProfile otherProfile = LostCityConfiguration.profiles.get(otherName);
+                    if (otherProfile != null) {
+                        LostCities.logger.info("Migrating deprecated 'outsideGroundLevel' from '" + name + "' to '" + otherName + "'");
+                        otherProfile.GROUNDLEVEL = profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL;
+                        otherProfile.WATERLEVEL_OFFSET = profile.WATERLEVEL_OFFSET;
+                        profileConfigs.get(otherName).getCategory(otherProfile.getCategoryLostcity()).get("groundLevel").set(otherProfile.GROUNDLEVEL);
+                        profileConfigs.get(otherName).getCategory(otherProfile.getCategoryLostcity()).get("waterLevelOffset").set(otherProfile.WATERLEVEL_OFFSET);
+                    }
+                }
+
+                profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL = -1;
+                profile.WATERLEVEL_OFFSET = 8;
+                profileConfigs.get(name).getCategory(profile.getCategoryCitySpheres()).get("outsideGroundLevel").set(profile.CITYSPHERE_OUTSIDE_GROUNDLEVEL);
+                profileConfigs.get(name).getCategory(profile.getCategoryLostcity()).get("waterLevelOffset").set(profile.WATERLEVEL_OFFSET);
+            }
+        }
+    }
+
 
     private void saveConfigs() {
         if (mainConfig.hasChanged()) {
             mainConfig.save();
         }
-        for (Configuration config : profileConfigs) {
+        for (Configuration config : profileConfigs.values()) {
             if (config.hasChanged()) {
                 config.save();
             }
