@@ -1,5 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
+import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import net.minecraft.world.chunk.ChunkPrimer;
 
@@ -9,12 +10,12 @@ import net.minecraft.world.chunk.ChunkPrimer;
 public class ChunkHeightmap {
     private byte heightmap[] = new byte[16*16];
 
-    public ChunkHeightmap(ChunkPrimer primer, boolean cavern, int groundLevel) {
+    public ChunkHeightmap(ChunkPrimer primer, LandscapeType type, int groundLevel) {
         char air = LostCitiesTerrainGenerator.airChar;
 
-        if (cavern) {
+        if (type == LandscapeType.CAVERN) {
             // Here we try to find the height inside the cavern itself. Ignoring the top layer
-            int base = Math.max(groundLevel-20, 1);
+            int base = Math.max(groundLevel - 20, 1);
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     int index = (x << 12) | (z << 8);
@@ -29,6 +30,19 @@ public class ChunkHeightmap {
                         while (y > 0 && primer.data[index + y] == air) {
                             y--;
                         }
+                    }
+                    heightmap[z * 16 + x] = (byte) y;
+                }
+            }
+        } else if (type == LandscapeType.SPACE) {
+            char base = LostCitiesTerrainGenerator.baseChar;
+            // Here we ignore the glass from the spheres
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    int index = (x << 12) | (z << 8);
+                    int y = 255;
+                    while (y > 0 && primer.data[index + y] != base) {
+                        y--;
                     }
                     heightmap[z * 16 + x] = (byte) y;
                 }
@@ -50,4 +64,67 @@ public class ChunkHeightmap {
     public int getHeight(int x, int z) {
         return heightmap[z*16+x] & 0xff;
     }
+
+    public int getAverageHeight() {
+        int cnt = 0;
+        int y = 0;
+        int yy;
+        yy = getHeight(2, 2);
+        if (yy > 5) {
+            y += yy;
+            cnt++;
+        }
+        yy = getHeight(13, 2);
+        if (yy > 5) {
+            y += yy;
+            cnt++;
+        }
+        yy = getHeight(2, 13);
+        if (yy > 5) {
+            y += yy;
+            cnt++;
+        }
+        yy = getHeight(13, 13);
+        if (yy > 5) {
+            y += yy;
+            cnt++;
+        }
+        yy = getHeight(8, 8);
+        if (yy > 5) {
+            y += yy;
+            cnt++;
+        }
+        if (cnt > 0) {
+            return y / cnt;
+        } else {
+            return 0;
+        }
+    }
+
+    public int getMinimumHeight() {
+        int y = 255;
+        int yy;
+        yy = getHeight(2, 2);
+        if (yy < y) {
+            y = yy;
+        }
+        yy = getHeight(13, 2);
+        if (yy < y) {
+            y = yy;
+        }
+        yy = getHeight(2, 13);
+        if (yy < y) {
+            y = yy;
+        }
+        yy = getHeight(13, 13);
+        if (yy < y) {
+            y = yy;
+        }
+        yy = getHeight(8, 8);
+        if (yy < y) {
+            y = yy;
+        }
+        return y;
+    }
+
 }

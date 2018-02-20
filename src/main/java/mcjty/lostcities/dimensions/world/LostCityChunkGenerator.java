@@ -187,13 +187,13 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
         } else if (cachedPrimers.containsKey(key)) {
-            ChunkHeightmap heightmap = new ChunkHeightmap(cachedPrimers.get(key), profile.isCavern(), profile.GROUNDLEVEL);
+            ChunkHeightmap heightmap = new ChunkHeightmap(cachedPrimers.get(key), profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL);
             cachedHeightmaps.put(key, heightmap);
             return heightmap;
         } else {
             ChunkPrimer primer = generatePrimer(chunkX, chunkZ);
             cachedPrimers.put(key, primer);
-            ChunkHeightmap heightmap = new ChunkHeightmap(cachedPrimers.get(key), profile.isCavern(), profile.GROUNDLEVEL);
+            ChunkHeightmap heightmap = new ChunkHeightmap(cachedPrimers.get(key), profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL);
             cachedHeightmaps.put(key, heightmap);
             return heightmap;
         }
@@ -296,7 +296,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
             // Calculate the chunk heightmap in case we need it later
             if (!cachedHeightmaps.containsKey(key)) {
                 // We might need this later
-                cachedHeightmaps.put(key, new ChunkHeightmap(chunkprimer, profile.isCavern(), profile.GROUNDLEVEL));
+                cachedHeightmaps.put(key, new ChunkHeightmap(chunkprimer, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL));
             }
         }
         return chunkprimer;
