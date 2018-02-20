@@ -146,6 +146,7 @@ public class LostCityConfiguration {
         profile.GENERATE_LIGHTING = true;
         profile.GENERATE_LAKES = false;
         profile.GENERATE_LIGHTING = true;
+        profile.GENERATE_VILLAGES = false;
 //        profile.setIconFile("textures/gui/icon_default.png");
         standardProfiles.put(profile.getName(), profile);
 
