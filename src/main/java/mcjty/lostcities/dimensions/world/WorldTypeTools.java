@@ -28,8 +28,11 @@ public class WorldTypeTools {
 
     public static void cleanCache() {
         profileMap.clear();
-        chunkGeneratorMap.clear();
         clientTimeout = -1;
+    }
+
+    public static void cleanChunkGeneratorMap() {
+        chunkGeneratorMap.clear();
     }
 
     public static void registerChunkGenerator(Integer dimension, LostCityChunkGenerator chunkGenerator) {

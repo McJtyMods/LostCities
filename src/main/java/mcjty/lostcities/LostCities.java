@@ -75,6 +75,7 @@ public class LostCities {
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
         cleanCaches();
+        WorldTypeTools.cleanChunkGeneratorMap();
     }
 
     private void cleanCaches() {
