@@ -1,6 +1,7 @@
 package mcjty.lostcities.commands;
 
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.WorldTypeTools;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.dimensions.world.lost.Railway;
@@ -39,8 +40,7 @@ public class CommandDebug implements ICommand {
         if (sender instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) sender;
             BlockPos position = player.getPosition();
-            ChunkProviderServer chunkProvider = ((WorldServer) player.getEntityWorld()).getChunkProvider();
-            LostCityChunkGenerator provider = (LostCityChunkGenerator) chunkProvider.chunkGenerator;
+            LostCityChunkGenerator provider = WorldTypeTools.getChunkGenerator(sender.getEntityWorld().provider.getDimension());
             BuildingInfo info = BuildingInfo.getBuildingInfo(position.getX() >> 4, position.getZ() >> 4, provider);
             System.out.println("profile = " + info.profile.getName());
             System.out.println("provider.hasMansion = " + info.provider.hasMansion(info.chunkX, info.chunkZ));

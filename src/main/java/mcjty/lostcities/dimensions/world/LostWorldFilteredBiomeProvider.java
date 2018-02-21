@@ -40,7 +40,7 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
 
     private LostCityChunkGenerator getProvider() {
         if (provider == null) {
-            provider = (LostCityChunkGenerator) ((WorldServer)world).getChunkProvider().chunkGenerator;
+            provider = WorldTypeTools.getChunkGenerator(world.provider.getDimension());
         }
         return provider;
     }

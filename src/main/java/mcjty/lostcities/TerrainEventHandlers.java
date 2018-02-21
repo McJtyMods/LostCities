@@ -139,8 +139,7 @@ public class TerrainEventHandlers {
     }
 
     private LostCityProfile getProfile(DecorateBiomeEvent.Decorate event, WorldServer world) {
-        WorldServer worldServer = world;
-        LostCityChunkGenerator provider = (LostCityChunkGenerator) worldServer.getChunkProvider().chunkGenerator;
+        LostCityChunkGenerator provider = WorldTypeTools.getChunkGenerator(world.provider.getDimension());
         int chunkX = (event.getPos().getX()) >> 4;
         int chunkZ = (event.getPos().getZ()) >> 4;
         return BuildingInfo.getProfile(chunkX, chunkZ, provider);
