@@ -54,6 +54,10 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
             return originalBiome;
         }
 
+        if(getProvider() == null) {
+            return originalBiome;
+        }
+
         if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             int chunkX = (pos.getX()) >> 4;
             int chunkZ = (pos.getZ()) >> 4;
@@ -80,6 +84,11 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
         if (!(world instanceof WorldServer)) {
             return;
         }
+
+        if(getProvider() == null) {
+            return;
+        }
+
         LostCityProfile profile = WorldTypeTools.getProfile(world);
         if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             int chunkX = (topx) >> 4;
