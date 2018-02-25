@@ -76,9 +76,13 @@ public class WorldTypeTools {
     }
 
     // Called client side when we get an answer from the server about our profile
-    public static void setProfileFromServer(int dimension, String profile) {
-        System.out.println("FROM SERVER: profile = " + profile + " for " + dimension);
-        profileMap.put(dimension, LostCityConfiguration.profiles.get(profile));
+    public static void setProfileFromServer(int dimension, String profileName) {
+        System.out.println("FROM SERVER: profile = " + profileName + " for " + dimension);
+        LostCityProfile profile = LostCityConfiguration.profiles.get(profileName);
+        if (profile == null) {
+            throw new RuntimeException("Cannot find profile '" + profileName + "' that the server is using! Please make client configs for Lost Cities compatible");
+        }
+        profileMap.put(dimension, profile);
     }
 
     /**
