@@ -46,6 +46,8 @@ public class ForgeEventHandlers {
                 return;
             }
 
+            LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world);
+
             Predicate<BlockPos> isSuitable = pos -> true;
             boolean needsCheck = false;
 
@@ -69,7 +71,6 @@ public class ForgeEventHandlers {
                 }
             } else if (!profile.SPAWN_SPHERE.isEmpty()) {
                 if ("<in>".equals(profile.SPAWN_SPHERE)) {
-                    LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world);
                     isSuitable = blockPos -> {
                         CitySphere sphere = CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, provider);
                         if (!sphere.isEnabled()) {
@@ -80,8 +81,14 @@ public class ForgeEventHandlers {
                     };
                     needsCheck = true;
                 } else if ("<out>".equals(profile.SPAWN_SPHERE)) {
-                    LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world);
-                    isSuitable = blockPos -> !CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, provider).isEnabled();
+                    isSuitable = blockPos -> {
+                        CitySphere sphere = CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, provider);
+                        if (!sphere.isEnabled()) {
+                            return true;
+                        }
+                        float sqradius = sphere.getRadius() * sphere.getRadius();
+                        return sphere.getCenterPos().distanceSq(new BlockPos(blockPos.getX(), sphere.getCenterPos().getY(), blockPos.getZ())) > sqradius;
+                    };
                     needsCheck = true;
                 } else {
                     final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(profile.SPAWN_SPHERE);
@@ -97,7 +104,6 @@ public class ForgeEventHandlers {
             }
 
             if (profile.SPAWN_NOT_IN_BUILDING) {
-                LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world);
                 isSuitable = isSuitable.and(blockPos -> isOutsideBuilding(provider, blockPos));
                 needsCheck = true;
             }
@@ -107,13 +113,13 @@ public class ForgeEventHandlers {
                 case DEFAULT:
                 case CAVERN:
                     if (needsCheck) {
-                        findSafeSpawnPoint(world, isSuitable);
+                        findSafeSpawnPoint(world, provider, isSuitable);
                         event.setCanceled(true);
                     }
                     break;
                 case FLOATING:
                 case SPACE:
-                    findSafeSpawnPoint(world, isSuitable);
+                    findSafeSpawnPoint(world, provider, isSuitable);
                     event.setCanceled(true);
                     break;
             }
@@ -129,13 +135,13 @@ public class ForgeEventHandlers {
         return (int) ((radius * pct) * (radius * pct));
     }
 
-    private void findSafeSpawnPoint(World world, @Nonnull Predicate<BlockPos> isSuitable) {
+    private void findSafeSpawnPoint(World world, LostCityChunkGenerator provider, @Nonnull Predicate<BlockPos> isSuitable) {
         Random rand = new Random(world.getSeed());
         rand.nextFloat();
         rand.nextFloat();
         int radius = 200;
         int attempts = 0;
-        int bottom = world.getWorldType().getMinimumSpawnHeight(world);
+//        int bottom = world.getWorldType().getMinimumSpawnHeight(world);
         while (true) {
             for (int i = 0 ; i < 200 ; i++) {
                 int x = rand.nextInt(radius * 2) - radius;
@@ -146,7 +152,9 @@ public class ForgeEventHandlers {
                     continue;
                 }
 
-                for (int y = bottom ; y < 125 ; y++) {
+                LostCityProfile profile = BuildingInfo.getProfile(x >> 4, z >> 4, provider);
+
+                for (int y = profile.GROUNDLEVEL-5 ; y < 125 ; y++) {
                     BlockPos pos = new BlockPos(x, y, z);
                     if (isValidStandingPosition(world, pos)) {
                         world.setSpawnPoint(pos.up());
