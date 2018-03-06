@@ -36,6 +36,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char hardAirChar;
     public static char glowstoneChar;
     public static char baseChar;
+    public static char gravelChar;
     public static char glassChar;       // @todo: for space: depend on city style
     public static char liquidChar;
     public static char leavesChar;
@@ -176,6 +177,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             hardAirChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COMMAND_BLOCK.getDefaultState());
             glowstoneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLOWSTONE.getDefaultState());
             baseChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONE.getDefaultState());
+            gravelChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRAVEL.getDefaultState());
             liquidChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.WATER.getDefaultState());
 
             // @todo

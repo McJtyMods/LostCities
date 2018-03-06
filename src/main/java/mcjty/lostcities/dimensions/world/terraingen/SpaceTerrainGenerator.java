@@ -132,7 +132,14 @@ public class SpaceTerrainGenerator {
 
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] biomes) {
         CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+
+        int outsideGround = provider.getOutsideProfile().GROUNDLEVEL;
+        int outsideWater = outsideGround - provider.getOutsideProfile().WATERLEVEL_OFFSET;
+        int groundlevel = provider.getProfile().GROUNDLEVEL;
+        int water = groundlevel - provider.getProfile().WATERLEVEL_OFFSET;
+
         if (sphere.isEnabled()) {
+
             float radius = sphere.getRadius();
             BlockPos cc = sphere.getCenterPos();
             double sqradiusOffset = (radius - 2) * (radius - 2);
@@ -147,9 +154,9 @@ public class SpaceTerrainGenerator {
                     Biome biome = biomes[x + z * 16];
                     // Even though x and z seems swapped below this code is working nevertheless
                     if (sqdist >= sqradiusOffset) {
-                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, provider.getOutsideProfile().GROUNDLEVEL);
+                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, outsideGround, outsideWater);
                     } else {
-                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, provider.getProfile().GROUNDLEVEL);
+                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, groundlevel, water);
                     }
                 }
             }
@@ -157,16 +164,17 @@ public class SpaceTerrainGenerator {
             for (int z = 0; z < 16; ++z) {
                 for (int x = 0; x < 16; ++x) {
                     Biome biome = biomes[x + z * 16];
-                    genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, provider.getOutsideProfile().GROUNDLEVEL);
+                    genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, outsideGround, outsideWater);
                 }
             }
         }
 
     }
 
-    public final void genBiomeTerrain(Biome Biome, ChunkPrimer primer, int x, int z, int topLevel) {
+    private void genBiomeTerrain(Biome Biome, ChunkPrimer primer, int x, int z, int topLevel, int waterLevel) {
         char air = LostCitiesTerrainGenerator.airChar;
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
+        char gravelBlock = LostCitiesTerrainGenerator.gravelChar;
 
         char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
         char topBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
@@ -180,6 +188,9 @@ public class SpaceTerrainGenerator {
         for (int y = topLevel + 20 ; y >= topLevel - 8 ; y--) {
             int index = bottomIndex + y;
             if (primer.data[index] == baseBlock) {
+                // @todo experiment with more realistic toppings for under water
+//                if (y == waterLevel-2) {
+//                    primer.data[index] = gravelBlock;
                 if (cnt == 0) {
                     primer.data[index] = topBlock;
                 } else if (cnt < 3) {
