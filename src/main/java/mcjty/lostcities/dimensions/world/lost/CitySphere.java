@@ -266,7 +266,7 @@ public class CitySphere implements ILostSphere {
      * Return true if a given chunk is fully enclosed in a city sphere
      */
     public static boolean fullyInsideCitySpere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
         if (!sphere.isEnabled()) {
             return false;
         }
@@ -294,7 +294,7 @@ public class CitySphere implements ILostSphere {
      * Return true if a given chunk is partially or fully enclosed in a city sphere
      */
     public static boolean intersectsWithCitySphere(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
         if (!sphere.isEnabled()) {
             return false;
         }
@@ -327,7 +327,7 @@ public class CitySphere implements ILostSphere {
      * Return true if a given chunk is partially enclosed in a city sphere (i.e. on the sphere border)
      */
     public static boolean onCitySphereBorder(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
         if (!sphere.isEnabled()) {
             return false;
         }
@@ -371,7 +371,7 @@ public class CitySphere implements ILostSphere {
         // This information is for city spheres. This information is only relevant
         // in the chunk representing the center of the city
         LostCityProfile profile = provider.getProfile();
-        boolean enabled = rand.nextFloat() < profile.CITYSPHERE_CHANCE;
+        boolean enabled = predef != null || rand.nextFloat() < profile.CITYSPHERE_CHANCE;
         float radius = predef != null ? predef.getRadius() : getSphereRadius(center, provider, rand);
         BlockPos centerPosition = predef != null ? new BlockPos(predef.getCenterX(), profile.GROUNDLEVEL, predef.getCenterZ()) : getSphereCenterPosition(center, provider, rand);
         citySphere = new CitySphere(center, radius, centerPosition, enabled);
@@ -434,7 +434,7 @@ public class CitySphere implements ILostSphere {
 
             CitySphere sphere;
             if (provider.getProfile().CITYSPHERE_ONLY_PREDEFINED) {
-                sphere = CitySphere.EMPTY;
+                sphere = EMPTY;
             } else {
                 int cx = (chunkX & ~0xf) + 8;
                 int cz = (chunkZ & ~0xf) + 8;
