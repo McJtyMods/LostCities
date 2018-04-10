@@ -93,7 +93,7 @@ public class BuildingInfo implements ILostChunkInfo {
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
     private final List<Pair<BlockPos, ConditionTodo>> lootTodo = new ArrayList<>();
-    private final List<BlockPos> genericTodo = new ArrayList<>();
+    private final List<BlockPos> lightingUpdateTodo = new ArrayList<>();
     private final List<Pair<Integer, Map<String, Integer>>> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
 
@@ -153,16 +153,16 @@ public class BuildingInfo implements ILostChunkInfo {
         torchTodo.clear();
     }
 
-    public void addGenericTodo(BlockPos pos) {
-        genericTodo.add(pos);
+    public void addLightingUpdateTodo(BlockPos pos) {
+        lightingUpdateTodo.add(pos);
     }
 
-    public List<BlockPos> getGenericTodo() {
-        return genericTodo;
+    public List<BlockPos> getLightingUpdateTodo() {
+        return lightingUpdateTodo;
     }
 
-    public void clearGenericTodo() {
-        genericTodo.clear();
+    public void clearLightingUpdateTodo() {
+        lightingUpdateTodo.clear();
     }
 
     public void addSpawnerTodo(BlockPos pos, ConditionTodo mobId) {

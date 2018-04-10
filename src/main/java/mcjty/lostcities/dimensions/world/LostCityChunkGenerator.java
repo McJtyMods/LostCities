@@ -453,13 +453,11 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         info.clearLootTodo();
 
 
-        for (BlockPos pos : info.getGenericTodo()) {
+        for (BlockPos pos : info.getLightingUpdateTodo()) {
             IBlockState state = world.getBlockState(pos);
-            if (state.getBlock() == Blocks.GLOWSTONE) {
-                world.setBlockState(pos, state, 3);
-            }
+            world.setBlockState(pos, state, 3);
         }
-        info.clearGenericTodo();
+        info.clearLightingUpdateTodo();
     }
 
 

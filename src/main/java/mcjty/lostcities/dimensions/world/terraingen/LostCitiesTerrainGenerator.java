@@ -2,6 +2,7 @@ package mcjty.lostcities.dimensions.world.terraingen;
 
 import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
+import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.*;
@@ -16,11 +17,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -54,6 +57,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private static Set<Character> railChars = null;
     private static Set<Character> glassChars = null;
     private static Set<Character> charactersNeedingTodo = null;
+    private static Set<Character> charactersNeedingLightingUpdate = null;
 
     private Character street;
     private Character streetBase;
@@ -125,7 +129,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static Set<Character> getCharactersNeedingTodo() {
         if (charactersNeedingTodo == null) {
             charactersNeedingTodo = new HashSet<>();
-            charactersNeedingTodo.add(glowstoneChar);
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH)));
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK)));
@@ -136,6 +139,19 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.YELLOW_FLOWER.getDefaultState()));
         }
         return charactersNeedingTodo;
+    }
+
+    public static Set<Character> getCharactersNeedingLightingUpdate() {
+        if (charactersNeedingLightingUpdate == null) {
+            charactersNeedingLightingUpdate = new HashSet<>();
+            for (String s : LostCityConfiguration.BLOCKS_REQUIRING_LIGHTING_UPDATES) {
+                Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(s));
+                if (block != null) {
+                    addStates(block, charactersNeedingLightingUpdate);
+                }
+            }
+        }
+        return charactersNeedingLightingUpdate;
     }
 
     public static Set<Character> getRotatableChars() {
@@ -1809,7 +1825,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
                         char glass = palette.get(corridorGlassBlock);
                         primer.data[index + (height++)] = glass;
-                        info.addGenericTodo(new BlockPos(x, height, z));
+                        info.addLightingUpdateTodo(new BlockPos(x, height, z));
                         primer.data[index + (height++)] = glowstoneChar;
                     } else {
                         char roof = palette.get(corridorRoofBlock);
@@ -2052,7 +2068,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
                         CompiledPalette.Info inf = compiledPalette.getInfo(c);
 
-
                         if (transform != Transform.ROTATE_NONE) {
                             if (getRotatableChars().contains(b)) {
                                 IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
@@ -2107,18 +2122,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                         b = airChar;
                                     }
                                 }
+                            } else if (getCharactersNeedingLightingUpdate().contains(b)) {
+                                info.getTodoChunk(rx, rz).addLightingUpdateTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                             } else if (getCharactersNeedingTodo().contains(b)) {
-                                if (b == glowstoneChar) {
-                                    info.getTodoChunk(rx, rz).addGenericTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
-                                } else {
-                                    IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
-                                    Block block = bs.getBlock();
-                                    if (block instanceof BlockSapling || block instanceof BlockFlower) {
-                                        if (info.profile.AVOID_FOLIAGE) {
-                                            b = airChar;
-                                        } else {
-                                            info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
-                                        }
+                                IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
+                                Block block = bs.getBlock();
+                                if (block instanceof BlockSapling || block instanceof BlockFlower) {
+                                    if (info.profile.AVOID_FOLIAGE) {
+                                        b = airChar;
+                                    } else {
+                                        info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                     }
                                 }
                             }

@@ -17,9 +17,6 @@ public class CompiledPalette {
 
     private final Map<Character, Object> palette = new HashMap<>();
     private final Map<Character, Character> damagedToBlock = new HashMap<>();
-//    private final Map<Character, String> mobIds = new HashMap<>();
-//    private final Map<Character, String> lootTables = new HashMap<>();
-//    private final Map<Character, Map<String, Integer>> torchOrientations = new HashMap<>();
     private final Map<Character, Info> information = new HashMap<>();
 
     public static class Info {
@@ -51,9 +48,6 @@ public class CompiledPalette {
         this.palette.putAll(other.palette);
         this.damagedToBlock.putAll(other.damagedToBlock);
         this.information.putAll(other.information);
-//        this.mobIds.putAll(other.mobIds);
-//        this.lootTables.putAll(other.lootTables);
-//        this.torchOrientations.putAll(other.torchOrientations);
         addPalettes(palettes);
     }
 

@@ -14,6 +14,7 @@ public class LostCityConfiguration {
      */
     public static final String CATEGORY_GENERAL = "general";
 
+    public static final String LIGHTING_UPDATE_COMMENT = "List of blocks for which a lighting update is needed";
     public static final String ASSET_COMMENT = "List of asset libraries loaded in the specified order. " +
             "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded from the config directory";
     public static final String WORLDTYPES_COMMENT = "List of other worldtypes (id) that this mod will try " +
@@ -23,6 +24,12 @@ public class LostCityConfiguration {
 
     public static final String[] DEFAULT_PROFILES = new String[]{"default", "cavern", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
     public static final String[] PRIVATE_PROFILES = new String[]{"bio_wasteland", "water_empty"};
+
+    public static String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
+            "minecraft:glowstone",
+            "minecraft:lit_pumpkin",
+            "minecraft:magma"
+    };
 
     public static String[] ASSETS = new String[] {
             "/assets/lostcities/citydata/conditions.json",
@@ -107,6 +114,8 @@ public class LostCityConfiguration {
                     DEFAULT_PROFILES, PROFILES_COMMENT);
 
         }
+
+        BLOCKS_REQUIRING_LIGHTING_UPDATES = cfg.getStringList("blocksRequiringLightingUpdates", CATEGORY_GENERAL, BLOCKS_REQUIRING_LIGHTING_UPDATES, LIGHTING_UPDATE_COMMENT);
 
         ADAPTING_WORLDTYPES = cfg.getStringList("adaptingWorldTypes", CATEGORY_GENERAL, ADAPTING_WORLDTYPES, WORLDTYPES_COMMENT);
 
