@@ -42,6 +42,10 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/repositories/snapshots/"
     }
+    maven {
+        name = "CoFH Maven"
+        url = "http://maven.covers1624.net"
+    }
 }
 
 version = "1.12-2.0.7"
@@ -56,9 +60,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.12.2-14.23.1.2604"
+    version = "1.12.2-14.23.3.2678"
     runDir = "run"
-    mappings = "snapshot_20180112"
+    mappings = "snapshot_20180504"
     useDepAts = true
 }
 
@@ -74,9 +78,10 @@ artifacts {
 
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.12:4.7.0.67"
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.10-4"
-    deobfCompile "com.github.mcjty:intwheel:1.12-1.2.7"
+    deobfCompile "mezz.jei:jei_1.12.2:4.8.5.159"
+    deobfCompile "mcp.mobius.waila:Hwyla:1.8.23-B38_1.12"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.20-12"
+    deobfCompile "cofh:RedstoneFlux:1.12-2.0.0.1:universal"
     //deobfCompile "mcp.mobius.waila:Hwyla:1.8.10-B23_1.11:api"
     //deobfCompile "mcjty.theoneprobe:TheOneProbe:1.1x-1.4.7-57"
     //deobfCompile "team.chisel:Chisel:MC1.11.2-0.0.10.14"
