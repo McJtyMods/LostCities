@@ -18,6 +18,14 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven'
 
+// More user properties
+ext.user = parseConfig(file('extra.properties'))
+if (ext.user != null) {
+    ext.user.each { k, v ->
+        project.ext.set(k, v)
+    }
+}
+
 repositories {
     maven { // The repo from which to get waila
         name "Mobius Repo"
@@ -60,9 +68,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.12.2-14.23.3.2678"
+    version = "${minecraft_version}-${forge_version}"
     runDir = "run"
-    mappings = "snapshot_20180504"
+    mappings = mcp_mappings
     useDepAts = true
 }
 
@@ -78,10 +86,10 @@ artifacts {
 
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.12.2:4.8.5.159"
-    deobfCompile "mcp.mobius.waila:Hwyla:1.8.23-B38_1.12"
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.20-12"
-    deobfCompile "cofh:RedstoneFlux:1.12-2.0.0.1:universal"
+    deobfCompile "mezz.jei:jei_${jei_version}"
+    deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-:${top_version}"
+    deobfCompile "cofh:RedstoneFlux:${redstoneflux_version}"
     //deobfCompile "mcp.mobius.waila:Hwyla:1.8.10-B23_1.11:api"
     //deobfCompile "mcjty.theoneprobe:TheOneProbe:1.1x-1.4.7-57"
     //deobfCompile "team.chisel:Chisel:MC1.11.2-0.0.10.14"
