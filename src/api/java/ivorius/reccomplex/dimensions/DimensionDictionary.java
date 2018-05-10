@@ -35,7 +35,7 @@ public class DimensionDictionary
      */
     public static final String UNREAL = "UNREAL";
     /**
-     * Dimensions made up in the mind of an entity or player. (e.g. his mind)
+     * Dimensions made up in the mind of an bindings or player. (e.g. his mind)
      */
     public static final String IMAGINARY = "IMAGINARY";
     /**
