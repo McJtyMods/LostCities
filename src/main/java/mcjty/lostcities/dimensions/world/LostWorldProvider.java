@@ -25,7 +25,11 @@ public class LostWorldProvider extends WorldProvider {
     @Override
     @Nonnull
     public String getSaveFolder() {
-        return "LOST";
+        if (world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
+            return "LOST";
+        } else {
+            return "LOST" + world.provider.getDimension();
+        }
     }
 
     @Override
@@ -53,7 +57,8 @@ public class LostWorldProvider extends WorldProvider {
     protected void init() {
         super.init();
 
-        LostCityProfile profile = LostCityConfiguration.profiles.get(LostCityConfiguration.DIMENSION_PROFILE);
+        String profileName = ModDimensions.dimensionProfileMap.get(world.provider.getDimension());
+        LostCityProfile profile = LostCityConfiguration.profiles.get(profileName);
         if (profile == null) {
             profile = WorldTypeTools.getProfile(world);
         }

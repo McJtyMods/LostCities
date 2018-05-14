@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.dimensions.ModDimensions;
 import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.network.PacketRequestProfile;
 import net.minecraft.world.World;
@@ -65,9 +66,9 @@ public class WorldTypeTools {
                 PacketHandler.INSTANCE.sendToServer(new PacketRequestProfile(world.provider.getDimension()));
                 clientTimeout = time;
             }
-            if (world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
+            if (world.provider.getDimension() != 0) {
                 // Don't put in cache because we might want to ask again
-                return LostCityConfiguration.profiles.get(LostCityConfiguration.DIMENSION_PROFILE);
+                return LostCityConfiguration.profiles.get(ModDimensions.dimensionProfileMap.get(world.provider.getDimension()));
             } else {
                 // Don't put in cache because we might want to ask again
                 return LostCityConfiguration.profiles.get(LostCityConfiguration.DEFAULT_PROFILE);
@@ -103,7 +104,7 @@ public class WorldTypeTools {
     }
 
     public static boolean isLostCities(World world) {
-        if (LostCityConfiguration.DIMENSION_ID != -1 && world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
+        if (ModDimensions.dimensionProfileMap.containsKey(world.provider.getDimension())) {
             return true;
         }
         if (world.provider.getDimension() != 0) {
@@ -113,8 +114,8 @@ public class WorldTypeTools {
     }
 
     private static LostCityProfile getProfileOnServer(World world) {
-        if (world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
-            LostCityProfile profile = LostCityConfiguration.profiles.get(LostCityConfiguration.DIMENSION_PROFILE);
+        if (ModDimensions.dimensionProfileMap.containsKey(world.provider.getDimension())) {
+            LostCityProfile profile = LostCityConfiguration.profiles.get(ModDimensions.dimensionProfileMap.get(world.provider.getDimension()));
             if (profile != null) {
                 return profile;
             }

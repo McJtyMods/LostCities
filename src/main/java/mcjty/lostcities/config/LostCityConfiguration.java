@@ -14,6 +14,7 @@ public class LostCityConfiguration {
      */
     public static final String CATEGORY_GENERAL = "general";
 
+    public static final String ADDITIONAL_DIMENSIONS_COMMENT = "List of additional Lost City dimensions. Format '<id>:<profile>'";
     public static final String LIGHTING_UPDATE_COMMENT = "List of blocks for which a lighting update is needed";
     public static final String ASSET_COMMENT = "List of asset libraries loaded in the specified order. " +
             "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded from the config directory";
@@ -43,6 +44,10 @@ public class LostCityConfiguration {
             "/assets/lostcities/citydata/buildingparts.json",
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
+    };
+
+    public static String[] ADDITIONAL_DIMENSIONS = new String[] {
+
     };
 
     public static String[] ADAPTING_WORLDTYPES = new String[] {};
@@ -118,6 +123,8 @@ public class LostCityConfiguration {
         BLOCKS_REQUIRING_LIGHTING_UPDATES = cfg.getStringList("blocksRequiringLightingUpdates", CATEGORY_GENERAL, BLOCKS_REQUIRING_LIGHTING_UPDATES, LIGHTING_UPDATE_COMMENT);
 
         ADAPTING_WORLDTYPES = cfg.getStringList("adaptingWorldTypes", CATEGORY_GENERAL, ADAPTING_WORLDTYPES, WORLDTYPES_COMMENT);
+
+        ADDITIONAL_DIMENSIONS = cfg.getStringList("additionalDimensions", CATEGORY_GENERAL, ADDITIONAL_DIMENSIONS, ADDITIONAL_DIMENSIONS_COMMENT);
 
         DIMENSION_PROFILE = cfg.getString("dimensionProfile", CATEGORY_GENERAL, DIMENSION_PROFILE, "The 'profile' to use for generation of the Lost City dimension");
         DEFAULT_PROFILE = cfg.getString("defaultProfile", CATEGORY_GENERAL, DEFAULT_PROFILE, "The default 'profile' to use for the overworld");
