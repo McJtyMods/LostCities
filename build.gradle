@@ -213,8 +213,5 @@ curseforge {
         mainArtifact(jar) {
             displayName = "${modname} - ${version}"
         }
-        relations {
-        }
-        addArtifact(apiJar)
     }
 }
