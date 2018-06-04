@@ -66,10 +66,12 @@ public class WorldTypeTools {
                 PacketHandler.INSTANCE.sendToServer(new PacketRequestProfile(world.provider.getDimension()));
                 clientTimeout = time;
             }
-            if (world.provider.getDimension() != 0) {
+            if (ModDimensions.dimensionProfileMap.keySet().contains(world.provider.getDimension())) {
+                System.out.println("YES: world.provider.getDimension() = " + world.provider.getDimension());
                 // Don't put in cache because we might want to ask again
                 return LostCityConfiguration.profiles.get(ModDimensions.dimensionProfileMap.get(world.provider.getDimension()));
             } else {
+                System.out.println("NO: world.provider.getDimension() = " + world.provider.getDimension());
                 // Don't put in cache because we might want to ask again
                 return LostCityConfiguration.profiles.get(LostCityConfiguration.DEFAULT_PROFILE);
             }
