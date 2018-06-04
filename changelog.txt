@@ -1,2 +1,5 @@
+2.0.9:
+- Fixed a crash bug in combination with the Aroma Mining Dimension
+
 2.0.8:
 - Added support for multiple Lost City dimensions through the new ADDITIONAL_DIMENSIONS config. These dimensions are not accessible with the usual method. They are mostly intended for pack devs who need multiple city dimensions with various properties (profiles)
