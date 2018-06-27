@@ -67,11 +67,9 @@ public class WorldTypeTools {
                 clientTimeout = time;
             }
             if (ModDimensions.dimensionProfileMap.keySet().contains(world.provider.getDimension())) {
-                System.out.println("YES: world.provider.getDimension() = " + world.provider.getDimension());
                 // Don't put in cache because we might want to ask again
                 return LostCityConfiguration.profiles.get(ModDimensions.dimensionProfileMap.get(world.provider.getDimension()));
             } else {
-                System.out.println("NO: world.provider.getDimension() = " + world.provider.getDimension());
                 // Don't put in cache because we might want to ask again
                 return LostCityConfiguration.profiles.get(LostCityConfiguration.DEFAULT_PROFILE);
             }
@@ -80,7 +78,6 @@ public class WorldTypeTools {
 
     // Called client side when we get an answer from the server about our profile
     public static void setProfileFromServer(int dimension, String profileName) {
-        System.out.println("FROM SERVER: profile = " + profileName + " for " + dimension);
         LostCityProfile profile = LostCityConfiguration.profiles.get(profileName);
         if (profile == null) {
             throw new RuntimeException("Cannot find profile '" + profileName + "' that the server is using! Please make client configs for Lost Cities compatible");
