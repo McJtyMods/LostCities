@@ -13,6 +13,7 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.ConditionContext;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import mcjty.lostcities.varia.ChunkCoord;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.BlockVine;
@@ -433,6 +434,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                     if (LostCityConfiguration.DEBUG) {
                         LostCities.logger.debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
                     }
+                } else if(tileentity != null) {
+                    LostCities.logger.error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");
+                } else {
+                    LostCities.logger.error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
                 }
             }
         }
@@ -446,6 +451,12 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
             if (te instanceof TileEntityLockableLoot) {
                 if (chunkGenerator.profile.GENERATE_LOOT) {
                     createLoot(info, random, world, pos, pair.getRight());
+                }
+            } else if (te == null) {
+                IBlockState state = world.getBlockState(pos);
+                Block block = state.getBlock();
+                if (block.hasTileEntity(state)) {
+                    LostCities.logger.error("The block " + block.getRegistryName() + " (" + block.getClass().getName() + ") at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
                 }
             }
         }
