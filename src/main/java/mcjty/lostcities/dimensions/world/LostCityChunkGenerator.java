@@ -203,7 +203,9 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
     @Override
     public Chunk generateChunk(int chunkX, int chunkZ) {
-        LostCitiesTerrainGenerator.setupChars();
+        LostCityProfile profile = BuildingInfo.getProfile(chunkX, chunkZ, this);
+
+        terrainGenerator.setupChars(profile);
         boolean isCity = BuildingInfo.isCity(chunkX, chunkZ, this);
 
         ChunkPrimer chunkprimer = getChunkPrimer(chunkX, chunkZ, isCity);
@@ -222,8 +224,6 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
             LostCities.logger.error("    Num cellars: " + info.getNumCellars());
             throw (e);
         }
-
-        LostCityProfile profile = BuildingInfo.getProfile(chunkX, chunkZ, this);
 
         BiomeProvider biomeProvider = this.worldObj.getBiomeProvider();
         this.biomesForGeneration = biomeProvider.getBiomes(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);

@@ -3,6 +3,7 @@ package mcjty.lostcities.dimensions.world.terraingen;
 import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.*;
@@ -34,14 +35,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private static int g_seed = 123456789;
     private final int mainGroundLevel;
     private final int waterLevel;
-    private static boolean charsSetup = false;
+    private boolean charsSetup = false;
     public static char airChar;
     public static char hardAirChar;
     public static char glowstoneChar;
     public static char baseChar;
     public static char gravelChar;
     public static char glassChar;       // @todo: for space: depend on city style
-    public static char liquidChar;
     public static char leavesChar;
     public static char leaves2Char;
     public static char leaves3Char;
@@ -52,6 +52,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char endportalFrameChar;
     public static char goldBlockChar;
     public static char diamondBlockChar;
+
+    public char liquidChar;
 
     private static Set<Character> rotatableChars = null;
     private static Set<Character> railChars = null;
@@ -187,14 +189,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    public static void setupChars() {
+    public void setupChars(LostCityProfile profile) {
         if (!charsSetup) {
             airChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.AIR.getDefaultState());
             hardAirChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COMMAND_BLOCK.getDefaultState());
             glowstoneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLOWSTONE.getDefaultState());
             baseChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONE.getDefaultState());
             gravelChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRAVEL.getDefaultState());
-            liquidChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.WATER.getDefaultState());
+            liquidChar = (char) Block.BLOCK_STATE_IDS.get(profile.getLiquidBlock());
 
             // @todo
             glassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS.getDefaultState());
@@ -375,7 +377,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
                 break;
             case CAVERN:
-                cavernTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
+                cavernTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes, this);
                 break;
         }
     }
@@ -386,13 +388,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 defaultGenerate(chunkX, chunkZ, primer);
                 break;
             case FLOATING:
-                islandTerrainGenerator.generate(chunkX, chunkZ, primer);
+                islandTerrainGenerator.generate(chunkX, chunkZ, primer, this);
                 break;
             case SPACE:
-                spaceTerrainGenerator.generate(chunkX, chunkZ, primer);
+                spaceTerrainGenerator.generate(chunkX, chunkZ, primer, this);
                 break;
             case CAVERN:
-                cavernTerrainGenerator.generate(chunkX, chunkZ, primer);
+                cavernTerrainGenerator.generate(chunkX, chunkZ, primer, this);
                 break;
         }
     }
@@ -505,7 +507,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 if (d != airChar || (index & 0xff) < info.waterLevel) {
                                     float damage = damageArea.getDamage(cx + x, cury, cz + z) * damageFactor;
                                     if (damage >= 0.001) {
-                                        Character newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette());
+                                        Character newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette(), liquidChar);
                                         if (newd != d) {
                                             primer.data[index] = newd;
                                             cntDamaged++;

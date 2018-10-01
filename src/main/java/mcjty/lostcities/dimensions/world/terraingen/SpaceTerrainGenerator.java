@@ -22,7 +22,7 @@ public class SpaceTerrainGenerator {
     }
 
 
-    public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
+    public void generate(int chunkX, int chunkZ, ChunkPrimer primer, LostCitiesTerrainGenerator terrainGenerator) {
         // Find the city center and get the city style for the center of the city
         CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
         CitySphere.initSphere(sphere, provider);   // Make sure city sphere information is complete
@@ -30,7 +30,7 @@ public class SpaceTerrainGenerator {
         LostCityProfile profile = provider.getProfile();
         LostCityProfile profileOut = provider.getOutsideProfile();
         boolean outsideLandscape = profile.CITYSPHERE_LANDSCAPE_OUTSIDE;
-        Character baseLiquid = LostCitiesTerrainGenerator.liquidChar;
+        Character baseLiquid = terrainGenerator.liquidChar;
         char airChar = LostCitiesTerrainGenerator.airChar;
 
         this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);

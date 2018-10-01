@@ -152,10 +152,10 @@ public class CavernTerrainGenerator {
         return noiseField;
     }
 
-    public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
+    public void generate(int chunkX, int chunkZ, ChunkPrimer primer, LostCitiesTerrainGenerator terrainGenerator) {
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
-        char baseLiquid = LostCitiesTerrainGenerator.liquidChar;
+        char baseLiquid = terrainGenerator.liquidChar;
 
         byte b0 = 4;
         LostCityProfile profile = provider.getProfile();
@@ -223,10 +223,10 @@ public class CavernTerrainGenerator {
 
 
 
-    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
+    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes, LostCitiesTerrainGenerator terrainGenerator) {
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
-        char baseLiquid = LostCitiesTerrainGenerator.liquidChar;
+        char baseLiquid = terrainGenerator.liquidChar;
         int bedrockLayer = provider.getProfile().BEDROCK_LAYER;
 
         byte groundLevel = (byte) provider.getProfile().GROUNDLEVEL;

@@ -210,7 +210,7 @@ public class IslandTerrainGenerator {
         return densities;
     }
 
-    public void generate(int chunkX, int chunkZ, ChunkPrimer primer) {
+    public void generate(int chunkX, int chunkZ, ChunkPrimer primer, LostCitiesTerrainGenerator terrainGenerator) {
         char baseBlock = LostCitiesTerrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
 

@@ -61,7 +61,7 @@ public class DamageArea {
         }
     }
 
-    public Character damageBlock(Character b, LostCityChunkGenerator provider, int y, float damage, CompiledPalette palette) {
+    public Character damageBlock(Character b, LostCityChunkGenerator provider, int y, float damage, CompiledPalette palette, char liquidChar) {
         if (b == LostCitiesTerrainGenerator.bedrockChar || b == LostCitiesTerrainGenerator.endportalChar || b == LostCitiesTerrainGenerator.endportalFrameChar) {
             return b;
         }
@@ -76,10 +76,10 @@ public class DamageArea {
                 if (provider.rand.nextFloat() < .7f) {
                     b = damaged;
                 } else {
-                    b = y < waterlevel ? LostCitiesTerrainGenerator.liquidChar : LostCitiesTerrainGenerator.airChar;
+                    b = y < waterlevel ? liquidChar : LostCitiesTerrainGenerator.airChar;
                 }
             } else {
-                b = y < waterlevel ? LostCitiesTerrainGenerator.liquidChar : LostCitiesTerrainGenerator.airChar;
+                b = y < waterlevel ? liquidChar : LostCitiesTerrainGenerator.airChar;
             }
         }
         return b;

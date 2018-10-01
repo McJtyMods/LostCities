@@ -1,9 +1,13 @@
 package mcjty.lostcities.config;
 
 import mcjty.lostcities.LostCities;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -30,6 +34,9 @@ public class LostCityProfile {
     private ResourceLocation icon;
 
     public int DEBRIS_TO_NEARBYCHUNK_FACTOR = 200;
+
+    private String LIQUID_BLOCK = "minecraft:water";
+    private IBlockState liquidBlock = null;
 
     public float VINE_CHANCE = 0.009f;
     public float CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
@@ -277,6 +284,8 @@ public class LostCityProfile {
         extraDescription = cfg.getString("extraDescription", categoryLostcity, inheritFrom.orElse(this).extraDescription, "Additional information");
         worldStyle = cfg.getString("worldStyle", categoryLostcity, inheritFrom.orElse(this).worldStyle, "The worldstyle used by this profile (defined in the assets)");
         iconFile = cfg.getString("icon", categoryLostcity, inheritFrom.orElse(this).iconFile, "The icon to use in the configuration screen (64x64)");
+
+        LIQUID_BLOCK = cfg.getString("liquidBlock", categoryLostcity, inheritFrom.orElse(this).LIQUID_BLOCK, "Block to use as a liquid");
 
         SPAWN_BIOME = cfg.getString("spawnBiome", categoryLostcity, inheritFrom.orElse(this).SPAWN_BIOME, "When this is set the player will always spawn in the given biome");
         SPAWN_CITY = cfg.getString("spawnCity", categoryLostcity, inheritFrom.orElse(this).SPAWN_CITY, "When this is set the player will always spawn in the given predefined city");
@@ -557,4 +566,17 @@ public class LostCityProfile {
     }
 
     public boolean isCavern() { return LANDSCAPE_TYPE == LandscapeType.CAVERN; }
+
+    public IBlockState getLiquidBlock() {
+        if (liquidBlock == null) {
+            Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LIQUID_BLOCK));
+            if (b == null) {
+                LostCities.logger.error("Bad liquid block: " + LIQUID_BLOCK + "!");
+                liquidBlock = Blocks.WATER.getDefaultState();
+            } else {
+                liquidBlock = b.getDefaultState();
+            }
+        }
+        return liquidBlock;
+    }
 }
