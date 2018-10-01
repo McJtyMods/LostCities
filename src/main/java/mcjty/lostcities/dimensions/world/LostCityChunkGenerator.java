@@ -562,7 +562,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                     k1 = x + this.rand.nextInt(16) + 8;
                     l1 = this.rand.nextInt(256);
                     i2 = z + this.rand.nextInt(16) + 8;
-                    (new WorldGenLakes(Blocks.WATER)).generate(w, this.rand, new BlockPos(k1, l1, i2));
+                    (new WorldGenLakes(profile.getLiquidBlock().getBlock())).generate(w, this.rand, new BlockPos(k1, l1, i2));
                 }
 
                 if (TerrainGen.populate(this, w, rand, chunkX, chunkZ, flag, PopulateChunkEvent.Populate.EventType.LAVA) && !flag && this.rand.nextInt(8) == 0) {
