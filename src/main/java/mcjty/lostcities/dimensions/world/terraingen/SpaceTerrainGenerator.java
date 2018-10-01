@@ -31,6 +31,7 @@ public class SpaceTerrainGenerator {
         LostCityProfile profileOut = provider.getOutsideProfile();
         boolean outsideLandscape = profile.CITYSPHERE_LANDSCAPE_OUTSIDE;
         Character baseLiquid = terrainGenerator.liquidChar;
+        Character baseChar = terrainGenerator.baseChar;
         char airChar = LostCitiesTerrainGenerator.airChar;
 
         this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
@@ -40,7 +41,7 @@ public class SpaceTerrainGenerator {
             BlockPos cc = sphere.getCenterPos();
             int cx = cc.getX() - chunkX * 16;
             int cz = cc.getZ() - chunkZ * 16;
-            fillSphere(primer, cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), baseLiquid, outsideLandscape);
+            fillSphere(primer, cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), baseLiquid, baseChar, outsideLandscape);
         } else if (outsideLandscape) {
             int waterLevel = profileOut.GROUNDLEVEL - profileOut.WATERLEVEL_OFFSET;
             for (int x = 0 ; x < 16 ; x++) {
@@ -51,7 +52,7 @@ public class SpaceTerrainGenerator {
                         if (y == 0) {
                             primer.data[index++] = LostCitiesTerrainGenerator.bedrockChar;
                         } else if (y <= vr + profileOut.GROUNDLEVEL) {
-                            primer.data[index++] = LostCitiesTerrainGenerator.baseChar;
+                            primer.data[index++] = terrainGenerator.baseChar;
                         } else if (y <= waterLevel) {
                             primer.data[index++] = baseLiquid;
                         } else {
@@ -64,7 +65,7 @@ public class SpaceTerrainGenerator {
     }
 
     private void fillSphere(ChunkPrimer primer, int centerx, int centery, int centerz, int radius,
-                            char glass, char block, char sideBlock, char liquidChar, boolean outsideLandscape) {
+                            char glass, char block, char sideBlock, char liquidChar, char baseChar, boolean outsideLandscape) {
         double sqradius = radius * radius;
         double sqradiusOffset = (radius-2) * (radius-2);
         LostCityProfile profile = provider.getProfile();
@@ -100,7 +101,7 @@ public class SpaceTerrainGenerator {
                                 }
                             }
                         } else if (y <= vo + profileOut.GROUNDLEVEL) {
-                            primer.data[index + y] = LostCitiesTerrainGenerator.baseChar;
+                            primer.data[index + y] = baseChar;
                         } else if (y <= waterLevelOut) {
                             primer.data[index + y] = liquidChar;
                         }
@@ -130,7 +131,7 @@ public class SpaceTerrainGenerator {
         }
     }
 
-    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] biomes) {
+    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] biomes, LostCitiesTerrainGenerator terrainGenerator) {
         CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
 
         int outsideGround = provider.getOutsideProfile().GROUNDLEVEL;
@@ -154,9 +155,9 @@ public class SpaceTerrainGenerator {
                     Biome biome = biomes[x + z * 16];
                     // Even though x and z seems swapped below this code is working nevertheless
                     if (sqdist >= sqradiusOffset) {
-                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, outsideGround, outsideWater);
+                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, outsideGround, outsideWater, terrainGenerator);
                     } else {
-                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, groundlevel, water);
+                        genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, groundlevel, water, terrainGenerator);
                     }
                 }
             }
@@ -164,16 +165,16 @@ public class SpaceTerrainGenerator {
             for (int z = 0; z < 16; ++z) {
                 for (int x = 0; x < 16; ++x) {
                     Biome biome = biomes[x + z * 16];
-                    genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, outsideGround, outsideWater);
+                    genBiomeTerrain(biome, primer, chunkX * 16 + z, chunkZ * 16 + x, outsideGround, outsideWater, terrainGenerator);
                 }
             }
         }
 
     }
 
-    private void genBiomeTerrain(Biome Biome, ChunkPrimer primer, int x, int z, int topLevel, int waterLevel) {
+    private void genBiomeTerrain(Biome Biome, ChunkPrimer primer, int x, int z, int topLevel, int waterLevel, LostCitiesTerrainGenerator terrainGenerator) {
         char air = LostCitiesTerrainGenerator.airChar;
-        char baseBlock = LostCitiesTerrainGenerator.baseChar;
+        char baseBlock = terrainGenerator.baseChar;
         char gravelBlock = LostCitiesTerrainGenerator.gravelChar;
 
         char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);

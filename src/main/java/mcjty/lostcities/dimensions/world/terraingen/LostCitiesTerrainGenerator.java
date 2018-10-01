@@ -39,7 +39,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char airChar;
     public static char hardAirChar;
     public static char glowstoneChar;
-    public static char baseChar;
     public static char gravelChar;
     public static char glassChar;       // @todo: for space: depend on city style
     public static char leavesChar;
@@ -54,6 +53,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static char diamondBlockChar;
 
     public char liquidChar;
+    public char baseChar;
 
     private static Set<Character> rotatableChars = null;
     private static Set<Character> railChars = null;
@@ -194,8 +194,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             airChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.AIR.getDefaultState());
             hardAirChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.COMMAND_BLOCK.getDefaultState());
             glowstoneChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLOWSTONE.getDefaultState());
-            baseChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.STONE.getDefaultState());
             gravelChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRAVEL.getDefaultState());
+
+            baseChar = (char) Block.BLOCK_STATE_IDS.get(profile.getBaseBlock());
             liquidChar = (char) Block.BLOCK_STATE_IDS.get(profile.getLiquidBlock());
 
             // @todo
@@ -371,10 +372,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 super.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
                 break;
             case FLOATING:
-                islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
+                islandTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes, this);
                 break;
             case SPACE:
-                spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes);
+                spaceTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes, this);
                 break;
             case CAVERN:
                 cavernTerrainGenerator.replaceBlocksForBiome(chunkX, chunkZ, primer, biomes, this);

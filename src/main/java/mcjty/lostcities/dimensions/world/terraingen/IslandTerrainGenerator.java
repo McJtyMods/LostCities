@@ -211,7 +211,7 @@ public class IslandTerrainGenerator {
     }
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer, LostCitiesTerrainGenerator terrainGenerator) {
-        char baseBlock = LostCitiesTerrainGenerator.baseChar;
+        char baseBlock = terrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
 
         byte b0 = 2;
@@ -275,7 +275,7 @@ public class IslandTerrainGenerator {
     }
 
 
-    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes) {
+    public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes, LostCitiesTerrainGenerator terrainGenerator) {
 //        ChunkProviderEvent.ReplaceBiomeBlocks event = new ChunkProviderEvent.ReplaceBiomeBlocks(provider, chunkX, chunkZ, aBlock, abyte, Biomes, world);
 //        MinecraftForge.EVENT_BUS.post(event);
 //        if (event.getResult() == Event.Result.DENY) {
@@ -288,14 +288,14 @@ public class IslandTerrainGenerator {
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 Biome Biome = Biomes[z + x * 16];
-                genBiomeTerrain(Biome, primer, chunkX * 16 + x, chunkZ * 16 + z, this.stoneNoise[z + x * 16]);
+                genBiomeTerrain(Biome, primer, chunkX * 16 + x, chunkZ * 16 + z, this.stoneNoise[z + x * 16], terrainGenerator);
             }
         }
     }
 
-    public final void genBiomeTerrain(Biome biome, ChunkPrimer primer, int x, int z, double noise) {
+    public final void genBiomeTerrain(Biome biome, ChunkPrimer primer, int x, int z, double noise, LostCitiesTerrainGenerator terrainGenerator) {
         char air = LostCitiesTerrainGenerator.airChar;
-        char baseBlock = LostCitiesTerrainGenerator.baseChar;
+        char baseBlock = terrainGenerator.baseChar;
         char baseLiquid = air;//@LostCitiesTerrainGenerator.liquidChar;
 
         int topLevel = provider.getProfile().GROUNDLEVEL;

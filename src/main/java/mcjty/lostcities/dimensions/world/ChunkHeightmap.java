@@ -10,7 +10,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
 public class ChunkHeightmap {
     private byte heightmap[] = new byte[16*16];
 
-    public ChunkHeightmap(ChunkPrimer primer, LandscapeType type, int groundLevel) {
+    public ChunkHeightmap(ChunkPrimer primer, LandscapeType type, int groundLevel, char baseChar) {
         char air = LostCitiesTerrainGenerator.airChar;
 
         if (type == LandscapeType.CAVERN) {
@@ -35,7 +35,7 @@ public class ChunkHeightmap {
                 }
             }
         } else if (type == LandscapeType.SPACE) {
-            char base = LostCitiesTerrainGenerator.baseChar;
+            char base = baseChar;
             // Here we ignore the glass from the spheres
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {

@@ -1,5 +1,6 @@
 2.0.12:
 - New profile config option to change the default base liquid to use while generating the world ('liquidBlock')
+- New profile config option to change the default base block to use while generating the world ('baseBlock')
 
 2.0.11:
 - Log an error if we detect that a block's TileEntity is wrong

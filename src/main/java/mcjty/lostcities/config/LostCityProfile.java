@@ -38,6 +38,9 @@ public class LostCityProfile {
     private String LIQUID_BLOCK = "minecraft:water";
     private IBlockState liquidBlock = null;
 
+    private String BASE_BLOCK = "minecraft:stone";
+    private IBlockState baseBlock = null;
+
     public float VINE_CHANCE = 0.009f;
     public float CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
     public int THICKNESS_OF_RANDOM_LEAFBLOCKS = 2;
@@ -286,6 +289,7 @@ public class LostCityProfile {
         iconFile = cfg.getString("icon", categoryLostcity, inheritFrom.orElse(this).iconFile, "The icon to use in the configuration screen (64x64)");
 
         LIQUID_BLOCK = cfg.getString("liquidBlock", categoryLostcity, inheritFrom.orElse(this).LIQUID_BLOCK, "Block to use as a liquid");
+        BASE_BLOCK = cfg.getString("baseBlock", categoryLostcity, inheritFrom.orElse(this).BASE_BLOCK, "Block to use as the worldgen base");
 
         SPAWN_BIOME = cfg.getString("spawnBiome", categoryLostcity, inheritFrom.orElse(this).SPAWN_BIOME, "When this is set the player will always spawn in the given biome");
         SPAWN_CITY = cfg.getString("spawnCity", categoryLostcity, inheritFrom.orElse(this).SPAWN_CITY, "When this is set the player will always spawn in the given predefined city");
@@ -578,5 +582,18 @@ public class LostCityProfile {
             }
         }
         return liquidBlock;
+    }
+
+    public IBlockState getBaseBlock() {
+        if (baseBlock == null) {
+            Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(BASE_BLOCK));
+            if (b == null) {
+                LostCities.logger.error("Bad base block: " + BASE_BLOCK + "!");
+                baseBlock = Blocks.STONE.getDefaultState();
+            } else {
+                baseBlock = b.getDefaultState();
+            }
+        }
+        return baseBlock;
     }
 }

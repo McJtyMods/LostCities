@@ -153,7 +153,7 @@ public class CavernTerrainGenerator {
     }
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer, LostCitiesTerrainGenerator terrainGenerator) {
-        char baseBlock = LostCitiesTerrainGenerator.baseChar;
+        char baseBlock = terrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
         char baseLiquid = terrainGenerator.liquidChar;
 
@@ -224,7 +224,7 @@ public class CavernTerrainGenerator {
 
 
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes, LostCitiesTerrainGenerator terrainGenerator) {
-        char baseBlock = LostCitiesTerrainGenerator.baseChar;
+        char baseBlock = terrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
         char baseLiquid = terrainGenerator.liquidChar;
         int bedrockLayer = provider.getProfile().BEDROCK_LAYER;
