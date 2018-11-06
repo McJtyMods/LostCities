@@ -20,7 +20,17 @@ public class BiomeTranslator {
     private final Map<String, Biome> translationMap = new HashMap<>();
 
     public BiomeTranslator(String[] allowedBiomeFactors, String[] manualBiomeMappings, BiomeSelectionStrategy strategy) {
+        for(String s : allowedBiomeFactors) {
+            if(s.indexOf('=') == -1) {
+                throw new IllegalArgumentException("Biome factor missing equals sign: " + s);
+            }
+        }
         this.allowedBiomeFactors = allowedBiomeFactors;
+        for(String s : manualBiomeMappings) {
+            if(s.indexOf('=') == -1) {
+                throw new IllegalArgumentException("Biome mapping missing equals sign: " + s);
+            }
+        }
         this.manualBiomeMappings = manualBiomeMappings;
         this.strategy = strategy;
     }
