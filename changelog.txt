@@ -1,3 +1,6 @@
+2.0.13:
+- Joseph added more useful error reporting if a factor or mapping is invalid
+
 2.0.12:
 - New profile config option to change the default base liquid to use while generating the world ('liquidBlock')
 - New profile config option to change the default base block to use while generating the world ('baseBlock')
