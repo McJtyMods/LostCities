@@ -52,7 +52,7 @@ public class CommandExportPart implements ICommand {
             EntityPlayer player = (EntityPlayer) sender;
             BlockPos start = player.getPosition().down();
 
-            String palettechars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            String palettechars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}\\|`~:;',./<>?";
             int idx = 0;
             Map<IBlockState, Character> mapping = new HashMap<>();
             Palette palette = new Palette("old");
