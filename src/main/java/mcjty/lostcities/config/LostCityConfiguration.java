@@ -63,6 +63,7 @@ public class LostCityConfiguration {
     public static boolean DIMENSION_BOP = true;
 
     public static boolean DEBUG = false;
+    public static boolean OPTIMIZED_CHUNKGEN = true;
 
     public static String SPECIAL_BED_BLOCK = Blocks.DIAMOND_BLOCK.getRegistryName().toString();
 
@@ -133,6 +134,7 @@ public class LostCityConfiguration {
         SPECIAL_BED_BLOCK = cfg.getString("specialBedBlock", CATEGORY_GENERAL, SPECIAL_BED_BLOCK, "Block to put underneath a bed so that it qualifies as a teleporter bed");
 
         DEBUG = cfg.getBoolean("debug", CATEGORY_GENERAL, DEBUG, "Enable debugging/logging");
+        OPTIMIZED_CHUNKGEN = cfg.getBoolean("optimizedChunkgen", CATEGORY_GENERAL, OPTIMIZED_CHUNKGEN, "Disable this if you have mods like NEID or JEID installed");
 
         return profileList;
     }

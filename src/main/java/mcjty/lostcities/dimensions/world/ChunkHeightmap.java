@@ -1,8 +1,9 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.config.LandscapeType;
+import mcjty.lostcities.dimensions.world.driver.IIndex;
+import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
-import net.minecraft.world.chunk.ChunkPrimer;
 
 /**
  * A heightmap for a chunk
@@ -10,7 +11,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
 public class ChunkHeightmap {
     private byte heightmap[] = new byte[16*16];
 
-    public ChunkHeightmap(ChunkPrimer primer, LandscapeType type, int groundLevel, char baseChar) {
+    public ChunkHeightmap(IPrimerDriver driver, LandscapeType type, int groundLevel, char baseChar) {
         char air = LostCitiesTerrainGenerator.airChar;
 
         if (type == LandscapeType.CAVERN) {
@@ -18,31 +19,32 @@ public class ChunkHeightmap {
             int base = Math.max(groundLevel - 20, 1);
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    int index = (x << 12) | (z << 8);
                     int y = base;
-                    while (y < 100 && primer.data[index + y] != air) {
+                    IIndex index = driver.getIndex(x, y, z);
+                    while (y < 100 && driver.getBlockChar(index) != air) {
                         y++;
+                        index.incY();
                     }
                     if (y >= 100) {
                         y = 128;
-                    }
-                    if (y < 100) {
-                        while (y > 0 && primer.data[index + y] == air) {
+                    } else {
+                        while (y > 0 && driver.getBlockChar(index) == air) {
                             y--;
+                            index.decY();
                         }
                     }
                     heightmap[z * 16 + x] = (byte) y;
                 }
             }
         } else if (type == LandscapeType.SPACE) {
-            char base = baseChar;
             // Here we ignore the glass from the spheres
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    int index = (x << 12) | (z << 8);
                     int y = 255;
-                    while (y > 0 && primer.data[index + y] != base) {
+                    IIndex index = driver.getIndex(x, y, z);
+                    while (y > 0 && driver.getBlockChar(index) != baseChar) {
                         y--;
+                        index.decY();
                     }
                     heightmap[z * 16 + x] = (byte) y;
                 }
@@ -50,10 +52,11 @@ public class ChunkHeightmap {
         } else {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    int index = (x << 12) | (z << 8);
                     int y = 255;
-                    while (y > 0 && primer.data[index + y] == air) {
+                    IIndex index = driver.getIndex(x, y, z);
+                    while (y > 0 && driver.getBlockChar(index) == air) {
                         y--;
+                        index.decY();
                     }
                     heightmap[z * 16 + x] = (byte) y;
                 }

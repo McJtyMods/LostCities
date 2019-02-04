@@ -1,7 +1,12 @@
 package mcjty.lostcities.dimensions.world.terraingen;
 
+import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.driver.IIndex;
+import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
+import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
+import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
@@ -14,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 
 public class CavernTerrainGenerator {
     private LostCityChunkGenerator provider;
+    private IPrimerDriver driver;
 
     /** A NoiseGeneratorOctaves used in generating nether terrain */
     private NoiseGeneratorOctaves netherNoiseGen1;
@@ -56,6 +62,7 @@ public class CavernTerrainGenerator {
         this.netherrackExculsivityNoiseGen = ctx.getPerlin3();
         this.netherNoiseGen6 = ctx.getScale();
         this.netherNoiseGen7 = ctx.getDepth();
+        driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
     }
 
     /**
@@ -153,6 +160,7 @@ public class CavernTerrainGenerator {
     }
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer, LostCitiesTerrainGenerator terrainGenerator) {
+        driver.setPrimer(primer);
         char baseBlock = terrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
         char baseLiquid = terrainGenerator.liquidChar;
@@ -188,7 +196,7 @@ public class CavernTerrainGenerator {
                         int height = (height32 * 8) + h;
 
                         for (int x = 0; x < 4; ++x) {
-                            int index = ((x + (x4 * 4)) << 12) | ((0 + (z4 * 4)) << 8) | height;
+                            IIndex index = driver.getIndex((x + (x4 * 4)), height, (0 + (z4 * 4)));
                             short maxheight = 256;
                             double d14 = 0.25D;
                             double d15 = d10;
@@ -196,14 +204,14 @@ public class CavernTerrainGenerator {
 
                             for (int z = 0; z < 4; ++z) {
                                 if (d15 > 0.0D) {
-                                    primer.data[index] = baseBlock;
+                                    driver.setBlockState(index, baseBlock);
                                 } else if (height < liquidlevel) {
-                                    primer.data[index] = baseLiquid;
+                                    driver.setBlockState(index, baseLiquid);
                                 } else {
-                                    primer.data[index] = air;
+                                    driver.setBlockState(index, air);
                                 }
 
-                                index += maxheight;
+                                index.incY(maxheight);
                                 d15 += d16;
                             }
 
@@ -224,6 +232,7 @@ public class CavernTerrainGenerator {
 
 
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes, LostCitiesTerrainGenerator terrainGenerator) {
+        driver.setPrimer(primer);
         char baseBlock = terrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
         char baseLiquid = terrainGenerator.liquidChar;
@@ -245,19 +254,19 @@ public class CavernTerrainGenerator {
                 char block1 = fillerBlock;
                 boolean foundAir = false;
 
+                IIndex index = driver.getIndex(x, 128, z);
                 for (int y = 128; y >= 0; --y) {
-                    int index = (z * 16 + x) * 256 + y;
 
                     if (y >= 128 - (provider.rand.nextInt(3)+bedrockLayer) || y <= (provider.rand.nextInt(3) + bedrockLayer)) {
-                        primer.data[index] = LostCitiesTerrainGenerator.bedrockChar;
+                        driver.setBlockState(index, LostCitiesTerrainGenerator.bedrockChar);
                     } else if (y > 85) {
                         // Don't do anything at this height. We're most likely still processing cavern ceiling
                     } else if (!foundAir) {
-                        if (primer.data[index] == air) {
+                        if (driver.getBlockChar(index) == air) {
                             foundAir = true;
                         }
                     } else {
-                        char currentBlock = primer.data[index];
+                        char currentBlock = driver.getBlockChar(index);
 
                         if (currentBlock != air) {
                             if (currentBlock == baseBlock) {
@@ -277,17 +286,17 @@ public class CavernTerrainGenerator {
                                     k = l;
 
                                     if (y >= groundLevel - 1) {
-                                        primer.data[index] = block;
+                                        driver.setBlockState(index, block);
                                     } else if (y < (groundLevel-5) -l) {
                                         block = air;
                                         block1 = baseBlock;
-                                        primer.data[index] = fillerBlock;
+                                        driver.setBlockState(index, fillerBlock);
                                     } else {
-                                        primer.data[index] = block1;
+                                        driver.setBlockState(index, block1);
                                     }
                                 } else if (k > 0) {
                                     --k;
-                                    primer.data[index] = block1;
+                                    driver.setBlockState(index, block1);
                                     if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
                                         k = provider.rand.nextInt(4) + Math.max(0, y - groundLevel);
                                         block1 = (char) Block.BLOCK_STATE_IDS.get(Blocks.SANDSTONE.getDefaultState());
@@ -298,6 +307,7 @@ public class CavernTerrainGenerator {
                             k = -1;
                         }
                     }
+                    index.decY();
                 }
             }
         }

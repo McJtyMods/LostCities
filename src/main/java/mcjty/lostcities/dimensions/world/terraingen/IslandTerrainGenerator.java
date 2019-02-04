@@ -1,6 +1,11 @@
 package mcjty.lostcities.dimensions.world.terraingen;
 
+import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.driver.IIndex;
+import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
+import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
+import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -18,6 +23,7 @@ import java.util.Random;
 
 public class IslandTerrainGenerator {
     private LostCityChunkGenerator provider;
+    private IPrimerDriver driver;
 
     private double[] densities;
 
@@ -94,6 +100,8 @@ public class IslandTerrainGenerator {
         this.noiseGen4 = ctx.getDepth();
         this.noiseGen5 = ctx.getScale();
         this.islandNoise = ctx.getIsland();
+
+        driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
     }
 
     /**
@@ -211,6 +219,7 @@ public class IslandTerrainGenerator {
     }
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer, LostCitiesTerrainGenerator terrainGenerator) {
+        driver.setPrimer(primer);
         char baseBlock = terrainGenerator.baseChar;
         char air = LostCitiesTerrainGenerator.airChar;
 
@@ -243,7 +252,7 @@ public class IslandTerrainGenerator {
                         int height = (height32 * 4) + h;
 
                         for (int x = 0; x < 8; ++x) {
-                            int index = ((x + (x2 * 8)) << 12) | ((0 + (z2 * 8)) << 8) | height;
+                            IIndex index = driver.getIndex((x + (x2 * 8)), height, (0 + (z2 * 8)));
                             short maxheight = 256;
                             double d14 = 0.125D;
                             double d15 = d10;
@@ -251,12 +260,12 @@ public class IslandTerrainGenerator {
 
                             for (int z = 0; z < 8; ++z) {
                                 if (d15 > 0.0D) {
-                                    primer.data[index] = baseBlock;
+                                    driver.setBlockState(index, baseBlock);
                                 } else {
-                                    primer.data[index] = air;
+                                    driver.setBlockState(index, air);
                                 }
 
-                                index += maxheight;
+                                index.incY(maxheight);
                                 d15 += d16;
                             }
 
@@ -294,6 +303,7 @@ public class IslandTerrainGenerator {
     }
 
     public final void genBiomeTerrain(Biome biome, ChunkPrimer primer, int x, int z, double noise, LostCitiesTerrainGenerator terrainGenerator) {
+        driver.setPrimer(primer);
         char air = LostCitiesTerrainGenerator.airChar;
         char baseBlock = terrainGenerator.baseChar;
         char baseLiquid = air;//@LostCitiesTerrainGenerator.liquidChar;
@@ -311,17 +321,15 @@ public class IslandTerrainGenerator {
         int cz = z & 15;
 
         // Index of the bottom of the column.
-        int bottomIndex = ((cz * 16) + cx) * 256;
+        IIndex index = driver.getIndex(cx, 255, cz);
 
         for (int height = 255; height >= 0; --height) {
-            int index = bottomIndex + height;
-
             if (height <= 2) {
-                primer.data[index] = air;
+                driver.setBlockState(index, air);
             } else {
-                char currentBlock = primer.data[index];
+                char currentBlock = driver.getBlockChar(index);
                 if (currentBlock == LostCitiesTerrainGenerator.bedrockChar && height <= 12) {
-                    primer.data[index] = air;
+                    driver.setBlockState(index, air);
                     k = -1;
                 } else {
                     if (currentBlock != air) {
@@ -346,17 +354,17 @@ public class IslandTerrainGenerator {
                                 k = l;
 
                                 if (height >= (topLevel-1)) {
-                                    primer.data[index] = block;
+                                    driver.setBlockState(index, block);
                                 } else if (height < (topLevel-6) - l) {
                                     block = air;
                                     block1 = baseBlock;
-                                    primer.data[index] = fillerBlock;
+                                    driver.setBlockState(index, fillerBlock);
                                 } else {
-                                    primer.data[index] = block1;
+                                    driver.setBlockState(index, block1);
                                 }
                             } else if (k > 0) {
                                 --k;
-                                primer.data[index] = block1;
+                                driver.setBlockState(index, block1);
 
                                 if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
                                     k = provider.rand.nextInt(4) + Math.max(0, height - topLevel);
@@ -369,6 +377,7 @@ public class IslandTerrainGenerator {
                     }
                 }
             }
+            index.decY();
         }
     }
 

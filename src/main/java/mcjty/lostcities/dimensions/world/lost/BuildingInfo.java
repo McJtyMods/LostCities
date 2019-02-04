@@ -4,6 +4,7 @@ import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.world.driver.IIndex;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -94,7 +95,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
     private final List<Pair<BlockPos, ConditionTodo>> lootTodo = new ArrayList<>();
     private final List<BlockPos> lightingUpdateTodo = new ArrayList<>();
-    private final List<Pair<Integer, Map<String, Integer>>> torchTodo = new ArrayList<>();
+    private final List<Pair<IIndex, Map<String, Integer>>> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
 
     public static class ConditionTodo {
@@ -141,11 +142,11 @@ public class BuildingInfo implements ILostChunkInfo {
         saplingTodo.clear();
     }
 
-    public void addTorchTodo(int index, Map<String, Integer> orientations) {
+    public void addTorchTodo(IIndex index, Map<String, Integer> orientations) {
         torchTodo.add(Pair.of(index, orientations));
     }
 
-    public List<Pair<Integer, Map<String, Integer>>> getTorchTodo() {
+    public List<Pair<IIndex, Map<String, Integer>>> getTorchTodo() {
         return torchTodo;
     }
 
