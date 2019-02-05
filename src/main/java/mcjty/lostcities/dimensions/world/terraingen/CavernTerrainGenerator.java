@@ -204,11 +204,11 @@ public class CavernTerrainGenerator {
 
                             for (int z = 0; z < 4; ++z) {
                                 if (d15 > 0.0D) {
-                                    driver.setBlockState(index, baseBlock);
+                                    driver.setBlock(index, baseBlock);
                                 } else if (height < liquidlevel) {
-                                    driver.setBlockState(index, baseLiquid);
+                                    driver.setBlock(index, baseLiquid);
                                 } else {
-                                    driver.setBlockState(index, air);
+                                    driver.setBlock(index, air);
                                 }
 
                                 index.incY(maxheight);
@@ -258,7 +258,7 @@ public class CavernTerrainGenerator {
                 for (int y = 128; y >= 0; --y) {
 
                     if (y >= 128 - (provider.rand.nextInt(3)+bedrockLayer) || y <= (provider.rand.nextInt(3) + bedrockLayer)) {
-                        driver.setBlockState(index, LostCitiesTerrainGenerator.bedrockChar);
+                        driver.setBlock(index, LostCitiesTerrainGenerator.bedrockChar);
                     } else if (y > 85) {
                         // Don't do anything at this height. We're most likely still processing cavern ceiling
                     } else if (!foundAir) {
@@ -286,17 +286,17 @@ public class CavernTerrainGenerator {
                                     k = l;
 
                                     if (y >= groundLevel - 1) {
-                                        driver.setBlockState(index, block);
+                                        driver.setBlock(index, block);
                                     } else if (y < (groundLevel-5) -l) {
                                         block = air;
                                         block1 = baseBlock;
-                                        driver.setBlockState(index, fillerBlock);
+                                        driver.setBlock(index, fillerBlock);
                                     } else {
-                                        driver.setBlockState(index, block1);
+                                        driver.setBlock(index, block1);
                                     }
                                 } else if (k > 0) {
                                     --k;
-                                    driver.setBlockState(index, block1);
+                                    driver.setBlock(index, block1);
                                     if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
                                         k = provider.rand.nextInt(4) + Math.max(0, y - groundLevel);
                                         block1 = (char) Block.BLOCK_STATE_IDS.get(Blocks.SANDSTONE.getDefaultState());

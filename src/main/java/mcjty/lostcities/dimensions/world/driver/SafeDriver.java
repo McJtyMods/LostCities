@@ -9,6 +9,9 @@ import java.util.Objects;
 public class SafeDriver implements IPrimerDriver {
 
     private ChunkPrimer primer;
+    private int currentX;
+    private int currentY;
+    private int currentZ;
 
     @Override
     public void setPrimer(ChunkPrimer primer) {
@@ -21,7 +24,29 @@ public class SafeDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setBlockStateRange(int x, int y, int z, int y2, char c) {
+    public void setCurrent(int x, int y, int z) {
+        currentX = x;
+        currentX = x;
+        currentX = x;
+    }
+
+    @Override
+    public IIndex getCurrent() {
+        return new Index(currentX, currentY, currentZ);
+    }
+
+    @Override
+    public void incY() {
+        currentY++;
+    }
+
+    @Override
+    public void decY() {
+        currentY--;
+    }
+
+    @Override
+    public void setBlockRange(int x, int y, int z, int y2, char c) {
         IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
         while (y < y2) {
             primer.setBlockState(x, y, z, state);
@@ -30,7 +55,7 @@ public class SafeDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setBlockStateRangeSafe(int x, int y, int z, int y2, char c) {
+    public void setBlockRangeSafe(int x, int y, int z, int y2, char c) {
         IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
         while (y < y2) {
             primer.setBlockState(x, y, z, state);
@@ -39,38 +64,51 @@ public class SafeDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setBlockStateRange(IIndex index, int y2, char c) {
+    public void setBlockRange(IIndex index, int y2, char c) {
         Index i = (Index) index;
-        setBlockStateRange(i.x, i.y, i.z, y2, c);
+        setBlockRange(i.x, i.y, i.z, y2, c);
     }
 
     @Override
-    public void setBlockStateRangeSafe(IIndex index, int y2, char c) {
+    public void setBlockRangeSafe(IIndex index, int y2, char c) {
         Index i = (Index) index;
-        setBlockStateRangeSafe(i.x, i.y, i.z, y2, c);
+        setBlockRangeSafe(i.x, i.y, i.z, y2, c);
     }
 
     @Override
-    public void setBlockState(IIndex index, char c) {
+    public IPrimerDriver addBlock(char c) {
+        IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
+        primer.setBlockState(currentX, currentY++, currentZ, state);
+        return this;
+    }
+
+    @Override
+    public IPrimerDriver addBlock(IBlockState c) {
+        primer.setBlockState(currentX, currentY++, currentZ, c);
+        return this;
+    }
+
+    @Override
+    public void setBlock(IIndex index, char c) {
         Index i = (Index) index;
         IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
         primer.setBlockState(i.x, i.y, i.z, state);
     }
 
     @Override
-    public void setBlockState(IIndex index, IBlockState c) {
+    public void setBlock(IIndex index, IBlockState c) {
         Index i = (Index) index;
         primer.setBlockState(i.x, i.y, i.z, c);
     }
 
     @Override
-    public void setBlockState(int x, int y, int z, char c) {
+    public void setBlock(int x, int y, int z, char c) {
         IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
         primer.setBlockState(x, y, z, state);
     }
 
     @Override
-    public void setBlockState(int x, int y, int z, IBlockState c) {
+    public void setBlock(int x, int y, int z, IBlockState c) {
         primer.setBlockState(x, y, z, c);
     }
 
@@ -78,6 +116,16 @@ public class SafeDriver implements IPrimerDriver {
     public IBlockState getBlockState(IIndex index) {
         Index i = (Index) index;
         return primer.getBlockState(i.x, i.y, i.z);
+    }
+
+    @Override
+    public char getBlockChar() {
+        return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(currentX, currentY, currentZ));
+    }
+
+    @Override
+    public char getBlockCharDown() {
+        return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(currentX, currentY-1, currentZ));
     }
 
     @Override

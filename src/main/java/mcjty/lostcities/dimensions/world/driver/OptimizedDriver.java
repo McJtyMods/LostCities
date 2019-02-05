@@ -10,6 +10,7 @@ import java.util.Objects;
 public class OptimizedDriver implements IPrimerDriver {
 
     private ChunkPrimer primer;
+    private int current;
 
     @Override
     public void setPrimer(ChunkPrimer primer) {
@@ -22,14 +23,34 @@ public class OptimizedDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setBlockStateRange(int x, int y, int z, int y2, char c) {
+    public void setCurrent(int x, int y, int z) {
+        current = getBlockIndex(x, y, z);
+    }
+
+    @Override
+    public IIndex getCurrent() {
+        return new Index(current);
+    }
+
+    @Override
+    public void incY() {
+        current++;
+    }
+
+    @Override
+    public void decY() {
+        current--;
+    }
+
+    @Override
+    public void setBlockRange(int x, int y, int z, int y2, char c) {
         int s = getBlockIndex(x, y, z);
         int e = s + y2-y;
         Arrays.fill(primer.data, s, e, c);
     }
 
     @Override
-    public void setBlockStateRangeSafe(int x, int y, int z, int y2, char c) {
+    public void setBlockRangeSafe(int x, int y, int z, int y2, char c) {
         if (y2 <= y) {
             return;
         }
@@ -39,14 +60,14 @@ public class OptimizedDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setBlockStateRange(IIndex index, int y2, char c) {
+    public void setBlockRange(IIndex index, int y2, char c) {
         int s = ((Index) index).index;
         int e = s + y2-index.getY();
         Arrays.fill(primer.data, s, e, c);
     }
 
     @Override
-    public void setBlockStateRangeSafe(IIndex index, int y2, char c) {
+    public void setBlockRangeSafe(IIndex index, int y2, char c) {
         int y = index.getY();
         if (y2 <= y) {
             return;
@@ -57,28 +78,50 @@ public class OptimizedDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setBlockState(IIndex index, char c) {
+    public IPrimerDriver addBlock(char c) {
+        primer.data[current++] = c;
+        return this;
+    }
+
+    @Override
+    public IPrimerDriver addBlock(IBlockState c) {
+        primer.data[current++] = (char) Block.BLOCK_STATE_IDS.get(c);
+        return this;
+    }
+
+    @Override
+    public void setBlock(IIndex index, char c) {
         primer.data[((Index) index).index] = c;
     }
 
     @Override
-    public void setBlockState(IIndex index, IBlockState c) {
+    public void setBlock(IIndex index, IBlockState c) {
         primer.data[((Index) index).index] = (char) Block.BLOCK_STATE_IDS.get(c);
     }
 
     @Override
-    public void setBlockState(int x, int y, int z, char c) {
+    public void setBlock(int x, int y, int z, char c) {
         primer.data[getBlockIndex(x, y, z)] = c;
     }
 
     @Override
-    public void setBlockState(int x, int y, int z, IBlockState c) {
+    public void setBlock(int x, int y, int z, IBlockState c) {
         primer.data[getBlockIndex(x, y, z)] = (char) Block.BLOCK_STATE_IDS.get(c);
     }
 
     @Override
     public IBlockState getBlockState(IIndex index) {
         return Block.BLOCK_STATE_IDS.getByValue(primer.data[((Index)index).index]);
+    }
+
+    @Override
+    public char getBlockChar() {
+        return primer.data[current];
+    }
+
+    @Override
+    public char getBlockCharDown() {
+        return primer.data[current-1];
     }
 
     @Override

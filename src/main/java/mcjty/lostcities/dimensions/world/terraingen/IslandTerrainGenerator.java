@@ -260,9 +260,9 @@ public class IslandTerrainGenerator {
 
                             for (int z = 0; z < 8; ++z) {
                                 if (d15 > 0.0D) {
-                                    driver.setBlockState(index, baseBlock);
+                                    driver.setBlock(index, baseBlock);
                                 } else {
-                                    driver.setBlockState(index, air);
+                                    driver.setBlock(index, air);
                                 }
 
                                 index.incY(maxheight);
@@ -325,11 +325,11 @@ public class IslandTerrainGenerator {
 
         for (int height = 255; height >= 0; --height) {
             if (height <= 2) {
-                driver.setBlockState(index, air);
+                driver.setBlock(index, air);
             } else {
                 char currentBlock = driver.getBlockChar(index);
                 if (currentBlock == LostCitiesTerrainGenerator.bedrockChar && height <= 12) {
-                    driver.setBlockState(index, air);
+                    driver.setBlock(index, air);
                     k = -1;
                 } else {
                     if (currentBlock != air) {
@@ -354,17 +354,17 @@ public class IslandTerrainGenerator {
                                 k = l;
 
                                 if (height >= (topLevel-1)) {
-                                    driver.setBlockState(index, block);
+                                    driver.setBlock(index, block);
                                 } else if (height < (topLevel-6) - l) {
                                     block = air;
                                     block1 = baseBlock;
-                                    driver.setBlockState(index, fillerBlock);
+                                    driver.setBlock(index, fillerBlock);
                                 } else {
-                                    driver.setBlockState(index, block1);
+                                    driver.setBlock(index, block1);
                                 }
                             } else if (k > 0) {
                                 --k;
-                                driver.setBlockState(index, block1);
+                                driver.setBlock(index, block1);
 
                                 if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
                                     k = provider.rand.nextInt(4) + Math.max(0, height - topLevel);

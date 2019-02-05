@@ -59,13 +59,13 @@ public class SpaceTerrainGenerator {
                     IIndex index = driver.getIndex(x, 0, z);
                     for (int y = 0; y <= Math.max(waterLevel, profileOut.GROUNDLEVEL + 30) ; y++) {
                         if (y == 0) {
-                            driver.setBlockState(index, LostCitiesTerrainGenerator.bedrockChar); index.incY();
+                            driver.setBlock(index, LostCitiesTerrainGenerator.bedrockChar); index.incY();
                         } else if (y <= vr + profileOut.GROUNDLEVEL) {
-                            driver.setBlockState(index, terrainGenerator.baseChar); index.incY();
+                            driver.setBlock(index, terrainGenerator.baseChar); index.incY();
                         } else if (y <= waterLevel) {
-                            driver.setBlockState(index, baseLiquid); index.incY();
+                            driver.setBlock(index, baseLiquid); index.incY();
                         } else {
-                            driver.setBlockState(index, airChar); index.incY();
+                            driver.setBlock(index, airChar); index.incY();
                         }
                     }
                 }
@@ -94,25 +94,25 @@ public class SpaceTerrainGenerator {
                         double dydy = (y-centery) * (y-centery);
                         double sqdist = dxdx + dydy + dzdz;
                         if (y == 0) {
-                            driver.setBlockState(index, LostCitiesTerrainGenerator.bedrockChar);
+                            driver.setBlock(index, LostCitiesTerrainGenerator.bedrockChar);
                         } else if (sqdist <= sqradius) {
                             if (sqdist >= sqradiusOffset) {
                                 if (y > centery) {
-                                    driver.setBlockState(index, glass);
+                                    driver.setBlock(index, glass);
                                 } else {
-                                    driver.setBlockState(index, sideBlock);
+                                    driver.setBlock(index, sideBlock);
                                 }
                             } else {
                                 if (y < centery + vr) {
-                                    driver.setBlockState(index, block);
+                                    driver.setBlock(index, block);
                                 } else if (y < waterLevel) {
-                                    driver.setBlockState(index, liquidChar);
+                                    driver.setBlock(index, liquidChar);
                                 }
                             }
                         } else if (y <= vo + profileOut.GROUNDLEVEL) {
-                            driver.setBlockState(index, baseChar);
+                            driver.setBlock(index, baseChar);
                         } else if (y <= waterLevelOut) {
-                            driver.setBlockState(index, liquidChar);
+                            driver.setBlock(index, liquidChar);
                         }
                         index.incY();
                     }
@@ -125,15 +125,15 @@ public class SpaceTerrainGenerator {
                         if (sqdist <= sqradius) {
                             if (sqdist >= sqradiusOffset) {
                                 if (y > centery) {
-                                    driver.setBlockState(index, glass);
+                                    driver.setBlock(index, glass);
                                 } else {
-                                    driver.setBlockState(index, sideBlock);
+                                    driver.setBlock(index, sideBlock);
                                 }
                             } else {
                                 if (y < centery + vr) {
-                                    driver.setBlockState(index, block);
+                                    driver.setBlock(index, block);
                                 } else if (y < waterLevel) {
-                                    driver.setBlockState(index, liquidChar);
+                                    driver.setBlock(index, liquidChar);
                                 }
                             }
                         }
@@ -205,9 +205,9 @@ public class SpaceTerrainGenerator {
 //                if (y == waterLevel-2) {
 //                    primer.data[index] = gravelBlock;
                 if (cnt == 0) {
-                    driver.setBlockState(index, topBlock);
+                    driver.setBlock(index, topBlock);
                 } else if (cnt < 3) {
-                    driver.setBlockState(index, fillerBlock);
+                    driver.setBlock(index, fillerBlock);
                 } else {
                     break;
                 }
