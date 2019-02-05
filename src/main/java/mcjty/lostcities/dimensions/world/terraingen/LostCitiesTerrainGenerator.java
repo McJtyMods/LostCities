@@ -1383,18 +1383,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                IIndex index = driver.getIndex(x, start, z);
+                driver.setCurrent(x, start, z);
                 for (int y = start; y < end; y++) {
-                    char p = driver.getBlockChar(index);
+                    char p = driver.getBlockChar();
                     if (p != airChar && p != liquidChar) {
-                        Blob blob = findBlob(blobs, index);
+                        Blob blob = findBlob(blobs, driver.getCurrent());
                         if (blob == null) {
                             blob = new Blob(start, end + 6);
                             blob.scan(info, driver, airChar, liquidChar, new BlockPos(x, y, z));
                             blobs.add(blob);
                         }
                     }
-                    index.incY();
+                    driver.incY();
                 }
             }
         }

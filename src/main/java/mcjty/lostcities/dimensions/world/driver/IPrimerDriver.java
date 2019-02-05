@@ -26,10 +26,6 @@ public interface IPrimerDriver {
 
     void setBlockRangeSafe(int x, int y, int z, int y2, char c);
 
-    void setBlockRange(IIndex index, int y2, char c);
-
-    void setBlockRangeSafe(IIndex index, int y2, char c);
-
     /// Set a block at the current position and increase the height with 1
     IPrimerDriver addBlock(char c);
 

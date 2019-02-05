@@ -64,18 +64,6 @@ public class SafeDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setBlockRange(IIndex index, int y2, char c) {
-        Index i = (Index) index;
-        setBlockRange(i.x, i.y, i.z, y2, c);
-    }
-
-    @Override
-    public void setBlockRangeSafe(IIndex index, int y2, char c) {
-        Index i = (Index) index;
-        setBlockRangeSafe(i.x, i.y, i.z, y2, c);
-    }
-
-    @Override
     public IPrimerDriver addBlock(char c) {
         IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
         primer.setBlockState(currentX, currentY++, currentZ, state);

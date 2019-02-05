@@ -60,24 +60,6 @@ public class OptimizedDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setBlockRange(IIndex index, int y2, char c) {
-        int s = ((Index) index).index;
-        int e = s + y2-index.getY();
-        Arrays.fill(primer.data, s, e, c);
-    }
-
-    @Override
-    public void setBlockRangeSafe(IIndex index, int y2, char c) {
-        int y = index.getY();
-        if (y2 <= y) {
-            return;
-        }
-        int s = ((Index) index).index;
-        int e = s + y2-y;
-        Arrays.fill(primer.data, s, e, c);
-    }
-
-    @Override
     public IPrimerDriver addBlock(char c) {
         primer.data[current++] = c;
         return this;
