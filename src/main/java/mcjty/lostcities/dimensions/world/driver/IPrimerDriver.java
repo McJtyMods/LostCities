@@ -9,16 +9,29 @@ public interface IPrimerDriver {
 
     ChunkPrimer getPrimer();
 
-    void setCurrent(int x, int y, int z);
+    IPrimerDriver current(int x, int y, int z);
+
+    IPrimerDriver current(IIndex index);
 
     /// Return a copy of the current position
     IIndex getCurrent();
 
     /// Increment the height of the current position
     void incY();
+    /// Increment the height of the current position
+    void incY(int amount);
     /// Decrement the height of the current position
     void decY();
 
+    void incX();
+
+    void incZ();
+
+    int getX();
+
+    int getY();
+
+    int getZ();
 
     IIndex getIndex(int x, int y, int z);
 
@@ -26,30 +39,23 @@ public interface IPrimerDriver {
 
     void setBlockRangeSafe(int x, int y, int z, int y2, char c);
 
-    /// Set a block at the current position and increase the height with 1
-    IPrimerDriver addBlock(char c);
+    /// Set a block at the current position
+    IPrimerDriver block(char c);
+
+    /// Set a block at the current position
+    IPrimerDriver block(IBlockState c);
 
     /// Set a block at the current position and increase the height with 1
-    IPrimerDriver addBlock(IBlockState c);
+    IPrimerDriver add(char c);
 
-    void setBlock(IIndex index, char c);
+    char getBlock();
 
-    void setBlock(IIndex index, IBlockState c);
+    char getBlockDown();
+    char getBlockEast();
+    char getBlockWest();
+    char getBlockSouth();
+    char getBlockNorth();
 
-    void setBlock(int x, int y, int z, char c);
-
-    void setBlock(int x, int y, int z, IBlockState c);
-
-    char getBlockChar();
-
-    char getBlockCharDown();
-
-    char getBlockChar(IIndex index);
-
-    IBlockState getBlockState(IIndex index);
-
-    char getBlockChar(int x, int y, int z);
-
-    IBlockState getBlockState(int x, int y, int z);
+    char getBlock(int x, int y, int z);
 
 }

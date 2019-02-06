@@ -23,8 +23,15 @@ public class OptimizedDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setCurrent(int x, int y, int z) {
+    public IPrimerDriver current(int x, int y, int z) {
         current = getBlockIndex(x, y, z);
+        return this;
+    }
+
+    @Override
+    public IPrimerDriver current(IIndex index) {
+        current = ((Index) index).index;
+        return this;
     }
 
     @Override
@@ -38,8 +45,38 @@ public class OptimizedDriver implements IPrimerDriver {
     }
 
     @Override
+    public void incY(int amount) {
+        current += amount;
+    }
+
+    @Override
     public void decY() {
         current--;
+    }
+
+    @Override
+    public void incX() {
+        current += 1<<12;
+    }
+
+    @Override
+    public void incZ() {
+        current += 1<<8;
+    }
+
+    @Override
+    public int getX() {
+        return (current >> 12) & 0xf;
+    }
+
+    @Override
+    public int getY() {
+        return current & 0xff;
+    }
+
+    @Override
+    public int getZ() {
+        return (current >> 8) & 0xf;
     }
 
     @Override
@@ -60,64 +97,55 @@ public class OptimizedDriver implements IPrimerDriver {
     }
 
     @Override
-    public IPrimerDriver addBlock(char c) {
+    public IPrimerDriver block(char c) {
+        primer.data[current] = c;
+        return this;
+    }
+
+    @Override
+    public IPrimerDriver block(IBlockState c) {
+        primer.data[current] = (char) Block.BLOCK_STATE_IDS.get(c);
+        return this;
+    }
+
+    @Override
+    public IPrimerDriver add(char c) {
         primer.data[current++] = c;
         return this;
     }
 
     @Override
-    public IPrimerDriver addBlock(IBlockState c) {
-        primer.data[current++] = (char) Block.BLOCK_STATE_IDS.get(c);
-        return this;
-    }
-
-    @Override
-    public void setBlock(IIndex index, char c) {
-        primer.data[((Index) index).index] = c;
-    }
-
-    @Override
-    public void setBlock(IIndex index, IBlockState c) {
-        primer.data[((Index) index).index] = (char) Block.BLOCK_STATE_IDS.get(c);
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, char c) {
-        primer.data[getBlockIndex(x, y, z)] = c;
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, IBlockState c) {
-        primer.data[getBlockIndex(x, y, z)] = (char) Block.BLOCK_STATE_IDS.get(c);
-    }
-
-    @Override
-    public IBlockState getBlockState(IIndex index) {
-        return Block.BLOCK_STATE_IDS.getByValue(primer.data[((Index)index).index]);
-    }
-
-    @Override
-    public char getBlockChar() {
+    public char getBlock() {
         return primer.data[current];
     }
 
     @Override
-    public char getBlockCharDown() {
+    public char getBlockDown() {
         return primer.data[current-1];
     }
 
     @Override
-    public char getBlockChar(IIndex index) {
-        return primer.data[((Index)index).index];
+    public char getBlockEast() {
+        return primer.data[current  + (1<<12)];
     }
 
     @Override
-    public IBlockState getBlockState(int x, int y, int z) {
-        return Block.BLOCK_STATE_IDS.getByValue(primer.data[getBlockIndex(x, y, z)]);
+    public char getBlockWest() {
+        return primer.data[current  - (1<<12)];
     }
 
     @Override
-    public char getBlockChar(int x, int y, int z) {
+    public char getBlockSouth() {
+        return primer.data[current  + (1<<8)];
+    }
+
+    @Override
+    public char getBlockNorth() {
+        return primer.data[current  - (1<<8)];
+    }
+
+    @Override
+    public char getBlock(int x, int y, int z) {
         return primer.data[getBlockIndex(x, y, z)];
     }
 
@@ -131,85 +159,10 @@ public class OptimizedDriver implements IPrimerDriver {
     }
 
     private class Index implements IIndex {
-        private int index;
+        private final int index;
 
-        public Index(int index) {
+        Index(int index) {
             this.index = index;
-        }
-
-        @Override
-        public void decY() {
-            index--;
-        }
-
-        @Override
-        public void incX() {
-            index += 1<<12;
-        }
-
-        @Override
-        public void incY() {
-            index++;
-        }
-
-        @Override
-        public void incY(int amount) {
-            index += amount;
-        }
-
-        @Override
-        public void incZ() {
-            index += 1<<8;
-        }
-
-        @Override
-        public IIndex up() {
-            return new Index(index+1);
-        }
-
-        @Override
-        public IIndex down() {
-            return new Index(index-1);
-        }
-
-        @Override
-        public IIndex north() {
-            return new Index(index-(1<<8));
-        }
-
-        @Override
-        public IIndex west() {
-            return new Index(index-(1<<12));
-        }
-
-        @Override
-        public IIndex south() {
-            return new Index(index+(1<<8));
-        }
-
-        @Override
-        public IIndex east() {
-            return new Index(index+(1<<12));
-        }
-
-        @Override
-        public int getX() {
-            return (index >> 12) & 0xf;
-        }
-
-        @Override
-        public int getY() {
-            return index & 0xff;
-        }
-
-        @Override
-        public int getZ() {
-            return (index >> 8) & 0xf;
-        }
-
-        @Override
-        public IIndex copy() {
-            return new Index(index);
         }
 
         @Override

@@ -24,10 +24,20 @@ public class SafeDriver implements IPrimerDriver {
     }
 
     @Override
-    public void setCurrent(int x, int y, int z) {
+    public IPrimerDriver current(int x, int y, int z) {
         currentX = x;
         currentX = x;
         currentX = x;
+        return this;
+    }
+
+    @Override
+    public IPrimerDriver current(IIndex index) {
+        Index i = (Index) index;
+        currentX = i.x;
+        currentY = i.y;
+        currentZ = i.z;
+        return this;
     }
 
     @Override
@@ -41,8 +51,38 @@ public class SafeDriver implements IPrimerDriver {
     }
 
     @Override
+    public void incY(int amount) {
+        currentY += amount;
+    }
+
+    @Override
     public void decY() {
         currentY--;
+    }
+
+    @Override
+    public void incX() {
+        currentX++;
+    }
+
+    @Override
+    public void incZ() {
+        currentZ++;
+    }
+
+    @Override
+    public int getX() {
+        return currentX;
+    }
+
+    @Override
+    public int getY() {
+        return currentY;
+    }
+
+    @Override
+    public int getZ() {
+        return currentZ;
     }
 
     @Override
@@ -64,73 +104,59 @@ public class SafeDriver implements IPrimerDriver {
     }
 
     @Override
-    public IPrimerDriver addBlock(char c) {
+    public IPrimerDriver block(char c) {
+        IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
+        primer.setBlockState(currentX, currentY, currentZ, state);
+        return this;
+    }
+
+    @Override
+    public IPrimerDriver block(IBlockState c) {
+        primer.setBlockState(currentX, currentY, currentZ, c);
+        return this;
+    }
+
+    @Override
+    public IPrimerDriver add(char c) {
         IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
         primer.setBlockState(currentX, currentY++, currentZ, state);
         return this;
     }
 
     @Override
-    public IPrimerDriver addBlock(IBlockState c) {
-        primer.setBlockState(currentX, currentY++, currentZ, c);
-        return this;
-    }
-
-    @Override
-    public void setBlock(IIndex index, char c) {
-        Index i = (Index) index;
-        IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
-        primer.setBlockState(i.x, i.y, i.z, state);
-    }
-
-    @Override
-    public void setBlock(IIndex index, IBlockState c) {
-        Index i = (Index) index;
-        primer.setBlockState(i.x, i.y, i.z, c);
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, char c) {
-        IBlockState state = Block.BLOCK_STATE_IDS.getByValue(c);
-        primer.setBlockState(x, y, z, state);
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, IBlockState c) {
-        primer.setBlockState(x, y, z, c);
-    }
-
-    @Override
-    public IBlockState getBlockState(IIndex index) {
-        Index i = (Index) index;
-        return primer.getBlockState(i.x, i.y, i.z);
-    }
-
-    @Override
-    public char getBlockChar() {
+    public char getBlock() {
         return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(currentX, currentY, currentZ));
     }
 
     @Override
-    public char getBlockCharDown() {
+    public char getBlockDown() {
         return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(currentX, currentY-1, currentZ));
     }
 
     @Override
-    public char getBlockChar(IIndex index) {
-        Index i = (Index) index;
-        return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(i.x, i.y, i.z));
+    public char getBlockEast() {
+        return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(currentX+1, currentY, currentZ));
+    }
+
+    @Override
+    public char getBlockWest() {
+        return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(currentX-1, currentY, currentZ));
+    }
+
+    @Override
+    public char getBlockSouth() {
+        return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(currentX, currentY, currentZ+1));
+    }
+
+    @Override
+    public char getBlockNorth() {
+        return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(currentX, currentY, currentZ-1));
     }
 
 
     @Override
-    public char getBlockChar(int x, int y, int z) {
+    public char getBlock(int x, int y, int z) {
         return (char) Block.BLOCK_STATE_IDS.get(primer.getBlockState(x, y, z));
-    }
-
-    @Override
-    public IBlockState getBlockState(int x, int y, int z) {
-        return primer.getBlockState(x, y, z);
     }
 
     @Override
@@ -140,89 +166,14 @@ public class SafeDriver implements IPrimerDriver {
 
 
     private class Index implements IIndex {
-        private int x;
-        private int y;
-        private int z;
+        private final int x;
+        private final int y;
+        private final int z;
 
-        public Index(int x, int y, int z) {
+        Index(int x, int y, int z) {
             this.x = x;
             this.y = y;
             this.z = z;
-        }
-
-        @Override
-        public IIndex up() {
-            return new Index(x, y+1, z);
-        }
-
-        @Override
-        public IIndex down() {
-            return new Index(x, y-1, z);
-        }
-
-        @Override
-        public IIndex north() {
-            return new Index(x, y, z-1);
-        }
-
-        @Override
-        public IIndex south() {
-            return new Index(x, y, z+1);
-        }
-
-        @Override
-        public IIndex west() {
-            return new Index(x-1, y, z);
-        }
-
-        @Override
-        public IIndex east() {
-            return new Index(x+1, y, z);
-        }
-
-        @Override
-        public int getX() {
-            return x;
-        }
-
-        @Override
-        public int getY() {
-            return y;
-        }
-
-        @Override
-        public int getZ() {
-            return z;
-        }
-
-        @Override
-        public void decY() {
-            y--;
-        }
-
-        @Override
-        public void incX() {
-            x++;
-        }
-
-        @Override
-        public void incY() {
-            y++;
-        }
-
-        @Override
-        public void incY(int amount) {
-            y += amount;
-        }
-
-        @Override
-        public void incZ() {
-            z++;
-        }
-
-        @Override
-        public IIndex copy() {
-            return new Index(x, y, z);
         }
 
         @Override

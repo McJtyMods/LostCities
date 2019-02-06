@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.config.LandscapeType;
-import mcjty.lostcities.dimensions.world.driver.IIndex;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 
@@ -20,17 +19,17 @@ public class ChunkHeightmap {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     int y = base;
-                    IIndex index = driver.getIndex(x, y, z);
-                    while (y < 100 && driver.getBlockChar(index) != air) {
+                    driver.current(x, y, z);
+                    while (y < 100 && driver.getBlock() != air) {
                         y++;
-                        index.incY();
+                        driver.incY();
                     }
                     if (y >= 100) {
                         y = 128;
                     } else {
-                        while (y > 0 && driver.getBlockChar(index) == air) {
+                        while (y > 0 && driver.getBlock() == air) {
                             y--;
-                            index.decY();
+                            driver.decY();
                         }
                     }
                     heightmap[z * 16 + x] = (byte) y;
@@ -41,10 +40,10 @@ public class ChunkHeightmap {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     int y = 255;
-                    IIndex index = driver.getIndex(x, y, z);
-                    while (y > 0 && driver.getBlockChar(index) != baseChar) {
+                    driver.current(x, y, z);
+                    while (y > 0 && driver.getBlock() != baseChar) {
                         y--;
-                        index.decY();
+                        driver.decY();
                     }
                     heightmap[z * 16 + x] = (byte) y;
                 }
@@ -53,10 +52,10 @@ public class ChunkHeightmap {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     int y = 255;
-                    IIndex index = driver.getIndex(x, y, z);
-                    while (y > 0 && driver.getBlockChar(index) == air) {
+                    driver.current(x, y, z);
+                    while (y > 0 && driver.getBlock() == air) {
                         y--;
-                        index.decY();
+                        driver.decY();
                     }
                     heightmap[z * 16 + x] = (byte) y;
                 }

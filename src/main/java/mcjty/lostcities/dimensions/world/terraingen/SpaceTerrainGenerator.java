@@ -3,7 +3,6 @@ package mcjty.lostcities.dimensions.world.terraingen;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.driver.IIndex;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
 import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
@@ -56,16 +55,16 @@ public class SpaceTerrainGenerator {
             for (int x = 0 ; x < 16 ; x++) {
                 for (int z = 0 ; z < 16 ; z++) {
                     double vr = profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION;
-                    IIndex index = driver.getIndex(x, 0, z);
+                    driver.current(x, 0, z);
                     for (int y = 0; y <= Math.max(waterLevel, profileOut.GROUNDLEVEL + 30) ; y++) {
                         if (y == 0) {
-                            driver.setBlock(index, LostCitiesTerrainGenerator.bedrockChar); index.incY();
+                            driver.add(LostCitiesTerrainGenerator.bedrockChar);
                         } else if (y <= vr + profileOut.GROUNDLEVEL) {
-                            driver.setBlock(index, terrainGenerator.baseChar); index.incY();
+                            driver.add(terrainGenerator.baseChar);
                         } else if (y <= waterLevel) {
-                            driver.setBlock(index, baseLiquid); index.incY();
+                            driver.add(baseLiquid);
                         } else {
-                            driver.setBlock(index, airChar); index.incY();
+                            driver.add(airChar);
                         }
                     }
                 }
@@ -89,55 +88,55 @@ public class SpaceTerrainGenerator {
                 double vo = profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION;
                 double vr = profile.CITYSPHERE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_SURFACE_VARIATION;
                 if (outsideLandscape) {
-                    IIndex index = driver.getIndex(x, 0, z);
+                    driver.current(x, 0, z);
                     for (int y = 0 ; y <= Math.max(Math.min(centery+radius, 255), waterLevel) ; y++) {
                         double dydy = (y-centery) * (y-centery);
                         double sqdist = dxdx + dydy + dzdz;
                         if (y == 0) {
-                            driver.setBlock(index, LostCitiesTerrainGenerator.bedrockChar);
+                            driver.block(LostCitiesTerrainGenerator.bedrockChar);
                         } else if (sqdist <= sqradius) {
                             if (sqdist >= sqradiusOffset) {
                                 if (y > centery) {
-                                    driver.setBlock(index, glass);
+                                    driver.block(glass);
                                 } else {
-                                    driver.setBlock(index, sideBlock);
+                                    driver.block(sideBlock);
                                 }
                             } else {
                                 if (y < centery + vr) {
-                                    driver.setBlock(index, block);
+                                    driver.block(block);
                                 } else if (y < waterLevel) {
-                                    driver.setBlock(index, liquidChar);
+                                    driver.block(liquidChar);
                                 }
                             }
                         } else if (y <= vo + profileOut.GROUNDLEVEL) {
-                            driver.setBlock(index, baseChar);
+                            driver.block(baseChar);
                         } else if (y <= waterLevelOut) {
-                            driver.setBlock(index, liquidChar);
+                            driver.block(liquidChar);
                         }
-                        index.incY();
+                        driver.incY();
                     }
                 } else {
                     int starty = Math.max(centery - radius, 0);
-                    IIndex index = driver.getIndex(x, starty, z);
+                    driver.current(x, starty, z);
                     for (int y = starty; y <= Math.min(centery+radius, 255) ; y++) {
                         double dydy = (y-centery) * (y-centery);
                         double sqdist = dxdx + dydy + dzdz;
                         if (sqdist <= sqradius) {
                             if (sqdist >= sqradiusOffset) {
                                 if (y > centery) {
-                                    driver.setBlock(index, glass);
+                                    driver.block(glass);
                                 } else {
-                                    driver.setBlock(index, sideBlock);
+                                    driver.block(sideBlock);
                                 }
                             } else {
                                 if (y < centery + vr) {
-                                    driver.setBlock(index, block);
+                                    driver.block(block);
                                 } else if (y < waterLevel) {
-                                    driver.setBlock(index, liquidChar);
+                                    driver.block(liquidChar);
                                 }
                             }
                         }
-                        index.incY();
+                        driver.incY();
                     }
                 }
             }
@@ -199,15 +198,15 @@ public class SpaceTerrainGenerator {
 
         int cnt = 0;
         for (int y = topLevel + 20 ; y >= topLevel - 8 ; y--) {
-            IIndex index = driver.getIndex(cx, y, cz);
-            if (driver.getBlockChar(index) == baseBlock) {
+            driver.current(cx, y, cz);
+            if (driver.getBlock() == baseBlock) {
                 // @todo experiment with more realistic toppings for under water
 //                if (y == waterLevel-2) {
 //                    primer.data[index] = gravelBlock;
                 if (cnt == 0) {
-                    driver.setBlock(index, topBlock);
+                    driver.block(topBlock);
                 } else if (cnt < 3) {
-                    driver.setBlock(index, fillerBlock);
+                    driver.block(fillerBlock);
                 } else {
                     break;
                 }

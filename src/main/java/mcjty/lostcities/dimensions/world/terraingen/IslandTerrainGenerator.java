@@ -2,7 +2,6 @@ package mcjty.lostcities.dimensions.world.terraingen;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.driver.IIndex;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
 import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
@@ -252,7 +251,7 @@ public class IslandTerrainGenerator {
                         int height = (height32 * 4) + h;
 
                         for (int x = 0; x < 8; ++x) {
-                            IIndex index = driver.getIndex((x + (x2 * 8)), height, (0 + (z2 * 8)));
+                            driver.current((x + (x2 * 8)), height, (0 + (z2 * 8)));
                             short maxheight = 256;
                             double d14 = 0.125D;
                             double d15 = d10;
@@ -260,12 +259,12 @@ public class IslandTerrainGenerator {
 
                             for (int z = 0; z < 8; ++z) {
                                 if (d15 > 0.0D) {
-                                    driver.setBlock(index, baseBlock);
+                                    driver.block(baseBlock);
                                 } else {
-                                    driver.setBlock(index, air);
+                                    driver.block(air);
                                 }
 
-                                index.incY(maxheight);
+                                driver.incY(maxheight);
                                 d15 += d16;
                             }
 
@@ -321,15 +320,15 @@ public class IslandTerrainGenerator {
         int cz = z & 15;
 
         // Index of the bottom of the column.
-        IIndex index = driver.getIndex(cx, 255, cz);
+        driver.current(cx, 255, cz);
 
         for (int height = 255; height >= 0; --height) {
             if (height <= 2) {
-                driver.setBlock(index, air);
+                driver.block(air);
             } else {
-                char currentBlock = driver.getBlockChar(index);
+                char currentBlock = driver.getBlock();
                 if (currentBlock == LostCitiesTerrainGenerator.bedrockChar && height <= 12) {
-                    driver.setBlock(index, air);
+                    driver.block(air);
                     k = -1;
                 } else {
                     if (currentBlock != air) {
@@ -354,17 +353,17 @@ public class IslandTerrainGenerator {
                                 k = l;
 
                                 if (height >= (topLevel-1)) {
-                                    driver.setBlock(index, block);
+                                    driver.block(block);
                                 } else if (height < (topLevel-6) - l) {
                                     block = air;
                                     block1 = baseBlock;
-                                    driver.setBlock(index, fillerBlock);
+                                    driver.block(fillerBlock);
                                 } else {
-                                    driver.setBlock(index, block1);
+                                    driver.block(block1);
                                 }
                             } else if (k > 0) {
                                 --k;
-                                driver.setBlock(index, block1);
+                                driver.block(block1);
 
                                 if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
                                     k = provider.rand.nextInt(4) + Math.max(0, height - topLevel);
@@ -377,7 +376,7 @@ public class IslandTerrainGenerator {
                     }
                 }
             }
-            index.decY();
+            driver.decY();
         }
     }
 
