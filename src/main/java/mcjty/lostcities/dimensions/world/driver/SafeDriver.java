@@ -26,8 +26,8 @@ public class SafeDriver implements IPrimerDriver {
     @Override
     public IPrimerDriver current(int x, int y, int z) {
         currentX = x;
-        currentY = x;
-        currentZ = x;
+        currentY = y;
+        currentZ = z;
         return this;
     }
 
