@@ -4,6 +4,7 @@ import mcjty.lostcities.LostCities;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import org.apache.logging.log4j.Level;
 
 import java.util.*;
 
@@ -134,7 +135,11 @@ public class LostCityConfiguration {
         SPECIAL_BED_BLOCK = cfg.getString("specialBedBlock", CATEGORY_GENERAL, SPECIAL_BED_BLOCK, "Block to put underneath a bed so that it qualifies as a teleporter bed");
 
         DEBUG = cfg.getBoolean("debug", CATEGORY_GENERAL, DEBUG, "Enable debugging/logging");
-        OPTIMIZED_CHUNKGEN = cfg.getBoolean("optimizedChunkgen", CATEGORY_GENERAL, OPTIMIZED_CHUNKGEN, "Disable this if you have mods like NEID or JEID installed");
+        OPTIMIZED_CHUNKGEN = cfg.getBoolean("optimizedChunkgen", CATEGORY_GENERAL, OPTIMIZED_CHUNKGEN, "Disable this if you have mods like NEID or JEID installed. Note that when NEID or JEID is present this is disabled by default");
+        if (LostCities.neid || LostCities.jeid) {
+            LostCities.logger.log(Level.INFO, "NEID or JEID detected: disabling optimized chunkgeneration!");
+            OPTIMIZED_CHUNKGEN = false;
+        }
 
         return profileList;
     }

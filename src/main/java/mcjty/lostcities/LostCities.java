@@ -39,6 +39,8 @@ public class LostCities {
     public static boolean chisel = false;
     public static boolean biomesoplenty = false;
     public static boolean atg = false;
+    public static boolean neid = false;
+    public static boolean jeid = false;
 
     public static Logger logger;
 
@@ -52,6 +54,8 @@ public class LostCities {
         chisel = Loader.isModLoaded("chisel");
         biomesoplenty = Loader.isModLoaded("biomesoplenty") || Loader.isModLoaded("BiomesOPlenty");
 //        atg = Loader.isModLoaded("atg"); // @todo
+        neid = Loader.isModLoaded("neid");
+        jeid = Loader.isModLoaded("jeid");
         this.proxy.preInit(e);
     }
 
