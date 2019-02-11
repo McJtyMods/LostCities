@@ -1,3 +1,6 @@
+upcoming:
+- Fixed a problem in the safe driver which caused it to crash
+
 2.0.14:
 - New config option 'optimizedChunkgen' that can be used to disable the optimized chunkgen that Lost Cities normally uses and switch to a 'safer' version
 - If NEID or JEID is installed this new safer chunkgen is used automatically
