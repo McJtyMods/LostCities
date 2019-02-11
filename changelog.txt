@@ -1,4 +1,4 @@
-upcoming:
+2.0.15:
 - Fixed a problem in the safe driver which caused it to crash
 
 2.0.14:
