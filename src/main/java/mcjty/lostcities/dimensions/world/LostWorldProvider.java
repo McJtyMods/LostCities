@@ -25,10 +25,12 @@ public class LostWorldProvider extends WorldProvider {
     @Override
     @Nonnull
     public String getSaveFolder() {
-        if (world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
+        //changed from world.provider.getDimension() to getDimension()
+        if (getDimension() == LostCityConfiguration.DIMENSION_ID) {
             return "LOST";
         } else {
-            return "LOST" + world.provider.getDimension();
+            //changed from world.provider.getDimension() to getDimension()
+            return "LOST" + getDimension();
         }
     }
 
