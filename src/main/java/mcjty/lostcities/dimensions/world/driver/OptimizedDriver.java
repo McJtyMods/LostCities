@@ -179,4 +179,11 @@ public class OptimizedDriver implements IPrimerDriver {
         }
     }
 
+    @Override
+    public IPrimerDriver copy() {
+        OptimizedDriver driver = new OptimizedDriver();
+        driver.current = current;
+        driver.primer = primer;
+        return driver;
+    }
 }

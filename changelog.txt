@@ -1,3 +1,6 @@
+2.0.17:
+- Fixed a rare crash with explosion handling during generation
+
 2.0.16:
 - Umbra Gaming fixed a sponge compatibility issue
 

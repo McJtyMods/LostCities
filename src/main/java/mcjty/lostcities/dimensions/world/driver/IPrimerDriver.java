@@ -58,4 +58,6 @@ public interface IPrimerDriver {
 
     char getBlock(int x, int y, int z);
 
+    IPrimerDriver copy();
+
 }

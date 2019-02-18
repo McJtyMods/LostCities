@@ -191,4 +191,14 @@ public class SafeDriver implements IPrimerDriver {
             return Objects.hash(x, y, z);
         }
     }
+
+    @Override
+    public IPrimerDriver copy() {
+        SafeDriver driver = new SafeDriver();
+        driver.currentX = currentX;
+        driver.currentY = currentY;
+        driver.currentZ = currentZ;
+        driver.primer = primer;
+        return driver;
+    }
 }

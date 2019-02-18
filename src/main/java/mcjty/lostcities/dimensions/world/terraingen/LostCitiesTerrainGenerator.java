@@ -1382,7 +1382,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         Blob blob = findBlob(blobs, driver.getCurrent());
                         if (blob == null) {
                             blob = new Blob(start, end + 6);
-                            blob.scan(info, driver, airChar, liquidChar, new BlockPos(x, y, z));
+                            // We must make a copy of the driver here so that we can safely modify it
+                            blob.scan(info, driver.copy(), airChar, liquidChar, new BlockPos(x, y, z));
                             blobs.add(blob);
                         }
                     }
