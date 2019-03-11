@@ -1,4 +1,4 @@
-package mcjty.lostcities.proxy;
+package mcjty.lostcities.setup;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.client.Minecraft;

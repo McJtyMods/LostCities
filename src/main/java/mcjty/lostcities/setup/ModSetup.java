@@ -1,4 +1,4 @@
-package mcjty.lostcities.proxy;
+package mcjty.lostcities.setup;
 
 import mcjty.lostcities.ForgeEventHandlers;
 import mcjty.lostcities.LostCities;

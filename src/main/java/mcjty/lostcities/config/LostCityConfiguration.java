@@ -1,7 +1,7 @@
 package mcjty.lostcities.config;
 
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.proxy.ModSetup;
+import mcjty.lostcities.setup.ModSetup;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;

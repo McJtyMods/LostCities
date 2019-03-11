@@ -1,7 +1,7 @@
 package mcjty.lostcities.config;
 
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.proxy.ModSetup;
+import mcjty.lostcities.setup.ModSetup;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.FMLLog;
 import org.apache.logging.log4j.Level;
