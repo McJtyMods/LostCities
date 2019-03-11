@@ -84,18 +84,18 @@ public class AssetRegistries {
         List<Map.Entry<Character, Integer>> local = new ArrayList<>(counterLocal.getMap().entrySet());
         global.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
         local.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
-        LostCities.logger.info("############################################################################");
-        LostCities.logger.info("Global palette entries");
+        LostCities.setup.getLogger().info("############################################################################");
+        LostCities.setup.getLogger().info("Global palette entries");
         printMap(usersPerCharacter, global);
-        LostCities.logger.info("----------------------------------------------------------------------------");
-        LostCities.logger.info("Local palette entries");
+        LostCities.setup.getLogger().info("----------------------------------------------------------------------------");
+        LostCities.setup.getLogger().info("Local palette entries");
         printMap(usersPerCharacter, local);
-        LostCities.logger.info("----------------------------------------------------------------------------");
+        LostCities.setup.getLogger().info("----------------------------------------------------------------------------");
 
         printChars("Global: ", counterGlobal);
         printChars("Local: ", counterLocal);
 
-        LostCities.logger.info("############################################################################");
+        LostCities.setup.getLogger().info("############################################################################");
     }
 
     private static void printChars(String prefix, Counter<Character> counter) {
@@ -105,7 +105,7 @@ public class AssetRegistries {
         for (Character character : chars) {
             s += character;
         }
-        LostCities.logger.info(prefix + s);
+        LostCities.setup.getLogger().info(prefix + s);
     }
 
     private static void printMap(Map<Character, Set<String>> usersPerCharacter, List<Map.Entry<Character, Integer>> map) {
@@ -120,7 +120,7 @@ public class AssetRegistries {
             } else {
                 s += ", Used " + users.size() + " times";
             }
-            LostCities.logger.info(s);
+            LostCities.setup.getLogger().info(s);
         }
     }
 

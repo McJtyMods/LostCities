@@ -46,9 +46,9 @@ public class BiomeTranslator {
             if (biome != null && destBiome != null) {
                 mapping.add(Pair.of(biome.biomeName, destBiome));
             } else if (biome == null) {
-                LostCities.logger.warn("Could not find biome '" + biomeId + "'!");
+                LostCities.setup.getLogger().warn("Could not find biome '" + biomeId + "'!");
             } else if (destBiome == null) {
-                LostCities.logger.warn("Could not find biome '" + destBiomeId + "'!");
+                LostCities.setup.getLogger().warn("Could not find biome '" + destBiomeId + "'!");
             }
         }
         return mapping;
@@ -66,7 +66,7 @@ public class BiomeTranslator {
             if (biome != null) {
                 biomes.add(Pair.of(f, biome));
             } else {
-                LostCities.logger.warn("Could not find biome '" + biomeId + "'!");
+                LostCities.setup.getLogger().warn("Could not find biome '" + biomeId + "'!");
             }
         }
         return biomes;
@@ -87,10 +87,10 @@ public class BiomeTranslator {
     }
 
     private void dumpTranslationMap() {
-        LostCities.logger.info("Dumping biome mapping");
+        LostCities.setup.getLogger().info("Dumping biome mapping");
         for (Map.Entry<String, Biome> entry : translationMap.entrySet()) {
             ResourceLocation biomeKey = ForgeRegistries.BIOMES.getKey(entry.getValue());
-            LostCities.logger.info("biome: " + entry.getKey() + " -> " + entry.getValue().biomeName + " (" + biomeKey.toString() + ")");
+            LostCities.setup.getLogger().info("biome: " + entry.getKey() + " -> " + entry.getValue().biomeName + " (" + biomeKey.toString() + ")");
         }
     }
 

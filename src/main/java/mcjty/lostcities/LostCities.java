@@ -7,12 +7,11 @@ import mcjty.lostcities.commands.CommandExportBuilding;
 import mcjty.lostcities.commands.CommandExportPart;
 import mcjty.lostcities.dimensions.world.WorldTypeTools;
 import mcjty.lostcities.dimensions.world.lost.*;
-import mcjty.lostcities.proxy.CommonProxy;
-import net.minecraftforge.fml.common.Loader;
+import mcjty.lostcities.proxy.IProxy;
+import mcjty.lostcities.proxy.ModSetup;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -29,42 +28,30 @@ public class LostCities {
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
 
     @SidedProxy(clientSide="mcjty.lostcities.proxy.ClientProxy", serverSide="mcjty.lostcities.proxy.ServerProxy")
-    public static CommonProxy proxy;
+    public static IProxy proxy;
+    public static ModSetup setup = new ModSetup();
 
     @Mod.Instance("lostcities")
     public static LostCities instance;
 
     public static LostCitiesImp lostCitiesImp = new LostCitiesImp();
 
-    public static boolean chisel = false;
-    public static boolean biomesoplenty = false;
-    public static boolean atg = false;
-    public static boolean neid = false;
-    public static boolean jeid = false;
-
-    public static Logger logger;
-
-    /**
-     * Run before anything else. Read your config, create blocks, items, etc, and
-     * register them with the GameRegistry.
-     */
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        logger = e.getModLog();
-        chisel = Loader.isModLoaded("chisel");
-        biomesoplenty = Loader.isModLoaded("biomesoplenty") || Loader.isModLoaded("BiomesOPlenty");
-//        atg = Loader.isModLoaded("atg"); // @todo
-        neid = Loader.isModLoaded("neid");
-        jeid = Loader.isModLoaded("jeid");
-        this.proxy.preInit(e);
+        setup.preInit(e);
+        proxy.preInit(e);
     }
 
-    /**
-     * Do your mod setup. Build whatever data structures you care about. Register recipes.
-     */
     @Mod.EventHandler
     public void init(FMLInitializationEvent e) {
-        this.proxy.init(e);
+        setup.init(e);
+        proxy.init(e);
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent e) {
+        setup.postInit(e);
+        proxy.postInit(e);
     }
 
     @Mod.EventHandler
@@ -100,18 +87,9 @@ public class LostCities {
                 if (value.isPresent()) {
                     value.get().apply(lostCitiesImp);
                 } else {
-                    logger.warn("Some mod didn't return a valid result with getLostCities!");
+                    setup.getLogger().warn("Some mod didn't return a valid result with getLostCities!");
                 }
             }
         }
-    }
-
-
-    /**
-     * Handle interaction with other mods, complete your setup based on this.
-     */
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent e) {
-        this.proxy.postInit(e);
     }
 }

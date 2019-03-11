@@ -54,7 +54,7 @@ public class ForgeEventHandlers {
             if (!profile.SPAWN_BIOME.isEmpty()) {
                 final Biome spawnBiome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(profile.SPAWN_BIOME));
                 if (spawnBiome == null) {
-                    LostCities.logger.error("Cannot find biome '" + profile.SPAWN_BIOME + "' for the player to spawn in !");
+                    LostCities.setup.getLogger().error("Cannot find biome '" + profile.SPAWN_BIOME + "' for the player to spawn in !");
                 } else {
                     isSuitable = blockPos -> world.getBiome(blockPos) == spawnBiome;
                     needsCheck = true;
@@ -62,7 +62,7 @@ public class ForgeEventHandlers {
             } else if (!profile.SPAWN_CITY.isEmpty()) {
                 final PredefinedCity city = AssetRegistries.PREDEFINED_CITIES.get(profile.SPAWN_CITY);
                 if (city == null) {
-                    LostCities.logger.error("Cannot find city '" + profile.SPAWN_CITY + "' for the player to spawn in !");
+                    LostCities.setup.getLogger().error("Cannot find city '" + profile.SPAWN_CITY + "' for the player to spawn in !");
                 } else {
                     float sqradius = getSqRadius(city.getRadius(), 0.8f);
                     isSuitable = blockPos -> city.getDimension() == world.provider.getDimension() &&
@@ -93,7 +93,7 @@ public class ForgeEventHandlers {
                 } else {
                     final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(profile.SPAWN_SPHERE);
                     if (sphere == null) {
-                        LostCities.logger.error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
+                        LostCities.setup.getLogger().error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
                     } else {
                         float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
                         isSuitable = blockPos -> sphere.getDimension() == world.provider.getDimension() &&
@@ -164,7 +164,7 @@ public class ForgeEventHandlers {
             }
             radius += 100;
             if (attempts > 10000) {
-                LostCities.logger.error("Can't find a valid spawn position!");
+                LostCities.setup.getLogger().error("Can't find a valid spawn position!");
                 throw new RuntimeException("Can't find a valid spawn position!");
             }
         }

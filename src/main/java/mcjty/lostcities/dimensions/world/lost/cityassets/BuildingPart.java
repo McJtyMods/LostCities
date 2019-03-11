@@ -114,7 +114,7 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
         if (localPalette == null && refPaletteName != null) {
             localPalette = AssetRegistries.PALETTES.get(refPaletteName);
             if (localPalette == null) {
-                LostCities.logger.error("Could not find palette '" + refPaletteName + "'!");
+                LostCities.setup.getLogger().error("Could not find palette '" + refPaletteName + "'!");
                 throw new RuntimeException("Could not find palette '" + refPaletteName + "'!");
             }
         }

@@ -1,10 +1,10 @@
 package mcjty.lostcities.dimensions.world;
 
-import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.BiomeSelectionStrategy;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.ModDimensions;
+import mcjty.lostcities.proxy.ModSetup;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -63,7 +63,7 @@ public class LostWorldProvider extends WorldProvider {
             profile = WorldTypeTools.getProfile(world);
         }
         BiomeProvider biomeProvider;
-        if (LostCities.biomesoplenty && LostCityConfiguration.DIMENSION_BOP) {
+        if (ModSetup.biomesoplenty && LostCityConfiguration.DIMENSION_BOP) {
             biomeProvider = getInternalBiomeProvider(world);
         } else {
             biomeProvider = new BiomeProvider(world.getWorldInfo());

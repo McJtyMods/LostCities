@@ -543,7 +543,7 @@ public class LostCityProfile {
             for (String s : CITY_BIOME_FACTORS) {
                 String[] split = StringUtils.split(s, '=');
                 if (split.length < 2) {
-                    LostCities.logger.error("Badly specified biome factor. Must be <biome>=<factor>!");
+                    LostCities.setup.getLogger().error("Badly specified biome factor. Must be <biome>=<factor>!");
                 } else {
                     float f = Float.parseFloat(split[1]);
                     String biomeId = split[0];
@@ -575,7 +575,7 @@ public class LostCityProfile {
         if (liquidBlock == null) {
             Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LIQUID_BLOCK));
             if (b == null) {
-                LostCities.logger.error("Bad liquid block: " + LIQUID_BLOCK + "!");
+                LostCities.setup.getLogger().error("Bad liquid block: " + LIQUID_BLOCK + "!");
                 liquidBlock = Blocks.WATER.getDefaultState();
             } else {
                 liquidBlock = b.getDefaultState();
@@ -588,7 +588,7 @@ public class LostCityProfile {
         if (baseBlock == null) {
             Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(BASE_BLOCK));
             if (b == null) {
-                LostCities.logger.error("Bad base block: " + BASE_BLOCK + "!");
+                LostCities.setup.getLogger().error("Bad base block: " + BASE_BLOCK + "!");
                 baseBlock = Blocks.STONE.getDefaultState();
             } else {
                 baseBlock = b.getDefaultState();

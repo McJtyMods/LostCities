@@ -20,7 +20,7 @@ public class NetworkTools {
             NBTTagCompound nbt = buf.readCompoundTag();
             return FluidStack.loadFluidStackFromNBT(nbt);
         } catch (IOException e) {
-            LostCities.logger.log(Level.ERROR, "Error reading fluid stack", e);
+            LostCities.setup.getLogger().log(Level.ERROR, "Error reading fluid stack", e);
         }
         return null;
     }
@@ -32,7 +32,7 @@ public class NetworkTools {
         try {
             buf.writeCompoundTag(nbt);
         } catch (Exception e) {
-            LostCities.logger.log(Level.ERROR, "Error writing fluid stack", e);
+            LostCities.setup.getLogger().log(Level.ERROR, "Error writing fluid stack", e);
         }
     }
 
@@ -41,7 +41,7 @@ public class NetworkTools {
         try {
             return buf.readCompoundTag();
         } catch (IOException e) {
-            LostCities.logger.log(Level.ERROR, "Error reading tag", e);
+            LostCities.setup.getLogger().log(Level.ERROR, "Error reading tag", e);
         }
         return null;
     }
@@ -51,7 +51,7 @@ public class NetworkTools {
         try {
             buf.writeCompoundTag(tag);
         } catch (Exception e) {
-            LostCities.logger.log(Level.ERROR, "Error writing tag", e);
+            LostCities.setup.getLogger().log(Level.ERROR, "Error writing tag", e);
         }
     }
 
@@ -64,7 +64,7 @@ public class NetworkTools {
             stack.setCount(buf.readInt());
             return stack;
         } catch (IOException e) {
-            LostCities.logger.log(Level.ERROR, "Error reading item stack", e);
+            LostCities.setup.getLogger().log(Level.ERROR, "Error reading item stack", e);
         }
         return ItemStack.EMPTY;
     }
@@ -78,7 +78,7 @@ public class NetworkTools {
             buf.writeCompoundTag(nbt);
             buf.writeInt(itemStack.getCount());
         } catch (Exception e) {
-            LostCities.logger.log(Level.ERROR, "Error writing item stack", e);
+            LostCities.setup.getLogger().log(Level.ERROR, "Error writing item stack", e);
         }
     }
 

@@ -1,6 +1,7 @@
 package mcjty.lostcities.config;
 
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.proxy.ModSetup;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -88,7 +89,7 @@ public class LostCityConfiguration {
         String[] profileList;
 
         if (oldVersion != VERSION) {
-            LostCities.logger.info("Upgrading Lost Cities config from " + oldVersion + " to " + VERSION + "!");
+            LostCities.setup.getLogger().info("Upgrading Lost Cities config from " + oldVersion + " to " + VERSION + "!");
             String[] configuredAssets = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, ASSET_COMMENT);
             List<String> mergedAssets = new ArrayList<>();
             Collections.addAll(mergedAssets, ASSETS);
@@ -136,8 +137,8 @@ public class LostCityConfiguration {
 
         DEBUG = cfg.getBoolean("debug", CATEGORY_GENERAL, DEBUG, "Enable debugging/logging");
         OPTIMIZED_CHUNKGEN = cfg.getBoolean("optimizedChunkgen", CATEGORY_GENERAL, OPTIMIZED_CHUNKGEN, "Disable this if you have mods like NEID or JEID installed. Note that when NEID or JEID is present this is disabled by default");
-        if (LostCities.neid || LostCities.jeid) {
-            LostCities.logger.log(Level.INFO, "NEID or JEID detected: disabling optimized chunkgeneration!");
+        if (ModSetup.neid || ModSetup.jeid) {
+            LostCities.setup.getLogger().log(Level.INFO, "NEID or JEID detected: disabling optimized chunkgeneration!");
             OPTIMIZED_CHUNKGEN = false;
         }
 

@@ -223,15 +223,15 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         try {
             terrainGenerator.generate(chunkX, chunkZ, chunkprimer);
         } catch (Exception e) {
-            LostCities.logger.error("An exception occured while generating chunk: " + chunkX + "," + chunkZ, e);
+            LostCities.setup.getLogger().error("An exception occured while generating chunk: " + chunkX + "," + chunkZ, e);
             BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, this);
-            LostCities.logger.error("    Chunk profile: " + info.profile.getName());
-            LostCities.logger.error("    Is City: " + info.isCity());
-            LostCities.logger.error("    Building type: " + info.getBuildingType());
-            LostCities.logger.error("    City level: " + info.getCityLevel());
-            LostCities.logger.error("    City ground level: " + info.getCityGroundLevel());
-            LostCities.logger.error("    Num floors: " + info.getNumFloors());
-            LostCities.logger.error("    Num cellars: " + info.getNumCellars());
+            LostCities.setup.getLogger().error("    Chunk profile: " + info.profile.getName());
+            LostCities.setup.getLogger().error("    Is City: " + info.isCity());
+            LostCities.setup.getLogger().error("    Building type: " + info.getBuildingType());
+            LostCities.setup.getLogger().error("    City level: " + info.getCityLevel());
+            LostCities.setup.getLogger().error("    City ground level: " + info.getCityGroundLevel());
+            LostCities.setup.getLogger().error("    Num floors: " + info.getNumFloors());
+            LostCities.setup.getLogger().error("    Num cellars: " + info.getNumCellars());
             throw (e);
         }
 
@@ -445,12 +445,12 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                     mobspawnerbaselogic.setEntityId(new ResourceLocation(fixedId));
                     spawner.markDirty();
                     if (LostCityConfiguration.DEBUG) {
-                        LostCities.logger.debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
+                        LostCities.setup.getLogger().debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
                     }
                 } else if(tileentity != null) {
-                    LostCities.logger.error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");
+                    LostCities.setup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");
                 } else {
-                    LostCities.logger.error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
+                    LostCities.setup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
                 }
             }
         }
@@ -469,7 +469,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                 IBlockState state = world.getBlockState(pos);
                 Block block = state.getBlock();
                 if (block.hasTileEntity(state)) {
-                    LostCities.logger.error("The block " + block.getRegistryName() + " (" + block.getClass().getName() + ") at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
+                    LostCities.setup.getLogger().error("The block " + block.getRegistryName() + " (" + block.getClass().getName() + ") at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
                 }
             }
         }
@@ -513,7 +513,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                 ((TileEntityLockableLoot) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
                 tileentity.markDirty();
                 if (LostCityConfiguration.DEBUG) {
-                    LostCities.logger.debug("createLootChest: loot=" + randomValue + " pos=" + pos.toString());
+                    LostCities.setup.getLogger().debug("createLootChest: loot=" + randomValue + " pos=" + pos.toString());
                 }
             }
         }

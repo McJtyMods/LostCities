@@ -383,7 +383,7 @@ public class CitySphere implements ILostSphere {
             if (predef != null && predef.getBiome() != null) {
                 citySphere.biome = Biome.REGISTRY.getObject(new ResourceLocation(predef.getBiome()));
                 if (citySphere.biome == null) {
-                    LostCities.logger.warn("Could not find biome '" + predef.getBiome() + "'!");
+                    LostCities.setup.getLogger().warn("Could not find biome '" + predef.getBiome() + "'!");
                 }
             } else if (profile.CITYSPHERE_SINGLE_BIOME) {
                 if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
