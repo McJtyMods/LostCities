@@ -1,3 +1,9 @@
+Upcoming:
+- Spanish (Argentina) support for the generator names from TBM13
+- English (upside-down) support for the generator names from The Fireplace
+- Fix a possible crash in case a compact machine is placed in a city sphere (by Thraaawn)
+- Force filtered biomes to actually check for allowed biomes (by esotericist)
+
 2.0.17:
 - Fixed a rare crash with explosion handling during generation
 
