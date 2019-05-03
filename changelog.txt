@@ -1,3 +1,6 @@
+Upcoming:
+- The client support (including fog) was accidentally removed
+
 2.0.18:
 - Spanish (Argentina) support for the generator names from TBM13
 - English (upside-down) support for the generator names from The Fireplace
