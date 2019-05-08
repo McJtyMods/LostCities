@@ -654,7 +654,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (dowater) {
             // Special case for drowned city
             driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquidChar);
-            driver.setBlockRangeSafe(x, info.waterLevel, z, height2, airChar);
+            driver.setBlockRangeSafe(x, info.waterLevel+1, z, height2, airChar);
         } else {
             driver.setBlockRange(x, height1, z, height2, airChar);
         }
