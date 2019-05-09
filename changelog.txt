@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed water level issue when combining biosphere with drowned cities, thanks to @3TUSK
+
 2.0.19:
 - The client support (including fog) was accidentally removed
 
