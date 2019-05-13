@@ -203,7 +203,9 @@ public class SpaceTerrainGenerator {
                 // @todo experiment with more realistic toppings for under water
 //                if (y == waterLevel-2) {
 //                    primer.data[index] = gravelBlock;
-                if (cnt == 0) {
+                if (y < waterLevel) {
+                    driver.block(gravelBlock);
+                } else if (cnt == 0) {
                     driver.block(topBlock);
                 } else if (cnt < 3) {
                     driver.block(fillerBlock);
