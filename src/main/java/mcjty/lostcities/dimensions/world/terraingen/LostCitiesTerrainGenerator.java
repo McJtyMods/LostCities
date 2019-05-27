@@ -494,7 +494,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             int height = yy * 16;
                             driver.current(x, height, z);
                             for (int y = 0; y < 16; y++) {
-                                driver.add(((height + y) < info.waterLevel) ? liquidChar : airChar);
+                                driver.add(((height + y) <= info.waterLevel) ? liquidChar : airChar);
                             }
                         }
                     }
@@ -509,7 +509,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             driver.current(x, cury, 0);
                             for (int z = 0; z < 16; z++) {
                                 char d = driver.getBlock();
-                                if (d != airChar || cury < info.waterLevel) {
+                                if (d != airChar || cury <= info.waterLevel) {
                                     float damage = damageArea.getDamage(cx + x, cury, cz + z) * damageFactor;
                                     if (damage >= 0.001) {
                                         Character newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette(), liquidChar);
