@@ -1,6 +1,8 @@
 Upcoming:
 - Fixed water level issue when combining biosphere with drowned cities, thanks to @3TUSK
 - New parkChance profile option that allows you to control the chance that a non-building section will be a park section. If you set this to 0 you will only get streets
+- wormzjl fixed explosion leaving a crater on water surface in submerged city style
+- wormzjl reports: currently when combining sphere with submerged cities, all outside ground appears to be a mixture of grass + sand, creating a lot of block update lag. This temporarily fixes this issue by replacing underwater toppings with gravel
 
 2.0.19:
 - The client support (including fog) was accidentally removed
