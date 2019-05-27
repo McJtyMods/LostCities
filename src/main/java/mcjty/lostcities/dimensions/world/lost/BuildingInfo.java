@@ -724,7 +724,7 @@ public class BuildingInfo implements ILostChunkInfo {
             highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider, profile);
             highwayZLevel = Highway.getZHighwayLevel(chunkX, chunkZ, provider, profile);
 
-            if (rand.nextDouble() < .2f) {
+            if (rand.nextDouble() < profile.PARK_CHANCE) {
                 streetType = StreetType.values()[rand.nextInt(StreetType.values().length)];
             } else {
                 streetType = StreetType.NORMAL;

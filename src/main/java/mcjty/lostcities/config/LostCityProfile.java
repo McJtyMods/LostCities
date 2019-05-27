@@ -151,6 +151,7 @@ public class LostCityProfile {
     public float BUILDING_FRONTCHANCE = .2f;
     public float LIBRARY_CHANCE = .1f;
     public float DATACENTER_CHANCE = .1f;
+    public float PARK_CHANCE = .2f;
 
     public float CORRIDOR_CHANCE = .7f;
     public float BRIDGE_CHANCE = .7f;
@@ -373,6 +374,7 @@ public class LostCityProfile {
         BUILDING_FRONTCHANCE = cfg.getFloat("buildingFrontChance", categoryLostcity, inheritFrom.orElse(this).BUILDING_FRONTCHANCE, 0.0f, 1.0f, "The chance that a building will have a 'front' part if this is possible (i.e. adjacent street)");
         LIBRARY_CHANCE = cfg.getFloat("libraryChance", categoryLostcity, inheritFrom.orElse(this).LIBRARY_CHANCE, 0.0f, 1.0f, "The chance that a 2x2 building will be a library");
         DATACENTER_CHANCE = cfg.getFloat("dataCenterChance", categoryLostcity, inheritFrom.orElse(this).DATACENTER_CHANCE, 0.0f, 1.0f, "The chance that a 2x2 building will be a data center");
+        PARK_CHANCE = cfg.getFloat("parkChance", categoryLostcity, inheritFrom.orElse(this).PARK_CHANCE, 0.0f, 1.0f, "The chance that a non-building section can be a park section");
 
         BUILDING2X2_CHANCE = cfg.getFloat("building2x2Chance", categoryLostcity, inheritFrom.orElse(this).BUILDING2X2_CHANCE, 0.0f, 1.0f, "The chance that a chunk can possibly be the top-left chunk of 2x2 building. " +
                 "There actually being a 2x2 building also depends on the condition of those other chunks");
