@@ -1,3 +1,6 @@
+Upcoming:
+- Joseph added a more useful error message when invalid parts are configured
+
 2.0.20:
 - Fixed water level issue when combining biosphere with drowned cities, thanks to @3TUSK
 - New parkChance profile option that allows you to control the chance that a non-building section will be a park section. If you set this to 0 you will only get streets
