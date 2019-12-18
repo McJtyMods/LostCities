@@ -3,6 +3,7 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Predicate;
@@ -147,7 +148,7 @@ public abstract class ConditionContext {
 
     public abstract boolean isSphere();
 
-    public abstract String getBiome();
+    public abstract ResourceLocation getBiome();
 
     public boolean isTopOfBuilding() {
         return floor >= floorsAboveGround;

@@ -1,6 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost;
 
-import net.minecraft.block.BlockRailBase;
+import net.minecraft.state.properties.RailShape;
 
 public enum Transform {
     ROTATE_NONE(net.minecraft.util.Rotation.NONE),
@@ -81,137 +81,137 @@ public enum Transform {
         throw new IllegalStateException("Cannot happen!");
     }
 
-    public BlockRailBase.EnumRailDirection transform(BlockRailBase.EnumRailDirection shape) {
+    public RailShape transform(RailShape shape) {
         if (this == ROTATE_NONE) {
             return shape;
         }
         switch (shape) {
             case NORTH_SOUTH:
-                return (this == ROTATE_90 || this == ROTATE_270 || this == MIRROR_90_X) ? BlockRailBase.EnumRailDirection.EAST_WEST : shape;
+                return (this == ROTATE_90 || this == ROTATE_270 || this == MIRROR_90_X) ? RailShape.EAST_WEST : shape;
             case EAST_WEST:
-                return (this == ROTATE_90 || this == ROTATE_270) ? BlockRailBase.EnumRailDirection.NORTH_SOUTH : shape;
+                return (this == ROTATE_90 || this == ROTATE_270) ? RailShape.NORTH_SOUTH : shape;
             case ASCENDING_EAST:
                 switch (this) {
                     case ROTATE_90:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
+                        return RailShape.ASCENDING_SOUTH;
                     case MIRROR_90_X:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
+                        return RailShape.ASCENDING_NORTH;
                     case ROTATE_180:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_WEST;
+                        return RailShape.ASCENDING_WEST;
                     case ROTATE_270:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
+                        return RailShape.ASCENDING_NORTH;
                     case MIRROR_X:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_WEST;
+                        return RailShape.ASCENDING_WEST;
                 }
                 break;
             case ASCENDING_WEST:
                 switch (this) {
                     case ROTATE_90:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
+                        return RailShape.ASCENDING_NORTH;
                     case MIRROR_90_X:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
+                        return RailShape.ASCENDING_SOUTH;
                     case ROTATE_180:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_EAST;
+                        return RailShape.ASCENDING_EAST;
                     case ROTATE_270:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
+                        return RailShape.ASCENDING_SOUTH;
                     case MIRROR_X:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_EAST;
+                        return RailShape.ASCENDING_EAST;
                 }
                 break;
             case ASCENDING_NORTH:
                 switch (this) {
                     case ROTATE_90:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_EAST;
+                        return RailShape.ASCENDING_EAST;
                     case MIRROR_90_X:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_WEST;
+                        return RailShape.ASCENDING_WEST;
                     case ROTATE_180:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
+                        return RailShape.ASCENDING_SOUTH;
                     case ROTATE_270:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_WEST;
+                        return RailShape.ASCENDING_WEST;
                     case MIRROR_X:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
+                        return RailShape.ASCENDING_SOUTH;
                     case MIRROR_Z:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_SOUTH;
+                        return RailShape.ASCENDING_SOUTH;
                 }
                 break;
             case ASCENDING_SOUTH:
                 switch (this) {
                     case ROTATE_90:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_WEST;
+                        return RailShape.ASCENDING_WEST;
                     case MIRROR_90_X:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_EAST;
+                        return RailShape.ASCENDING_EAST;
                     case ROTATE_180:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
+                        return RailShape.ASCENDING_NORTH;
                     case ROTATE_270:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_EAST;
+                        return RailShape.ASCENDING_EAST;
                     case MIRROR_X:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
+                        return RailShape.ASCENDING_NORTH;
                     case MIRROR_Z:
-                        return BlockRailBase.EnumRailDirection.ASCENDING_NORTH;
+                        return RailShape.ASCENDING_NORTH;
                 }
                 break;
             case SOUTH_EAST:
                 switch (this) {
                     case ROTATE_90:
-                        return BlockRailBase.EnumRailDirection.SOUTH_WEST;
+                        return RailShape.SOUTH_WEST;
                     case MIRROR_90_X:
-                        return BlockRailBase.EnumRailDirection.NORTH_EAST;
+                        return RailShape.NORTH_EAST;
                     case ROTATE_180:
-                        return BlockRailBase.EnumRailDirection.NORTH_WEST;
+                        return RailShape.NORTH_WEST;
                     case ROTATE_270:
-                        return BlockRailBase.EnumRailDirection.NORTH_EAST;
+                        return RailShape.NORTH_EAST;
                     case MIRROR_X:
-                        return BlockRailBase.EnumRailDirection.SOUTH_WEST;
+                        return RailShape.SOUTH_WEST;
                     case MIRROR_Z:
-                        return BlockRailBase.EnumRailDirection.NORTH_EAST;
+                        return RailShape.NORTH_EAST;
                 }
                 break;
             case SOUTH_WEST:
                 switch (this) {
                     case ROTATE_90:
-                        return BlockRailBase.EnumRailDirection.NORTH_WEST;
+                        return RailShape.NORTH_WEST;
                     case MIRROR_90_X:
-                        return BlockRailBase.EnumRailDirection.SOUTH_EAST;
+                        return RailShape.SOUTH_EAST;
                     case ROTATE_180:
-                        return BlockRailBase.EnumRailDirection.NORTH_EAST;
+                        return RailShape.NORTH_EAST;
                     case ROTATE_270:
-                        return BlockRailBase.EnumRailDirection.SOUTH_EAST;
+                        return RailShape.SOUTH_EAST;
                     case MIRROR_X:
-                        return BlockRailBase.EnumRailDirection.SOUTH_EAST;
+                        return RailShape.SOUTH_EAST;
                     case MIRROR_Z:
-                        return BlockRailBase.EnumRailDirection.NORTH_WEST;
+                        return RailShape.NORTH_WEST;
                 }
                 break;
             case NORTH_WEST:
                 switch (this) {
                     case ROTATE_90:
-                        return BlockRailBase.EnumRailDirection.NORTH_EAST;
+                        return RailShape.NORTH_EAST;
                     case MIRROR_90_X:
-                        return BlockRailBase.EnumRailDirection.SOUTH_WEST;
+                        return RailShape.SOUTH_WEST;
                     case ROTATE_180:
-                        return BlockRailBase.EnumRailDirection.SOUTH_EAST;
+                        return RailShape.SOUTH_EAST;
                     case ROTATE_270:
-                        return BlockRailBase.EnumRailDirection.SOUTH_WEST;
+                        return RailShape.SOUTH_WEST;
                     case MIRROR_X:
-                        return BlockRailBase.EnumRailDirection.NORTH_EAST;
+                        return RailShape.NORTH_EAST;
                     case MIRROR_Z:
-                        return BlockRailBase.EnumRailDirection.SOUTH_WEST;
+                        return RailShape.SOUTH_WEST;
                 }
                 break;
             case NORTH_EAST:
                 switch (this) {
                     case ROTATE_90:
-                        return BlockRailBase.EnumRailDirection.SOUTH_EAST;
+                        return RailShape.SOUTH_EAST;
                     case MIRROR_90_X:
-                        return BlockRailBase.EnumRailDirection.NORTH_WEST;
+                        return RailShape.NORTH_WEST;
                     case ROTATE_180:
-                        return BlockRailBase.EnumRailDirection.SOUTH_WEST;
+                        return RailShape.SOUTH_WEST;
                     case ROTATE_270:
-                        return BlockRailBase.EnumRailDirection.NORTH_WEST;
+                        return RailShape.NORTH_WEST;
                     case MIRROR_X:
-                        return BlockRailBase.EnumRailDirection.NORTH_WEST;
+                        return RailShape.NORTH_WEST;
                     case MIRROR_Z:
-                        return BlockRailBase.EnumRailDirection.SOUTH_EAST;
+                        return RailShape.SOUTH_EAST;
                 }
                 break;
         }

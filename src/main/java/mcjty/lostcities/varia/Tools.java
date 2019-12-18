@@ -1,9 +1,9 @@
 package mcjty.lostcities.varia;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -13,35 +13,18 @@ import java.util.Random;
 
 public class Tools {
 
-    public static IBlockState stringToState(String s) {
-        if (s.contains("@")) {
-            String[] split = StringUtils.split(s, '@');
-            Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(split[0]));
-            if (value == null) {
-                throw new RuntimeException("Cannot find block: '" + split[0] + "'!");
-            }
-            try {
-                int meta = Integer.parseInt(split[1]);
-                return value.getStateFromMeta(meta);
-            } catch (NumberFormatException e) {
-                throw new RuntimeException("Bad meta for: '" + s + "'!");
-            }
-        } else {
-            Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(s));
-            if (value == null) {
-                throw new RuntimeException("Cannot find block: '" + s + "'!");
-            }
-            return value.getDefaultState();
+    public static BlockState stringToState(String s) {
+        // @todo 1.14, support properties
+        Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(s));
+        if (value == null) {
+            throw new RuntimeException("Cannot find block: '" + s + "'!");
         }
+        return value.getDefaultState();
     }
 
-    public static String stateToString(IBlockState state) {
-        int meta = state.getBlock().getMetaFromState(state);
-        if (meta == 0) {
-            return state.getBlock().getRegistryName().toString();
-        } else {
-            return state.getBlock().getRegistryName().toString() + "@" + meta;
-        }
+    public static String stateToString(BlockState state) {
+        // @todo 1.14
+        return state.getBlock().getRegistryName().toString();
     }
 
     public static String getRandomFromList(Random random, List<Pair<Float, String>> list) {

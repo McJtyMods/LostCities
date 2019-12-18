@@ -1,31 +1,6 @@
 package mcjty.lostcities.commands;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.WorldTypeTools;
-import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
-import mcjty.lostcities.dimensions.world.lost.cityassets.Palette;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.*;
-
-public class CommandExportPart implements ICommand {
+public class CommandExportPart {} /* @todo 1.14 implements ICommand {
 
     @Override
     public String getName() {
@@ -54,13 +29,13 @@ public class CommandExportPart implements ICommand {
 
             String palettechars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}\\|`~:;',./<>?";
             int idx = 0;
-            Map<IBlockState, Character> mapping = new HashMap<>();
+            Map<BlockState, Character> mapping = new HashMap<>();
             Palette palette = new Palette("old");
             Palette paletteNew = new Palette("new");
             LostCityChunkGenerator provider = WorldTypeTools.getChunkGenerator(sender.getEntityWorld().provider.getDimension());
             BuildingInfo info = BuildingInfo.getBuildingInfo(start.getX() >> 4, start.getZ() >> 4, provider);
             for (Character character : info.getCompiledPalette().getCharacters()) {
-                IBlockState state = info.getCompiledPalette().getStraight(character);
+                BlockState state = info.getCompiledPalette().getStraight(character);
                 if (state != null) {
                     palette.addMapping(character, state);
                     mapping.put(state, character);
@@ -78,7 +53,7 @@ public class CommandExportPart implements ICommand {
                 for (int x = 0 ; x < 16 ; x++) {
                     for (int z = 0 ; z < 16 ; z++) {
                         pos.setPos(cx + x, cy, cz + z);
-                        IBlockState state = server.getEntityWorld().getBlockState(pos);
+                        BlockState state = server.getEntityWorld().getBlockState(pos);
                         Character character = mapping.get(state);
                         if (character == null) {
                             while (true) {
@@ -151,3 +126,4 @@ public class CommandExportPart implements ICommand {
         String sequence[] = new String[256];
     }
 }
+*/

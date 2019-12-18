@@ -1,22 +1,17 @@
 package mcjty.lostcities.dimensions.world.terraingen;
 
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
-import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.NoiseGeneratorOctaves;
-import net.minecraft.world.gen.NoiseGeneratorPerlin;
-import net.minecraft.world.gen.NoiseGeneratorSimplex;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.terraingen.ChunkGeneratorEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraft.world.gen.OctavesNoiseGenerator;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
+import net.minecraft.world.gen.SimplexNoiseGenerator;
 
 import java.util.Random;
 
@@ -26,13 +21,13 @@ public class IslandTerrainGenerator {
 
     private double[] densities;
 
-    private NoiseGeneratorOctaves noiseGen1;
-    private NoiseGeneratorOctaves noiseGen2;
-    private NoiseGeneratorOctaves noiseGen3;
-    private NoiseGeneratorOctaves noiseGen4;
-    private NoiseGeneratorOctaves noiseGen5;
+    private OctavesNoiseGenerator noiseGen1;
+    private OctavesNoiseGenerator noiseGen2;
+    private OctavesNoiseGenerator noiseGen3;
+    private OctavesNoiseGenerator noiseGen4;
+    private OctavesNoiseGenerator noiseGen5;
 
-    private NoiseGeneratorPerlin surfaceNoise;
+    private PerlinNoiseGenerator surfaceNoise;
 
     private double[] stoneNoise = new double[256];
     private double[] noiseData1;
@@ -40,7 +35,7 @@ public class IslandTerrainGenerator {
     private double[] noiseData3;
     private double[] noiseData4;
     private double[] noiseData5;
-    private NoiseGeneratorSimplex islandNoise;          // @todo unusued for now
+    private SimplexNoiseGenerator islandNoise;          // @todo unusued for now
 
     public static final int NORMAL = 0;
     public static final int CHAOTIC = 1;
@@ -80,27 +75,28 @@ public class IslandTerrainGenerator {
     public void setup(World world, LostCityChunkGenerator provider) {
         this.provider = provider;
 
-        this.noiseGen1 = new NoiseGeneratorOctaves(provider.rand, 16);
-        this.noiseGen2 = new NoiseGeneratorOctaves(provider.rand, 16);
-        this.noiseGen3 = new NoiseGeneratorOctaves(provider.rand, 8);
-        this.noiseGen4 = new NoiseGeneratorOctaves(provider.rand, 10);
-        this.noiseGen5 = new NoiseGeneratorOctaves(provider.rand, 16);
-        this.islandNoise = new NoiseGeneratorSimplex(provider.rand);
+        this.noiseGen1 = new OctavesNoiseGenerator(provider.rand, 16);
+        this.noiseGen2 = new OctavesNoiseGenerator(provider.rand, 16);
+        this.noiseGen3 = new OctavesNoiseGenerator(provider.rand, 8);
+        this.noiseGen4 = new OctavesNoiseGenerator(provider.rand, 10);
+        this.noiseGen5 = new OctavesNoiseGenerator(provider.rand, 16);
+        this.islandNoise = new SimplexNoiseGenerator(provider.rand);
 
-        this.surfaceNoise = new NoiseGeneratorPerlin(provider.rand, 4);     // Used only for biome decoration
+        this.surfaceNoise = new PerlinNoiseGenerator(provider.rand, 4);     // Used only for biome decoration
 
-        net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd ctx =
-                new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd(noiseGen1, noiseGen2, noiseGen3, noiseGen4, noiseGen5, islandNoise);
-        ctx = net.minecraftforge.event.terraingen.TerrainGen.getModdedNoiseGenerators(world, provider.rand, ctx);
+        // @todo 1.14
+//        net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd ctx =
+//                new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextEnd(noiseGen1, noiseGen2, noiseGen3, noiseGen4, noiseGen5, islandNoise);
+//        ctx = net.minecraftforge.event.terraingen.TerrainGen.getModdedNoiseGenerators(world, provider.rand, ctx);
+//
+//        this.noiseGen1 = ctx.getLPerlin1();
+//        this.noiseGen2 = ctx.getLPerlin2();
+//        this.noiseGen3 = ctx.getPerlin();
+//        this.noiseGen4 = ctx.getDepth();
+//        this.noiseGen5 = ctx.getScale();
+//        this.islandNoise = ctx.getIsland();
 
-        this.noiseGen1 = ctx.getLPerlin1();
-        this.noiseGen2 = ctx.getLPerlin2();
-        this.noiseGen3 = ctx.getPerlin();
-        this.noiseGen4 = ctx.getDepth();
-        this.noiseGen5 = ctx.getScale();
-        this.islandNoise = ctx.getIsland();
-
-        driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
+        driver = new SafeDriver();
     }
 
     /**
@@ -108,11 +104,12 @@ public class IslandTerrainGenerator {
      * size.
      */
     private double[] initializeNoiseField(double[] densities, int chunkX2, int chunkY2, int chunkZ2, int sizeX, int sizeY, int sizeZ) {
-        ChunkGeneratorEvent.InitNoiseField event = new ChunkGeneratorEvent.InitNoiseField(provider, densities, chunkX2, chunkY2, chunkZ2, sizeX, sizeY, sizeZ);
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.getResult() == Event.Result.DENY) {
-            return event.getNoisefield();
-        }
+        // @todo 1.14
+//        ChunkGeneratorEvent.InitNoiseField event = new ChunkGeneratorEvent.InitNoiseField(provider, densities, chunkX2, chunkY2, chunkZ2, sizeX, sizeY, sizeZ);
+//        MinecraftForge.EVENT_BUS.post(event);
+//        if (event.getResult() == Event.Result.DENY) {
+//            return event.getNoisefield();
+//        }
 
         if (densities == null) {
             densities = new double[sizeX * sizeY * sizeZ];
@@ -122,12 +119,13 @@ public class IslandTerrainGenerator {
 
         double d0 = 684.412D;
         double d1 = 684.412D;
-        this.noiseData4 = this.noiseGen4.generateNoiseOctaves(this.noiseData4, chunkX2, chunkZ2, sizeX, sizeZ, 1.121D, 1.121D, 0.5D);
-        this.noiseData5 = this.noiseGen5.generateNoiseOctaves(this.noiseData5, chunkX2, chunkZ2, sizeX, sizeZ, 200.0D, 200.0D, 0.5D);
-        d0 *= 2.0D;
-        this.noiseData1 = this.noiseGen3.generateNoiseOctaves(this.noiseData1, chunkX2, chunkY2, chunkZ2, sizeX, sizeY, sizeZ, d0 / 80.0D, d1 / 160.0D, d0 / 80.0D);
-        this.noiseData2 = this.noiseGen1.generateNoiseOctaves(this.noiseData2, chunkX2, chunkY2, chunkZ2, sizeX, sizeY, sizeZ, d0, d1, d0);
-        this.noiseData3 = this.noiseGen2.generateNoiseOctaves(this.noiseData3, chunkX2, chunkY2, chunkZ2, sizeX, sizeY, sizeZ, d0, d1, d0);
+        // @todo 1.14
+//        this.noiseData4 = this.noiseGen4.generateNoiseOctaves(this.noiseData4, chunkX2, chunkZ2, sizeX, sizeZ, 1.121D, 1.121D, 0.5D);
+//        this.noiseData5 = this.noiseGen5.generateNoiseOctaves(this.noiseData5, chunkX2, chunkZ2, sizeX, sizeZ, 200.0D, 200.0D, 0.5D);
+//        d0 *= 2.0D;
+//        this.noiseData1 = this.noiseGen3.generateNoiseOctaves(this.noiseData1, chunkX2, chunkY2, chunkZ2, sizeX, sizeY, sizeZ, d0 / 80.0D, d1 / 160.0D, d0 / 80.0D);
+//        this.noiseData2 = this.noiseGen1.generateNoiseOctaves(this.noiseData2, chunkX2, chunkY2, chunkZ2, sizeX, sizeY, sizeZ, d0, d1, d0);
+//        this.noiseData3 = this.noiseGen2.generateNoiseOctaves(this.noiseData3, chunkX2, chunkY2, chunkZ2, sizeX, sizeY, sizeZ, d0, d1, d0);
         int k1 = 0;
 
         Random random = new Random(chunkX2 * 13 + chunkY2 * 157 + chunkZ2 * 13883);
@@ -291,7 +289,8 @@ public class IslandTerrainGenerator {
 //        }
 
         double d0 = 0.03125D;
-        this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, 0.0625D, 0.0625D, 1.0D);
+        // @todo 1.14
+//        this.stoneNoise = this.surfaceNoise.getRegion(this.stoneNoise, (chunkX * 16), (chunkZ * 16), 16, 16, 0.0625D, 0.0625D, 1.0D);
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -309,8 +308,8 @@ public class IslandTerrainGenerator {
 
         int topLevel = provider.getProfile().GROUNDLEVEL;
 
-        char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(biome.fillerBlock);
-        char topBlock = (char) Block.BLOCK_STATE_IDS.get(biome.topBlock);
+        char fillerBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(biome.fillerBlock);
+        char topBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(biome.topBlock);
         char block = topBlock;
         char block1 = fillerBlock;
 

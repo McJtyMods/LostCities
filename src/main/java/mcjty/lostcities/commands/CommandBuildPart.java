@@ -1,26 +1,6 @@
 package mcjty.lostcities.commands;
 
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.WorldTypeTools;
-import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
-import mcjty.lostcities.dimensions.world.lost.cityassets.BuildingPart;
-import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-
-public class CommandBuildPart implements ICommand {
+public class CommandBuildPart {} /* @todo 1.14 implements ICommand {
 
     @Override
     public String getName() {
@@ -58,7 +38,7 @@ public class CommandBuildPart implements ICommand {
                     for (int z = 0; z < part.getZSize(); z++) {
                         BlockPos pos = new BlockPos(info.chunkX*16+x, start.getY()+y, info.chunkZ*16+z);
                         Character character = part.getC(x, y, z);
-                        IBlockState state = palette.getStraight(character);
+                        BlockState state = palette.getStraight(character);
                         if (state != null && state.getBlock() != Blocks.COMMAND_BLOCK) {
                             try {
                                 sender.getEntityWorld().setBlockState(pos, state, 3);
@@ -97,3 +77,4 @@ public class CommandBuildPart implements ICommand {
         String sequence[] = new String[256];
     }
 }
+*/

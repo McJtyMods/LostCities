@@ -1,6 +1,5 @@
 package mcjty.lostcities.dimensions.world.terraingen;
 
-import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
@@ -8,25 +7,23 @@ import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IIndex;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
-import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.*;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Biomes;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.state.EnumProperty;
+import net.minecraft.state.properties.DoorHingeSide;
+import net.minecraft.state.properties.DoubleBlockHalf;
+import net.minecraft.state.properties.RailShape;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.NoiseGeneratorPerlin;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -68,9 +65,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private Character street2;
     private int streetBorder;
 
-    private NoiseGeneratorPerlin rubbleNoise;
-    private NoiseGeneratorPerlin leavesNoise;
-    private NoiseGeneratorPerlin ruinNoise;
+    private PerlinNoiseGenerator rubbleNoise;
+    private PerlinNoiseGenerator leavesNoise;
+    private PerlinNoiseGenerator ruinNoise;
 
     private static char randomLeafs[] = null;
 
@@ -82,16 +79,16 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public LostCitiesTerrainGenerator(LostCityChunkGenerator provider) {
         super(provider);
-        driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
+        driver = new SafeDriver();
         this.mainGroundLevel = provider.getProfile().GROUNDLEVEL;
         this.waterLevel = provider.getProfile().GROUNDLEVEL - provider.getProfile().WATERLEVEL_OFFSET;
-        this.rubbleNoise = new NoiseGeneratorPerlin(provider.rand, 4);
-        this.leavesNoise = new NoiseGeneratorPerlin(provider.rand, 4);
-        this.ruinNoise = new NoiseGeneratorPerlin(provider.rand, 4);
+        this.rubbleNoise = new PerlinNoiseGenerator(provider.rand, 4);
+        this.leavesNoise = new PerlinNoiseGenerator(provider.rand, 4);
+        this.ruinNoise = new PerlinNoiseGenerator(provider.rand, 4);
 
-        islandTerrainGenerator.setup(provider.worldObj, provider);
-        cavernTerrainGenerator.setup(provider.worldObj, provider);
-        spaceTerrainGenerator.setup(provider.worldObj, provider);
+        islandTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
+        cavernTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
+        spaceTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
     }
 
     public static char getRandomLeaf() {
@@ -115,7 +112,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (railChars == null) {
             railChars = new HashSet<>();
             addStates(Blocks.RAIL, railChars);
-            addStates(Blocks.GOLDEN_RAIL, railChars);
+            addStates(Blocks.POWERED_RAIL, railChars);
         }
         return railChars;
     }
@@ -124,9 +121,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (glassChars == null) {
             glassChars = new HashSet<>();
             addStates(Blocks.GLASS, glassChars);
-            addStates(Blocks.STAINED_GLASS, glassChars);
+//            addStates(Blocks.STAINED_GLASS, glassChars);  // @todo 1.14
             addStates(Blocks.GLASS_PANE, glassChars);
-            addStates(Blocks.STAINED_GLASS_PANE, glassChars);
+//            addStates(Blocks.STAINED_GLASS_PANE, glassChars);
         }
         return glassChars;
     }
@@ -134,14 +131,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     public static Set<Character> getCharactersNeedingTodo() {
         if (charactersNeedingTodo == null) {
             charactersNeedingTodo = new HashSet<>();
-            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA)));
-            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH)));
-            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK)));
-            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE)));
-            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.DARK_OAK)));
-            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.JUNGLE)));
-            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.RED_FLOWER.getDefaultState()));
-            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.YELLOW_FLOWER.getDefaultState()));
+            // @todo 1.14
+//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA)));
+//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH)));
+//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK)));
+//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE)));
+//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.DARK_OAK)));
+//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.JUNGLE)));
+//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.RED_FLOWER.getDefaultState()));
+//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.YELLOW_FLOWER.getDefaultState()));
         }
         return charactersNeedingTodo;
     }
@@ -182,14 +180,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private static void addStates(Block block, Set<Character> set) {
-        for (int m = 0; m < 16; m++) {
-            try {
-                IBlockState state = block.getStateFromMeta(m);
-                set.add((char) Block.BLOCK_STATE_IDS.get(state));
-            } catch (Exception e) {
-                // Ignore
-            }
-        }
+        // @todo 1.14
+//        for (int m = 0; m < 16; m++) {
+//            try {
+//                BlockState state = block.getStateFromMeta(m);
+//                set.add((char) Block.BLOCK_STATE_IDS.get(state));
+//            } catch (Exception e) {
+//                // Ignore
+//            }
+//        }
     }
 
     public void setupChars(LostCityProfile profile) {
@@ -205,14 +204,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             // @todo
             glassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GLASS.getDefaultState());
 
-            leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
-                    .withProperty(BlockLeaves.DECAYABLE, false));
-            leaves2Char = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
-                    .withProperty(BlockLeaves.DECAYABLE, false)
-                    .withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE));
-            leaves3Char = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
-                    .withProperty(BlockLeaves.DECAYABLE, false)
-                    .withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE));
+            // @todo 1.14
+//            leavesChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
+//                    .withProperty(BlockLeaves.DECAYABLE, false));
+//            leaves2Char = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
+//                    .withProperty(BlockLeaves.DECAYABLE, false)
+//                    .withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.JUNGLE));
+//            leaves3Char = (char) Block.BLOCK_STATE_IDS.get(Blocks.LEAVES.getDefaultState()
+//                    .withProperty(BlockLeaves.DECAYABLE, false)
+//                    .withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.SPRUCE));
 
             ironbarsChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.IRON_BARS.getDefaultState());
             grassChar = (char) Block.BLOCK_STATE_IDS.get(Blocks.GRASS.getDefaultState());
@@ -272,14 +272,14 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         // primer vs generating it here
         provider.rand.setSeed(chunkX * 257017164707L + chunkZ * 101754694003L);
 
-        LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
-        if (!MinecraftForge.EVENT_BUS.post(event)) {
-            if (info.getDamageArea().hasExplosions()) {
-                breakBlocksForDamage(chunkX, chunkZ, info);
-                fixAfterExplosionNew(info, provider.rand);
-            }
-            generateDebris(provider.rand, info);
-        }
+//        LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.getWorld().getWorld(), provider, chunkX, chunkZ, driver.getPrimer());
+//        if (!MinecraftForge.EVENT_BUS.post(event)) {
+//            if (info.getDamageArea().hasExplosions()) {
+//                breakBlocksForDamage(chunkX, chunkZ, info);
+//                fixAfterExplosionNew(info, provider.rand);
+//            }
+//            generateDebris(provider.rand, info);
+//        }
     }
 
 
@@ -350,21 +350,22 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             Map<String, Integer> map = pair.getRight();
 
             char torch = driver.getBlock();
-            IBlockState torchState = Block.BLOCK_STATE_IDS.getByValue(torch);
+            BlockState torchState = Block.BLOCK_STATE_IDS.getByValue(torch);
             if (map != null) {
                 int x = driver.getX();
                 int z = driver.getZ();
-                if (driver.getBlockDown() != airChar) {
-                    driver.block(torchState.getBlock().getStateFromMeta(map.get("up")));
-                } else if (x > 0 && driver.getBlockWest() != airChar) {
-                    driver.block(torchState.getBlock().getStateFromMeta(map.get("east")));
-                } else if (x < 15 && driver.getBlockEast() != airChar) {
-                    driver.block(torchState.getBlock().getStateFromMeta(map.get("west")));
-                } else if (z > 0 && driver.getBlockNorth() != airChar) {
-                    driver.block(torchState.getBlock().getStateFromMeta(map.get("south")));
-                } else if (z < 15 && driver.getBlockSouth() != airChar) {
-                    driver.block(torchState.getBlock().getStateFromMeta(map.get("north")));
-                }
+// @todo 1.14
+                //                if (driver.getBlockDown() != airChar) {
+//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("up")));
+//                } else if (x > 0 && driver.getBlockWest() != airChar) {
+//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("east")));
+//                } else if (x < 15 && driver.getBlockEast() != airChar) {
+//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("west")));
+//                } else if (z > 0 && driver.getBlockNorth() != airChar) {
+//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("south")));
+//                } else if (z < 15 && driver.getBlockSouth() != airChar) {
+//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("north")));
+//                }
             }
         }
         info.clearTorchTodo();
@@ -406,7 +407,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void defaultGenerate(int chunkX, int chunkZ, ChunkPrimer primer) {
-        IPrimerDriver driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
+        IPrimerDriver driver = new SafeDriver();
         driver.setPrimer(primer);
         generateHeightmap(chunkX, chunkZ);
         for (int x4 = 0; x4 < 4; ++x4) {
@@ -470,8 +471,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             flattenChunkToCityBorder(chunkX, chunkZ);
         }
 
-        LostCityEvent.PostGenOutsideChunkEvent postevent = new LostCityEvent.PostGenOutsideChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
-        MinecraftForge.EVENT_BUS.post(postevent);
+        // @todo 1.14
+//        LostCityEvent.PostGenOutsideChunkEvent postevent = new LostCityEvent.PostGenOutsideChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
+//        MinecraftForge.EVENT_BUS.post(postevent);
 
         generateBridges(info);
         generateHighways(chunkX, chunkZ, info);
@@ -857,7 +859,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private static boolean isWaterBiome(Biome biome) {
         return !(biome != Biomes.OCEAN && biome != Biomes.DEEP_OCEAN && biome != Biomes.FROZEN_OCEAN
-                && biome != Biomes.RIVER && biome != Biomes.FROZEN_RIVER && biome != Biomes.BEACH && biome != Biomes.COLD_BEACH);
+                && biome != Biomes.RIVER && biome != Biomes.FROZEN_RIVER && biome != Biomes.BEACH && biome != Biomes.SNOWY_BEACH);
     }
 
     private void flattenChunkBorder(BuildingInfo info, int x, int offset, int z, Random rand, int level) {
@@ -884,7 +886,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         ChunkHeightmap heightmap = provider.getHeightmap(info.chunkX, info.chunkZ);
 
-        Random rand = new Random(provider.seed * 377 + chunkZ * 341873128712L + chunkX * 132897987541L);
+        Random rand = new Random(provider.getSeed() * 377 + chunkZ * 341873128712L + chunkX * 132897987541L);
         rand.nextFloat();
         rand.nextFloat();
 
@@ -905,16 +907,17 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         }
 
-        LostCityEvent.PreGenCityChunkEvent event = new LostCityEvent.PreGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
-        if (!MinecraftForge.EVENT_BUS.post(event)) {
+        // @todo 1.14
+//        LostCityEvent.PreGenCityChunkEvent event = new LostCityEvent.PreGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
+//        if (!MinecraftForge.EVENT_BUS.post(event)) {
             if (building) {
                 generateBuilding(info, heightmap);
             } else {
                 generateStreet(info, heightmap, rand);
             }
-        }
-        LostCityEvent.PostGenCityChunkEvent postevent = new LostCityEvent.PostGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
-        MinecraftForge.EVENT_BUS.post(postevent);
+//        }
+//        LostCityEvent.PostGenCityChunkEvent postevent = new LostCityEvent.PostGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
+//        MinecraftForge.EVENT_BUS.post(postevent);
 
         if (info.profile.RUINS) {
             generateRuins(info);
@@ -1438,8 +1441,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private double[] leavesBuffer = new double[256];
 
     private void generateRubble(int chunkX, int chunkZ, BuildingInfo info) {
-        this.rubbleBuffer = this.rubbleNoise.getRegion(this.rubbleBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
-        this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
+        // @todo 1.14
+//        this.rubbleBuffer = this.rubbleNoise.getRegion(this.rubbleBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
+//        this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -1523,10 +1527,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int chunkX = info.chunkX;
         int chunkZ = info.chunkZ;
         double d0 = 0.03125D;
-        this.ruinBuffer = this.ruinNoise.getRegion(this.ruinBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
+        // @todo 1.14
+//        this.ruinBuffer = this.ruinNoise.getRegion(this.ruinBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
         boolean doLeaves = info.profile.RUBBLELAYER;
         if (doLeaves) {
-            this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
+            // @todo 1.14
+//            this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
         }
 
         int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * 6.0f));
@@ -1792,9 +1798,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateCorridors(BuildingInfo info, boolean xRail, boolean zRail) {
-        IBlockState railx = Blocks.RAIL.getDefaultState().withProperty(BlockRail.SHAPE, BlockRailBase.EnumRailDirection.EAST_WEST);
+        BlockState railx = Blocks.RAIL.getDefaultState().with(RailBlock.SHAPE, RailShape.EAST_WEST);
         char railxC = (char) Block.BLOCK_STATE_IDS.get(railx);
-        IBlockState railz = Blocks.RAIL.getDefaultState();
+        BlockState railz = Blocks.RAIL.getDefaultState();
         char railzC = (char) Block.BLOCK_STATE_IDS.get(railz);
 
         Character corridorRoofBlock = info.getCityStyle().getCorridorRoofBlock();
@@ -2061,21 +2067,21 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
                         if (transform != Transform.ROTATE_NONE) {
                             if (getRotatableChars().contains(b)) {
-                                IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
-                                bs = bs.withRotation(transform.getMcRotation());
+                                BlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
+                                bs = bs.rotate(transform.getMcRotation());
                                 b = (char) Block.BLOCK_STATE_IDS.get(bs);
                             } else if (getRailChars().contains(b)) {
-                                IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
-                                PropertyEnum<BlockRailBase.EnumRailDirection> shapeProperty;
+                                BlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
+                                EnumProperty<RailShape> shapeProperty;
                                 if (bs.getBlock() == Blocks.RAIL) {
-                                    shapeProperty = BlockRail.SHAPE;
-                                } else if (bs.getBlock() == Blocks.GOLDEN_RAIL) {
-                                    shapeProperty = BlockRailPowered.SHAPE;
+                                    shapeProperty = RailBlock.SHAPE;
+                                } else if (bs.getBlock() == Blocks.POWERED_RAIL) {
+                                    shapeProperty = RailBlock.SHAPE;
                                 } else {
                                     throw new RuntimeException("Error with rail!");
                                 }
-                                BlockRailBase.EnumRailDirection shape = bs.getValue(shapeProperty);
-                                bs = bs.withProperty(shapeProperty, transform.transform(shape));
+                                RailShape shape = bs.get(shapeProperty);
+                                bs = bs.with(shapeProperty, transform.transform(shape));
                                 b = (char) Block.BLOCK_STATE_IDS.get(bs);
                             }
                         }
@@ -2116,9 +2122,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             } else if (getCharactersNeedingLightingUpdate().contains(b)) {
                                 info.getTodoChunk(rx, rz).addLightingUpdateTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                             } else if (getCharactersNeedingTodo().contains(b)) {
-                                IBlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
+                                BlockState bs = Block.BLOCK_STATE_IDS.getByValue(b);
                                 Block block = bs.getBlock();
-                                if (block instanceof BlockSapling || block instanceof BlockFlower) {
+                                if (block instanceof SaplingBlock || block instanceof FlowerBlock) {
                                     if (info.profile.AVOID_FOLIAGE) {
                                         b = airChar;
                                     } else {
@@ -2347,11 +2353,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
     }
 
-    private char getDoor(Block door, boolean upper, boolean left, EnumFacing facing) {
-        IBlockState bs = door.getDefaultState()
-                .withProperty(BlockDoor.HALF, upper ? BlockDoor.EnumDoorHalf.UPPER : BlockDoor.EnumDoorHalf.LOWER)
-                .withProperty(BlockDoor.HINGE, left ? BlockDoor.EnumHingePosition.LEFT : BlockDoor.EnumHingePosition.RIGHT)
-                .withProperty(BlockDoor.FACING, facing);
+    private char getDoor(Block door, boolean upper, boolean left, net.minecraft.util.Direction facing) {
+        BlockState bs = door.getDefaultState()
+                .with(DoorBlock.HALF, upper ? DoubleBlockHalf.UPPER : DoubleBlockHalf.LOWER)
+                .with(DoorBlock.HINGE, left ? DoorHingeSide.LEFT : DoorHingeSide.RIGHT)
+                .with(DoorBlock.FACING, facing);
         return (char) Block.BLOCK_STATE_IDS.get(bs);
     }
 
@@ -2376,13 +2382,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
                 driver.current(x, height, 7)
                         .add(filler)
-                        .add(getDoor(info.doorBlock, false, true, EnumFacing.EAST))
-                        .add(getDoor(info.doorBlock, true, true, EnumFacing.EAST))
+                        .add(getDoor(info.doorBlock, false, true, net.minecraft.util.Direction.EAST))
+                        .add(getDoor(info.doorBlock, true, true, net.minecraft.util.Direction.EAST))
                         .add(filler);
                 driver.current(x, height, 8)
                         .add(filler)
-                        .add(getDoor(info.doorBlock, false, false, EnumFacing.EAST))
-                        .add(getDoor(info.doorBlock, true, false, EnumFacing.EAST))
+                        .add(getDoor(info.doorBlock, false, false, net.minecraft.util.Direction.EAST))
+                        .add(getDoor(info.doorBlock, true, false, net.minecraft.util.Direction.EAST))
                         .add(filler);
             }
         }
@@ -2398,13 +2404,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             driver.setBlockRange(x, height, 9, height + 4, filler);
             driver.current(x, height, 7)
                 .add(filler)
-                .add(getDoor(info.doorBlock, false, false, EnumFacing.WEST))
-                .add(getDoor(info.doorBlock, true, false, EnumFacing.WEST))
+                .add(getDoor(info.doorBlock, false, false, net.minecraft.util.Direction.WEST))
+                .add(getDoor(info.doorBlock, true, false, net.minecraft.util.Direction.WEST))
                 .add(filler);
             driver.current(x, height, 8)
                 .add(filler)
-                .add(getDoor(info.doorBlock, false, true, EnumFacing.WEST))
-                .add(getDoor(info.doorBlock, true, true, EnumFacing.WEST))
+                .add(getDoor(info.doorBlock, false, true, net.minecraft.util.Direction.WEST))
+                .add(getDoor(info.doorBlock, true, true, net.minecraft.util.Direction.WEST))
                 .add(filler);
         }
         if (info.hasConnectionAtZ(f + info.floorsBelowGround)) {
@@ -2419,13 +2425,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 driver.setBlockRange(9, height, z, height + 4, filler);
                 driver.current(7, height, z)
                     .add(filler)
-                    .add(getDoor(info.doorBlock, false, true, EnumFacing.NORTH))
-                    .add(getDoor(info.doorBlock, true, true, EnumFacing.NORTH))
+                    .add(getDoor(info.doorBlock, false, true, net.minecraft.util.Direction.NORTH))
+                    .add(getDoor(info.doorBlock, true, true, net.minecraft.util.Direction.NORTH))
                     .add(filler);
                 driver.current(8, height, z)
                     .add(filler)
-                    .add(getDoor(info.doorBlock, false, false, EnumFacing.NORTH))
-                    .add(getDoor(info.doorBlock, true, false, EnumFacing.NORTH))
+                    .add(getDoor(info.doorBlock, false, false, net.minecraft.util.Direction.NORTH))
+                    .add(getDoor(info.doorBlock, true, false, net.minecraft.util.Direction.NORTH))
                     .add(filler);
             }
         }
@@ -2441,13 +2447,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             driver.setBlockRange(9, height, z, height + 4, filler);
             driver.current(7, height, z)
                 .add(filler)
-                .add(getDoor(info.doorBlock, false, false, EnumFacing.SOUTH))
-                .add(getDoor(info.doorBlock, true, false, EnumFacing.SOUTH))
+                .add(getDoor(info.doorBlock, false, false, net.minecraft.util.Direction.SOUTH))
+                .add(getDoor(info.doorBlock, true, false, net.minecraft.util.Direction.SOUTH))
                 .add(filler);
             driver.current(8, height, z)
                 .add(filler)
-                .add(getDoor(info.doorBlock, false, true, EnumFacing.SOUTH))
-                .add(getDoor(info.doorBlock, true, true, EnumFacing.SOUTH))
+                .add(getDoor(info.doorBlock, false, true, net.minecraft.util.Direction.SOUTH))
+                .add(getDoor(info.doorBlock, true, true, net.minecraft.util.Direction.SOUTH))
                 .add(filler);
         }
     }

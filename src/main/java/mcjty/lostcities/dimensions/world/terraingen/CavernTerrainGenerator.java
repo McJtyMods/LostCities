@@ -1,33 +1,28 @@
 package mcjty.lostcities.dimensions.world.terraingen;
 
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
-import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.NoiseGeneratorOctaves;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.terraingen.ChunkGeneratorEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraft.world.gen.OctavesNoiseGenerator;
 
 public class CavernTerrainGenerator {
     private LostCityChunkGenerator provider;
     private IPrimerDriver driver;
 
     /** A NoiseGeneratorOctaves used in generating nether terrain */
-    private NoiseGeneratorOctaves netherNoiseGen1;
-    private NoiseGeneratorOctaves netherNoiseGen2;
-    private NoiseGeneratorOctaves netherNoiseGen3;
+    private OctavesNoiseGenerator netherNoiseGen1;
+    private OctavesNoiseGenerator netherNoiseGen2;
+    private OctavesNoiseGenerator netherNoiseGen3;
     /** Determines whether something other than nettherack can be generated at a location */
-    private NoiseGeneratorOctaves netherrackExculsivityNoiseGen;
-    private NoiseGeneratorOctaves netherNoiseGen6;
-    private NoiseGeneratorOctaves netherNoiseGen7;
+    private OctavesNoiseGenerator netherrackExculsivityNoiseGen;
+    private OctavesNoiseGenerator netherNoiseGen6;
+    private OctavesNoiseGenerator netherNoiseGen7;
 
     private double[] noiseField;
     /** Holds the noise used to determine whether something other than the baseblock can be generated at a location */
@@ -41,27 +36,28 @@ public class CavernTerrainGenerator {
     public void setup(World world, LostCityChunkGenerator provider) {
         this.provider = provider;
 
-        this.netherNoiseGen1 = new NoiseGeneratorOctaves(provider.rand, 16);
-        this.netherNoiseGen2 = new NoiseGeneratorOctaves(provider.rand, 16);
-        this.netherNoiseGen3 = new NoiseGeneratorOctaves(provider.rand, 8);
+        this.netherNoiseGen1 = new OctavesNoiseGenerator(provider.rand, 16);
+        this.netherNoiseGen2 = new OctavesNoiseGenerator(provider.rand, 16);
+        this.netherNoiseGen3 = new OctavesNoiseGenerator(provider.rand, 8);
         /* Determines whether slowsand or gravel can be generated at a location */
-        NoiseGeneratorOctaves slowsandGravelNoiseGen = new NoiseGeneratorOctaves(provider.rand, 4);
-        this.netherrackExculsivityNoiseGen = new NoiseGeneratorOctaves(provider.rand, 4);
-        this.netherNoiseGen6 = new NoiseGeneratorOctaves(provider.rand, 10);
-        this.netherNoiseGen7 = new NoiseGeneratorOctaves(provider.rand, 16);
+        OctavesNoiseGenerator slowsandGravelNoiseGen = new OctavesNoiseGenerator(provider.rand, 4);
+        this.netherrackExculsivityNoiseGen = new OctavesNoiseGenerator(provider.rand, 4);
+        this.netherNoiseGen6 = new OctavesNoiseGenerator(provider.rand, 10);
+        this.netherNoiseGen7 = new OctavesNoiseGenerator(provider.rand, 16);
 
-        net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextHell ctx =
-                new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextHell(netherNoiseGen1, netherNoiseGen2, netherNoiseGen3,
-                        slowsandGravelNoiseGen, netherrackExculsivityNoiseGen, netherNoiseGen6, netherNoiseGen7);
-        ctx = net.minecraftforge.event.terraingen.TerrainGen.getModdedNoiseGenerators(world, provider.rand, ctx);
-        this.netherNoiseGen1 = ctx.getLPerlin1();
-        this.netherNoiseGen2 = ctx.getLPerlin2();
-        this.netherNoiseGen3 = ctx.getPerlin();
-        slowsandGravelNoiseGen = ctx.getPerlin2();
-        this.netherrackExculsivityNoiseGen = ctx.getPerlin3();
-        this.netherNoiseGen6 = ctx.getScale();
-        this.netherNoiseGen7 = ctx.getDepth();
-        driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
+        // @todo 1.14
+//        net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextHell ctx =
+//                new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextHell(netherNoiseGen1, netherNoiseGen2, netherNoiseGen3,
+//                        slowsandGravelNoiseGen, netherrackExculsivityNoiseGen, netherNoiseGen6, netherNoiseGen7);
+//        ctx = net.minecraftforge.event.terraingen.TerrainGen.getModdedNoiseGenerators(world, provider.rand, ctx);
+//        this.netherNoiseGen1 = ctx.getLPerlin1();
+//        this.netherNoiseGen2 = ctx.getLPerlin2();
+//        this.netherNoiseGen3 = ctx.getPerlin();
+//        slowsandGravelNoiseGen = ctx.getPerlin2();
+//        this.netherrackExculsivityNoiseGen = ctx.getPerlin3();
+//        this.netherNoiseGen6 = ctx.getScale();
+//        this.netherNoiseGen7 = ctx.getDepth();
+        driver = new SafeDriver();
     }
 
     /**
@@ -69,11 +65,12 @@ public class CavernTerrainGenerator {
      * size.
      */
     private double[] initializeNoiseField(double[] noiseField, int x, int y, int z, int sx, int sy, int sz) {
-        ChunkGeneratorEvent.InitNoiseField event = new ChunkGeneratorEvent.InitNoiseField(provider, noiseField, x, y, z, sx, sy, sz);
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.getResult() == Event.Result.DENY) {
-            return event.getNoisefield();
-        }
+        // @todo 1.14
+//        ChunkGeneratorEvent.InitNoiseField event = new ChunkGeneratorEvent.InitNoiseField(provider, noiseField, x, y, z, sx, sy, sz);
+//        MinecraftForge.EVENT_BUS.post(event);
+//        if (event.getResult() == Event.Result.DENY) {
+//            return event.getNoisefield();
+//        }
 
         int syr = 16;
 
@@ -83,11 +80,12 @@ public class CavernTerrainGenerator {
 
         double d0 = 684.412D;
         double d1 = 2053.236D;
-        this.noiseData4 = this.netherNoiseGen6.generateNoiseOctaves(this.noiseData4, x, y, z, sx, 1, sz, 1.0D, 0.0D, 1.0D);
-        this.noiseData5 = this.netherNoiseGen7.generateNoiseOctaves(this.noiseData5, x, y, z, sx, 1, sz, 100.0D, 0.0D, 100.0D);
-        this.noiseData1 = this.netherNoiseGen3.generateNoiseOctaves(this.noiseData1, x, y, z, sx, sy, sz, d0 / 80.0D, d1 / 60.0D, d0 / 80.0D);
-        this.noiseData2 = this.netherNoiseGen1.generateNoiseOctaves(this.noiseData2, x, y, z, sx, sy, sz, d0, d1, d0);
-        this.noiseData3 = this.netherNoiseGen2.generateNoiseOctaves(this.noiseData3, x, y, z, sx, sy, sz, d0, d1, d0);
+        // @todo 1.14
+//        this.noiseData4 = this.netherNoiseGen6.generateNoiseOctaves(this.noiseData4, x, y, z, sx, 1, sz, 1.0D, 0.0D, 1.0D);
+//        this.noiseData5 = this.netherNoiseGen7.generateNoiseOctaves(this.noiseData5, x, y, z, sx, 1, sz, 100.0D, 0.0D, 100.0D);
+//        this.noiseData1 = this.netherNoiseGen3.generateNoiseOctaves(this.noiseData1, x, y, z, sx, sy, sz, d0 / 80.0D, d1 / 60.0D, d0 / 80.0D);
+//        this.noiseData2 = this.netherNoiseGen1.generateNoiseOctaves(this.noiseData2, x, y, z, sx, sy, sz, d0, d1, d0);
+//        this.noiseData3 = this.netherNoiseGen2.generateNoiseOctaves(this.noiseData3, x, y, z, sx, sy, sz, d0, d1, d0);
         int k1 = 0;
         double[] adouble1 = new double[sy];
         int i2;
@@ -239,13 +237,14 @@ public class CavernTerrainGenerator {
 
         byte groundLevel = (byte) provider.getProfile().GROUNDLEVEL;
         double d0 = 0.03125D;
-        this.baseBlockExclusivityNoise = this.netherrackExculsivityNoiseGen.generateNoiseOctaves(this.baseBlockExclusivityNoise, chunkX * 16, chunkZ * 16, 0, 16, 16, 1, d0 * 2.0D, d0 * 2.0D, d0 * 2.0D);
+        // @todo 1.14
+//        this.baseBlockExclusivityNoise = this.netherrackExculsivityNoiseGen.generateNoiseOctaves(this.baseBlockExclusivityNoise, chunkX * 16, chunkZ * 16, 0, 16, 16, 1, d0 * 2.0D, d0 * 2.0D, d0 * 2.0D);
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 Biome Biome = Biomes[z + x * 16];
-                char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
-                char topBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
+                char fillerBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
+                char topBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
 
                 int l = (int)(this.baseBlockExclusivityNoise[x + z * 16] / 3.0D + 3.0D + provider.rand.nextDouble() * 0.25D);
                 int k = -1;

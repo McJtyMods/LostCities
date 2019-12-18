@@ -1,51 +1,49 @@
 package mcjty.lostcities.dimensions.world;
 
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.MapGenCaves;
+import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.carver.CaveWorldCarver;
+import net.minecraft.world.gen.feature.ProbabilityConfig;
 
-public class LostGenCaves extends MapGenCaves {
+import java.util.BitSet;
+import java.util.Random;
+
+public class LostGenCaves extends CaveWorldCarver {
 
     private final LostCityChunkGenerator provider;
 
     public LostGenCaves(LostCityChunkGenerator provider) {
+        super(ProbabilityConfig::deserialize, 256);
         this.provider = provider;
     }
 
-    /**
-     * Recursively called by generate()
-     */
     @Override
-    protected void recursiveGenerate(World worldIn, int chunkX, int chunkZ, int originalX, int originalZ, ChunkPrimer chunkPrimerIn) {
-        int i = this.rand.nextInt(this.rand.nextInt(this.rand.nextInt(15) + 1) + 1);
+    public boolean carve(IChunk chunkIn, Random rand, int seaLevel, int chunkX, int chunkZ, int originalX, int originalZ, BitSet carvingMask, ProbabilityConfig config) {
+        int i = (this.func_222704_c() * 2 - 1) * 16;
+        int j = rand.nextInt(rand.nextInt(rand.nextInt(this.func_222724_a()) + 1) + 1);
 
-        if (this.rand.nextInt(7) != 0) {
-            i = 0;
-        }
-
-        for (int j = 0; j < i; ++j) {
-            double d0 = (double) (chunkX * 16 + this.rand.nextInt(16));
-            double d1 = (double) this.rand.nextInt(this.rand.nextInt(provider.getProfile().MAX_CAVE_HEIGHT - 8) + 8);
-            double d2 = (double) (chunkZ * 16 + this.rand.nextInt(16));
-            int k = 1;
-
-            if (this.rand.nextInt(4) == 0) {
-                this.addRoom(this.rand.nextLong(), originalX, originalZ, chunkPrimerIn, d0, d1, d2);
-                k += this.rand.nextInt(4);
+        for(int k = 0; k < j; ++k) {
+            double d0 = (double)(chunkX * 16 + rand.nextInt(16));
+            double d1 = (double) rand.nextInt(rand.nextInt(provider.getProfile().MAX_CAVE_HEIGHT - 8) + 8);
+            double d2 = (double)(chunkZ * 16 + rand.nextInt(16));
+            int l = 1;
+            if (rand.nextInt(4) == 0) {
+                double d3 = 0.5D;
+                float f1 = 1.0F + rand.nextFloat() * 6.0F;
+                this.func_222723_a(chunkIn, rand.nextLong(), seaLevel, originalX, originalZ, d0, d1, d2, f1, 0.5D, carvingMask);
+                l += rand.nextInt(4);
             }
 
-            for (int l = 0; l < k; ++l) {
-                float f = this.rand.nextFloat() * ((float) Math.PI * 2F);
-                float f1 = (this.rand.nextFloat() - 0.5F) * 2.0F / 8.0F;
-                float f2 = this.rand.nextFloat() * 2.0F + this.rand.nextFloat();
-
-                if (this.rand.nextInt(10) == 0) {
-                    f2 *= this.rand.nextFloat() * this.rand.nextFloat() * 3.0F + 1.0F;
-                }
-
-                this.addTunnel(this.rand.nextLong(), originalX, originalZ, chunkPrimerIn, d0, d1, d2, f2, f, f1, 0, 0, 1.0D);
+            for(int k1 = 0; k1 < l; ++k1) {
+                float f = rand.nextFloat() * ((float)Math.PI * 2F);
+                float f3 = (rand.nextFloat() - 0.5F) / 4.0F;
+                float f2 = this.generateCaveRadius(rand);
+                int i1 = i - rand.nextInt(i / 4);
+                int j1 = 0;
+                this.carveTunnel(chunkIn, rand.nextLong(), seaLevel, originalX, originalZ, d0, d1, d2, f2, f, f3, 0, i1, this.func_222725_b(), carvingMask);
             }
         }
+
+        return true;
     }
 }
 

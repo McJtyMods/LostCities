@@ -3,6 +3,7 @@ package mcjty.lostcities;
 import mcjty.lostcities.api.ILostChunkGenerator;
 import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.dimensions.world.WorldTypeTools;
+import net.minecraft.world.dimension.DimensionType;
 
 import javax.annotation.Nullable;
 
@@ -10,7 +11,7 @@ public class LostCitiesImp implements ILostCities {
 
     @Nullable
     @Override
-    public ILostChunkGenerator getLostGenerator(int dimension) {
+    public ILostChunkGenerator getLostGenerator(DimensionType dimension) {
         return WorldTypeTools.getChunkGenerator(dimension);
     }
 }

@@ -1,10 +1,11 @@
 package mcjty.lostcities.dimensions.world;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.Heightmap;
 
 public class WorldGenerationTools {
 
@@ -21,7 +22,7 @@ public class WorldGenerationTools {
 
 
     public static int findSuitableEmptySpot(World world, int x, int z) {
-        int y = world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z)).getY();
+        int y = world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, new BlockPos(x, 0, z)).getY();
         if (y == -1) {
             return -1;
         }
@@ -33,7 +34,7 @@ public class WorldGenerationTools {
         }
 
 
-        IBlockState state = world.getBlockState(new BlockPos(x, y + 1, z));
+        BlockState state = world.getBlockState(new BlockPos(x, y + 1, z));
         Block block = state.getBlock();
         while (block.getMaterial(state).isLiquid()) {
             y++;
@@ -52,7 +53,7 @@ public class WorldGenerationTools {
         if (world.isAirBlock(new BlockPos(x, y, z))) {
             return false;
         }
-        IBlockState state = world.getBlockState(new BlockPos(x, y, z));
+        BlockState state = world.getBlockState(new BlockPos(x, y, z));
         Block block = state.getBlock();
         return block.getMaterial(state).blocksMovement();
     }

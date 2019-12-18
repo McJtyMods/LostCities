@@ -1,18 +1,6 @@
 package mcjty.lostcities.gui;
 
-import com.google.common.collect.Lists;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.List;
-
-@SideOnly(Side.CLIENT)
-public class GuiMutableLabel extends Gui {
+public class GuiMutableLabel {} /* @todo 1.14 extends Screen {
     protected int width = 200;
     protected int height = 20;
     public int x;
@@ -54,9 +42,6 @@ public class GuiMutableLabel extends Gui {
         labels.clear();
     }
 
-    /**
-     * Sets the Label to be centered
-     */
     public GuiMutableLabel setCentered() {
         this.centered = true;
         return this;
@@ -94,3 +79,4 @@ public class GuiMutableLabel extends Gui {
         }
     }
 }
+*/

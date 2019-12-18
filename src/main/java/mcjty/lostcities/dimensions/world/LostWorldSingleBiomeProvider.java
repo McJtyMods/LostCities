@@ -1,13 +1,13 @@
 package mcjty.lostcities.dimensions.world;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeProvider;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.gen.feature.structure.Structure;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class LostWorldSingleBiomeProvider extends BiomeProvider {
     /**
@@ -29,28 +29,11 @@ public class LostWorldSingleBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    public Biome[] getBiomesForGeneration(Biome[] biomes, int x, int z, int width, int height) {
-        if (biomes == null || biomes.length < width * height) {
-            biomes = new Biome[width * height];
-        }
-
-        Arrays.fill(biomes, 0, width * height, this.biome);
+    public Biome[] getBiomes(int x, int z, int width, int length, boolean cacheFlag) {
+        // @todo 1.14: is this right?
+        Biome[] biomes = new Biome[width * length];
+        Arrays.fill(biomes, 0, width * length, this.biome);
         return biomes;
-    }
-
-    @Override
-    public Biome[] getBiomes(@Nullable Biome[] oldBiomeList, int x, int z, int width, int depth) {
-        if (oldBiomeList == null || oldBiomeList.length < width * depth) {
-            oldBiomeList = new Biome[width * depth];
-        }
-
-        Arrays.fill(oldBiomeList, 0, width * depth, this.biome);
-        return oldBiomeList;
-    }
-
-    @Override
-    public Biome[] getBiomes(@Nullable Biome[] listToReuse, int x, int z, int width, int length, boolean cacheFlag) {
-        return this.getBiomes(listToReuse, x, z, width, length);
     }
 
     @Override
@@ -60,17 +43,37 @@ public class LostWorldSingleBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    public boolean areBiomesViable(int x, int z, int radius, List<Biome> allowed) {
-        return allowed.contains(this.biome);
+    public Biome getBiome(int x, int y) {
+        return biome;
     }
 
     @Override
-    public boolean isFixedBiome() {
-        return true;
+    public Set<Biome> getBiomesInSquare(int centerX, int centerZ, int sideLength) {
+        return Collections.singleton(biome);
     }
 
     @Override
-    public Biome getFixedBiome() {
-        return this.biome;
+    public boolean hasStructure(Structure<?> structureIn) {
+        return false;
     }
+
+    @Override
+    public Set<BlockState> getSurfaceBlocks() {
+        return Collections.emptySet();
+    }
+
+    //    @Override
+//    public boolean areBiomesViable(int x, int z, int radius, List<Biome> allowed) {
+//        return allowed.contains(this.biome);
+//    }
+
+//    @Override
+//    public boolean isFixedBiome() {
+//        return true;
+//    }
+
+//    @Override
+//    public Biome getFixedBiome() {
+//        return this.biome;
+//    }
 }

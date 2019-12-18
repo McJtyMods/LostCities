@@ -24,7 +24,7 @@ public class DamageArea {
     private final LostCityProfile profile;
 
     public DamageArea(int chunkX, int chunkZ, LostCityChunkGenerator provider, BuildingInfo info) {
-        this.seed = provider.seed;
+        this.seed = provider.getSeed();
         this.profile = info.profile;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
@@ -176,7 +176,7 @@ public class DamageArea {
     public float getDamageFactor() {
         float damage = 0.0f;
         for (Explosion explosion : explosions) {
-            double sq = explosion.getCenter().distanceSq(chunkX * 16, explosion.getCenter().getY(), chunkZ * 16);
+            double sq = explosion.getCenter().distanceSq(chunkX * 16.0, (double) explosion.getCenter().getY(), chunkZ * 16.0, true);
             if (sq < explosion.getSqradius()) {
                 double d = Math.sqrt(sq);
                 damage += 3.0f * (explosion.getRadius() - d) / explosion.getRadius();
@@ -189,7 +189,7 @@ public class DamageArea {
     public float getDamage(int x, int y, int z) {
         float damage = 0.0f;
         for (Explosion explosion : explosions) {
-            double sq = explosion.getCenter().distanceSq(x, y, z);
+            double sq = explosion.getCenter().distanceSq(x, y, z, true);
             if (sq < explosion.getSqradius()) {
                 double d = Math.sqrt(sq);
                 damage += 3.0f * (explosion.getRadius() - d) / explosion.getRadius();

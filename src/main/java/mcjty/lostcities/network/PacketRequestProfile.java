@@ -1,48 +1,41 @@
 package mcjty.lostcities.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.WorldTypeTools;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import mcjty.lostcities.varia.WorldTools;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketRequestProfile implements IMessage {
+import java.util.function.Supplier;
 
-    private int dimension;
+public class PacketRequestProfile {
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        dimension = buf.readInt();
+    private DimensionType dimension;
+
+    public PacketRequestProfile(PacketBuffer buf) {
+        dimension = DimensionType.getById(buf.readInt());
     }
 
-    @Override
-    public void toBytes(ByteBuf buf) {
-        buf.writeInt(dimension);
+    public void toBytes(PacketBuffer buf) {
+        buf.writeInt(dimension.getId());
     }
 
     public PacketRequestProfile() {
     }
 
-    public PacketRequestProfile(int dimension) {
+    public PacketRequestProfile(DimensionType dimension) {
         this.dimension = dimension;
     }
 
-    public static class Handler implements IMessageHandler<PacketRequestProfile, IMessage> {
-        @Override
-        public IMessage onMessage(PacketRequestProfile message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketRequestProfile message, MessageContext ctx) {
-            EntityPlayerMP player = ctx.getServerHandler().player;
-            LostCityProfile profile = WorldTypeTools.getProfile(DimensionManager.getWorld(message.dimension));
-            PacketHandler.INSTANCE.sendTo(new PacketReturnProfileToClient(message.dimension, profile.getName()), player);
-        }
+    public void handle(Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            ServerPlayerEntity player = ctx.get().getSender();
+            LostCityProfile profile = WorldTypeTools.getProfile(WorldTools.getWorld(dimension));
+            PacketHandler.INSTANCE.sendTo(new PacketReturnProfileToClient(dimension, profile.getName()), player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+        });
+        ctx.get().setPacketHandled(true);
     }
-
 }

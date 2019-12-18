@@ -96,7 +96,7 @@ public class Railway {
      * The station grid repeats every 9 chunks. There is never a station at every 18/18 multiple chunk
      */
     private static RailChunkInfo getRailChunkTypeInternal(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
-        Random rand = new QualityRandom(provider.seed + chunkZ * 2600003897L + chunkX * 43600002517L);
+        Random rand = new QualityRandom(provider.getSeed() + chunkZ * 2600003897L + chunkX * 43600002517L);
         rand.nextFloat();
         rand.nextFloat();
 
@@ -304,7 +304,7 @@ public class Railway {
     }
 
     public static RailChunkInfo getRailChunkType(int chunkX, int chunkZ, LostCityChunkGenerator provider, LostCityProfile profile) {
-        ChunkCoord key = new ChunkCoord(provider.dimensionId, chunkX, chunkZ);
+        ChunkCoord key = new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ);
         if (railInfo.containsKey(key)) {
             return railInfo.get(key);
         }

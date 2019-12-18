@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class Palette implements ILostCityAsset {
 
     private String name;
     final Map<Character, Object> palette = new HashMap<>();
-    private final Map<IBlockState, IBlockState> damaged = new HashMap<>();
+    private final Map<BlockState, BlockState> damaged = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
     private final Map<Character, String> lootTables = new HashMap<>(); // For chests
     private final Map<Character, Map<String, Integer>> torchOrientations = new HashMap<>(); // For torches
@@ -50,7 +50,7 @@ public class Palette implements ILostCityAsset {
         return name;
     }
 
-    public Map<IBlockState, IBlockState> getDamaged() {
+    public Map<BlockState, BlockState> getDamaged() {
         return damaged;
     }
 
@@ -82,7 +82,7 @@ public class Palette implements ILostCityAsset {
             JsonObject o = element.getAsJsonObject();
             Object value = null;
             Character c = o.get("char").getAsCharacter();
-            IBlockState dmg = null;
+            BlockState dmg = null;
             if (o.has("damaged")) {
                 dmg = Tools.stringToState(o.get("damaged").getAsString());
             }
@@ -104,7 +104,7 @@ public class Palette implements ILostCityAsset {
             }
             if (o.has("block")) {
                 String block = o.get("block").getAsString();
-                IBlockState state = Tools.stringToState(block);
+                BlockState state = Tools.stringToState(block);
                 palette.put(c, state);
                 if (dmg != null) {
                     damaged.put(state, dmg);
@@ -114,12 +114,12 @@ public class Palette implements ILostCityAsset {
                 palette.put(c, value);
             } else if (o.has("blocks")) {
                 JsonArray array = o.get("blocks").getAsJsonArray();
-                List<Pair<Integer, IBlockState>> blocks = new ArrayList<>();
+                List<Pair<Integer, BlockState>> blocks = new ArrayList<>();
                 for (JsonElement el : array) {
                     JsonObject ob = el.getAsJsonObject();
                     Integer f = ob.get("random").getAsInt();
                     String block = ob.get("block").getAsString();
-                    IBlockState state = Tools.stringToState(block);
+                    BlockState state = Tools.stringToState(block);
                     blocks.add(Pair.of(f, state));
                     if (dmg != null) {
                         damaged.put(state, dmg);
@@ -148,8 +148,8 @@ public class Palette implements ILostCityAsset {
         for (Map.Entry<Character, Object> entry : palette.entrySet()) {
             JsonObject o = new JsonObject();
             o.add("char", new JsonPrimitive(entry.getKey()));
-            if (entry.getValue() instanceof IBlockState) {
-                IBlockState state = (IBlockState) entry.getValue();
+            if (entry.getValue() instanceof BlockState) {
+                BlockState state = (BlockState) entry.getValue();
                 o.add("block", new JsonPrimitive(Tools.stateToString(state)));
                 if (damaged.containsKey(state)) {
                     o.add("damaged", new JsonPrimitive(Tools.stateToString(damaged.get(state))));
@@ -171,13 +171,13 @@ public class Palette implements ILostCityAsset {
         return object;
     }
 
-    public Palette addMapping(char c, IBlockState state) {
+    public Palette addMapping(char c, BlockState state) {
         palette.put(c, state);
         return this;
     }
 
     @SafeVarargs
-    private final Palette addMappingViaState(char c, Pair<Integer, IBlockState>... randomBlocks) {
+    private final Palette addMappingViaState(char c, Pair<Integer, BlockState>... randomBlocks) {
         palette.put(c, randomBlocks);
         return this;
     }

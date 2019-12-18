@@ -1,30 +1,27 @@
 package mcjty.lostcities.dimensions.world.terraingen;
 
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
-import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
-import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
 
 public class SpaceTerrainGenerator {
     private LostCityChunkGenerator provider;
 
-    private NoiseGeneratorPerlin surfaceNoise;
+    private PerlinNoiseGenerator surfaceNoise;
     private double[] surfaceBuffer = new double[256];
     private IPrimerDriver driver;
 
     public void setup(World world, LostCityChunkGenerator provider) {
         this.provider = provider;
-        this.surfaceNoise = new NoiseGeneratorPerlin(provider.rand, 4);
-        driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
+        this.surfaceNoise = new PerlinNoiseGenerator(provider.rand, 4);
+        driver = new SafeDriver();
     }
 
 
@@ -42,7 +39,8 @@ public class SpaceTerrainGenerator {
         Character baseChar = terrainGenerator.baseChar;
         char airChar = LostCitiesTerrainGenerator.airChar;
 
-        this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
+        // @todo 1.14
+//        this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
 
         if (sphere.isEnabled()) {
             float radius = sphere.getRadius();
@@ -190,8 +188,8 @@ public class SpaceTerrainGenerator {
         char baseBlock = terrainGenerator.baseChar;
         char gravelBlock = LostCitiesTerrainGenerator.gravelChar;
 
-        char fillerBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
-        char topBlock = (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
+        char fillerBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
+        char topBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
 
         int cx = x & 15;
         int cz = z & 15;

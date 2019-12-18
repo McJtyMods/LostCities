@@ -2,12 +2,11 @@ package mcjty.lostcities.config;
 
 import mcjty.lostcities.LostCities;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -36,10 +35,10 @@ public class LostCityProfile {
     public int DEBRIS_TO_NEARBYCHUNK_FACTOR = 200;
 
     private String LIQUID_BLOCK = "minecraft:water";
-    private IBlockState liquidBlock = null;
+    private BlockState liquidBlock = null;
 
     private String BASE_BLOCK = "minecraft:stone";
-    private IBlockState baseBlock = null;
+    private BlockState baseBlock = null;
 
     public float VINE_CHANCE = 0.009f;
     public float CHANCE_OF_RANDOM_LEAFBLOCKS = .1f;
@@ -549,9 +548,10 @@ public class LostCityProfile {
                 } else {
                     float f = Float.parseFloat(split[1]);
                     String biomeId = split[0];
-                    Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
+                    Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(biomeId));
                     if (biome != null) {
-                        biomeFactorMap.put(Biome.REGISTRY.getNameForObject(biome).toString(), f);
+                        biomeFactorMap.put(biome.getRegistryName().toString(), f);
+//                        biomeFactorMap.put(Biome.REGISTRY.getNameForObject(biome).toString(), f);
                     }
                 }
             }
@@ -573,7 +573,7 @@ public class LostCityProfile {
 
     public boolean isCavern() { return LANDSCAPE_TYPE == LandscapeType.CAVERN; }
 
-    public IBlockState getLiquidBlock() {
+    public BlockState getLiquidBlock() {
         if (liquidBlock == null) {
             Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LIQUID_BLOCK));
             if (b == null) {
@@ -586,7 +586,7 @@ public class LostCityProfile {
         return liquidBlock;
     }
 
-    public IBlockState getBaseBlock() {
+    public BlockState getBaseBlock() {
         if (baseBlock == null) {
             Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(BASE_BLOCK));
             if (b == null) {

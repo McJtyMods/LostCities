@@ -4,11 +4,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class PredefinedSphere implements ILostCityAsset {
 
     private String name;
-    private int dimension;
+    private DimensionType dimension;
     private int chunkX;
     private int chunkZ;
     private int centerX;
@@ -32,7 +35,7 @@ public class PredefinedSphere implements ILostCityAsset {
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
-        dimension = object.get("dimension").getAsInt();
+        dimension = DimensionType.byName(new ResourceLocation(object.get("dimension").getAsString()));
         chunkX = object.get("chunkx").getAsInt();
         chunkZ = object.get("chunkz").getAsInt();
         centerX = object.get("centerx").getAsInt();
@@ -60,7 +63,7 @@ public class PredefinedSphere implements ILostCityAsset {
         return object;
     }
 
-    public int getDimension() {
+    public DimensionType getDimension() {
         return dimension;
     }
 

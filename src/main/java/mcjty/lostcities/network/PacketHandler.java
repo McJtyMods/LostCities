@@ -1,15 +1,16 @@
 package mcjty.lostcities.network;
 
 
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+import mcjty.lostcities.LostCities;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class PacketHandler {
     private static int ID = 12;
     private static int packetId = 0;
 
-    public static SimpleNetworkWrapper INSTANCE = null;
+    public static SimpleChannel INSTANCE = null;
 
     public static int nextPacketID() {
         return packetId++;
@@ -23,15 +24,21 @@ public class PacketHandler {
     }
 
     public static void registerMessages(String channelName) {
-        INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(channelName);
+        INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(LostCities.MODID, channelName), () -> "1.0", s -> true, s -> true);
         registerMessages();
     }
 
     public static void registerMessages() {
         // Server side
-        INSTANCE.registerMessage(PacketRequestProfile.Handler.class, PacketRequestProfile.class, nextID(), Side.SERVER);
+        INSTANCE.registerMessage(nextID(), PacketRequestProfile.class,
+                PacketRequestProfile::toBytes,
+                PacketRequestProfile::new,
+                PacketRequestProfile::handle);
 
         // Client side
-        INSTANCE.registerMessage(PacketReturnProfileToClient.Handler.class, PacketReturnProfileToClient.class, nextID(), Side.CLIENT);
+        INSTANCE.registerMessage(nextID(), PacketReturnProfileToClient.class,
+                PacketReturnProfileToClient::toBytes,
+                PacketReturnProfileToClient::new,
+                PacketReturnProfileToClient::handle);
     }
 }

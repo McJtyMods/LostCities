@@ -5,71 +5,79 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.ModDimensions;
 import mcjty.lostcities.setup.ModSetup;
-import net.minecraft.world.DimensionType;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.OverworldGenSettings;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-public class LostWorldProvider extends WorldProvider {
+public class LostWorldProvider extends Dimension {
+
+    public LostWorldProvider(World worldIn) {
+        super(worldIn, ModDimensions.lostDimensionType);
+    }
+
+    // @todo 1.14
+//    @Override
+//    @Nonnull
+//    public String getSaveFolder() {
+//        if (getDimension() == LostCityConfiguration.DIMENSION_ID) {
+//            return "LOST";
+//        } else {
+//            return "LOST" + getDimension();
+//        }
+//    }
 
     @Override
     @Nonnull
-    public DimensionType getDimensionType() {
-        return ModDimensions.lostDimensionType;
+    public ChunkGenerator createChunkGenerator() {
+//        return new LostCityChunkGenerator(world, (world.getSeed() >> 3) ^ 34328884229L);
+        // @todo 1.14
+        return new LostCityChunkGenerator(world, null, new OverworldGenSettings());
     }
 
-    @Override
-    @Nonnull
-    public String getSaveFolder() {
-        if (getDimension() == LostCityConfiguration.DIMENSION_ID) {
-            return "LOST";
-        } else {
-            return "LOST" + getDimension();
-        }
-    }
+    // @todo 1.14
+//    private BiomeProvider getInternalBiomeProvider(World world) {
+//        if (biomeProvider == null) {
+//            for (WorldType type : WorldType.WORLD_TYPES) {
+//                if ("BIOMESOP".equals(type.getName())) {
+//                    WorldType orig = world.getWorldInfo().getTerrainType();
+//                    world.getWorldInfo().setTerrainType(type);
+//                    biomeProvider = type.getBiomeProvider(world);
+//                    world.getWorldInfo().setTerrainType(orig);
+//                    break;
+//                }
+//            }
+//        }
+//        return biomeProvider;
+//    }
 
-    @Override
-    @Nonnull
-    public IChunkGenerator createChunkGenerator() {
-        return new LostCityChunkGenerator(world, (world.getSeed() >> 3) ^ 34328884229L);
-    }
-
-    private BiomeProvider getInternalBiomeProvider(World world) {
-        if (biomeProvider == null) {
-            for (WorldType type : WorldType.WORLD_TYPES) {
-                if ("BIOMESOP".equals(type.getName())) {
-                    WorldType orig = world.getWorldInfo().getTerrainType();
-                    world.getWorldInfo().setTerrainType(type);
-                    biomeProvider = type.getBiomeProvider(world);
-                    world.getWorldInfo().setTerrainType(orig);
-                    break;
-                }
-            }
-        }
-        return biomeProvider;
-    }
-
-    @Override
+    // @todo 1.14
+//    @Override
     protected void init() {
-        super.init();
+//        super.init();
 
-        String profileName = ModDimensions.dimensionProfileMap.get(world.provider.getDimension());
+        String profileName = ModDimensions.dimensionProfileMap.get(world.getDimension().getType());
         LostCityProfile profile = LostCityConfiguration.profiles.get(profileName);
         if (profile == null) {
             profile = WorldTypeTools.getProfile(world);
         }
         BiomeProvider biomeProvider;
         if (ModSetup.biomesoplenty && LostCityConfiguration.DIMENSION_BOP) {
-            biomeProvider = getInternalBiomeProvider(world);
+            biomeProvider = null; // @todo 1.14 getInternalBiomeProvider(world);
         } else {
-            biomeProvider = new BiomeProvider(world.getWorldInfo());
+//            biomeProvider = new BiomeProvider(world.getWorldInfo());
+            biomeProvider = null;
         }
         if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
-            this.biomeProvider = biomeProvider;
+            // @todo 1.14
+//            this.biomeProvider = biomeProvider;
         } else {
             String[] outsideAllowedbiomeFactors = profile.ALLOWED_BIOME_FACTORS;
             String[] outsideManualBiomeMapping = profile.MANUAL_BIOME_MAPPINGS;
@@ -80,14 +88,53 @@ public class LostWorldProvider extends WorldProvider {
                 outsideManualBiomeMapping = outProfile.MANUAL_BIOME_MAPPINGS;
                 outsideStrategy = outProfile.BIOME_SELECTION_STRATEGY;
             }
-            this.biomeProvider = new LostWorldFilteredBiomeProvider(world, biomeProvider,
-                    profile.ALLOWED_BIOME_FACTORS,
-                    profile.MANUAL_BIOME_MAPPINGS,
-                    profile.BIOME_SELECTION_STRATEGY,
-                    outsideAllowedbiomeFactors,
-                    outsideManualBiomeMapping,
-                    outsideStrategy);
+            // @todo 1.14
+//            this.biomeProvider = new LostWorldFilteredBiomeProvider(world, biomeProvider,
+//                    profile.ALLOWED_BIOME_FACTORS,
+//                    profile.MANUAL_BIOME_MAPPINGS,
+//                    profile.BIOME_SELECTION_STRATEGY,
+//                    outsideAllowedbiomeFactors,
+//                    outsideManualBiomeMapping,
+//                    outsideStrategy);
         }
     }
 
+
+    // @todo 1.14 for all below
+    @Nullable
+    @Override
+    public BlockPos findSpawn(ChunkPos chunkPosIn, boolean checkValid) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public BlockPos findSpawn(int posX, int posZ, boolean checkValid) {
+        return null;
+    }
+
+    @Override
+    public float calculateCelestialAngle(long worldTime, float partialTicks) {
+        return 0;
+    }
+
+    @Override
+    public boolean isSurfaceWorld() {
+        return false;
+    }
+
+    @Override
+    public Vec3d getFogColor(float celestialAngle, float partialTicks) {
+        return null;
+    }
+
+    @Override
+    public boolean canRespawnHere() {
+        return false;
+    }
+
+    @Override
+    public boolean doesXZShowFog(int x, int z) {
+        return false;
+    }
 }

@@ -10,22 +10,25 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.PredefinedCity;
 import mcjty.lostcities.dimensions.world.lost.cityassets.PredefinedSphere;
 import mcjty.lostcities.varia.CustomTeleporter;
+import mcjty.lostcities.varia.WorldTools;
+import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockBed;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
@@ -35,8 +38,8 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
-        World world = event.getWorld();
-        if (!world.isRemote) {
+        IWorld world = event.getWorld();
+        if (!world.isRemote()) {
             if (!WorldTypeTools.isLostCities(world)) {
                 return;
             }
@@ -46,7 +49,7 @@ public class ForgeEventHandlers {
                 return;
             }
 
-            LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world);
+            LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world.getWorld());
 
             Predicate<BlockPos> isSuitable = pos -> true;
             boolean needsCheck = false;
@@ -65,7 +68,7 @@ public class ForgeEventHandlers {
                     LostCities.setup.getLogger().error("Cannot find city '" + profile.SPAWN_CITY + "' for the player to spawn in !");
                 } else {
                     float sqradius = getSqRadius(city.getRadius(), 0.8f);
-                    isSuitable = blockPos -> city.getDimension() == world.provider.getDimension() &&
+                    isSuitable = blockPos -> city.getDimension() == world.getWorld().getDimension().getType() &&
                             CitySphere.squaredDistance(city.getChunkX()*16+8, city.getChunkZ()*16+8, blockPos.getX(), blockPos.getZ()) < sqradius;
                     needsCheck = true;
                 }
@@ -96,7 +99,7 @@ public class ForgeEventHandlers {
                         LostCities.setup.getLogger().error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
                     } else {
                         float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
-                        isSuitable = blockPos -> sphere.getDimension() == world.provider.getDimension() &&
+                        isSuitable = blockPos -> sphere.getDimension() == world.getDimension().getType() &&
                                 CitySphere.squaredDistance(sphere.getChunkX() * 16 + 8, sphere.getChunkZ() * 16 + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
                         needsCheck = true;
                     }
@@ -113,13 +116,13 @@ public class ForgeEventHandlers {
                 case DEFAULT:
                 case CAVERN:
                     if (needsCheck) {
-                        findSafeSpawnPoint(world, provider, isSuitable);
+                        findSafeSpawnPoint(world.getWorld(), provider, isSuitable);
                         event.setCanceled(true);
                     }
                     break;
                 case FLOATING:
                 case SPACE:
-                    findSafeSpawnPoint(world, provider, isSuitable);
+                    findSafeSpawnPoint(world.getWorld(), provider, isSuitable);
                     event.setCanceled(true);
                     break;
             }
@@ -171,16 +174,18 @@ public class ForgeEventHandlers {
     }
 
     private boolean isValidStandingPosition(World world, BlockPos pos) {
-        IBlockState state = world.getBlockState(pos);
-        return state.getBlock().isTopSolid(state) && state.getBlock().isFullCube(state) && state.getBlock().isOpaqueCube(state) && world.isAirBlock(pos.up()) && world.isAirBlock(pos.up(2));
+        BlockState state = world.getBlockState(pos);
+//        return state.getBlock().isTopSolid(state) && state.getBlock().isFullCube(state) && state.getBlock().isOpaqueCube(state) && world.isAirBlock(pos.up()) && world.isAirBlock(pos.up(2));
+        // @todo 1.14
+        return state.getBlock().isSolid(state);
     }
 
     private boolean isValidSpawnBed(World world, BlockPos pos) {
-        IBlockState state = world.getBlockState(pos);
-        if (!(state.getBlock() instanceof BlockBed)) {
+        BlockState state = world.getBlockState(pos);
+        if (!(state.getBlock() instanceof BedBlock)) {
             return false;
         }
-        EnumFacing direction = Blocks.BED.getBedDirection(state, world, pos);
+        Direction direction = Blocks.BLACK_BED.getBedDirection(state, world, pos);
         Block b1 = world.getBlockState(pos.down()).getBlock();
         Block b2 = world.getBlockState(pos.offset(direction.getOpposite()).down()).getBlock();
         Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LostCityConfiguration.SPECIAL_BED_BLOCK));
@@ -188,22 +193,22 @@ public class ForgeEventHandlers {
             return false;
         }
         // Check if the bed is surrounded by 6 skulls
-        if (world.getBlockState(pos.offset(direction)).getBlock() != Blocks.SKULL) {
+        if (world.getBlockState(pos.offset(direction)).getBlock() != Blocks.SKELETON_SKULL) {   // @todo 1.14 other skulls!
             return false;
         }
-        if (world.getBlockState(pos.offset(direction.rotateY())).getBlock() != Blocks.SKULL) {
+        if (world.getBlockState(pos.offset(direction.rotateY())).getBlock() != Blocks.SKELETON_SKULL) {
             return false;
         }
-        if (world.getBlockState(pos.offset(direction.rotateYCCW())).getBlock() != Blocks.SKULL) {
+        if (world.getBlockState(pos.offset(direction.rotateYCCW())).getBlock() != Blocks.SKELETON_SKULL) {
             return false;
         }
-        if (world.getBlockState(pos.offset(direction.getOpposite(), 2)).getBlock() != Blocks.SKULL) {
+        if (world.getBlockState(pos.offset(direction.getOpposite(), 2)).getBlock() != Blocks.SKELETON_SKULL) {
             return false;
         }
-        if (world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateY())).getBlock() != Blocks.SKULL) {
+        if (world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateY())).getBlock() != Blocks.SKELETON_SKULL) {
             return false;
         }
-        if (world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateYCCW())).getBlock() != Blocks.SKULL) {
+        if (world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateYCCW())).getBlock() != Blocks.SKELETON_SKULL) {
             return false;
         }
         return true;
@@ -271,7 +276,7 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onPlayerSleepInBedEvent(PlayerSleepInBedEvent event) {
-        if (LostCityConfiguration.DIMENSION_ID == -1) {
+        if (LostCityConfiguration.DIMENSION_ID == null) {
             return;
         }
 
@@ -284,21 +289,21 @@ public class ForgeEventHandlers {
             return;
         }
 
-        if (world.provider.getDimension() == LostCityConfiguration.DIMENSION_ID) {
+        if (world.getDimension().getType() == LostCityConfiguration.DIMENSION_ID) {
             event.setResult(Event.Result.DENY);
-            WorldServer destWorld = DimensionManager.getWorld(0);
+            ServerWorld destWorld = WorldTools.getOverworld(world);
             BlockPos location = findLocation(bedLocation, destWorld);
-            CustomTeleporter.teleportToDimension(event.getEntityPlayer(), 0, location);
+            CustomTeleporter.teleportToDimension(event.getEntityPlayer(), DimensionType.OVERWORLD, location);
         } else {
             event.setResult(Event.Result.DENY);
-            WorldServer destWorld = event.getEntity().getEntityWorld().getMinecraftServer().getWorld(LostCityConfiguration.DIMENSION_ID);
+            ServerWorld destWorld = event.getEntity().getEntityWorld().getServer().getWorld(LostCityConfiguration.DIMENSION_ID);
             BlockPos location = findLocation(bedLocation, destWorld);
             CustomTeleporter.teleportToDimension(event.getEntityPlayer(), LostCityConfiguration.DIMENSION_ID, location);
         }
     }
 
-    private BlockPos findLocation(BlockPos bedLocation, WorldServer destWorld) {
-        BlockPos top = destWorld.getTopSolidOrLiquidBlock(bedLocation);
+    private BlockPos findLocation(BlockPos bedLocation, ServerWorld destWorld) {
+        BlockPos top = destWorld.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, bedLocation);
         BlockPos location = findValidTeleportLocation(destWorld, top);
         if (location == null) {
             location = top;

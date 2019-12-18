@@ -3,8 +3,8 @@ package mcjty.lostcities.dimensions.world;
 import mcjty.lostcities.api.IChunkPrimerFactory;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.gen.ChunkGenerator;
 
 public class LostWorldTypeAdapter extends LostWorldType {
 
@@ -15,27 +15,28 @@ public class LostWorldTypeAdapter extends LostWorldType {
 
     private final String otherWorldtype;
     private BiomeProvider biomeProvider = null;
-    private IChunkGenerator otherGenerator = null;
+    private ChunkGenerator otherGenerator = null;
     private IChunkPrimerFactory factory = null;
 
-
     @Override
-    public IChunkGenerator getChunkGenerator(World world, String generatorOptions) {
+    public ChunkGenerator<?> createChunkGenerator(World world) {
         if (otherGenerator == null) {
             for (WorldType type : WorldType.WORLD_TYPES) {
                 if (otherWorldtype.equals(type.getName())) {
-                    WorldType orig = world.getWorldInfo().getTerrainType();
-                    world.getWorldInfo().setTerrainType(type);
-                    otherGenerator = type.getChunkGenerator(world, generatorOptions);
-                    world.getWorldInfo().setTerrainType(orig);
-                    if (otherGenerator instanceof IChunkPrimerFactory) {
-                        factory = (IChunkPrimerFactory) otherGenerator;
-                    }
+                    // @todo 1.14
+//                    WorldType orig = world.getWorldInfo().getTerrainType();
+//                    world.getWorldInfo().setTerrainType(type);
+//                    otherGenerator = type.getChunkGenerator(world, generatorOptions);
+//                    world.getWorldInfo().setTerrainType(orig);
+//                    if (otherGenerator instanceof IChunkPrimerFactory) {
+//                        factory = (IChunkPrimerFactory) otherGenerator;
+//                    }
                     break;
                 }
             }
         }
-        return new LostCityChunkGenerator(world, factory);
+//        return new LostCityChunkGenerator(world, factory);
+        return null;
     }
 
     @Override
@@ -43,10 +44,11 @@ public class LostWorldTypeAdapter extends LostWorldType {
         if (biomeProvider == null) {
             for (WorldType type : WorldType.WORLD_TYPES) {
                 if (otherWorldtype.equals(type.getName())) {
-                    WorldType orig = world.getWorldInfo().getTerrainType();
-                    world.getWorldInfo().setTerrainType(type);
-                    biomeProvider = type.getBiomeProvider(world);
-                    world.getWorldInfo().setTerrainType(orig);
+                    // @todo 1.14
+//                    WorldType orig = world.getWorldInfo().getTerrainType();
+//                    world.getWorldInfo().setTerrainType(type);
+//                    biomeProvider = type.getBiomeProvider(world);
+//                    world.getWorldInfo().setTerrainType(orig);
                     break;
                 }
             }

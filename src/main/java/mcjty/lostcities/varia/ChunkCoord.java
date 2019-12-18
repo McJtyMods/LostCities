@@ -1,19 +1,20 @@
 package mcjty.lostcities.varia;
 
 import mcjty.lostcities.dimensions.world.lost.Orientation;
+import net.minecraft.world.dimension.DimensionType;
 
 public class ChunkCoord {
-    private final int dimension;
+    private final DimensionType dimension;
     private final int chunkX;
     private final int chunkZ;
 
-    public ChunkCoord(int dimension, int chunkX, int chunkZ) {
+    public ChunkCoord(DimensionType dimension, int chunkX, int chunkZ) {
         this.dimension = dimension;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
     }
 
-    public int getDimension() {
+    public DimensionType getDimension() {
         return dimension;
     }
 
@@ -71,7 +72,7 @@ public class ChunkCoord {
 
     @Override
     public int hashCode() {
-        int result = dimension;
+        int result = dimension.getId();
         result = 31 * result + chunkX;
         result = 31 * result + chunkZ;
         return result;

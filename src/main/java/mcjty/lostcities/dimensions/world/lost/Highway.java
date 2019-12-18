@@ -3,7 +3,7 @@ package mcjty.lostcities.dimensions.world.lost;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.varia.ChunkCoord;
-import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +12,8 @@ import java.util.function.Function;
 
 public class Highway {
 
-    private static NoiseGeneratorPerlin perlinX = null;
-    private static NoiseGeneratorPerlin perlinZ = null;
+    private static PerlinNoiseGenerator perlinX = null;
+    private static PerlinNoiseGenerator perlinZ = null;
     private static Map<ChunkCoord, Integer> xHighwayLevelCache = new HashMap<>();
     private static Map<ChunkCoord, Integer> zHighwayLevelCache = new HashMap<>();
 
@@ -21,11 +21,11 @@ public class Highway {
     private static void makePerlin(long seed) {
         if (perlinX == null) {
             Random random = new Random(seed);
-            perlinX = new NoiseGeneratorPerlin(random, 4);
+            perlinX = new PerlinNoiseGenerator(random, 4);
         }
         if (perlinZ == null) {
             Random random = new Random(seed ^ 879190747L);
-            perlinZ = new NoiseGeneratorPerlin(random, 4);
+            perlinZ = new PerlinNoiseGenerator(random, 4);
         }
     }
 
@@ -41,7 +41,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getXHighwayLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider, LostCityProfile profile) {
-        return getHighwayLevel(provider, profile, Highway.xHighwayLevelCache, cp -> hasXHighway(cp, profile), Orientation.X, new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+        return getHighwayLevel(provider, profile, Highway.xHighwayLevelCache, cp -> hasXHighway(cp, profile), Orientation.X, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
     }
 
     /**
@@ -49,7 +49,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getZHighwayLevel(int chunkX, int chunkZ, LostCityChunkGenerator provider, LostCityProfile profile) {
-        return getHighwayLevel(provider, profile, Highway.zHighwayLevelCache, cp -> hasZHighway(cp, profile), Orientation.Z, new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+        return getHighwayLevel(provider, profile, Highway.zHighwayLevelCache, cp -> hasZHighway(cp, profile), Orientation.Z, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
     }
 
     private static int getHighwayLevel(LostCityChunkGenerator provider, LostCityProfile profile, Map<ChunkCoord, Integer> cache, Function<ChunkCoord, Boolean> hasHighway, Orientation orientation, ChunkCoord cp) {
@@ -75,7 +75,7 @@ public class Highway {
             return -1;
         }
 
-        makePerlin(provider.seed);
+        makePerlin(provider.getSeed());
         if (hasHighway.apply(cp)) {
             // This is part of a highway. Find the left-most chunk that is still part of this highway
             ChunkCoord lower = cp.lower(orientation);

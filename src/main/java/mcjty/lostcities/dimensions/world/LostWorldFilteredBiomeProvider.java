@@ -3,15 +3,19 @@ package mcjty.lostcities.dimensions.world;
 import mcjty.lostcities.config.BiomeSelectionStrategy;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeProvider;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class LostWorldFilteredBiomeProvider extends BiomeProvider {
 
@@ -40,7 +44,7 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
 
     private LostCityChunkGenerator getProvider() {
         if (provider == null) {
-            provider = WorldTypeTools.getChunkGenerator(world.provider.getDimension());
+            provider = WorldTypeTools.getChunkGenerator(world.getDimension().getType());
         }
         return provider;
     }
@@ -50,7 +54,7 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
     public Biome getBiome(BlockPos pos) {
         LostCityProfile profile = WorldTypeTools.getProfile(world);
         Biome originalBiome = original.getBiome(pos);
-        if (!(world instanceof WorldServer)) {
+        if (!(world instanceof ServerWorld)) {
             return originalBiome;
         }
 
@@ -81,7 +85,7 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
     }
 
     private void translateList(Biome[] biomes, int topx, int topz, int width, int height) {
-        if (!(world instanceof WorldServer)) {
+        if (!(world instanceof ServerWorld)) {
             return;
         }
 
@@ -125,57 +129,55 @@ public class LostWorldFilteredBiomeProvider extends BiomeProvider {
     }
 
     @Override
-    public Biome[] getBiomesForGeneration(Biome[] biomes, int x, int z, int width, int height) {
-        biomes = original.getBiomesForGeneration(biomes, x, z, width, height);
-        translateList(biomes, x, z, width, height);
+    public Biome[] getBiomes(int x, int z, int width, int length, boolean cacheFlag) {
+        Biome[] biomes = original.getBiomes(x, z, width, length, cacheFlag);
+        translateList(biomes, x, z, width, length);
         return biomes;
     }
 
     @Override
-    public Biome[] getBiomes(@Nullable Biome[] oldBiomeList, int x, int z, int width, int depth) {
-        oldBiomeList = original.getBiomes(oldBiomeList, x, z, width, depth);
-        translateList(oldBiomeList, x, z, width, depth);
-        return oldBiomeList;
-    }
-
-    public Biome[] getBiomesAlternate(@Nullable Biome[] oldBiomeList, int x, int z, int width, int depth) {
-        oldBiomeList = original.getBiomes(oldBiomeList, x, z, width, depth);
-        for (int i = 0 ; i < oldBiomeList.length ; i++) {
-            oldBiomeList[i] = outsideTranslator.translate(oldBiomeList[i]);
-        }
-        return oldBiomeList;
+    public Biome getBiome(int x, int y) {
+        Biome biome = original.getBiome(x, y);
+        return biomeTranslator.translate(biome);
     }
 
     @Override
-    public Biome[] getBiomes(@Nullable Biome[] listToReuse, int x, int z, int width, int length, boolean cacheFlag) {
-        return this.getBiomes(listToReuse, x, z, width, length);
+    public Set<Biome> getBiomesInSquare(int centerX, int centerZ, int sideLength) {
+        Set<Biome> biomes = original.getBiomesInSquare(centerX, centerZ, sideLength);
+        Set<Biome> newBiomes = new HashSet<>();
+        for (Biome biome : biomes) {
+            newBiomes.add(biomeTranslator.translate(biome));
+        }
+        return newBiomes;
+    }
+
+    @Override
+    public boolean hasStructure(Structure<?> structureIn) {
+        return original.hasStructure(structureIn);
+    }
+
+    @Override
+    public Set<BlockState> getSurfaceBlocks() {
+        return original.getSurfaceBlocks();
+    }
+
+    @Override
+    public Biome getBiomeAtFactorFour(int factorFourX, int factorFourZ) {
+        Biome biome = super.getBiomeAtFactorFour(factorFourX, factorFourZ);
+        return biomeTranslator.translate(biome);
+    }
+
+    public Biome[] getBiomesAlternate(int x, int z, int width, int depth, boolean cacheFlag) {
+        Biome[] biomes = original.getBiomes(x, z, width, depth, cacheFlag);
+        for (int i = 0 ; i < biomes.length ; i++) {
+            biomes[i] = outsideTranslator.translate(biomes[i]);
+        }
+        return biomes;
     }
 
     @Override
     @Nullable
     public BlockPos findBiomePosition(int x, int z, int range, List<Biome> biomes, Random random) {
         return original.findBiomePosition(x, z, range, biomes, random);
-    }
-
-    @Override
-    public boolean areBiomesViable(int x, int z, int radius, List<Biome> allowed) {
-        boolean result = false;
-        Biome[] biomeList = getBiomes(null, x, z, radius, radius);
-        for (int i = 0 ; i < biomeList.length ; i++) {
-            if ( allowed.contains(biomeList[i]) ) {
-                result = true;
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public boolean isFixedBiome() {
-        return false;
-    }
-
-    @Override
-    public Biome getFixedBiome() {
-        return null;
     }
 }

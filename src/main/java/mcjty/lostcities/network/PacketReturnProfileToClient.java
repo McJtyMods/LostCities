@@ -1,47 +1,39 @@
 package mcjty.lostcities.network;
 
-import io.netty.buffer.ByteBuf;
-import mcjty.lostcities.LostCities;
 import mcjty.lostcities.dimensions.world.WorldTypeTools;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketReturnProfileToClient implements IMessage {
+import java.util.function.Supplier;
 
-    private int dimension;
+public class PacketReturnProfileToClient {
+
+    private DimensionType dimension;
     private String profile;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        dimension = buf.readInt();
-        profile = NetworkTools.readString(buf);
+    public PacketReturnProfileToClient(PacketBuffer buf) {
+        dimension = DimensionType.getById(buf.readInt());
+        profile = buf.readString(32767);
     }
 
-    @Override
-    public void toBytes(ByteBuf buf) {
-        buf.writeInt(dimension);
-        NetworkTools.writeString(buf, profile);
+    public void toBytes(PacketBuffer buf) {
+        buf.writeInt(dimension.getId());
+        buf.writeString(profile);
     }
 
     public PacketReturnProfileToClient() {
     }
 
-    public PacketReturnProfileToClient(int dimension, String profileName) {
+    public PacketReturnProfileToClient(DimensionType dimension, String profileName) {
         this.dimension = dimension;
         this.profile = profileName;
     }
 
-    public static class Handler implements IMessageHandler<PacketReturnProfileToClient, IMessage> {
-        @Override
-        public IMessage onMessage(PacketReturnProfileToClient message, MessageContext ctx) {
-            LostCities.proxy.addScheduledTaskClient(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketReturnProfileToClient message, MessageContext ctx) {
-            WorldTypeTools.setProfileFromServer(message.dimension, message.profile);
-        }
+    public void handle(Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            WorldTypeTools.setProfileFromServer(dimension, profile);
+        });
+        ctx.get().setPacketHandled(true);
     }
-
 }

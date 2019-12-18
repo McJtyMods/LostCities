@@ -2,7 +2,7 @@ package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -70,13 +70,13 @@ public class CompiledPalette {
         for (Palette p : palettes) {
             for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {
                 Object value = entry.getValue();
-                if (value instanceof IBlockState) {
-                    palette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+                if (value instanceof BlockState) {
+                    palette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((BlockState) value));
                 } else if (value instanceof Pair[]) {
-                    Pair<Integer, IBlockState>[] r = (Pair<Integer, IBlockState>[]) value;
+                    Pair<Integer, BlockState>[] r = (Pair<Integer, BlockState>[]) value;
                     char[] randomBlocks = new char[128];
                     int idx = 0;
-                    for (Pair<Integer, IBlockState> pair : r) {
+                    for (Pair<Integer, BlockState> pair : r) {
                         idx = addEntries(randomBlocks, idx, (char) Block.BLOCK_STATE_IDS.get(pair.getRight()), pair.getLeft());
                         if (idx >= randomBlocks.length) {
                             break;
@@ -104,8 +104,8 @@ public class CompiledPalette {
                         char c = ((String) value).charAt(0);
                         if (palette.containsKey(c) && !palette.containsKey(entry.getKey())) {
                             Object s = palette.get(c);
-                            if (s instanceof IBlockState) {
-                                s = (char) Block.BLOCK_STATE_IDS.get((IBlockState) value);
+                            if (s instanceof BlockState) {
+                                s = (char) Block.BLOCK_STATE_IDS.get((BlockState) value);
                             }
                             palette.put(entry.getKey(), s);
                             dirty = true;
@@ -116,8 +116,8 @@ public class CompiledPalette {
         }
 
         for (Palette p : palettes) {
-            for (Map.Entry<IBlockState, IBlockState> entry : p.getDamaged().entrySet()) {
-                IBlockState c = entry.getKey();
+            for (Map.Entry<BlockState, BlockState> entry : p.getDamaged().entrySet()) {
+                BlockState c = entry.getKey();
                 damagedToBlock.put((char) Block.BLOCK_STATE_IDS.get(c), (char) Block.BLOCK_STATE_IDS.get(entry.getValue()));
             }
             for (Map.Entry<Character, String> entry : p.getMobIds().entrySet()) {
@@ -139,11 +139,11 @@ public class CompiledPalette {
         return palette.keySet();
     }
 
-    public IBlockState getStraight(char c) {
+    public BlockState getStraight(char c) {
         try {
             Object o = palette.get(c);
-            if (o instanceof IBlockState) {
-                return (IBlockState) o;
+            if (o instanceof BlockState) {
+                return (BlockState) o;
             } else if (o instanceof Character) {
                 return Block.BLOCK_STATE_IDS.getByValue((Character) o);
             } else {

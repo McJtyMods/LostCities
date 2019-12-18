@@ -3,17 +3,11 @@ package mcjty.lostcities.dimensions.world;
 import mcjty.lostcities.config.BiomeSelectionStrategy;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.gui.GuiLostCityConfiguration;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiCreateWorld;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.OverworldGenSettings;
 
 public class LostWorldTypeBOP extends WorldType {
 
@@ -24,8 +18,10 @@ public class LostWorldTypeBOP extends WorldType {
     private BiomeProvider biomeProvider = null;
 
     @Override
-    public IChunkGenerator getChunkGenerator(World world, String generatorOptions) {
-        return new LostCityChunkGenerator(world, world.getSeed());
+    public ChunkGenerator<?> createChunkGenerator(World world) {
+//        return new LostCityChunkGenerator(world, world.getSeed());
+        // @todo 1.14
+        return new LostCityChunkGenerator(world, biomeProvider, new OverworldGenSettings());
     }
 
     @Override
@@ -43,10 +39,11 @@ public class LostWorldTypeBOP extends WorldType {
         if (biomeProvider == null) {
             for (WorldType type : WorldType.WORLD_TYPES) {
                 if ("BIOMESOP".equals(type.getName())) {
-                    WorldType orig = world.getWorldInfo().getTerrainType();
-                    world.getWorldInfo().setTerrainType(type);
-                    biomeProvider = type.getBiomeProvider(world);
-                    world.getWorldInfo().setTerrainType(orig);
+                    WorldType orig = world.getWorldType();
+                    // @todo 1.14
+//                    world.getWorldInfo().setTerrainType(type);
+//                    biomeProvider = type.getBiomeProvider(world);
+//                    world.getWorldInfo().setTerrainType(orig);
                     break;
                 }
             }
@@ -54,7 +51,7 @@ public class LostWorldTypeBOP extends WorldType {
         return biomeProvider;
     }
 
-    @Override
+    // @todo 1.14
     public BiomeProvider getBiomeProvider(World world) {
         LostCityProfile profile = WorldTypeTools.getProfile(world);
         if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
@@ -80,41 +77,41 @@ public class LostWorldTypeBOP extends WorldType {
     }
 
     @Override
-    public boolean isCustomizable() {
+    public boolean hasCustomOptions() {
         return true;
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void onCustomizeButton(Minecraft mc, GuiCreateWorld guiCreateWorld) {
-        mc.displayGuiScreen(new GuiLostCityConfiguration(guiCreateWorld));
-    }
-
-    @Override
-    public int getSpawnFuzz(WorldServer world, MinecraftServer server) {
-        LostCityProfile profile = WorldTypeTools.getProfile(world);
-        switch (profile.LANDSCAPE_TYPE) {
-            case DEFAULT:
-            case FLOATING:
-                return super.getSpawnFuzz(world, server);
-            case SPACE:
-            case CAVERN:
-                return 0;
-        }
-        return super.getSpawnFuzz(world, server);
-    }
-
-    @Override
-    public int getMinimumSpawnHeight(World world) {
-        LostCityProfile profile = WorldTypeTools.getProfile(world);
-        switch (profile.LANDSCAPE_TYPE) {
-            case DEFAULT:
-            case FLOATING:
-                return super.getMinimumSpawnHeight(world);
-            case SPACE:
-            case CAVERN:
-                return profile.GROUNDLEVEL;
-        }
-        return super.getMinimumSpawnHeight(world);
-    }
+    // @todo 1.14
+//    @Override
+//    public void onCustomizeButton(Minecraft mc, GuiCreateWorld guiCreateWorld) {
+//        mc.displayGuiScreen(new GuiLostCityConfiguration(guiCreateWorld));
+//    }
+//
+//    @Override
+//    public int getSpawnFuzz(WorldServer world, MinecraftServer server) {
+//        LostCityProfile profile = WorldTypeTools.getProfile(world);
+//        switch (profile.LANDSCAPE_TYPE) {
+//            case DEFAULT:
+//            case FLOATING:
+//                return super.getSpawnFuzz(world, server);
+//            case SPACE:
+//            case CAVERN:
+//                return 0;
+//        }
+//        return super.getSpawnFuzz(world, server);
+//    }
+//
+//    @Override
+//    public int getMinimumSpawnHeight(World world) {
+//        LostCityProfile profile = WorldTypeTools.getProfile(world);
+//        switch (profile.LANDSCAPE_TYPE) {
+//            case DEFAULT:
+//            case FLOATING:
+//                return super.getMinimumSpawnHeight(world);
+//            case SPACE:
+//            case CAVERN:
+//                return profile.GROUNDLEVEL;
+//        }
+//        return super.getMinimumSpawnHeight(world);
+//    }
 }

@@ -38,7 +38,7 @@ public class City {
         if (predefinedCityMap.isEmpty()) {
             return null;
         }
-        return predefinedCityMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+        return predefinedCityMap.get(new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
     }
 
     public static PredefinedCity.PredefinedBuilding getPredefinedBuilding(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
@@ -54,7 +54,7 @@ public class City {
         if (predefinedBuildingMap.isEmpty()) {
             return null;
         }
-        return predefinedBuildingMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+        return predefinedBuildingMap.get(new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
     }
 
     public static PredefinedCity.PredefinedStreet getPredefinedStreet(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
@@ -70,7 +70,7 @@ public class City {
         if (predefinedStreetMap.isEmpty()) {
             return null;
         }
-        return predefinedStreetMap.get(new ChunkCoord(provider.dimensionId, chunkX, chunkZ));
+        return predefinedStreetMap.get(new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
     }
 
 
@@ -79,7 +79,7 @@ public class City {
         if (city != null) {
             return true;
         }
-        Random rand = new Random(provider.seed + chunkZ * 797003437L + chunkX * 295075153L);
+        Random rand = new Random(provider.getSeed() + chunkZ * 797003437L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
         if (provider.getProfile().isSpace()) {
@@ -107,7 +107,7 @@ public class City {
         if (city != null) {
             return city.getRadius();
         }
-        Random rand = new Random(provider.seed + chunkZ * 100001653L + chunkX * 295075153L);
+        Random rand = new Random(provider.getSeed() + chunkZ * 100001653L + chunkX * 295075153L);
         rand.nextFloat();
         rand.nextFloat();
         LostCityProfile profile = provider.getProfile();
@@ -131,7 +131,7 @@ public class City {
             }
             // Otherwise we chose a random city style
         }
-        Random rand = new Random(provider.seed + chunkZ * 899809363L + chunkX * 256203221L);
+        Random rand = new Random(provider.getSeed() + chunkZ * 899809363L + chunkX * 256203221L);
         rand.nextFloat();
         rand.nextFloat();
         return provider.worldStyle.getRandomCityStyle(provider, chunkX, chunkZ, rand);
@@ -139,7 +139,7 @@ public class City {
 
     // Calculate the citystyle based on all surrounding cities
     public static CityStyle getCityStyle(int chunkX, int chunkZ, LostCityChunkGenerator provider, LostCityProfile profile) {
-        Random rand = new Random(provider.seed + chunkZ * 593441843L + chunkX * 217645177L);
+        Random rand = new Random(provider.getSeed() + chunkZ * 593441843L + chunkX * 217645177L);
         rand.nextFloat();
         rand.nextFloat();
 
@@ -194,17 +194,19 @@ public class City {
 
         for (int cx = -4 ; cx <= 4 ; cx++) {
             for (int cz = -4 ; cz <= 4 ; cz++) {
-                if (provider.hasMansion(chunkX+cx, chunkZ+cz)) {
-                    return 0.0f;
-                }
+                // @todo 1.14
+//                if (provider.hasMansion(chunkX+cx, chunkZ+cz)) {
+//                    return 0.0f;
+//                }
             }
         }
 
         for (int cx = -2 ; cx <= 2 ; cx++) {
             for (int cz = -2 ; cz <= 2 ; cz++) {
-                if (provider.hasOceanMonument(chunkX+cx, chunkZ+cz)) {
-                    return 0.0f;
-                }
+                // @todo 1.14
+//                if (provider.hasOceanMonument(chunkX+cx, chunkZ+cz)) {
+//                    return 0.0f;
+//                }
             }
         }
 
@@ -227,7 +229,7 @@ public class City {
 
         for (int cx = -1 ; cx <= 1 ; cx++) {
             for (int cz = -1 ; cz <= 1 ; cz++) {
-                Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX + cx, chunkZ + cz)).getBiomes();
+                Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX + cx, chunkZ + cz)).getBiomes();
                 if (isTooHighForBuilding(biomes)) {
                     return 0;
                 }
@@ -235,15 +237,15 @@ public class City {
         }
 
         float foundFactor = profile.CITY_DEFAULT_BIOME_FACTOR;
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ)).getBiomes();
         Map<String, Float> map = profile.getBiomeFactorMap();
         for (Biome biome : biomes) {
-            ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
+            ResourceLocation object = biome.getRegistryName();
             Float f;
             try {
                 f = map.get(object.toString());
             } catch(NullPointerException e) {
-                throw new RuntimeException("Biome '" + biome.getBiomeName() + "' (" + biome.getBiomeClass().getName() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
+                throw new RuntimeException("Biome '" + biome.getTranslationKey() + "' (" + biome.getRegistryName().getPath() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
             }
             if (f != null) {
                 foundFactor = f;
@@ -255,8 +257,10 @@ public class City {
     }
 
     public static boolean isTooHighForBuilding(Biome[] biomes) {
-        return biomes[55].getBaseHeight() > 4 || biomes[54].getBaseHeight() > 4 || biomes[56].getBaseHeight() > 4
-                || biomes[5].getBaseHeight() > 4 || biomes[95].getBaseHeight() > 4;
+        // @todo 1.14
+//        return biomes[55].getBaseHeight() > 4 || biomes[54].getBaseHeight() > 4 || biomes[56].getBaseHeight() > 4
+//                || biomes[5].getBaseHeight() > 4 || biomes[95].getBaseHeight() > 4;
+        return false;
     }
 
 }

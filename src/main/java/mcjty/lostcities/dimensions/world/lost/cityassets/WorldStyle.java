@@ -12,6 +12,7 @@ import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -49,11 +50,11 @@ public class WorldStyle implements ILostCityAsset {
             Predicate<Info> predicate = Predicates.alwaysTrue();
             if (o.has("biomes")) {
                 JsonArray ar = o.get("biomes").getAsJsonArray();
-                Set<String> biomes = new HashSet<>();
+                Set<ResourceLocation> biomes = new HashSet<>();
                 for (JsonElement el : ar) {
-                    Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(el.getAsString()));
+                    Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(el.getAsString()));
                     if (biome != null) {
-                        biomes.add(Biome.REGISTRY.getNameForObject(biome).toString());
+                        biomes.add(biome.getRegistryName());
                     }
                 }
                 predicate = info -> hasBiomes(info, biomes);
@@ -62,12 +63,11 @@ public class WorldStyle implements ILostCityAsset {
         }
     }
 
-    private boolean isValidBiome(Set<String> biomeSet, Biome biome) {
-        ResourceLocation object = Biome.REGISTRY.getNameForObject(biome);
-        return biomeSet.contains(object.toString());
+    private boolean isValidBiome(Set<ResourceLocation> biomeSet, Biome biome) {
+        return biomeSet.contains(biome.getRegistryName());
     }
 
-    private boolean hasBiomes(Info info, Set<String> biomeSet) {
+    private boolean hasBiomes(Info info, Set<ResourceLocation> biomeSet) {
         Biome[] biomes = info.biomes;
 
         if (isValidBiome(biomeSet, biomes[55]) || isValidBiome(biomeSet, biomes[54]) || isValidBiome(biomeSet, biomes[56])
@@ -101,7 +101,7 @@ public class WorldStyle implements ILostCityAsset {
 
 
     public String getRandomCityStyle(LostCityChunkGenerator provider, int chunkX, int chunkZ, Random random) {
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.dimensionId, chunkX, chunkZ)).getBiomes();
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ)).getBiomes();
         Info info = new Info(biomes, chunkX, chunkZ);
         List<Pair<Float, String>> ct = new ArrayList<>();
         for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {

@@ -1,13 +1,14 @@
 package mcjty.lostcities.dimensions.world.driver;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.IChunk;
 
 public interface IPrimerDriver {
 
-    void setPrimer(ChunkPrimer primer);
+    void setPrimer(IChunk primer);
 
-    ChunkPrimer getPrimer();
+    IChunk getPrimer();
 
     IPrimerDriver current(int x, int y, int z);
 
@@ -43,7 +44,7 @@ public interface IPrimerDriver {
     IPrimerDriver block(char c);
 
     /// Set a block at the current position
-    IPrimerDriver block(IBlockState c);
+    IPrimerDriver block(BlockState c);
 
     /// Set a block at the current position and increase the height with 1
     IPrimerDriver add(char c);

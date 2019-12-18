@@ -1,11 +1,8 @@
 package mcjty.lostcities.config;
 
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.setup.ModSetup;
-import net.minecraft.init.Blocks;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import org.apache.logging.log4j.Level;
+import net.minecraft.block.Blocks;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.*;
 
@@ -61,11 +58,10 @@ public class LostCityConfiguration {
 
     public static String DIMENSION_PROFILE = "default";
     public static String DEFAULT_PROFILE = "default";
-    public static int DIMENSION_ID = 111;
+    public static DimensionType DIMENSION_ID;// @todo 1.14 = 111;
     public static boolean DIMENSION_BOP = true;
 
     public static boolean DEBUG = false;
-    public static boolean OPTIMIZED_CHUNKGEN = true;
 
     public static String SPECIAL_BED_BLOCK = Blocks.DIAMOND_BLOCK.getRegistryName().toString();
 
@@ -80,9 +76,10 @@ public class LostCityConfiguration {
             oldVersion = cfg.getInt("version", CATEGORY_GENERAL, VERSION, 0, 10000, "Config version. Do not modify this manually!");
         }
 
-        Property versionProperty = new Property("version", Integer.toString(VERSION), Property.Type.INTEGER);
-        versionProperty.setComment("Config version. Do not modify this manually!");
-        cfg.getCategory(CATEGORY_GENERAL).put("version", versionProperty);
+        // @todo 1.14
+//        Property versionProperty = new Property("version", Integer.toString(VERSION), Property.Type.INTEGER);
+//        versionProperty.setComment("Config version. Do not modify this manually!");
+//        cfg.getCategory(CATEGORY_GENERAL).put("version", versionProperty);
 
         initStandardProfiles();
 
@@ -131,16 +128,12 @@ public class LostCityConfiguration {
 
         DIMENSION_PROFILE = cfg.getString("dimensionProfile", CATEGORY_GENERAL, DIMENSION_PROFILE, "The 'profile' to use for generation of the Lost City dimension");
         DEFAULT_PROFILE = cfg.getString("defaultProfile", CATEGORY_GENERAL, DEFAULT_PROFILE, "The default 'profile' to use for the overworld");
-        DIMENSION_ID = cfg.getInt("dimensionId", CATEGORY_GENERAL, DIMENSION_ID, -10000, 10000, "The 'ID' of the Lost City Dimension. Set to -1 if you don't want this dimension");
+        // @todo 1.14
+//        DIMENSION_ID = cfg.getInt("dimensionId", CATEGORY_GENERAL, DIMENSION_ID, -10000, 10000, "The 'ID' of the Lost City Dimension. Set to -1 if you don't want this dimension");
         DIMENSION_BOP = cfg.getBoolean("dimensionBoP", CATEGORY_GENERAL, DIMENSION_BOP, "If true and if Biomes O Plenty is present the dimension will use BoP biomes");
         SPECIAL_BED_BLOCK = cfg.getString("specialBedBlock", CATEGORY_GENERAL, SPECIAL_BED_BLOCK, "Block to put underneath a bed so that it qualifies as a teleporter bed");
 
         DEBUG = cfg.getBoolean("debug", CATEGORY_GENERAL, DEBUG, "Enable debugging/logging");
-        OPTIMIZED_CHUNKGEN = cfg.getBoolean("optimizedChunkgen", CATEGORY_GENERAL, OPTIMIZED_CHUNKGEN, "Disable this if you have mods like NEID or JEID installed. Note that when NEID or JEID is present this is disabled by default");
-        if (ModSetup.neid || ModSetup.jeid) {
-            LostCities.setup.getLogger().log(Level.INFO, "NEID or JEID detected: disabling optimized chunkgeneration!");
-            OPTIMIZED_CHUNKGEN = false;
-        }
 
         return profileList;
     }

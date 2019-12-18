@@ -1,24 +1,6 @@
 package mcjty.lostcities.commands;
 
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
-import mcjty.lostcities.dimensions.world.WorldTypeTools;
-import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.CitySphere;
-import mcjty.lostcities.dimensions.world.lost.Railway;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.gen.ChunkProviderServer;
-
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-
-public class CommandDebug implements ICommand {
+public class CommandDebug {} /* @todo 1.14 implements ICommand {
 
     @Override
     public String getName() {
@@ -96,3 +78,4 @@ public class CommandDebug implements ICommand {
         return getName().compareTo(o.getName());
     }
 }
+*/

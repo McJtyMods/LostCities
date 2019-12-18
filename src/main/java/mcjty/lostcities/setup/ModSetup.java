@@ -2,22 +2,17 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.ForgeEventHandlers;
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.TerrainEventHandlers;
 import mcjty.lostcities.config.ConfigSetup;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.ModDimensions;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.network.PacketHandler;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -27,44 +22,40 @@ public class ModSetup {
     public static boolean chisel = false;
     public static boolean biomesoplenty = false;
     public static boolean atg = false;
-    public static boolean neid = false;
-    public static boolean jeid = false;
 
-    private Logger logger;
-    public static File modConfigDir;
+    public static Logger logger = null;
 
-    public void preInit(FMLPreInitializationEvent e) {
-        logger = e.getModLog();
+    public static Logger getLogger() {
+        return logger;
+    }
+
+
+    public void init(FMLCommonSetupEvent e) {
+        logger = LogManager.getLogger();
+
         PacketHandler.registerMessages("lostcities");
 
         setupModCompat();
 
-        modConfigDir = e.getModConfigurationDirectory();
         ConfigSetup.init();
         ModDimensions.init();
 
-        LootTableList.register(new ResourceLocation(LostCities.MODID, "chests/lostcitychest"));
-        LootTableList.register(new ResourceLocation(LostCities.MODID, "chests/raildungeonchest"));
+        MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
+        // @todo 1.14
+//        MinecraftForge.TERRAIN_GEN_BUS.register(new TerrainEventHandlers());
+
+        // @todo 1.14
+//        LootTableList.register(new ResourceLocation(LostCities.MODID, "chests/lostcitychest"));
+//        LootTableList.register(new ResourceLocation(LostCities.MODID, "chests/raildungeonchest"));
     }
 
     private void setupModCompat() {
-        chisel = Loader.isModLoaded("chisel");
-        biomesoplenty = Loader.isModLoaded("biomesoplenty") || Loader.isModLoaded("BiomesOPlenty");
+        chisel = ModList.get().isLoaded("chisel");
+        biomesoplenty = ModList.get().isLoaded("biomesoplenty");
 //        atg = Loader.isModLoaded("atg"); // @todo
-        neid = Loader.isModLoaded("neid");
-        jeid = Loader.isModLoaded("jeid");
     }
 
-    public Logger getLogger() {
-        return logger;
-    }
-
-    public void init(FMLInitializationEvent e) {
-        MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
-        MinecraftForge.TERRAIN_GEN_BUS.register(new TerrainEventHandlers());
-    }
-
-    public void postInit(FMLPostInitializationEvent e) {
+    public void postInit() {
         ConfigSetup.postInit();
         ConfigSetup.profileConfigs.clear();
 
@@ -76,16 +67,18 @@ public class ModSetup {
                 } catch (IOException ex) {
                     throw new UncheckedIOException(ex);
                 }
-            } else if (path.startsWith("$")) {
-                File file = new File(modConfigDir.getPath() + File.separator + path.substring(1));
-                AssetRegistries.load(file);
+// @todo 1.14
+//            } else if (path.startsWith("$")) {
+//                File file = new File(modConfigDir.getPath() + File.separator + path.substring(1));
+//                AssetRegistries.load(file);
             } else {
                 throw new RuntimeException("Invalid path for lostcity resource in 'assets' config!");
             }
         }
 
         if (LostCityConfiguration.DEBUG) {
-            logger.info("Asset parts loaded: " + AssetRegistries.PARTS.getCount());
+            // @todo 1.14
+//            logger.info("Asset parts loaded: " + AssetRegistries.PARTS.getCount());
             AssetRegistries.showStatistics();
         }
     }

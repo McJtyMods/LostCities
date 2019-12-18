@@ -1,17 +1,17 @@
 package mcjty.lostcities;
 
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.world.LostWorldType;
 import mcjty.lostcities.dimensions.world.WorldTypeTools;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ClientEventHandlers {
 
     @SubscribeEvent
     public void onFogEvent(EntityViewRenderEvent.FogColors event) {
-        if (WorldTypeTools.isLostCities(event.getEntity().world)) {
-            LostCityProfile profile = WorldTypeTools.getProfile(event.getEntity().world);
+        if (WorldTypeTools.isLostCities(Minecraft.getInstance().world)) {
+            LostCityProfile profile = WorldTypeTools.getProfile(Minecraft.getInstance().world);
             if (profile.FOG_RED >= 0) {
                 event.setRed(profile.FOG_RED);
             }
@@ -26,8 +26,8 @@ public class ClientEventHandlers {
 
     @SubscribeEvent
     public void onFogDensity(EntityViewRenderEvent.FogDensity event) {
-        if (WorldTypeTools.isLostCities(event.getEntity().world)) {
-            LostCityProfile profile = WorldTypeTools.getProfile(event.getEntity().world);
+        if (WorldTypeTools.isLostCities(Minecraft.getInstance().world)) {
+            LostCityProfile profile = WorldTypeTools.getProfile(Minecraft.getInstance().world);
             if (profile.FOG_DENSITY >= 0) {
                 event.setDensity(profile.FOG_DENSITY);
                 event.setCanceled(true);
