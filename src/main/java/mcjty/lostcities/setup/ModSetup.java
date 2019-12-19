@@ -7,9 +7,13 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.ModDimensions;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.network.PacketHandler;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.carver.ICarverConfig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,6 +37,8 @@ public class ModSetup {
     public void init(FMLCommonSetupEvent e) {
         logger = LogManager.getLogger();
 
+        LostCityConfiguration.initStandardProfiles();
+
         PacketHandler.registerMessages("lostcities");
 
         setupModCompat();
@@ -47,15 +53,7 @@ public class ModSetup {
         // @todo 1.14
 //        LootTableList.register(new ResourceLocation(LostCities.MODID, "chests/lostcitychest"));
 //        LootTableList.register(new ResourceLocation(LostCities.MODID, "chests/raildungeonchest"));
-    }
 
-    private void setupModCompat() {
-        chisel = ModList.get().isLoaded("chisel");
-        biomesoplenty = ModList.get().isLoaded("biomesoplenty");
-//        atg = Loader.isModLoaded("atg"); // @todo
-    }
-
-    public void postInit() {
         ConfigSetup.postInit();
         ConfigSetup.profileConfigs.clear();
 
@@ -81,5 +79,17 @@ public class ModSetup {
 //            logger.info("Asset parts loaded: " + AssetRegistries.PARTS.getCount());
             AssetRegistries.showStatistics();
         }
+
+        for (Biome biome : ForgeRegistries.BIOMES) {
+            biome.addCarver(GenerationStage.Carving.AIR, Biome.createCarver(Registration.LOSTCITY_CARVER, ICarverConfig.field_214644_a));
+        }
+
     }
+
+    private void setupModCompat() {
+        chisel = ModList.get().isLoaded("chisel");
+        biomesoplenty = ModList.get().isLoaded("biomesoplenty");
+//        atg = Loader.isModLoaded("atg"); // @todo
+    }
+
 }

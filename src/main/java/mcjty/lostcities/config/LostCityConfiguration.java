@@ -41,8 +41,8 @@ public class LostCityConfiguration {
             "/assets/lostcities/citydata/railparts.json",
             "/assets/lostcities/citydata/monorailparts.json",
             "/assets/lostcities/citydata/buildingparts.json",
-            "/assets/lostcities/citydata/library.json",
-            "$lostcities/userassets.json"
+            "/assets/lostcities/citydata/library.json"
+//            "$lostcities/userassets.json" @todo 1.14
     };
 
     public static String[] ADDITIONAL_DIMENSIONS = new String[] {
@@ -143,7 +143,7 @@ public class LostCityConfiguration {
                 PRIVATE_PROFILES, PRIVATE_PROFILES_COMMENT);
     }
 
-    private static void initStandardProfiles() {
+    public static void initStandardProfiles() {
         LostCityProfile profile = new LostCityProfile("default", true);
         profile.setIconFile("textures/gui/icon_default.png");
         standardProfiles.put(profile.getName(), profile);

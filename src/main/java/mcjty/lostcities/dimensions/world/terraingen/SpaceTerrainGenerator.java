@@ -5,6 +5,8 @@ import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -35,9 +37,9 @@ public class SpaceTerrainGenerator {
         LostCityProfile profile = provider.getProfile();
         LostCityProfile profileOut = provider.getOutsideProfile();
         boolean outsideLandscape = profile.CITYSPHERE_LANDSCAPE_OUTSIDE;
-        Character baseLiquid = terrainGenerator.liquidChar;
-        Character baseChar = terrainGenerator.baseChar;
-        char airChar = LostCitiesTerrainGenerator.airChar;
+        BlockState baseLiquid = terrainGenerator.liquidChar;
+        BlockState baseChar = terrainGenerator.baseChar;
+        BlockState airChar = LostCitiesTerrainGenerator.airChar;
 
         // @todo 1.14
 //        this.surfaceBuffer = this.surfaceNoise.getRegion(this.surfaceBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
@@ -71,7 +73,7 @@ public class SpaceTerrainGenerator {
     }
 
     private void fillSphere(int centerx, int centery, int centerz, int radius,
-                            char glass, char block, char sideBlock, char liquidChar, char baseChar, boolean outsideLandscape) {
+                            BlockState glass, BlockState block, BlockState sideBlock, BlockState liquidChar, BlockState baseChar, boolean outsideLandscape) {
         double sqradius = radius * radius;
         double sqradiusOffset = (radius-2) * (radius-2);
         LostCityProfile profile = provider.getProfile();
@@ -184,12 +186,12 @@ public class SpaceTerrainGenerator {
 
     private void genBiomeTerrain(Biome Biome, ChunkPrimer primer, int x, int z, int topLevel, int waterLevel, LostCitiesTerrainGenerator terrainGenerator) {
         driver.setPrimer(primer);
-        char air = LostCitiesTerrainGenerator.airChar;
-        char baseBlock = terrainGenerator.baseChar;
-        char gravelBlock = LostCitiesTerrainGenerator.gravelChar;
+        BlockState air = LostCitiesTerrainGenerator.airChar;
+        BlockState baseBlock = terrainGenerator.baseChar;
+        BlockState gravelBlock = LostCitiesTerrainGenerator.gravelChar;
 
-        char fillerBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
-        char topBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
+        BlockState fillerBlock = Blocks.AIR.getDefaultState(); // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
+        BlockState topBlock = Blocks.AIR.getDefaultState(); // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
 
         int cx = x & 15;
         int cz = z & 15;

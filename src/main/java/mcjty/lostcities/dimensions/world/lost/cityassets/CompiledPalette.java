@@ -1,7 +1,6 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -16,7 +15,7 @@ import java.util.Set;
 public class CompiledPalette {
 
     private final Map<Character, Object> palette = new HashMap<>();
-    private final Map<Character, Character> damagedToBlock = new HashMap<>();
+    private final Map<BlockState, BlockState> damagedToBlock = new HashMap<>();
     private final Map<Character, Info> information = new HashMap<>();
 
     public static class Info {
@@ -55,7 +54,7 @@ public class CompiledPalette {
         addPalettes(palettes);
     }
 
-    private int addEntries(char[] randomBlocks, int idx, char c, int cnt) {
+    private int addEntries(BlockState[] randomBlocks, int idx, BlockState c, int cnt) {
         for (int i = 0 ; i < cnt ; i++) {
             if (idx >= randomBlocks.length) {
                 return idx;
@@ -71,13 +70,13 @@ public class CompiledPalette {
             for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {
                 Object value = entry.getValue();
                 if (value instanceof BlockState) {
-                    palette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((BlockState) value));
+                    palette.put(entry.getKey(), value);
                 } else if (value instanceof Pair[]) {
                     Pair<Integer, BlockState>[] r = (Pair<Integer, BlockState>[]) value;
-                    char[] randomBlocks = new char[128];
+                    BlockState[] randomBlocks = new BlockState[128];
                     int idx = 0;
                     for (Pair<Integer, BlockState> pair : r) {
-                        idx = addEntries(randomBlocks, idx, (char) Block.BLOCK_STATE_IDS.get(pair.getRight()), pair.getLeft());
+                        idx = addEntries(randomBlocks, idx, pair.getRight(), pair.getLeft());
                         if (idx >= randomBlocks.length) {
                             break;
                         }
@@ -104,9 +103,6 @@ public class CompiledPalette {
                         char c = ((String) value).charAt(0);
                         if (palette.containsKey(c) && !palette.containsKey(entry.getKey())) {
                             Object s = palette.get(c);
-                            if (s instanceof BlockState) {
-                                s = (char) Block.BLOCK_STATE_IDS.get((BlockState) value);
-                            }
                             palette.put(entry.getKey(), s);
                             dirty = true;
                         }
@@ -118,7 +114,7 @@ public class CompiledPalette {
         for (Palette p : palettes) {
             for (Map.Entry<BlockState, BlockState> entry : p.getDamaged().entrySet()) {
                 BlockState c = entry.getKey();
-                damagedToBlock.put((char) Block.BLOCK_STATE_IDS.get(c), (char) Block.BLOCK_STATE_IDS.get(entry.getValue()));
+                damagedToBlock.put(c, entry.getValue());
             }
             for (Map.Entry<Character, String> entry : p.getMobIds().entrySet()) {
                 Character c = entry.getKey();
@@ -145,10 +141,11 @@ public class CompiledPalette {
             if (o instanceof BlockState) {
                 return (BlockState) o;
             } else if (o instanceof Character) {
-                return Block.BLOCK_STATE_IDS.getByValue((Character) o);
+                throw new IllegalStateException("BAD!");
+//                return Block.BLOCK_STATE_IDS.getByValue((Character) o);
             } else {
-                char[] randomBlocks = (char[]) o;
-                return Block.BLOCK_STATE_IDS.getByValue(randomBlocks[0]);
+                BlockState[] randomBlocks = (BlockState[]) o;
+                return randomBlocks[0];
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -165,15 +162,15 @@ public class CompiledPalette {
     }
 
     // Same as get(c) but with a predefined random generator that is predictable
-    public Character get(char c, Random rand) {
+    public BlockState get(char c, Random rand) {
         try {
             Object o = palette.get(c);
-            if (o instanceof Character) {
-                return (Character) o;
+            if (o instanceof BlockState) {
+                return (BlockState) o;
             } else if (o == null) {
                 return null;
             } else {
-                char[] randomBlocks = (char[]) o;
+                BlockState[] randomBlocks = (BlockState[]) o;
                 return randomBlocks[rand.nextInt(128)];
             }
         } catch (Exception e) {
@@ -183,24 +180,23 @@ public class CompiledPalette {
 
     }
 
-    public Character get(char c) {
+    public BlockState get(char c) {
         try {
             Object o = palette.get(c);
-            if (o instanceof Character) {
-                return (Character) o;
+            if (o instanceof BlockState) {
+                return (BlockState) o;
             } else if (o == null) {
                 return null;
             } else {
-                char[] randomBlocks = (char[]) o;
+                BlockState[] randomBlocks = (BlockState[]) o;
                 return randomBlocks[LostCitiesTerrainGenerator.fastrand128()];
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
-    public Character canBeDamagedToIronBars(Character b) {
+    public BlockState canBeDamagedToIronBars(BlockState b) {
         return damagedToBlock.get(b);
     }
 

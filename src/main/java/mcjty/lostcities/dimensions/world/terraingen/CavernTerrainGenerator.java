@@ -5,6 +5,7 @@ import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -158,9 +159,9 @@ public class CavernTerrainGenerator {
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer, LostCitiesTerrainGenerator terrainGenerator) {
         driver.setPrimer(primer);
-        char baseBlock = terrainGenerator.baseChar;
-        char air = LostCitiesTerrainGenerator.airChar;
-        char baseLiquid = terrainGenerator.liquidChar;
+        BlockState baseBlock = terrainGenerator.baseChar;
+        BlockState air = LostCitiesTerrainGenerator.airChar;
+        BlockState baseLiquid = terrainGenerator.liquidChar;
 
         byte b0 = 4;
         LostCityProfile profile = provider.getProfile();
@@ -230,9 +231,9 @@ public class CavernTerrainGenerator {
 
     public void replaceBlocksForBiome(int chunkX, int chunkZ, ChunkPrimer primer, Biome[] Biomes, LostCitiesTerrainGenerator terrainGenerator) {
         driver.setPrimer(primer);
-        char baseBlock = terrainGenerator.baseChar;
-        char air = LostCitiesTerrainGenerator.airChar;
-        char baseLiquid = terrainGenerator.liquidChar;
+        BlockState baseBlock = terrainGenerator.baseChar;
+        BlockState air = LostCitiesTerrainGenerator.airChar;
+        BlockState baseLiquid = terrainGenerator.liquidChar;
         int bedrockLayer = provider.getProfile().BEDROCK_LAYER;
 
         byte groundLevel = (byte) provider.getProfile().GROUNDLEVEL;
@@ -243,13 +244,13 @@ public class CavernTerrainGenerator {
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 Biome Biome = Biomes[z + x * 16];
-                char fillerBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
-                char topBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
+                BlockState fillerBlock = Blocks.AIR.getDefaultState(); // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.fillerBlock);
+                BlockState topBlock = Blocks.AIR.getDefaultState(); // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(Biome.topBlock);
 
                 int l = (int)(this.baseBlockExclusivityNoise[x + z * 16] / 3.0D + 3.0D + provider.rand.nextDouble() * 0.25D);
                 int k = -1;
-                char block = topBlock;
-                char block1 = fillerBlock;
+                BlockState block = topBlock;
+                BlockState block1 = fillerBlock;
                 boolean foundAir = false;
 
                 driver.current(x, 128, z);
@@ -264,7 +265,7 @@ public class CavernTerrainGenerator {
                             foundAir = true;
                         }
                     } else {
-                        char currentBlock = driver.getBlock();
+                        BlockState currentBlock = driver.getBlock();
 
                         if (currentBlock != air) {
                             if (currentBlock == baseBlock) {
@@ -295,9 +296,9 @@ public class CavernTerrainGenerator {
                                 } else if (k > 0) {
                                     --k;
                                     driver.block(block1);
-                                    if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
+                                    if (k == 0 && block1 == Blocks.SAND.getDefaultState()) {
                                         k = provider.rand.nextInt(4) + Math.max(0, y - groundLevel);
-                                        block1 = (char) Block.BLOCK_STATE_IDS.get(Blocks.SANDSTONE.getDefaultState());
+                                        block1 = Blocks.SANDSTONE.getDefaultState();
                                     }
                                 }
                             }

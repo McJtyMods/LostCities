@@ -7,6 +7,7 @@ import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import net.minecraft.block.BlockState;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -234,7 +235,7 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
         return slices[y].charAt(z * xSize + x);
     }
 
-    public Character get(BuildingInfo info, int x, int y, int z) {
+    public BlockState get(BuildingInfo info, int x, int y, int z) {
         return info.getCompiledPalette().get(slices[y].charAt(z * xSize + x));
     }
 

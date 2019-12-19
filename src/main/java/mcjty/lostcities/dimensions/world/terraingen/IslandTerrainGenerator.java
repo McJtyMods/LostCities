@@ -4,6 +4,7 @@ import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -217,8 +218,8 @@ public class IslandTerrainGenerator {
 
     public void generate(int chunkX, int chunkZ, ChunkPrimer primer, LostCitiesTerrainGenerator terrainGenerator) {
         driver.setPrimer(primer);
-        char baseBlock = terrainGenerator.baseChar;
-        char air = LostCitiesTerrainGenerator.airChar;
+        BlockState baseBlock = terrainGenerator.baseChar;
+        BlockState air = LostCitiesTerrainGenerator.airChar;
 
         byte b0 = 2;
         int k = b0 + 1;
@@ -302,16 +303,16 @@ public class IslandTerrainGenerator {
 
     public final void genBiomeTerrain(Biome biome, ChunkPrimer primer, int x, int z, double noise, LostCitiesTerrainGenerator terrainGenerator) {
         driver.setPrimer(primer);
-        char air = LostCitiesTerrainGenerator.airChar;
-        char baseBlock = terrainGenerator.baseChar;
-        char baseLiquid = air;//@LostCitiesTerrainGenerator.liquidChar;
+        BlockState air = LostCitiesTerrainGenerator.airChar;
+        BlockState baseBlock = terrainGenerator.baseChar;
+        BlockState baseLiquid = air;//@LostCitiesTerrainGenerator.liquidChar;
 
         int topLevel = provider.getProfile().GROUNDLEVEL;
 
-        char fillerBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(biome.fillerBlock);
-        char topBlock = 0; // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(biome.topBlock);
-        char block = topBlock;
-        char block1 = fillerBlock;
+        BlockState fillerBlock = Blocks.AIR.getDefaultState(); // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(biome.fillerBlock);
+        BlockState topBlock = Blocks.AIR.getDefaultState(); // @todo 1.14 (char) Block.BLOCK_STATE_IDS.get(biome.topBlock);
+        BlockState block = topBlock;
+        BlockState block1 = fillerBlock;
 
         int k = -1;
         int l = (int)(noise / 3.0D + 3.0D + provider.rand.nextDouble() * 0.25D);
@@ -325,7 +326,7 @@ public class IslandTerrainGenerator {
             if (height <= 2) {
                 driver.block(air);
             } else {
-                char currentBlock = driver.getBlock();
+                BlockState currentBlock = driver.getBlock();
                 if (currentBlock == LostCitiesTerrainGenerator.bedrockChar && height <= 12) {
                     driver.block(air);
                     k = -1;
@@ -343,7 +344,7 @@ public class IslandTerrainGenerator {
 
                                 if (height < topLevel && (block == air)) { // @todo configure height!
                                     if (biome.getTemperature(new BlockPos(x, height, z)) < 0.15F) {
-                                        block = (char) Block.BLOCK_STATE_IDS.get(Blocks.ICE.getDefaultState());
+                                        block = Blocks.ICE.getDefaultState();
                                     } else {
                                         block = baseBlock;  // No liquid since we are floating
                                     }
@@ -364,9 +365,9 @@ public class IslandTerrainGenerator {
                                 --k;
                                 driver.block(block1);
 
-                                if (k == 0 && block1 == Block.BLOCK_STATE_IDS.get(Blocks.SAND.getDefaultState())) {
+                                if (k == 0 && block1 == Blocks.SAND.getDefaultState()) {
                                     k = provider.rand.nextInt(4) + Math.max(0, height - topLevel);
-                                    block1 = (char) Block.BLOCK_STATE_IDS.get(Blocks.SANDSTONE.getDefaultState());
+                                    block1 = Blocks.SANDSTONE.getDefaultState();
                                 }
                             }
                         }

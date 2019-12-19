@@ -1,10 +1,11 @@
 package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.IDimensionInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import mcjty.lostcities.varia.GeometryTools;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
@@ -23,7 +24,7 @@ public class DamageArea {
     private final AxisAlignedBB chunkBox;
     private final LostCityProfile profile;
 
-    public DamageArea(int chunkX, int chunkZ, LostCityChunkGenerator provider, BuildingInfo info) {
+    public DamageArea(int chunkX, int chunkZ, IDimensionInfo provider, BuildingInfo info) {
         this.seed = provider.getSeed();
         this.profile = info.profile;
         this.chunkX = chunkX;
@@ -61,7 +62,7 @@ public class DamageArea {
         }
     }
 
-    public Character damageBlock(Character b, LostCityChunkGenerator provider, int y, float damage, CompiledPalette palette, char liquidChar) {
+    public BlockState damageBlock(BlockState b, IDimensionInfo provider, int y, float damage, CompiledPalette palette, BlockState liquidChar) {
         if (b == LostCitiesTerrainGenerator.bedrockChar || b == LostCitiesTerrainGenerator.endportalChar || b == LostCitiesTerrainGenerator.endportalFrameChar) {
             return b;
         }
@@ -69,11 +70,11 @@ public class DamageArea {
         if (LostCitiesTerrainGenerator.getGlassChars().contains(b)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }
-        if (provider.rand.nextFloat() <= damage) {
-            Character damaged = palette.canBeDamagedToIronBars(b);
+        if (provider.getRandom().nextFloat() <= damage) {
+            BlockState damaged = palette.canBeDamagedToIronBars(b);
             int waterlevel = profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
             if (damage < BLOCK_DAMAGE_CHANCE && damaged != null) {
-                if (provider.rand.nextFloat() < .7f) {
+                if (provider.getRandom().nextFloat() < .7f) {
                     b = damaged;
                 } else {
                     b = y <= waterlevel ? liquidChar : LostCitiesTerrainGenerator.airChar;
@@ -90,7 +91,7 @@ public class DamageArea {
         return dmin <= radius * radius;
     }
 
-    private Explosion getExplosionAt(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    private Explosion getExplosionAt(int chunkX, int chunkZ, IDimensionInfo provider) {
         Random rand = new Random(seed + chunkZ * 295075153L + chunkX * 797003437L);
         rand.nextFloat();
         rand.nextFloat();
@@ -101,7 +102,7 @@ public class DamageArea {
         return null;
     }
 
-    private Explosion getMiniExplosionAt(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    private Explosion getMiniExplosionAt(int chunkX, int chunkZ, IDimensionInfo provider) {
         Random rand = new Random(seed + chunkZ * 1400305337L + chunkX * 573259391L);
         rand.nextFloat();
         rand.nextFloat();

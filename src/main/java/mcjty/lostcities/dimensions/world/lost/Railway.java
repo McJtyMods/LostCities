@@ -2,7 +2,7 @@ package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
+import mcjty.lostcities.dimensions.IDimensionInfo;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.QualityRandom;
 
@@ -95,7 +95,7 @@ public class Railway {
     /**
      * The station grid repeats every 9 chunks. There is never a station at every 18/18 multiple chunk
      */
-    private static RailChunkInfo getRailChunkTypeInternal(int chunkX, int chunkZ, LostCityChunkGenerator provider) {
+    private static RailChunkInfo getRailChunkTypeInternal(int chunkX, int chunkZ, IDimensionInfo provider) {
         Random rand = new QualityRandom(provider.getSeed() + chunkZ * 2600003897L + chunkX * 43600002517L);
         rand.nextFloat();
         rand.nextFloat();
@@ -275,7 +275,7 @@ public class Railway {
         return RailChunkInfo.NOTHING;
     }
 
-    private static RailChunkInfo getStationType(int chunkX, int chunkZ, LostCityChunkGenerator provider, LostCityProfile profile, float r, int rails, String part) {
+    private static RailChunkInfo getStationType(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, float r, int rails, String part) {
         int cityLevel = BuildingInfo.getCityLevel(chunkX, chunkZ, provider);
         if (cityLevel > 2) {
             // We are too high here. We need an underground station
@@ -303,7 +303,7 @@ public class Railway {
         return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, rails, part) : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
     }
 
-    public static RailChunkInfo getRailChunkType(int chunkX, int chunkZ, LostCityChunkGenerator provider, LostCityProfile profile) {
+    public static RailChunkInfo getRailChunkType(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
         ChunkCoord key = new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ);
         if (railInfo.containsKey(key)) {
             return railInfo.get(key);
@@ -324,7 +324,7 @@ public class Railway {
         return info;
     }
 
-    private static RailChunkInfo testAdjacentRailChunk(float r, RailChunkInfo adjacent, RailDirection direction, int chunkX, int chunkZ, LostCityChunkGenerator provider, LostCityProfile profile) {
+    private static RailChunkInfo testAdjacentRailChunk(float r, RailChunkInfo adjacent, RailDirection direction, int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
         switch (adjacent.getType()) {
             case NONE:
                 return RailChunkInfo.NOTHING;

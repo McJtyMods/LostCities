@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
+import mcjty.lostcities.dimensions.IDimensionInfo;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -65,7 +66,7 @@ public class Style implements ILostCityAsset {
         return name;
     }
 
-    public Palette getRandomPalette(LostCityChunkGenerator provider, Random random) {
+    public Palette getRandomPalette(IDimensionInfo provider, Random random) {
         Palette palette = new Palette();
         for (List<Pair<Float, String>> pairs : randomPaletteChoices) {
             float totalweight = 0;

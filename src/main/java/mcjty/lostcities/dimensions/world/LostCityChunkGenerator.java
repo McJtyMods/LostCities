@@ -3,6 +3,8 @@ package mcjty.lostcities.dimensions.world;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.dimensions.ICityCarver;
+import mcjty.lostcities.dimensions.IDimensionInfo;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
@@ -10,7 +12,7 @@ import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import mcjty.lostcities.varia.ChunkCoord;
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.Util;
@@ -42,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class LostCityChunkGenerator extends NoiseChunkGenerator<OverworldGenSettings> implements ILostChunkGenerator {
+public class LostCityChunkGenerator extends NoiseChunkGenerator<OverworldGenSettings> implements ILostChunkGenerator, IDimensionInfo {
 
     public Random rand;
     private LostCityProfile profile; // Current profile
@@ -81,8 +83,24 @@ public class LostCityChunkGenerator extends NoiseChunkGenerator<OverworldGenSett
         terrainGenerator.setup(world);
     }
 
+    @Override
     public IWorld getWorld() {
         return world;
+    }
+
+    @Override
+    public WorldStyle getWorldStyle() {
+        return worldStyle;
+    }
+
+    @Override
+    public ICityCarver getCarver() {
+        return null;
+    }
+
+    @Override
+    public Random getRandom() {
+        return rand;
     }
 
     @Override
@@ -217,10 +235,12 @@ public class LostCityChunkGenerator extends NoiseChunkGenerator<OverworldGenSett
         return 63;
     }
 
+    @Override
     public LostCityProfile getProfile() {
         return profile;
     }
 
+    @Override
     public LostCityProfile getOutsideProfile() {
         return outsideProfile;
     }
@@ -348,14 +368,15 @@ public class LostCityChunkGenerator extends NoiseChunkGenerator<OverworldGenSett
     }
 //
 //    // Get a heightmap for a chunk. If needed calculate (and cache) a primer
+    @Override
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
         ChunkCoord key = new ChunkCoord(getWorld().getDimension().getType(), chunkX, chunkZ);
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
         } else if (cachedPrimers.containsKey(key)) {
-            char baseChar = (char) Block.BLOCK_STATE_IDS.get(profile.getBaseBlock());
+            BlockState baseChar = profile.getBaseBlock();
             ChunkPrimer primer = cachedPrimers.get(key);
-            IPrimerDriver driver = new SafeDriver();
+            SafeDriver driver = new SafeDriver();
             driver.setPrimer(primer);
             ChunkHeightmap heightmap = new ChunkHeightmap(driver, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, baseChar);
             cachedHeightmaps.put(key, heightmap);
@@ -363,8 +384,8 @@ public class LostCityChunkGenerator extends NoiseChunkGenerator<OverworldGenSett
         } else {
             ChunkPrimer primer = generatePrimer(chunkX, chunkZ);
             cachedPrimers.put(key, primer);
-            char baseChar = (char) Block.BLOCK_STATE_IDS.get(profile.getBaseBlock());
-            IPrimerDriver driver = new SafeDriver();
+            BlockState baseChar = profile.getBaseBlock();
+            SafeDriver driver = new SafeDriver();
             driver.setPrimer(primer);
             ChunkHeightmap heightmap = new ChunkHeightmap(driver, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, baseChar);
             cachedHeightmaps.put(key, heightmap);
@@ -473,7 +494,7 @@ public class LostCityChunkGenerator extends NoiseChunkGenerator<OverworldGenSett
             // Calculate the chunk heightmap in case we need it later
             if (!cachedHeightmaps.containsKey(key)) {
                 // We might need this later
-                char baseChar = (char) Block.BLOCK_STATE_IDS.get(profile.getBaseBlock());
+                BlockState baseChar = profile.getBaseBlock();
                 IPrimerDriver driver = new SafeDriver();
                 driver.setPrimer(chunkprimer);
                 cachedHeightmaps.put(key, new ChunkHeightmap(driver, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, baseChar));
