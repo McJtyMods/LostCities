@@ -241,6 +241,7 @@ public class LostCityTerrainCarver implements ICityCarver {
 
     // Note that for normal chunks this is called with a pre-filled in landscape primer
     public void generate(int chunkX, int chunkZ, IChunk primer) {
+        System.out.println("CARVE " + chunkX + "," + chunkZ);
         driver.setPrimer(primer);
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
@@ -1612,7 +1613,13 @@ public class LostCityTerrainCarver implements ICityCarver {
         // Base blocks below streets
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
-                driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, info.getCityGroundLevel(), baseChar);
+                int y = info.getCityGroundLevel()-1;
+                driver.current(x, y, z);
+                while (driver.getY() > info.profile.BEDROCK_LAYER && driver.getBlock() == airChar) {
+                    driver.block(baseChar);
+                    driver.decY();
+                }
+//                driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, info.getCityGroundLevel(), baseChar);
             }
         }
     }
