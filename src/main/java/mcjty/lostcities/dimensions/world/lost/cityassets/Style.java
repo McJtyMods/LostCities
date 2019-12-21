@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.dimensions.IDimensionInfo;
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;

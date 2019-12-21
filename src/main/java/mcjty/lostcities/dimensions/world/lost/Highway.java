@@ -2,7 +2,6 @@ package mcjty.lostcities.dimensions.world.lost;
 
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.IDimensionInfo;
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.world.gen.PerlinNoiseGenerator;
 

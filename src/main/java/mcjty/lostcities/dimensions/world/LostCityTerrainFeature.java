@@ -1,14 +1,11 @@
-package mcjty.lostcities.dimensions.world.terraingen;
+package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.ICityCarver;
 import mcjty.lostcities.dimensions.IDimensionInfo;
-import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.driver.IIndex;
-import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
-import mcjty.lostcities.dimensions.world.driver.SafeDriver;
+import mcjty.lostcities.dimensions.world.driver.PrimerDriver;
 import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -18,49 +15,55 @@ import net.minecraft.state.EnumProperty;
 import net.minecraft.state.properties.DoorHingeSide;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.state.properties.RailShape;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.chunk.UpgradeData;
+import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.PerlinNoiseGenerator;
+import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 import java.util.function.BiFunction;
 
-public class LostCityTerrainCarver implements ICityCarver {
+public class LostCityTerrainFeature {
 
     private static int g_seed = 123456789;
     private final int mainGroundLevel;
     private final int waterLevel;
-    private boolean charsSetup = false;
-    public static BlockState airChar;
-    public static BlockState hardAirChar;
-    public static BlockState glowstoneChar;
-    public static BlockState gravelChar;
-    public static BlockState glassChar;       // @todo: for space: depend on city style
-    public static BlockState leavesChar;
-    public static BlockState leaves2Char;
-    public static BlockState leaves3Char;
-    public static BlockState ironbarsChar;
-    public static BlockState grassChar;
-    public static BlockState bedrockChar;
-    public static BlockState endportalChar;
-    public static BlockState endportalFrameChar;
-    public static BlockState goldBlockChar;
-    public static BlockState diamondBlockChar;
+    private boolean statesSetup = false;
+    public static BlockState air;
+    public static BlockState hardAir;
+    public static BlockState glowstone;
+    public static BlockState gravel;
+    public static BlockState glass;       // @todo: for space: depend on city style
+    public static BlockState leaves;
+    public static BlockState leaves2;
+    public static BlockState leaves3;
+    public static BlockState ironbars;
+    public static BlockState grass;
+    public static BlockState bedrock;
+    public static BlockState endportal;
+    public static BlockState endportalFrame;
+    public static BlockState goldBlock;
+    public static BlockState diamondBlock;
 
-    public BlockState liquidChar;
-    public BlockState baseChar;
+    public BlockState liquid;
+    public BlockState base;
 
-    private static Set<BlockState> rotatableChars = null;
-    private static Set<BlockState> railChars = null;
-    private static Set<BlockState> glassChars = null;
-    private static Set<BlockState> charactersNeedingTodo = null;
-    private static Set<BlockState> charactersNeedingLightingUpdate = null;
+    private static Set<BlockState> rotatableStates = null;
+    private static Set<BlockState> railStates = null;
+    private static Set<BlockState> glassStates = null;
+    private static Set<BlockState> statesNeedingTodo = null;
+    private static Set<BlockState> statesNeedingLightingUpdate = null;
 
     private BlockState street;
     private BlockState streetBase;
@@ -73,20 +76,20 @@ public class LostCityTerrainCarver implements ICityCarver {
 
     private static BlockState randomLeafs[] = null;
 
-    private IPrimerDriver driver;
-    private IslandTerrainGenerator islandTerrainGenerator = new IslandTerrainGenerator(IslandTerrainGenerator.ISLANDS);
-    private CavernTerrainGenerator cavernTerrainGenerator = new CavernTerrainGenerator();
-    private SpaceTerrainGenerator spaceTerrainGenerator = new SpaceTerrainGenerator();
+    private PrimerDriver driver;
+    private WorldGenRegion region;
 
     private final IDimensionInfo provider;
     private final LostCityProfile profile;
     private final Random rand;
 
-    public LostCityTerrainCarver(IDimensionInfo provider, LostCityProfile profile, Random rand) {
+    private Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
+
+    public LostCityTerrainFeature(IDimensionInfo provider, LostCityProfile profile, Random rand) {
         this.provider = provider;
         this.profile = profile;
         this.rand = rand;
-        driver = new SafeDriver();
+        driver = new PrimerDriver();
         this.mainGroundLevel = profile.GROUNDLEVEL;
         this.waterLevel = profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
         this.rubbleNoise = new PerlinNoiseGenerator(rand, 4);
@@ -103,87 +106,92 @@ public class LostCityTerrainCarver implements ICityCarver {
             randomLeafs = new BlockState[128];
             int i = 0;
             for (; i < 20; i++) {
-                randomLeafs[i] = leaves2Char;
+                randomLeafs[i] = leaves2;
             }
             for (; i < 40; i++) {
-                randomLeafs[i] = leaves3Char;
+                randomLeafs[i] = leaves3;
             }
             for (; i < randomLeafs.length; i++) {
-                randomLeafs[i] = leavesChar;
+                randomLeafs[i] = leaves;
             }
         }
         return randomLeafs[fastrand128()];
     }
 
-    public static Set<BlockState> getRailChars() {
-        if (railChars == null) {
-            railChars = new HashSet<>();
-            addStates(Blocks.RAIL, railChars);
-            addStates(Blocks.POWERED_RAIL, railChars);
+    public static Set<BlockState> getRailStates() {
+        if (railStates == null) {
+            railStates = new HashSet<>();
+            addStates(Blocks.RAIL, railStates);
+            addStates(Blocks.POWERED_RAIL, railStates);
         }
-        return railChars;
+        return railStates;
     }
 
-    public static Set<BlockState> getGlassChars() {
-        if (glassChars == null) {
-            glassChars = new HashSet<>();
-            addStates(Blocks.GLASS, glassChars);
-//            addStates(Blocks.STAINED_GLASS, glassChars);  // @todo 1.14
-            addStates(Blocks.GLASS_PANE, glassChars);
-//            addStates(Blocks.STAINED_GLASS_PANE, glassChars);
+    public static Set<BlockState> getGlassStates() {
+        if (glassStates == null) {
+            glassStates = new HashSet<>();
+            for (Block block : Tags.Blocks.GLASS.getAllElements()) {
+                addStates(block, glassStates);
+            }
+            for (Block block : Tags.Blocks.STAINED_GLASS.getAllElements()) {
+                addStates(block, glassStates);
+            }
+            for (Block block : Tags.Blocks.GLASS_PANES.getAllElements()) {
+                addStates(block, glassStates);
+            }
+            for (Block block : Tags.Blocks.STAINED_GLASS_PANES.getAllElements()) {
+                addStates(block, glassStates);
+            }
         }
-        return glassChars;
+        return glassStates;
     }
 
-    public static Set<BlockState> getCharactersNeedingTodo() {
-        if (charactersNeedingTodo == null) {
-            charactersNeedingTodo = new HashSet<>();
-            // @todo 1.14
-//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.ACACIA)));
-//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.BIRCH)));
-//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.OAK)));
-//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.SPRUCE)));
-//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.DARK_OAK)));
-//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.SAPLING.getDefaultState().withProperty(BlockSapling.TYPE, BlockPlanks.EnumType.JUNGLE)));
-//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.RED_FLOWER.getDefaultState()));
-//            charactersNeedingTodo.add((char) Block.BLOCK_STATE_IDS.get(Blocks.YELLOW_FLOWER.getDefaultState()));
+    public static Set<BlockState> getStatesNeedingTodo() {
+        if (statesNeedingTodo == null) {
+            statesNeedingTodo = new HashSet<>();
+            for (Block block : BlockTags.SAPLINGS.getAllElements()) {
+                addStates(block, statesNeedingTodo);
+            }
+            for (Block block : BlockTags.SMALL_FLOWERS.getAllElements()) {
+                addStates(block, statesNeedingTodo);
+            }
         }
-        return charactersNeedingTodo;
+        return statesNeedingTodo;
     }
 
-    public static Set<BlockState> getCharactersNeedingLightingUpdate() {
-        if (charactersNeedingLightingUpdate == null) {
-            charactersNeedingLightingUpdate = new HashSet<>();
+    public static Set<BlockState> getStatesNeedingLightingUpdate() {
+        if (statesNeedingLightingUpdate == null) {
+            statesNeedingLightingUpdate = new HashSet<>();
             for (String s : LostCityConfiguration.BLOCKS_REQUIRING_LIGHTING_UPDATES) {
                 Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(s));
                 if (block != null) {
-                    addStates(block, charactersNeedingLightingUpdate);
+                    addStates(block, statesNeedingLightingUpdate);
                 }
             }
         }
-        return charactersNeedingLightingUpdate;
+        return statesNeedingLightingUpdate;
     }
 
-    public static Set<BlockState> getRotatableChars() {
-        if (rotatableChars == null) {
-            rotatableChars = new HashSet<>();
-            addStates(Blocks.ACACIA_STAIRS, rotatableChars);
-            addStates(Blocks.BIRCH_STAIRS, rotatableChars);
-            addStates(Blocks.BRICK_STAIRS, rotatableChars);
-            addStates(Blocks.QUARTZ_STAIRS, rotatableChars);
-            addStates(Blocks.STONE_BRICK_STAIRS, rotatableChars);
-            addStates(Blocks.DARK_OAK_STAIRS, rotatableChars);
-            addStates(Blocks.JUNGLE_STAIRS, rotatableChars);
-            addStates(Blocks.NETHER_BRICK_STAIRS, rotatableChars);
-            addStates(Blocks.OAK_STAIRS, rotatableChars);
-            addStates(Blocks.PURPUR_STAIRS, rotatableChars);
-            addStates(Blocks.RED_SANDSTONE_STAIRS, rotatableChars);
-            addStates(Blocks.SANDSTONE_STAIRS, rotatableChars);
-            addStates(Blocks.SPRUCE_STAIRS, rotatableChars);
-            addStates(Blocks.STONE_STAIRS, rotatableChars);
-            addStates(Blocks.LADDER, rotatableChars);
+    public static Set<BlockState> getRotatableStates() {
+        if (rotatableStates == null) {
+            rotatableStates = new HashSet<>();
+            addStates(Blocks.ACACIA_STAIRS, rotatableStates);
+            addStates(Blocks.BIRCH_STAIRS, rotatableStates);
+            addStates(Blocks.BRICK_STAIRS, rotatableStates);
+            addStates(Blocks.QUARTZ_STAIRS, rotatableStates);
+            addStates(Blocks.STONE_BRICK_STAIRS, rotatableStates);
+            addStates(Blocks.DARK_OAK_STAIRS, rotatableStates);
+            addStates(Blocks.JUNGLE_STAIRS, rotatableStates);
+            addStates(Blocks.NETHER_BRICK_STAIRS, rotatableStates);
+            addStates(Blocks.OAK_STAIRS, rotatableStates);
+            addStates(Blocks.PURPUR_STAIRS, rotatableStates);
+            addStates(Blocks.RED_SANDSTONE_STAIRS, rotatableStates);
+            addStates(Blocks.SANDSTONE_STAIRS, rotatableStates);
+            addStates(Blocks.SPRUCE_STAIRS, rotatableStates);
+            addStates(Blocks.STONE_STAIRS, rotatableStates);
+            addStates(Blocks.LADDER, rotatableStates);
         }
-        return rotatableChars;
+        return rotatableStates;
     }
 
     private static void addStates(Block block, Set<BlockState> set) {
@@ -192,35 +200,35 @@ public class LostCityTerrainCarver implements ICityCarver {
         }
     }
 
-    public void setupChars(LostCityProfile profile) {
-        if (!charsSetup) {
-            airChar = Blocks.AIR.getDefaultState();
-            hardAirChar = Blocks.COMMAND_BLOCK.getDefaultState();
-            glowstoneChar = Blocks.GLOWSTONE.getDefaultState();
-            gravelChar = Blocks.GRAVEL.getDefaultState();
+    public void setupStates(LostCityProfile profile) {
+        if (!statesSetup) {
+            air = Blocks.AIR.getDefaultState();
+            hardAir = Blocks.COMMAND_BLOCK.getDefaultState();
+            glowstone = Blocks.GLOWSTONE.getDefaultState();
+            gravel = Blocks.GRAVEL.getDefaultState();
 
-            baseChar = profile.getBaseBlock();
-            liquidChar = profile.getLiquidBlock();
+            base = profile.getBaseBlock();
+            liquid = profile.getLiquidBlock();
 
             // @todo
-            glassChar = Blocks.GLASS.getDefaultState();
+            glass = Blocks.GLASS.getDefaultState();
 
             // @todo 1.14
-            leavesChar = Blocks.OAK_LEAVES.getDefaultState()
+            leaves = Blocks.OAK_LEAVES.getDefaultState()
                     .with(LeavesBlock.PERSISTENT, true);
-            leaves2Char = Blocks.JUNGLE_LEAVES.getDefaultState()
+            leaves2 = Blocks.JUNGLE_LEAVES.getDefaultState()
                     .with(LeavesBlock.PERSISTENT, true);
-            leaves3Char = Blocks.SPRUCE_LEAVES.getDefaultState()
+            leaves3 = Blocks.SPRUCE_LEAVES.getDefaultState()
                     .with(LeavesBlock.PERSISTENT, true);
 
-            ironbarsChar = Blocks.IRON_BARS.getDefaultState();
-            grassChar = Blocks.GRASS.getDefaultState();
-            bedrockChar = Blocks.BEDROCK.getDefaultState();
-            endportalChar = Blocks.END_PORTAL.getDefaultState();
-            endportalFrameChar = Blocks.END_PORTAL_FRAME.getDefaultState();
-            goldBlockChar = Blocks.GOLD_BLOCK.getDefaultState();
-            diamondBlockChar = Blocks.DIAMOND_BLOCK.getDefaultState();
-            charsSetup = true;
+            ironbars = Blocks.IRON_BARS.getDefaultState();
+            grass = Blocks.GRASS_BLOCK.getDefaultState();
+            bedrock = Blocks.BEDROCK.getDefaultState();
+            endportal = Blocks.END_PORTAL.getDefaultState();
+            endportalFrame = Blocks.END_PORTAL_FRAME.getDefaultState();
+            goldBlock = Blocks.GOLD_BLOCK.getDefaultState();
+            diamondBlock = Blocks.DIAMOND_BLOCK.getDefaultState();
+            statesSetup = true;
         }
     }
 
@@ -234,15 +242,11 @@ public class LostCityTerrainCarver implements ICityCarver {
         return (g_seed >> 16) & 0x7F;
     }
 
-    @Override
-    public void carve(IChunk chunk) {
-        generate(chunk.getPos().x, chunk.getPos().z, chunk);
-    }
-
-    // Note that for normal chunks this is called with a pre-filled in landscape primer
-    public void generate(int chunkX, int chunkZ, IChunk primer) {
-        System.out.println("CARVE " + chunkX + "," + chunkZ);
-        driver.setPrimer(primer);
+    public void generate(WorldGenRegion region, IChunk chunk) {
+        int chunkX = chunk.getPos().x;
+        int chunkZ = chunk.getPos().z;
+        driver.setPrimer(chunk);
+        this.region = region;
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
         // @todo this setup is not very clean
@@ -423,7 +427,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                             int height = yy * 16;
                             driver.current(x, height, z);
                             for (int y = 0; y < 16; y++) {
-                                driver.add(((height + y) <= info.waterLevel) ? liquidChar : airChar);
+                                driver.add(((height + y) <= info.waterLevel) ? liquid : air);
                             }
                         }
                     }
@@ -438,10 +442,10 @@ public class LostCityTerrainCarver implements ICityCarver {
                             driver.current(x, cury, 0);
                             for (int z = 0; z < 16; z++) {
                                 BlockState d = driver.getBlock();
-                                if (d != airChar || cury <= info.waterLevel) {
+                                if (d != air || cury <= info.waterLevel) {
                                     float damage = damageArea.getDamage(cx + x, cury, cz + z) * damageFactor;
                                     if (damage >= 0.001) {
-                                        BlockState newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette(), liquidChar);
+                                        BlockState newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette(), liquid);
                                         if (newd != d) {
                                             driver.block(newd);
                                             cntDamaged++;
@@ -557,7 +561,7 @@ public class LostCityTerrainCarver implements ICityCarver {
             int z1 = transform.rotateZ(0, 15);
             driver.current(x1, highwayGroundLevel-1, z1);
             for (int y = 0; y < 40; y++) {
-                if (driver.getBlock() == airChar || driver.getBlock() == liquidChar) {
+                if (driver.getBlock() == air || driver.getBlock() == liquid) {
                     driver.block(sup);
                 } else {
                     break;
@@ -569,7 +573,7 @@ public class LostCityTerrainCarver implements ICityCarver {
             int z2 = transform.rotateZ(0, 0);
             driver.current(x2, highwayGroundLevel-1, z2);
             for (int y = 0; y < 40; y++) {
-                if (driver.getBlock() == airChar || driver.getBlock() == liquidChar) {
+                if (driver.getBlock() == air || driver.getBlock() == liquid) {
                     driver.block(sup);
                 } else {
                     break;
@@ -582,10 +586,10 @@ public class LostCityTerrainCarver implements ICityCarver {
     private void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater) {
         if (dowater) {
             // Special case for drowned city
-            driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquidChar);
-            driver.setBlockRangeSafe(x, info.waterLevel+1, z, height2, airChar);
+            driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquid);
+            driver.setBlockRangeSafe(x, info.waterLevel+1, z, height2, air);
         } else {
-            driver.setBlockRange(x, height1, z, height2, airChar);
+            driver.setBlockRange(x, height1, z, height2, air);
         }
     }
 
@@ -622,7 +626,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                             if (info.profile.GENERATE_LIGHTING) {
                                 info.addTorchTodo(driver.getCurrent(), orientations);
                             } else {
-                                b = airChar;        // No torch!
+                                b = air;        // No torch!
                             }
                         }
                     }
@@ -793,8 +797,8 @@ public class LostCityTerrainCarver implements ICityCarver {
         driver.current(x, 0, z);
         for (int y = 0; y <= (level - offset - rand.nextInt(2)); y++) {
             BlockState b = driver.getBlock();
-            if (b != bedrockChar) {
-                driver.add(baseChar);
+            if (b != bedrock) {
+                driver.add(base);
             } else {
                 driver.incY();
             }
@@ -808,10 +812,35 @@ public class LostCityTerrainCarver implements ICityCarver {
         clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
+    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
+        ChunkCoord key = new ChunkCoord(region.getDimension().getType(), chunkX, chunkZ);
+        if (cachedHeightmaps.containsKey(key)) {
+            return cachedHeightmaps.get(key);
+        } else {
+            ChunkHeightmap heightmap;
+            if (region.chunkExists(chunkX, chunkZ)) {
+                heightmap = new ChunkHeightmap(region.getChunk(chunkX, chunkZ), profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+            } else {
+                // @todo 1.14 what to do here? We can't get to the desired chunk? We need some kind of dummy then?
+                // At the very least we don't cache this information. This could possibly lead to wrong results.
+                ChunkPrimer primer = new ChunkPrimer(new ChunkPos(chunkX, chunkZ), UpgradeData.EMPTY);
+                ChunkGenerator<?> generator = region.getDimension().getWorld().getChunkProvider().getChunkGenerator();
+                generator.generateBiomes(primer);
+                generator.makeBase(region.getDimension().getWorld(), primer);
+                generator.generateSurface(primer);
+
+                heightmap = new ChunkHeightmap(primer, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+//                heightmap = new ChunkHeightmap(region.getChunk(region.getMainChunkX(), region.getMainChunkZ()), profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+            }
+            cachedHeightmaps.put(key, heightmap);
+            return heightmap;
+        }
+    }
+
     private void doCityChunk(int chunkX, int chunkZ, BuildingInfo info) {
         boolean building = info.hasBuilding;
 
-        ChunkHeightmap heightmap = provider.getHeightmap(info.chunkX, info.chunkZ);
+        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ);
 
         Random rand = new Random(provider.getSeed() * 377 + chunkZ * 341873128712L + chunkX * 132897987541L);
         rand.nextFloat();
@@ -820,7 +849,7 @@ public class LostCityTerrainCarver implements ICityCarver {
         if (info.profile.isDefault()) {
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
-                    driver.setBlockRange(x, 0, z, info.profile.BEDROCK_LAYER, bedrockChar);
+                    driver.setBlockRange(x, 0, z, info.profile.BEDROCK_LAYER, bedrock);
                 }
             }
 
@@ -828,7 +857,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                 // Special case for a high water level
                 for (int x = 0; x < 16; ++x) {
                     for (int z = 0; z < 16; ++z) {
-                        driver.setBlockRange(x, info.groundLevel, z, info.waterLevel, liquidChar);
+                        driver.setBlockRange(x, info.groundLevel, z, info.waterLevel, liquid);
                     }
                 }
             }
@@ -923,24 +952,24 @@ public class LostCityTerrainCarver implements ICityCarver {
                 RailChunkType type1 = info.getXmin().getRailInfo().getType();
                 RailChunkType type2 = info.getXmax().getRailInfo().getType();
                 if (!type1.isStation() && !type2.isStation()) {
-                    if (driver.getBlock(3, height + 2, 3) == liquidChar &&
-                            driver.getBlock(12, height + 2, 3) == liquidChar &&
-                            driver.getBlock(3, height + 2, 12) == liquidChar &&
-                            driver.getBlock(12, height + 2, 12) == liquidChar &&
-                            driver.getBlock(3, height + 4, 7) == liquidChar &&
-                            driver.getBlock(12, height + 4, 8) == liquidChar) {
+                    if (driver.getBlock(3, height + 2, 3) == liquid &&
+                            driver.getBlock(12, height + 2, 3) == liquid &&
+                            driver.getBlock(3, height + 2, 12) == liquid &&
+                            driver.getBlock(12, height + 2, 12) == liquid &&
+                            driver.getBlock(3, height + 4, 7) == liquid &&
+                            driver.getBlock(12, height + 4, 8) == liquid) {
                         part = AssetRegistries.PARTS.get("rails_horizontal_water");
                     }
                 }
                 break;
             case VERTICAL:
                 part = AssetRegistries.PARTS.get("rails_vertical");
-                if (driver.getBlock(3, height + 2, 3) == liquidChar &&
-                        driver.getBlock(12, height + 2, 3) == liquidChar &&
-                        driver.getBlock(3, height + 2, 12) == liquidChar &&
-                        driver.getBlock(12, height + 2, 12) == liquidChar &&
-                        driver.getBlock(3, height + 4, 7) == liquidChar &&
-                        driver.getBlock(12, height + 4, 8) == liquidChar) {
+                if (driver.getBlock(3, height + 2, 3) == liquid &&
+                        driver.getBlock(12, height + 2, 3) == liquid &&
+                        driver.getBlock(3, height + 2, 12) == liquid &&
+                        driver.getBlock(12, height + 2, 12) == liquid &&
+                        driver.getBlock(3, height + 4, 7) == liquid &&
+                        driver.getBlock(12, height + 4, 8) == liquid) {
                     part = AssetRegistries.PARTS.get("rails_vertical_water");
                 }
                 if (railInfo.getDirection() == Railway.RailDirection.EAST) {
@@ -985,8 +1014,8 @@ public class LostCityTerrainCarver implements ICityCarver {
             // If there is a rail dungeon north or south we must make a connection here
             if (info.getZmin().railDungeon != null) {
                 for (int z = 0; z < 4; z++) {
-                    driver.current(6, height + 1, z).add(rail).add(airChar).add(airChar);
-                    driver.current(7, height + 1, z).add(rail).add(airChar).add(airChar);
+                    driver.current(6, height + 1, z).add(rail).add(air).add(air);
+                    driver.current(7, height + 1, z).add(rail).add(air).add(air);
                 }
                 for (int z = 0; z < 3; z++) {
                     driver.current(5, height+2, z).add(rail).add(rail).add(rail);
@@ -1000,8 +1029,8 @@ public class LostCityTerrainCarver implements ICityCarver {
 
             if (info.getZmax().railDungeon != null) {
                 for (int z = 0; z < 5; z++) {
-                    driver.current(6, height+1, 15-z).add(rail).add(airChar).add(airChar);
-                    driver.current(7, height+1, 15-z).add(rail).add(airChar).add(airChar);
+                    driver.current(6, height+1, 15-z).add(rail).add(air).add(air);
+                    driver.current(7, height+1, 15-z).add(rail).add(air).add(air);
                 }
                 for (int z = 0; z < 4; z++) {
                     driver.current(5, height+2, 15-z).add(rail).add(rail).add(rail);
@@ -1050,11 +1079,11 @@ public class LostCityTerrainCarver implements ICityCarver {
                         for (int x = 0; x < 16; x++) {
                             for (int y = height + 1; y < height + part.getSliceCount(); y++) {
                                 driver.current(x, y, 5);
-                                if (getRailChars().contains(driver.getBlock())) {
+                                if (getRailStates().contains(driver.getBlock())) {
                                     driver.block(rail);
                                 }
                                 driver.current(x, y, 9);;
-                                if (getRailChars().contains(driver.getBlock())) {
+                                if (getRailStates().contains(driver.getBlock())) {
                                     driver.block(rail);
                                 }
                             }
@@ -1063,7 +1092,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                         for (int x = 0; x < 16; x++) {
                             for (int y = height + 1; y < height + part.getSliceCount(); y++) {
                                 driver.current(x, y, 7);
-                                if (getRailChars().contains(driver.getBlock())) {
+                                if (getRailStates().contains(driver.getBlock())) {
                                     driver.block(rail);
                                 }
                             }
@@ -1116,6 +1145,10 @@ public class LostCityTerrainCarver implements ICityCarver {
 
             generatePart(info, stairs, transform, 0, oy, 0, false);
         }
+    }
+
+    public long getSeed() {
+        return region.getSeed();
     }
 
     private static class Blob implements Comparable<Blob> {
@@ -1225,7 +1258,7 @@ public class LostCityTerrainCarver implements ICityCarver {
             return false;
         }
 
-        public void scan(BuildingInfo info, IPrimerDriver driver, BlockState air, BlockState liquid, BlockPos pos) {
+        public void scan(BuildingInfo info, PrimerDriver driver, BlockState air, BlockState liquid, BlockPos pos) {
             DamageArea damageArea = info.getDamageArea();
             avgdamage = 0;
             cntMindamage = 0;
@@ -1308,12 +1341,12 @@ public class LostCityTerrainCarver implements ICityCarver {
                 driver.current(x, start, z);
                 for (int y = start; y < end; y++) {
                     BlockState p = driver.getBlock();
-                    if (p != airChar && p != liquidChar) {
+                    if (p != air && p != liquid) {
                         Blob blob = findBlob(blobs, driver.getCurrent());
                         if (blob == null) {
                             blob = new Blob(start, end + 6);
                             // We must make a copy of the driver here so that we can safely modify it
-                            blob.scan(info, driver.copy(), airChar, liquidChar, new BlockPos(x, y, z));
+                            blob.scan(info, driver.copy(), air, liquid, new BlockPos(x, y, z));
                             blobs.add(blob);
                         }
                     }
@@ -1343,7 +1376,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                     || blob.connections < 5) {
                 for (IIndex index : blob.connectedBlocks) {
                     driver.current(index);
-                    driver.block(((driver.getY()) < info.waterLevel) ? liquidChar : airChar);
+                    driver.block(((driver.getY()) < info.waterLevel) ? liquid : air);
                 }
             } else {
                 blocksToMove.connectedBlocks.addAll(blob.connectedBlocks);
@@ -1352,10 +1385,10 @@ public class LostCityTerrainCarver implements ICityCarver {
         for (IIndex index : blocksToMove.connectedBlocks) {
             driver.current(index);
             BlockState c = driver.getBlock();
-            driver.block(((driver.getY()) < info.waterLevel) ? liquidChar : airChar);
+            driver.block(((driver.getY()) < info.waterLevel) ? liquid : air);
             driver.decY();
             int y = driver.getY();
-            while (y > 2 && (blocksToMove.contains(driver.getCurrent()) || driver.getBlock() == airChar || driver.getBlock() == liquidChar)) {
+            while (y > 2 && (blocksToMove.contains(driver.getCurrent()) || driver.getBlock() == air || driver.getBlock() == liquid)) {
                 driver.decY();
                 y--;
             }
@@ -1380,18 +1413,18 @@ public class LostCityTerrainCarver implements ICityCarver {
                     int height = getInterpolatedHeight(info, x, z);
                     driver.current(x, height, z);
                     BlockState c = driver.getBlockDown();
-                    if (c != airChar && c != liquidChar) {
+                    if (c != air && c != liquid) {
                         for (int i = 0; i < vr; i++) {
-                            if (driver.getBlock() == airChar || driver.getBlock() == liquidChar) {
-                                driver.add(baseChar);
+                            if (driver.getBlock() == air || driver.getBlock() == liquid) {
+                                driver.add(base);
                             } else {
                                 driver.incY();
                             }
                         }
                     }
-                    if (driver.getBlockDown() == baseChar) {
+                    if (driver.getBlockDown() == base) {
                         for (int i = 0; i < vl; i++) {
-                            if (driver.getBlock() == airChar || driver.getBlock() == liquidChar) {
+                            if (driver.getBlock() == air || driver.getBlock() == liquid) {
                                 driver.add(getRandomLeaf());
                             } else {
                                 driver.incY();
@@ -1477,12 +1510,12 @@ public class LostCityTerrainCarver implements ICityCarver {
                 while (height > 0) {
                     BlockState damage = info.getCompiledPalette().canBeDamagedToIronBars(driver.getBlock());
                     BlockState c = driver.getBlockDown();
-                    if ((damage != null || c == ironbarsChar) && c != airChar && c != liquidChar && rand.nextFloat() < .2f) {
-                        driver.add(ironbarsChar);
+                    if ((damage != null || c == ironbars) && c != air && c != liquid && rand.nextFloat() < .2f) {
+                        driver.add(ironbars);
                     } else {
                         if (vl > 0) {
                             c = driver.getBlockDown();
-                            while (c == airChar || c == liquidChar) {
+                            while (c == air || c == liquid) {
                                 driver.decY();
                                 height++;   // Make sure we keep on filling with air a bit longer because we are lowering here
                                 c = driver.getBlockDown();
@@ -1490,7 +1523,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                             driver.add(getRandomLeaf());
                             vl--;
                         } else {
-                            driver.add(airChar);
+                            driver.add(air);
                         }
                     }
                     height--;
@@ -1615,8 +1648,8 @@ public class LostCityTerrainCarver implements ICityCarver {
             for (int z = 0; z < 16; ++z) {
                 int y = info.getCityGroundLevel()-1;
                 driver.current(x, y, z);
-                while (driver.getY() > info.profile.BEDROCK_LAYER && driver.getBlock() == airChar) {
-                    driver.block(baseChar);
+                while (driver.getY() > info.profile.BEDROCK_LAYER && driver.getBlock() == air) {
+                    driver.block(base);
                     driver.decY();
                 }
 //                driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, info.getCityGroundLevel(), baseChar);
@@ -1632,8 +1665,8 @@ public class LostCityTerrainCarver implements ICityCarver {
             for (int z = 0; z < 16; ++z) {
                 int y = lowestLevel - 1;
                 driver.current(x, y, z);
-                while (y > 1 && driver.getBlock() == airChar) {
-                    driver.block(baseChar).decY();
+                while (y > 1 && driver.getBlock() == air) {
+                    driver.block(base).decY();
                     y--;
                 }
             }
@@ -1647,7 +1680,7 @@ public class LostCityTerrainCarver implements ICityCarver {
         BlockState border = info.getCompiledPalette().get(borderBlock);
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
-                driver.setBlockRange(x, info.getCityGroundLevel() - (offset - 1), z, info.getCityGroundLevel(), baseChar);
+                driver.setBlockRange(x, info.getCityGroundLevel() - (offset - 1), z, info.getCityGroundLevel(), base);
                 driver.current(x, info.getCityGroundLevel() - offset, z).block(border);
             }
         }
@@ -1671,7 +1704,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                 if (adjacent.isCity) {
                     adjacentY = Math.min(adjacentY, adjacent.getCityGroundLevel());
                 } else {
-                    ChunkHeightmap adjacentHeightmap = provider.getHeightmap(adjacent.chunkX, adjacent.chunkZ);
+                    ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.chunkX, adjacent.chunkZ);
                     int minimumHeight = adjacentHeightmap.getMinimumHeight();
                     adjacentY = Math.min(adjacentY, minimumHeight-2);
                 }
@@ -1698,7 +1731,7 @@ public class LostCityTerrainCarver implements ICityCarver {
             if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
                 driver.current(x, info.getCityGroundLevel() + 1, z).block(wall);
             } else {
-                driver.current(x, info.getCityGroundLevel() + 1, z).block(airChar);
+                driver.current(x, info.getCityGroundLevel() + 1, z).block(air);
             }
         }
     }
@@ -1707,18 +1740,18 @@ public class LostCityTerrainCarver implements ICityCarver {
      * Generate a column of wall blocks (and stone below that in water)
      */
     private void generateBorderSupport(BuildingInfo info, BlockState wall, int x, int z, int offset) {
-        ChunkHeightmap heightmap = provider.getHeightmap(info.chunkX, info.chunkZ);
+        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ);
         int height = heightmap.getHeight(x, z);
         if (height > 1) {
             // None void
             int y = info.getCityGroundLevel() - offset - 1;
             driver.current(x, y, z);
-            while (y > 1 && driver.getBlock() == airChar) {
+            while (y > 1 && driver.getBlock() == air) {
                 driver.block(wall).decY();
                 y--;
             }
-            while (y > 1 && driver.getBlock() == liquidChar) {
-                driver.block(baseChar).decY();
+            while (y > 1 && driver.getBlock() == liquid) {
+                driver.block(base).decY();
                 y--;
             }
         }
@@ -1748,20 +1781,20 @@ public class LostCityTerrainCarver implements ICityCarver {
                     } else if (zRail && x == 10) {
                         b = railz;
                     } else {
-                        b = airChar;
+                        b = air;
                     }
-                    driver.current(x, height, z).add(b).add(airChar).add(airChar);
+                    driver.current(x, height, z).add(b).add(air).add(air);
 
                     if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
                         BlockState glass = palette.get(corridorGlassBlock);
                         info.addLightingUpdateTodo(new BlockPos(x, height, z));
-                        driver.add(glass).add(glowstoneChar);
+                        driver.add(glass).add(glowstone);
                     } else {
                         BlockState roof = palette.get(corridorRoofBlock);
                         driver.add(roof).add(roof);
                     }
                 } else {
-                    driver.setBlockRange(x, info.groundLevel - 5, z, info.getCityGroundLevel(), baseChar);
+                    driver.setBlockRange(x, info.groundLevel - 5, z, info.getCityGroundLevel(), base);
                 }
             }
         }
@@ -1773,7 +1806,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                 for (int z = 0; z < 16; z++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
-                    while (driver.getBlockDown() == airChar) {
+                    while (driver.getBlockDown() == air) {
                         driver.decY();
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - x));
@@ -1790,7 +1823,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                 for (int z = 0; z < 16; z++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
-                    while (driver.getBlockDown() == airChar) {
+                    while (driver.getBlockDown() == air) {
                         driver.decY();
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS));
@@ -1807,7 +1840,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                 for (int x = 0; x < 16; x++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
-                    while (driver.getBlockDown() == airChar) {
+                    while (driver.getBlockDown() == air) {
                         driver.decY();
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - z));
@@ -1824,7 +1857,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                 for (int x = 0; x < 16; x++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
-                    while (driver.getBlockDown() == airChar) {
+                    while (driver.getBlockDown() == air) {
                         driver.decY();
                     }
                     float v = info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS);
@@ -1855,40 +1888,40 @@ public class LostCityTerrainCarver implements ICityCarver {
                     if (elevated) {
                         if (x == 0 && z == 0) {
                             if (el01 && el00 && el10) {
-                                b = grassChar;
+                                b = grass;
                             }
                         } else if (x == 15 && z == 0) {
                             if (el21 && el20 && el10) {
-                                b = grassChar;
+                                b = grass;
                             }
                         } else if (x == 0 && z == 15) {
                             if (el01 && el02 && el12) {
-                                b = grassChar;
+                                b = grass;
                             }
                         } else if (x == 15 && z == 15) {
                             if (el12 && el22 && el21) {
-                                b = grassChar;
+                                b = grass;
                             }
                         } else if (x == 0) {
                             if (el01) {
-                                b = grassChar;
+                                b = grass;
                             }
                         } else if (x == 15) {
                             if (el21) {
-                                b = grassChar;
+                                b = grass;
                             }
                         } else if (z == 0) {
                             if (el10) {
-                                b = grassChar;
+                                b = grass;
                             }
                         } else if (z == 15) {
                             if (el12) {
-                                b = grassChar;
+                                b = grass;
                             }
                         }
                     }
                 } else {
-                    b = grassChar;
+                    b = grass;
                 }
                 driver.current(x, height, z).block(b);
             }
@@ -1997,9 +2030,9 @@ public class LostCityTerrainCarver implements ICityCarver {
                         CompiledPalette.Info inf = compiledPalette.getInfo(c);
 
                         if (transform != Transform.ROTATE_NONE) {
-                            if (getRotatableChars().contains(b)) {
+                            if (getRotatableStates().contains(b)) {
                                 b = b.rotate(transform.getMcRotation());
-                            } else if (getRailChars().contains(b)) {
+                            } else if (getRailStates().contains(b)) {
                                 EnumProperty<RailShape> shapeProperty;
                                 if (b.getBlock() == Blocks.RAIL) {
                                     shapeProperty = RailBlock.SHAPE;
@@ -2013,16 +2046,16 @@ public class LostCityTerrainCarver implements ICityCarver {
                             }
                         }
                         // We don't replace the world where the part is empty (air)
-                        if (b != airChar) {
-                            if (b == liquidChar) {
+                        if (b != air) {
+                            if (b == liquid) {
                                 if (info.profile.AVOID_WATER) {
-                                    b = airChar;
+                                    b = air;
                                 }
-                            } else if (b == hardAirChar) {
+                            } else if (b == hardAir) {
                                 if (airWaterLevel && !info.profile.AVOID_WATER && !nowater) {
-                                    b = (oy + y) < info.waterLevel ? liquidChar : airChar;
+                                    b = (oy + y) < info.waterLevel ? liquid : air;
                                 } else {
-                                    b = airChar;
+                                    b = air;
                                 }
                             } else if (inf != null) {
                                 Map<String, Integer> orientations = inf.getTorchOrientations();
@@ -2030,7 +2063,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                                     if (info.profile.GENERATE_LIGHTING) {
                                         info.addTorchTodo(driver.getCurrent(), orientations);
                                     } else {
-                                        b = airChar;        // No torches
+                                        b = air;        // No torches
                                     }
                                 } else if (inf.getLoot() != null && !inf.getLoot().isEmpty()) {
                                     if (!info.noLoot) {
@@ -2043,17 +2076,17 @@ public class LostCityTerrainCarver implements ICityCarver {
                                         info.getTodoChunk(rx, rz).addSpawnerTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
                                                 new BuildingInfo.ConditionTodo(mobid, part.getName(), info));
                                     } else {
-                                        b = airChar;
+                                        b = air;
                                     }
                                 }
-                            } else if (getCharactersNeedingLightingUpdate().contains(b)) {
+                            } else if (getStatesNeedingLightingUpdate().contains(b)) {
                                 info.getTodoChunk(rx, rz).addLightingUpdateTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
-                            } else if (getCharactersNeedingTodo().contains(b)) {
+                            } else if (getStatesNeedingTodo().contains(b)) {
                                 BlockState bs = b;
                                 Block block = bs.getBlock();
                                 if (block instanceof SaplingBlock || block instanceof FlowerBlock) {
                                     if (info.profile.AVOID_FOLIAGE) {
-                                        b = airChar;
+                                        b = air;
                                     } else {
                                         info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                     }
@@ -2098,7 +2131,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                     int z = rand.nextInt(16);
                     if (rand.nextFloat() < locationFactor.apply(x, z)) {
                         driver.current(x, h, z);
-                        while (h > 0 && (driver.getBlock() == airChar || driver.getBlock() == liquidChar)) {
+                        while (h > 0 && (driver.getBlock() == air || driver.getBlock() == liquid)) {
                             h--;
                             driver.decY();
                         }
@@ -2106,7 +2139,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                         BlockState b;
                         switch (rand.nextInt(5)) {
                             case 0:
-                                b = ironbarsChar;
+                                b = ironbars;
                                 break;
                             default:
                                 b = filler;     // Filler from adjacent building
@@ -2129,7 +2162,7 @@ public class LostCityTerrainCarver implements ICityCarver {
             }
             if (info.profile.isSpace()) {
                 // Base it on ground level
-                ChunkHeightmap adjacentHeightmap = provider.getHeightmap(adjacent.chunkX, adjacent.chunkZ);
+                ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.chunkX, adjacent.chunkZ);
                 int adjacentHeight = adjacentHeightmap.getAverageHeight();
                 if (adjacentHeight > 5) {
                     if ((adjacentHeight-4) < info.getCityGroundLevel()) {
@@ -2181,7 +2214,7 @@ public class LostCityTerrainCarver implements ICityCarver {
                     int index = (x << 12) | (z << 8);
                     int height = heightmap.getHeight(x, z);
                     if (height > 1 && height < lowestLevel - 1) {
-                        driver.setBlockRange(x, height+1, z, lowestLevel, baseChar);
+                        driver.setBlockRange(x, height+1, z, lowestLevel, base);
                     }
                     // Also clear the inside of buildings to avoid geometry that doesn't really belong there
                     clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, info.waterLevel > info.groundLevel);
@@ -2200,7 +2233,7 @@ public class LostCityTerrainCarver implements ICityCarver {
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     if (isSide(x, z)) {
-                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel - 10, baseChar);
+                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel - 10, base);
                         int y = lowestLevel - 10;
                         driver.current(x, y, z);
                         while (y < lowestLevel) {
@@ -2208,9 +2241,9 @@ public class LostCityTerrainCarver implements ICityCarver {
                             y++;
                         }
                     } else if (info.profile.isDefault()) {
-                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel, baseChar);
+                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel, base);
                     }
-                    if (driver.getBlock(x, lowestLevel, z) == airChar) {
+                    if (driver.getBlock(x, lowestLevel, z) == air) {
                         BlockState filler = palette.get(fillerBlock);
                         driver.current(x, lowestLevel, z).block(filler); // There is nothing below so we fill this with the filler
                     }
@@ -2268,12 +2301,12 @@ public class LostCityTerrainCarver implements ICityCarver {
                 int y = lowestLevel - 1;
                 driver.current(x, y, z);
                 if (isSide(x, z)) {
-                    while (y > 1 && driver.getBlock() == airChar) {
+                    while (y > 1 && driver.getBlock() == air) {
                         driver.block(info.getCompiledPalette().get(borderBlock)).decY();
                     }
                 } else {
-                    while (y > 1 && driver.getBlock() == airChar) {
-                        driver.block(baseChar).decY();
+                    while (y > 1 && driver.getBlock() == air) {
+                        driver.block(base).decY();
                     }
                 }
             }
@@ -2299,8 +2332,8 @@ public class LostCityTerrainCarver implements ICityCarver {
                 driver.setBlockRange(x, height, 6, height + 4, filler);
                 driver.setBlockRange(x, height, 9, height + 4, filler);
 
-                driver.current(x, height, 7).add(filler).add(airChar).add(airChar).add(filler);
-                driver.current(x, height, 8).add(filler).add(airChar).add(airChar).add(filler);
+                driver.current(x, height, 7).add(filler).add(air).add(air).add(filler);
+                driver.current(x, height, 8).add(filler).add(air).add(air).add(filler);
 
             } else if (hasConnectionToTopOrOutside(f, info, info.getXmin())) {
                 driver.setBlockRange(x, height, 6, height + 4, filler);
@@ -2322,8 +2355,8 @@ public class LostCityTerrainCarver implements ICityCarver {
             int x = 15;
             driver.setBlockRange(x, height, 6, height + 4, filler);
             driver.setBlockRange(x, height, 9, height + 4, filler);
-            driver.current(x, height, 7).add(filler).add(airChar).add(airChar).add(filler);
-            driver.current(x, height, 8).add(filler).add(airChar).add(airChar).add(filler);
+            driver.current(x, height, 7).add(filler).add(air).add(air).add(filler);
+            driver.current(x, height, 8).add(filler).add(air).add(air).add(filler);
         } else if (hasConnectionToTopOrOutside(f, info, info.getXmax()) && (info.getXmax().hasConnectionAtXFromStreet(f + info.getXmax().floorsBelowGround))) {
             int x = 15;
             driver.setBlockRange(x, height, 6, height + 4, filler);
@@ -2344,8 +2377,8 @@ public class LostCityTerrainCarver implements ICityCarver {
             if (hasConnectionWithBuilding(f, info, info.getZmin())) {
                 driver.setBlockRange(6, height, z, height + 4, filler);
                 driver.setBlockRange(9, height, z, height + 4, filler);
-                driver.current(7, height, z).add(filler).add(airChar).add(airChar).add(filler);
-                driver.current(8, height, z).add(filler).add(airChar).add(airChar).add(filler);
+                driver.current(7, height, z).add(filler).add(air).add(air).add(filler);
+                driver.current(8, height, z).add(filler).add(air).add(air).add(filler);
             } else if (hasConnectionToTopOrOutside(f, info, info.getZmin())) {
                 driver.setBlockRange(6, height, z, height + 4, filler);
                 driver.setBlockRange(9, height, z, height + 4, filler);
@@ -2365,8 +2398,8 @@ public class LostCityTerrainCarver implements ICityCarver {
             int z = 15;
             driver.setBlockRange(6, height, z, height + 4, filler);
             driver.setBlockRange(9, height, z, height + 4, filler);
-            driver.current(7, height, z).add(filler).add(airChar).add(airChar).add(filler);
-            driver.current(8, height, z).add(filler).add(airChar).add(airChar).add(filler);
+            driver.current(7, height, z).add(filler).add(air).add(air).add(filler);
+            driver.current(8, height, z).add(filler).add(air).add(air).add(filler);
         } else if (hasConnectionToTopOrOutside(f, info, info.getZmax()) && (info.getZmax().hasConnectionAtZFromStreet(f + info.getZmax().floorsBelowGround))) {
             int z = 15;
             driver.setBlockRange(6, height, z, height + 4, filler);
@@ -2388,25 +2421,25 @@ public class LostCityTerrainCarver implements ICityCarver {
         if (info.getXmin().hasXCorridor()) {
             int x = 0;
             for (int z = 7; z <= 10; z++) {
-                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, airChar);
+                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, air);
             }
         }
         if (info.getXmax().hasXCorridor()) {
             int x = 15;
             for (int z = 7; z <= 10; z++) {
-                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, airChar);
+                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, air);
             }
         }
         if (info.getZmin().hasXCorridor()) {
             int z = 0;
             for (int x = 7; x <= 10; x++) {
-                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, airChar);
+                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, air);
             }
         }
         if (info.getZmax().hasXCorridor()) {
             int z = 15;
             for (int x = 7; x <= 10; x++) {
-                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, airChar);
+                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, air);
             }
         }
     }

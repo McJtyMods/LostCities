@@ -4,12 +4,13 @@ import mcjty.lostcities.ForgeEventHandlers;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.ConfigSetup;
 import mcjty.lostcities.config.LostCityConfiguration;
-import mcjty.lostcities.dimensions.ModDimensions;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.network.PacketHandler;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.carver.ICarverConfig;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.gen.placement.CountRangeConfig;
+import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -44,7 +45,7 @@ public class ModSetup {
         setupModCompat();
 
         ConfigSetup.init();
-        ModDimensions.init();
+//        ModDimensions.init();
 
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         // @todo 1.14
@@ -81,7 +82,8 @@ public class ModSetup {
         }
 
         for (Biome biome : ForgeRegistries.BIOMES) {
-            biome.addCarver(GenerationStage.Carving.AIR, Biome.createCarver(Registration.LOSTCITY_CARVER, ICarverConfig.field_214644_a));
+//            biome.addCarver(GenerationStage.Carving.AIR, Biome.createCarver(Registration.LOSTCITY_CARVER, ICarverConfig.field_214644_a));
+            biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Biome.createDecoratedFeature(Registration.LOSTCITY_FEATURE, NoFeatureConfig.NO_FEATURE_CONFIG, Placement.COUNT_RANGE, new CountRangeConfig(1, 0, 0, 1)));
         }
 
     }

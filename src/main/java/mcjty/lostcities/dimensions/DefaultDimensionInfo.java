@@ -1,13 +1,10 @@
 package mcjty.lostcities.dimensions;
 
-import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
-import mcjty.lostcities.dimensions.world.driver.SafeDriver;
+import mcjty.lostcities.dimensions.world.LostCityTerrainFeature;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
-import mcjty.lostcities.dimensions.world.terraingen.LostCityTerrainCarver;
-import net.minecraft.block.Blocks;
 import net.minecraft.world.IWorld;
 
 import java.util.Random;
@@ -18,14 +15,14 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     private final LostCityProfile profile;
     private final WorldStyle style;
 
-    private final LostCityTerrainCarver carver;
+    private final LostCityTerrainFeature feature;
 
     public DefaultDimensionInfo(IWorld world, LostCityProfile profile) {
         this.world = world;
         this.profile = profile;
         style = AssetRegistries.WORLDSTYLES.get("standard");
-        carver = new LostCityTerrainCarver(this, profile, getRandom());
-        carver.setupChars(profile);
+        feature = new LostCityTerrainFeature(this, profile, getRandom());
+        feature.setupStates(profile);
     }
 
     @Override
@@ -54,17 +51,17 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     }
 
     @Override
-    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
-        return new ChunkHeightmap(null /* @todo */, LandscapeType.DEFAULT, 65, Blocks.AIR.getDefaultState());    // @todo
-    }
-
-    @Override
     public Random getRandom() {
         return world.getRandom();
     }
 
     @Override
-    public ICityCarver getCarver() {
-        return carver;
+    public LostCityTerrainFeature getFeature() {
+        return feature;
+    }
+
+    @Override
+    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
+        return feature.getHeightmap(chunkX, chunkZ);
     }
 }

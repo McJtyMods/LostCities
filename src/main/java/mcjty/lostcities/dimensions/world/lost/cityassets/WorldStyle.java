@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.dimensions.IDimensionInfo;
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.lost.BiomeInfo;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;

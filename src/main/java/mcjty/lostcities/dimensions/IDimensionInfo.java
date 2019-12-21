@@ -2,7 +2,7 @@ package mcjty.lostcities.dimensions;
 
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
-import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
+import mcjty.lostcities.dimensions.world.LostCityTerrainFeature;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import net.minecraft.world.IWorld;
 
@@ -19,9 +19,9 @@ public interface IDimensionInfo {
 
     WorldStyle getWorldStyle();
 
-    ChunkHeightmap getHeightmap(int chunkX, int chunkZ);
-
     Random getRandom();
 
-    ICityCarver getCarver();
+    LostCityTerrainFeature getFeature();
+
+    ChunkHeightmap getHeightmap(int chunkX, int chunkZ);
 }

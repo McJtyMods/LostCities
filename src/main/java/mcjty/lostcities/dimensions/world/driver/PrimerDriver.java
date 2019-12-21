@@ -1,154 +1,134 @@
 package mcjty.lostcities.dimensions.world.driver;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
 
 import java.util.Objects;
 
-// @todo OPTIMIZE!!!!!!
-public class SafeDriver implements IPrimerDriver {
+public class PrimerDriver {
 
     private IChunk primer;
     private final BlockPos.MutableBlockPos current = new BlockPos.MutableBlockPos();
+    private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-    @Override
     public void setPrimer(IChunk primer) {
         this.primer = primer;
     }
 
-    @Override
     public IChunk getPrimer() {
         return primer;
     }
 
-    @Override
-    public IPrimerDriver current(int x, int y, int z) {
+    public PrimerDriver current(int x, int y, int z) {
         current.setPos(x, y, z);
         return this;
     }
 
-    @Override
-    public IPrimerDriver current(IIndex index) {
+    public PrimerDriver current(IIndex index) {
         Index i = (Index) index;
         current.setPos(i.x, i.y, i.z);
         return this;
     }
 
-    @Override
     public IIndex getCurrent() {
         return new Index(current.getX(), current.getY(), current.getZ());
     }
 
-    @Override
     public void incY() {
         current.setY(current.getY()+1);
     }
 
-    @Override
     public void incY(int amount) {
         current.setY(current.getY()+amount);
     }
 
-    @Override
     public void decY() {
         current.setY(current.getY()-1);
     }
 
-    @Override
     public void incX() {
         current.setX(current.getX()+1);
     }
 
-    @Override
     public void incZ() {
         current.setZ(current.getZ()+1);
     }
 
-    @Override
     public int getX() {
         return current.getX();
     }
 
-    @Override
     public int getY() {
         return current.getY();
     }
 
-    @Override
     public int getZ() {
         return current.getZ();
     }
 
-    @Override
     public void setBlockRange(int x, int y, int z, int y2, BlockState state) {
+        pos.setPos(x, y, z);
         while (y < y2) {
-            primer.setBlockState(new BlockPos(x, y, z), state, false);
+            if (primer.getBlockState(pos) != state) {
+                primer.setBlockState(pos, state, false);
+            }
             y++;
+            pos.setY(y);
         }
     }
 
-    // @todo OPTIMIZE!!!!!!
-    // @todo use mutable blockpos?
-    @Override
     public void setBlockRangeSafe(int x, int y, int z, int y2, BlockState state) {
+        pos.setPos(x, y, z);
         while (y < y2) {
-            primer.setBlockState(new BlockPos(x, y, z), state, false);
+            if (primer.getBlockState(pos) != state) {
+                primer.setBlockState(pos, state, false);
+            }
             y++;
+            pos.setY(y);
         }
     }
 
-    @Override
-    public IPrimerDriver block(BlockState c) {
+    public PrimerDriver block(BlockState c) {
         primer.setBlockState(current, c, false);
         return this;
     }
 
-    @Override
-    public IPrimerDriver add(BlockState state) {
+    public PrimerDriver add(BlockState state) {
         primer.setBlockState(current, state, false);
         incY();
         return this;
     }
 
-    @Override
     public BlockState getBlock() {
         return primer.getBlockState(current);
     }
 
-    @Override
     public BlockState getBlockDown() {
-        return primer.getBlockState(new BlockPos(current.getX(), current.getY()-1, current.getZ()));
+        return primer.getBlockState(pos.setPos(current.getX(), current.getY()-1, current.getZ()));
     }
 
-    @Override
     public BlockState getBlockEast() {
-        return primer.getBlockState(new BlockPos(current.getX()+1, current.getY(), current.getZ()));
+        return primer.getBlockState(pos.setPos(current.getX()+1, current.getY(), current.getZ()));
     }
 
-    @Override
     public BlockState getBlockWest() {
-        return primer.getBlockState(new BlockPos(current.getX()-1, current.getY(), current.getZ()));
+        return primer.getBlockState(pos.setPos(current.getX()-1, current.getY(), current.getZ()));
     }
 
-    @Override
     public BlockState getBlockSouth() {
-        return primer.getBlockState(new BlockPos(current.getX(), current.getY(), current.getZ()+1));
+        return primer.getBlockState(pos.setPos(current.getX(), current.getY(), current.getZ()+1));
     }
 
-    @Override
     public BlockState getBlockNorth() {
-        return primer.getBlockState(new BlockPos(current.getX(), current.getY(), current.getZ()-1));
+        return primer.getBlockState(pos.setPos(current.getX(), current.getY(), current.getZ()-1));
     }
 
 
-    @Override
     public BlockState getBlock(int x, int y, int z) {
-        return primer.getBlockState(new BlockPos(x, y, z));
+        return primer.getBlockState(pos.setPos(x, y, z));
     }
 
-    @Override
     public IIndex getIndex(int x, int y, int z) {
         return new Index(x, y, z);
     }
@@ -181,9 +161,8 @@ public class SafeDriver implements IPrimerDriver {
         }
     }
 
-    @Override
-    public IPrimerDriver copy() {
-        SafeDriver driver = new SafeDriver();
+    public PrimerDriver copy() {
+        PrimerDriver driver = new PrimerDriver();
         driver.current.setPos(current);
         driver.primer = primer;
         return driver;

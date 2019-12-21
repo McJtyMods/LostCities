@@ -1,6 +1,5 @@
 package mcjty.lostcities.network;
 
-import mcjty.lostcities.dimensions.world.WorldTypeTools;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -32,7 +31,8 @@ public class PacketReturnProfileToClient {
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            WorldTypeTools.setProfileFromServer(dimension, profile);
+            // @todo 1.14
+//            WorldTypeTools.setProfileFromServer(dimension, profile);
         });
         ctx.get().setPacketHandled(true);
     }

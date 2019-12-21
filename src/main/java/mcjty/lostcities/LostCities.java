@@ -1,11 +1,14 @@
 package mcjty.lostcities;
 
-import mcjty.lostcities.dimensions.world.WorldTypeTools;
 import mcjty.lostcities.dimensions.world.lost.*;
+import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.Logger;
 
 @Mod(LostCities.MODID)
@@ -21,7 +24,15 @@ public class LostCities {
 
     public LostCities() {
         instance = this;
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
+
         FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent event) -> setup.init(event));
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientEventHandlers::init);
+
+        Config.loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("lostcities-client.toml"));
+        Config.loadConfig(Config.COMMON_CONFIG, FMLPaths.CONFIGDIR.get().resolve("lostcities-common.toml"));
     }
 
     public static Logger getLogger() {
@@ -69,7 +80,7 @@ public class LostCities {
         BiomeInfo.cleanCache();
         City.cleanCache();
         CitySphere.cleanCache();
-        WorldTypeTools.cleanCache();
+//        WorldTypeTools.cleanCache();
     }
 
     // @todo 1.14

@@ -3,7 +3,7 @@ package mcjty.lostcities.dimensions.world.lost;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.IDimensionInfo;
 import mcjty.lostcities.dimensions.world.lost.cityassets.CompiledPalette;
-import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.LostCityTerrainFeature;
 import mcjty.lostcities.varia.GeometryTools;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -63,11 +63,11 @@ public class DamageArea {
     }
 
     public BlockState damageBlock(BlockState b, IDimensionInfo provider, int y, float damage, CompiledPalette palette, BlockState liquidChar) {
-        if (b == LostCitiesTerrainGenerator.bedrockChar || b == LostCitiesTerrainGenerator.endportalChar || b == LostCitiesTerrainGenerator.endportalFrameChar) {
+        if (b == LostCityTerrainFeature.bedrock || b == LostCityTerrainFeature.endportal || b == LostCityTerrainFeature.endportalFrame) {
             return b;
         }
 
-        if (LostCitiesTerrainGenerator.getGlassChars().contains(b)) {
+        if (LostCityTerrainFeature.getGlassStates().contains(b)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }
         if (provider.getRandom().nextFloat() <= damage) {
@@ -77,10 +77,10 @@ public class DamageArea {
                 if (provider.getRandom().nextFloat() < .7f) {
                     b = damaged;
                 } else {
-                    b = y <= waterlevel ? liquidChar : LostCitiesTerrainGenerator.airChar;
+                    b = y <= waterlevel ? liquidChar : LostCityTerrainFeature.air;
                 }
             } else {
-                b = y <= waterlevel ? liquidChar : LostCitiesTerrainGenerator.airChar;
+                b = y <= waterlevel ? liquidChar : LostCityTerrainFeature.air;
             }
         }
         return b;

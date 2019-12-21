@@ -1,9 +1,10 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.config.LandscapeType;
-import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
-import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.driver.PrimerDriver;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.IChunk;
 
 /**
  * A heightmap for a chunk
@@ -11,63 +12,55 @@ import net.minecraft.block.BlockState;
 public class ChunkHeightmap {
     private byte heightmap[] = new byte[16*16];
 
-    public ChunkHeightmap(IPrimerDriver driver, LandscapeType type, int groundLevel, BlockState baseChar) {
-        BlockState air = LostCitiesTerrainGenerator.airChar;
+    public ChunkHeightmap(IChunk chunk, LandscapeType type, int groundLevel, BlockState baseChar) {
+        BlockState air = LostCityTerrainFeature.air;
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-        if (driver != null) {
-            if (type == LandscapeType.CAVERN) {
-                // Here we try to find the height inside the cavern itself. Ignoring the top layer
-                int base = Math.max(groundLevel - 20, 1);
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        int y = base;
-                        driver.current(x, y, z);
-                        while (y < 100 && driver.getBlock() != air) {
-                            y++;
-                            driver.incY();
-                        }
-                        if (y >= 100) {
-                            y = 128;
-                        } else {
-                            while (y > 0 && driver.getBlock() == air) {
-                                y--;
-                                driver.decY();
-                            }
-                        }
-                        heightmap[z * 16 + x] = (byte) y;
+        if (type == LandscapeType.CAVERN) {
+            // Here we try to find the height inside the cavern itself. Ignoring the top layer
+            int base = Math.max(groundLevel - 20, 1);
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    int y = base;
+                    pos.setPos(x, y, z);
+                    while (y < 100 && chunk.getBlockState(pos) != air) {
+                        y++;
+                        pos.setY(y);
                     }
-                }
-            } else if (type == LandscapeType.SPACE) {
-                // Here we ignore the glass from the spheres
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        int y = 255;
-                        driver.current(x, y, z);
-                        while (y > 0 && driver.getBlock() != baseChar) {
+                    if (y >= 100) {
+                        y = 128;
+                    } else {
+                        while (y > 0 && chunk.getBlockState(pos) == air) {
                             y--;
-                            driver.decY();
+                            pos.setY(y);
                         }
-                        heightmap[z * 16 + x] = (byte) y;
                     }
+                    heightmap[z * 16 + x] = (byte) y;
                 }
-            } else {
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        int y = 255;
-                        driver.current(x, y, z);
-                        while (y > 0 && driver.getBlock() == air) {
-                            y--;
-                            driver.decY();
-                        }
-                        heightmap[z * 16 + x] = (byte) y;
+            }
+        } else if (type == LandscapeType.SPACE) {
+            // Here we ignore the glass from the spheres
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    int y = 255;
+                    pos.setPos(x, y, z);
+                    while (y > 0 && chunk.getBlockState(pos) != baseChar) {
+                        y--;
+                        pos.setY(y);
                     }
+                    heightmap[z * 16 + x] = (byte) y;
                 }
             }
         } else {
-            // @todo 1.14 temporary until we figure out a better way to calculate a heightmap
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    heightmap[z * 16 + x] = 65;
+                    int y = 255;
+                    pos.setPos(x, y, z);
+                    while (y > 0 && chunk.getBlockState(pos) == air) {
+                        y--;
+                        pos.setY(y);
+                    }
+                    heightmap[z * 16 + x] = (byte) y;
                 }
             }
         }

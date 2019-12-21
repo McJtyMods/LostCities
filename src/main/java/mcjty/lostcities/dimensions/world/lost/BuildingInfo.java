@@ -6,7 +6,7 @@ import mcjty.lostcities.dimensions.IDimensionInfo;
 import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.driver.IIndex;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
-import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
+import mcjty.lostcities.dimensions.world.LostCityTerrainFeature;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
 import mcjty.lostcities.varia.QualityRandom;
@@ -1340,7 +1340,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (provider.getProfile().isSpace() && hasMonorail()) {
             return false;
         }
-        return i.cityLevel < cityLevel || LostCitiesTerrainGenerator.isWaterBiome(provider, i.coord);
+        return i.cityLevel < cityLevel || LostCityTerrainFeature.isWaterBiome(provider, i.coord);
     }
 
 
