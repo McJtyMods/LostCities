@@ -1,18 +1,23 @@
 package mcjty.lostcities.dimensions.world.driver;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.FourWayBlock;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.WorldGenRegion;
 
 import java.util.Objects;
 
 public class PrimerDriver {
 
+    private WorldGenRegion region;
     private IChunk primer;
     private final BlockPos.MutableBlockPos current = new BlockPos.MutableBlockPos();
     private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-    public void setPrimer(IChunk primer) {
+    public void setPrimer(WorldGenRegion region, IChunk primer) {
+        this.region = region;
         this.primer = primer;
     }
 
@@ -89,13 +94,46 @@ public class PrimerDriver {
         }
     }
 
+    private BlockState correct(BlockState state) {
+        if (state.getBlock() instanceof FourWayBlock) {
+            int cx = current.getX() + primer.getPos().x * 16;
+            int cy = current.getY();
+            int cz = current.getZ() + primer.getPos().z * 16;
+
+            BlockState west = region.getBlockState(pos.setPos(cx - 1, cy, cz));
+            if (west.getBlock() instanceof FourWayBlock) {
+                state = state.with(FourWayBlock.WEST, true);
+                region.setBlockState(pos, west.getBlock().updatePostPlacement(west, Direction.EAST, state, region, pos, current), 0);
+            }
+
+            BlockState east = region.getBlockState(pos.setPos(cx + 1, cy, cz));
+            if (east.getBlock() instanceof FourWayBlock) {
+                state = state.with(FourWayBlock.EAST, true);
+                region.setBlockState(pos, east.getBlock().updatePostPlacement(east, Direction.WEST, state, region, pos, current), 0);
+            }
+
+            BlockState north = region.getBlockState(pos.setPos(cx, cy, cz - 1));
+            if (north.getBlock() instanceof FourWayBlock) {
+                state = state.with(FourWayBlock.NORTH, true);
+                region.setBlockState(pos, north.getBlock().updatePostPlacement(north, Direction.SOUTH, state, region, pos, current), 0);
+            }
+
+            BlockState south = region.getBlockState(pos.setPos(cx, cy, cz + 1));
+            if (south.getBlock() instanceof FourWayBlock) {
+                state = state.with(FourWayBlock.SOUTH, true);
+                region.setBlockState(pos, south.getBlock().updatePostPlacement(south, Direction.NORTH, state, region, pos, current), 0);
+            }
+        }
+        return state;
+    }
+
     public PrimerDriver block(BlockState c) {
-        primer.setBlockState(current, c, false);
+        primer.setBlockState(current, correct(c), false);
         return this;
     }
 
     public PrimerDriver add(BlockState state) {
-        primer.setBlockState(current, state, false);
+        primer.setBlockState(current, correct(state), false);
         incY();
         return this;
     }

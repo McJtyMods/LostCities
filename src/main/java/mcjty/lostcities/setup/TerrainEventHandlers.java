@@ -1,4 +1,4 @@
-package mcjty.lostcities;
+package mcjty.lostcities.setup;
 
 public class TerrainEventHandlers {
 

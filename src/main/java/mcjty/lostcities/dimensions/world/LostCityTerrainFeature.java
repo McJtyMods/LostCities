@@ -245,7 +245,7 @@ public class LostCityTerrainFeature {
     public void generate(WorldGenRegion region, IChunk chunk) {
         int chunkX = chunk.getPos().x;
         int chunkZ = chunk.getPos().z;
-        driver.setPrimer(chunk);
+        driver.setPrimer(region, chunk);
         this.region = region;
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
