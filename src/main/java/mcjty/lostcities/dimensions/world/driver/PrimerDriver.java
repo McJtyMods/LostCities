@@ -3,8 +3,11 @@ package mcjty.lostcities.dimensions.world.driver;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FourWayBlock;
+import net.minecraft.block.StairsBlock;
+import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.WorldGenRegion;
 
@@ -104,6 +107,44 @@ public class PrimerDriver {
         return newAdjacent;
     }
 
+    public static boolean isBlockStairs(BlockState state) {
+        return state.getBlock() instanceof StairsBlock;
+    }
+
+    private static boolean isDifferentStairs(BlockState state, IBlockReader worldIn, BlockPos pos, Direction face) {
+        BlockState blockstate = worldIn.getBlockState(pos.offset(face));
+        return !isBlockStairs(blockstate) || blockstate.get(StairsBlock.FACING) != state.get(StairsBlock.FACING) || blockstate.get(StairsBlock.HALF) != state.get(StairsBlock.HALF);
+    }
+
+    private static StairsShape getShapeProperty(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        Direction direction = state.get(StairsBlock.FACING);
+        BlockState blockstate = worldIn.getBlockState(pos.offset(direction));
+        if (isBlockStairs(blockstate) && state.get(StairsBlock.HALF) == blockstate.get(StairsBlock.HALF)) {
+            Direction direction1 = blockstate.get(StairsBlock.FACING);
+            if (direction1.getAxis() != state.get(StairsBlock.FACING).getAxis() && isDifferentStairs(state, worldIn, pos, direction1.getOpposite())) {
+                if (direction1 == direction.rotateYCCW()) {
+                    return StairsShape.OUTER_LEFT;
+                }
+
+                return StairsShape.OUTER_RIGHT;
+            }
+        }
+
+        BlockState blockstate1 = worldIn.getBlockState(pos.offset(direction.getOpposite()));
+        if (isBlockStairs(blockstate1) && state.get(StairsBlock.HALF) == blockstate1.get(StairsBlock.HALF)) {
+            Direction direction2 = blockstate1.get(StairsBlock.FACING);
+            if (direction2.getAxis() != state.get(StairsBlock.FACING).getAxis() && isDifferentStairs(state, worldIn, pos, direction2)) {
+                if (direction2 == direction.rotateYCCW()) {
+                    return StairsShape.INNER_LEFT;
+                }
+
+                return StairsShape.INNER_RIGHT;
+            }
+        }
+
+        return StairsShape.STRAIGHT;
+    }
+
     private static boolean canAttach(BlockState state) {
         if (state.isAir()) {
             return false;
@@ -129,6 +170,8 @@ public class PrimerDriver {
             state = state.with(FourWayBlock.EAST, canAttach(eastState));
             state = state.with(FourWayBlock.NORTH, canAttach(northState));
             state = state.with(FourWayBlock.SOUTH, canAttach(southState));
+        } else if (state.getBlock() instanceof StairsBlock) {
+            state = state.with(StairsBlock.SHAPE, getShapeProperty(state, region, pos.setPos(cx, cy, cz)));
         }
         return state;
     }
