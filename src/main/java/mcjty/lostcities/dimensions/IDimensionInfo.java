@@ -9,6 +9,8 @@ import net.minecraft.world.IWorld;
 import java.util.Random;
 
 public interface IDimensionInfo {
+    void setWorld(IWorld world);
+
     long getSeed();
 
     IWorld getWorld();

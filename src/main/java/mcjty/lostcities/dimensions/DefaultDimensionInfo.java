@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class DefaultDimensionInfo implements IDimensionInfo {
 
-    private final IWorld world;
+    private IWorld world;
     private final LostCityProfile profile;
     private final WorldStyle style;
 
@@ -23,6 +23,11 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         style = AssetRegistries.WORLDSTYLES.get("standard");
         feature = new LostCityTerrainFeature(this, profile, getRandom());
         feature.setupStates(profile);
+    }
+
+    @Override
+    public void setWorld(IWorld world) {
+        this.world = world;
     }
 
     @Override

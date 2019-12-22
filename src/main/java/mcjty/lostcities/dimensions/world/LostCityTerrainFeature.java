@@ -77,7 +77,6 @@ public class LostCityTerrainFeature {
     private static BlockState randomLeafs[] = null;
 
     private PrimerDriver driver;
-    private WorldGenRegion region;
 
     private final IDimensionInfo provider;
     private final LostCityProfile profile;
@@ -243,10 +242,12 @@ public class LostCityTerrainFeature {
     }
 
     public void generate(WorldGenRegion region, IChunk chunk) {
+        WorldGenRegion oldRegion = driver.getRegion();
+        IChunk oldChunk = driver.getPrimer();
+        driver.setPrimer(region, chunk);
+
         int chunkX = chunk.getPos().x;
         int chunkZ = chunk.getPos().z;
-        driver.setPrimer(region, chunk);
-        this.region = region;
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
         // @todo this setup is not very clean
@@ -283,12 +284,16 @@ public class LostCityTerrainFeature {
 
 //        LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.getWorld().getWorld(), provider, chunkX, chunkZ, driver.getPrimer());
 //        if (!MinecraftForge.EVENT_BUS.post(event)) {
-//            if (info.getDamageArea().hasExplosions()) {
-//                breakBlocksForDamage(chunkX, chunkZ, info);
-//                fixAfterExplosionNew(info, rand);
-//            }
-//            generateDebris(rand, info);
+            if (info.getDamageArea().hasExplosions()) {
+                breakBlocksForDamage(chunkX, chunkZ, info);
+                fixAfterExplosionNew(info, rand);
+            }
+            generateDebris(rand, info);
 //        }
+
+        ChunkFixer.fix(provider, chunkX, chunkZ);
+
+        driver.setPrimer(oldRegion, oldChunk);
     }
 
 
@@ -813,6 +818,7 @@ public class LostCityTerrainFeature {
     }
 
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
+        WorldGenRegion region = driver.getRegion();
         ChunkCoord key = new ChunkCoord(region.getDimension().getType(), chunkX, chunkZ);
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
@@ -1148,7 +1154,7 @@ public class LostCityTerrainFeature {
     }
 
     public long getSeed() {
-        return region.getSeed();
+        return driver.getRegion().getSeed();
     }
 
     private static class Blob implements Comparable<Blob> {
@@ -1346,8 +1352,10 @@ public class LostCityTerrainFeature {
                         if (blob == null) {
                             blob = new Blob(start, end + 6);
                             // We must make a copy of the driver here so that we can safely modify it
-                            blob.scan(info, driver.copy(), air, liquid, new BlockPos(x, y, z));
+                            IIndex current = driver.getCurrent();
+                            blob.scan(info, driver, air, liquid, new BlockPos(x, y, z));
                             blobs.add(blob);
+                            driver.current(current);
                         }
                     }
                     driver.incY();

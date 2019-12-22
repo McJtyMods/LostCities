@@ -39,6 +39,7 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
                     dimensionInfo.put(type, diminfo);
                 }
                 IDimensionInfo diminfo = dimensionInfo.get(type);
+                diminfo.setWorld(world);
                 diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
                 return true;
             }

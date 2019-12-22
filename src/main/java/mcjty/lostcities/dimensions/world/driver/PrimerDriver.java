@@ -25,6 +25,10 @@ public class PrimerDriver {
         this.primer = primer;
     }
 
+    public WorldGenRegion getRegion() {
+        return region;
+    }
+
     public IChunk getPrimer() {
         return primer;
     }
@@ -257,6 +261,7 @@ public class PrimerDriver {
         PrimerDriver driver = new PrimerDriver();
         driver.current.setPos(current);
         driver.primer = primer;
+        driver.region = region;
         return driver;
     }
 }
