@@ -13,7 +13,7 @@ import net.minecraftforge.registries.ObjectHolder;
 public class Registration {
 
     @ObjectHolder("lostcities:lostcityfeature")
-    public static Feature LOSTCITY_FEATURE;
+    public static LostCityFeature LOSTCITY_FEATURE;
 
     @SubscribeEvent
     public static void registerFeatures(final RegistryEvent.Register<Feature<?>> event) {

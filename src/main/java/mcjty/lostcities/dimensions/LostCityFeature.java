@@ -12,6 +12,7 @@ import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -27,23 +28,31 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
     @Override
     public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config) {
         if (world instanceof WorldGenRegion) {
-            DimensionType type = world.getDimension().getType();
-            String profileName = Config.getProfileForDimension(type);
-            if (profileName != null) {
+            IDimensionInfo diminfo = getDimensionInfo(world);
+            if (diminfo != null) {
                 WorldGenRegion region = (WorldGenRegion) world;
                 int chunkX = region.getMainChunkX();
                 int chunkZ = region.getMainChunkZ();
-                if (!dimensionInfo.containsKey(type)) {
-                    LostCityProfile profile = LostCityConfiguration.standardProfiles.get(profileName);
-                    IDimensionInfo diminfo = new DefaultDimensionInfo(world, profile);
-                    dimensionInfo.put(type, diminfo);
-                }
-                IDimensionInfo diminfo = dimensionInfo.get(type);
                 diminfo.setWorld(world);
                 diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
                 return true;
             }
         }
         return false;
+    }
+
+    @Nullable
+    public IDimensionInfo getDimensionInfo(IWorld world) {
+        DimensionType type = world.getDimension().getType();
+        String profileName = Config.getProfileForDimension(type);
+        if (profileName != null) {
+            if (!dimensionInfo.containsKey(type)) {
+                LostCityProfile profile = LostCityConfiguration.standardProfiles.get(profileName);
+                IDimensionInfo diminfo = new DefaultDimensionInfo(world, profile);
+                dimensionInfo.put(type, diminfo);
+            }
+            return dimensionInfo.get(type);
+        }
+        return null;
     }
 }

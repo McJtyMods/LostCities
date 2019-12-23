@@ -1,6 +1,15 @@
 package mcjty.lostcities.setup;
 
+import mcjty.lostcities.commands.ModCommands;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+
 public class ForgeEventHandlers {
+
+    @SubscribeEvent
+    public void serverLoad(FMLServerStartingEvent event) {
+        ModCommands.register(event.getCommandDispatcher());
+    }
 
 //    @SubscribeEvent
 //    public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
