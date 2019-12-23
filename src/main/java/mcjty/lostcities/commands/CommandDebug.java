@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lostcities.dimensions.IDimensionInfo;
+import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
 import mcjty.lostcities.dimensions.world.lost.Railway;
@@ -48,6 +49,8 @@ public class CommandDebug implements Command<CommandSource> {
                 System.out.println("getCityStyle() = " + BuildingInfo.getChunkCharacteristics(info.chunkX, info.chunkZ, info.provider).cityStyle.getName());
                 System.out.println("streetType = " + info.streetType);
                 System.out.println("ruinHeight = " + info.ruinHeight);
+                System.out.println("tunnel0 = " + info.isTunnel(0));
+                System.out.println("tunnel1 = " + info.isTunnel(1));
                 System.out.println("getHighwayXLevel() = " + info.getHighwayXLevel());
                 System.out.println("getHighwayZLevel() = " + info.getHighwayZLevel());
                 System.out.println("getChestTodo().size() = " + info.getLootTodo().size());
@@ -66,6 +69,16 @@ public class CommandDebug implements Command<CommandSource> {
                 System.out.println("sphere.cityCenter = " + sphere.getCenter());
                 System.out.println("sphere.isEnabled() = " + sphere.isEnabled());
                 System.out.println("sphere.radius = " + sphere.getRadius());
+
+                ChunkHeightmap heightmap = dimInfo.getFeature().getHeightmap(info.chunkX, info.chunkZ, player.getServerWorld());
+                int avg = 0;
+                for (int x = 0 ; x < 16 ; x++) {
+                    for (int z = 0 ; z < 16 ; z++) {
+                        avg += heightmap.getHeight(x, z);
+                    }
+                }
+                avg /= 16*16;
+                System.out.println("Average chunk height (heightmap): " + avg);
             }
         }
         return 0;

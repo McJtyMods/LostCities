@@ -19,9 +19,11 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -818,29 +820,47 @@ public class LostCityTerrainFeature {
     }
 
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
-        WorldGenRegion region = driver.getRegion();
+        IWorld region = driver.getRegion();
+        return getHeightmap(chunkX, chunkZ, region);
+    }
+
+    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ, IWorld region) {
         ChunkCoord key = new ChunkCoord(region.getDimension().getType(), chunkX, chunkZ);
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
         } else {
             ChunkHeightmap heightmap;
             if (region.chunkExists(chunkX, chunkZ)) {
-                heightmap = new ChunkHeightmap(region.getChunk(chunkX, chunkZ), profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+                IChunk chunk = region.getChunk(chunkX, chunkZ);
+                ChunkStatus status = chunk.getStatus();
+                if (status.isAtLeast(ChunkStatus.CARVERS)) {
+                    System.out.println("Generating real heightmap for " + chunkX + "," + chunkZ + " (status " + status.getName() + ")");
+                    heightmap = new ChunkHeightmap(chunk, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+                } else {
+//                    System.out.println("+++++ Generating dummy for " + chunkX + "," + chunkZ + " (status " + status.getName() + ")");
+                    ChunkPrimer primer = makeDummyChunk(chunkX, chunkZ, region);
+                    heightmap = new ChunkHeightmap(primer, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+                }
             } else {
+                System.out.println("##### Generating dummy for " + chunkX + "," + chunkZ);
                 // @todo 1.14 what to do here? We can't get to the desired chunk? We need some kind of dummy then?
                 // At the very least we don't cache this information. This could possibly lead to wrong results.
-                ChunkPrimer primer = new ChunkPrimer(new ChunkPos(chunkX, chunkZ), UpgradeData.EMPTY);
-                ChunkGenerator<?> generator = region.getDimension().getWorld().getChunkProvider().getChunkGenerator();
-                generator.generateBiomes(primer);
-                generator.makeBase(region.getDimension().getWorld(), primer);
-                generator.generateSurface(primer);
-
+                ChunkPrimer primer = makeDummyChunk(chunkX, chunkZ, region);
                 heightmap = new ChunkHeightmap(primer, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
 //                heightmap = new ChunkHeightmap(region.getChunk(region.getMainChunkX(), region.getMainChunkZ()), profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
             }
             cachedHeightmaps.put(key, heightmap);
             return heightmap;
         }
+    }
+
+    private ChunkPrimer makeDummyChunk(int chunkX, int chunkZ, IWorld region) {
+        ChunkPrimer primer = new ChunkPrimer(new ChunkPos(chunkX, chunkZ), UpgradeData.EMPTY);
+        ChunkGenerator<?> generator = region.getDimension().getWorld().getChunkProvider().getChunkGenerator();
+        generator.generateBiomes(primer);
+        generator.makeBase(region.getDimension().getWorld(), primer);
+        generator.generateSurface(primer);
+        return primer;
     }
 
     private void doCityChunk(int chunkX, int chunkZ, BuildingInfo info) {
