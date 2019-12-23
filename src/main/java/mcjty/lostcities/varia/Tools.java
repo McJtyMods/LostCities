@@ -68,6 +68,9 @@ public class Tools {
 
     private static BlockState getLadderState(int meta) {
         Direction direction = Direction.values()[MathHelper.abs(meta % Direction.values().length)];
+        if (direction.getAxis() == Direction.Axis.Y) {
+            direction = Direction.NORTH;
+        }
         return Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, direction);
     }
 

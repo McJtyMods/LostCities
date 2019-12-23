@@ -42,15 +42,24 @@ public class ClientEventHandlers {
 //        }
 //    }
 
+    private Button lostCitiesButton = null;
+
     @SubscribeEvent
-    public void onGuiPost(GuiScreenEvent.InitGuiEvent.Post event) {
-// @disabled for now
-        //        if (event.getGui() instanceof CreateWorldScreen) {
-//            CreateWorldScreen screen = (CreateWorldScreen) event.getGui();
-//            event.addWidget(new Button(screen.width / 2 - 75, 167, 150, 20, "Lost Cities", p_onPress_1_ -> {
-//
-//            }));
-//        }
+    public void onGuiDraw(GuiScreenEvent.DrawScreenEvent event) {
+        if (event.getGui() instanceof CreateWorldScreen && lostCitiesButton != null) {
+            CreateWorldScreen screen = (CreateWorldScreen) event.getGui();
+            lostCitiesButton.visible = screen.inMoreWorldOptionsDisplay;
+        }
     }
 
+    @SubscribeEvent
+    public void onGuiPost(GuiScreenEvent.InitGuiEvent.Post event) {
+        if (event.getGui() instanceof CreateWorldScreen) {
+            CreateWorldScreen screen = (CreateWorldScreen) event.getGui();
+            lostCitiesButton = new Button(screen.width / 2 - 75, 167, 150, 20, "Lost Cities", p_onPress_1_ -> {
+
+            });
+            event.addWidget(lostCitiesButton);
+        }
+    }
 }
