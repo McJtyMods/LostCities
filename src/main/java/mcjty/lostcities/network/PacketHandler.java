@@ -29,16 +29,17 @@ public class PacketHandler {
     }
 
     public static void registerMessages() {
-        // Server side
         INSTANCE.registerMessage(nextID(), PacketRequestProfile.class,
                 PacketRequestProfile::toBytes,
                 PacketRequestProfile::new,
                 PacketRequestProfile::handle);
-
-        // Client side
         INSTANCE.registerMessage(nextID(), PacketReturnProfileToClient.class,
                 PacketReturnProfileToClient::toBytes,
                 PacketReturnProfileToClient::new,
                 PacketReturnProfileToClient::handle);
+        INSTANCE.registerMessage(nextID(), PacketProfileToServer.class,
+                PacketProfileToServer::toBytes,
+                PacketProfileToServer::new,
+                PacketProfileToServer::handle);
     }
 }

@@ -144,7 +144,11 @@ public class LostCityConfiguration {
     }
 
     public static void initStandardProfiles() {
-        LostCityProfile profile = new LostCityProfile("default", true);
+        LostCityProfile profile = new LostCityProfile("customized", false);
+        profile.setDescription("Customized profile");
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("default", true);
         profile.setIconFile("textures/gui/icon_default.png");
         standardProfiles.put(profile.getName(), profile);
 
@@ -307,7 +311,7 @@ public class LostCityConfiguration {
         profile.GROUNDLEVEL = 60;
         profile.CITYSPHERE_CHANCE = 0.4f;
 //        profile.CITY_CHANCE = 0.3f;       // @EXP
-        profile.CITY_CHANCE = 0.7f;
+        profile.CITY_CHANCE = 0.6f;
 
         profile.CITY_MAXRADIUS = 90;
         profile.CITY_THRESSHOLD = .05f;
