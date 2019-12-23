@@ -1,68 +1,58 @@
 package mcjty.lostcities.dimensions.world;
 
 import mcjty.lostcities.config.LandscapeType;
-import mcjty.lostcities.dimensions.world.driver.PrimerDriver;
 import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.IChunk;
 
 /**
  * A heightmap for a chunk
  */
 public class ChunkHeightmap {
-    private byte heightmap[] = new byte[16*16];
+    private final byte heightmap[] = new byte[16*16];
+    private final LandscapeType type;
+    private final int groundLevel;
+    private final BlockState baseState;
 
-    public ChunkHeightmap(IChunk chunk, LandscapeType type, int groundLevel, BlockState baseChar) {
+    public ChunkHeightmap(LandscapeType type, int groundLevel, BlockState baseState) {
+        this.groundLevel = groundLevel;
+        this.type = type;
+        this.baseState = baseState;
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                heightmap[z * 16 + x] = 0;
+            }
+        }
+    }
+
+    public void update(int x, int y, int z, BlockState state) {
         BlockState air = LostCityTerrainFeature.air;
-        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        if (state == air) {
+            return;
+        }
+
+        int current = heightmap[z * 16 + x] & 0xff;
+        if (y <= current) {
+            return;
+        }
 
         if (type == LandscapeType.CAVERN) {
             // Here we try to find the height inside the cavern itself. Ignoring the top layer
             int base = Math.max(groundLevel - 20, 1);
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    int y = base;
-                    pos.setPos(x, y, z);
-                    while (y < 100 && chunk.getBlockState(pos) != air) {
-                        y++;
-                        pos.setY(y);
-                    }
-                    if (y >= 100) {
-                        y = 128;
-                    } else {
-                        while (y > 0 && chunk.getBlockState(pos) == air) {
-                            y--;
-                            pos.setY(y);
-                        }
-                    }
-                    heightmap[z * 16 + x] = (byte) y;
-                }
+            if (y > 100 || y < base) {
+                return;
             }
+            if (y == 100) {
+                heightmap[z * 16 + x] = (byte) 128;
+                return;
+            }
+            heightmap[z * 16 + x] = (byte) y;
         } else if (type == LandscapeType.SPACE) {
-            // Here we ignore the glass from the spheres
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    int y = 255;
-                    pos.setPos(x, y, z);
-                    while (y > 0 && chunk.getBlockState(pos) != baseChar) {
-                        y--;
-                        pos.setY(y);
-                    }
-                    heightmap[z * 16 + x] = (byte) y;
-                }
+            // Here we ignore the glass from the spheres (we only look at the base state)
+            if (state != baseState) {
+                return;
             }
+            heightmap[z * 16 + x] = (byte) y;
         } else {
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    int y = 255;
-                    pos.setPos(x, y, z);
-                    while (y > 0 && chunk.getBlockState(pos) == air) {
-                        y--;
-                        pos.setY(y);
-                    }
-                    heightmap[z * 16 + x] = (byte) y;
-                }
-            }
+            heightmap[z * 16 + x] = (byte) y;
         }
     }
 

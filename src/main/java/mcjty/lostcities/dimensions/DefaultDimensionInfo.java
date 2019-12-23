@@ -67,6 +67,6 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 
     @Override
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
-        return feature.getHeightmap(chunkX, chunkZ);
+        return feature.getHeightmap(chunkX, chunkZ, getWorld());
     }
 }

@@ -18,9 +18,6 @@ import java.util.Random;
 
 public class Tools {
 
-
-
-
     public static BlockState stringToState(String s) {
         if ("minecraft:double_stone_slab".equals(s)) {
             return Blocks.SMOOTH_STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
@@ -48,6 +45,8 @@ public class Tools {
             return getStoneSlabState(meta, Blocks.SMOOTH_STONE_SLAB.getDefaultState());
         } else if (s.equals("minecraft:redstone_torch")) {
             return getRedstoneTorchState(meta);
+        } else if (s.equals("minecraft:ladder")) {
+            return getLadderState(meta);
         }
 
         String converted = ItemStackDataFlattening.updateItem(s, meta);
@@ -65,6 +64,11 @@ public class Tools {
             throw new RuntimeException("Cannot find block: '" + s + "'!");
         }
         return value.getDefaultState();
+    }
+
+    private static BlockState getLadderState(int meta) {
+        Direction direction = Direction.values()[MathHelper.abs(meta % Direction.values().length)];
+        return Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, direction);
     }
 
     private static BlockState getRedstoneTorchState(int meta) {

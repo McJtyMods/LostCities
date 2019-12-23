@@ -12,6 +12,7 @@ public class ModCommands {
         LiteralCommandNode<CommandSource> cmdList = dispatcher.register(
                 Commands.literal(LostCities.MODID)
                         .then(CommandDebug.register(dispatcher))
+                        .then(CommandMap.register(dispatcher))
         );
 
         dispatcher.register(Commands.literal("lost").redirect(cmdList));

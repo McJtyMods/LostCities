@@ -328,7 +328,7 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("rarecities", true);
         profile.setDescription("Cities are rare");
         profile.setIconFile("textures/gui/icon_rarecities.png");
-        profile.CITY_CHANCE = 0.002f;
+        profile.CITY_CHANCE = 0.001f;
         profile.RUINS = false;
         profile.HIGHWAY_REQUIRES_TWO_CITIES = false;
         profile.RAILWAYS_CAN_END = true;
@@ -352,7 +352,7 @@ public class LostCityConfiguration {
         profile.DEBRIS_TO_NEARBYCHUNK_FACTOR = 175;
         profile.DESTROY_LONE_BLOCKS_FACTOR = 0.08f;
         profile.DESTROY_OR_MOVE_CHANCE = 0.2f;
-        profile.EXPLOSION_CHANCE = 0.008f;
+        profile.EXPLOSION_CHANCE = 0.006f;
         profile.EXPLOSION_MAXHEIGHT = 256;
         profile.EXPLOSION_MAXRADIUS = 60;
         profile.EXPLOSION_MINHEIGHT = 130;

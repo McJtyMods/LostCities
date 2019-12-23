@@ -23,9 +23,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.PerlinNoiseGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
@@ -819,54 +817,30 @@ public class LostCityTerrainFeature {
         clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
-    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
-        IWorld region = driver.getRegion();
-        return getHeightmap(chunkX, chunkZ, region);
-    }
-
-    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ, IWorld region) {
-        ChunkCoord key = new ChunkCoord(region.getDimension().getType(), chunkX, chunkZ);
+    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ, IWorld world) {
+        ChunkCoord key = new ChunkCoord(world.getDimension().getType(), chunkX, chunkZ);
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
         } else {
-            ChunkHeightmap heightmap;
-            if (region.chunkExists(chunkX, chunkZ)) {
-                IChunk chunk = region.getChunk(chunkX, chunkZ);
-                ChunkStatus status = chunk.getStatus();
-                if (status.isAtLeast(ChunkStatus.CARVERS)) {
-                    System.out.println("Generating real heightmap for " + chunkX + "," + chunkZ + " (status " + status.getName() + ")");
-                    heightmap = new ChunkHeightmap(chunk, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
-                } else {
-//                    System.out.println("+++++ Generating dummy for " + chunkX + "," + chunkZ + " (status " + status.getName() + ")");
-                    ChunkPrimer primer = makeDummyChunk(chunkX, chunkZ, region);
-                    heightmap = new ChunkHeightmap(primer, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
-                }
-            } else {
-                System.out.println("##### Generating dummy for " + chunkX + "," + chunkZ);
-                // @todo 1.14 what to do here? We can't get to the desired chunk? We need some kind of dummy then?
-                // At the very least we don't cache this information. This could possibly lead to wrong results.
-                ChunkPrimer primer = makeDummyChunk(chunkX, chunkZ, region);
-                heightmap = new ChunkHeightmap(primer, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
-//                heightmap = new ChunkHeightmap(region.getChunk(region.getMainChunkX(), region.getMainChunkZ()), profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
-            }
+            ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+            makeDummyChunk(chunkX, chunkZ, world, heightmap);
             cachedHeightmaps.put(key, heightmap);
             return heightmap;
         }
     }
 
-    private ChunkPrimer makeDummyChunk(int chunkX, int chunkZ, IWorld region) {
-        ChunkPrimer primer = new ChunkPrimer(new ChunkPos(chunkX, chunkZ), UpgradeData.EMPTY);
+    private void makeDummyChunk(int chunkX, int chunkZ, IWorld region, ChunkHeightmap heightmap) {
+        DummyChunk primer = new DummyChunk(new ChunkPos(chunkX, chunkZ), heightmap);
         ChunkGenerator<?> generator = region.getDimension().getWorld().getChunkProvider().getChunkGenerator();
         generator.generateBiomes(primer);
         generator.makeBase(region.getDimension().getWorld(), primer);
         generator.generateSurface(primer);
-        return primer;
     }
 
     private void doCityChunk(int chunkX, int chunkZ, BuildingInfo info) {
         boolean building = info.hasBuilding;
 
-        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ);
+        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, provider.getWorld());
 
         Random rand = new Random(provider.getSeed() * 377 + chunkZ * 341873128712L + chunkX * 132897987541L);
         rand.nextFloat();
@@ -1732,7 +1706,7 @@ public class LostCityTerrainFeature {
                 if (adjacent.isCity) {
                     adjacentY = Math.min(adjacentY, adjacent.getCityGroundLevel());
                 } else {
-                    ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.chunkX, adjacent.chunkZ);
+                    ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.chunkX, adjacent.chunkZ, provider.getWorld());
                     int minimumHeight = adjacentHeightmap.getMinimumHeight();
                     adjacentY = Math.min(adjacentY, minimumHeight-2);
                 }
@@ -1768,7 +1742,7 @@ public class LostCityTerrainFeature {
      * Generate a column of wall blocks (and stone below that in water)
      */
     private void generateBorderSupport(BuildingInfo info, BlockState wall, int x, int z, int offset) {
-        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ);
+        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, provider.getWorld());
         int height = heightmap.getHeight(x, z);
         if (height > 1) {
             // None void
@@ -2190,7 +2164,7 @@ public class LostCityTerrainFeature {
             }
             if (info.profile.isSpace()) {
                 // Base it on ground level
-                ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.chunkX, adjacent.chunkZ);
+                ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.chunkX, adjacent.chunkZ, provider.getWorld());
                 int adjacentHeight = adjacentHeightmap.getAverageHeight();
                 if (adjacentHeight > 5) {
                     if ((adjacentHeight-4) < info.getCityGroundLevel()) {
@@ -2261,7 +2235,7 @@ public class LostCityTerrainFeature {
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     if (isSide(x, z)) {
-                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel - 10, base);
+//                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel - 10, base);
                         int y = lowestLevel - 10;
                         driver.current(x, y, z);
                         while (y < lowestLevel) {
@@ -2269,18 +2243,18 @@ public class LostCityTerrainFeature {
                             y++;
                         }
                     } else if (info.profile.isDefault()) {
-                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel, base);
+//                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel, base);
                     }
                     if (driver.getBlock(x, lowestLevel, z) == air) {
                         BlockState filler = palette.get(fillerBlock);
                         driver.current(x, lowestLevel, z).block(filler); // There is nothing below so we fill this with the filler
                     }
 
-                    if (info.profile.isCavern()) {
+//                    if (info.profile.isCavern()) {
                         // Also clear the inside of buildings to avoid geometry that doesn't really belong there
 //                        clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, waterLevel > mainGroundLevel);
                         clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, info.waterLevel > info.groundLevel);
-                    }
+//                    }
                 }
             }
         }

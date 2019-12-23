@@ -993,40 +993,31 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static int getCityLevelNormal(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        // @todo: average out nearby biomes?
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ)).getBiomes();
-        float h = 0.0f;
-        for (Biome biome : biomes) {
-            // @todo 1.14
-//            h += biome.getBaseHeight();
-        }
-        h /= biomes.length;
+        // OLD METHOD:
+//        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ)).getBiomes();
+//        float h = 0.0f;
+//        for (Biome biome : biomes) {
+//            h += biome.getDepth();
+//        }
+//        h /= biomes.length;
+//
+//        int height = 0;
+//
+//        if (h < 0.15f) {
+//            height = 70;
+//        } else if (h < 0.4f) {
+//            height = 79;
+//        } else if (h < 0.7f) {
+//            height = 88;
+//        } else if (h < 1.3) {
+//            height = 95;
+//        } else {
+//            height = 100;
+//        }
+//        int level1 = getLevelBasedOnHeight(height, profile);
 
-        // deep ocean = -1.8
-        // ocean = -1
-        // river = -0.5
-        // swampland = -0.2
-        // beach = 0
-        // plains = .125
-        // taiga = 0.2
-        // ice mountains/desert hills = 0.45
-        // hills edge/stone beach = 0.8
-        // extreme hills = 1
-        // savanna plateau = 1.5
-        // mesa = 1.5
-        int height = 0;
-
-        if (h < 0.15f) {
-            height = 70;
-        } else if (h < 0.4f) {
-            height = 79;
-        } else if (h < 0.7f) {
-            height = 88;
-        } else if (h < 1.3) {
-            height = 95;
-        } else {
-            height = 100;
-        }
+        ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
+        int height = heightmap.getAverageHeight();
         return getLevelBasedOnHeight(height, profile);
     }
 
