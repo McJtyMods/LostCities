@@ -179,6 +179,8 @@ public class ChunkFixer {
         }
         info.clearLootTodo();
 
+        // @todo 1.14 is this still needed?
+
 //        for (BlockPos pos : info.getLightingUpdateTodo()) {
 //            BlockState state = world.getBlockState(pos);
 //            world.setBlockState(pos, state, 3);
