@@ -211,6 +211,9 @@ public class LostCityProfile {
 
     public LostCityProfile(PacketBuffer buf) {
         // @todo
+        name = "";
+        inheritFrom = Optional.empty();
+        isPublic = false;
     }
 
     public void setIconFile(String iconFile) {
