@@ -112,8 +112,10 @@ public class ChunkFixer {
 
         for (Pair<BlockPos, BuildingInfo.ConditionTodo> pair : info.getMobSpawnerTodo()) {
             BlockPos pos = pair.getKey();
+            BlockState state = world.getBlockState(pos);
+            world.setBlockState(pos, state, 2); // Recreate the block on the world so that TE can be made
             // Double check that it is still a spawner (could be destroyed by explosion)
-            if (world.getBlockState(pos).getBlock() == Blocks.SPAWNER) {
+            if (state.getBlock() == Blocks.SPAWNER) {
                 TileEntity tileentity = world.getTileEntity(pos);
                 if (tileentity instanceof MobSpawnerTileEntity) {
                     MobSpawnerTileEntity spawner = (MobSpawnerTileEntity) tileentity;
@@ -159,6 +161,9 @@ public class ChunkFixer {
 
         for (Pair<BlockPos, BuildingInfo.ConditionTodo> pair : info.getLootTodo()) {
             BlockPos pos = pair.getKey();
+            BlockState state = world.getBlockState(pos);
+            world.setBlockState(pos, state, 2); // Recreate the block on the world so that TE can be made
+
             // Double check that it is still something that can hold loot (could be destroyed by explosion)
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof LockableLootTileEntity) {
@@ -166,7 +171,6 @@ public class ChunkFixer {
                     createLoot(info, random, world, pos, pair.getRight(), diminfo);
                 }
             } else if (te == null) {
-                BlockState state = world.getBlockState(pos);
                 Block block = state.getBlock();
                 if (block.hasTileEntity(state)) {
                     LostCities.setup.getLogger().error("The block " + block.getRegistryName() + " (" + block.getClass().getName() + ") at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
@@ -175,12 +179,11 @@ public class ChunkFixer {
         }
         info.clearLootTodo();
 
-
-        for (BlockPos pos : info.getLightingUpdateTodo()) {
-            BlockState state = world.getBlockState(pos);
-            world.setBlockState(pos, state, 3);
-        }
-        info.clearLightingUpdateTodo();
+//        for (BlockPos pos : info.getLightingUpdateTodo()) {
+//            BlockState state = world.getBlockState(pos);
+//            world.setBlockState(pos, state, 3);
+//        }
+//        info.clearLightingUpdateTodo();
     }
 
 
@@ -210,11 +213,12 @@ public class ChunkFixer {
                 if (randomValue == null) {
                     throw new RuntimeException("Condition '" + lootTable + "' did not return a table under certain conditions!");
                 }
-                ((LockableLootTileEntity) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
-                tileentity.markDirty();
-                if (LostCityConfiguration.DEBUG) {
-                    LostCities.setup.getLogger().debug("createLootChest: loot=" + randomValue + " pos=" + pos.toString());
-                }
+//                ((LockableLootTileEntity) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
+//                tileentity.markDirty();
+//                if (LostCityConfiguration.DEBUG) {
+//                    LostCities.setup.getLogger().debug("createLootChest: loot=" + randomValue + " pos=" + pos.toString());
+//                }
+                LockableLootTileEntity.setLootTable(world, random, pos, new ResourceLocation(randomValue));
             }
         }
     }
@@ -223,6 +227,6 @@ public class ChunkFixer {
     public static void fix(IDimensionInfo info, int chunkX, int chunkZ) {
         generateTrees(info.getRandom(), chunkX, chunkZ, info.getWorld(), info);
         generateVines(info.getRandom(), chunkX, chunkZ, info.getWorld(), info);
-//        generateLootSpawners(info.getRandom(), chunkX, chunkZ, info.getWorld(), info);
+        generateLootSpawners(info.getRandom(), chunkX, chunkZ, info.getWorld(), info);
     }
 }
