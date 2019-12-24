@@ -20,7 +20,7 @@ public class GuiLostCityConfiguration extends Screen {
     private Map<Integer, String> profileNames = new HashMap<>();
     private int page = 0;
     private int numpages;
-    private GuiMutableLabel pagelabel;
+//    private GuiMutableLabel pagelabel;
 
     public GuiLostCityConfiguration(CreateWorldScreen parent) {
         super(new StringTextComponent("Lost City Configuration"));

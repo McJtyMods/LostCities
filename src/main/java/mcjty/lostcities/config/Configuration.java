@@ -87,7 +87,9 @@ public class Configuration {
     }
 
     public void addCustomCategoryComment(String category, String description) {
-        categoryMap.put(category, new Category(category, description));
+        if (!categoryMap.containsKey(category)) {
+            categoryMap.put(category, new Category(category, description));
+        }
     }
 
     private <T> Category getValueCategory(String name, String category, T defaultValue, String description) {
@@ -103,7 +105,12 @@ public class Configuration {
 
     public float getFloat(String name, String category, float defaultValue, float minValue, float maxValue, String description) {
         Category cat = getValueCategory(name, category, defaultValue, description);
-        return (Float) cat.valueMap.get(name).value;
+        Object value = cat.valueMap.get(name).value;
+        if (value instanceof Float) {
+            return (Float) value;
+        } else {
+            return ((Integer) value).floatValue();
+        }
     }
 
     public boolean getBoolean(String name, String category, boolean defaultValue, String description) {
@@ -113,7 +120,12 @@ public class Configuration {
 
     public int getInt(String name, String category, int defaultValue, int minValue, int maxValue, String description) {
         Category cat = getValueCategory(name, category, defaultValue, description);
-        return (Integer) cat.valueMap.get(name).value;
+        Object value = cat.valueMap.get(name).value;
+        if (value instanceof Float) {
+            return ((Float) value).intValue();
+        } else {
+            return (Integer) value;
+        }
     }
 
     public String getString(String name, String category, String defaultValue, String description) {

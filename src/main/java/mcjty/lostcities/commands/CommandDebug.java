@@ -79,6 +79,10 @@ public class CommandDebug implements Command<CommandSource> {
                 }
                 avg /= 16*16;
                 System.out.println("Average chunk height (heightmap): " + avg);
+
+                System.out.println("dimInfo.getProfile().BUILDING_MINFLOORS = " + dimInfo.getProfile().BUILDING_MINFLOORS);
+                System.out.println("dimInfo.getProfile().BUILDING_MAXFLOORS = " + dimInfo.getProfile().BUILDING_MAXFLOORS);
+                System.out.println("dimInfo.getProfile().CITY_CHANCE = " + dimInfo.getProfile().CITY_CHANCE);
             }
         }
         return 0;

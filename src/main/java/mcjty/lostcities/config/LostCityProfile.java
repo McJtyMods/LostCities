@@ -213,23 +213,18 @@ public class LostCityProfile {
     }
 
     public LostCityProfile(String name, PacketBuffer buf) {
-        buf.readString(32767);
-        // @todo
-        this.name = name;
-        inheritFrom = Optional.empty();
-        isPublic = false;
+        this(name, buf.readString(32767));
     }
 
     public LostCityProfile(String name, String json) {
-        Configuration config = new Configuration();
-
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(json);
-        config.fromJson(element.getAsJsonObject());
-        // @todo
         this.name = name;
         inheritFrom = Optional.empty();
         isPublic = false;
+        Configuration config = new Configuration();
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(json);
+        config.fromJson(element.getAsJsonObject());
+        init(config);
     }
 
     public void setIconFile(String iconFile) {
@@ -252,12 +247,12 @@ public class LostCityProfile {
     }
 
     public void init(Configuration cfg) {
-        categoryLostcity = LostCityProfile.CATEGORY_LOSTCITY + "_" + name;
-        categoryStructures = LostCityProfile.CATEGORY_STRUCTURES + "_" + name;
-        categoryExplosions = LostCityProfile.CATEGORY_EXPLOSIONS + "_" + name;
-        categoryCities = LostCityProfile.CATEGORY_CITIES + "_" + name;
-        categoryCitySpheres = LostCityProfile.CATEGORY_CITY_SPHERES + "_" + name;
-        categoryClient = LostCityProfile.CATEGORY_CLIENT + "_" + name;
+        categoryLostcity = LostCityProfile.CATEGORY_LOSTCITY;
+        categoryStructures = LostCityProfile.CATEGORY_STRUCTURES;
+        categoryExplosions = LostCityProfile.CATEGORY_EXPLOSIONS;
+        categoryCities = LostCityProfile.CATEGORY_CITIES;
+        categoryCitySpheres = LostCityProfile.CATEGORY_CITY_SPHERES;
+        categoryClient = LostCityProfile.CATEGORY_CLIENT;
         cfg.addCustomCategoryComment(categoryLostcity, "Settings related to the Lost City for the " + name + " profile");
         cfg.addCustomCategoryComment(categoryStructures, "Settings related to structure generation for the " + name + " profile");
         cfg.addCustomCategoryComment(categoryExplosions, "Settings related to explosions and damage for the " + name + " profile");
@@ -525,7 +520,7 @@ public class LostCityProfile {
         GENERATE_MINESHAFTS = cfg.getBoolean("generateMineshafts", categoryStructures, inheritFrom.orElse(this).GENERATE_MINESHAFTS, "Generate mineshafts");
         GENERATE_LAKES = cfg.getBoolean("generateLakes", categoryStructures, inheritFrom.orElse(this).GENERATE_LAKES, "Generate lakes (lava/water)");
         GENERATE_DUNGEONS = cfg.getBoolean("generateDungeons", categoryStructures, inheritFrom.orElse(this).GENERATE_DUNGEONS, "Generate dungeons");
-        MAX_CAVE_HEIGHT = cfg.getInt(categoryStructures, "maxCaveHeight", inheritFrom.orElse(this).MAX_CAVE_HEIGHT, 20, 240, "Maximum height at which vanilla caves can generate. Default is 128. Lower this if you don't want the caves to damage buildings");
+        MAX_CAVE_HEIGHT = cfg.getInt("maxCaveHeight", categoryStructures, inheritFrom.orElse(this).MAX_CAVE_HEIGHT, 20, 240, "Maximum height at which vanilla caves can generate. Default is 128. Lower this if you don't want the caves to damage buildings");
 
         PREVENT_VILLAGES_IN_CITIES = cfg.getBoolean("preventVillagesInCities", categoryStructures, inheritFrom.orElse(this).PREVENT_VILLAGES_IN_CITIES, "If true then an attempt will be made to prevent villages in cities. " +
                 "Note that enabling this option will likely require a low city " +
@@ -624,133 +619,9 @@ public class LostCityProfile {
     }
 
     public void copyFrom(LostCityProfile other) {
-        this.worldStyle = other.worldStyle;
-        this.DEBRIS_TO_NEARBYCHUNK_FACTOR = other.DEBRIS_TO_NEARBYCHUNK_FACTOR;
-        this.LIQUID_BLOCK = other.LIQUID_BLOCK;
-        this.BASE_BLOCK = other.BASE_BLOCK;
-        this.VINE_CHANCE = other.VINE_CHANCE;
-        this.CHANCE_OF_RANDOM_LEAFBLOCKS = other.CHANCE_OF_RANDOM_LEAFBLOCKS;
-        this.THICKNESS_OF_RANDOM_LEAFBLOCKS = other.THICKNESS_OF_RANDOM_LEAFBLOCKS;
-        this.AVOID_FOLIAGE = other.AVOID_FOLIAGE;
-        this.AVOID_GENERATED_FLOWERS = other.AVOID_GENERATED_FLOWERS;
-        this.AVOID_GENERATED_MUSHROOMS = other.AVOID_GENERATED_MUSHROOMS;
-        this.AVOID_GENERATED_REEDS = other.AVOID_GENERATED_REEDS;
-        this.AVOID_GENERATED_LILYPADS = other.AVOID_GENERATED_LILYPADS;
-        this.AVOID_GENERATED_GRASS = other.AVOID_GENERATED_GRASS;
-        this.AVOID_GENERATED_PUMPKINS = other.AVOID_GENERATED_PUMPKINS;
-        this.AVOID_GENERATED_CACTII = other.AVOID_GENERATED_CACTII;
-        this.AVOID_GENERATED_TREES = other.AVOID_GENERATED_TREES;
-        this.AVOID_GENERATED_LAKE_WATER = other.AVOID_GENERATED_LAKE_WATER;
-        this.AVOID_GENERATED_DESERT_WELL = other.AVOID_GENERATED_DESERT_WELL;
-        this.AVOID_GENERATED_FOSSILS = other.AVOID_GENERATED_FOSSILS;
-        this.RUBBLELAYER = other.RUBBLELAYER;
-        this.RUBBLE_DIRT_SCALE = other.RUBBLE_DIRT_SCALE;
-        this.RUBBLE_LEAVE_SCALE = other.RUBBLE_LEAVE_SCALE;
-        this.RUINS = other.RUINS;
-        this.RUIN_CHANCE = other.RUIN_CHANCE;
-        this.RUIN_MINLEVEL_PERCENT = other.RUIN_MINLEVEL_PERCENT;
-        this.RUIN_MAXLEVEL_PERCENT = other.RUIN_MAXLEVEL_PERCENT;
-        this.GROUNDLEVEL = other.GROUNDLEVEL;
-        this.WATERLEVEL_OFFSET = other.WATERLEVEL_OFFSET;
-        this.HIGHWAY_REQUIRES_TWO_CITIES = other.HIGHWAY_REQUIRES_TWO_CITIES;
-        this.HIGHWAY_LEVEL_FROM_CITIES_MODE = other.HIGHWAY_LEVEL_FROM_CITIES_MODE;
-        this.HIGHWAY_MAINPERLIN_SCALE = other.HIGHWAY_MAINPERLIN_SCALE;
-        this.HIGHWAY_SECONDARYPERLIN_SCALE = other.HIGHWAY_SECONDARYPERLIN_SCALE;
-        this.HIGHWAY_PERLIN_FACTOR = other.HIGHWAY_PERLIN_FACTOR;
-        this.HIGHWAY_DISTANCE_MASK = other.HIGHWAY_DISTANCE_MASK;
-        this.HIGHWAY_SUPPORTS = other.HIGHWAY_SUPPORTS;
-        this.RAILWAY_DUNGEON_CHANCE = other.RAILWAY_DUNGEON_CHANCE;
-        this.RAILWAYS_CAN_END = other.RAILWAYS_CAN_END;
-        this.RAILWAYS_ENABLED = other.RAILWAYS_ENABLED;
-        this.RAILWAY_STATIONS_ENABLED = other.RAILWAY_STATIONS_ENABLED;
-        this.DESTROY_LONE_BLOCKS_FACTOR = other.DESTROY_LONE_BLOCKS_FACTOR;
-        this.DESTROY_OR_MOVE_CHANCE = other.DESTROY_OR_MOVE_CHANCE;
-        this.DESTROY_SMALL_SECTIONS_SIZE = other.DESTROY_SMALL_SECTIONS_SIZE;
-        this.EXPLOSIONS_IN_CITIES_ONLY = other.EXPLOSIONS_IN_CITIES_ONLY;
-        this.GENERATE_SPAWNERS = other.GENERATE_SPAWNERS;
-        this.GENERATE_LOOT = other.GENERATE_LOOT;
-        this.GENERATE_LIGHTING = other.GENERATE_LIGHTING;
-        this.AVOID_WATER = other.AVOID_WATER;
-        this.EXPLOSION_CHANCE = other.EXPLOSION_CHANCE;
-        this.EXPLOSION_MINRADIUS = other.EXPLOSION_MINRADIUS;
-        this.EXPLOSION_MAXRADIUS = other.EXPLOSION_MAXRADIUS;
-        this.EXPLOSION_MINHEIGHT = other.EXPLOSION_MINHEIGHT;
-        this.EXPLOSION_MAXHEIGHT = other.EXPLOSION_MAXHEIGHT;
-        this.MINI_EXPLOSION_CHANCE = other.MINI_EXPLOSION_CHANCE;
-        this.MINI_EXPLOSION_MINRADIUS = other.MINI_EXPLOSION_MINRADIUS;
-        this.MINI_EXPLOSION_MAXRADIUS = other.MINI_EXPLOSION_MAXRADIUS;
-        this.MINI_EXPLOSION_MINHEIGHT = other.MINI_EXPLOSION_MINHEIGHT;
-        this.MINI_EXPLOSION_MAXHEIGHT = other.MINI_EXPLOSION_MAXHEIGHT;
-        this.CITY_CHANCE = other.CITY_CHANCE;
-        this.CITY_MINRADIUS = other.CITY_MINRADIUS;
-        this.CITY_MAXRADIUS = other.CITY_MAXRADIUS;
-        this.CITY_THRESSHOLD = other.CITY_THRESSHOLD;
-        this.CITYSPHERE_FACTOR = other.CITYSPHERE_FACTOR;
-        this.CITYSPHERE_CHANCE = other.CITYSPHERE_CHANCE;
-        this.CITYSPHERE_SURFACE_VARIATION = other.CITYSPHERE_SURFACE_VARIATION;
-        this.CITYSPHERE_OUTSIDE_SURFACE_VARIATION = other.CITYSPHERE_OUTSIDE_SURFACE_VARIATION;
-        this.CITYSPHERE_MONORAIL_CHANCE = other.CITYSPHERE_MONORAIL_CHANCE;
-        this.CITYSPHERE_OUTSIDE_GROUNDLEVEL = other.CITYSPHERE_OUTSIDE_GROUNDLEVEL;
-        this.CITYSPHERE_LANDSCAPE_OUTSIDE = other.CITYSPHERE_LANDSCAPE_OUTSIDE;
-        this.CITYSPHERE_OUTSIDE_PROFILE = other.CITYSPHERE_OUTSIDE_PROFILE;
-        this.CITYSPHERE_ONLY_PREDEFINED = other.CITYSPHERE_ONLY_PREDEFINED;
-        this.CITYSPHERE_MONORAIL_HEIGHT_OFFSET = other.CITYSPHERE_MONORAIL_HEIGHT_OFFSET;
-        this.CITYSPHERE_SINGLE_BIOME = other.CITYSPHERE_SINGLE_BIOME;
-        this.CITY_LEVEL0_HEIGHT = other.CITY_LEVEL0_HEIGHT;
-        this.CITY_LEVEL1_HEIGHT = other.CITY_LEVEL1_HEIGHT;
-        this.CITY_LEVEL2_HEIGHT = other.CITY_LEVEL2_HEIGHT;
-        this.CITY_LEVEL3_HEIGHT = other.CITY_LEVEL3_HEIGHT;
-        this.CITY_DEFAULT_BIOME_FACTOR = other.CITY_DEFAULT_BIOME_FACTOR;
-        this.GENERATOR_OPTIONS = other.GENERATOR_OPTIONS;
-        this.BIOME_SELECTION_STRATEGY = other.BIOME_SELECTION_STRATEGY;
-        this.CHEST_WITHOUT_LOOT_CHANCE = other.CHEST_WITHOUT_LOOT_CHANCE;
-        this.BUILDING_WITHOUT_LOOT_CHANCE = other.BUILDING_WITHOUT_LOOT_CHANCE;
-        this.BUILDING_CHANCE = other.BUILDING_CHANCE;
-        this.BUILDING_MINFLOORS = other.BUILDING_MINFLOORS;
-        this.BUILDING_MAXFLOORS = other.BUILDING_MAXFLOORS;
-        this.BUILDING_MINFLOORS_CHANCE = other.BUILDING_MINFLOORS_CHANCE;
-        this.BUILDING_MAXFLOORS_CHANCE = other.BUILDING_MAXFLOORS_CHANCE;
-        this.BUILDING_MINCELLARS = other.BUILDING_MINCELLARS;
-        this.BUILDING_MAXCELLARS = other.BUILDING_MAXCELLARS;
-        this.BUILDING_DOORWAYCHANCE = other.BUILDING_DOORWAYCHANCE;
-        this.BUILDING_FRONTCHANCE = other.BUILDING_FRONTCHANCE;
-        this.LIBRARY_CHANCE = other.LIBRARY_CHANCE;
-        this.DATACENTER_CHANCE = other.DATACENTER_CHANCE;
-        this.PARK_CHANCE = other.PARK_CHANCE;
-        this.CORRIDOR_CHANCE = other.CORRIDOR_CHANCE;
-        this.BRIDGE_CHANCE = other.BRIDGE_CHANCE;
-        this.FOUNTAIN_CHANCE = other.FOUNTAIN_CHANCE;
-        this.BUILDING2X2_CHANCE = other.BUILDING2X2_CHANCE;
-        this.BRIDGE_SUPPORTS = other.BRIDGE_SUPPORTS;
-        this.BEDROCK_LAYER = other.BEDROCK_LAYER;
-        this.GENERATE_VILLAGES = other.GENERATE_VILLAGES;
-        this.GENERATE_CAVES = other.GENERATE_CAVES;
-        this.GENERATE_RAVINES = other.GENERATE_RAVINES;
-        this.GENERATE_MINESHAFTS = other.GENERATE_MINESHAFTS;
-        this.GENERATE_STRONGHOLDS = other.GENERATE_STRONGHOLDS;
-        this.GENERATE_SCATTERED = other.GENERATE_SCATTERED;
-        this.GENERATE_OCEANMONUMENTS = other.GENERATE_OCEANMONUMENTS;
-        this.GENERATE_MANSIONS = other.GENERATE_MANSIONS;
-        this.GENERATE_LAKES = other.GENERATE_LAKES;
-        this.GENERATE_DUNGEONS = other.GENERATE_DUNGEONS;
-        this.HORIZON = other.HORIZON;
-        this.FOG_RED = other.FOG_RED;
-        this.FOG_GREEN = other.FOG_GREEN;
-        this.FOG_BLUE = other.FOG_BLUE;
-        this.FOG_DENSITY = other.FOG_DENSITY;
-        this.SPAWN_BIOME = other.SPAWN_BIOME;
-        this.SPAWN_CITY = other.SPAWN_CITY;
-        this.SPAWN_SPHERE = other.SPAWN_SPHERE;
-        this.SPAWN_NOT_IN_BUILDING = other.SPAWN_NOT_IN_BUILDING;
-        this.MAX_CAVE_HEIGHT = other.MAX_CAVE_HEIGHT;
-        this.LANDSCAPE_TYPE = other.LANDSCAPE_TYPE;
-        this.PREVENT_VILLAGES_IN_CITIES = other.PREVENT_VILLAGES_IN_CITIES;
-        this.PREVENT_LAKES_RAVINES_IN_CITIES = other.PREVENT_LAKES_RAVINES_IN_CITIES;
-
-        this.ALLOWED_BIOME_FACTORS = other.ALLOWED_BIOME_FACTORS.clone();
-        this.MANUAL_BIOME_MAPPINGS = other.MANUAL_BIOME_MAPPINGS.clone();
-        this.CITY_BIOME_FACTORS = other.CITY_BIOME_FACTORS.clone();
-
+        Configuration config = new Configuration();
+        other.init(config);
+        init(config);
     }
 
     public JsonObject toJson() {
@@ -760,6 +631,7 @@ public class LostCityProfile {
     }
 
     public void toBytes(PacketBuffer buf) {
-        // @todo
+        JsonObject jsonObject = toJson();
+        buf.writeString(jsonObject.toString());
     }
 }

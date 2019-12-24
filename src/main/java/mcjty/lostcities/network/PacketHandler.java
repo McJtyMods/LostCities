@@ -37,9 +37,5 @@ public class PacketHandler {
                 PacketReturnProfileToClient::toBytes,
                 PacketReturnProfileToClient::new,
                 PacketReturnProfileToClient::handle);
-        INSTANCE.registerMessage(nextID(), PacketProfileToServer.class,
-                PacketProfileToServer::toBytes,
-                PacketProfileToServer::new,
-                PacketProfileToServer::handle);
     }
 }
