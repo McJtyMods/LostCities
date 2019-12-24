@@ -16,7 +16,7 @@ public class PacketProfileToServer {
     public PacketProfileToServer(PacketBuffer buf) {
         profileName = buf.readString(32767);
         if (buf.readBoolean()) {
-            profile = new LostCityProfile(buf);
+            profile = new LostCityProfile(profileName, buf);
         }
     }
 

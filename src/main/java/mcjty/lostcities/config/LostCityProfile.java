@@ -1,5 +1,8 @@
 package mcjty.lostcities.config;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import mcjty.lostcities.LostCities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -209,9 +212,22 @@ public class LostCityProfile {
         this.isPublic = isPublic;
     }
 
-    public LostCityProfile(PacketBuffer buf) {
+    public LostCityProfile(String name, PacketBuffer buf) {
+        buf.readString(32767);
         // @todo
-        name = "";
+        this.name = name;
+        inheritFrom = Optional.empty();
+        isPublic = false;
+    }
+
+    public LostCityProfile(String name, String json) {
+        Configuration config = new Configuration();
+
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(json);
+        config.fromJson(element.getAsJsonObject());
+        // @todo
+        this.name = name;
         inheritFrom = Optional.empty();
         isPublic = false;
     }
@@ -499,23 +515,23 @@ public class LostCityProfile {
     }
 
     private void initStructures(Configuration cfg) {
-        GENERATE_OCEANMONUMENTS = cfg.get(categoryStructures, "generateOceanMonuments", inheritFrom.orElse(this).GENERATE_OCEANMONUMENTS, "Generate ocean monuments").getBoolean();
-        GENERATE_MANSIONS = cfg.get(categoryStructures, "generateMansions", inheritFrom.orElse(this).GENERATE_MANSIONS, "Generate mansions").getBoolean();
-        GENERATE_SCATTERED = cfg.get(categoryStructures, "generateScattered", inheritFrom.orElse(this).GENERATE_SCATTERED, "Generate scattered features (swamphunts, desert temples, ...)").getBoolean();
-        GENERATE_STRONGHOLDS = cfg.get(categoryStructures, "generateStrongholds", inheritFrom.orElse(this).GENERATE_STRONGHOLDS, "Generate strongholds").getBoolean();
-        GENERATE_VILLAGES = cfg.get(categoryStructures, "generateVillages", inheritFrom.orElse(this).GENERATE_VILLAGES, "Generate villages").getBoolean();
-        GENERATE_CAVES = cfg.get(categoryStructures, "generateCaves", inheritFrom.orElse(this).GENERATE_CAVES, "Generate caves").getBoolean();
-        GENERATE_RAVINES = cfg.get(categoryStructures, "generateRavines", inheritFrom.orElse(this).GENERATE_RAVINES, "Generate ravines").getBoolean();
-        GENERATE_MINESHAFTS = cfg.get(categoryStructures, "generateMineshafts", inheritFrom.orElse(this).GENERATE_MINESHAFTS, "Generate mineshafts").getBoolean();
-        GENERATE_LAKES = cfg.get(categoryStructures, "generateLakes", inheritFrom.orElse(this).GENERATE_LAKES, "Generate lakes (lava/water)").getBoolean();
-        GENERATE_DUNGEONS = cfg.get(categoryStructures, "generateDungeons", inheritFrom.orElse(this).GENERATE_DUNGEONS, "Generate dungeons").getBoolean();
+        GENERATE_OCEANMONUMENTS = cfg.getBoolean("generateOceanMonuments", categoryStructures, inheritFrom.orElse(this).GENERATE_OCEANMONUMENTS, "Generate ocean monuments");
+        GENERATE_MANSIONS = cfg.getBoolean("generateMansions", categoryStructures, inheritFrom.orElse(this).GENERATE_MANSIONS, "Generate mansions");
+        GENERATE_SCATTERED = cfg.getBoolean("generateScattered", categoryStructures, inheritFrom.orElse(this).GENERATE_SCATTERED, "Generate scattered features (swamphunts, desert temples, ...)");
+        GENERATE_STRONGHOLDS = cfg.getBoolean("generateStrongholds", categoryStructures, inheritFrom.orElse(this).GENERATE_STRONGHOLDS, "Generate strongholds");
+        GENERATE_VILLAGES = cfg.getBoolean("generateVillages", categoryStructures, inheritFrom.orElse(this).GENERATE_VILLAGES, "Generate villages");
+        GENERATE_CAVES = cfg.getBoolean("generateCaves", categoryStructures, inheritFrom.orElse(this).GENERATE_CAVES, "Generate caves");
+        GENERATE_RAVINES = cfg.getBoolean("generateRavines", categoryStructures, inheritFrom.orElse(this).GENERATE_RAVINES, "Generate ravines");
+        GENERATE_MINESHAFTS = cfg.getBoolean("generateMineshafts", categoryStructures, inheritFrom.orElse(this).GENERATE_MINESHAFTS, "Generate mineshafts");
+        GENERATE_LAKES = cfg.getBoolean("generateLakes", categoryStructures, inheritFrom.orElse(this).GENERATE_LAKES, "Generate lakes (lava/water)");
+        GENERATE_DUNGEONS = cfg.getBoolean("generateDungeons", categoryStructures, inheritFrom.orElse(this).GENERATE_DUNGEONS, "Generate dungeons");
         MAX_CAVE_HEIGHT = cfg.getInt(categoryStructures, "maxCaveHeight", inheritFrom.orElse(this).MAX_CAVE_HEIGHT, 20, 240, "Maximum height at which vanilla caves can generate. Default is 128. Lower this if you don't want the caves to damage buildings");
 
-        PREVENT_VILLAGES_IN_CITIES = cfg.get(categoryStructures, "preventVillagesInCities", inheritFrom.orElse(this).PREVENT_VILLAGES_IN_CITIES, "If true then an attempt will be made to prevent villages in cities. " +
+        PREVENT_VILLAGES_IN_CITIES = cfg.getBoolean("preventVillagesInCities", categoryStructures, inheritFrom.orElse(this).PREVENT_VILLAGES_IN_CITIES, "If true then an attempt will be made to prevent villages in cities. " +
                 "Note that enabling this option will likely require a low city " +
-                "density in order to actually get a reasonable chance for villages.").getBoolean();
-        PREVENT_LAKES_RAVINES_IN_CITIES = cfg.get(categoryStructures, "preventLakesRavinesInCities", inheritFrom.orElse(this).PREVENT_LAKES_RAVINES_IN_CITIES,
-                "If true then no lakes and ravines will be generated in cities").getBoolean();
+                "density in order to actually get a reasonable chance for villages.");
+        PREVENT_LAKES_RAVINES_IN_CITIES = cfg.getBoolean("preventLakesRavinesInCities", categoryStructures, inheritFrom.orElse(this).PREVENT_LAKES_RAVINES_IN_CITIES,
+                "If true then no lakes and ravines will be generated in cities");
     }
 
     public String getName() {
@@ -611,9 +627,7 @@ public class LostCityProfile {
         this.worldStyle = other.worldStyle;
         this.DEBRIS_TO_NEARBYCHUNK_FACTOR = other.DEBRIS_TO_NEARBYCHUNK_FACTOR;
         this.LIQUID_BLOCK = other.LIQUID_BLOCK;
-        this.liquidBlock = other.liquidBlock;
         this.BASE_BLOCK = other.BASE_BLOCK;
-        this.baseBlock = other.baseBlock;
         this.VINE_CHANCE = other.VINE_CHANCE;
         this.CHANCE_OF_RANDOM_LEAFBLOCKS = other.CHANCE_OF_RANDOM_LEAFBLOCKS;
         this.THICKNESS_OF_RANDOM_LEAFBLOCKS = other.THICKNESS_OF_RANDOM_LEAFBLOCKS;
@@ -737,6 +751,12 @@ public class LostCityProfile {
         this.MANUAL_BIOME_MAPPINGS = other.MANUAL_BIOME_MAPPINGS.clone();
         this.CITY_BIOME_FACTORS = other.CITY_BIOME_FACTORS.clone();
 
+    }
+
+    public JsonObject toJson() {
+        Configuration config = new Configuration();
+        init(config);
+        return config.toJson();
     }
 
     public void toBytes(PacketBuffer buf) {
