@@ -767,8 +767,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
             floors = f;
 
-            int maxcellars = getMaxcellars(provider, cs);
-            int fb = profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
+            int maxcellars = getMaxcellars(cs);
+            int fb = profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars+1));
             if (getMaxHighwayLevel() >= 0) {
                 // If we are above a highway we make sure we can't have too many cellars
                 fb = Math.min(cityLevel-getMaxHighwayLevel()-1, fb);
@@ -876,7 +876,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return hasHorizontalMonorail() || hasVerticalMonorail();
     }
 
-    private int getMaxcellars(IDimensionInfo provider, CityStyle cs) {
+    private int getMaxcellars(CityStyle cs) {
         int maxcellars = profile.BUILDING_MAXCELLARS + cityLevel;
         if (buildingType.getMaxCellars() != -1) {
             maxcellars = Math.min(maxcellars, buildingType.getMaxCellars());
@@ -1641,7 +1641,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
     @Override
     public int getRuinLevel() {
-        if (!profile.RUINS) {
+        if (profile.RUIN_CHANCE <= 0.0) {
             return -1;
         }
         if (ruinHeight < 0) {

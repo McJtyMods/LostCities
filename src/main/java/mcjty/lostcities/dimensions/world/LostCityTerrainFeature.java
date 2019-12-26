@@ -876,7 +876,7 @@ public class LostCityTerrainFeature {
 //        LostCityEvent.PostGenCityChunkEvent postevent = new LostCityEvent.PostGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
 //        MinecraftForge.EVENT_BUS.post(postevent);
 
-        if (info.profile.RUINS) {
+        if (info.profile.RUIN_CHANCE > 0.0) {
             generateRuins(info);
         }
 

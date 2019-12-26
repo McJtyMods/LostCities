@@ -3,6 +3,7 @@ package mcjty.lostcities.gui;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.gui.elements.GuiBooleanValueElement;
 import mcjty.lostcities.gui.elements.GuiElement;
 import mcjty.lostcities.gui.elements.GuiFloatValueElement;
 import mcjty.lostcities.setup.Config;
@@ -15,6 +16,7 @@ import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -29,7 +31,8 @@ public class GuiLCConfig extends Screen {
     private Button cancelButton;
     private Button randomizeButton;
 
-    private String mode = "Cities";
+    private final static List<String> modes = Arrays.asList("Cities", "Buildings", "Damage");
+    private String mode = modes.get(0);
 
     private long seed = 3439249320423L;
     private Random random = new Random();
@@ -85,27 +88,42 @@ public class GuiLCConfig extends Screen {
         randomizeButton = addButton(new Button(this.width - 35, 35, 30, 20, "Rnd", p -> randomizePreview()));
 
         int left = 110;
-        add(new GuiFloatValueElement(this, "Cities", "Rarity:", left, 40, LostCitySetup::getRarity, LostCitySetup::setRarity));
-        add(new GuiFloatValueElement(this, "Cities", "Radius:", left, 65, LostCitySetup::getMinSize, LostCitySetup::setMinSize));
-        add(new GuiFloatValueElement(this, "Cities", null, left + 70, 65, LostCitySetup::getMaxSize, LostCitySetup::setMaxSize));
-        add(new GuiFloatValueElement(this, "Cities", "Buildings:", left, 90, LostCitySetup::getBuildingRarity, LostCitySetup::setBuildingRarity));
+        int yoffs = 21;
 
-        add(new GuiFloatValueElement(this, "Buildings", "Floors:", left, 40, LostCitySetup::getMinFloors, LostCitySetup::setMinFloors));
-        add(new GuiFloatValueElement(this, "Buildings", null, left + 70, 40, LostCitySetup::getMaxFloors, LostCitySetup::setMaxFloors));
-        add(new GuiFloatValueElement(this, "Buildings", "Floor Chance:", left, 65, LostCitySetup::getMinFloorsChance, LostCitySetup::setMinFloorsChance));
-        add(new GuiFloatValueElement(this, "Buildings", null, left + 70, 65, LostCitySetup::getMaxFloorsChance, LostCitySetup::setMaxFloorsChance));
-        add(new GuiFloatValueElement(this, "Buildings", "Cellars:", left, 90, LostCitySetup::getMinCellars, LostCitySetup::setMinCellars));
-        add(new GuiFloatValueElement(this, "Buildings", null, left + 70, 90, LostCitySetup::getMaxCellars, LostCitySetup::setMaxCellars));
+        int y = 40;
+        add(new GuiFloatValueElement(this, "Cities", "Rarity:", left, y, LostCitySetup::getRarity, LostCitySetup::setRarity)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Cities", "Radius:", left, y, LostCitySetup::getMinSize, LostCitySetup::setMinSize));
+        add(new GuiFloatValueElement(this, "Cities", null, left + 55, y, LostCitySetup::getMaxSize, LostCitySetup::setMaxSize)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Cities", "Buildings:", left, y, LostCitySetup::getBuildingRarity, LostCitySetup::setBuildingRarity));
+
+        y = 40;
+        add(new GuiFloatValueElement(this, "Buildings", "Floors:", left, y, LostCitySetup::getMinFloors, LostCitySetup::setMinFloors));
+        add(new GuiFloatValueElement(this, "Buildings", null, left + 55, y, LostCitySetup::getMaxFloors, LostCitySetup::setMaxFloors)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Buildings", "Floor Chance:", left, y, LostCitySetup::getMinFloorsChance, LostCitySetup::setMinFloorsChance));
+        add(new GuiFloatValueElement(this, "Buildings", null, left + 55, y, LostCitySetup::getMaxFloorsChance, LostCitySetup::setMaxFloorsChance)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Buildings", "Cellars:", left, y, LostCitySetup::getMinCellars, LostCitySetup::setMinCellars));
+        add(new GuiFloatValueElement(this, "Buildings", null, left + 55, y, LostCitySetup::getMaxCellars, LostCitySetup::setMaxCellars));
+
+        y = 40;
+        add(new GuiBooleanValueElement(this, "Damage", "Rubble", left, y, LostCitySetup::getRubble, LostCitySetup::setRubble)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Damage", "Ruins:", left, y, LostCitySetup::getRuins, LostCitySetup::setRuins)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Damage", "Ruin level:", left, y, LostCitySetup::getRuinMinLevel, LostCitySetup::setRuinMinLevel));
+        add(new GuiFloatValueElement(this, "Damage", null, left + 55, y, LostCitySetup::getRuinMaxLevel, LostCitySetup::setRuinMaxLevel)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Damage", "Explosion radius:", left, y, LostCitySetup::getExplosionMinLevel, LostCitySetup::setExplosionMinLevel));
+        add(new GuiFloatValueElement(this, "Damage", null, left + 55, y, LostCitySetup::getExplosionMaxLevel, LostCitySetup::setExplosionMaxLevel)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Damage", "Explosion height:", left, y, LostCitySetup::getExplosionMinHeight, LostCitySetup::setExplosionMinHeight));
+        add(new GuiFloatValueElement(this, "Damage", null, left + 55, y, LostCitySetup::getExplosionMaxHeight, LostCitySetup::setExplosionMaxHeight)); y += yoffs;
 
         updateValues();
     }
 
     private void toggleMode() {
-        if ("Cities".equals(mode)) {
-            mode = "Buildings";
-        } else {
-            mode = "Cities";
+        int idx = modes.indexOf(mode);
+        idx++;
+        if (idx >= modes.size()) {
+            idx = 0;
         }
+        mode = modes.get(idx);
         modeButton.setMessage(mode);
     }
 
@@ -136,23 +154,28 @@ public class GuiLCConfig extends Screen {
         localSetup.get().ifPresent(profile -> {
             if ("Cities".equals(mode)) {
                 renderPreviewMap(profile);
+            } else if ("Buildings".equals(mode)) {
+                renderPreviewCity(profile, false);
             } else {
-                renderPreviewCity(profile);
+                renderPreviewCity(profile, true);
             }
         });
     }
 
-    private void renderPreviewCity(LostCityProfile profile) {
-        fill(260, 50, 260+150, 50+100, 0xff0099bb);
-        fill(260, 50+100, 260+150, 50+150, 0xff996633);
+    private void renderPreviewCity(LostCityProfile profile, boolean showDamage) {
+        int base = 50 + 120;
+        fill(260, 50, 260 + 150, base, 0xff0099bb);
+        fill(260, base, 260 + 150, 50 + 150, 0xff996633);
 
-        float radius = 140;
+        float radius = 190;
+        int dimHor = 10;
+        int dimVer = 4;
 
         Random rand = new Random(seed);
 
-        for (int x = 0 ; x < 20 ; x++) {
+        for (int x = 0; x < 14; x++) {
             float factor = 0;
-            float sqdist = (x * 16 - 10 * 16) * (x * 16 - 10 * 16);
+            float sqdist = (x * 16 - 12 * 16) * (x * 16 - 12 * 16);
             if (sqdist < radius * radius) {
                 float dist = (float) Math.sqrt(sqdist);
                 factor = (radius - dist) / radius;
@@ -173,13 +196,35 @@ public class GuiLCConfig extends Screen {
                     f = minfloors;
                 }
                 for (int i = 0; i < f; i++) {
-                    fill(260 + 7 * x, 50 + 100 - i * 7 - 7, 260 + 7 * x + 6, 50 + 100 - i * 7 + 6 - 7, 0xffffffff);
+                    fill(260 + dimHor * x, base - i * dimVer - dimVer, 260 + dimHor * x + dimHor - 1, base - i * dimVer + dimVer - 1 - dimVer, 0xffffffff);
                 }
 
                 int maxcellars = profile.BUILDING_MAXCELLARS;
-                int fb = profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars));
+                int fb = profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars + 1));
                 for (int i = 0; i < fb; i++) {
-                    fill(260 + 7 * x, 50 + 100 + i * 7, 260 + 7 * x + 6, 50 + 100 + i * 7 + 6, 0xff333333);
+                    fill(260 + dimHor * x, base + i * dimVer, 260 + dimHor * x + dimHor - 1, base + i * dimVer + dimVer - 1, 0xff333333);
+                }
+            }
+        }
+
+//        profile.EXPLOSION_CHANCE
+        if (showDamage) {
+            float horFactor = 1.0f * dimHor / 16.0f;
+            float verFactor = 1.0f * dimVer / 6.0f;
+            int cx = 260 + 75;
+            int cz = (int) (base - (profile.EXPLOSION_MINHEIGHT-65) * verFactor);
+            Random rnd = new Random(333);
+            int explosionRadius = profile.EXPLOSION_MAXRADIUS;
+            for (int x = (int) (cx - explosionRadius * horFactor); x <= cx + explosionRadius * horFactor; x++) {
+                for (int z = (int) (cz - explosionRadius * verFactor); z <= cz + explosionRadius * verFactor; z++) {
+                    double sqdist = (cx - x) * (cx - x) / horFactor / horFactor + (cz - z) * (cz - z) / verFactor / verFactor;
+                    double dist = Math.sqrt(sqdist);
+                    if (dist < explosionRadius - 3) {
+                        double damage = 3.0f * (explosionRadius - dist) / explosionRadius;
+                        if (rnd.nextFloat() < damage) {
+                            fill(x, z, x + 1, z + 1, 0x66ff0000);
+                        }
+                    }
                 }
             }
         }

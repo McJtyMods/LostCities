@@ -21,7 +21,7 @@ public class GuiFloatValueElement extends GuiElement {
         this.label = label;
         this.getter = getter;
         this.setter = setter;
-        field = new TextFieldWidget(gui.getFont(), x, y, 60, 16, getter.apply(gui.getLocalSetup()));
+        field = new TextFieldWidget(gui.getFont(), x, y, 45, 16, getter.apply(gui.getLocalSetup()));
         field.setResponder(s -> setter.accept(gui.getLocalSetup(), s));
         gui.addWidget(field);
     }

@@ -64,7 +64,6 @@ public class LostCityProfile {
     public float RUBBLE_DIRT_SCALE = 3.0f;
     public float RUBBLE_LEAVE_SCALE = 6.0f;
 
-    public boolean RUINS = true;
     public float RUIN_CHANCE = 0.05f;
     public float RUIN_MINLEVEL_PERCENT = 0.8f;
     public float RUIN_MAXLEVEL_PERCENT = 1.0f;
@@ -149,7 +148,7 @@ public class LostCityProfile {
     public int BUILDING_MINFLOORS_CHANCE = 4;
     public int BUILDING_MAXFLOORS_CHANCE = 6;
     public int BUILDING_MINCELLARS = 0;
-    public int BUILDING_MAXCELLARS = 4;
+    public int BUILDING_MAXCELLARS = 3;
     public float BUILDING_DOORWAYCHANCE = .6f;
     public float BUILDING_FRONTCHANCE = .2f;
     public float LIBRARY_CHANCE = .1f;
@@ -363,10 +362,8 @@ public class LostCityProfile {
         RUBBLE_LEAVE_SCALE = cfg.getFloat("rubbleLeaveScale", categoryLostcity, inheritFrom.orElse(this).RUBBLE_LEAVE_SCALE, 0.0f, 100.0f,
                 "The scale of the leave layer. Smaller values make the layer larger. Use 0 to disable");
 
-        RUINS = cfg.getBoolean("ruins", categoryLostcity, inheritFrom.orElse(this).RUINS,
-                "If true there is a chance a building is ruined from the top (not caused by explosion damage)");
         RUIN_CHANCE = cfg.getFloat("ruinChance", categoryLostcity, inheritFrom.orElse(this).RUIN_CHANCE, 0.0f, 1.0f,
-                "If ruines are enabled this gives the chance that a building is ruined");
+                "This gives the chance that a building is ruined");
         RUIN_MINLEVEL_PERCENT = cfg.getFloat("ruinMinlevelPercent", categoryLostcity, inheritFrom.orElse(this).RUIN_MINLEVEL_PERCENT, 0.0f, 1.0f,
                 "If a building is ruined this indicates the minimum start height for the ruin destruction layer");
         RUIN_MAXLEVEL_PERCENT = cfg.getFloat("ruinMaxlevelPercent", categoryLostcity, inheritFrom.orElse(this).RUIN_MAXLEVEL_PERCENT, 0.0f, 1.0f,

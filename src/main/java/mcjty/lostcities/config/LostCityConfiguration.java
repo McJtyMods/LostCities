@@ -177,7 +177,7 @@ public class LostCityConfiguration {
         profile.setIconFile("textures/gui/icon_nodamage.png");
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
-        profile.RUINS = false;
+        profile.RUIN_CHANCE = 0;
         profile.RUBBLELAYER = false;
         profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
         profile.MAX_CAVE_HEIGHT = 64;
@@ -191,7 +191,7 @@ public class LostCityConfiguration {
         profile.LANDSCAPE_TYPE = LandscapeType.FLOATING;
         profile.HORIZON = 0;
         profile.WATERLEVEL_OFFSET = 70;
-        profile.BUILDING_MAXCELLARS = 2;
+        profile.BUILDING_MAXCELLARS = 1;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 15;
@@ -303,7 +303,6 @@ public class LostCityConfiguration {
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 0;
-        profile.RUINS = true;
         profile.RUIN_CHANCE = 0.7f;
         profile.RUIN_MINLEVEL_PERCENT = 0.3f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.8f;
@@ -333,7 +332,7 @@ public class LostCityConfiguration {
         profile.setDescription("Cities are rare");
         profile.setIconFile("textures/gui/icon_rarecities.png");
         profile.CITY_CHANCE = 0.001f;
-        profile.RUINS = false;
+        profile.RUIN_CHANCE = 0;
         profile.HIGHWAY_REQUIRES_TWO_CITIES = false;
         profile.RAILWAYS_CAN_END = true;
         standardProfiles.put(profile.getName(), profile);
@@ -388,7 +387,6 @@ public class LostCityConfiguration {
         profile.RUBBLELAYER = true;
         profile.RUBBLE_DIRT_SCALE = 2.0f;
         profile.RUBBLE_LEAVE_SCALE = 2.0f;
-        profile.RUINS = true;
         profile.RUIN_CHANCE = 0.9f;
         profile.RUIN_MINLEVEL_PERCENT = 0.0f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.8f;
@@ -407,7 +405,6 @@ public class LostCityConfiguration {
         profile.RUBBLELAYER = true;
         profile.RUBBLE_DIRT_SCALE = 2.0f;
         profile.RUBBLE_LEAVE_SCALE = 0.0f;
-        profile.RUINS = true;
         profile.RUIN_CHANCE = 0.5f;
         profile.RUIN_MINLEVEL_PERCENT = 0.5f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.9f;
@@ -480,8 +477,7 @@ public class LostCityConfiguration {
         profile.RUBBLELAYER = true;
         profile.RUBBLE_DIRT_SCALE = 2.0f;
         profile.RUBBLE_LEAVE_SCALE = 0.0f;
-        profile.BUILDING_MAXCELLARS = 2;
-        profile.RUINS = true;
+        profile.BUILDING_MAXCELLARS = 1;
         profile.RUIN_CHANCE = 1.0f;
         profile.RUIN_MINLEVEL_PERCENT = 0.1f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.4f;

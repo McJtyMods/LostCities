@@ -214,7 +214,7 @@ public class LostCitySetup {
     }
 
     public void setMinCellars(String s) {
-        setIntValue(s, (p,f) -> p.BUILDING_MINCELLARS = f, p -> p.BUILDING_MINCELLARS, 0, 30);
+        setIntValue(s, (p,f) -> p.BUILDING_MINCELLARS = f, p -> p.BUILDING_MINCELLARS, 0, 7);
     }
 
     public String getMaxCellars() {
@@ -222,7 +222,73 @@ public class LostCitySetup {
     }
 
     public void setMaxCellars(String s) {
-        setIntValue(s, (p,f) -> p.BUILDING_MAXCELLARS = f, p -> p.BUILDING_MAXCELLARS, 0, 30);
+        setIntValue(s, (p,f) -> p.BUILDING_MAXCELLARS = f, p -> p.BUILDING_MAXCELLARS, 0, 7);
     }
 
+    //------------------------------------------
+    public Boolean getRubble() {
+        return get().map(p -> p.RUBBLELAYER).orElse(false);
+    }
+
+    public void setRubble(Boolean value) {
+        get().ifPresent(p -> p.RUBBLELAYER = value);
+    }
+
+    //------------------------------------------
+    public String getRuins() {
+        return get().map(p -> Float.toString(p.RUIN_CHANCE)).orElse("n.a.");
+    }
+
+    public void setRuins(String s) {
+        setFloatValue(s, (p,f) -> p.RUIN_CHANCE = f, p -> p.RUIN_CHANCE, 0.0f, 1.0f);
+    }
+
+    public String getRuinMinLevel() {
+        return get().map(p -> Float.toString(p.RUIN_MINLEVEL_PERCENT)).orElse("n.a.");
+    }
+
+    public void setRuinMinLevel(String s) {
+        setFloatValue(s, (p,f) -> p.RUIN_MINLEVEL_PERCENT = f, p -> p.RUIN_MINLEVEL_PERCENT, 0.0f, 1.0f);
+    }
+
+    public String getRuinMaxLevel() {
+        return get().map(p -> Float.toString(p.RUIN_MAXLEVEL_PERCENT)).orElse("n.a.");
+    }
+
+    public void setRuinMaxLevel(String s) {
+        setFloatValue(s, (p,f) -> p.RUIN_MAXLEVEL_PERCENT = f, p -> p.RUIN_MAXLEVEL_PERCENT, 0.0f, 1.0f);
+    }
+
+    //------------------------------------------
+    public String getExplosionMinLevel() {
+        return get().map(p -> Integer.toString(p.EXPLOSION_MINRADIUS)).orElse("n.a.");
+    }
+
+    public void setExplosionMinLevel(String s) {
+        setIntValue(s, (p,f) -> p.EXPLOSION_MINRADIUS = f, p -> p.EXPLOSION_MINRADIUS, 0, 3000);
+    }
+
+    public String getExplosionMaxLevel() {
+        return get().map(p -> Integer.toString(p.EXPLOSION_MAXRADIUS)).orElse("n.a.");
+    }
+
+    public void setExplosionMaxLevel(String s) {
+        setIntValue(s, (p,f) -> p.EXPLOSION_MAXRADIUS = f, p -> p.EXPLOSION_MAXRADIUS, 0, 1000);
+    }
+
+    public String getExplosionMinHeight() {
+        return get().map(p -> Integer.toString(p.EXPLOSION_MINHEIGHT)).orElse("n.a.");
+    }
+
+    public void setExplosionMinHeight(String s) {
+        setIntValue(s, (p,f) -> p.EXPLOSION_MINHEIGHT = f, p -> p.EXPLOSION_MINHEIGHT, 0, 256);
+    }
+
+    public String getExplosionMaxHeight() {
+        return get().map(p -> Integer.toString(p.EXPLOSION_MAXHEIGHT)).orElse("n.a.");
+    }
+
+    public void setExplosionMaxHeight(String s) {
+        setIntValue(s, (p,f) -> p.EXPLOSION_MAXHEIGHT = f, p -> p.EXPLOSION_MAXHEIGHT, 0, 256);
+    }
 }
