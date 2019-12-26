@@ -31,7 +31,7 @@ public class GuiLCConfig extends Screen {
     private Button cancelButton;
     private Button randomizeButton;
 
-    private final static List<String> modes = Arrays.asList("Cities", "Buildings", "Damage");
+    private final static List<String> modes = Arrays.asList("Cities", "Buildings", "Damage", "Various");
     private String mode = modes.get(0);
 
     private long seed = 3439249320423L;
@@ -92,6 +92,7 @@ public class GuiLCConfig extends Screen {
 
         int y = 40;
         add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getRarity, LostCitySetup::setRarity).label("Rarity:")); y += yoffs;
+        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getCityThresshold, LostCitySetup::setCityThresshold).label("Thresshold:")); y += yoffs;
         add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getMinSize, LostCitySetup::setMinSize).label("Radius:"));
         add(new GuiFloatValueElement(this, "Cities", left + 55, y, LostCitySetup::getMaxSize, LostCitySetup::setMaxSize)); y += yoffs;
         add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getBuildingRarity, LostCitySetup::setBuildingRarity).label("Buildings:"));
@@ -122,6 +123,12 @@ public class GuiLCConfig extends Screen {
         add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getMiniExplosionMaxLevel, LostCitySetup::setMiniExplosionMaxLevel).prefix("+")); y += yoffs;
         add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getMiniExplosionMinHeight, LostCitySetup::setMiniExplosionMinHeight).label("Height:"));
         add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getMiniExplosionMaxHeight, LostCitySetup::setMiniExplosionMaxHeight)); y += yoffs;
+
+        left = 110;
+        y = 40;
+        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getSpawners, LostCitySetup::setSpawners).label("Spawners:")); y += yoffs;
+        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getLighting, LostCitySetup::setLighting).label("Lighting:")); y += yoffs;
+        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getLoot, LostCitySetup::setLoot).label("Loot:")); y += yoffs;
 
         updateValues();
     }
@@ -165,8 +172,9 @@ public class GuiLCConfig extends Screen {
                 renderPreviewMap(profile);
             } else if ("Buildings".equals(mode)) {
                 renderPreviewCity(profile, false);
-            } else {
+            } else if ("Damage".equals(mode)) {
                 renderPreviewCity(profile, true);
+            } else {
             }
         });
     }

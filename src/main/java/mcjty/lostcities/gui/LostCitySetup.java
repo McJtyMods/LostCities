@@ -150,6 +150,15 @@ public class LostCitySetup {
     }
 
     //------------------------------------------
+    public String getCityThresshold() {
+        return get().map(p -> Float.toString(p.CITY_THRESSHOLD)).orElse("n.a.");
+    }
+
+    public void setCityThresshold(String s) {
+        setFloatValue(s, (p,f) -> p.CITY_THRESSHOLD = f, p -> p.CITY_THRESSHOLD, 0.0f, 1.0f);
+    }
+
+    //------------------------------------------
     public String getBuildingRarity() {
         return get().map(p -> Float.toString(p.BUILDING_CHANCE)).orElse("n.a.");
     }
@@ -232,6 +241,31 @@ public class LostCitySetup {
 
     public void setRubble(Boolean value) {
         get().ifPresent(p -> p.RUBBLELAYER = value);
+    }
+
+    //------------------------------------------
+    public Boolean getSpawners() {
+        return get().map(p -> p.GENERATE_SPAWNERS).orElse(false);
+    }
+
+    public void setSpawners(Boolean value) {
+        get().ifPresent(p -> p.GENERATE_SPAWNERS = value);
+    }
+
+    public Boolean getLighting() {
+        return get().map(p -> p.GENERATE_LIGHTING).orElse(false);
+    }
+
+    public void setLighting(Boolean value) {
+        get().ifPresent(p -> p.GENERATE_LIGHTING = value);
+    }
+
+    public Boolean getLoot() {
+        return get().map(p -> p.GENERATE_LOOT).orElse(false);
+    }
+
+    public void setLoot(Boolean value) {
+        get().ifPresent(p -> p.GENERATE_LOOT = value);
     }
 
     //------------------------------------------
