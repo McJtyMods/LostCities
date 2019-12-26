@@ -11,15 +11,14 @@ import java.util.function.Function;
 public class GuiBooleanValueElement extends GuiElement {
 
     private final GuiLCConfig gui;
-    private final String label;
+    private String label = null;
     private final Button field;
     private final Function<LostCitySetup, Boolean> getter;
     private final BiConsumer<LostCitySetup, Boolean> setter;
 
-    public GuiBooleanValueElement(GuiLCConfig gui, String page, String label, int x, int y, Function<LostCitySetup, Boolean> getter, BiConsumer<LostCitySetup, Boolean> setter) {
+    public GuiBooleanValueElement(GuiLCConfig gui, String page, int x, int y, Function<LostCitySetup, Boolean> getter, BiConsumer<LostCitySetup, Boolean> setter) {
         super(page, x, y);
         this.gui = gui;
-        this.label = label;
         this.getter = getter;
         this.setter = setter;
         field = new Button(x, y, 60, 16, getter.apply(gui.getLocalSetup()) ? "On" : "Off", button -> {
@@ -32,6 +31,11 @@ public class GuiBooleanValueElement extends GuiElement {
             setter.accept(gui.getLocalSetup(), "On".equals(message));
         });
         gui.addWidget(field);
+    }
+
+    public GuiBooleanValueElement label(String label) {
+        this.label = label;
+        return this;
     }
 
     @Override

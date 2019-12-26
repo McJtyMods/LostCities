@@ -260,6 +260,14 @@ public class LostCitySetup {
     }
 
     //------------------------------------------
+    public String getExplosionChance() {
+        return get().map(p -> Float.toString(p.EXPLOSION_CHANCE)).orElse("n.a.");
+    }
+
+    public void setExplosionChance(String s) {
+        setFloatValue(s, (p,f) -> p.EXPLOSION_CHANCE = f, p -> p.EXPLOSION_CHANCE, 0.0f, 1.0f);
+    }
+
     public String getExplosionMinLevel() {
         return get().map(p -> Integer.toString(p.EXPLOSION_MINRADIUS)).orElse("n.a.");
     }
@@ -290,5 +298,46 @@ public class LostCitySetup {
 
     public void setExplosionMaxHeight(String s) {
         setIntValue(s, (p,f) -> p.EXPLOSION_MAXHEIGHT = f, p -> p.EXPLOSION_MAXHEIGHT, 0, 256);
+    }
+
+    //------------------------------------------
+    public String getMiniExplosionChance() {
+        return get().map(p -> Float.toString(p.MINI_EXPLOSION_CHANCE)).orElse("n.a.");
+    }
+
+    public void setMiniExplosionChance(String s) {
+        setFloatValue(s, (p,f) -> p.MINI_EXPLOSION_CHANCE = f, p -> p.MINI_EXPLOSION_CHANCE, 0.0f, 1.0f);
+    }
+
+    public String getMiniExplosionMinLevel() {
+        return get().map(p -> Integer.toString(p.MINI_EXPLOSION_MINRADIUS)).orElse("n.a.");
+    }
+
+    public void setMiniExplosionMinLevel(String s) {
+        setIntValue(s, (p,f) -> p.MINI_EXPLOSION_MINRADIUS = f, p -> p.MINI_EXPLOSION_MINRADIUS, 0, 3000);
+    }
+
+    public String getMiniExplosionMaxLevel() {
+        return get().map(p -> Integer.toString(p.MINI_EXPLOSION_MAXRADIUS)).orElse("n.a.");
+    }
+
+    public void setMiniExplosionMaxLevel(String s) {
+        setIntValue(s, (p,f) -> p.MINI_EXPLOSION_MAXRADIUS = f, p -> p.MINI_EXPLOSION_MAXRADIUS, 0, 1000);
+    }
+
+    public String getMiniExplosionMinHeight() {
+        return get().map(p -> Integer.toString(p.MINI_EXPLOSION_MINHEIGHT)).orElse("n.a.");
+    }
+
+    public void setMiniExplosionMinHeight(String s) {
+        setIntValue(s, (p,f) -> p.MINI_EXPLOSION_MINHEIGHT = f, p -> p.MINI_EXPLOSION_MINHEIGHT, 0, 256);
+    }
+
+    public String getMiniExplosionMaxHeight() {
+        return get().map(p -> Integer.toString(p.MINI_EXPLOSION_MAXHEIGHT)).orElse("n.a.");
+    }
+
+    public void setMiniExplosionMaxHeight(String s) {
+        setIntValue(s, (p,f) -> p.MINI_EXPLOSION_MAXHEIGHT = f, p -> p.MINI_EXPLOSION_MAXHEIGHT, 0, 256);
     }
 }

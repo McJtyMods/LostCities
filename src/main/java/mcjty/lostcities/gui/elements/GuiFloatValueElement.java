@@ -10,20 +10,30 @@ import java.util.function.Function;
 public class GuiFloatValueElement extends GuiElement {
 
     private final GuiLCConfig gui;
-    private final String label;
+    private String label = null;
+    private String prefix = null;
     private final TextFieldWidget field;
     private final Function<LostCitySetup, String> getter;
     private final BiConsumer<LostCitySetup, String> setter;
 
-    public GuiFloatValueElement(GuiLCConfig gui, String page, String label, int x, int y, Function<LostCitySetup, String> getter, BiConsumer<LostCitySetup, String> setter) {
+    public GuiFloatValueElement(GuiLCConfig gui, String page, int x, int y, Function<LostCitySetup, String> getter, BiConsumer<LostCitySetup, String> setter) {
         super(page, x, y);
         this.gui = gui;
-        this.label = label;
         this.getter = getter;
         this.setter = setter;
         field = new TextFieldWidget(gui.getFont(), x, y, 45, 16, getter.apply(gui.getLocalSetup()));
         field.setResponder(s -> setter.accept(gui.getLocalSetup(), s));
         gui.addWidget(field);
+    }
+
+    public GuiFloatValueElement prefix(String prefix) {
+        this.prefix = prefix;
+        return this;
+    }
+
+    public GuiFloatValueElement label(String label) {
+        this.label = label;
+        return this;
     }
 
     @Override
@@ -33,9 +43,12 @@ public class GuiFloatValueElement extends GuiElement {
 
     @Override
     public void render() {
-        if (label != null) {
-            if (field.visible) {
+        if (field.visible) {
+            if (label != null) {
                 gui.drawString(gui.getFont(), label, 10, y + 5, 0xffffffff);
+            }
+            if (prefix != null) {
+                gui.drawString(gui.getFont(), prefix, x - 8, y + 5, 0xffffffff);
             }
         }
     }
