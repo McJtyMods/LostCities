@@ -101,7 +101,7 @@ public class WorldStyle implements ILostCityAsset {
 
 
     public String getRandomCityStyle(IDimensionInfo provider, int chunkX, int chunkZ, Random random) {
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ)).getBiomes();
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getBiomes();
         Info info = new Info(biomes, chunkX, chunkZ);
         List<Pair<Float, String>> ct = new ArrayList<>();
         for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {

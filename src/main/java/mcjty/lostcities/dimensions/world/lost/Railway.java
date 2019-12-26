@@ -304,7 +304,7 @@ public class Railway {
     }
 
     public static RailChunkInfo getRailChunkType(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        ChunkCoord key = new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ);
+        ChunkCoord key = new ChunkCoord(provider.getType(), chunkX, chunkZ);
         if (railInfo.containsKey(key)) {
             return railInfo.get(key);
         }

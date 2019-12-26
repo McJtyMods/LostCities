@@ -1,0 +1,180 @@
+package mcjty.lostcities.gui;
+
+import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.dimensions.IDimensionInfo;
+import mcjty.lostcities.dimensions.world.ChunkHeightmap;
+import mcjty.lostcities.dimensions.world.LostCityTerrainFeature;
+import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.dimension.DimensionType;
+
+import java.util.Random;
+
+public class NullDimensionInfo implements IDimensionInfo {
+
+    private final String[] biomeMap = new String[] {
+            "ddddddddddddddddddddddppppppppppppppp==ppppppppppp",
+            "ddddddddddddddddddddpppppppppppppppp==pppppppppppp",
+            "ddddddddddddddddddddpppppppppppppp===ppppppppppppp",
+            "pddddddddddddddddpppppppppppppppppp==ppppppppppppp",
+            "pppdddddddppppppppppppppppppppppppp==ppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppp==pppppppppp--",
+            "ppppppppppppppppppppppppppppppppppppp==ppppppp----",
+            "pppppppppppppppppppppppppppppppppppppp==ppppp-----",
+            "pppppppppppppppppppppppppppppppppppppp===pppp-----",
+            "ppppppppppppppppppppppppppppppppppppppp===ppppp---",
+            "pppppppppppppppppppppppppppppppppppppppp==--pp----",
+            "pppppppppppppppppppppppppppppppppppppppp*---------",
+            "pppppppppppppppppppppppppppppppppppppp****--------",
+            "ppppppppppppppppppppppppppppppppppppp***----------",
+            "pppppppppppppppppppppppppppppppppppp**------------",
+            "ppppppppppppppppppppppppppppppppppppp**-----------",
+            "ppppppppppppppppppppppppppppppppppppppp*----------",
+            "pppppppppppppppppppppppppppppppppppppp**----------",
+            "ppppp###pppppppppppppppppppppppppppppp**----------",
+            "ppppp####ppppppp#####pppppppppppppppppp*----------",
+            "pppppp#####pp##+++#####ppppppppppppp*****---------",
+            "pppppppp#####++++####pppppppppppppp**------pp----p",
+            "ppppppppp##++++++###pppppppppppppppp***---pppp--pp",
+            "ppppppppp###+++++++#####ppppppppppppp---pppppppppp",
+            "pppppppp##p##+++++++###ppppppppppppppppppppppppppp",
+            "pppppppppp#####++++####ppppppppppppppppppppppppppp",
+            "pppppppppppp###+++++###ppppppppppppppppppppppppppp",
+            "ppppppppppppp####++++####ppppppppppppppppppppppppp",
+            "pppppppppppppp####++######pppppppppppppppppppppppp",
+            "ppppppppppppppp#+++####ppppppppppppppppppppppppppp",
+            "ppppppppppppp####pp#####pppppppppppppppppppppppppp",
+            "pppppppppp#####ppppppppppppppppppppppppppppppppppp",
+            "ppppppppppp###pppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppp"
+    };
+
+    private final LostCityProfile profile;
+    private final WorldStyle style;
+    private final Random random;
+    private final long seed;
+
+    private final LostCityTerrainFeature feature;
+
+    public NullDimensionInfo(LostCityProfile profile, long seed) {
+        this.profile = profile;
+        style = AssetRegistries.WORLDSTYLES.get("standard");
+        this.seed = seed;
+        random = new Random(seed);
+        feature = new LostCityTerrainFeature(this, profile, getRandom());
+        feature.setupStates(profile);
+    }
+
+    @Override
+    public void setWorld(IWorld world) {
+    }
+
+    @Override
+    public long getSeed() {
+        return seed;
+    }
+
+    @Override
+    public IWorld getWorld() {
+        return null;
+    }
+
+    @Override
+    public DimensionType getType() {
+        return DimensionType.OVERWORLD;
+    }
+
+    @Override
+    public LostCityProfile getProfile() {
+        return profile;
+    }
+
+    @Override
+    public LostCityProfile getOutsideProfile() {
+        return null;
+    }
+
+    @Override
+    public WorldStyle getWorldStyle() {
+        return style;
+    }
+
+    @Override
+    public Random getRandom() {
+        return random;
+    }
+
+    @Override
+    public LostCityTerrainFeature getFeature() {
+        return feature;
+    }
+
+    @Override
+    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
+        ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, getFeature().base);
+        char b = getBiomeChar(chunkX, chunkZ);
+        int y = 65;
+        switch (b) {
+            case 'p': y = 65; break;
+            case '-': y = 60; break;
+            case '=': y = 65; break;
+            case '#': y = 85; break;
+            case '+': y = 105; break;
+            case '*': y = 65; break;
+            case 'd': y = 65; break;
+        }
+        for (int x = 0 ; x < 16 ; x++) {
+            for (int z = 0 ; z < 16 ; z++) {
+                heightmap.update(x, y, z, getFeature().base);
+            }
+        }
+        return heightmap;
+    }
+
+    public char getBiomeChar(int chunkX, int chunkZ) {
+        if (chunkX >= 0 && chunkX < 50 && chunkZ >= 0 && chunkZ < 50) {
+            return biomeMap[chunkZ].charAt(chunkX);
+        } else {
+            return 'p';
+        }
+    }
+
+    @Override
+    public Biome[] getBiomes(int chunkX, int chunkZ) {
+        Biome[] biomes = new Biome[10*10];
+        Biome biome = Biomes.PLAINS;
+        char b = getBiomeChar(chunkX, chunkZ);
+        switch (b) {
+            case 'p': biome = Biomes.PLAINS; break;
+            case '-': biome = Biomes.OCEAN; break;
+            case '=': biome = Biomes.RIVER; break;
+            case '#': biome = Biomes.MOUNTAIN_EDGE; break;
+            case '+': biome = Biomes.MOUNTAINS; break;
+            case '*': biome = Biomes.BEACH; break;
+            case 'd': biome = Biomes.DESERT; break;
+        }
+        for (int i = 0 ; i < biomes.length ; i++) {
+            biomes[i] = biome;
+        }
+        return biomes;
+    }
+}

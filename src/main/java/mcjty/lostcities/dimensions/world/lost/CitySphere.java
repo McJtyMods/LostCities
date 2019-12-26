@@ -256,7 +256,7 @@ public class CitySphere implements ILostSphere {
      * From the center
      */
     private static float getSphereRadius(ChunkCoord center, IDimensionInfo provider, Random rand) {
-        PredefinedCity city = City.getPredefinedCity(center.getChunkX(), center.getChunkZ(), provider);
+        PredefinedCity city = City.getPredefinedCity(center.getChunkX(), center.getChunkZ(), provider.getType());
         LostCityProfile profile = provider.getProfile();
         if (city != null) {
             return city.getRadius() * profile.CITYSPHERE_FACTOR;
@@ -422,12 +422,12 @@ public class CitySphere implements ILostSphere {
      */
     @Nonnull
     public static CitySphere getCitySphere(int chunkX, int chunkZ, IDimensionInfo provider) {
-        ChunkCoord coord = new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ);
+        ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
         if (!citySphereCache.containsKey(coord)) {
             for (PredefinedSphere predef : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
-                if (predef.getDimension() == provider.getWorld().getDimension().getType()) {
+                if (predef.getDimension() == provider.getType()) {
                     if (intersectChunkWithSphere(chunkX, chunkZ, predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
-                        ChunkCoord center = new ChunkCoord(provider.getWorld().getDimension().getType(), predef.getChunkX(), predef.getChunkZ());
+                        ChunkCoord center = new ChunkCoord(provider.getType(), predef.getChunkX(), predef.getChunkZ());
                         CitySphere sphere = getSphereAtCenter(center, provider, predef);
                         updateCache(coord, sphere);
                         return sphere;
@@ -441,7 +441,7 @@ public class CitySphere implements ILostSphere {
             } else {
                 int cx = (chunkX & ~0xf) + 8;
                 int cz = (chunkZ & ~0xf) + 8;
-                ChunkCoord center = new ChunkCoord(provider.getWorld().getDimension().getType(), cx, cz);
+                ChunkCoord center = new ChunkCoord(provider.getType(), cx, cz);
                 sphere = getSphereAtCenter(center, provider, null);
             }
             updateCache(coord, sphere);

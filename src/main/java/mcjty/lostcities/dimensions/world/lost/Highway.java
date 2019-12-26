@@ -41,7 +41,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getXHighwayLevel(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        return getHighwayLevel(provider, profile, Highway.xHighwayLevelCache, cp -> hasXHighway(cp, profile), Orientation.X, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
+        return getHighwayLevel(provider, profile, Highway.xHighwayLevelCache, cp -> hasXHighway(cp, profile), Orientation.X, new ChunkCoord(provider.getType(), chunkX, chunkZ));
     }
 
     /**
@@ -49,7 +49,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getZHighwayLevel(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        return getHighwayLevel(provider, profile, Highway.zHighwayLevelCache, cp -> hasZHighway(cp, profile), Orientation.Z, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
+        return getHighwayLevel(provider, profile, Highway.zHighwayLevelCache, cp -> hasZHighway(cp, profile), Orientation.Z, new ChunkCoord(provider.getType(), chunkX, chunkZ));
     }
 
     private static int getHighwayLevel(IDimensionInfo provider, LostCityProfile profile, Map<ChunkCoord, Integer> cache, Function<ChunkCoord, Boolean> hasHighway, Orientation orientation, ChunkCoord cp) {

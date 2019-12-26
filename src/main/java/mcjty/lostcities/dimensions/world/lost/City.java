@@ -9,6 +9,7 @@ import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -28,7 +29,7 @@ public class City {
         predefinedStreetMap = null;
     }
 
-    public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, DimensionType type) {
         if (predefinedCityMap == null) {
             predefinedCityMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -38,10 +39,10 @@ public class City {
         if (predefinedCityMap.isEmpty()) {
             return null;
         }
-        return predefinedCityMap.get(new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
+        return predefinedCityMap.get(new ChunkCoord(type, chunkX, chunkZ));
     }
 
-    public static PredefinedCity.PredefinedBuilding getPredefinedBuilding(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static PredefinedCity.PredefinedBuilding getPredefinedBuilding(int chunkX, int chunkZ, DimensionType type) {
         if (predefinedBuildingMap == null) {
             predefinedBuildingMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -54,10 +55,10 @@ public class City {
         if (predefinedBuildingMap.isEmpty()) {
             return null;
         }
-        return predefinedBuildingMap.get(new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
+        return predefinedBuildingMap.get(new ChunkCoord(type, chunkX, chunkZ));
     }
 
-    public static PredefinedCity.PredefinedStreet getPredefinedStreet(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static PredefinedCity.PredefinedStreet getPredefinedStreet(int chunkX, int chunkZ, DimensionType type) {
         if (predefinedStreetMap == null) {
             predefinedStreetMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -70,12 +71,12 @@ public class City {
         if (predefinedStreetMap.isEmpty()) {
             return null;
         }
-        return predefinedStreetMap.get(new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ));
+        return predefinedStreetMap.get(new ChunkCoord(type, chunkX, chunkZ));
     }
 
 
     public static boolean isCityCenter(int chunkX, int chunkZ, IDimensionInfo provider) {
-        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider);
+        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider.getType());
         if (city != null) {
             return true;
         }
@@ -103,7 +104,7 @@ public class City {
      * Return the radius of the city with the given center
      */
     public static float getCityRadius(int chunkX, int chunkZ, IDimensionInfo provider) {
-        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider);
+        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider.getType());
         if (city != null) {
             return city.getRadius();
         }
@@ -111,20 +112,24 @@ public class City {
         rand.nextFloat();
         rand.nextFloat();
         LostCityProfile profile = provider.getProfile();
+        int cityRange = profile.CITY_MAXRADIUS - profile.CITY_MINRADIUS;
+        if (cityRange < 1) {
+            cityRange = 1;
+        }
         if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
             if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
-                return profile.CITY_MINRADIUS + rand.nextInt(profile.CITY_MAXRADIUS - profile.CITY_MINRADIUS);
+                return profile.CITY_MINRADIUS + rand.nextInt(cityRange);
             } else {
                 return provider.getOutsideProfile().CITY_MINRADIUS + rand.nextInt(provider.getOutsideProfile().CITY_MAXRADIUS - provider.getOutsideProfile().CITY_MINRADIUS);
             }
         } else {
-            return profile.CITY_MINRADIUS + rand.nextInt(profile.CITY_MAXRADIUS - profile.CITY_MINRADIUS);
+            return profile.CITY_MINRADIUS + rand.nextInt(cityRange);
         }
     }
 
     // Call this on a city center to get the style of that city
     public static String getCityStyleForCityCenter(int chunkX, int chunkZ, IDimensionInfo provider) {
-        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider);
+        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider.getType());
         if (city != null) {
             if (city.getCityStyle() != null) {
                 return city.getCityStyle();
@@ -168,26 +173,27 @@ public class City {
     }
 
     public static float getCityFactor(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
+        DimensionType type = provider.getType();
         // If we have a predefined building here we force a high city factor
 
-        PredefinedCity.PredefinedBuilding predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ, provider);
+        PredefinedCity.PredefinedBuilding predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null) {
             return 1.0f;
         }
-        PredefinedCity.PredefinedStreet predefinedStreet = getPredefinedStreet(chunkX, chunkZ, provider);
+        PredefinedCity.PredefinedStreet predefinedStreet = getPredefinedStreet(chunkX, chunkZ, type);
         if (predefinedStreet != null) {
             return 1.0f;
         }
 
-        predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ, provider);
+        predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             return 1.0f;
         }
-        predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ-1, provider);
+        predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ-1, type);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             return 1.0f;
         }
-        predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ-1, provider);
+        predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ-1, type);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             return 1.0f;
         }
@@ -229,7 +235,7 @@ public class City {
 
         for (int cx = -1 ; cx <= 1 ; cx++) {
             for (int cz = -1 ; cz <= 1 ; cz++) {
-                Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX + cx, chunkZ + cz)).getBiomes();
+                Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX + cx, chunkZ + cz)).getBiomes();
                 if (isTooHighForBuilding(biomes)) {
                     return 0;
                 }
@@ -237,7 +243,7 @@ public class City {
         }
 
         float foundFactor = profile.CITY_DEFAULT_BIOME_FACTOR;
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ)).getBiomes();
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX, chunkZ)).getBiomes();
         Map<String, Float> map = profile.getBiomeFactorMap();
         for (Biome biome : biomes) {
             ResourceLocation object = biome.getRegistryName();

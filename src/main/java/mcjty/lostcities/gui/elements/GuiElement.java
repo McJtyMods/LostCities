@@ -5,7 +5,10 @@ public class GuiElement {
     protected final int x;
     protected final int y;
 
-    public GuiElement(int x, int y) {
+    protected final String page;
+
+    public GuiElement(String page, int x, int y) {
+        this.page = page;
         this.x = x;
         this.y = y;
     }
@@ -23,6 +26,10 @@ public class GuiElement {
     }
 
     public void setEnabled(boolean b) {
+
+    }
+
+    public void setBasedOnMode(String mode) {
 
     }
 }

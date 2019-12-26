@@ -5,6 +5,8 @@ import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCityTerrainFeature;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Random;
 
@@ -14,6 +16,8 @@ public interface IDimensionInfo {
     long getSeed();
 
     IWorld getWorld();
+
+    DimensionType getType();
 
     LostCityProfile getProfile();
 
@@ -26,4 +30,6 @@ public interface IDimensionInfo {
     LostCityTerrainFeature getFeature();
 
     ChunkHeightmap getHeightmap(int chunkX, int chunkZ);
+
+    Biome[] getBiomes(int chunkX, int chunkZ);
 }

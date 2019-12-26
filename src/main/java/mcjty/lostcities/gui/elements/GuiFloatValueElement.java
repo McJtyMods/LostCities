@@ -15,8 +15,8 @@ public class GuiFloatValueElement extends GuiElement {
     private final Function<LostCitySetup, String> getter;
     private final BiConsumer<LostCitySetup, String> setter;
 
-    public GuiFloatValueElement(GuiLCConfig gui, String label, int x, int y, Function<LostCitySetup, String> getter, BiConsumer<LostCitySetup, String> setter) {
-        super(x, y);
+    public GuiFloatValueElement(GuiLCConfig gui, String page, String label, int x, int y, Function<LostCitySetup, String> getter, BiConsumer<LostCitySetup, String> setter) {
+        super(page, x, y);
         this.gui = gui;
         this.label = label;
         this.getter = getter;
@@ -34,7 +34,9 @@ public class GuiFloatValueElement extends GuiElement {
     @Override
     public void render() {
         if (label != null) {
-            gui.drawString(gui.getFont(), label, 10, y + 5, 0xffffffff);
+            if (field.visible) {
+                gui.drawString(gui.getFont(), label, 10, y + 5, 0xffffffff);
+            }
         }
     }
 
@@ -46,5 +48,10 @@ public class GuiFloatValueElement extends GuiElement {
     @Override
     public void setEnabled(boolean b) {
         field.setEnabled(b);
+    }
+
+    @Override
+    public void setBasedOnMode(String mode) {
+        field.setVisible(page.equalsIgnoreCase(mode));
     }
 }

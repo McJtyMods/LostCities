@@ -16,6 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
+import net.minecraft.world.dimension.DimensionType;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -331,7 +332,8 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static LostChunkCharacteristics getChunkCharacteristics(int chunkX, int chunkZ, IDimensionInfo provider) {
-        ChunkCoord key = new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ);
+        DimensionType type = provider.getType();
+        ChunkCoord key = new ChunkCoord(type, chunkX, chunkZ);
         if (cityInfoMap.containsKey(key)) {
             return cityInfoMap.get(key);
         } else {
@@ -355,7 +357,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             }
 
-            ChunkCoord coord = new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ);
+            ChunkCoord coord = new ChunkCoord(type, chunkX, chunkZ);
             CityStyle cityStyle;
             // If this is a street we find other chunks connected to this and pick the cityStyle
             // that represents the majority. This is to prevent streets from switching style randomly if two
@@ -399,7 +401,7 @@ public class BuildingInfo implements ILostChunkInfo {
                     characteristics.buildingType = topleft.buildingType;
                 }
             } else {
-                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
                 if (characteristics.section == 0) {
                     String name = cityStyle.getRandomMultiBuilding(rand);
                     if (predefinedBuilding != null) {
@@ -455,12 +457,13 @@ public class BuildingInfo implements ILostChunkInfo {
     private static boolean checkBuildingPossibility(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, int section, int cityLevel, Random rand) {
         boolean b;
         float bc = rand.nextFloat();
+        DimensionType type = provider.getType();
 
-        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null) {
             return true;    // We don't need other tests
         }
-        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
+        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
         if (predefinedStreet != null) {
             return false;   // No building here
         }
@@ -542,11 +545,12 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+        DimensionType type = provider.getType();
+        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             return true;    // We don't need other tests. This is the top-left of a multibuilding
         }
-        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
+        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
         if (predefinedStreet != null) {
             return false;   // There is a street here so no building
         }
@@ -598,7 +602,8 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+        DimensionType type = provider.getType();
+        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             // Regardless of other conditions, this is the top left of a multibuilding
             return true;
@@ -615,7 +620,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, provider, profile) &&
                 !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, provider, profile)
                 ) {
-            PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, provider);
+            PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
             if (predefinedStreet != null) {
                 return false;   // There is a street here so no building
             }
@@ -633,7 +638,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static BuildingInfo getBuildingInfo(int chunkX, int chunkZ, IDimensionInfo provider) {
-        ChunkCoord key = new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ);
+        ChunkCoord key = new ChunkCoord(provider.getType(), chunkX, chunkZ);
         if (buildingInfoMap.containsKey(key)) {
             return buildingInfoMap.get(key);
         }
@@ -662,7 +667,8 @@ public class BuildingInfo implements ILostChunkInfo {
         this.provider = provider;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        this.coord = new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ);
+        DimensionType type = provider.getType();
+        this.coord = new ChunkCoord(type, chunkX, chunkZ);
 
         outsideChunk = provider.getProfile().isSpace() && !CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider);
         profile = getProfile(chunkX, chunkZ, provider);
@@ -722,7 +728,7 @@ public class BuildingInfo implements ILostChunkInfo {
             noLoot = topleft.noLoot;
             ruinHeight = topleft.ruinHeight;
         } else {
-            PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, provider);
+            PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
             highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider, profile);
             highwayZLevel = Highway.getZHighwayLevel(chunkX, chunkZ, provider, profile);
 
@@ -994,7 +1000,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
     private static int getCityLevelNormal(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
         // OLD METHOD:
-//        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ)).getBiomes();
+//        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getBiomes();
 //        float h = 0.0f;
 //        for (Biome biome : biomes) {
 //            h += biome.getDepth();
@@ -1311,7 +1317,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isOcean != null) {
             return isOcean;
         }
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getWorld().getDimension().getType(), chunkX, chunkZ)).getBiomes();
+        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getBiomes();
         isOcean = isOcean(biomes);
         return isOcean;
     }

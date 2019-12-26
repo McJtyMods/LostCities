@@ -6,6 +6,8 @@ import mcjty.lostcities.dimensions.world.LostCityTerrainFeature;
 import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Random;
 
@@ -41,6 +43,11 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     }
 
     @Override
+    public DimensionType getType() {
+        return world.getDimension().getType();
+    }
+
+    @Override
     public LostCityProfile getProfile() {
         return profile;
     }
@@ -68,5 +75,10 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     @Override
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
         return feature.getHeightmap(chunkX, chunkZ, getWorld());
+    }
+
+    @Override
+    public Biome[] getBiomes(int chunkX, int chunkZ) {
+        return getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider().getBiomes((chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10, false);
     }
 }

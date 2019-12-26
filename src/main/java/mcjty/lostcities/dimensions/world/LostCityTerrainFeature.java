@@ -31,6 +31,7 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -817,7 +818,7 @@ public class LostCityTerrainFeature {
         clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
-    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ, IWorld world) {
+    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ, @Nonnull IWorld world) {
         ChunkCoord key = new ChunkCoord(world.getDimension().getType(), chunkX, chunkZ);
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
