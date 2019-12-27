@@ -1194,15 +1194,15 @@ public class LostCityTerrainFeature {
 //
         public int needsSplitting() {
             float averageBlocksPerLevel = (float) connectedBlocks.size() / (highestY - lowestY + 1);
-            int connectionThresshold = (int) (averageBlocksPerLevel / 10);
-            if (connectionThresshold <= 0) {
+            int connectionThreshold = (int) (averageBlocksPerLevel / 10);
+            if (connectionThreshold <= 0) {
                 // Too small to split
                 return -1;
             }
             int cuttingY = -1;      // Where we will cut
             int cuttingCount = 1000000;
             for (int y = lowestY; y <= highestY; y++) {
-                if (y >= 3 && blocksPerY.get(y) <= connectionThresshold) {
+                if (y >= 3 && blocksPerY.get(y) <= connectionThreshold) {
                     if (blocksPerY.get(y) < cuttingCount) {
                         cuttingCount = blocksPerY.get(y);
                         cuttingY = y;

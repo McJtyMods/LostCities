@@ -467,7 +467,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         float cityFactor = City.getCityFactor(chunkX, chunkZ, provider, profile);
-        return cityFactor > profile.CITY_THRESSHOLD;
+        return cityFactor > profile.CITY_THRESHOLD;
     }
 
     public static boolean isCity(int chunkX, int chunkZ, IDimensionInfo provider) {
@@ -607,7 +607,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
         // Get the (possbily cached) heightmap for this chunk
         ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
-        // The height at which the highway would be + a thresshold of 3
+        // The height at which the highway would be + a threshold of 3
         int highwayHeight = groundLevel + level * 6 + 3;
         // If there are many places in the chunk above this height we will need a tunnel
         int cnt = 0;

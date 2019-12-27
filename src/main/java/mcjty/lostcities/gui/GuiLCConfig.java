@@ -99,7 +99,7 @@ public class GuiLCConfig extends Screen {
         int y = 40;
         add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getRarity, LostCitySetup::setRarity).label("Rarity:").tooltip("The chance that a given chunk is the center of a city"));
         y += yoffs;
-        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getCityThresshold, LostCitySetup::setCityThresshold).label("Thresshold:").tooltip("This value helps determine how overlapping city spheres are merged"));
+        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getCityThreshold, LostCitySetup::setCityThreshold).label("Threshold:").tooltip("This value helps determine how overlapping city spheres are merged"));
         y += yoffs;
         add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getMinSize, LostCitySetup::setMinSize).label("Radius:").tooltip("Minimum radius for a city"));
         add(new GuiFloatValueElement(this, "Cities", left + 55, y, LostCitySetup::getMaxSize, LostCitySetup::setMaxSize).tooltip("Maximum radius for a city"));

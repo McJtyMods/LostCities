@@ -150,12 +150,12 @@ public class LostCitySetup {
     }
 
     //------------------------------------------
-    public String getCityThresshold() {
-        return get().map(p -> Float.toString(p.CITY_THRESSHOLD)).orElse("n.a.");
+    public String getCityThreshold() {
+        return get().map(p -> Float.toString(p.CITY_THRESHOLD)).orElse("n.a.");
     }
 
-    public void setCityThresshold(String s) {
-        setFloatValue(s, (p,f) -> p.CITY_THRESSHOLD = f, p -> p.CITY_THRESSHOLD, 0.0f, 1.0f);
+    public void setCityThreshold(String s) {
+        setFloatValue(s, (p,f) -> p.CITY_THRESHOLD = f, p -> p.CITY_THRESHOLD, 0.0f, 1.0f);
     }
 
     //------------------------------------------

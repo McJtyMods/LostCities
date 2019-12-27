@@ -110,7 +110,7 @@ public class LostCityProfile {
     public float CITY_CHANCE = .01f;
     public int CITY_MINRADIUS = 50;
     public int CITY_MAXRADIUS = 128;
-    public float CITY_THRESSHOLD = .2f;
+    public float CITY_THRESHOLD = .2f;
 
     public float CITYSPHERE_FACTOR = 1.2f;
     public float CITYSPHERE_CHANCE = 0.7f;
@@ -466,9 +466,9 @@ public class LostCityProfile {
         CITY_CHANCE = cfg.getFloat("cityChance", categoryCities, inheritFrom.orElse(this).CITY_CHANCE, 0.0f, 1.0f, "The chance this chunk will be the center of a city");
         CITY_MINRADIUS = cfg.getInt("cityMinRadius", categoryCities, inheritFrom.orElse(this).CITY_MINRADIUS, 1, 10000, "The minimum radius of a city");
         CITY_MAXRADIUS = cfg.getInt("cityMaxRadius", categoryCities, inheritFrom.orElse(this).CITY_MAXRADIUS, 1, 10000, "The maximum radius of a city");
-        CITY_THRESSHOLD = cfg.getFloat("cityThresshold", categoryCities, inheritFrom.orElse(this).CITY_THRESSHOLD, 0.0f, 1.0f, "The center and radius of a city define a sphere. " +
-                "This thresshold indicates from which point a city is considered a city. " +
-                "This is important for calculating where cities are based on overlapping city circles (where the city thressholds are added)");
+        CITY_THRESHOLD = cfg.getFloat("cityThreshold", categoryCities, inheritFrom.orElse(this).CITY_THRESHOLD, 0.0f, 1.0f, "The center and radius of a city define a sphere. " +
+                "This threshold indicates from which point a city is considered a city. " +
+                "This is important for calculating where cities are based on overlapping city circles (where the city thresholds are added)");
         CITY_BIOME_FACTORS = cfg.getStringList("cityBiomeFactors", categoryCities, inheritFrom.orElse(this).CITY_BIOME_FACTORS, "List of biomes with a factor to affect the city factor in that biome. Using the value 0 you can disable city generation in biomes");
         CITY_DEFAULT_BIOME_FACTOR = cfg.getFloat("cityBiomeFactorDefault", categoryCities, inheritFrom.orElse(this).CITY_DEFAULT_BIOME_FACTOR, 0.0f, 1.0f, "The default biome factor which is used if your biome is not specified in 'cityBiomeFactors'");
 
