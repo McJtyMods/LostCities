@@ -152,6 +152,9 @@ public class GuiLCConfig extends Screen {
         add(new GuiFloatValueElement(this, "Various", left, y, LostCitySetup::getVineChance, LostCitySetup::setVineChance).label("Vines:").tooltip("The chance that a vine will be created on the side of a building"));
         y += yoffs;
         add(new GuiFloatValueElement(this, "Various", left, y, LostCitySetup::getLeafBlocksChance, LostCitySetup::setLeafBlocksChance).label("Leafs:").tooltip("The chance for random leaf blocks on the ground"));
+        y += yoffs;
+        y += yoffs;
+        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getNetherGen, LostCitySetup::setNetherGen).label("Nether:").tooltip("If enabled there will be cities in the Nether (experimental)"));
 
         updateValues();
     }

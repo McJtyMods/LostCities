@@ -89,6 +89,7 @@ public class LostCityProfile {
     public int DESTROY_SMALL_SECTIONS_SIZE = 50;
     public boolean EXPLOSIONS_IN_CITIES_ONLY = true;
 
+    public boolean GENERATE_NETHER = false;
     public boolean GENERATE_SPAWNERS = true;
     public boolean GENERATE_LOOT = true;
     public boolean GENERATE_LIGHTING = false;
@@ -429,6 +430,8 @@ public class LostCityProfile {
         BEDROCK_LAYER = cfg.getInt("bedrockLayer", categoryLostcity, inheritFrom.orElse(this).BEDROCK_LAYER, 0, 10,
                 "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");
 
+        GENERATE_NETHER = cfg.getBoolean("generateNether", categoryLostcity, inheritFrom.orElse(this).GENERATE_NETHER,
+                "If true then generate a cavern type world in the Nether");
         GENERATE_SPAWNERS = cfg.getBoolean("generateSpawners", categoryLostcity, inheritFrom.orElse(this).GENERATE_SPAWNERS,
                 "If true then the buildings will be full of spawners");
         GENERATE_LOOT = cfg.getBoolean("generateLoot", categoryLostcity, inheritFrom.orElse(this).GENERATE_LOOT,

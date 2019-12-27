@@ -391,4 +391,14 @@ public class LostCitySetup {
     public void setLeafBlocksChance(String s) {
         setFloatValue(s, (p,f) -> p.CHANCE_OF_RANDOM_LEAFBLOCKS = f, p -> p.CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f);
     }
+
+    //------------------------------------------
+    public Boolean getNetherGen() {
+        return get().map(p -> p.GENERATE_NETHER).orElse(false);
+    }
+
+    public void setNetherGen(Boolean value) {
+        get().ifPresent(p -> p.GENERATE_NETHER = value);
+    }
+
 }
