@@ -221,12 +221,12 @@ public class GuiLCConfig extends Screen {
 
         for (int x = 0; x < 14; x++) {
             float factor = 0;
-            float sqdist = (x * 16 - 12 * 16) * (x * 16 - 12 * 16);
+            float sqdist = (x * 16 - 7 * 16) * (x * 16 - 7 * 16);
             if (sqdist < radius * radius) {
                 float dist = (float) Math.sqrt(sqdist);
                 factor = (radius - dist) / radius;
             }
-            if (factor > 0) {
+            if (factor > 0 && x > 0) {
                 int maxfloors = profile.BUILDING_MAXFLOORS;
                 int randdist = (int) (profile.BUILDING_MINFLOORS_CHANCE + (factor + .1f) * (profile.BUILDING_MAXFLOORS_CHANCE - profile.BUILDING_MINFLOORS_CHANCE));
                 if (randdist < 1) {
@@ -234,8 +234,8 @@ public class GuiLCConfig extends Screen {
                 }
                 int f = profile.BUILDING_MINFLOORS + rand.nextInt(randdist);
                 f++;
-                if (f > maxfloors) {
-                    f = maxfloors;
+                if (f > maxfloors+1) {
+                    f = maxfloors+1;
                 }
                 int minfloors = profile.BUILDING_MINFLOORS + 1;
                 if (f < minfloors) {

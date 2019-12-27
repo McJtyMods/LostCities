@@ -145,7 +145,7 @@ public class LostCityProfile {
     public float BUILDING_WITHOUT_LOOT_CHANCE = .2f;
     public float BUILDING_CHANCE = .3f;
     public int BUILDING_MINFLOORS = 0;
-    public int BUILDING_MAXFLOORS = 9;
+    public int BUILDING_MAXFLOORS = 8;
     public int BUILDING_MINFLOORS_CHANCE = 4;
     public int BUILDING_MAXFLOORS_CHANCE = 6;
     public int BUILDING_MINCELLARS = 0;

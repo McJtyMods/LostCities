@@ -351,7 +351,7 @@ public class LostCityConfiguration {
         profile.BUILDING_MINFLOORS = 4;
         profile.BUILDING_MINFLOORS_CHANCE = 8;
         profile.BUILDING_MAXFLOORS_CHANCE = 15;
-        profile.BUILDING_MAXFLOORS = 20;
+        profile.BUILDING_MAXFLOORS = 19;
         profile.DEBRIS_TO_NEARBYCHUNK_FACTOR = 175;
         profile.DESTROY_LONE_BLOCKS_FACTOR = 0.08f;
         profile.DESTROY_OR_MOVE_CHANCE = 0.2f;
