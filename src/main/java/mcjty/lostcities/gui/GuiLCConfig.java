@@ -132,6 +132,8 @@ public class GuiLCConfig extends Screen {
         add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getSpawners, LostCitySetup::setSpawners).label("Spawners:")); y += yoffs;
         add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getLighting, LostCitySetup::setLighting).label("Lighting:")); y += yoffs;
         add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getLoot, LostCitySetup::setLoot).label("Loot:")); y += yoffs;
+        add(new GuiFloatValueElement(this, "Various", left, y, LostCitySetup::getVineChance, LostCitySetup::setVineChance).label("Vines:")); y += yoffs;
+        add(new GuiFloatValueElement(this, "Various", left, y, LostCitySetup::getLeafBlocksChance, LostCitySetup::setLeafBlocksChance).label("Leafs:"));
 
         updateValues();
     }

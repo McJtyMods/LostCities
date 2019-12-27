@@ -29,78 +29,93 @@ public class ChunkFixer {
         for (BlockPos pos : info.getSaplingTodo()) {
             BlockState state = world.getBlockState(pos);
             if (state.getBlock() instanceof SaplingBlock) {
-                ((SaplingBlock)state.getBlock()).grow(world, pos, state, random);
+                ((SaplingBlock) state.getBlock()).grow(world, pos, state, random);
             }
         }
         info.clearSaplingTodo();
     }
 
     private static void generateVines(Random random, int chunkX, int chunkZ, IWorld world, IDimensionInfo provider) {
+        float vineChance = provider.getProfile().VINE_CHANCE;
+        if (vineChance < 0.000001) {
+            return;
+        }
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
+        int maxHeight = info.getMaxHeight();
+
         if (info.hasBuilding) {
             BuildingInfo adjacent = info.getXmax();
             int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
-            for (int z = 0; z < 15; z++) {
-                for (int y = bottom; y < (info.getMaxHeight()); y++) {
-                    if (random.nextFloat() < provider.getProfile().VINE_CHANCE) {
-                        createVineStrip(random, world, bottom, VineBlock.WEST, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
+            AfterGenTodo.addTodo(provider.getType(), w -> {
+                for (int z = 0; z < 15; z++) {
+                    for (int y = bottom; y < maxHeight; y++) {
+                        if (w.getRandom().nextFloat() < vineChance) {
+                            createVineStrip(w, bottom, VineBlock.WEST, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
+                        }
                     }
                 }
-            }
+            });
         }
         if (info.getXmax().hasBuilding) {
             BuildingInfo adjacent = info.getXmax();
-            int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? info.getMaxHeight() : (info.getCityGroundLevel() + 3));
-            for (int z = 0; z < 15; z++) {
-                for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
-                    if (random.nextFloat() < provider.getProfile().VINE_CHANCE) {
-                        createVineStrip(random, world, bottom, VineBlock.EAST, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
+            int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
+            AfterGenTodo.addTodo(provider.getType(), w -> {
+                for (int z = 0; z < 15; z++) {
+                    for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
+                        if (w.getRandom().nextFloat() < vineChance) {
+                            createVineStrip(w, bottom, VineBlock.EAST, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
+                        }
                     }
                 }
-            }
+            });
         }
 
         if (info.hasBuilding) {
             BuildingInfo adjacent = info.getZmax();
             int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
-            for (int x = 0; x < 15; x++) {
-                for (int y = bottom; y < (info.getMaxHeight()); y++) {
-                    if (random.nextFloat() < provider.getProfile().VINE_CHANCE) {
-                        createVineStrip(random, world, bottom, VineBlock.NORTH, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
+            AfterGenTodo.addTodo(provider.getType(), w -> {
+                for (int x = 0; x < 15; x++) {
+                    for (int y = bottom; y < maxHeight; y++) {
+                        if (w.getRandom().nextFloat() < vineChance) {
+                            createVineStrip(w, bottom, VineBlock.NORTH, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
+                        }
                     }
                 }
-            }
+            });
         }
         if (info.getZmax().hasBuilding) {
             BuildingInfo adjacent = info.getZmax();
-            int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? info.getMaxHeight() : (info.getCityGroundLevel() + 3));
-            for (int x = 0; x < 15; x++) {
-                for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
-                    if (random.nextFloat() < provider.getProfile().VINE_CHANCE) {
-                        createVineStrip(random, world, bottom, VineBlock.SOUTH, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
+            int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
+            AfterGenTodo.addTodo(provider.getType(), w -> {
+                for (int x = 0; x < 15; x++) {
+                    for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
+                        if (w.getRandom().nextFloat() < vineChance) {
+                            createVineStrip(w, bottom, VineBlock.SOUTH, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
+                        }
                     }
                 }
-            }
+            });
         }
     }
 
-    private static void createVineStrip(Random random, IWorld world, int bottom, BooleanProperty direction, BlockPos pos, BlockPos vineHolderPos) {
+    private static void createVineStrip(IWorld world, int bottom, BooleanProperty direction, BlockPos pos, BlockPos vineHolderPos) {
         if (world.isAirBlock(vineHolderPos)) {
             return;
         }
         if (!world.isAirBlock(pos)) {
             return;
         }
-        world.setBlockState(pos, Blocks.VINE.getDefaultState().with(direction, true), 0);
+        BlockState state = Blocks.VINE.getDefaultState().with(direction, true);
+        world.setBlockState(pos, state, 0);
         pos = pos.down();
-        while (pos.getY() >= bottom && random.nextFloat() < .8f) {
+        while (pos.getY() >= bottom && world.getRandom().nextFloat() < .8f) {
             if (!world.isAirBlock(pos)) {
                 return;
             }
-            world.setBlockState(pos, Blocks.VINE.getDefaultState().with(direction, true), 0);
+            world.setBlockState(pos, state, 0);
             pos = pos.down();
         }
     }
@@ -148,7 +163,7 @@ public class ChunkFixer {
                     if (LostCityConfiguration.DEBUG) {
                         LostCities.setup.getLogger().debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
                     }
-                } else if(tileentity != null) {
+                } else if (tileentity != null) {
                     LostCities.setup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");
                 } else {
                     LostCities.setup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");

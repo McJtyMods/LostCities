@@ -374,4 +374,21 @@ public class LostCitySetup {
     public void setMiniExplosionMaxHeight(String s) {
         setIntValue(s, (p,f) -> p.MINI_EXPLOSION_MAXHEIGHT = f, p -> p.MINI_EXPLOSION_MAXHEIGHT, 0, 256);
     }
+
+    //------------------------------------------
+    public String getVineChance() {
+        return get().map(p -> Float.toString(p.VINE_CHANCE)).orElse("n.a.");
+    }
+
+    public void setVineChance(String s) {
+        setFloatValue(s, (p,f) -> p.VINE_CHANCE = f, p -> p.VINE_CHANCE, 0.0f, 1.0f);
+    }
+
+    public String getLeafBlocksChance() {
+        return get().map(p -> Float.toString(p.CHANCE_OF_RANDOM_LEAFBLOCKS)).orElse("n.a.");
+    }
+
+    public void setLeafBlocksChance(String s) {
+        setFloatValue(s, (p,f) -> p.CHANCE_OF_RANDOM_LEAFBLOCKS = f, p -> p.CHANCE_OF_RANDOM_LEAFBLOCKS, 0.0f, 1.0f);
+    }
 }
