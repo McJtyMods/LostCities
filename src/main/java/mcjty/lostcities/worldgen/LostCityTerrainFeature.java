@@ -5,6 +5,7 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.GeometryTools;
+import mcjty.lostcities.varia.NoiseGeneratorPerlin;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.block.*;
@@ -67,9 +68,9 @@ public class LostCityTerrainFeature {
     private BlockState street2;
     private int streetBorder;
 
-    private PerlinNoiseGenerator rubbleNoise;
-    private PerlinNoiseGenerator leavesNoise;
-    private PerlinNoiseGenerator ruinNoise;
+    private NoiseGeneratorPerlin rubbleNoise;
+    private NoiseGeneratorPerlin leavesNoise;
+    private NoiseGeneratorPerlin ruinNoise;
 
     private static BlockState randomLeafs[] = null;
 
@@ -88,9 +89,9 @@ public class LostCityTerrainFeature {
         driver = new ChunkDriver();
         this.mainGroundLevel = profile.GROUNDLEVEL;
         this.waterLevel = profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
-        this.rubbleNoise = new PerlinNoiseGenerator(rand, 4);
-        this.leavesNoise = new PerlinNoiseGenerator(rand, 4);
-        this.ruinNoise = new PerlinNoiseGenerator(rand, 4);
+        this.rubbleNoise = new NoiseGeneratorPerlin(rand, 4);
+        this.leavesNoise = new NoiseGeneratorPerlin(rand, 4);
+        this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);
 
 //        islandTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
 //        cavernTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
@@ -1393,9 +1394,8 @@ public class LostCityTerrainFeature {
     private double[] leavesBuffer = new double[256];
 
     private void generateRubble(int chunkX, int chunkZ, BuildingInfo info) {
-        // @todo 1.14
-//        this.rubbleBuffer = this.rubbleNoise.getRegion(this.rubbleBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
-//        this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
+        this.rubbleBuffer = this.rubbleNoise.getRegion(this.rubbleBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
+        this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -1479,12 +1479,10 @@ public class LostCityTerrainFeature {
         int chunkX = info.chunkX;
         int chunkZ = info.chunkZ;
         double d0 = 0.03125D;
-        // @todo 1.14
-//        this.ruinBuffer = this.ruinNoise.getRegion(this.ruinBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
+        this.ruinBuffer = this.ruinNoise.getRegion(this.ruinBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, d0 * 2.0D, d0 * 2.0D, 1.0D);
         boolean doLeaves = info.profile.RUBBLELAYER;
         if (doLeaves) {
-            // @todo 1.14
-//            this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
+            this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
         }
 
         int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * 6.0f));
@@ -1492,12 +1490,14 @@ public class LostCityTerrainFeature {
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 double v = ruinBuffer[x + z * 16];
+//                double v = ruinNoise.getValue(x, z) / 16.0;
                 int height = baseheight + (int) v;
                 driver.current(x, height, z);
                 height = info.getMaxHeight() + 10 - height;
                 int vl = 0;
                 if (doLeaves) {
                     vl = (int) (info.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesBuffer[x + z * 16] / info.profile.RUBBLE_LEAVE_SCALE);
+//                    vl = (int) (info.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesNoise.getValue(x / 64.0, z / 64.0) / 4.0 * info.profile.RUBBLE_LEAVE_SCALE);
                 }
                 while (height > 0) {
                     BlockState damage = info.getCompiledPalette().canBeDamagedToIronBars(driver.getBlock());
