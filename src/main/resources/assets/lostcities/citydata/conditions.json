@@ -5,15 +5,15 @@
     "values": [
       {
         "factor": 1,
-        "value": "Zombie"
+        "value": "minecraft:zombie"
       },
       {
         "factor": 1,
-        "value": "Skeleton"
+        "value": "minecraft:skeleton"
       },
       {
         "factor": 1,
-        "value": "Spider"
+        "value": "minecraft:spider"
       }
     ]
   },
@@ -23,11 +23,11 @@
     "values": [
       {
         "factor": 1,
-        "value": "Blaze"
+        "value": "minecraft:blaze"
       },
       {
         "factor": 1,
-        "value": "Witch"
+        "value": "minecraft:witch"
       }
     ]
   },

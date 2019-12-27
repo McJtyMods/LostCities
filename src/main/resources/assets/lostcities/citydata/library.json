@@ -59,12 +59,12 @@
     "palette": [
       {
         "char": "1",
-        "block": "minecraft:mob_spawner",
+        "block": "minecraft:spawner",
         "mob": "easymobs"
       },
       {
         "char": "4",
-        "block": "minecraft:mob_spawner",
+        "block": "minecraft:spawner",
         "mob": "hardmobs"
       },
       {
