@@ -4,6 +4,7 @@ public class GuiElement {
 
     protected final int x;
     protected final int y;
+    protected String tooltip = null;
 
     protected final String page;
 
@@ -12,6 +13,12 @@ public class GuiElement {
         this.x = x;
         this.y = y;
     }
+
+    public GuiElement tooltip(String tooltip) {
+        this.tooltip = tooltip;
+        return this;
+    }
+
 
     public void tick() {
 

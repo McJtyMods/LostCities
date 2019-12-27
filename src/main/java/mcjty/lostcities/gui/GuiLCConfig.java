@@ -3,6 +3,7 @@ package mcjty.lostcities.gui;
 import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.gui.elements.ButtonExt;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.Highway;
 import mcjty.lostcities.worldgen.lost.Railway;
@@ -76,64 +77,81 @@ public class GuiLCConfig extends Screen {
         super.init();
         this.minecraft.keyboardListener.enableRepeatEvents(true);
 
-        profileButton = addButton(new Button(70, 10, 100, 20, localSetup.getProfileLabel(), p -> {
+        profileButton = addButton(new ButtonExt(this, 70, 10, 100, 20, localSetup.getProfileLabel(), p -> {
             localSetup.toggleProfile();
             updateValues();
-        }));
-        customizeButton = addButton(new Button(180, 10, 100, 20, "Customize", p -> {
+        }).tooltip("Select a standard profile for your Lost City worldgen"));
+        customizeButton = addButton(new ButtonExt(this, 180, 10, 100, 20, "Customize", p -> {
             localSetup.customize();
             updateValues();
-        }));
-        modeButton = addButton(new Button(290, 10, 100, 20, "Cities", p -> toggleMode()));
+        }).tooltip("Create a customized version of the currently selected profile"));
+        modeButton = addButton(new ButtonExt(this, 290, 10, 100, 20, "Cities", p -> toggleMode())
+            .tooltip("Switch between different configuration pages"));
 
         doneButton = addButton(new Button(10, this.height - 30, 120, 20, "Done", p -> done()));
         cancelButton = addButton(new Button(this.width - 130, this.height - 30, 120, 20, "Cancel", p -> cancel()));
-        randomizeButton = addButton(new Button(this.width - 35, 35, 30, 20, "Rnd", p -> randomizePreview()));
+        randomizeButton = addButton(new ButtonExt(this,this.width - 35, 35, 30, 20, "Rnd", p -> randomizePreview())
+            .tooltip("Randomize the seed for the preview (does not affect the generated world)"));
 
         int left = 110;
         int yoffs = 21;
 
         int y = 40;
-        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getRarity, LostCitySetup::setRarity).label("Rarity:")); y += yoffs;
-        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getCityThresshold, LostCitySetup::setCityThresshold).label("Thresshold:")); y += yoffs;
-        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getMinSize, LostCitySetup::setMinSize).label("Radius:"));
-        add(new GuiFloatValueElement(this, "Cities", left + 55, y, LostCitySetup::getMaxSize, LostCitySetup::setMaxSize)); y += yoffs;
-        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getBuildingRarity, LostCitySetup::setBuildingRarity).label("Buildings:"));
+        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getRarity, LostCitySetup::setRarity).label("Rarity:").tooltip("The chance that a given chunk is the center of a city"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getCityThresshold, LostCitySetup::setCityThresshold).label("Thresshold:").tooltip("This value helps determine how overlapping city spheres are merged"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getMinSize, LostCitySetup::setMinSize).label("Radius:").tooltip("Minimum radius for a city"));
+        add(new GuiFloatValueElement(this, "Cities", left + 55, y, LostCitySetup::getMaxSize, LostCitySetup::setMaxSize).tooltip("Maximum radius for a city"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Cities", left, y, LostCitySetup::getBuildingRarity, LostCitySetup::setBuildingRarity).label("Buildings:").tooltip("The chance that a city chunk will also contain a building"));
 
         y = 40;
-        add(new GuiFloatValueElement(this, "Buildings", left, y, LostCitySetup::getMinFloors, LostCitySetup::setMinFloors).label("Floors:"));
-        add(new GuiFloatValueElement(this, "Buildings", left + 55, y, LostCitySetup::getMaxFloors, LostCitySetup::setMaxFloors)); y += yoffs;
-        add(new GuiFloatValueElement(this, "Buildings", left, y, LostCitySetup::getMinFloorsChance, LostCitySetup::setMinFloorsChance).label("Floor Chance:"));
-        add(new GuiFloatValueElement(this, "Buildings", left + 55, y, LostCitySetup::getMaxFloorsChance, LostCitySetup::setMaxFloorsChance)); y += yoffs;
-        add(new GuiFloatValueElement(this, "Buildings", left, y, LostCitySetup::getMinCellars, LostCitySetup::setMinCellars).label("Cellars:"));
-        add(new GuiFloatValueElement(this, "Buildings", left + 55, y, LostCitySetup::getMaxCellars, LostCitySetup::setMaxCellars));
+        add(new GuiFloatValueElement(this, "Buildings", left, y, LostCitySetup::getMinFloors, LostCitySetup::setMinFloors).label("Floors:").tooltip("The minimum amount of floors every building has"));
+        add(new GuiFloatValueElement(this, "Buildings", left + 55, y, LostCitySetup::getMaxFloors, LostCitySetup::setMaxFloors).tooltip("The maximum amount of floors for a building"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Buildings", left, y, LostCitySetup::getMinFloorsChance, LostCitySetup::setMinFloorsChance).label("Floor Chance:").tooltip("A number that helps determine a random number of floors based on how far from the city center we are"));
+        add(new GuiFloatValueElement(this, "Buildings", left + 55, y, LostCitySetup::getMaxFloorsChance, LostCitySetup::setMaxFloorsChance).tooltip("A number that helps determine a random number of floors based on how far from the city center we are"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Buildings", left, y, LostCitySetup::getMinCellars, LostCitySetup::setMinCellars).label("Cellars:").tooltip("Minimum amount of cellars under a building (if cellars are possible)"));
+        add(new GuiFloatValueElement(this, "Buildings", left + 55, y, LostCitySetup::getMaxCellars, LostCitySetup::setMaxCellars).tooltip("Maximum amount of cellars under a building"));
 
         left = 70;
         y = 40;
-        add(new GuiBooleanValueElement(this, "Damage", left, y, LostCitySetup::getRubble, LostCitySetup::setRubble).label("Rubble:")); y += yoffs;
-        add(new GuiFloatValueElement(this, "Damage", left, y, LostCitySetup::getRuins, LostCitySetup::setRuins).label("Ruins:").prefix("%"));
-        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getRuinMinLevel, LostCitySetup::setRuinMinLevel).prefix("-"));
-        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getRuinMaxLevel, LostCitySetup::setRuinMaxLevel).prefix("+")); y += yoffs;
+        add(new GuiBooleanValueElement(this, "Damage", left, y, LostCitySetup::getRubble, LostCitySetup::setRubble).label("Rubble:").tooltip("If enabled a random rubble layer is added in the cities"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Damage", left, y, LostCitySetup::getRuins, LostCitySetup::setRuins).label("Ruins:").prefix("%").tooltip("The chance that a building is ruined"));
+        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getRuinMinLevel, LostCitySetup::setRuinMinLevel).prefix("-").tooltip("The minimum height percentage at which a building can start becoming ruined"));
+        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getRuinMaxLevel, LostCitySetup::setRuinMaxLevel).prefix("+").tooltip("The maximum height percentage at which a building can start becoming ruined"));
+        y += yoffs;
 
-        add(new GuiFloatValueElement(this, "Damage", left, y, LostCitySetup::getExplosionChance, LostCitySetup::setExplosionChance).label("Explosion:").prefix("%"));
-        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getExplosionMinLevel, LostCitySetup::setExplosionMinLevel).prefix("-"));
-        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getExplosionMaxLevel, LostCitySetup::setExplosionMaxLevel).prefix("+")); y += yoffs;
-        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getExplosionMinHeight, LostCitySetup::setExplosionMinHeight).label("Height:"));
-        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getExplosionMaxHeight, LostCitySetup::setExplosionMaxHeight)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Damage", left, y, LostCitySetup::getExplosionChance, LostCitySetup::setExplosionChance).label("Explosion:").prefix("%").tooltip("The chance for a big explosion to occur in a given chunk"));
+        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getExplosionMinLevel, LostCitySetup::setExplosionMinLevel).prefix("-").tooltip("The minimum radius for a big explosion"));
+        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getExplosionMaxLevel, LostCitySetup::setExplosionMaxLevel).prefix("+").tooltip("The maximum radius for a big explosion"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getExplosionMinHeight, LostCitySetup::setExplosionMinHeight).label("Height:").tooltip("The minimum height level at which the center of an explosion can occur"));
+        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getExplosionMaxHeight, LostCitySetup::setExplosionMaxHeight).tooltip("The maximum height level at which the center of an explosion can occur"));
+        y += yoffs;
 
-        add(new GuiFloatValueElement(this, "Damage", left, y, LostCitySetup::getMiniExplosionChance, LostCitySetup::setMiniExplosionChance).label("Min/exp:").prefix("%"));
-        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getMiniExplosionMinLevel, LostCitySetup::setMiniExplosionMinLevel).prefix("-"));
-        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getMiniExplosionMaxLevel, LostCitySetup::setMiniExplosionMaxLevel).prefix("+")); y += yoffs;
-        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getMiniExplosionMinHeight, LostCitySetup::setMiniExplosionMinHeight).label("Height:"));
-        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getMiniExplosionMaxHeight, LostCitySetup::setMiniExplosionMaxHeight)); y += yoffs;
+        add(new GuiFloatValueElement(this, "Damage", left, y, LostCitySetup::getMiniExplosionChance, LostCitySetup::setMiniExplosionChance).label("Min/exp:").prefix("%").tooltip("The chance for a small explosion to occur in a given chunk"));
+        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getMiniExplosionMinLevel, LostCitySetup::setMiniExplosionMinLevel).prefix("-").tooltip("The minimum radius for a small  explosion"));
+        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getMiniExplosionMaxLevel, LostCitySetup::setMiniExplosionMaxLevel).prefix("+").tooltip("The maximum radius for a small explosion"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Damage", left + 80, y, LostCitySetup::getMiniExplosionMinHeight, LostCitySetup::setMiniExplosionMinHeight).label("Height:").tooltip("The minimum height level at which the center of an explosion can occur"));
+        add(new GuiFloatValueElement(this, "Damage", left + 140, y, LostCitySetup::getMiniExplosionMaxHeight, LostCitySetup::setMiniExplosionMaxHeight).tooltip("The maximum height level at which the center of an explosion can occur"));
+        y += yoffs;
 
         left = 110;
         y = 40;
-        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getSpawners, LostCitySetup::setSpawners).label("Spawners:")); y += yoffs;
-        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getLighting, LostCitySetup::setLighting).label("Lighting:")); y += yoffs;
-        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getLoot, LostCitySetup::setLoot).label("Loot:")); y += yoffs;
-        add(new GuiFloatValueElement(this, "Various", left, y, LostCitySetup::getVineChance, LostCitySetup::setVineChance).label("Vines:")); y += yoffs;
-        add(new GuiFloatValueElement(this, "Various", left, y, LostCitySetup::getLeafBlocksChance, LostCitySetup::setLeafBlocksChance).label("Leafs:"));
+        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getSpawners, LostCitySetup::setSpawners).label("Spawners:").tooltip("Enable or disable mob spawners in buildings"));
+        y += yoffs;
+        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getLighting, LostCitySetup::setLighting).label("Lighting:").tooltip("If enabled friendly torches are added to various buildings"));
+        y += yoffs;
+        add(new GuiBooleanValueElement(this, "Various", left, y, LostCitySetup::getLoot, LostCitySetup::setLoot).label("Loot:").tooltip("If enabled there will be loot in chests"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Various", left, y, LostCitySetup::getVineChance, LostCitySetup::setVineChance).label("Vines:").tooltip("The chance that a vine will be created on the side of a building"));
+        y += yoffs;
+        add(new GuiFloatValueElement(this, "Various", left, y, LostCitySetup::getLeafBlocksChance, LostCitySetup::setLeafBlocksChance).label("Leafs:").tooltip("The chance for random leaf blocks on the ground"));
 
         updateValues();
     }
@@ -343,5 +361,11 @@ public class GuiLCConfig extends Screen {
         refreshButtons();
         renderExtra();
         super.render(mouseX, mouseY, partialTicks);
+        for(Widget widget : this.buttons) {
+            if (widget.isHovered()) {
+                widget.renderToolTip(mouseX - 0, mouseY - 0);
+                break;
+            }
+        }
     }
 }

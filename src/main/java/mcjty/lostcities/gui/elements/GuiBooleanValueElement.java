@@ -12,7 +12,7 @@ public class GuiBooleanValueElement extends GuiElement {
 
     private final GuiLCConfig gui;
     private String label = null;
-    private final Button field;
+    private final ButtonExt field;
     private final Function<LostCitySetup, Boolean> getter;
     private final BiConsumer<LostCitySetup, Boolean> setter;
 
@@ -21,7 +21,7 @@ public class GuiBooleanValueElement extends GuiElement {
         this.gui = gui;
         this.getter = getter;
         this.setter = setter;
-        field = new Button(x, y, 60, 16, getter.apply(gui.getLocalSetup()) ? "On" : "Off", button -> {
+        field = new ButtonExt(gui, x, y, 60, 16, getter.apply(gui.getLocalSetup()) ? "On" : "Off", button -> {
             String message = button.getMessage();
             if ("On".equals(message)) {
                 button.setMessage("Off");
@@ -35,6 +35,12 @@ public class GuiBooleanValueElement extends GuiElement {
 
     public GuiBooleanValueElement label(String label) {
         this.label = label;
+        return this;
+    }
+
+    @Override
+    public GuiElement tooltip(String tooltip) {
+        field.tooltip(tooltip);
         return this;
     }
 

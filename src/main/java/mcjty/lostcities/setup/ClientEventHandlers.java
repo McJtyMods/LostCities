@@ -58,7 +58,7 @@ public class ClientEventHandlers {
     public void onGuiPost(GuiScreenEvent.InitGuiEvent.Post event) {
         if (event.getGui() instanceof CreateWorldScreen) {
             CreateWorldScreen screen = (CreateWorldScreen) event.getGui();
-            lostCitiesButton = new Button(screen.width / 2 + 5, 125, 150, 20, "Lost Cities", p_onPress_1_ -> {
+            lostCitiesButton = new Button(screen.width - 90, 60, 45, 20, "LC", p_onPress_1_ -> {
                 Minecraft.getInstance().displayGuiScreen(new GuiLCConfig(screen));
             });
             event.addWidget(lostCitiesButton);

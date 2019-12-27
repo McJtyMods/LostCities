@@ -21,7 +21,14 @@ public class GuiFloatValueElement extends GuiElement {
         this.gui = gui;
         this.getter = getter;
         this.setter = setter;
-        field = new TextFieldWidget(gui.getFont(), x, y, 45, 16, getter.apply(gui.getLocalSetup()));
+        field = new TextFieldWidget(gui.getFont(), x, y, 45, 16, getter.apply(gui.getLocalSetup())) {
+            @Override
+            public void renderToolTip(int x, int y) {
+                if (tooltip != null) {
+                    gui.renderTooltip(tooltip, x, y);
+                }
+            }
+        };
         field.setResponder(s -> setter.accept(gui.getLocalSetup(), s));
         gui.addWidget(field);
     }
