@@ -75,6 +75,13 @@ public class Config {
                     LostCityConfiguration.standardProfiles.get("customized").copyFrom(profile);
                 }
             }
+
+            String profile = getProfileForDimension(DimensionType.OVERWORLD);
+            if (profile != null && !profile.isEmpty()) {
+                if (LostCityConfiguration.standardProfiles.get(profile).GENERATE_NETHER) {
+                    dimensionProfileCache.put(DimensionType.THE_NETHER, "cavern");
+                }
+            }
         }
         return dimensionProfileCache.get(type);
     }
