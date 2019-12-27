@@ -21,12 +21,12 @@ public class CompiledPalette {
     public static class Info {
         private final String mobId;
         private final String loot;
-        private final Map<String, Integer> torchOrientations;
+        private final boolean isTorch;
 
-        public Info(String mobId, String loot, Map<String, Integer> torchOrientations) {
+        public Info(String mobId, String loot, boolean isTorch) {
             this.mobId = mobId;
             this.loot = loot;
-            this.torchOrientations = torchOrientations;
+            this.isTorch = isTorch;
         }
 
         public String getMobId() {
@@ -37,8 +37,8 @@ public class CompiledPalette {
             return loot;
         }
 
-        public Map<String, Integer> getTorchOrientations() {
-            return torchOrientations;
+        public boolean isTorch() {
+            return isTorch;
         }
     }
 
@@ -118,15 +118,14 @@ public class CompiledPalette {
             }
             for (Map.Entry<Character, String> entry : p.getMobIds().entrySet()) {
                 Character c = entry.getKey();
-                information.put(c, new Info(entry.getValue(), null, null));
+                information.put(c, new Info(entry.getValue(), null, false));
             }
             for (Map.Entry<Character, String> entry : p.getLootTables().entrySet()) {
                 Character c = entry.getKey();
-                information.put(c, new Info(null, entry.getValue(), null));
+                information.put(c, new Info(null, entry.getValue(), false));
             }
-            for (Map.Entry<Character, Map<String, Integer>> entry : p.getTorchOrientations().entrySet()) {
-                Character c = entry.getKey();
-                information.put(c, new Info(null, null, entry.getValue()));
+            for (Character c : p.getTorches()) {
+                information.put(c, new Info(null, null, true));
             }
         }
     }

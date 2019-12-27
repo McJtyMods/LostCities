@@ -28,7 +28,7 @@ public class GuiBooleanValueElement extends GuiElement {
             } else {
                 button.setMessage("On");
             }
-            setter.accept(gui.getLocalSetup(), "On".equals(message));
+            setter.accept(gui.getLocalSetup(), "On".equals(button.getMessage()));
         });
         gui.addWidget(field);
     }

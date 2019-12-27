@@ -29,7 +29,6 @@ import net.minecraft.world.gen.PerlinNoiseGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -354,32 +353,27 @@ public class LostCityTerrainFeature {
     }
 
     private void fixTorches(BuildingInfo info) {
-        List<Pair<IIndex, Map<String, Integer>>> torches = info.getTorchTodo();
+        List<IIndex> torches = info.getTorchTodo();
         if (torches.isEmpty()) {
             return;
         }
 
-        for (Pair<IIndex, Map<String, Integer>> pair : torches) {
-            IIndex idx = pair.getLeft();
+        for (IIndex idx : torches) {
             driver.current(idx);
-            Map<String, Integer> map = pair.getRight();
 
-            BlockState torchState = driver.getBlock();
-            if (map != null) {
-                int x = driver.getX();
-                int z = driver.getZ();
-// @todo 1.14
-                //                if (driver.getBlockDown() != airChar) {
-//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("up")));
-//                } else if (x > 0 && driver.getBlockWest() != airChar) {
-//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("east")));
-//                } else if (x < 15 && driver.getBlockEast() != airChar) {
-//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("west")));
-//                } else if (z > 0 && driver.getBlockNorth() != airChar) {
-//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("south")));
-//                } else if (z < 15 && driver.getBlockSouth() != airChar) {
-//                    driver.block(torchState.getBlock().getStateFromMeta(map.get("north")));
-//                }
+            BlockState torchState = Blocks.WALL_TORCH.getDefaultState();
+            int x = driver.getX();
+            int z = driver.getZ();
+            if (driver.getBlockDown() != air) {
+                driver.block(Blocks.TORCH.getDefaultState());
+            } else if (x > 0 && driver.getBlockWest() != air) {
+                driver.block(torchState.with(WallTorchBlock.HORIZONTAL_FACING, net.minecraft.util.Direction.EAST));
+            } else if (x < 15 && driver.getBlockEast() != air) {
+                driver.block(torchState.with(WallTorchBlock.HORIZONTAL_FACING, net.minecraft.util.Direction.WEST));
+            } else if (z > 0 && driver.getBlockNorth() != air) {
+                driver.block(torchState.with(WallTorchBlock.HORIZONTAL_FACING, net.minecraft.util.Direction.SOUTH));
+            } else if (z < 15 && driver.getBlockSouth() != air) {
+                driver.block(torchState.with(WallTorchBlock.HORIZONTAL_FACING, net.minecraft.util.Direction.NORTH));
             }
         }
         info.clearTorchTodo();
@@ -627,10 +621,9 @@ public class LostCityTerrainFeature {
                     BlockState b = info.getCompiledPalette().get(c);
                     CompiledPalette.Info inf = compiledPalette.getInfo(c);
                     if (inf != null) {
-                        Map<String, Integer> orientations = inf.getTorchOrientations();
-                        if (orientations != null) {
+                        if (inf.isTorch()) {
                             if (info.profile.GENERATE_LIGHTING) {
-                                info.addTorchTodo(driver.getCurrent(), orientations);
+                                info.addTorchTodo(driver.getCurrent());
                             } else {
                                 b = air;        // No torch!
                             }
@@ -2061,10 +2054,9 @@ public class LostCityTerrainFeature {
                                     b = air;
                                 }
                             } else if (inf != null) {
-                                Map<String, Integer> orientations = inf.getTorchOrientations();
-                                if (orientations != null) {
+                                if (inf.isTorch()) {
                                     if (info.profile.GENERATE_LIGHTING) {
-                                        info.addTorchTodo(driver.getCurrent(), orientations);
+                                        info.addTorchTodo(driver.getCurrent());
                                     } else {
                                         b = air;        // No torches
                                     }

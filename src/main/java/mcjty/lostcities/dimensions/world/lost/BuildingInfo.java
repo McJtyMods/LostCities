@@ -97,7 +97,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
     private final List<Pair<BlockPos, ConditionTodo>> lootTodo = new ArrayList<>();
     private final List<BlockPos> lightingUpdateTodo = new ArrayList<>();
-    private final List<Pair<IIndex, Map<String, Integer>>> torchTodo = new ArrayList<>();
+    private final List<IIndex> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
 
     public static class ConditionTodo {
@@ -144,11 +144,11 @@ public class BuildingInfo implements ILostChunkInfo {
         saplingTodo.clear();
     }
 
-    public void addTorchTodo(IIndex index, Map<String, Integer> orientations) {
-        torchTodo.add(Pair.of(index, orientations));
+    public void addTorchTodo(IIndex index) {
+        torchTodo.add(index);
     }
 
-    public List<Pair<IIndex, Map<String, Integer>>> getTorchTodo() {
+    public List<IIndex> getTorchTodo() {
         return torchTodo;
     }
 
@@ -331,7 +331,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return (CityStyle) getChunkCharacteristics(chunkX, chunkZ, provider).cityStyle;
     }
 
-    public static LostChunkCharacteristics getChunkCharacteristics(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static synchronized LostChunkCharacteristics getChunkCharacteristics(int chunkX, int chunkZ, IDimensionInfo provider) {
         DimensionType type = provider.getType();
         ChunkCoord key = new ChunkCoord(type, chunkX, chunkZ);
         if (cityInfoMap.containsKey(key)) {
@@ -637,7 +637,7 @@ public class BuildingInfo implements ILostChunkInfo {
         cityInfoMap.clear();
     }
 
-    public static BuildingInfo getBuildingInfo(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static synchronized  BuildingInfo getBuildingInfo(int chunkX, int chunkZ, IDimensionInfo provider) {
         ChunkCoord key = new ChunkCoord(provider.getType(), chunkX, chunkZ);
         if (buildingInfoMap.containsKey(key)) {
             return buildingInfoMap.get(key);

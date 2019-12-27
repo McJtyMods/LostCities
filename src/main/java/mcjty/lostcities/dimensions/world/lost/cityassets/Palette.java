@@ -9,10 +9,7 @@ import mcjty.lostcities.varia.Tools;
 import net.minecraft.block.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A palette of materials as used by building parts
@@ -24,7 +21,7 @@ public class Palette implements ILostCityAsset {
     private final Map<BlockState, BlockState> damaged = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
     private final Map<Character, String> lootTables = new HashMap<>(); // For chests
-    private final Map<Character, Map<String, Integer>> torchOrientations = new HashMap<>(); // For torches
+    private final Set<Character> torches = new HashSet<>(); // For torches
 
     public Palette() {
     }
@@ -42,7 +39,7 @@ public class Palette implements ILostCityAsset {
         damaged.putAll(other.damaged);
         mobIds.putAll(other.mobIds);
         lootTables.putAll(other.lootTables);
-        torchOrientations.putAll(other.torchOrientations);
+        torches.addAll(other.torches);
     }
 
     @Override
@@ -62,8 +59,8 @@ public class Palette implements ILostCityAsset {
         return lootTables;
     }
 
-    public Map<Character, Map<String, Integer>> getTorchOrientations() {
-        return torchOrientations;
+    public Set<Character> getTorches() {
+        return torches;
     }
 
     public Map<Character, Object> getPalette() {
@@ -93,14 +90,15 @@ public class Palette implements ILostCityAsset {
                 lootTables.put(c, o.get("loot").getAsString());
             }
             if (o.has("facing")) {
-                Map<String, Integer> or = new HashMap<>();
-                JsonObject torchObj = o.get("facing").getAsJsonObject();
-                getOrientation(or, torchObj, "north");
-                getOrientation(or, torchObj, "south");
-                getOrientation(or, torchObj, "west");
-                getOrientation(or, torchObj, "east");
-                getOrientation(or, torchObj, "up");
-                torchOrientations.put(c, or);
+                // @todo 1.14
+//                Map<String, Integer> or = new HashMap<>();
+//                JsonObject torchObj = o.get("facing").getAsJsonObject();
+//                getOrientation(or, torchObj, "north");
+//                getOrientation(or, torchObj, "south");
+//                getOrientation(or, torchObj, "west");
+//                getOrientation(or, torchObj, "east");
+//                getOrientation(or, torchObj, "up");
+                torches.add(c);
             }
             if (o.has("block")) {
                 String block = o.get("block").getAsString();

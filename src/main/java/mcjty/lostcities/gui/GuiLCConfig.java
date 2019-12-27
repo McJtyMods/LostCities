@@ -3,6 +3,8 @@ package mcjty.lostcities.gui;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
+import mcjty.lostcities.dimensions.world.lost.Highway;
+import mcjty.lostcities.dimensions.world.lost.Railway;
 import mcjty.lostcities.gui.elements.GuiBooleanValueElement;
 import mcjty.lostcities.gui.elements.GuiElement;
 import mcjty.lostcities.gui.elements.GuiFloatValueElement;
@@ -161,6 +163,8 @@ public class GuiLCConfig extends Screen {
 
     private void refreshPreview() {
         BuildingInfo.cleanCache();
+        Highway.cleanCache();
+        Railway.cleanCache();
     }
 
     private void renderExtra() {
@@ -312,12 +316,12 @@ public class GuiLCConfig extends Screen {
 
 
     private void cancel() {
-        BuildingInfo.cleanCache();
+        refreshPreview();
         Minecraft.getInstance().displayGuiScreen(parent);
     }
 
     private void done() {
-        BuildingInfo.cleanCache();
+        refreshPreview();
         LostCitySetup.CLIENT_SETUP.copyFrom(localSetup);
         LostCityProfile customizedProfile = localSetup.getCustomizedProfile();
         if ("customized".equals(localSetup.getProfile()) && customizedProfile != null) {
