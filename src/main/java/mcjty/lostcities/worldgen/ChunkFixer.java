@@ -127,7 +127,7 @@ public class ChunkFixer {
         for (Pair<BlockPos, BuildingInfo.ConditionTodo> pair : info.getMobSpawnerTodo()) {
             BlockPos pos = pair.getKey();
             BlockState state = world.getBlockState(pos);
-            world.setBlockState(pos, state, 2); // Recreate the block on the world so that TE can be made
+            world.setBlockState(pos, state, 3); // Recreate the block on the world so that TE can be made
             // Double check that it is still a spawner (could be destroyed by explosion)
             if (state.getBlock() == Blocks.SPAWNER) {
                 TileEntity tileentity = world.getTileEntity(pos);
@@ -176,7 +176,7 @@ public class ChunkFixer {
         for (Pair<BlockPos, BuildingInfo.ConditionTodo> pair : info.getLootTodo()) {
             BlockPos pos = pair.getKey();
             BlockState state = world.getBlockState(pos);
-            world.setBlockState(pos, state, 2); // Recreate the block on the world so that TE can be made
+            world.setBlockState(pos, state, 3); // Recreate the block on the world so that TE can be made
 
             // Double check that it is still something that can hold loot (could be destroyed by explosion)
             TileEntity te = world.getTileEntity(pos);
