@@ -1,10 +1,11 @@
 package mcjty.lostcities.gui;
 
+import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
-import mcjty.lostcities.dimensions.world.lost.Highway;
-import mcjty.lostcities.dimensions.world.lost.Railway;
+import mcjty.lostcities.worldgen.lost.BuildingInfo;
+import mcjty.lostcities.worldgen.lost.Highway;
+import mcjty.lostcities.worldgen.lost.Railway;
 import mcjty.lostcities.gui.elements.GuiBooleanValueElement;
 import mcjty.lostcities.gui.elements.GuiElement;
 import mcjty.lostcities.gui.elements.GuiFloatValueElement;
@@ -285,10 +286,10 @@ public class GuiLCConfig extends Screen {
                     case 'd': color = 0xffcccc55; break;
                 }
                 fill(sx, sz, sx + 3, sz + 3, color);
-                BuildingInfo info = BuildingInfo.getBuildingInfo(x, z, diminfo);
-                if (info.isCity) {
+                LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(x, z, diminfo);
+                if (characteristics.isCity) {
                     color = 0xff995555;
-                    if (info.hasBuilding) {
+                    if (BuildingInfo.hasBuildingGui(x, z, diminfo, characteristics)) {
                         color = 0xffffffff;
                     }
                     fill(sx, sz, sx + 2, sz + 2, color);

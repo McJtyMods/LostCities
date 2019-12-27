@@ -1,6 +1,6 @@
 package mcjty.lostcities.varia;
 
-import mcjty.lostcities.dimensions.world.lost.Orientation;
+import mcjty.lostcities.worldgen.lost.Orientation;
 import net.minecraft.world.dimension.DimensionType;
 
 public class ChunkCoord {

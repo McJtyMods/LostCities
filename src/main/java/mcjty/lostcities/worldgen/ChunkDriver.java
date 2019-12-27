@@ -1,4 +1,4 @@
-package mcjty.lostcities.dimensions.world.driver;
+package mcjty.lostcities.worldgen;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -11,9 +11,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.WorldGenRegion;
 
-import java.util.Objects;
-
-public class PrimerDriver {
+public class ChunkDriver {
 
     private WorldGenRegion region;
     private IChunk primer;
@@ -33,19 +31,18 @@ public class PrimerDriver {
         return primer;
     }
 
-    public PrimerDriver current(int x, int y, int z) {
+    public ChunkDriver current(int x, int y, int z) {
         current.setPos(x, y, z);
         return this;
     }
 
-    public PrimerDriver current(IIndex index) {
-        Index i = (Index) index;
-        current.setPos(i.x, i.y, i.z);
+    public ChunkDriver current(BlockPos i) {
+        current.setPos(i);
         return this;
     }
 
-    public IIndex getCurrent() {
-        return new Index(current.getX(), current.getY(), current.getZ());
+    public BlockPos getCurrentCopy() {
+        return current.toImmutable();
     }
 
     public void incY() {
@@ -180,17 +177,17 @@ public class PrimerDriver {
         return state;
     }
 
-    public PrimerDriver blockImm(BlockState c) {
+    public ChunkDriver blockImm(BlockState c) {
         primer.setBlockState(current, c, false);
         return this;
     }
 
-    public PrimerDriver block(BlockState c) {
+    public ChunkDriver block(BlockState c) {
         primer.setBlockState(current, correct(c), false);
         return this;
     }
 
-    public PrimerDriver add(BlockState state) {
+    public ChunkDriver add(BlockState state) {
         primer.setBlockState(current, correct(state), false);
         incY();
         return this;
@@ -223,45 +220,5 @@ public class PrimerDriver {
 
     public BlockState getBlock(int x, int y, int z) {
         return primer.getBlockState(pos.setPos(x, y, z));
-    }
-
-    public IIndex getIndex(int x, int y, int z) {
-        return new Index(x, y, z);
-    }
-
-
-    private class Index implements IIndex {
-        private final int x;
-        private final int y;
-        private final int z;
-
-        Index(int x, int y, int z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Index index = (Index) o;
-            return x == index.x &&
-                    y == index.y &&
-                    z == index.z;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y, z);
-        }
-    }
-
-    public PrimerDriver copy() {
-        PrimerDriver driver = new PrimerDriver();
-        driver.current.setPos(current);
-        driver.primer = primer;
-        driver.region = region;
-        return driver;
     }
 }

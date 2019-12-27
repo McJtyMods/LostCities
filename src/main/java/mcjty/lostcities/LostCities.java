@@ -1,6 +1,6 @@
 package mcjty.lostcities;
 
-import mcjty.lostcities.dimensions.world.lost.*;
+import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.setup.ClientEventHandlers;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;

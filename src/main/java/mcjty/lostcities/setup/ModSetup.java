@@ -3,7 +3,7 @@ package mcjty.lostcities.setup;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.ConfigSetup;
 import mcjty.lostcities.config.LostCityConfiguration;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.network.PacketHandler;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;

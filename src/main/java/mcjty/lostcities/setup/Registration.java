@@ -2,7 +2,7 @@ package mcjty.lostcities.setup;
 
 
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.dimensions.LostCityFeature;
+import mcjty.lostcities.worldgen.LostCityFeature;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

@@ -1,10 +1,8 @@
-package mcjty.lostcities.dimensions;
+package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.world.ChunkHeightmap;
-import mcjty.lostcities.dimensions.world.LostCityTerrainFeature;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
-import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;

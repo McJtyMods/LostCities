@@ -1,6 +1,6 @@
 package mcjty.lostcities.varia;
 
-import mcjty.lostcities.dimensions.world.lost.Orientation;
+import mcjty.lostcities.worldgen.lost.Orientation;
 
 /**
  * An index of a block as used in the ChunkPrimer

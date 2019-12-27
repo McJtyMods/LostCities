@@ -1,11 +1,11 @@
 package mcjty.lostcities.gui;
 
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.dimensions.IDimensionInfo;
-import mcjty.lostcities.dimensions.world.ChunkHeightmap;
-import mcjty.lostcities.dimensions.world.LostCityTerrainFeature;
-import mcjty.lostcities.dimensions.world.lost.cityassets.AssetRegistries;
-import mcjty.lostcities.dimensions.world.lost.cityassets.WorldStyle;
+import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.ChunkHeightmap;
+import mcjty.lostcities.worldgen.LostCityTerrainFeature;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -137,8 +137,8 @@ public class NullDimensionInfo implements IDimensionInfo {
             case 'p': y = 65; break;
             case '-': y = 60; break;
             case '=': y = 65; break;
-            case '#': y = 85; break;
-            case '+': y = 105; break;
+            case '#': y = 95; break;
+            case '+': y = 125; break;
             case '*': y = 65; break;
             case 'd': y = 65; break;
         }
