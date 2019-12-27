@@ -1,9 +1,6 @@
 package mcjty.lostcities.worldgen;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FourWayBlock;
-import net.minecraft.block.StairsBlock;
+import net.minecraft.block.*;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -101,6 +98,9 @@ public class ChunkDriver {
 
     private BlockState updateAdjacent(BlockState state, Direction direction, BlockPos pos) {
         BlockState adjacent = region.getBlockState(pos);
+        if (adjacent.getBlock() instanceof LadderBlock) {
+            return adjacent;
+        }
         BlockState newAdjacent = adjacent.getBlock().updatePostPlacement(adjacent, direction, state, region, pos, current);
         if (newAdjacent != adjacent) {
             region.setBlockState(pos, newAdjacent, 0);
