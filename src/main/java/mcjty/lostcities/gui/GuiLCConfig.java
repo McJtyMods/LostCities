@@ -209,7 +209,7 @@ public class GuiLCConfig extends Screen {
 
     private void renderPreviewCity(LostCityProfile profile, boolean showDamage) {
         int base = 50 + 120;
-        int leftRender = 270;
+        int leftRender = this.width - 157;
         fill(leftRender, 50, leftRender + 150, base, 0xff0099bb);
         fill(leftRender, base, leftRender + 150, 50 + 150, 0xff996633);
 
@@ -295,7 +295,7 @@ public class GuiLCConfig extends Screen {
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
         for (int z = 0; z < 50; z++) {
             for (int x = 0; x < 50; x++) {
-                int sx = x * 3 + 260;
+                int sx = x * 3 + this.width - 160;
                 int sz = z * 3 + 50;
                 int color = 0xff005500;
                 char b = diminfo.getBiomeChar(x, z);
@@ -365,7 +365,8 @@ public class GuiLCConfig extends Screen {
         renderExtra();
         super.render(mouseX, mouseY, partialTicks);
         for(Widget widget : this.buttons) {
-            if (widget.isHovered()) {
+            if (widget.isMouseOver(mouseX, mouseY) && widget.visible) {
+//            if (widget.isHovered() && widget.visible) {
                 widget.renderToolTip(mouseX - 0, mouseY - 0);
                 break;
             }
