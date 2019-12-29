@@ -5,18 +5,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class ClientEventHandlers {
 
-    public static void init(FMLClientSetupEvent event) {
-        MinecraftForge.EVENT_BUS.register(new ClientEventHandlers());
-
-    }
-
-//
+    //
 //    @SubscribeEvent
 //    public void onFogEvent(EntityViewRenderEvent.FogColors event) {
 //        if (WorldTypeTools.isLostCities(Minecraft.getInstance().world)) {
