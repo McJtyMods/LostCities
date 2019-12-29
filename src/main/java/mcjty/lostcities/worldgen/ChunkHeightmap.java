@@ -122,4 +122,30 @@ public class ChunkHeightmap {
         return y;
     }
 
+    public int getMaximumHeight() {
+        int y = 0;
+        int yy;
+        yy = getHeight(2, 2);
+        if (yy > y) {
+            y = yy;
+        }
+        yy = getHeight(13, 2);
+        if (yy > y) {
+            y = yy;
+        }
+        yy = getHeight(2, 13);
+        if (yy > y) {
+            y = yy;
+        }
+        yy = getHeight(13, 13);
+        if (yy > y) {
+            y = yy;
+        }
+        yy = getHeight(8, 8);
+        if (yy > y) {
+            y = yy;
+        }
+        return y;
+    }
+
 }

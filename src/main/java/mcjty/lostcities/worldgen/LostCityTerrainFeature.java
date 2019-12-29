@@ -23,7 +23,6 @@ import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.PerlinNoiseGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -1538,6 +1537,10 @@ public class LostCityTerrainFeature {
 
         if (canDoParks) {
             int height = info.getCityGroundLevel();
+            // In default landscape type we clear the landscape on top of the building
+            if (profile.isDefault()) {
+                clearToMax(info, heightmap, height);
+            }
 
             BuildingInfo.StreetType streetType = info.streetType;
             boolean elevated = info.isElevatedParkSection();
@@ -1749,10 +1752,11 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void generateFrontPart(BuildingInfo info, int height, BuildingInfo adj, Transform rot) {
+    private int generateFrontPart(BuildingInfo info, int height, BuildingInfo adj, Transform rot) {
         if (info.hasFrontPartFrom(adj)) {
-            generatePart(adj, adj.frontType, rot, 0, height, 0, false);
+            return generatePart(adj, adj.frontType, rot, 0, height, 0, false);
         }
+        return height;
     }
 
     private void generateCorridors(BuildingInfo info, boolean xRail, boolean zRail) {
@@ -2250,6 +2254,13 @@ public class LostCityTerrainFeature {
 
         int height = lowestLevel;
         for (int f = -info.floorsBelowGround; f <= info.getNumFloors(); f++) {
+            // In default landscape type we clear the landscape on top of the building when we are at the top floor
+            if (f == info.getNumFloors()) {
+                if (profile.isDefault()) {
+                    clearToMax(info, heightmap, height);
+                }
+            }
+
             BuildingPart part = info.getFloor(f);
             generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
             part = info.getFloorPart2(f);
@@ -2282,6 +2293,17 @@ public class LostCityTerrainFeature {
         if (info.floorsBelowGround >= 1) {
             // We have to potentially connect to corridors
             generateCorridorConnections(info);
+        }
+    }
+
+    private void clearToMax(BuildingInfo info, ChunkHeightmap heightmap, int height) {
+        int maximumHeight = Math.min(255, heightmap.getMaximumHeight() + 10);
+        if (height < maximumHeight) {
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    clearRange(info, x, z, height, maximumHeight, false);
+                }
+            }
         }
     }
 
