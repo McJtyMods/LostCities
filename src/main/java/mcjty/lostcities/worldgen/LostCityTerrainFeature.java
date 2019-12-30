@@ -682,6 +682,43 @@ public class LostCityTerrainFeature {
     }
 
     /**
+     * Given adjacent (city) chunks, calculate the desired height to interpolate the
+     * landscape too. This is calculated for the reference position of this chunk (0,0 point)
+     */
+    private int getDesiredInterpolatedHeight(BuildingInfo info) {
+        // @todo
+        return 0;
+    }
+
+    /**
+     * Get the lowest height of a corner of four chunks (if it is a city chunk).
+     * info: reference to the bottom-right chunk. The 0,0 position of this chunk is the reference.
+     * Returns Integer.MAX_VALUE if the corner is not adjacent to any city chunk
+     * Also returns Integer.MAX_VALUE if all corners are city chunks (as this kind of corner should
+     * also have no effect on the landscape beyond those chunks)
+     */
+    private int getCityHeightAt00Corner(BuildingInfo info) {
+        int h = getCityHeightForChunk(info);
+        h = Math.min(h, getCityHeightForChunk(info.getXmin()));
+        h = Math.min(h, getCityHeightForChunk(info.getZmin()));
+        h = Math.min(h, getCityHeightForChunk(info.getXmin().getZmin()));
+        return h;
+    }
+
+    private int getCityHeightForChunk(BuildingInfo info) {
+        if (info.isCity) {
+            return info.getCityGroundLevel();
+        } else {
+            if (info.isOcean()) {
+                return info.groundLevel - 4;
+            } else {
+                return Integer.MAX_VALUE;
+            }
+        }
+    }
+
+
+    /**
      * Get the lowest height of a corner of four chunks
      * info: reference to the bottom-right chunk. The 0,0 position of this chunk is the reference
      */
