@@ -5,8 +5,8 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
 import mcjty.lostcities.varia.QualityRandom;
-import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
+import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.block.Block;
@@ -14,7 +14,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.dimension.DimensionType;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
@@ -91,6 +90,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
     private Boolean horizontalMonorail = null;
     private Boolean verticalMonorail = null;
+
+    private Integer[] desiredTerrainCorrectionHeights = null;
 
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
@@ -1345,7 +1346,8 @@ public class BuildingInfo implements ILostChunkInfo {
     private static boolean isOcean(Biome[] biomes) {
         int cnt = 0;
         for (Biome biome : biomes) {
-            if (biome == Biomes.OCEAN || biome == Biomes.DEEP_OCEAN || biome == Biomes.FROZEN_OCEAN) {
+            Biome.Category category = biome.getCategory();
+            if (category == Biome.Category.OCEAN) {
                 cnt++;
             }
         }
@@ -1580,6 +1582,137 @@ public class BuildingInfo implements ILostChunkInfo {
         }
         return connectionAtZ[level];
     }
+
+    /**
+     * Get the lowest height of a corner of four chunks (if it is a city chunk).
+     * info: reference to the bottom-right chunk. The 0,0 position of this chunk is the reference.
+     * Returns 100000 if the corner is not adjacent to any city chunk
+     * Also returns 100000 if all corners are city or landscape chunks (as
+     * this kind of corner should also have no effect on the landscape beyond those chunks)
+     * This is the level 0 version which looks at current chunk corner only
+     */
+    public int getLowestCityHeightAtChunkCorner() {
+        BuildingInfo info00 = getXmin().getZmin();
+        BuildingInfo info01 = getXmin();
+        BuildingInfo info10 = getZmin();
+        if (isCity && info10.isCity && info00.isCity && info01.isCity) {
+            return 100000;
+        }
+        if (!isCity && !info10.isCity && !info00.isCity && !info01.isCity) {
+            return 100000;
+        }
+        // If we come here we have a mix of city and normal chunks
+        int h = getCityHeightForChunk();
+        h = Math.min(h, info01.getCityHeightForChunk());
+        h = Math.min(h, info10.getCityHeightForChunk());
+        h = Math.min(h, info00.getCityHeightForChunk());
+        return h;
+    }
+
+    /*
+     * This is used for correcting the terrain and indicates the desired
+     * level to which adjacent terrains should interpolate
+     */
+    public int getCityHeightForChunk() {
+        if (isCity) {
+            return getCityGroundLevel();
+        } else {
+            if (isOcean()) {    // @todo check?
+                return groundLevel - 4;
+            } else {
+                return 100000;
+            }
+        }
+    }
+
+    /**
+     * Given adjacent (city) chunks, calculate the desired height to interpolate the
+     * landscape too (minimum/maximum). This is calculated for the reference position of this chunk (0,0 point)
+     * This is the level 1 version which looks at adjacent heights only
+     */
+    public Integer[] getDesiredMaxHeightL1() {
+        int h = getLowestCityHeightAtChunkCorner();
+
+        int cx = chunkX;
+        int cz = chunkZ;
+
+        if (h < 256) {
+            // The L0 height at this corner is fixed so we return that
+            return new Integer[] {
+                    h + LostCityTerrainFeature.getRandomizedOffset(cx, cz, profile.TERRAIN_FIX_LOWER_MIN_OFFSET, profile.TERRAIN_FIX_LOWER_MAX_OFFSET),
+                    h + LostCityTerrainFeature.getRandomizedOffset(cx, cz, profile.TERRAIN_FIX_UPPER_MIN_OFFSET, profile.TERRAIN_FIX_UPPER_MAX_OFFSET) };
+        }
+
+        Integer[] minMax = new Integer[] { 100000, 100000 };
+
+        getXmin().getZmin().updateMinMaxL1(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL1(cx-1, cz-1));
+        getXmin().updateMinMaxL1(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL1(cx-1, cz));
+        getXmin().getZmax().updateMinMaxL1(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL1(cx-1, cz+1));
+
+        getZmin().updateMinMaxL1(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL1(cx, cz-1));
+        getZmax().updateMinMaxL1(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL1(cx, cz+1));
+
+        getXmax().getZmin().updateMinMaxL1(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL1(cx+1, cz-1));
+        getXmax().updateMinMaxL1(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL1(cx+1, cz));
+        getXmax().getZmax().updateMinMaxL1(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL1(cx+1, cz+1));
+
+        return minMax;
+    }
+
+    /**
+     * Given adjacent (city) chunks, calculate the desired height to interpolate the
+     * landscape too. This is calculated for the reference position of this chunk (0,0 point)
+     * This is the level 2 version which looks at L1 heights of adjacent chunks
+     */
+    public synchronized Integer[] getDesiredMaxHeightL2() {
+        if (desiredTerrainCorrectionHeights == null) {
+            Integer[] mm = getDesiredMaxHeightL1();
+            if (mm[0] < 256) {
+                // The L1 height at this corner is fixed so we return that
+                return mm;
+            }
+
+            int cx = chunkX;
+            int cz = chunkZ;
+
+            Integer[] minMax = new Integer[]{100000, 100000};
+
+            getXmin().getZmin().updateMinMaxL2(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL2(cx - 1, cz - 1));
+            getXmin().updateMinMaxL2(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL2(cx - 1, cz));
+            getXmin().getZmax().updateMinMaxL2(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL2(cx - 1, cz + 1));
+
+            getZmin().updateMinMaxL2(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL2(cx, cz - 1));
+            getZmax().updateMinMaxL2(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL2(cx, cz + 1));
+
+            getXmax().getZmin().updateMinMaxL2(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL2(cx + 1, cz - 1));
+            getXmax().updateMinMaxL2(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL2(cx + 1, cz));
+            getXmax().getZmax().updateMinMaxL2(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL2(cx + 1, cz + 1));
+            desiredTerrainCorrectionHeights = minMax;
+        }
+        return desiredTerrainCorrectionHeights;
+    }
+
+    public void updateMinMaxL2(Integer[] minMax, int offs) {
+        Integer[] h = getDesiredMaxHeightL1();
+        if ((h[0]-offs) < minMax[0]) {
+            minMax[0] = h[0]-offs;
+        }
+        if ((h[1]+offs) < minMax[1]) {
+            minMax[1] = h[1]+offs;
+        }
+    }
+
+
+    private void updateMinMaxL1(Integer[] minMax, int offs) {
+        int h = getLowestCityHeightAtChunkCorner();
+        if ((h-offs) < minMax[0]) {
+            minMax[0] = h-offs;
+        }
+        if ((h+offs) < minMax[1]) {
+            minMax[1] = h+offs;
+        }
+    }
+
 
     public enum StreetType {
         NORMAL,

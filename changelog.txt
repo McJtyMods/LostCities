@@ -1,3 +1,14 @@
+Upcoming:
+- Implemented a much better landscape correcting algorithm so that city chunks fit much better with adjacent high mountains or very low ocean chunks
+- Vines are now handled in a much more efficient manner. Should avoid the TPS problems people were getting
+- Oceans, rivers, and beaches are now recognized in a way that allows modded biomes to work too
+
+2.0.23-alpha:
+- Fixed a problem on servers
+
+2.0.22-alpha:
+- First port to 1.14.4!
+
 2.0.21:
 - Joseph added a more useful error message when invalid parts are configured
 
