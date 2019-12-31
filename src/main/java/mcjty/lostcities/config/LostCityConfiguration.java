@@ -190,7 +190,7 @@ public class LostCityConfiguration {
         profile.CITY_CHANCE = 0.03f;
         profile.LANDSCAPE_TYPE = LandscapeType.FLOATING;
         profile.HORIZON = 0;
-        profile.WATERLEVEL_OFFSET = 70;
+//        profile.WATERLEVEL_OFFSET = 70;
         profile.BUILDING_MAXCELLARS = 1;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
@@ -215,7 +215,7 @@ public class LostCityConfiguration {
         profile.setIconFile("textures/gui/icon_space.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.HORIZON = 0;
-        profile.WATERLEVEL_OFFSET = 70;
+//        profile.WATERLEVEL_OFFSET = 70;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
@@ -250,7 +250,7 @@ public class LostCityConfiguration {
         profile.setIconFile("textures/gui/icon_bubbles.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.HORIZON = 90;
-        profile.WATERLEVEL_OFFSET = 8;
+//        profile.WATERLEVEL_OFFSET = 8;
         profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "water_empty";
         profile.RAILWAYS_CAN_END = true;
@@ -296,8 +296,7 @@ public class LostCityConfiguration {
         profile.MINI_EXPLOSION_MAXHEIGHT = 75;
         profile.MINI_EXPLOSION_MINRADIUS = 5;
         profile.MINI_EXPLOSION_MAXRADIUS = 10;
-//        profile.WATERLEVEL_OFFSET = -3;           // @EXP
-        profile.WATERLEVEL_OFFSET = 70;
+//        profile.WATERLEVEL_OFFSET = 70;
 
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
@@ -397,7 +396,7 @@ public class LostCityConfiguration {
         profile.setDescription("Wasteland, no water, bare land");
         profile.setExtraDescription("This profile works best with Biomes O Plenty");
         profile.setIconFile("textures/gui/icon_wasteland.png");
-        profile.WATERLEVEL_OFFSET = 70;
+//        profile.WATERLEVEL_OFFSET = 70;
         profile.GENERATE_LAKES = false;
         profile.GENERATE_OCEANMONUMENTS = false;
         profile.VINE_CHANCE = 0.003f;
@@ -420,7 +419,7 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("atlantis", true);
         profile.setDescription("Drowned cities, raised waterlevel");
         profile.setIconFile("textures/gui/icon_atlantis.png");
-        profile.WATERLEVEL_OFFSET = -20;
+//        profile.WATERLEVEL_OFFSET = -20;
         profile.RUIN_CHANCE = 0.1f;
         standardProfiles.put(profile.getName(), profile);
 
@@ -444,7 +443,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("water_empty", false);
         profile.setDescription("Private empty terrain for waterbubbles");
-        profile.WATERLEVEL_OFFSET = -80;
+//        profile.WATERLEVEL_OFFSET = -80;
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
         profile.HIGHWAY_DISTANCE_MASK = 0;
@@ -465,7 +464,7 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("bio_wasteland", false);
         profile.setDescription("Private wasteland for biospheres");
         profile.GROUNDLEVEL = 40;
-        profile.WATERLEVEL_OFFSET = 70;
+//        profile.WATERLEVEL_OFFSET = 70;
         profile.AVOID_WATER = true;
         profile.CITY_CHANCE = 0.008f;
         profile.CITY_MINRADIUS = 30;

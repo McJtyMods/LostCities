@@ -720,11 +720,12 @@ public class BuildingInfo implements ILostChunkInfo {
 
         if (outsideChunk && provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE) {
             groundLevel = provider.getOutsideProfile().GROUNDLEVEL;
-            waterLevel = groundLevel - provider.getOutsideProfile().WATERLEVEL_OFFSET;
+//            waterLevel = groundLevel - provider.getOutsideProfile().WATERLEVEL_OFFSET;
         } else {
             groundLevel = provider.getProfile().GROUNDLEVEL;
-            waterLevel = groundLevel - provider.getProfile().WATERLEVEL_OFFSET;
+//            waterLevel = groundLevel - provider.getProfile().WATERLEVEL_OFFSET;
         }
+        waterLevel = provider.getWorld().getSeaLevel();
 
         CityStyle cs = (CityStyle) characteristics.cityStyle;
 
