@@ -3,6 +3,8 @@ Upcoming:
 - Vines are now handled in a much more efficient manner. Should avoid the TPS problems people were getting
 - Oceans, rivers, and beaches are now recognized in a way that allows modded biomes to work too
 - When a highway is generated it will no longer remove leaf blocks and logs above the highway
+- When Lost Cities starts for the first time it will generate a config/lostcity_profiles folder containing standard profiles. As long as that folder exists Lost Cities will not do that again. You can alter/copy/remove profiles in that directory and they will be recognized automatically
+- New 'saveprofile' command to save the current profile to a file (which you can then copy to config/lostcity_profiles)
 
 2.0.23-alpha:
 - Fixed a problem on servers

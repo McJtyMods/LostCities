@@ -3,9 +3,7 @@ package mcjty.lostcities.gui;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -13,8 +11,7 @@ public class LostCitySetup {
 
     public static final LostCitySetup CLIENT_SETUP = new LostCitySetup(() -> {});
 
-    private static final List<String> PROFILES = Arrays.asList("default", "nodamage", "rarecities", "onlycities", "tallbuildings", "safe",
-            "ancient", "wasteland", "atlantis", "realistic");
+    private List<String> profiles = null;
 
     private String profile = null;
     private LostCityProfile customizedProfile = null;
@@ -79,20 +76,33 @@ public class LostCitySetup {
     }
 
     public void toggleProfile() {
+        if (profiles == null) {
+            profiles = new ArrayList<>(LostCityConfiguration.standardProfiles.keySet());
+            profiles.sort((o1, o2) -> {
+                if ("default".equals(o1)) {
+                    return -1;
+                }
+                if ("default".equals(o2)) {
+                    return 1;
+                }
+                return o1.compareTo(o2);
+            });
+        }
+
         if (profile == null) {
             if (customizedProfile != null) {
                 profile = "customized";
             } else {
-                profile = PROFILES.get(0);
+                profile = profiles.get(0);
             }
         } else if ("customized".equals(profile)) {
-            profile = PROFILES.get(0);
+            profile = profiles.get(0);
         } else {
-            int i = PROFILES.indexOf(profile);
-            if (i == -1 || i >= PROFILES.size()-1) {
+            int i = profiles.indexOf(profile);
+            if (i == -1 || i >= profiles.size()-1) {
                 profile = null;
             } else {
-                profile = PROFILES.get(i+1);
+                profile = profiles.get(i+1);
             }
         }
         refreshPreview.run();

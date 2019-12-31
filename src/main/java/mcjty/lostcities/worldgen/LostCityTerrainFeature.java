@@ -87,7 +87,7 @@ public class LostCityTerrainFeature {
         this.rand = rand;
         driver = new ChunkDriver();
         this.mainGroundLevel = profile.GROUNDLEVEL;
-        this.waterLevel = provider.getWorld().getSeaLevel();// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
+        this.waterLevel = provider.getWorld() == null ? 65 : provider.getWorld().getSeaLevel();// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
         this.rubbleNoise = new NoiseGeneratorPerlin(rand, 4);
         this.leavesNoise = new NoiseGeneratorPerlin(rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);

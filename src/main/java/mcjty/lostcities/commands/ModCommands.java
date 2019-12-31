@@ -9,13 +9,14 @@ import net.minecraft.command.Commands;
 public class ModCommands {
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
-        LiteralCommandNode<CommandSource> cmdList = dispatcher.register(
+        LiteralCommandNode<CommandSource> commands = dispatcher.register(
                 Commands.literal(LostCities.MODID)
                         .then(CommandDebug.register(dispatcher))
                         .then(CommandMap.register(dispatcher))
+                        .then(CommandSaveProfile.register(dispatcher))
         );
 
-        dispatcher.register(Commands.literal("lost").redirect(cmdList));
+        dispatcher.register(Commands.literal("lost").redirect(commands));
     }
 
 }

@@ -10,6 +10,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(LostCities.MODID)
@@ -17,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 public class LostCities {
     public static final String MODID = "lostcities";
 
-    public static Logger logger = null; // @todo 1.14
+    public static Logger logger = LogManager.getLogger(LostCities.MODID);
 
     public static ModSetup setup = new ModSetup();
     public static LostCities instance;

@@ -59,7 +59,7 @@ public class Tools {
             }
         }
         Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(s));
-        System.out.println("original = " + original + ", value = " + value);
+//        System.out.println("original = " + original + ", value = " + value);
         if (value == null) {
             throw new RuntimeException("Cannot find block: '" + s + "'!");
         }

@@ -37,7 +37,7 @@ public class ModSetup {
     public void init(FMLCommonSetupEvent e) {
         logger = LogManager.getLogger();
 
-        LostCityConfiguration.initStandardProfiles();
+        LostCityConfiguration.setupProfiles();
 
         PacketHandler.registerMessages("lostcities");
 
