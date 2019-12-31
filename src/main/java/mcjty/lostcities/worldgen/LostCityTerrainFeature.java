@@ -840,6 +840,30 @@ public class LostCityTerrainFeature {
         }
     }
 
+    /**
+     * Get the lowest height of a corner of four chunks
+     * info: reference to the bottom-right chunk. The 0,0 position of this chunk is the reference
+     */
+    private int getHeightAt00Corner(BuildingInfo info) {
+        int h = getHeightForChunk(info);
+        h = Math.min(h, getHeightForChunk(info.getXmin()));
+        h = Math.min(h, getHeightForChunk(info.getZmin()));
+        h = Math.min(h, getHeightForChunk(info.getXmin().getZmin()));
+        return h;
+    }
+
+    private int getHeightForChunk(BuildingInfo info) {
+        if (info.isCity) {
+            return info.getCityGroundLevel();
+        } else {
+            if (info.isOcean()) {
+                return info.groundLevel - 4;
+            } else {
+                return info.getCityGroundLevel();
+            }
+        }
+    }
+
     private void flattenChunkToCityBorderV2(int chunkX, int chunkZ) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
         float h00 = getDesiredInterpolatedHeightL2(info);
@@ -912,31 +936,6 @@ public class LostCityTerrainFeature {
 //        } else {
 //            driver.setBlockRange(x, height1, z, height2, air);
 //        }
-    }
-
-
-    /**
-     * Get the lowest height of a corner of four chunks
-     * info: reference to the bottom-right chunk. The 0,0 position of this chunk is the reference
-     */
-    private int getHeightAt00Corner(BuildingInfo info) {
-        int h = getHeightForChunk(info);
-        h = Math.min(h, getHeightForChunk(info.getXmin()));
-        h = Math.min(h, getHeightForChunk(info.getZmin()));
-        h = Math.min(h, getHeightForChunk(info.getXmin().getZmin()));
-        return h;
-    }
-
-    private int getHeightForChunk(BuildingInfo info) {
-        if (info.isCity) {
-            return info.getCityGroundLevel();
-        } else {
-            if (info.isOcean()) {
-                return info.groundLevel - 4;
-            } else {
-                return info.getCityGroundLevel();
-            }
-        }
     }
 
 
@@ -1019,8 +1018,10 @@ public class LostCityTerrainFeature {
     }
 
     private static boolean isWaterBiome(Biome biome) {
-        return !(biome != Biomes.OCEAN && biome != Biomes.DEEP_OCEAN && biome != Biomes.FROZEN_OCEAN
-                && biome != Biomes.RIVER && biome != Biomes.FROZEN_RIVER && biome != Biomes.BEACH && biome != Biomes.SNOWY_BEACH);
+        Biome.Category category = biome.getCategory();
+        return category.equals(Biome.Category.OCEAN) || category.equals(Biome.Category.BEACH) || category.equals(Biome.Category.RIVER);
+//        return !(biome != Biomes.OCEAN && biome != Biomes.DEEP_OCEAN && biome != Biomes.FROZEN_OCEAN
+//                && biome != Biomes.RIVER && biome != Biomes.FROZEN_RIVER && biome != Biomes.BEACH && biome != Biomes.SNOWY_BEACH);
     }
 
     private void flattenChunkBorder(BuildingInfo info, int x, int offset, int z, Random rand, int level) {
