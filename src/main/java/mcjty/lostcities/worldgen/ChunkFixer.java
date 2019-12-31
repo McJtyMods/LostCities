@@ -15,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.spawner.AbstractSpawner;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
@@ -47,57 +48,57 @@ public class ChunkFixer {
         int maxHeight = info.getMaxHeight();
 
         if (info.hasBuilding) {
-            BuildingInfo adjacent = info.getXmax();
-            int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
-            AfterGenTodo.addTodo(provider.getType(), w -> {
+            if (world.getChunk(chunkX + 1, chunkZ).getStatus().isAtLeast(ChunkStatus.FEATURES)) {
+                BuildingInfo adjacent = info.getXmax();
+                int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < maxHeight; y++) {
-                        if (w.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(w, bottom, VineBlock.WEST, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
+                        if (world.getRandom().nextFloat() < vineChance) {
+                            createVineStrip(world, bottom, VineBlock.WEST, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
                         }
                     }
                 }
-            });
+            }
         }
         if (info.getXmax().hasBuilding) {
-            BuildingInfo adjacent = info.getXmax();
-            int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
-            AfterGenTodo.addTodo(provider.getType(), w -> {
+            if (world.getChunk(chunkX + 1, chunkZ).getStatus().isAtLeast(ChunkStatus.FEATURES)) {
+                BuildingInfo adjacent = info.getXmax();
+                int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
-                        if (w.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(w, bottom, VineBlock.EAST, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
+                        if (world.getRandom().nextFloat() < vineChance) {
+                            createVineStrip(world, bottom, VineBlock.EAST, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
                         }
                     }
                 }
-            });
+            }
         }
 
         if (info.hasBuilding) {
-            BuildingInfo adjacent = info.getZmax();
-            int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
-            AfterGenTodo.addTodo(provider.getType(), w -> {
+            if (world.getChunk(chunkX, chunkZ + 1).getStatus().isAtLeast(ChunkStatus.FEATURES)) {
+                BuildingInfo adjacent = info.getZmax();
+                int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < maxHeight; y++) {
-                        if (w.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(w, bottom, VineBlock.NORTH, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
+                        if (world.getRandom().nextFloat() < vineChance) {
+                            createVineStrip(world, bottom, VineBlock.NORTH, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
                         }
                     }
                 }
-            });
+            }
         }
         if (info.getZmax().hasBuilding) {
-            BuildingInfo adjacent = info.getZmax();
-            int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
-            AfterGenTodo.addTodo(provider.getType(), w -> {
+            if (world.getChunk(chunkX, chunkZ + 1).getStatus().isAtLeast(ChunkStatus.FEATURES)) {
+                BuildingInfo adjacent = info.getZmax();
+                int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
-                        if (w.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(w, bottom, VineBlock.SOUTH, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
+                        if (world.getRandom().nextFloat() < vineChance) {
+                            createVineStrip(world, bottom, VineBlock.SOUTH, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
                         }
                     }
                 }
-            });
+            }
         }
     }
 

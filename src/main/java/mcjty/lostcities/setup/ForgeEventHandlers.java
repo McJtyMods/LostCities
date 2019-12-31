@@ -1,8 +1,6 @@
 package mcjty.lostcities.setup;
 
 import mcjty.lostcities.commands.ModCommands;
-import mcjty.lostcities.worldgen.AfterGenTodo;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
@@ -11,13 +9,6 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void serverLoad(FMLServerStartingEvent event) {
         ModCommands.register(event.getCommandDispatcher());
-    }
-
-    @SubscribeEvent
-    public void onWorldTick(TickEvent.WorldTickEvent event) {
-        if (event.phase == TickEvent.Phase.START && !event.world.isRemote) {
-            AfterGenTodo.handleTodo(event.world);
-        }
     }
 
 //    @SubscribeEvent
