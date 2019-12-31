@@ -8,6 +8,8 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.WorldGenRegion;
 
+import java.util.function.Predicate;
+
 public class ChunkDriver {
 
     private WorldGenRegion region;
@@ -85,10 +87,34 @@ public class ChunkDriver {
         }
     }
 
+    public void setBlockRange(int x, int y, int z, int y2, BlockState state, Predicate<BlockState> test) {
+        pos.setPos(x, y, z);
+        while (y < y2) {
+            BlockState st = primer.getBlockState(pos);
+            if (st != state && test.test(st)) {
+                primer.setBlockState(pos, state, false);
+            }
+            y++;
+            pos.setY(y);
+        }
+    }
+
     public void setBlockRangeSafe(int x, int y, int z, int y2, BlockState state) {
         pos.setPos(x, y, z);
         while (y < y2) {
             if (primer.getBlockState(pos) != state) {
+                primer.setBlockState(pos, state, false);
+            }
+            y++;
+            pos.setY(y);
+        }
+    }
+
+    public void setBlockRangeSafe(int x, int y, int z, int y2, BlockState state, Predicate<BlockState> test) {
+        pos.setPos(x, y, z);
+        while (y < y2) {
+            BlockState st = primer.getBlockState(pos);
+            if (st != state && test.test(st)) {
                 primer.setBlockState(pos, state, false);
             }
             y++;

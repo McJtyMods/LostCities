@@ -29,6 +29,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 public class LostCityTerrainFeature {
 
@@ -499,6 +500,10 @@ public class LostCityTerrainFeature {
         }
     }
 
+    private static boolean isClearableAboveHighway(BlockState st) {
+        return !st.getBlock().isIn(BlockTags.LEAVES) && !st.getBlock().isIn(BlockTags.LOGS);
+    }
+
     private void generateHighwayPart(BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix) {
         int highwayGroundLevel = info.groundLevel + level * 6;
 
@@ -516,7 +521,8 @@ public class LostCityTerrainFeature {
                 int clearheight = 15;
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
-                        clearRange(info, x, z, height, height + clearheight, info.waterLevel > info.groundLevel);
+                        clearRange(info, x, z, height, height + clearheight, info.waterLevel > info.groundLevel,
+                                LostCityTerrainFeature::isClearableAboveHighway);
                     }
                 }
             }
@@ -528,7 +534,8 @@ public class LostCityTerrainFeature {
                 int clearheight = 15;
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
-                        clearRange(info, x, z, height, height + clearheight, info.waterLevel > info.groundLevel);
+                        clearRange(info, x, z, height, height + clearheight, info.waterLevel > info.groundLevel,
+                                LostCityTerrainFeature::isClearableAboveHighway);
                     }
                 }
             }
@@ -570,6 +577,16 @@ public class LostCityTerrainFeature {
             driver.setBlockRangeSafe(x, info.waterLevel+1, z, height2, air);
         } else {
             driver.setBlockRange(x, height1, z, height2, air);
+        }
+    }
+
+    private void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater, Predicate<BlockState> test) {
+        if (dowater) {
+            // Special case for drowned city
+            driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquid, test);
+            driver.setBlockRangeSafe(x, info.waterLevel+1, z, height2, air, test);
+        } else {
+            driver.setBlockRange(x, height1, z, height2, air, test);
         }
     }
 
