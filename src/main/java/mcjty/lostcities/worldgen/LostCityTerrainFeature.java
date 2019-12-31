@@ -9,6 +9,7 @@ import mcjty.lostcities.varia.NoiseGeneratorPerlin;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.properties.DoorHingeSide;
 import net.minecraft.state.properties.DoubleBlockHalf;
@@ -19,8 +20,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
@@ -376,23 +375,6 @@ public class LostCityTerrainFeature {
         info.clearTorchTodo();
     }
 
-    public void doCoreChunk(int chunkX, int chunkZ, ChunkPrimer primer) {
-        switch (profile.LANDSCAPE_TYPE) {
-            case DEFAULT:
-//                defaultGenerate(chunkX, chunkZ, primer);
-                break;
-            case FLOATING:
-//                islandTerrainGenerator.generate(chunkX, chunkZ, primer, this);
-                break;
-            case SPACE:
-//                spaceTerrainGenerator.generate(chunkX, chunkZ, primer, this);
-                break;
-            case CAVERN:
-//                cavernTerrainGenerator.generate(chunkX, chunkZ, primer, this);
-                break;
-        }
-    }
-
     private void doNormalChunk(int chunkX, int chunkZ, BuildingInfo info) {
 //        debugClearChunk(chunkX, chunkZ, primer);
         if (info.profile.isDefault()) {
@@ -682,6 +664,12 @@ public class LostCityTerrainFeature {
         }
     }
 
+    private static int getRandomizedOffset(int chunkX, int chunkZ, int min, int max) {
+        Random rand = new Random(chunkZ * 256203221L + chunkX * 899809363L);
+        rand.nextFloat();
+        return rand.nextInt(max-min+1) + min;
+    }
+
     private static int getHeightOffsetL1(int chunkX, int chunkZ) {
         Random rand = new Random(chunkZ * 341873128712L + chunkX * 132897987541L);
         rand.nextFloat();
@@ -699,107 +687,84 @@ public class LostCityTerrainFeature {
      * landscape too. This is calculated for the reference position of this chunk (0,0 point)
      * This is the level 2 version which looks at L1 heights of adjacent chunks
      */
-    private int getDesiredInterpolatedHeightL2(BuildingInfo info) {
-        int h = getDesiredInterpolatedHeightL1(info);
-        if (h < 256) {
+    private Integer[] getDesiredMaxHeightL2(BuildingInfo info) {
+        Integer[] mm = getDesiredMaxHeightL1(info);
+        if (mm[0] < 256) {
             // The L1 height at this corner is fixed so we return that
-            return h;
+            return mm;
         }
 
         int cx = info.chunkX;
         int cz = info.chunkZ;
 
-        int minH = 100000;
-        h = getDesiredInterpolatedHeightL1(info.getXmin().getZmin()) + 25 + getHeightOffsetL2(cx-1, cz-1);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL1(info.getXmin()) + 20 + getHeightOffsetL2(cx-1, cz);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL1(info.getXmin().getZmax()) + 25 + getHeightOffsetL2(cx-1, cz+1);
-        if (h < minH) {
-            minH = h;
-        }
+        Integer[] minMax = new Integer[] { 100000, 100000 };
 
-        h = getDesiredInterpolatedHeightL1(info.getZmin()) + 20 + getHeightOffsetL2(cx, cz-1);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL1(info.getZmax()) + 20 + getHeightOffsetL2(cx, cz+1);
-        if (h < minH) {
-            minH = h;
-        }
+        updateMinMaxL2(minMax, info.getXmin().getZmin(), 25 + getHeightOffsetL2(cx-1, cz-1));
+        updateMinMaxL2(minMax, info.getXmin(), 20 + getHeightOffsetL2(cx-1, cz));
+        updateMinMaxL2(minMax, info.getXmin().getZmax(), 25 + getHeightOffsetL2(cx-1, cz+1));
 
-        h = getDesiredInterpolatedHeightL1(info.getXmax().getZmin()) + 25 + getHeightOffsetL2(cx+1, cz-1);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL1(info.getXmax()) + 20 + getHeightOffsetL2(cx+1, cz);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL1(info.getXmax().getZmax()) + 25 + getHeightOffsetL2(cx+1, cz+1);
-        if (h < minH) {
-            minH = h;
-        }
+        updateMinMaxL2(minMax, info.getZmin(), 20 + getHeightOffsetL2(cx, cz-1));
+        updateMinMaxL2(minMax, info.getZmax(), 20 + getHeightOffsetL2(cx, cz+1));
 
-        return minH;
+        updateMinMaxL2(minMax, info.getXmax().getZmin(), 25 + getHeightOffsetL2(cx+1, cz-1));
+        updateMinMaxL2(minMax, info.getXmax(), 20 + getHeightOffsetL2(cx+1, cz));
+        updateMinMaxL2(minMax, info.getXmax().getZmax(), 25 + getHeightOffsetL2(cx+1, cz+1));
+
+        return minMax;
+    }
+
+    private void updateMinMaxL2(Integer[] minMax, BuildingInfo info, int offs) {
+        Integer[] h = getDesiredMaxHeightL1(info);
+        if ((h[0]-offs) < minMax[0]) {
+            minMax[0] = h[0]-offs;
+        }
+        if ((h[1]+offs) < minMax[1]) {
+            minMax[1] = h[1]+offs;
+        }
     }
 
     /**
      * Given adjacent (city) chunks, calculate the desired height to interpolate the
-     * landscape too. This is calculated for the reference position of this chunk (0,0 point)
+     * landscape too (minimum/maximum). This is calculated for the reference position of this chunk (0,0 point)
      * This is the level 1 version which looks at adjacent heights only
      */
-    private int getDesiredInterpolatedHeightL1(BuildingInfo info) {
-        int h = getDesiredInterpolatedHeightL0(info);
-        if (h < 256) {
-            // The L0 height at this corner is fixed so we return that
-            return h;
-        }
+    private Integer[] getDesiredMaxHeightL1(BuildingInfo info) {
+        int h = getLowestCityHeightAtChunkCorner(info);
 
         int cx = info.chunkX;
         int cz = info.chunkZ;
 
-        int minH = 100000;
-        h = getDesiredInterpolatedHeightL0(info.getXmin().getZmin()) + 25 + getHeightOffsetL1(cx-1, cz-1);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL0(info.getXmin()) + 20 + getHeightOffsetL1(cx-1, cz);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL0(info.getXmin().getZmax()) + 25 + getHeightOffsetL1(cx-1, cz+1);
-        if (h < minH) {
-            minH = h;
+        if (h < 256) {
+            // The L0 height at this corner is fixed so we return that
+            return new Integer[] {
+                    h + getRandomizedOffset(cx, cz, profile.TERRAIN_FIX_LOWER_MIN_OFFSET, profile.TERRAIN_FIX_LOWER_MAX_OFFSET),
+                    h + getRandomizedOffset(cx, cz, profile.TERRAIN_FIX_UPPER_MIN_OFFSET, profile.TERRAIN_FIX_UPPER_MAX_OFFSET) };
         }
 
-        h = getDesiredInterpolatedHeightL0(info.getZmin()) + 20 + getHeightOffsetL1(cx, cz-1);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL0(info.getZmax()) + 20 + getHeightOffsetL1(cx, cz+1);
-        if (h < minH) {
-            minH = h;
-        }
+        Integer[] minMax = new Integer[] { 100000, 100000 };
 
-        h = getDesiredInterpolatedHeightL0(info.getXmax().getZmin()) + 25 + getHeightOffsetL1(cx+1, cz-1);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL0(info.getXmax()) + 20 + getHeightOffsetL1(cx+1, cz);
-        if (h < minH) {
-            minH = h;
-        }
-        h = getDesiredInterpolatedHeightL0(info.getXmax().getZmax()) + 25 + getHeightOffsetL1(cx+1, cz+1);
-        if (h < minH) {
-            minH = h;
-        }
+        updateMinMaxL1(minMax, info.getXmin().getZmin(), 25 + getHeightOffsetL1(cx-1, cz-1));
+        updateMinMaxL1(minMax, info.getXmin(), 20 + getHeightOffsetL1(cx-1, cz));
+        updateMinMaxL1(minMax, info.getXmin().getZmax(), 25 + getHeightOffsetL1(cx-1, cz+1));
 
-        return minH;
+        updateMinMaxL1(minMax, info.getZmin(), 20 + getHeightOffsetL1(cx, cz-1));
+        updateMinMaxL1(minMax, info.getZmax(), 20 + getHeightOffsetL1(cx, cz+1));
+
+        updateMinMaxL1(minMax, info.getXmax().getZmin(), 25 + getHeightOffsetL1(cx+1, cz-1));
+        updateMinMaxL1(minMax, info.getXmax(), 20 + getHeightOffsetL1(cx+1, cz));
+        updateMinMaxL1(minMax, info.getXmax().getZmax(), 25 + getHeightOffsetL1(cx+1, cz+1));
+
+        return minMax;
+    }
+
+    private void updateMinMaxL1(Integer[] minMax, BuildingInfo info, int offs) {
+        int h = getLowestCityHeightAtChunkCorner(info);
+        if ((h-offs) < minMax[0]) {
+            minMax[0] = h-offs;
+        }
+        if ((h+offs) < minMax[1]) {
+            minMax[1] = h+offs;
+        }
     }
 
     /**
@@ -810,7 +775,7 @@ public class LostCityTerrainFeature {
      * this kind of corner should also have no effect on the landscape beyond those chunks)
      * This is the level 0 version which looks at current chunk corner only
      */
-    private int getDesiredInterpolatedHeightL0(BuildingInfo info11) {
+    private int getLowestCityHeightAtChunkCorner(BuildingInfo info11) {
         BuildingInfo info00 = info11.getXmin().getZmin();
         BuildingInfo info01 = info11.getXmin();
         BuildingInfo info10 = info11.getZmin();
@@ -864,57 +829,149 @@ public class LostCityTerrainFeature {
         }
     }
 
+    /*
+     * This routine is used on a normal (non-city) chunk to make sure the landscape nicely fits
+     * with any possible adjacent city chunks. It works by creating two meshes that are overlayed
+     * on the terrain. Meshes are defined at chunk corners. Every chunk corner has a corresponding
+     * height on the two meshes.
+     *
+     * The upper mesh indicates the maximum height the terrain is allowed to go. If a certain chunk
+     * corner is not adjacent to any city chunk or is not adjacent to any normal chunk then there is
+     * no maximum height and in that case we set it to 100000. Otherwise (if the chunk corner
+     * is adjacent to mixed chunks) the maximum allowed height of the terrain is equal to the minimum
+     * height of all the city chunks (with minimum height we mean the lower city level or the height
+     * of the first floor).
+     *
+     * The lower mesh indicates the minimum height the terrain is allowed to go. Same as with the upper
+     * mesh there is no minimum in case the chunk corner is not a mixed type corner. Otherwise the
+     * minimum height is going to be some (configurable) offset below the minimum lower city level.
+     *
+     * Every normal chunk is made to fit between the lower and the upper mesh by moving down
+     * or up the top layer (6 thick) of the terrain. In a chunk these heights are interpolated
+     * (bilinear interpolation).
+     */
     private void flattenChunkToCityBorderV2(int chunkX, int chunkZ) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
-        float h00 = getDesiredInterpolatedHeightL2(info);
-        float h10 = getDesiredInterpolatedHeightL2(info.getXmax());
-        float h01 = getDesiredInterpolatedHeightL2(info.getZmax());
-        float h11 = getDesiredInterpolatedHeightL2(info.getXmax().getZmax());
+        Integer[] mm00 = getDesiredMaxHeightL2(info);
+        Integer[] mm10 = getDesiredMaxHeightL2(info.getXmax());
+        Integer[] mm01 = getDesiredMaxHeightL2(info.getZmax());
+        Integer[] mm11 = getDesiredMaxHeightL2(info.getXmax().getZmax());
 
-        if (h00 < 256 || h10 < 256 || h01 < 256 || h11 < 256) {
-            // We need to flatten
-            int maxHeightP = getHeightmap(chunkX, chunkZ, provider.getWorld()).getMaximumHeight() + 10;
-            if (h00 >= 256) {
-                h00 = maxHeightP;
+        float min00 = mm00[0];
+        float min10 = mm10[0];
+        float min01 = mm01[0];
+        float min11 = mm11[0];
+        float max00 = mm00[1];
+        float max10 = mm10[1];
+        float max01 = mm01[1];
+        float max11 = mm11[1];
+        if (max00 < 256 || max10 < 256 || max01 < 256 || max11 < 256 ||
+                min00 < 256 || min10 < 256 || min01 < 256 || min11 < 256) {
+            // We need to fit the terrain between the upper and lower mesh here
+            ChunkHeightmap heightmap = getHeightmap(chunkX, chunkZ, provider.getWorld());
+            int maxHeightP = heightmap.getMaximumHeight() + 10;
+            int minHeightP = heightmap.getMinimumHeight() - 10;
+            if (max00 >= 256) {
+                max00 = maxHeightP;
             }
-            if (h10 >= 256) {
-                h10 = maxHeightP;
+            if (max10 >= 256) {
+                max10 = maxHeightP;
             }
-            if (h01 >= 256) {
-                h01 = maxHeightP;
+            if (max01 >= 256) {
+                max01 = maxHeightP;
             }
-            if (h11 >= 256) {
-                h11 = maxHeightP;
+            if (max11 >= 256) {
+                max11 = maxHeightP;
+            }
+            if (min00 >= 256) {
+                min00 = minHeightP;
+            }
+            if (min10 >= 256) {
+                min10 = minHeightP;
+            }
+            if (min01 >= 256) {
+                min01 = minHeightP;
+            }
+            if (min11 >= 256) {
+                min11 = minHeightP;
             }
 
             for (int x = 0; x < 16; x++) {
+                // Bilinear interpolation
+                float factor = (15.0f - x) / 15.0f;
+                float maxh0 = max11 + (max01 - max11) * factor;
+                float maxh1 = max10 + (max00 - max10) * factor;
+                float minh0 = min11 + (min01 - min11) * factor;
+                float minh1 = min10 + (min00 - min10) * factor;
                 for (int z = 0; z < 16; z++) {
-                    int height = bipolate(h11, h01, h10, h00, x, z);
-//                    clearRange(info, x, z, height, 256, info.waterLevel > info.groundLevel);
-                    moveDown(info, x, z, height, 255, info.waterLevel > info.groundLevel);
+                    float maxheight = maxh0 + (maxh1 - maxh0) * (15.0f - z) / 15.0f;
+                    boolean moved = moveDown(info, x, z, (int) maxheight, info.waterLevel > info.groundLevel);
+
+                    if (!moved) {
+                        float minheight = minh0 + (minh1 - minh0) * (15.0f - z) / 15.0f;
+                        moveUp(info, x, z, (int) minheight, info.waterLevel > info.groundLevel);
+                    }
                 }
             }
         }
     }
 
+    // Return true if state is air or liquid
+    private static boolean isEmpty(BlockState state) {
+        Material material = state.getMaterial();
+        if (material == Material.AIR) {
+            return true;
+        }
+        if (material == Material.WATER) {
+            return true;
+        }
+        if (material == Material.LAVA) {
+            return true;
+        }
+        return false;
+    }
 
-    // @todo
-    private void moveDown(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater) {
-        int y = height2;
-        driver.current(x, y, z);
+    private void moveUp(BuildingInfo info, int x, int z, int height, boolean dowater) {
+        // Find the first non-empty block starting at the given height
+        driver.current(x, height, z);
         // We assume here we are not in a void chunk
-        while (driver.getBlock() == air && driver.getY() > height1) {
+        while (isEmpty(driver.getBlock()) && driver.getY() > 0) {
             driver.decY();
         }
 
-        if (driver.getY() <= height1) {
+        if (driver.getY() >= height) {
             return; // Nothing to do
+        }
+
+        int idx = driver.getY();    // Points to non-empty block below the empty block
+        driver.current(x, height, z);
+        while (idx > 0) {
+            BlockState blockToMove = driver.getBlock(x, idx, z);
+            if (blockToMove.getMaterial() == Material.AIR || blockToMove.getBlock() == Blocks.BEDROCK) {
+                break;
+            }
+            driver.block(blockToMove);
+            driver.decY();;
+            idx--;
+        }
+    }
+
+    private boolean moveDown(BuildingInfo info, int x, int z, int height, boolean dowater) {
+        int y = 255;
+        driver.current(x, y, z);
+        // We assume here we are not in a void chunk
+        while (driver.getBlock() == air && driver.getY() > height) {
+            driver.decY();
+        }
+
+        if (driver.getY() <= height) {
+            return false; // Nothing to do
         }
 
         // We arrived at our first non-air block
         BlockState[] buffer = new BlockState[6];
         int bufferIdx = 0;
-        while (driver.getY() >= height1) {
+        while (driver.getY() >= height) {
             if (bufferIdx < buffer.length) {
                 buffer[bufferIdx++] = driver.getBlock();
             }
@@ -936,6 +993,7 @@ public class LostCityTerrainFeature {
 //        } else {
 //            driver.setBlockRange(x, height1, z, height2, air);
 //        }
+        return true;
     }
 
 
