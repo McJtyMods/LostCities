@@ -155,7 +155,7 @@ public class LostCityConfiguration {
                 PRIVATE_PROFILES, PRIVATE_PROFILES_COMMENT);
     }
 
-    public static void initStandardProfiles() {
+    private static void initStandardProfiles() {
         LostCityProfile profile = new LostCityProfile("customized", false);
         profile.setDescription("Customized profile");
         standardProfiles.put(profile.getName(), profile);
@@ -508,6 +508,9 @@ public class LostCityConfiguration {
         if (Files.exists(profileDir)) {
             LostCities.getLogger().info("Reading existing profiles from 'config/lostcity_profiles'");
             readProfiles(profileDir);
+            LostCityProfile profile = new LostCityProfile("customized", false);
+            profile.setDescription("Customized profile");
+            standardProfiles.put(profile.getName(), profile);
         } else {
             LostCities.getLogger().info("Creating standard profiles into 'config/lostcity_profiles'");
             initStandardProfiles();
