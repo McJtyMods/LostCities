@@ -1,5 +1,6 @@
 Upcoming:
 - Fixed a problem with cities generating under very high biomes. Sometimes pieces of the original landscape were still present
+- Potentially fixed an issue correcting block states in a not-fully-generated chunk
 
 2.0.25-alpha:
 - Fixed generation of bridges. They never really appeared

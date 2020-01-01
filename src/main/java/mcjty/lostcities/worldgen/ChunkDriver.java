@@ -4,7 +4,9 @@ import net.minecraft.block.*;
 import net.minecraft.state.properties.StairsShape;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.WorldGenRegion;
 
@@ -122,16 +124,17 @@ public class ChunkDriver {
         }
     }
 
-    private BlockState updateAdjacent(BlockState state, Direction direction, BlockPos pos) {
-
-
+    private BlockState updateAdjacent(BlockState state, Direction direction, BlockPos pos, IChunk thisChunk) {
         BlockState adjacent = region.getBlockState(pos);
         if (adjacent.getBlock() instanceof LadderBlock) {
             return adjacent;
         }
         BlockState newAdjacent = adjacent.getBlock().updatePostPlacement(adjacent, direction, state, region, pos, current);
         if (newAdjacent != adjacent) {
-            region.setBlockState(pos, newAdjacent, 0);
+            IChunk chunk = region.getChunk(pos);
+            if (chunk == thisChunk || chunk.getStatus().isAtLeast(ChunkStatus.FULL)) {
+                region.setBlockState(pos, newAdjacent, 0);
+            }
         }
         return newAdjacent;
     }
@@ -189,10 +192,11 @@ public class ChunkDriver {
         int cy = current.getY();
         int cz = current.getZ() + primer.getPos().z * 16;
 
-        BlockState westState = updateAdjacent(state, Direction.EAST, pos.setPos(cx - 1, cy, cz));
-        BlockState eastState = updateAdjacent(state, Direction.WEST, pos.setPos(cx + 1, cy, cz));
-        BlockState northState = updateAdjacent(state, Direction.SOUTH, pos.setPos(cx, cy, cz - 1));
-        BlockState southState = updateAdjacent(state, Direction.NORTH, pos.setPos(cx, cy, cz + 1));
+        IChunk thisChunk = region.getChunk(cx >> 4, cz >> 4);
+        BlockState westState = updateAdjacent(state, Direction.EAST, pos.setPos(cx - 1, cy, cz), thisChunk);
+        BlockState eastState = updateAdjacent(state, Direction.WEST, pos.setPos(cx + 1, cy, cz), thisChunk);
+        BlockState northState = updateAdjacent(state, Direction.SOUTH, pos.setPos(cx, cy, cz - 1), thisChunk);
+        BlockState southState = updateAdjacent(state, Direction.NORTH, pos.setPos(cx, cy, cz + 1), thisChunk);
 
         if (state.getBlock() instanceof FourWayBlock) {
             state = state.with(FourWayBlock.WEST, canAttach(westState));
