@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem with cities generating under very high biomes. Sometimes pieces of the original landscape were still present
+
 2.0.25-alpha:
 - Fixed generation of bridges. They never really appeared
 - Slightly changed the offset of lower mesh terrain gen so it always matches (remove configs for this to work)

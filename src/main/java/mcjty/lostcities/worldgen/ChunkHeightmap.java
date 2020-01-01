@@ -11,6 +11,9 @@ public class ChunkHeightmap {
     private final LandscapeType type;
     private final int groundLevel;
     private final BlockState baseState;
+    private Integer maxHeight = null;
+    private Integer minHeight = null;
+    private Integer avgHeight = null;
 
     public ChunkHeightmap(LandscapeType type, int groundLevel, BlockState baseState) {
         this.groundLevel = groundLevel;
@@ -60,92 +63,47 @@ public class ChunkHeightmap {
         return heightmap[z*16+x] & 0xff;
     }
 
+    private void calculateHeightInfo() {
+        int max = 0;
+        int min = 256;
+        int avg = 0;
+        for (int x = 0 ; x < 16 ; x++) {
+            for (int z = 0 ; z < 16 ; z++) {
+                int h = getHeight(x, z);
+                if (h > max) {
+                    max = h;
+                }
+                if (h < min) {
+                    min = h;
+                }
+                avg += h;
+            }
+        }
+        avgHeight = avg / 256;
+        minHeight = min;
+        maxHeight = max;
+    }
+
     public int getAverageHeight() {
-        int cnt = 0;
-        int y = 0;
-        int yy;
-        yy = getHeight(2, 2);
-        if (yy > 5) {
-            y += yy;
-            cnt++;
+        if (avgHeight == null) {
+            calculateHeightInfo();
         }
-        yy = getHeight(13, 2);
-        if (yy > 5) {
-            y += yy;
-            cnt++;
-        }
-        yy = getHeight(2, 13);
-        if (yy > 5) {
-            y += yy;
-            cnt++;
-        }
-        yy = getHeight(13, 13);
-        if (yy > 5) {
-            y += yy;
-            cnt++;
-        }
-        yy = getHeight(8, 8);
-        if (yy > 5) {
-            y += yy;
-            cnt++;
-        }
-        if (cnt > 0) {
-            return y / cnt;
-        } else {
-            return 0;
-        }
+        return avgHeight;
+
     }
 
     public int getMinimumHeight() {
-        int y = 255;
-        int yy;
-        yy = getHeight(2, 2);
-        if (yy < y) {
-            y = yy;
+        if (minHeight == null) {
+            calculateHeightInfo();
         }
-        yy = getHeight(13, 2);
-        if (yy < y) {
-            y = yy;
-        }
-        yy = getHeight(2, 13);
-        if (yy < y) {
-            y = yy;
-        }
-        yy = getHeight(13, 13);
-        if (yy < y) {
-            y = yy;
-        }
-        yy = getHeight(8, 8);
-        if (yy < y) {
-            y = yy;
-        }
-        return y;
+        return minHeight;
     }
 
     public int getMaximumHeight() {
-        int y = 0;
-        int yy;
-        yy = getHeight(2, 2);
-        if (yy > y) {
-            y = yy;
+        if (maxHeight == null) {
+            calculateHeightInfo();
         }
-        yy = getHeight(13, 2);
-        if (yy > y) {
-            y = yy;
-        }
-        yy = getHeight(2, 13);
-        if (yy > y) {
-            y = yy;
-        }
-        yy = getHeight(13, 13);
-        if (yy > y) {
-            y = yy;
-        }
-        yy = getHeight(8, 8);
-        if (yy > y) {
-            y = yy;
-        }
-        return y;
+        return maxHeight;
     }
 
 }
