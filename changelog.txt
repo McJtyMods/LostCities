@@ -1,4 +1,4 @@
-Upcoming:
+2.0.25-alpha:
 - Fixed generation of bridges. They never really appeared
 - Slightly changed the offset of lower mesh terrain gen so it always matches (remove configs for this to work)
 - Fixed a problem where customizing a profile could cause crashes
