@@ -123,6 +123,8 @@ public class ChunkDriver {
     }
 
     private BlockState updateAdjacent(BlockState state, Direction direction, BlockPos pos) {
+
+
         BlockState adjacent = region.getBlockState(pos);
         if (adjacent.getBlock() instanceof LadderBlock) {
             return adjacent;

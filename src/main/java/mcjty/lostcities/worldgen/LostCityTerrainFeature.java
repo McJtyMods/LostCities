@@ -968,8 +968,8 @@ public class LostCityTerrainFeature {
 
     public static boolean isWaterBiome(IDimensionInfo provider, ChunkCoord coord) {
         BiomeInfo biomeInfo = BiomeInfo.getBiomeInfo(provider, coord);
-        Biome[] biomes = biomeInfo.getBiomes();
-        return isWaterBiome(biomes[55]) || isWaterBiome(biomes[54]) || isWaterBiome(biomes[56]);
+        Biome mainBiome = biomeInfo.getMainBiome();
+        return isWaterBiome(mainBiome);
     }
 
     private static boolean isWaterBiome(Biome biome) {

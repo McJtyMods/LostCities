@@ -6,6 +6,8 @@ import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -176,5 +178,22 @@ public class NullDimensionInfo implements IDimensionInfo {
             biomes[i] = biome;
         }
         return biomes;
+    }
+
+    @Override
+    public Biome getBiome(BlockPos pos) {
+        Biome biome = Biomes.PLAINS;
+        ChunkPos cp = new ChunkPos(pos);
+        char b = getBiomeChar(cp.x, cp.z);
+        switch (b) {
+            case 'p': biome = Biomes.PLAINS; break;
+            case '-': biome = Biomes.OCEAN; break;
+            case '=': biome = Biomes.RIVER; break;
+            case '#': biome = Biomes.MOUNTAIN_EDGE; break;
+            case '+': biome = Biomes.MOUNTAINS; break;
+            case '*': biome = Biomes.BEACH; break;
+            case 'd': biome = Biomes.DESERT; break;
+        }
+        return biome;
     }
 }

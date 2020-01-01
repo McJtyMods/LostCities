@@ -130,7 +130,7 @@ public class LostCityProfile {
     public int CITY_LEVEL2_HEIGHT = 91;
     public int CITY_LEVEL3_HEIGHT = 99;
 
-    public int TERRAIN_FIX_LOWER_MIN_OFFSET = -7;
+    public int TERRAIN_FIX_LOWER_MIN_OFFSET = -4;
     public int TERRAIN_FIX_LOWER_MAX_OFFSET = -3;
     public int TERRAIN_FIX_UPPER_MIN_OFFSET = -1;
     public int TERRAIN_FIX_UPPER_MAX_OFFSET = 1;

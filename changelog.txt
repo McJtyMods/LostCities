@@ -1,3 +1,7 @@
+Upcoming:
+- Fixed generation of bridges. They never really appeared
+- Slightly changed the offset of lower mesh terrain gen so it always matches (remove configs for this to work)
+
 2.0.24-alpha:
 - Implemented a much better landscape correcting algorithm so that city chunks fit much better with adjacent high mountains or very low ocean chunks
 - Vines are now handled in a much more efficient manner. Should avoid the TPS problems people were getting

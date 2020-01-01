@@ -3,8 +3,10 @@ package mcjty.lostcities.worldgen;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Random;
@@ -77,6 +79,13 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 
     @Override
     public Biome[] getBiomes(int chunkX, int chunkZ) {
-        return getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider().getBiomes((chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10, false);
+        BiomeProvider biomeProvider = getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider();
+        return biomeProvider.getBiomes((chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10, false);
+    }
+
+    @Override
+    public Biome getBiome(BlockPos pos) {
+        BiomeProvider biomeProvider = getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider();
+        return biomeProvider.getBiome(pos);
     }
 }
