@@ -6,10 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
-import mcjty.lostcities.worldgen.IDimensionInfo;
-import mcjty.lostcities.worldgen.lost.BiomeInfo;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;
+import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.lost.BiomeInfo;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -68,13 +68,8 @@ public class WorldStyle implements ILostCityAsset {
     }
 
     private boolean hasBiomes(Info info, Set<ResourceLocation> biomeSet) {
-        Biome[] biomes = info.biomes;
-
-        if (isValidBiome(biomeSet, biomes[55]) || isValidBiome(biomeSet, biomes[54]) || isValidBiome(biomeSet, biomes[56])
-                || isValidBiome(biomeSet, biomes[5]) || isValidBiome(biomeSet, biomes[95]) ) {
-            return true;
-        }
-        return false;
+        Biome biome = info.biome;
+        return isValidBiome(biomeSet, biome);
     }
 
     public String getOutsideStyle() {
@@ -101,7 +96,7 @@ public class WorldStyle implements ILostCityAsset {
 
 
     public String getRandomCityStyle(IDimensionInfo provider, int chunkX, int chunkZ, Random random) {
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getBiomes();
+        Biome biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
         Info info = new Info(biomes, chunkX, chunkZ);
         List<Pair<Float, String>> ct = new ArrayList<>();
         for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {
@@ -114,12 +109,12 @@ public class WorldStyle implements ILostCityAsset {
     }
 
     private static class Info {
-        private Biome[] biomes;
+        private Biome biome;
         private int chunkX;
         private int chunkZ;
 
-        public Info(Biome[] biomes, int chunkX, int chunkZ) {
-            this.biomes = biomes;
+        public Info(Biome biome, int chunkX, int chunkZ) {
+            this.biome = biome;
             this.chunkX = chunkX;
             this.chunkZ = chunkZ;
         }

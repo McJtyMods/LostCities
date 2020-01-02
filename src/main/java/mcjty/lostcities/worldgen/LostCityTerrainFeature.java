@@ -975,8 +975,6 @@ public class LostCityTerrainFeature {
     private static boolean isWaterBiome(Biome biome) {
         Biome.Category category = biome.getCategory();
         return category.equals(Biome.Category.OCEAN) || category.equals(Biome.Category.BEACH) || category.equals(Biome.Category.RIVER);
-//        return !(biome != Biomes.OCEAN && biome != Biomes.DEEP_OCEAN && biome != Biomes.FROZEN_OCEAN
-//                && biome != Biomes.RIVER && biome != Biomes.FROZEN_RIVER && biome != Biomes.BEACH && biome != Biomes.SNOWY_BEACH);
     }
 
     @Deprecated

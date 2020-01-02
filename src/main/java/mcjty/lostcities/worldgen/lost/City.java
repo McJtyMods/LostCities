@@ -1,12 +1,12 @@
 package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.varia.ChunkCoord;
+import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
-import mcjty.lostcities.varia.ChunkCoord;
-import mcjty.lostcities.varia.Tools;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
@@ -233,30 +233,28 @@ public class City {
             }
         }
 
-        for (int cx = -1 ; cx <= 1 ; cx++) {
-            for (int cz = -1 ; cz <= 1 ; cz++) {
-                Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX + cx, chunkZ + cz)).getBiomes();
-                if (isTooHighForBuilding(biomes)) {
-                    return 0;
-                }
-            }
-        }
+        // @todo 1.14: do we need this?
+//        for (int cx = -1 ; cx <= 1 ; cx++) {
+//            for (int cz = -1 ; cz <= 1 ; cz++) {
+//                Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX + cx, chunkZ + cz)).getBiomes();
+//                if (isTooHighForBuilding(biomes)) {
+//                    return 0;
+//                }
+//            }
+//        }
 
         float foundFactor = profile.CITY_DEFAULT_BIOME_FACTOR;
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX, chunkZ)).getBiomes();
+        Biome biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX, chunkZ)).getMainBiome();
         Map<String, Float> map = profile.getBiomeFactorMap();
-        for (Biome biome : biomes) {
-            ResourceLocation object = biome.getRegistryName();
-            Float f;
-            try {
-                f = map.get(object.toString());
-            } catch(NullPointerException e) {
-                throw new RuntimeException("Biome '" + biome.getTranslationKey() + "' (" + biome.getRegistryName().getPath() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
-            }
-            if (f != null) {
-                foundFactor = f;
-                break;
-            }
+        ResourceLocation object = biome.getRegistryName();
+        Float f;
+        try {
+            f = map.get(object.toString());
+        } catch(NullPointerException e) {
+            throw new RuntimeException("Biome '" + biome.getTranslationKey() + "' (" + biome.getRegistryName().getPath() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
+        }
+        if (f != null) {
+            foundFactor = f;
         }
 
         return Math.min(Math.max(factor * foundFactor, 0), 1);
