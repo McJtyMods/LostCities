@@ -3,6 +3,7 @@ Upcoming:
 - Potentially fixed an issue correcting block states in a not-fully-generated chunk
 - Fixed the check if a biome is an ocean or not
 - Fixed the detection of biomes in general
+- Lower the stone border a few blocks so it is always covered by terrain (there were sometimes gaps with ocean chunks adjacent to street chunks)
 
 2.0.25-alpha:
 - Fixed generation of bridges. They never really appeared

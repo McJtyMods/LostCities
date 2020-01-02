@@ -1882,7 +1882,7 @@ public class LostCityTerrainFeature {
         switch (info.profile.LANDSCAPE_TYPE) {
             case DEFAULT:
                 // We do the ocean border 6 lower then groundlevel
-                setBlocksFromPalette(x, info.groundLevel - 6, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                setBlocksFromPalette(x, info.groundLevel - 8, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
                 break;
             case SPACE: {
                 int adjacentY = info.getCityGroundLevel() - 8;
