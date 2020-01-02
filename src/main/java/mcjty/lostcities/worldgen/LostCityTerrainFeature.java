@@ -238,6 +238,54 @@ public class LostCityTerrainFeature {
         return (g_seed >> 16) & 0x7F;
     }
 
+    public void generateDummy(WorldGenRegion region, IChunk chunk) {
+
+        WorldGenRegion oldRegion = driver.getRegion();
+        IChunk oldChunk = driver.getPrimer();
+        driver.setPrimer(region, chunk);
+
+        street = Blocks.STONE_BRICKS.getDefaultState();
+
+        int chunkX = chunk.getPos().x;
+        int chunkZ = chunk.getPos().z;
+        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+        Random r = new Random(chunkX * 257017164707L + chunkZ * 101754694003L);
+        r.nextFloat();
+        if (r.nextFloat() < .4) {
+            for (int x = 0 ; x < 16 ; x++) {
+                for (int z = 0 ; z < 16 ; z++) {
+                    int height = r.nextInt(50) + 30;
+                    driver.current(x, 30, z);
+                    while (height > 0) {
+                        if (r.nextFloat() < 0.01) {
+                            driver.add(glowstone);
+                        } else {
+                            driver.add(street);
+                        }
+                        height--;
+                    }
+                }
+            }
+        } else if (r.nextFloat() < .4) {
+            for (int x = 0 ; x < 16 ; x++) {
+                for (int z = 0 ; z < 16 ; z++) {
+                    int height = r.nextInt(50) + 30;
+                    driver.current(x, 30, z);
+                    while (height > 0) {
+                        if (r.nextFloat() < 0.01) {
+                            driver.add(glowstone);
+                        } else {
+                            driver.add(air);
+                        }
+                        height--;
+                    }
+                }
+            }
+        }
+
+        driver.setPrimer(oldRegion, oldChunk);
+    }
+
     public void generate(WorldGenRegion region, IChunk chunk) {
         WorldGenRegion oldRegion = driver.getRegion();
         IChunk oldChunk = driver.getPrimer();
