@@ -249,6 +249,7 @@ public class LostCityTerrainFeature {
         int chunkX = chunk.getPos().x;
         int chunkZ = chunk.getPos().z;
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+        ChunkHeightmap heightmap = getHeightmap(chunkX, chunkZ, region);
         Random r = new Random(chunkX * 257017164707L + chunkZ * 101754694003L);
         r.nextFloat();
         if (r.nextFloat() < .4) {
@@ -596,7 +597,7 @@ public class LostCityTerrainFeature {
             int z1 = transform.rotateZ(0, 15);
             driver.current(x1, highwayGroundLevel-1, z1);
             for (int y = 0; y < 40; y++) {
-                if (driver.getBlock() == air || driver.getBlock() == liquid) {
+                if (isEmpty(driver.getBlock())) {
                     driver.block(sup);
                 } else {
                     break;
@@ -608,7 +609,7 @@ public class LostCityTerrainFeature {
             int z2 = transform.rotateZ(0, 0);
             driver.current(x2, highwayGroundLevel-1, z2);
             for (int y = 0; y < 40; y++) {
-                if (driver.getBlock() == air || driver.getBlock() == liquid) {
+                if (isEmpty(driver.getBlock())) {
                     driver.block(sup);
                 } else {
                     break;
@@ -1506,7 +1507,7 @@ public class LostCityTerrainFeature {
                     continue;
                 }
                 driver.current(x, y, z);
-                if (driver.getBlock() == air || driver.getBlock() == liquid) {
+                if (isEmpty(driver.getBlock())) {
                     continue;
                 }
                 connectedBlocks.add(pos);
@@ -1618,7 +1619,7 @@ public class LostCityTerrainFeature {
             driver.block(((driver.getY()) < info.waterLevel) ? liquid : air);
             driver.decY();
             int y = driver.getY();
-            while (y > 2 && (blocksToMove.contains(driver.getCurrentCopy()) || driver.getBlock() == air || driver.getBlock() == liquid)) {
+            while (y > 2 && (blocksToMove.contains(driver.getCurrentCopy()) || isEmpty(driver.getBlock()))) {
                 driver.decY();
                 y--;
             }
@@ -1644,7 +1645,7 @@ public class LostCityTerrainFeature {
                     BlockState c = driver.getBlockDown();
                     if (c != air && c != liquid) {
                         for (int i = 0; i < vr; i++) {
-                            if (driver.getBlock() == air || driver.getBlock() == liquid) {
+                            if (isEmpty(driver.getBlock())) {
                                 driver.add(base);
                             } else {
                                 driver.incY();
@@ -1653,7 +1654,7 @@ public class LostCityTerrainFeature {
                     }
                     if (driver.getBlockDown() == base) {
                         for (int i = 0; i < vl; i++) {
-                            if (driver.getBlock() == air || driver.getBlock() == liquid) {
+                            if (isEmpty(driver.getBlock())) {
                                 driver.add(getRandomLeaf());
                             } else {
                                 driver.incY();
@@ -1744,7 +1745,7 @@ public class LostCityTerrainFeature {
                     } else {
                         if (vl > 0) {
                             c = driver.getBlockDown();
-                            while (c == air || c == liquid) {
+                            while (isEmpty(c)) {
                                 driver.decY();
                                 height++;   // Make sure we keep on filling with air a bit longer because we are lowering here
                                 c = driver.getBlockDown();
@@ -1881,7 +1882,7 @@ public class LostCityTerrainFeature {
             for (int z = 0; z < 16; ++z) {
                 int y = info.getCityGroundLevel()-1;
                 driver.current(x, y, z);
-                while (driver.getY() > info.profile.BEDROCK_LAYER && driver.getBlock() == air) {
+                while (driver.getY() > info.profile.BEDROCK_LAYER && isEmpty(driver.getBlock())) {
                     driver.block(base);
                     driver.decY();
                 }
@@ -1929,8 +1930,8 @@ public class LostCityTerrainFeature {
 
         switch (info.profile.LANDSCAPE_TYPE) {
             case DEFAULT:
-                // We do the ocean border 6 lower then groundlevel
-                setBlocksFromPalette(x, info.groundLevel - 8, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                // We do the ocean border 12 lower then groundlevel
+                setBlocksFromPalette(x, info.groundLevel - 12, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
                 break;
             case SPACE: {
                 int adjacentY = info.getCityGroundLevel() - 8;
@@ -2364,7 +2365,7 @@ public class LostCityTerrainFeature {
                     int z = rand.nextInt(16);
                     if (rand.nextFloat() < locationFactor.apply(x, z)) {
                         driver.current(x, h, z);
-                        while (h > 0 && (driver.getBlock() == air || driver.getBlock() == liquid)) {
+                        while (h > 0 && isEmpty(driver.getBlock())) {
                             h--;
                             driver.decY();
                         }
