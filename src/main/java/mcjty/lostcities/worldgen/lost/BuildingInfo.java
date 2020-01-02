@@ -1338,8 +1338,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isOcean != null) {
             return isOcean;
         }
-        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getBiomes();
-        isOcean = isOcean(biomes);
+        isOcean = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome().getCategory() == Biome.Category.OCEAN;
         return isOcean;
     }
 
