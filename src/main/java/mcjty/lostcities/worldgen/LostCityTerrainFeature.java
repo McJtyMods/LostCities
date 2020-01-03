@@ -1145,6 +1145,7 @@ public class LostCityTerrainFeature {
         BuildingPart part;
         Transform transform = Transform.ROTATE_NONE;
         boolean needsStaircase = false;
+        boolean clearUpper = false;
         switch (type) {
             case NONE:
                 return;
@@ -1161,6 +1162,7 @@ public class LostCityTerrainFeature {
                         part = AssetRegistries.PARTS.get("station_open");
                     }
                 }
+                clearUpper = true;
                 break;
             case STATION_UNDERGROUND:
                 part = AssetRegistries.PARTS.get("station_underground_stairs");
@@ -1235,7 +1237,18 @@ public class LostCityTerrainFeature {
                 part = AssetRegistries.PARTS.get("rails_flat");
                 break;
         }
-        generatePart(info, part, transform, 0, height, 0, false);
+        int h = generatePart(info, part, transform, 0, height, 0, false);
+        if (clearUpper) {
+            ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, provider.getWorld());
+            int maxh = heightmap.getMaximumHeight() + 4;
+            if (h < maxh) {
+                for (int x = 0; x < 16; x++) {
+                    for (int z = 0; z < 16; z++) {
+                        clearRange(info, x, z, h, maxh, false);
+                    }
+                }
+            }
+        }
 
         Character railMainBlock = info.getCityStyle().getRailMainBlock();
         BlockState rail = info.getCompiledPalette().get(railMainBlock);

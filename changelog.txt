@@ -4,6 +4,7 @@ Upcoming:
 - Fixed the check if a biome is an ocean or not
 - Fixed the detection of biomes in general
 - Lower the stone border a few blocks so it is always covered by terrain (there were sometimes gaps with ocean chunks adjacent to street chunks)
+- Clear land above above-ground railway stations
 
 2.0.25-alpha:
 - Fixed generation of bridges. They never really appeared
