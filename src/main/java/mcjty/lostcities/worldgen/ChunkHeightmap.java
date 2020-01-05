@@ -44,7 +44,7 @@ public class ChunkHeightmap {
                 return;
             }
             if (y == 100) {
-                heightmap[z * 16 + x] = (byte) 128;
+                heightmap[z * 16 + x] = (byte) 127;
                 return;
             }
             heightmap[z * 16 + x] = (byte) y;
