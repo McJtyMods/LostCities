@@ -354,7 +354,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             if (map != null) {
                 int x = driver.getX();
                 int z = driver.getZ();
-                if (driver.getBlockDown() != airChar) {
+                if (driver.getY() != 0 && driver.getBlockDown() != airChar) {
                     driver.block(torchState.getBlock().getStateFromMeta(map.get("up")));
                 } else if (x > 0 && driver.getBlockWest() != airChar) {
                     driver.block(torchState.getBlock().getStateFromMeta(map.get("east")));
@@ -1448,6 +1448,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 if (vr > .5 || vl > .5) {
                     int height = getInterpolatedHeight(info, x, z);
                     driver.current(x, height, z);
+                    if (height == 0) {
+                        // whoops, it's air all the way down. No rubble here
+                        continue;
+                    }
                     char c = driver.getBlockDown();
                     if (c != airChar && c != liquidChar) {
                         for (int i = 0; i < vr; i++) {
@@ -1532,9 +1536,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * 6.0f));
 
         for (int x = 0; x < 16; ++x) {
-            for (int z = 0; z < 16; ++z) {
+            zLoop: for (int z = 0; z < 16; ++z) {
                 double v = ruinBuffer[x + z * 16];
                 int height = baseheight + (int) v;
+                if (height == 0) continue; // Ruins need to sit on something, and the void isn't something
                 driver.current(x, height, z);
                 height = info.getMaxHeight() + 10 - height;
                 int vl = 0;
@@ -1551,6 +1556,10 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             c = driver.getBlockDown();
                             while (c == airChar || c == liquidChar) {
                                 driver.decY();
+                                if (driver.getY() == 0) {
+                                    // whoops, it's air all the way down. No ruins here
+                                    continue zLoop;
+                                }
                                 height++;   // Make sure we keep on filling with air a bit longer because we are lowering here
                                 c = driver.getBlockDown();
                             }
@@ -1831,13 +1840,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void generateRandomVegetation(BuildingInfo info, Random rand, int height) {
+        if (height == 0) return; // Leaf blocks need to sit on something, and the void isn't something
         if (info.getXmin().hasBuilding) {
             for (int x = 0; x < info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS; x++) {
-                for (int z = 0; z < 16; z++) {
+                zLoop: for (int z = 0; z < 16; z++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
                     while (driver.getBlockDown() == airChar) {
                         driver.decY();
+                        if (driver.getY() == 0) {
+                            // whoops, it's air all the way down. No leaf blocks here
+                            continue zLoop;
+                        }
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - x));
                     int cnt = 0;
@@ -1850,11 +1864,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         if (info.getXmax().hasBuilding) {
             for (int x = 15 - info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS; x < 15; x++) {
-                for (int z = 0; z < 16; z++) {
+                zLoop: for (int z = 0; z < 16; z++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
                     while (driver.getBlockDown() == airChar) {
                         driver.decY();
+                        if (driver.getY() == 0) {
+                            // whoops, it's air all the way down. No leaf blocks here
+                            continue zLoop;
+                        }
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS));
                     int cnt = 0;
@@ -1867,11 +1885,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         if (info.getZmin().hasBuilding) {
             for (int z = 0; z < info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS; z++) {
-                for (int x = 0; x < 16; x++) {
+                xLoop: for (int x = 0; x < 16; x++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
                     while (driver.getBlockDown() == airChar) {
                         driver.decY();
+                        if (driver.getY() == 0) {
+                            // whoops, it's air all the way down. No leaf blocks here
+                            continue xLoop;
+                        }
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - z));
                     int cnt = 0;
@@ -1884,11 +1906,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         }
         if (info.getZmax().hasBuilding) {
             for (int z = 15 - info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS; z < 15; z++) {
-                for (int x = 0; x < 16; x++) {
+                xLoop: for (int x = 0; x < 16; x++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
                     while (driver.getBlockDown() == airChar) {
                         driver.decY();
+                        if (driver.getY() == 0) {
+                            // whoops, it's air all the way down. No leaf blocks here
+                            continue xLoop;
+                        }
                     }
                     float v = info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS);
                     int cnt = 0;
