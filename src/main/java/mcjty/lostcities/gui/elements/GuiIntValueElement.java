@@ -3,9 +3,8 @@ package mcjty.lostcities.gui.elements;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.entity.player.PlayerEntity;
 
-public class GuiFloatValueElement extends GuiElement {
+public class GuiIntValueElement extends GuiElement {
 
     private final GuiLCConfig gui;
     private String label = null;
@@ -13,7 +12,7 @@ public class GuiFloatValueElement extends GuiElement {
     private final TextFieldWidget field;
     private final String attribute;
 
-    public GuiFloatValueElement(GuiLCConfig gui, String page, int x, int y, String attribute) {
+    public GuiIntValueElement(GuiLCConfig gui, String page, int x, int y, String attribute) {
         super(page, x, y);
         this.gui = gui;
         this.attribute = attribute;
@@ -30,9 +29,9 @@ public class GuiFloatValueElement extends GuiElement {
             gui.getLocalSetup().get().ifPresent(profile -> {
                 Configuration configuration = profile.toConfiguration();
 
-                float value = 0;
+                int value = 0;
                 try {
-                    value = Float.parseFloat(s);
+                    value = Integer.parseInt(s);
                 } catch (NumberFormatException e) {
                     return;
                 }
@@ -49,12 +48,12 @@ public class GuiFloatValueElement extends GuiElement {
         gui.addWidget(field);
     }
 
-    public GuiFloatValueElement prefix(String prefix) {
+    public GuiIntValueElement prefix(String prefix) {
         this.prefix = prefix;
         return this;
     }
 
-    public GuiFloatValueElement label(String label) {
+    public GuiIntValueElement label(String label) {
         this.label = label;
         return this;
     }

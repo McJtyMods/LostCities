@@ -1,34 +1,33 @@
 package mcjty.lostcities.gui.elements;
 
+import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
-import mcjty.lostcities.gui.LostCitySetup;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class GuiBooleanValueElement extends GuiElement {
 
     private final GuiLCConfig gui;
     private String label = null;
     private final ButtonExt field;
-    private final Function<LostCitySetup, Boolean> getter;
-    private final BiConsumer<LostCitySetup, Boolean> setter;
+    private final String attribute;
 
-    public GuiBooleanValueElement(GuiLCConfig gui, String page, int x, int y, Function<LostCitySetup, Boolean> getter, BiConsumer<LostCitySetup, Boolean> setter) {
+    public GuiBooleanValueElement(GuiLCConfig gui, String page, int x, int y, String attribute) {
         super(page, x, y);
         this.gui = gui;
-        this.getter = getter;
-        this.setter = setter;
-        field = new ButtonExt(gui, x, y, 60, 16, getter.apply(gui.getLocalSetup()) ? "On" : "Off", button -> {
+        this.attribute = attribute;
+        Boolean c = gui.getLocalSetup().get().map(h -> (Boolean) h.toConfiguration().get(attribute)).orElse(false);
+        field = new ButtonExt(gui, x, y, 60, 16, c ? "On" : "Off", button -> {
             String message = button.getMessage();
             if ("On".equals(message)) {
                 button.setMessage("Off");
             } else {
                 button.setMessage("On");
             }
-            setter.accept(gui.getLocalSetup(), "On".equals(button.getMessage()));
+            gui.getLocalSetup().get().ifPresent(profile -> {
+                Configuration configuration = profile.toConfiguration();
+                configuration.set(attribute, "On".equals(button.getMessage()));
+                profile.copyFromConfiguration(configuration);
+                gui.refreshPreview();
+            });
         });
         gui.addWidget(field);
     }
@@ -55,8 +54,10 @@ public class GuiBooleanValueElement extends GuiElement {
 
     @Override
     public void update() {
-        Boolean result = getter.apply(gui.getLocalSetup());
-        field.setMessage(result ? "On" : "Off");
+        gui.getLocalSetup().get().ifPresent(profile -> {
+            Boolean result = profile.toConfiguration().get(attribute);
+            field.setMessage(result ? "On" : "Off");
+        });
     }
 
     @Override

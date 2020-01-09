@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class Configuration {
@@ -12,12 +14,39 @@ public class Configuration {
     public static class Value<T> {
         private final String name;
         private final String comment;
-        private final T value;
+        private T value;
+        private final T min;
+        private final T max;
+        private final Comparator<T> comparator;
 
-        public Value(String name, String comment, T value) {
+        public Value(String name, String comment, T value, T min, T max, @Nonnull Comparator<T> comparator) {
             this.name = name;
             this.comment = comment;
             this.value = value;
+            this.min = min;
+            this.max = max;
+            this.comparator = comparator;
+        }
+
+        public void set(T val) {
+            value = val;
+        }
+
+        public T get() {
+            return value;
+        }
+
+        // Return true if we had to change the value
+        public boolean constrain() {
+            if (comparator.compare(value, min) < 0) {
+                value = min;
+                return true;
+            }
+            if (comparator.compare(value, max) > 0) {
+                value = max;
+                return true;
+            }
+            return false;
         }
     }
 
@@ -33,6 +62,45 @@ public class Configuration {
     }
 
     private final Map<String, Category> categoryMap = new HashMap<>();
+
+    public Value getValue(String name) {
+        String[] split = name.split("\\.");
+        Category category = categoryMap.get(split[0]);
+        if (category == null) {
+            throw new RuntimeException("Could not find category '" + split[0] + "'!");
+        }
+        Value value = category.valueMap.get(split[1]);
+        if (value == null) {
+            throw new RuntimeException("Could not find value '" + name + "'!");
+        }
+        return value;
+    }
+
+    public <T> T get(String name) {
+        String[] split = name.split("\\.");
+        Category category = categoryMap.get(split[0]);
+        if (category == null) {
+            throw new RuntimeException("Could not find category '" + split[0] + "'!");
+        }
+        Value value = category.valueMap.get(split[1]);
+        if (value == null) {
+            throw new RuntimeException("Could not find value '" + name + "'!");
+        }
+        return (T) value.value;
+    }
+
+    public <T> void set(String name, T val) {
+        String[] split = name.split("\\.");
+        Category category = categoryMap.get(split[0]);
+        if (category == null) {
+            throw new RuntimeException("Could not find category '" + split[0] + "'!");
+        }
+        Value value = category.valueMap.get(split[1]);
+        if (value == null) {
+            throw new RuntimeException("Could not find value '" + name + "'!");
+        }
+        value.value = val;
+    }
 
     public JsonObject toJson() {
         JsonObject root = new JsonObject();
@@ -92,19 +160,20 @@ public class Configuration {
         }
     }
 
-    private <T> Category getValueCategory(String name, String category, T defaultValue, String description) {
+    private <T> Category getValueCategory(String name, String category, T defaultValue, String description, T min, T max,
+                                          @Nonnull Comparator<T> comparator) {
         Category cat = categoryMap.get(category);
         if (cat == null) {
             throw new IllegalStateException("Missing category: " + category);
         }
         if (!cat.valueMap.containsKey(name)) {
-            cat.valueMap.put(name, new Value<>(name, description, defaultValue));
+            cat.valueMap.put(name, new Value<>(name, description, defaultValue, min, max, comparator));
         }
         return cat;
     }
 
     public float getFloat(String name, String category, float defaultValue, float minValue, float maxValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description);
+        Category cat = getValueCategory(name, category, defaultValue, description, minValue, maxValue, Float::compareTo);
         Object value = cat.valueMap.get(name).value;
         if (value instanceof Float) {
             return (Float) value;
@@ -114,12 +183,12 @@ public class Configuration {
     }
 
     public boolean getBoolean(String name, String category, boolean defaultValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description);
+        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0);
         return (Boolean) cat.valueMap.get(name).value;
     }
 
     public int getInt(String name, String category, int defaultValue, int minValue, int maxValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description);
+        Category cat = getValueCategory(name, category, defaultValue, description, minValue, maxValue, Integer::compareTo);
         Object value = cat.valueMap.get(name).value;
         if (value instanceof Float) {
             return ((Float) value).intValue();
@@ -129,17 +198,17 @@ public class Configuration {
     }
 
     public String getString(String name, String category, String defaultValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description);
+        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0);
         return (String) cat.valueMap.get(name).value;
     }
 
     public String getString(String name, String category, String defaultValue, String description, String[] strings) {
-        Category cat = getValueCategory(name, category, defaultValue, description);
+        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0);
         return (String) cat.valueMap.get(name).value;
     }
 
     public String[] getStringList(String name, String category, String[] defaultValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description);
+        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0);
         return (String[]) cat.valueMap.get(name).value;
     }
 
