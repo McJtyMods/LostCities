@@ -3,6 +3,7 @@ package mcjty.lostcities.gui;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,8 @@ public class LostCitySetup {
         }
         customizedProfile = new LostCityProfile("customized", false);
         LostCityProfile original = LostCityConfiguration.standardProfiles.get(profile);
+        LostCityConfiguration.standardProfiles.put("customized", customizedProfile);
+        profiles.add("customized");
         customizedProfile.copyFrom(original);
         profile = "customized";
         refreshPreview.run();
@@ -100,11 +103,11 @@ public class LostCitySetup {
         }
 
         if (profile == null) {
-            if (customizedProfile != null) {
-                profile = "customized";
-            } else {
+//            if (customizedProfile != null) {
+//                profile = "customized";
+//            } else {
                 profile = profiles.get(0);
-            }
+//            }
         } else {
             int i = profiles.indexOf(profile);
             if (i == -1 || i >= profiles.size()-1) {

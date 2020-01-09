@@ -156,9 +156,11 @@ public class LostCityConfiguration {
     }
 
     private static void initStandardProfiles() {
-        LostCityProfile profile = new LostCityProfile("customized", false);
-        profile.setDescription("Customized profile");
-        standardProfiles.put(profile.getName(), profile);
+        LostCityProfile profile;
+
+//        profile = new LostCityProfile("customized", false);
+//        profile.setDescription("Customized profile");
+//        standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("default", true);
         profile.setIconFile("textures/gui/icon_default.png");
@@ -178,7 +180,6 @@ public class LostCityConfiguration {
         profile.MINI_EXPLOSION_CHANCE = 0;
         profile.GENERATE_LIGHTING = true;
         profile.GENERATE_LAKES = false;
-        profile.GENERATE_LIGHTING = true;
         profile.GENERATE_VILLAGES = false;
 //        profile.setIconFile("textures/gui/icon_default.png");
         standardProfiles.put(profile.getName(), profile);
@@ -508,9 +509,9 @@ public class LostCityConfiguration {
         if (Files.exists(profileDir)) {
             LostCities.getLogger().info("Reading existing profiles from 'config/lostcity_profiles'");
             readProfiles(profileDir);
-            LostCityProfile profile = new LostCityProfile("customized", false);
-            profile.setDescription("Customized profile");
-            standardProfiles.put(profile.getName(), profile);
+//            LostCityProfile profile = new LostCityProfile("customized", false);
+//            profile.setDescription("Customized profile");
+//            standardProfiles.put(profile.getName(), profile);
         } else {
             LostCities.getLogger().info("Creating standard profiles into 'config/lostcity_profiles'");
             initStandardProfiles();
