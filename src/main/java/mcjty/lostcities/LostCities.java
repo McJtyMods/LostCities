@@ -20,7 +20,8 @@ import java.util.function.Function;
         dependencies =
                         "after:forge@[" + LostCities.MIN_FORGE11_VER + ",)",
         version = LostCities.VERSION,
-        acceptedMinecraftVersions = "[1.12,1.13)")
+        acceptedMinecraftVersions = "[1.12,1.13)",
+        acceptableRemoteVersions = "*")
 public class LostCities {
     public static final String MODID = "lostcities";
     public static final String VERSION = "2.0.21";
