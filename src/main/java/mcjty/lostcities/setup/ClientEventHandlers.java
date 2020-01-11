@@ -4,6 +4,7 @@ import mcjty.lostcities.gui.GuiLCConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.world.WorldType;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -52,7 +53,8 @@ public class ClientEventHandlers {
         if (event.getGui() instanceof CreateWorldScreen) {
             CreateWorldScreen screen = (CreateWorldScreen) event.getGui();
             lostCitiesButton = new Button(screen.width - 90, 60, 45, 20, "LC", p_onPress_1_ -> {
-                Minecraft.getInstance().displayGuiScreen(new GuiLCConfig(screen));
+                WorldType worldType = WorldType.WORLD_TYPES[screen.selectedIndex];
+                Minecraft.getInstance().displayGuiScreen(new GuiLCConfig(screen, worldType));
             });
             event.addWidget(lostCitiesButton);
         }

@@ -3,9 +3,8 @@ package mcjty.lostcities.gui.elements;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.entity.player.PlayerEntity;
 
-public class GuiFloatValueElement extends GuiElement {
+public class FloatElement extends GuiElement {
 
     private final GuiLCConfig gui;
     private String label = null;
@@ -13,7 +12,7 @@ public class GuiFloatValueElement extends GuiElement {
     private final TextFieldWidget field;
     private final String attribute;
 
-    public GuiFloatValueElement(GuiLCConfig gui, String page, int x, int y, String attribute) {
+    public FloatElement(GuiLCConfig gui, String page, int x, int y, String attribute) {
         super(page, x, y);
         this.gui = gui;
         this.attribute = attribute;
@@ -21,9 +20,9 @@ public class GuiFloatValueElement extends GuiElement {
         field = new TextFieldWidget(gui.getFont(), x, y, 45, 16, Float.toString(c)) {
             @Override
             public void renderToolTip(int x, int y) {
-                if (tooltip != null) {
-                    gui.renderTooltip(tooltip, x, y);
-                }
+                    gui.getLocalSetup().get().ifPresent(h -> {
+                        gui.renderTooltip(h.toConfiguration().getValue(attribute).getComment(), x, y);
+                    });
             }
         };
         field.setResponder(s -> {
@@ -49,12 +48,12 @@ public class GuiFloatValueElement extends GuiElement {
         gui.addWidget(field);
     }
 
-    public GuiFloatValueElement prefix(String prefix) {
+    public FloatElement prefix(String prefix) {
         this.prefix = prefix;
         return this;
     }
 
-    public GuiFloatValueElement label(String label) {
+    public FloatElement label(String label) {
         this.label = label;
         return this;
     }
@@ -101,4 +100,5 @@ public class GuiFloatValueElement extends GuiElement {
     public void setBasedOnMode(String mode) {
         field.setVisible(page.equalsIgnoreCase(mode));
     }
+
 }

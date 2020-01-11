@@ -137,9 +137,7 @@ public class LostCityProfile {
 
     public Float CITY_DEFAULT_BIOME_FACTOR = 1.0f;
     public String[] CITY_BIOME_FACTORS = new String[] { "river=0", "frozen_river=0", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.4" };
-    public Map<String, Float> biomeFactorMap = null;
-
-    public String GENERATOR_OPTIONS = "";
+    public Map<ResourceLocation, Float> biomeFactorMap = null;
 
     public String[] ALLOWED_BIOME_FACTORS = new String[] { };
     public String[] MANUAL_BIOME_MAPPINGS = new String[] { };
@@ -451,9 +449,6 @@ public class LostCityProfile {
         if (BIOME_SELECTION_STRATEGY == null) {
             throw new RuntimeException("Bad biome selection strategy: " + biomeSelectionStrategy + "!");
         }
-
-        GENERATOR_OPTIONS = cfg.getString("generatorOptions", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).GENERATOR_OPTIONS,
-                "A json with generator options for the chunk generator");
     }
 
     private void initCities(Configuration cfg) {
@@ -551,7 +546,7 @@ public class LostCityProfile {
         return worldStyle;
     }
 
-    public Map<String, Float> getBiomeFactorMap() {
+    public Map<ResourceLocation, Float> getBiomeFactorMap() {
         if (biomeFactorMap == null) {
             biomeFactorMap = new HashMap<>();
             for (String s : CITY_BIOME_FACTORS) {
@@ -563,8 +558,9 @@ public class LostCityProfile {
                     String biomeId = split[0];
                     Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(biomeId));
                     if (biome != null) {
-                        biomeFactorMap.put(biome.getRegistryName().toString(), f);
-//                        biomeFactorMap.put(Biome.REGISTRY.getNameForObject(biome).toString(), f);
+                        biomeFactorMap.put(biome.getRegistryName(), f);
+                    } else {
+                        LostCities.setup.getLogger().warn("Can't find biome " + biomeId);
                     }
                 }
             }

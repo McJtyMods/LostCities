@@ -36,6 +36,10 @@ public class Configuration {
             return value;
         }
 
+        public String getComment() {
+            return comment;
+        }
+
         // Return true if we had to change the value
         public boolean constrain() {
             if (comparator.compare(value, min) < 0) {

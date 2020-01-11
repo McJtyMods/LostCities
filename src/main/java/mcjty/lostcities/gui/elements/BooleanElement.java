@@ -3,14 +3,14 @@ package mcjty.lostcities.gui.elements;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
 
-public class GuiBooleanValueElement extends GuiElement {
+public class BooleanElement extends GuiElement {
 
     private final GuiLCConfig gui;
     private String label = null;
     private final ButtonExt field;
     private final String attribute;
 
-    public GuiBooleanValueElement(GuiLCConfig gui, String page, int x, int y, String attribute) {
+    public BooleanElement(GuiLCConfig gui, String page, int x, int y, String attribute) {
         super(page, x, y);
         this.gui = gui;
         this.attribute = attribute;
@@ -28,18 +28,19 @@ public class GuiBooleanValueElement extends GuiElement {
                 profile.copyFromConfiguration(configuration);
                 gui.refreshPreview();
             });
-        });
+        }) {
+            @Override
+            public void renderToolTip(int x, int y) {
+                gui.getLocalSetup().get().ifPresent(h -> {
+                    gui.renderTooltip(h.toConfiguration().getValue(attribute).getComment(), x, y);
+                });
+            }
+        };
         gui.addWidget(field);
     }
 
-    public GuiBooleanValueElement label(String label) {
+    public BooleanElement label(String label) {
         this.label = label;
-        return this;
-    }
-
-    @Override
-    public GuiElement tooltip(String tooltip) {
-        field.tooltip(tooltip);
         return this;
     }
 

@@ -5,7 +5,7 @@ import mcjty.lostcities.config.ConfigSetup;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.network.PacketHandler;
-import mcjty.lostcities.worldtypes.LostWorldType;
+import mcjty.lostcities.worldtypes.CavernWorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
@@ -42,7 +42,7 @@ public class ModSetup {
 
         PacketHandler.registerMessages("lostcities");
 
-        LostWorldType.init();
+        CavernWorldType.init();
 
         setupModCompat();
 

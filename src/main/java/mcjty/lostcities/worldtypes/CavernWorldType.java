@@ -6,21 +6,21 @@ import net.minecraft.world.biome.provider.OverworldBiomeProviderSettings;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.NetherGenSettings;
 
-public class LostWorldType extends WorldType {
+public class CavernWorldType extends WorldType {
 
-    private static LostWorldType worldType;
+    private static CavernWorldType worldType;
 
     public static void init() {
-        worldType = new LostWorldType("lc_cavern");
+        worldType = new CavernWorldType("lc_cavern");
     }
 
-    public LostWorldType(String name) {
+    public CavernWorldType(String name) {
         super(name);
     }
 
     @Override
     public ChunkGenerator<?> createChunkGenerator(World world) {
-        return new LostChunkGenerator(world, new LostBiomeProvider(new OverworldBiomeProviderSettings().setWorldInfo(world.getWorldInfo())), new NetherGenSettings());
+        return new CavernChunkGenerator(world, new LostBiomeProvider(new OverworldBiomeProviderSettings().setWorldInfo(world.getWorldInfo())), new NetherGenSettings());
     }
 
 

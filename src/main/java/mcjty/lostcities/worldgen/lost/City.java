@@ -245,11 +245,11 @@ public class City {
 
         float foundFactor = profile.CITY_DEFAULT_BIOME_FACTOR;
         Biome biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX, chunkZ)).getMainBiome();
-        Map<String, Float> map = profile.getBiomeFactorMap();
+        Map<ResourceLocation, Float> map = profile.getBiomeFactorMap();
         ResourceLocation object = biome.getRegistryName();
         Float f;
         try {
-            f = map.get(object.toString());
+            f = map.get(object);
         } catch(NullPointerException e) {
             throw new RuntimeException("Biome '" + biome.getTranslationKey() + "' (" + biome.getRegistryName().getPath() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
         }
