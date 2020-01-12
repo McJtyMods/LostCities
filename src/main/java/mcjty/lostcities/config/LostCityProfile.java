@@ -69,6 +69,7 @@ public class LostCityProfile {
     public float RUIN_MAXLEVEL_PERCENT = 1.0f;
 
     public int GROUNDLEVEL = 71;
+    public int SEALEVEL = -1;   // If -1 just use default
 
     public boolean HIGHWAY_REQUIRES_TWO_CITIES = true;
     public int HIGHWAY_LEVEL_FROM_CITIES_MODE = 0;
@@ -365,6 +366,7 @@ public class LostCityProfile {
                 "If a building is ruined this indicates the maximum start height for the ruin destruction layer");
 
         GROUNDLEVEL = cfg.getInt("groundLevel", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).GROUNDLEVEL, 2, 256, "Ground level");
+        SEALEVEL = cfg.getInt("seaLevel", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).SEALEVEL, -1, 256, "Sea level (-1 is default)");
 
         CHEST_WITHOUT_LOOT_CHANCE = cfg.getFloat("chestWithoutLootChance", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).CHEST_WITHOUT_LOOT_CHANCE, 0.0f, 1.0f, "The chance that a chest will have no loot");
         BUILDING_WITHOUT_LOOT_CHANCE = cfg.getFloat("buildingWithoutLootChance", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).BUILDING_WITHOUT_LOOT_CHANCE, 0.0f, 1.0f, "The chance that a building will have no loot and no spawners");

@@ -181,6 +181,13 @@ public class LostCityConfiguration {
         profile.GENERATE_LIGHTING = true;
         profile.GENERATE_LAKES = false;
         profile.GENERATE_VILLAGES = false;
+        profile.RAILWAYS_ENABLED = false;
+        profile.GROUNDLEVEL = 40;
+        profile.SEALEVEL = 32;
+        profile.CITY_LEVEL0_HEIGHT = 40+4;
+        profile.CITY_LEVEL1_HEIGHT = 40+12;
+        profile.CITY_LEVEL2_HEIGHT = 40+20;
+        profile.CITY_LEVEL3_HEIGHT = 40+28;
 //        profile.setIconFile("textures/gui/icon_default.png");
         standardProfiles.put(profile.getName(), profile);
 

@@ -2,6 +2,8 @@ Upcoming:
 - Added lc_cavern worldtype for cavern style worlds
 - The Lost City configuration screen (LC button) will now select 'cavern' as first option if you are using lc_cavern
 - New 'Transport' configuration page so that you can configure railways and highways
+TODO: Make standard profiles read-only!
+
 
 2.0.26-alpha:
 - Fixed a problem with cities generating under very high biomes. Sometimes pieces of the original landscape were still present
