@@ -106,10 +106,13 @@ public class Configuration {
         value.value = val;
     }
 
-    public JsonObject toJson() {
+    public JsonObject toJson(boolean readonly) {
         JsonObject root = new JsonObject();
         for (Map.Entry<String, Category> entry : categoryMap.entrySet()) {
             JsonObject categoryObject = new JsonObject();
+            if (readonly) {
+                categoryObject.addProperty("__readonly__", "This profile is read only and cannot be modified! If you want to make a new profile based on this then you can make a copy to a new name");
+            }
             Category category = entry.getValue();
             for (Map.Entry<String, Value> valueEntry : category.valueMap.entrySet()) {
                 String key = valueEntry.getKey();

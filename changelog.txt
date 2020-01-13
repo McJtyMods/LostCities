@@ -2,7 +2,7 @@ Upcoming:
 - Added lc_cavern worldtype for cavern style worlds
 - The Lost City configuration screen (LC button) will now select 'cavern' as first option if you are using lc_cavern
 - New 'Transport' configuration page so that you can configure railways and highways
-TODO: Make standard profiles read-only!
+- The standard profiles as they are saved in the config/lostcity_profiles are now read-only and will be generated again everytime the game starts. You can make a copy of them under a new name and modify it for your own needs
 
 
 2.0.26-alpha:

@@ -60,7 +60,7 @@ public class GuiLCConfig extends Screen {
         Config.profileFromClient = profileName;
         if (profile != null) {
             LostCityConfiguration.standardProfiles.get("customized").copyFrom(profile);
-            Config.jsonFromClient = profile.toJson().toString();
+            Config.jsonFromClient = profile.toJson(false).toString();
         }
     }
 

@@ -616,14 +616,14 @@ public class LostCityProfile {
         init(config);
     }
 
-    public JsonObject toJson() {
+    public JsonObject toJson(boolean readonly) {
         Configuration config = new Configuration();
         init(config);
-        return config.toJson();
+        return config.toJson(readonly);
     }
 
     public void toBytes(PacketBuffer buf) {
-        JsonObject jsonObject = toJson();
+        JsonObject jsonObject = toJson(false);
         buf.writeString(jsonObject.toString());
     }
 

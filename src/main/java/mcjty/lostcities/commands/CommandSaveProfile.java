@@ -41,7 +41,7 @@ public class CommandSaveProfile implements Command<CommandSource> {
             context.getSource().sendFeedback(new StringTextComponent(TextFormatting.RED + "Could not find profile '" + name + "'!"), true);
             return 0;
         }
-        JsonObject jsonObject = profile.toJson();
+        JsonObject jsonObject = profile.toJson(false);
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         try {
             try (PrintWriter writer = new PrintWriter(new File(name + ".json"))) {

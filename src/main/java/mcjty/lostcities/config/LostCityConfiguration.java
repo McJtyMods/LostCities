@@ -2,6 +2,7 @@ package mcjty.lostcities.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import mcjty.lostcities.LostCities;
 import net.minecraft.block.Blocks;
@@ -513,33 +514,29 @@ public class LostCityConfiguration {
     public static void setupProfiles() {
         Path path = FMLPaths.CONFIGDIR.get();
         Path profileDir = Paths.get(path.toString(), "lostcity_profiles");
-        if (Files.exists(profileDir)) {
-            LostCities.getLogger().info("Reading existing profiles from 'config/lostcity_profiles'");
-            readProfiles(profileDir);
-//            LostCityProfile profile = new LostCityProfile("customized", false);
-//            profile.setDescription("Customized profile");
-//            standardProfiles.put(profile.getName(), profile);
-        } else {
-            LostCities.getLogger().info("Creating standard profiles into 'config/lostcity_profiles'");
-            initStandardProfiles();
-            new File(profileDir.toString()).mkdir();
-            for (Map.Entry<String, LostCityProfile> entry : standardProfiles.entrySet()) {
-                String name = entry.getKey();
-                if (!"customized".equals(name)) {
-                    LostCityProfile profile = entry.getValue();
-                    JsonObject jsonObject = profile.toJson();
-                    Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-                    try {
-                        try (PrintWriter writer = new PrintWriter(new File(profileDir.toString(), name + ".json"))) {
-                            writer.print(gson.toJson(jsonObject));
-                            writer.flush();
-                        }
-                    } catch (FileNotFoundException e) {
-                        LostCities.getLogger().error("Couldn't save profile '" + name + "'!");
+
+        LostCities.getLogger().info("Creating standard profiles into 'config/lostcity_profiles'");
+        initStandardProfiles();
+        new File(profileDir.toString()).mkdir();
+        for (Map.Entry<String, LostCityProfile> entry : standardProfiles.entrySet()) {
+            String name = entry.getKey();
+            if (!"customized".equals(name)) {
+                LostCityProfile profile = entry.getValue();
+                JsonObject jsonObject = profile.toJson(true);
+                Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+                try {
+                    try (PrintWriter writer = new PrintWriter(new File(profileDir.toString(), name + ".json"))) {
+                        writer.print(gson.toJson(jsonObject));
+                        writer.flush();
                     }
+                } catch (FileNotFoundException e) {
+                    LostCities.getLogger().error("Couldn't save profile '" + name + "'!");
                 }
             }
         }
+
+        LostCities.getLogger().info("Reading existing profiles from 'config/lostcity_profiles'");
+        readProfiles(profileDir);
     }
 
     private static void readProfiles(Path profileDir) {
