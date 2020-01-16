@@ -1,9 +1,13 @@
 package mcjty.lostcities.setup;
 
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.gui.GuiLCConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -45,6 +49,10 @@ public class ClientEventHandlers {
         if (event.getGui() instanceof CreateWorldScreen && lostCitiesButton != null) {
             CreateWorldScreen screen = (CreateWorldScreen) event.getGui();
             lostCitiesButton.visible = screen.inMoreWorldOptionsDisplay;
+            if (lostCitiesButton.visible) {
+                Minecraft.getInstance().getTextureManager().bindTexture(new ResourceLocation(LostCities.MODID, "textures/gui/configicon.png"));
+                screen.blit(screen.width - 100, 30, 70, 70, 256, 256, 256, 256, 256, 256);
+            }
         }
     }
 
@@ -52,7 +60,7 @@ public class ClientEventHandlers {
     public void onGuiPost(GuiScreenEvent.InitGuiEvent.Post event) {
         if (event.getGui() instanceof CreateWorldScreen) {
             CreateWorldScreen screen = (CreateWorldScreen) event.getGui();
-            lostCitiesButton = new Button(screen.width - 90, 60, 45, 20, "LC", p_onPress_1_ -> {
+            lostCitiesButton = new Button(screen.width - 100, 10, 70, 20, "Cities", p_onPress_1_ -> {
                 WorldType worldType = WorldType.WORLD_TYPES[screen.selectedIndex];
                 Minecraft.getInstance().displayGuiScreen(new GuiLCConfig(screen, worldType));
             });

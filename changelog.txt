@@ -3,7 +3,7 @@ Upcoming:
 - The Lost City configuration screen (LC button) will now select 'cavern' as first option if you are using lc_cavern
 - New 'Transport' configuration page so that you can configure railways and highways
 - The standard profiles as they are saved in the config/lostcity_profiles are now read-only and will be generated again everytime the game starts. You can make a copy of them under a new name and modify it for your own needs
-
+- Nicer Lost City configuration button
 
 2.0.26-alpha:
 - Fixed a problem with cities generating under very high biomes. Sometimes pieces of the original landscape were still present
