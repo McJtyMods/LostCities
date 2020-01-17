@@ -72,6 +72,9 @@ public class Config {
                 String json = Config.SELECTED_CUSTOM_JSON.get();
                 if (json != null && !json.isEmpty()) {
                     LostCityProfile profile = new LostCityProfile("customized", json);
+                    if (!LostCityConfiguration.standardProfiles.containsKey("customized")) {
+                        LostCityConfiguration.standardProfiles.put("customized", new LostCityProfile("customized", false));
+                    }
                     LostCityConfiguration.standardProfiles.get("customized").copyFrom(profile);
                 }
             }
