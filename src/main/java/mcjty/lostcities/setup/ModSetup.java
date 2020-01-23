@@ -3,8 +3,8 @@ package mcjty.lostcities.setup;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.ConfigSetup;
 import mcjty.lostcities.config.LostCityConfiguration;
-import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.network.PacketHandler;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldtypes.CavernWorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
@@ -85,7 +85,10 @@ public class ModSetup {
 
         for (Biome biome : ForgeRegistries.BIOMES) {
 //            biome.addCarver(GenerationStage.Carving.AIR, Biome.createCarver(Registration.LOSTCITY_CARVER, ICarverConfig.field_214644_a));
-            biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Biome.createDecoratedFeature(Registration.LOSTCITY_FEATURE, NoFeatureConfig.NO_FEATURE_CONFIG, Placement.COUNT_RANGE, new CountRangeConfig(1, 0, 0, 1)));
+            biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Registration.LOSTCITY_FEATURE
+                    .func_225566_b_(NoFeatureConfig.NO_FEATURE_CONFIG)
+                    .func_227228_a_(Placement.COUNT_RANGE.func_227446_a_(new CountRangeConfig(1, 0, 0, 1)))
+            );
         }
 
     }

@@ -49,7 +49,7 @@ public class CommandExportBuilding {} /* @todo 1.14 implements ICommand {
                 int cx = (start.getX() >> 4) * 16;
                 int cy = start.getY() + f * 6;
                 int cz = (start.getZ() >> 4) * 16;
-                BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(cx, cy, cz);
+                BlockPos.Mutable pos = new BlockPos.Mutable(cx, cy, cz);
                 for (int x = 0 ; x < 16 ; x++) {
                     for (int z = 0 ; z < 16 ; z++) {
                         for (int y = 0 ; y < 6 ; y++) {

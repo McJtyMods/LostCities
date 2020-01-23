@@ -3,8 +3,8 @@ package mcjty.lostcities.worldgen;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.palette.UpgradeData;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.chunk.UpgradeData;
 import net.minecraft.world.lighting.WorldLightManager;
 
 import javax.annotation.Nullable;

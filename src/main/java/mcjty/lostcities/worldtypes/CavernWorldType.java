@@ -20,7 +20,7 @@ public class CavernWorldType extends WorldType {
 
     @Override
     public ChunkGenerator<?> createChunkGenerator(World world) {
-        return new CavernChunkGenerator(world, new LostBiomeProvider(new OverworldBiomeProviderSettings().setWorldInfo(world.getWorldInfo())), new NetherGenSettings());
+        return new CavernChunkGenerator(world, new LostBiomeProvider(new OverworldBiomeProviderSettings(world.getWorldInfo())), new NetherGenSettings());
     }
 
 

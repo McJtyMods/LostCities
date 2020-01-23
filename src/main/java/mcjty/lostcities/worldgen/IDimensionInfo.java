@@ -30,7 +30,7 @@ public interface IDimensionInfo {
 
     ChunkHeightmap getHeightmap(int chunkX, int chunkZ);
 
-    Biome[] getBiomes(int chunkX, int chunkZ);
+//    Biome[] getBiomes(int chunkX, int chunkZ);
 
     Biome getBiome(BlockPos pos);
 }

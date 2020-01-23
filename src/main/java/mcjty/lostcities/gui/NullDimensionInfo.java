@@ -160,25 +160,25 @@ public class NullDimensionInfo implements IDimensionInfo {
         }
     }
 
-    @Override
-    public Biome[] getBiomes(int chunkX, int chunkZ) {
-        Biome[] biomes = new Biome[10*10];
-        Biome biome = Biomes.PLAINS;
-        char b = getBiomeChar(chunkX, chunkZ);
-        switch (b) {
-            case 'p': biome = Biomes.PLAINS; break;
-            case '-': biome = Biomes.OCEAN; break;
-            case '=': biome = Biomes.RIVER; break;
-            case '#': biome = Biomes.MOUNTAIN_EDGE; break;
-            case '+': biome = Biomes.MOUNTAINS; break;
-            case '*': biome = Biomes.BEACH; break;
-            case 'd': biome = Biomes.DESERT; break;
-        }
-        for (int i = 0 ; i < biomes.length ; i++) {
-            biomes[i] = biome;
-        }
-        return biomes;
-    }
+//    @Override
+//    public Biome[] getBiomes(int chunkX, int chunkZ) {
+//        Biome[] biomes = new Biome[10*10];
+//        Biome biome = Biomes.PLAINS;
+//        char b = getBiomeChar(chunkX, chunkZ);
+//        switch (b) {
+//            case 'p': biome = Biomes.PLAINS; break;
+//            case '-': biome = Biomes.OCEAN; break;
+//            case '=': biome = Biomes.RIVER; break;
+//            case '#': biome = Biomes.MOUNTAIN_EDGE; break;
+//            case '+': biome = Biomes.MOUNTAINS; break;
+//            case '*': biome = Biomes.BEACH; break;
+//            case 'd': biome = Biomes.DESERT; break;
+//        }
+//        for (int i = 0 ; i < biomes.length ; i++) {
+//            biomes[i] = biome;
+//        }
+//        return biomes;
+//    }
 
     @Override
     public Biome getBiome(BlockPos pos) {

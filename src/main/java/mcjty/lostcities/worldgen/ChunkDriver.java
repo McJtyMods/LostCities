@@ -16,8 +16,8 @@ public class ChunkDriver {
 
     private WorldGenRegion region;
     private IChunk primer;
-    private final BlockPos.MutableBlockPos current = new BlockPos.MutableBlockPos();
-    private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+    private final BlockPos.Mutable current = new BlockPos.Mutable();
+    private final BlockPos.Mutable pos = new BlockPos.Mutable();
 
     public void setPrimer(WorldGenRegion region, IChunk primer) {
         this.region = region;

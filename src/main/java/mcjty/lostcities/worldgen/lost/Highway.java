@@ -1,9 +1,9 @@
 package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.varia.ChunkCoord;
-import net.minecraft.world.gen.PerlinNoiseGenerator;
+import mcjty.lostcities.varia.PerlinNoiseGenerator14;
+import mcjty.lostcities.worldgen.IDimensionInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +12,8 @@ import java.util.function.Function;
 
 public class Highway {
 
-    private static PerlinNoiseGenerator perlinX = null;
-    private static PerlinNoiseGenerator perlinZ = null;
+    private static PerlinNoiseGenerator14 perlinX = null;
+    private static PerlinNoiseGenerator14 perlinZ = null;
     private static Map<ChunkCoord, Integer> xHighwayLevelCache = new HashMap<>();
     private static Map<ChunkCoord, Integer> zHighwayLevelCache = new HashMap<>();
 
@@ -21,11 +21,11 @@ public class Highway {
     private static void makePerlin(long seed) {
         if (perlinX == null) {
             Random random = new Random(seed);
-            perlinX = new PerlinNoiseGenerator(random, 4);
+            perlinX = new PerlinNoiseGenerator14(random, 4);
         }
         if (perlinZ == null) {
             Random random = new Random(seed ^ 879190747L);
-            perlinZ = new PerlinNoiseGenerator(random, 4);
+            perlinZ = new PerlinNoiseGenerator14(random, 4);
         }
     }
 

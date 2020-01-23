@@ -6,8 +6,11 @@ import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerChunkProvider;
 
 import java.util.Random;
 
@@ -77,15 +80,23 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         return feature.getHeightmap(chunkX, chunkZ, getWorld());
     }
 
-    @Override
-    public Biome[] getBiomes(int chunkX, int chunkZ) {
-        BiomeProvider biomeProvider = getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider();
-        return biomeProvider.getBiomes((chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10, false);
-    }
-
+//    @Override
+//    public Biome[] getBiomes(int chunkX, int chunkZ) {
+//        AbstractChunkProvider chunkProvider = getWorld().getChunkProvider();
+//        if (chunkProvider instanceof ServerChunkProvider) {
+//            BiomeProvider biomeProvider = ((ServerChunkProvider) chunkProvider).getChunkGenerator().getBiomeProvider();
+//            return biomeProvider.getBiomes((chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10, false);
+//        }
+//    }
+//
     @Override
     public Biome getBiome(BlockPos pos) {
-        BiomeProvider biomeProvider = getWorld().getChunkProvider().getChunkGenerator().getBiomeProvider();
-        return biomeProvider.getBiome(pos);
+        AbstractChunkProvider chunkProvider = getWorld().getChunkProvider();
+        if (chunkProvider instanceof ServerChunkProvider) {
+            BiomeProvider biomeProvider = ((ServerChunkProvider) chunkProvider).getChunkGenerator().getBiomeProvider();
+            // @todo 1.15 check if thi sis correct!
+            return biomeProvider.func_225526_b_(pos.getX(), pos.getY(), pos.getZ());
+        }
+        return Biomes.PLAINS;
     }
 }

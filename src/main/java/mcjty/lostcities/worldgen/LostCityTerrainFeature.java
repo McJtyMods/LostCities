@@ -20,9 +20,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -1061,10 +1063,14 @@ public class LostCityTerrainFeature {
 
     private void makeDummyChunk(int chunkX, int chunkZ, IWorld region, ChunkHeightmap heightmap) {
         DummyChunk primer = new DummyChunk(new ChunkPos(chunkX, chunkZ), heightmap);
-        ChunkGenerator<?> generator = region.getDimension().getWorld().getChunkProvider().getChunkGenerator();
-        generator.generateBiomes(primer);
-        generator.makeBase(region.getDimension().getWorld(), primer);
-        generator.generateSurface(primer);
+        AbstractChunkProvider chunkProvider = region.getDimension().getWorld().getChunkProvider();
+        if (chunkProvider instanceof ServerChunkProvider) {
+            // @todo 1.15 check!
+            ChunkGenerator<?> generator = ((ServerChunkProvider) chunkProvider).getChunkGenerator();
+            generator.generateBiomes(primer);
+            generator.makeBase(region.getDimension().getWorld(), primer);
+            generator.func_225551_a_((WorldGenRegion) region, primer);
+        }
     }
 
     private void doCityChunk(int chunkX, int chunkZ, BuildingInfo info) {

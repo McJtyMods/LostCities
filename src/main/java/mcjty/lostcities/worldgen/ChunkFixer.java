@@ -16,6 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.spawner.AbstractSpawner;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
@@ -30,7 +31,7 @@ public class ChunkFixer {
         for (BlockPos pos : info.getSaplingTodo()) {
             BlockState state = world.getBlockState(pos);
             if (state.getBlock() instanceof SaplingBlock) {
-                ((SaplingBlock) state.getBlock()).grow(world, pos, state, random);
+                ((SaplingBlock) state.getBlock()).grow((ServerWorld)world, random, pos, state);
             }
         }
         info.clearSaplingTodo();
