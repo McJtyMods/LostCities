@@ -95,7 +95,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         if (chunkProvider instanceof ServerChunkProvider) {
             BiomeProvider biomeProvider = ((ServerChunkProvider) chunkProvider).getChunkGenerator().getBiomeProvider();
             // @todo 1.15 check if thi sis correct!
-            return biomeProvider.func_225526_b_(pos.getX(), pos.getY(), pos.getZ());
+            return biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ());
         }
         return Biomes.PLAINS;
     }
