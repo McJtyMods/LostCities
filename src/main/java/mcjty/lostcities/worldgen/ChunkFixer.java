@@ -31,7 +31,8 @@ public class ChunkFixer {
         for (BlockPos pos : info.getSaplingTodo()) {
             BlockState state = world.getBlockState(pos);
             if (state.getBlock() instanceof SaplingBlock) {
-                ((SaplingBlock) state.getBlock()).grow((ServerWorld)world, random, pos, state);
+                // @todo 1.15 how to do this?
+//                ((SaplingBlock) state.getBlock()).grow((ServerWorld)world, random, pos, state);
             }
         }
         info.clearSaplingTodo();
