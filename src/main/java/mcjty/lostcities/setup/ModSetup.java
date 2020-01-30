@@ -86,7 +86,7 @@ public class ModSetup {
         for (Biome biome : ForgeRegistries.BIOMES) {
 //            biome.addCarver(GenerationStage.Carving.AIR, Biome.createCarver(Registration.LOSTCITY_CARVER, ICarverConfig.field_214644_a));
             biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Registration.LOSTCITY_FEATURE
-                    .func_225566_b_(NoFeatureConfig.NO_FEATURE_CONFIG)
+                    .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
                     .func_227228_a_(Placement.COUNT_RANGE.func_227446_a_(new CountRangeConfig(1, 0, 0, 1)))
             );
         }
