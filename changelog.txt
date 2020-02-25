@@ -1,3 +1,6 @@
+Upcoming:
+- Avoid generating Lost Cities in biomes that are marked as 'void'
+
 2.0.28-alpha:
 - Fixed a crash in Lost Cities loading existing worlds
 
