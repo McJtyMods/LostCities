@@ -88,7 +88,7 @@ public class ModSetup {
             if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)) {
                 biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Registration.LOSTCITY_FEATURE
                         .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
-                        .func_227228_a_(Placement.COUNT_RANGE.func_227446_a_(new CountRangeConfig(1, 0, 0, 1)))
+                        .withPlacement(Placement.COUNT_RANGE.configure(new CountRangeConfig(1, 0, 0, 1)))
                 );
             }
         }

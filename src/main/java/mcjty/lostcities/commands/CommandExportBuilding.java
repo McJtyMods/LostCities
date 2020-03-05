@@ -96,7 +96,7 @@ public class CommandExportBuilding {} /* @todo 1.14 implements ICommand {
                 writer.flush();
             }
         } catch (FileNotFoundException e) {
-            sender.sendMessage(new TextComponentString("Error writing to file '" + args[0] + "'!"));
+            sender.sendMessage(new StringTextComponent("Error writing to file '" + args[0] + "'!"));
         } catch (Exception e) {
             e.printStackTrace();
         }

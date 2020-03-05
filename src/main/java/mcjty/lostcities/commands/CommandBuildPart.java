@@ -23,7 +23,7 @@ public class CommandBuildPart {} /* @todo 1.14 implements ICommand {
             String partname = args[0];
             BuildingPart part = AssetRegistries.PARTS.get(partname);
             if (part == null) {
-                sender.sendMessage(new TextComponentString("Cannot find part '" + partname + "'!"));
+                sender.sendMessage(new StringTextComponent("Cannot find part '" + partname + "'!"));
                 return;
             }
 
