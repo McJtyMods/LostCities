@@ -129,13 +129,7 @@ public class ChunkDriver {
         if (adjacent.getBlock() instanceof LadderBlock) {
             return adjacent;
         }
-        BlockState newAdjacent = null;
-        try {
-            newAdjacent = adjacent.getBlock().updatePostPlacement(adjacent, direction, state, region, pos, current);
-        } catch (Exception e) {
-            // We got an exception. For example for beehives there can potentially be a problem so in this case we just ignore it
-            return adjacent;
-        }
+        BlockState newAdjacent = adjacent.updatePostPlacement(direction, state, region, pos, pos.offset(direction));
         if (newAdjacent != adjacent) {
             IChunk chunk = region.getChunk(pos);
             if (chunk == thisChunk || chunk.getStatus().isAtLeast(ChunkStatus.FULL)) {
