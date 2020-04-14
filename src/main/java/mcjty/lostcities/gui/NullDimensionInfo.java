@@ -1,8 +1,8 @@
 package mcjty.lostcities.gui;
 
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
+import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;

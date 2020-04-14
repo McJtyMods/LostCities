@@ -100,7 +100,7 @@ public class AssetRegistries {
 
     private static void printChars(String prefix, Counter<Character> counter) {
         List<Character> chars = new ArrayList<>(counter.getMap().keySet());
-        chars.sort((o1, o2) -> o1.compareTo(o2));
+        chars.sort(Character::compareTo);
         String s = "";
         for (Character character : chars) {
             s += character;

@@ -2,9 +2,9 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.QualityRandom;
+import mcjty.lostcities.worldgen.IDimensionInfo;
 
 import java.util.HashMap;
 import java.util.Map;

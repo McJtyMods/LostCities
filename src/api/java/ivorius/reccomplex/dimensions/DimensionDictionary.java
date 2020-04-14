@@ -2,9 +2,6 @@ package ivorius.reccomplex.dimensions;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-
-import java.util.*;
-
 import net.minecraft.world.WorldProvider;
 
 /**
