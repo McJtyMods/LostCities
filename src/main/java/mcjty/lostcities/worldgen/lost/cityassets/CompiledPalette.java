@@ -1,8 +1,10 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import net.minecraft.block.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.Level;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -147,7 +149,7 @@ public class CompiledPalette {
                 return randomBlocks[0];
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LostCities.logger.log(Level.ERROR, e);
             return null;
         }
     }
@@ -173,7 +175,7 @@ public class CompiledPalette {
                 return randomBlocks[rand.nextInt(128)];
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LostCities.logger.log(Level.ERROR, e);
             return null;
         }
 

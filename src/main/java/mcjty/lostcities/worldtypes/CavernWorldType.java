@@ -8,6 +8,7 @@ import net.minecraft.world.gen.NetherGenSettings;
 
 public class CavernWorldType extends WorldType {
 
+    @SuppressWarnings("FieldCanBeLocal")
     private static CavernWorldType worldType;
 
     public static void init() {

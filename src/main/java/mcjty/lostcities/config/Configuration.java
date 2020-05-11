@@ -11,15 +11,13 @@ import java.util.*;
 public class Configuration {
 
     public static class Value<T> {
-        private final String name;
         private final String comment;
         private T value;
         private final T min;
         private final T max;
         private final Comparator<T> comparator;
 
-        public Value(String name, String comment, T value, T min, T max, @Nonnull Comparator<T> comparator) {
-            this.name = name;
+        public Value(String comment, T value, T min, T max, @Nonnull Comparator<T> comparator) {
             this.comment = comment;
             this.value = value;
             this.min = min;
@@ -54,14 +52,7 @@ public class Configuration {
     }
 
     public static class Category {
-        private final String name;
-        private final String comment;
         private final Map<String, Value> valueMap = new HashMap<>();
-
-        public Category(String name, String comment) {
-            this.name = name;
-            this.comment = comment;
-        }
     }
 
     private final Map<String, Category> categoryMap = new HashMap<>();
@@ -162,7 +153,7 @@ public class Configuration {
 
     public void addCustomCategoryComment(String category, String description) {
         if (!categoryMap.containsKey(category)) {
-            categoryMap.put(category, new Category(category, description));
+            categoryMap.put(category, new Category());
         }
     }
 
@@ -173,7 +164,7 @@ public class Configuration {
             throw new IllegalStateException("Missing category: " + category);
         }
         if (!cat.valueMap.containsKey(name)) {
-            cat.valueMap.put(name, new Value<>(name, description, defaultValue, min, max, comparator));
+            cat.valueMap.put(name, new Value<>(description, defaultValue, min, max, comparator));
         }
         return cat;
     }

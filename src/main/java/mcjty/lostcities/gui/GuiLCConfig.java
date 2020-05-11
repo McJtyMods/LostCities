@@ -31,9 +31,6 @@ public class GuiLCConfig extends Screen {
     private Button profileButton;
     private Button customizeButton;
     private Button modeButton;
-    private Button doneButton;
-    private Button cancelButton;
-    private Button randomizeButton;
 
     private static final int YOFFSET = 21;
     private String curpage;
@@ -93,10 +90,10 @@ public class GuiLCConfig extends Screen {
         modeButton = addButton(new ButtonExt(this, 290, 10, 100, 20, mode, p -> toggleMode())
             .tooltip("Switch between different configuration pages"));
 
-        doneButton = addButton(new Button(10, this.height - 30, 120, 20, "Done", p -> done()));
-        cancelButton = addButton(new Button(this.width - 130, this.height - 30, 120, 20, "Cancel", p -> cancel()));
-        randomizeButton = addButton(new ButtonExt(this,this.width - 35, 35, 30, 20, "Rnd", p -> randomizePreview())
-            .tooltip("Randomize the seed for the preview (does not affect the generated world)"));
+        Button doneButton = addButton(new Button(10, this.height - 30, 120, 20, "Done", p -> done()));
+        Button cancelButton = addButton(new Button(this.width - 130, this.height - 30, 120, 20, "Cancel", p -> cancel()));
+        Button randomizeButton = addButton(new ButtonExt(this, this.width - 35, 35, 30, 20, "Rnd", p -> randomizePreview())
+                .tooltip("Randomize the seed for the preview (does not affect the generated world)"));
 
         initCities(110);
         initBuildings(110);

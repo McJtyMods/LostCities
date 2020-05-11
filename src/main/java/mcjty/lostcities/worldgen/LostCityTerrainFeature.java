@@ -35,9 +35,8 @@ import java.util.function.Predicate;
 
 public class LostCityTerrainFeature {
 
-    private static int g_seed = 123456789;
+    private static int gSeed = 123456789;
     private final int mainGroundLevel;
-    private final int waterLevel;
     private boolean statesSetup = false;
     public static BlockState air;
     public static BlockState hardAir;
@@ -89,7 +88,7 @@ public class LostCityTerrainFeature {
         this.rand = rand;
         driver = new ChunkDriver();
         this.mainGroundLevel = profile.GROUNDLEVEL;
-        this.waterLevel = provider.getWorld() == null ? 65 : provider.getWorld().getSeaLevel();// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
+        int waterLevel = provider.getWorld() == null ? 65 : provider.getWorld().getSeaLevel();// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
         this.rubbleNoise = new NoiseGeneratorPerlin(rand, 4);
         this.leavesNoise = new NoiseGeneratorPerlin(rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);
@@ -231,13 +230,13 @@ public class LostCityTerrainFeature {
     }
 
     private static int fastrand() {
-        g_seed = (214013 * g_seed + 2531011);
-        return (g_seed >> 16) & 0x7FFF;
+        gSeed = (214013 * gSeed + 2531011);
+        return (gSeed >> 16) & 0x7FFF;
     }
 
     public static int fastrand128() {
-        g_seed = (214013 * g_seed + 2531011);
-        return (g_seed >> 16) & 0x7F;
+        gSeed = (214013 * gSeed + 2531011);
+        return (gSeed >> 16) & 0x7F;
     }
 
     public void generateDummy(WorldGenRegion region, IChunk chunk) {
@@ -1402,7 +1401,6 @@ public class LostCityTerrainFeature {
 
     private static class Blob implements Comparable<Blob> {
         private final int starty;
-        private final int endy;
         private final Set<BlockPos> connectedBlocks = new HashSet<>();
         private final Map<Integer, Integer> blocksPerY = new HashMap<>();
         private int connections = 0;
@@ -1411,9 +1409,8 @@ public class LostCityTerrainFeature {
         private float avgdamage;
         private int cntMindamage;  // Number of blocks that receive almost no damage
 
-        public Blob(int starty, int endy) {
+        public Blob(int starty) {
             this.starty = starty;
-            this.endy = endy;
             lowestY = 256;
             highestY = 0;
         }
@@ -1592,7 +1589,7 @@ public class LostCityTerrainFeature {
                     if (p != air && p != liquid) {
                         Blob blob = findBlob(blobs, driver.getCurrentCopy());
                         if (blob == null) {
-                            blob = new Blob(start, end + 6);
+                            blob = new Blob(start);
                             // We must make a copy of the driver here so that we can safely modify it
                             BlockPos current = driver.getCurrentCopy();
                             blob.scan(info, driver, air, liquid, new BlockPos(x, y, z));
@@ -1618,7 +1615,7 @@ public class LostCityTerrainFeature {
 //            }
 //        }
 
-        Blob blocksToMove = new Blob(0, 256);
+        Blob blocksToMove = new Blob(0);
 
         // Sort all blobs we delete with lowest first
         blobs.stream().filter(blob -> blob.destroyOrMoveThis(provider, info)).sorted().forEachOrdered(blob -> {

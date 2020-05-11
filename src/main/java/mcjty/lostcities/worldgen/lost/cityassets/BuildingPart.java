@@ -177,11 +177,12 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
         object.add("zsize", new JsonPrimitive(zSize));
         JsonArray sliceArray = new JsonArray();
         for (String slice : slices) {
+            String s = slice;
             JsonArray a = new JsonArray();
-            while (!slice.isEmpty()) {
-                String left = StringUtils.left(slice, xSize);
+            while (!s.isEmpty()) {
+                String left = StringUtils.left(s, xSize);
                 a.add(new JsonPrimitive(left));
-                slice = slice.substring(left.length());
+                s = s.substring(left.length());
             }
             sliceArray.add(a);
         }
