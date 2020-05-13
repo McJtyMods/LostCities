@@ -22,36 +22,6 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven'
 
-repositories {
-    maven { // The repo from which to get waila
-        name "Mobius Repo"
-        url "https://tehnut.info/maven"
-        //url "http://mobiusstrip.eu/maven"
-    }
-    maven { // JEI
-        url "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        name 'OC Repo'
-        url "http://maven.cil.li/"
-    }
-    maven { // TOP
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
-    }
-    maven { // McJtyLib
-        url "http://maven.k-4u.nl"
-    }
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-    maven {
-        name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
-    }
-}
-
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
@@ -79,19 +49,20 @@ artifacts {
     archives deobfJar
 }
 
+repositories {
+    maven { // JEI
+        url "http://dvs1.progwml6.com/files/maven"
+    }
+    maven { // CTM
+        url "http://maven.tterrag.com/"
+    }
+}
 
 dependencies {
-    deobfCompile "mezz.jei:jei_${jei_version}"
-    deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}"
+    deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
+    deobfCompile "team.chisel:Chisel:MC${minecraft_version}-${chisel_version}"
     deobfCompile "mcjty.theoneprobe:TheOneProbe-${top_version}"
-    deobfCompile "cofh:RedstoneFlux:${redstoneflux_version}"
-    //deobfCompile "mcp.mobius.waila:Hwyla:1.8.10-B23_1.11:api"
-    //deobfCompile "mcjty.theoneprobe:TheOneProbe:1.1x-1.4.7-57"
-    //deobfCompile "team.chisel:Chisel:MC1.11.2-0.0.10.14"
-    //deobfCompile "com.github.mcjty:compatlayer:1.11.2-0.2.6"
-    //deobfCompile "com.github.mcjty:intwheel:1.1x-1.2.6"
-
-    //compile "li.cil.oc:OpenComputers:MC1.7.10-1.5.+:api"
+    deobfCompile "mezz.jei:jei_${jei_version}"
 }
 
 jar {
