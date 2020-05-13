@@ -494,7 +494,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             int height = yy * 16;
                             driver.current(x, height, z);
                             for (int y = 0; y < 16; y++) {
-                                driver.add(((height + y) <= info.waterLevel) ? liquidChar : airChar);
+                                driver.add(((height + y) < info.waterLevel) ? liquidChar : airChar);
                             }
                         }
                     }
@@ -509,7 +509,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             driver.current(x, cury, 0);
                             for (int z = 0; z < 16; z++) {
                                 char d = driver.getBlock();
-                                if (d != airChar || cury <= info.waterLevel) {
+                                if (d != airChar || cury < info.waterLevel) {
                                     float damage = damageArea.getDamage(cx + x, cury, cz + z) * damageFactor;
                                     if (damage >= 0.001) {
                                         Character newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette(), liquidChar);
@@ -654,7 +654,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (dowater) {
             // Special case for drowned city
             driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquidChar);
-            driver.setBlockRangeSafe(x, info.waterLevel+1, z, height2, airChar);
+            driver.setBlockRangeSafe(x, Math.max(info.waterLevel, height1), z, height2, airChar);
         } else {
             driver.setBlockRange(x, height1, z, height2, airChar);
         }
@@ -2123,7 +2123,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                     if (info.profile.GENERATE_LIGHTING) {
                                         info.addTorchTodo(driver.getCurrent(), orientations);
                                     } else {
-                                        b = airChar;        // No torches
+                                        // No torches
+                                        b = airChar;
                                     }
                                 } else if (inf.getLoot() != null && !inf.getLoot().isEmpty()) {
                                     if (!info.noLoot) {
