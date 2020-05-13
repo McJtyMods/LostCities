@@ -61,7 +61,7 @@ public class SpaceTerrainGenerator {
                             driver.add(LostCitiesTerrainGenerator.bedrockChar);
                         } else if (y <= vr + profileOut.GROUNDLEVEL) {
                             driver.add(terrainGenerator.baseChar);
-                        } else if (y <= waterLevel) {
+                        } else if (y < waterLevel) {
                             driver.add(baseLiquid);
                         } else {
                             driver.add(airChar);
@@ -110,7 +110,7 @@ public class SpaceTerrainGenerator {
                             }
                         } else if (y <= vo + profileOut.GROUNDLEVEL) {
                             driver.block(baseChar);
-                        } else if (y <= waterLevelOut) {
+                        } else if (y < waterLevelOut) {
                             driver.block(liquidChar);
                         }
                         driver.incY();
