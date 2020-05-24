@@ -1937,6 +1937,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         boolean el02 = info.getXmin().getZmax().isElevatedParkSection();
         boolean el12 = info.getZmax().isElevatedParkSection();
         boolean el22 = info.getXmax().getZmax().isElevatedParkSection();
+        //prevent grass under water
+        char c = height < waterLevel ? gravelChar : grassChar;
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 if (x == 0 || x == 15 || z == 0 || z == 15) {
@@ -1944,40 +1946,40 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     if (elevated) {
                         if (x == 0 && z == 0) {
                             if (el01 && el00 && el10) {
-                                b = grassChar;
+                                b = c;
                             }
                         } else if (x == 15 && z == 0) {
                             if (el21 && el20 && el10) {
-                                b = grassChar;
+                                b = c;
                             }
                         } else if (x == 0 && z == 15) {
                             if (el01 && el02 && el12) {
-                                b = grassChar;
+                                b = c;
                             }
                         } else if (x == 15 && z == 15) {
                             if (el12 && el22 && el21) {
-                                b = grassChar;
+                                b = c;
                             }
                         } else if (x == 0) {
                             if (el01) {
-                                b = grassChar;
+                                b = c;
                             }
                         } else if (x == 15) {
                             if (el21) {
-                                b = grassChar;
+                                b = c;
                             }
                         } else if (z == 0) {
                             if (el10) {
-                                b = grassChar;
+                                b = c;
                             }
                         } else if (z == 15) {
                             if (el12) {
-                                b = grassChar;
+                                b = c;
                             }
                         }
                     }
                 } else {
-                    b = grassChar;
+                    b = c;
                 }
                 driver.current(x, height, z).block(b);
             }
