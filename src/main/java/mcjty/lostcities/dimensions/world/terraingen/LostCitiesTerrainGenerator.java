@@ -753,15 +753,25 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     /**
-     * Get the lowest height of a corner of four chunks
+     * Get the ground height of a corner of four chunks
+     * if there is city chuck nearby, the height should be the city's height level
      * info: reference to the bottom-right chunk. The 0,0 position of this chunk is the reference
      */
     private int getHeightAt00Corner(BuildingInfo info) {
         int h = getHeightForChunk(info);
-        h = Math.min(h, getHeightForChunk(info.getXmin()));
-        h = Math.min(h, getHeightForChunk(info.getZmin()));
-        h = Math.min(h, getHeightForChunk(info.getXmin().getZmin()));
-        return h;
+        int h_X = getHeightForChunk(info.getXmin());
+        int h_Z = getHeightForChunk(info.getZmin());
+        int h_XZ = getHeightForChunk(info.getXmin().getZmin());
+        ArrayList<Integer> cites = new ArrayList(4);
+        if(info.isCity())
+            cites.add(h);
+        if(info.getXmin().isCity())
+            cites.add(h_X);
+        if(info.getZmin().isCity())
+            cites.add(h_Z);
+        if(info.getXmin().getZmin().isCity())
+            cites.add(h_XZ);
+        return cites.isEmpty() ? Math.min(h,Math.min(h_X,Math.min(h_Z,h_XZ))) : Collections.min(cites);
     }
 
     private int getHeightForChunk(BuildingInfo info) {
@@ -771,7 +781,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             if (info.isOcean()) {
                 return info.groundLevel - 4;
             } else {
-                return info.getCityGroundLevel();
+                return info.groundLevel;
             }
         }
     }
@@ -780,6 +790,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     private void flattenChunkToCityBorder(int chunkX, int chunkZ) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
+
+        ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
 
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
         float h00 = getHeightAt00Corner(info);
@@ -821,8 +833,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         }
                     }
 
-                    int offset = (int) (Math.sqrt(mindist) * 2);
-                    flattenChunkBorder(info, x, offset, z, provider.rand, height);
+                    double percent = Math.atan(mindist / 85) * 0.8;
+                    int offset = Math.abs(heightmap.getHeight(x,z) - height);
+                    flattenChunkBorder(info, x, (int)(offset * percent), z, provider.rand, height);
                 }
             }
         }
@@ -842,8 +855,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     }
                     int height = minheight;//info.getCityGroundLevel();
 
-                    int offset = (int) (Math.sqrt(mindist) * 2);
-                    flattenChunkBorderDownwards(info, x, offset, z, provider.rand, height);
+                    double percent = Math.atan(mindist / 85) * 0.8;
+                    int offset = Math.abs(heightmap.getHeight(x,z) - height);
+                    flattenChunkBorderDownwards(info, x, (int)(offset * percent), z, provider.rand, height);
                 }
             }
         }
@@ -862,7 +876,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void flattenChunkBorder(BuildingInfo info, int x, int offset, int z, Random rand, int level) {
         driver.current(x, 0, z);
-        for (int y = 0; y <= (level - offset - rand.nextInt(2)); y++) {
+        for (int y = 0; y <= level - offset - rand.nextInt(2); y++) {
             char b = driver.getBlock();
             if (b != bedrockChar) {
                 driver.add(baseChar);
@@ -870,13 +884,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 driver.incY();
             }
         }
-        int r = rand.nextInt(2);
-        clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
+        clearRange(info, x, z,level + offset + rand.nextInt(2), 230, info.waterLevel > info.groundLevel);
     }
 
     private void flattenChunkBorderDownwards(BuildingInfo info, int x, int offset, int z, Random rand, int level) {
-        int r = rand.nextInt(2);
-        clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
+        clearRange(info, x, z,level + offset + rand.nextInt(2), 230, info.waterLevel > info.groundLevel);
     }
 
     private void doCityChunk(int chunkX, int chunkZ, BuildingInfo info) {
