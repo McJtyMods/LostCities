@@ -19,11 +19,6 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 
 repositories {
-    maven { // The repo from which to get waila
-        name "Mobius Repo"
-        url "https://tehnut.info/maven"
-        //url "http://mobiusstrip.eu/maven"
-    }
     maven { // JEI
         url "https://dvs1.progwml6.com/files/maven"
     }

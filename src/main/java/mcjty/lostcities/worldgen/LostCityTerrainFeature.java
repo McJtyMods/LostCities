@@ -1068,7 +1068,7 @@ public class LostCityTerrainFeature {
             ChunkGenerator<?> generator = ((ServerChunkProvider) chunkProvider).getChunkGenerator();
             generator.generateBiomes(primer);
             generator.makeBase(region.getDimension().getWorld(), primer);
-            generator.func_225551_a_((WorldGenRegion) region, primer);
+            generator.generateSurface((WorldGenRegion) region, primer);
         }
     }
 
