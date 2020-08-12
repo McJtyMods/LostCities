@@ -13,6 +13,7 @@ import net.minecraft.world.gen.placement.CountRangeConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -84,14 +85,16 @@ public class ModSetup {
             AssetRegistries.showStatistics();
         }
 
-        for (Biome biome : ForgeRegistries.BIOMES) {
-            if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)) {
-                biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Registration.LOSTCITY_FEATURE
-                        .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
-                        .withPlacement(Placement.COUNT_RANGE.configure(new CountRangeConfig(1, 0, 0, 1)))
-                );
+        DeferredWorkQueue.runLater(() -> {
+            for (Biome biome : ForgeRegistries.BIOMES) {
+                if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)) {
+                    biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Registration.LOSTCITY_FEATURE
+                            .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
+                            .withPlacement(Placement.COUNT_RANGE.configure(new CountRangeConfig(1, 0, 0, 1)))
+                    );
+                }
             }
-        }
+        });
 
     }
 
