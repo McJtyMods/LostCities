@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem on servers
+
 3.0.1-alpha:
 - Avoid generating Lost Cities in biomes that are marked as 'void'
 - Avoid a crash with some blocks (beehives) causing out of bounds errors during chunk generation
