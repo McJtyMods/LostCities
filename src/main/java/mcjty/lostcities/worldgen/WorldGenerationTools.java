@@ -35,14 +35,12 @@ public class WorldGenerationTools {
 
 
         BlockState state = world.getBlockState(new BlockPos(x, y + 1, z));
-        Block block = state.getBlock();
-        while (block.getMaterial(state).isLiquid()) {
+        while (state.getMaterial().isLiquid()) {
             y++;
             if (y > world.getHeight()-10) {
                 return -1;
             }
             state = world.getBlockState(new BlockPos(x, y + 1, z));
-            block = state.getBlock();
         }
 
         return y;
@@ -54,8 +52,7 @@ public class WorldGenerationTools {
             return false;
         }
         BlockState state = world.getBlockState(new BlockPos(x, y, z));
-        Block block = state.getBlock();
-        return block.getMaterial(state).blocksMovement();
+        return state.getMaterial().blocksMovement();
     }
 
     // Return true if this block is solid.

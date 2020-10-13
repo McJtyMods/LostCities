@@ -6,12 +6,13 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Random;
 
@@ -87,7 +88,7 @@ public class NullDimensionInfo implements IDimensionInfo {
     }
 
     @Override
-    public void setWorld(IWorld world) {
+    public void setWorld(ISeedReader world) {
     }
 
     @Override
@@ -96,13 +97,13 @@ public class NullDimensionInfo implements IDimensionInfo {
     }
 
     @Override
-    public IWorld getWorld() {
+    public ISeedReader getWorld() {
         return null;
     }
 
     @Override
-    public DimensionType getType() {
-        return DimensionType.OVERWORLD;
+    public RegistryKey<World> getType() {
+        return World.OVERWORLD;
     }
 
     @Override
@@ -181,8 +182,8 @@ public class NullDimensionInfo implements IDimensionInfo {
 //    }
 
     @Override
-    public Biome getBiome(BlockPos pos) {
-        Biome biome = Biomes.PLAINS;
+    public RegistryKey<Biome> getBiome(BlockPos pos) {
+        RegistryKey<Biome> biome = Biomes.PLAINS;
         ChunkPos cp = new ChunkPos(pos);
         char b = getBiomeChar(cp.x, cp.z);
         switch (b) {

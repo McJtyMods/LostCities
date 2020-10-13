@@ -92,7 +92,7 @@ public class BiomeTranslator {
         LostCities.setup.getLogger().info("Dumping biome mapping");
         for (Map.Entry<ResourceLocation, Biome> entry : translationMap.entrySet()) {
             ResourceLocation biomeKey = ForgeRegistries.BIOMES.getKey(entry.getValue());
-            LostCities.setup.getLogger().info("biome: " + entry.getKey() + " -> " + entry.getValue().getTranslationKey() + " (" + biomeKey.toString() + ")");
+            LostCities.setup.getLogger().info("biome: " + entry.getKey() + " -> " + entry.getValue().getRegistryName().toString() + " (" + biomeKey.toString() + ")");
         }
     }
 
@@ -109,7 +109,7 @@ public class BiomeTranslator {
                 }
             }
             if (bestFit == null) {
-                bestFit = Biomes.PLAINS;
+                bestFit = ForgeRegistries.BIOMES.getValue(Biomes.PLAINS.getRegistryName());
             }
             translationMap.put(biome.getRegistryName(), bestFit);
         }
@@ -133,7 +133,7 @@ public class BiomeTranslator {
                 }
             }
             if (bestFit.isEmpty()) {
-                bestFit.add(Biomes.PLAINS);
+                bestFit.add(ForgeRegistries.BIOMES.getValue(Biomes.PLAINS.getRegistryName()));
             }
 
             if (bestFit.size() == 1) {
@@ -178,8 +178,9 @@ public class BiomeTranslator {
         if (a == b) {
             return -1000;
         }
+        // @todo 1.16
 //        float dr = a.getRainfall() - b.getRainfall();
-        float dt = a.getDefaultTemperature() - b.getDefaultTemperature();
+//        float dt = a.getDefaultTemperature() - b.getDefaultTemperature();
 //        float dv = a.getHeightVariation() - b.getHeightVariation();
 //        float dh = a.getBaseHeight() - b.getBaseHeight();
 

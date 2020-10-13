@@ -14,8 +14,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -27,7 +27,7 @@ public class CitySphere implements ILostSphere {
 
     private static Map<ChunkCoord, CitySphere> citySphereCache = new HashMap<>();
 
-    public static final CitySphere EMPTY = new CitySphere(new ChunkCoord(DimensionType.OVERWORLD, 0, 0), 0.0f, new BlockPos(0, 0, 0), false);
+    public static final CitySphere EMPTY = new CitySphere(new ChunkCoord(World.OVERWORLD, 0, 0), 0.0f, new BlockPos(0, 0, 0), false);
 
     private final ChunkCoord center;
     private final BlockPos centerPos;

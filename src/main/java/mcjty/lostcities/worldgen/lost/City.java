@@ -7,9 +7,10 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -29,7 +30,7 @@ public class City {
         predefinedStreetMap = null;
     }
 
-    public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, DimensionType type) {
+    public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, RegistryKey<World> type) {
         if (predefinedCityMap == null) {
             predefinedCityMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -42,7 +43,7 @@ public class City {
         return predefinedCityMap.get(new ChunkCoord(type, chunkX, chunkZ));
     }
 
-    public static PredefinedCity.PredefinedBuilding getPredefinedBuilding(int chunkX, int chunkZ, DimensionType type) {
+    public static PredefinedCity.PredefinedBuilding getPredefinedBuilding(int chunkX, int chunkZ, RegistryKey<World> type) {
         if (predefinedBuildingMap == null) {
             predefinedBuildingMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -58,7 +59,7 @@ public class City {
         return predefinedBuildingMap.get(new ChunkCoord(type, chunkX, chunkZ));
     }
 
-    public static PredefinedCity.PredefinedStreet getPredefinedStreet(int chunkX, int chunkZ, DimensionType type) {
+    public static PredefinedCity.PredefinedStreet getPredefinedStreet(int chunkX, int chunkZ, RegistryKey<World> type) {
         if (predefinedStreetMap == null) {
             predefinedStreetMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -173,7 +174,7 @@ public class City {
     }
 
     public static float getCityFactor(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        DimensionType type = provider.getType();
+        RegistryKey<World> type = provider.getType();
         // If we have a predefined building here we force a high city factor
 
         PredefinedCity.PredefinedBuilding predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ, type);
@@ -251,7 +252,7 @@ public class City {
         try {
             f = map.get(object);
         } catch(NullPointerException e) {
-            throw new RuntimeException("Biome '" + biome.getTranslationKey() + "' (" + biome.getRegistryName().getPath() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
+            throw new RuntimeException("Biome '" + biome.getRegistryName().toString() + "' (" + biome.getRegistryName().getPath() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
         }
         if (f != null) {
             foundFactor = f;

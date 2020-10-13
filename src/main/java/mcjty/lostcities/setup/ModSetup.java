@@ -7,11 +7,6 @@ import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldtypes.CavernWorldType;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraft.world.gen.placement.CountRangeConfig;
-import net.minecraft.world.gen.placement.Placement;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModList;
@@ -44,7 +39,8 @@ public class ModSetup {
 
         PacketHandler.registerMessages("lostcities");
 
-        CavernWorldType.init();
+        // @todo 1.16
+//        CavernWorldType.init();
 
         setupModCompat();
 
@@ -87,12 +83,13 @@ public class ModSetup {
 
         DeferredWorkQueue.runLater(() -> {
             for (Biome biome : ForgeRegistries.BIOMES) {
-                if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)) {
-                    biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Registration.LOSTCITY_FEATURE
-                            .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
-                            .withPlacement(Placement.COUNT_RANGE.configure(new CountRangeConfig(1, 0, 0, 1)))
-                    );
-                }
+                // @todo 1.16
+//                if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)) {
+//                    biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Registration.LOSTCITY_FEATURE
+//                            .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
+//                            .withPlacement(Placement.COUNT_RANGE.configure(new CountRangeConfig(1, 0, 0, 1)))
+//                    );
+//                }
             }
         });
 

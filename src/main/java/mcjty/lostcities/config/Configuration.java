@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -11,14 +13,14 @@ import java.util.*;
 public class Configuration {
 
     public static class Value<T> {
-        private final String comment;
+        private final ITextComponent comment;
         private T value;
         private final T min;
         private final T max;
         private final Comparator<T> comparator;
 
         public Value(String comment, T value, T min, T max, @Nonnull Comparator<T> comparator) {
-            this.comment = comment;
+            this.comment = new StringTextComponent(comment);
             this.value = value;
             this.min = min;
             this.max = max;
@@ -33,7 +35,7 @@ public class Configuration {
             return value;
         }
 
-        public String getComment() {
+        public ITextComponent getComment() {
             return comment;
         }
 

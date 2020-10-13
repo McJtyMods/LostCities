@@ -1,5 +1,6 @@
 package mcjty.lostcities.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
@@ -15,7 +16,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.WorldType;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.Random;
 public class GuiLCConfig extends Screen {
 
     private final Screen parent;
-    private final WorldType worldType;
+//    private final WorldType worldType;
 
     private Button profileButton;
     private Button customizeButton;
@@ -46,10 +46,10 @@ public class GuiLCConfig extends Screen {
 
     private LostCitySetup localSetup = new LostCitySetup(this::refreshPreview);
 
-    public GuiLCConfig(Screen parent, WorldType worldType) {
+    public GuiLCConfig(Screen parent) { // @todo 1.16}, WorldType worldType) {
         super(new StringTextComponent("Lost City Configuration"));
         this.parent = parent;
-        this.worldType = worldType;
+//        this.worldType = worldType;
         localSetup.copyFrom(LostCitySetup.CLIENT_SETUP);
     }
 
@@ -79,21 +79,23 @@ public class GuiLCConfig extends Screen {
         super.init();
         this.minecraft.keyboardListener.enableRepeatEvents(true);
 
-        profileButton = addButton(new ButtonExt(this, 70, 10, 100, 20, localSetup.getProfileLabel(), p -> {
-            localSetup.toggleProfile(worldType);
+        profileButton = addButton(new ButtonExt(this, 70, 10, 100, 20, new StringTextComponent(localSetup.getProfileLabel()), p -> {
+            localSetup.toggleProfile(/* @todo 1.16 worldType*/);
             updateValues();
-        }).tooltip("Select a standard profile for your Lost City worldgen"));
-        customizeButton = addButton(new ButtonExt(this, 180, 10, 100, 20, "Customize", p -> {
+        }).tooltip(new StringTextComponent("Select a standard profile for your Lost City worldgen")));
+        customizeButton = addButton(new ButtonExt(this, 180, 10, 100, 20, new StringTextComponent("Customize"), p -> {
             localSetup.customize();
             updateValues();
-        }).tooltip("Create a customized version of the currently selected profile"));
-        modeButton = addButton(new ButtonExt(this, 290, 10, 100, 20, mode, p -> toggleMode())
-            .tooltip("Switch between different configuration pages"));
+        }).tooltip(new StringTextComponent("Create a customized version of the currently selected profile")));
+        modeButton = addButton(new ButtonExt(this, 290, 10, 100, 20, new StringTextComponent(mode), p -> toggleMode())
+            .tooltip(new StringTextComponent("Switch between different configuration pages")));
 
-        Button doneButton = addButton(new Button(10, this.height - 30, 120, 20, "Done", p -> done()));
-        Button cancelButton = addButton(new Button(this.width - 130, this.height - 30, 120, 20, "Cancel", p -> cancel()));
-        Button randomizeButton = addButton(new ButtonExt(this, this.width - 35, 35, 30, 20, "Rnd", p -> randomizePreview())
-                .tooltip("Randomize the seed for the preview (does not affect the generated world)"));
+        Button doneButton = addButton(new Button(10, this.height - 30, 120, 20,
+                new StringTextComponent("Done"), p -> done()));
+        Button cancelButton = addButton(new Button(this.width - 130, this.height - 30, 120, 20,
+                new StringTextComponent("Cancel"), p -> cancel()));
+        Button randomizeButton = addButton(new ButtonExt(this, this.width - 35, 35, 30, 20, new StringTextComponent("Rnd"), p -> randomizePreview())
+                .tooltip(new StringTextComponent("Randomize the seed for the preview (does not affect the generated world)")));
 
         initCities(110);
         initBuildings(110);
@@ -211,7 +213,7 @@ public class GuiLCConfig extends Screen {
             idx = 0;
         }
         mode = MODES.get(idx);
-        modeButton.setMessage(mode);
+        modeButton.setMessage(new StringTextComponent(mode));
     }
 
     private GuiElement add(GuiElement el) {
@@ -236,26 +238,26 @@ public class GuiLCConfig extends Screen {
         Railway.cleanCache();
     }
 
-    private void renderExtra() {
-        drawString(font, "Profile:", 10, 16, 0xffffffff);
-        elements.stream().forEach(GuiElement::render);
+    private void renderExtra(MatrixStack stack) {
+        drawString(stack, font, "Profile:", 10, 16, 0xffffffff);
+        elements.stream().forEach(el -> el.render(stack));
 
         localSetup.get().ifPresent(profile -> {
             if ("Cities".equals(mode)) {
-                renderPreviewMap(profile, false);
+                renderPreviewMap(stack, profile, false);
             } else if ("Buildings".equals(mode)) {
-                renderPreviewCity(profile, false);
+                renderPreviewCity(stack, profile, false);
             } else if ("Damage".equals(mode)) {
-                renderPreviewCity(profile, true);
+                renderPreviewCity(stack, profile, true);
             } else if ("Transport".equals(mode)) {
-                renderPreviewTransports(profile);
+                renderPreviewTransports(stack, profile);
             } else {
             }
         });
     }
 
-    private void renderPreviewTransports(LostCityProfile profile) {
-        renderPreviewMap(profile, true);
+    private void renderPreviewTransports(MatrixStack stack, LostCityProfile profile) {
+        renderPreviewMap(stack, profile, true);
         Random rand = new Random(seed);
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
         for (int z = 0; z < 50; z++) {
@@ -277,17 +279,17 @@ public class GuiLCConfig extends Screen {
                     }
                 }
                 if (color != 0) {
-                    fill(sx, sz, sx + 3, sz + 3, color);
+                    fill(stack, sx, sz, sx + 3, sz + 3, color);
                 }
             }
         }
     }
 
-    private void renderPreviewCity(LostCityProfile profile, boolean showDamage) {
+    private void renderPreviewCity(MatrixStack stack, LostCityProfile profile, boolean showDamage) {
         int base = 50 + 120;
         int leftRender = this.width - 157;
-        fill(leftRender, 50, leftRender + 150, base, 0xff0099bb);
-        fill(leftRender, base, leftRender + 150, 50 + 150, 0xff996633);
+        fill(stack, leftRender, 50, leftRender + 150, base, 0xff0099bb);
+        fill(stack, leftRender, base, leftRender + 150, 50 + 150, 0xff996633);
 
         float radius = 190;
         int dimHor = 10;
@@ -318,13 +320,13 @@ public class GuiLCConfig extends Screen {
                     f = minfloors;
                 }
                 for (int i = 0; i < f; i++) {
-                    fill(leftRender + dimHor * x, base - i * dimVer - dimVer, leftRender + dimHor * x + dimHor - 1, base - i * dimVer + dimVer - 1 - dimVer, 0xffffffff);
+                    fill(stack, leftRender + dimHor * x, base - i * dimVer - dimVer, leftRender + dimHor * x + dimHor - 1, base - i * dimVer + dimVer - 1 - dimVer, 0xffffffff);
                 }
 
                 int maxcellars = profile.BUILDING_MAXCELLARS;
                 int fb = profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars + 1));
                 for (int i = 0; i < fb; i++) {
-                    fill(leftRender + dimHor * x, base + i * dimVer, leftRender + dimHor * x + dimHor - 1, base + i * dimVer + dimVer - 1, 0xff333333);
+                    fill(stack, leftRender + dimHor * x, base + i * dimVer, leftRender + dimHor * x + dimHor - 1, base + i * dimVer + dimVer - 1, 0xff333333);
                 }
             }
         }
@@ -344,7 +346,7 @@ public class GuiLCConfig extends Screen {
                     if (dist < explosionRadius - 3) {
                         double damage = 3.0f * (explosionRadius - dist) / explosionRadius;
                         if (rnd.nextFloat() < damage) {
-                            fill(x, z, x + 1, z + 1, 0x66ff0000);
+                            fill(stack, x, z, x + 1, z + 1, 0x66ff0000);
                         }
                     }
                 }
@@ -359,7 +361,7 @@ public class GuiLCConfig extends Screen {
                     if (dist < explosionRadius - 3) {
                         double damage = 3.0f * (explosionRadius - dist) / explosionRadius;
                         if (rnd.nextFloat() < damage) {
-                            fill(x, z, x + 1, z + 1, 0x66ff0000);
+                            fill(stack, x, z, x + 1, z + 1, 0x66ff0000);
                         }
                     }
                 }
@@ -377,7 +379,7 @@ public class GuiLCConfig extends Screen {
         return color;
     }
 
-    private void renderPreviewMap(LostCityProfile profile, boolean soft) {
+    private void renderPreviewMap(MatrixStack stack, LostCityProfile profile, boolean soft) {
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
         for (int z = 0; z < 50; z++) {
             for (int x = 0; x < 50; x++) {
@@ -394,14 +396,14 @@ public class GuiLCConfig extends Screen {
                     case '*': color = 0xcccc55; break;
                     case 'd': color = 0xcccc55; break;
                 }
-                fill(sx, sz, sx + 3, sz + 3, 0xff000000 + soften(color, soft));
+                fill(stack, sx, sz, sx + 3, sz + 3, 0xff000000 + soften(color, soft));
                 LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(x, z, diminfo);
                 if (characteristics.isCity) {
                     color = 0x995555;
                     if (BuildingInfo.hasBuildingGui(x, z, diminfo, characteristics)) {
                         color = 0xffffff;
                     }
-                    fill(sx, sz, sx + 2, sz + 2, 0xff000000 + soften(color, soft));
+                    fill(stack, sx, sz, sx + 2, sz + 2, 0xff000000 + soften(color, soft));
                 }
             }
         }
@@ -413,7 +415,7 @@ public class GuiLCConfig extends Screen {
     }
 
     private void refreshButtons() {
-        profileButton.setMessage(localSetup.getProfileLabel());
+        profileButton.setMessage(new StringTextComponent(localSetup.getProfileLabel()));
         customizeButton.active = localSetup.isCustomizable();
 
         boolean isCustomized = "customized".equals(localSetup.getProfileLabel());
@@ -445,15 +447,15 @@ public class GuiLCConfig extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground();
+    public void render(MatrixStack stack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(stack);
         refreshButtons();
-        renderExtra();
-        super.render(mouseX, mouseY, partialTicks);
+        renderExtra(stack);
+        super.render(stack, mouseX, mouseY, partialTicks);
         for(Widget widget : this.buttons) {
             if (widget.isMouseOver(mouseX, mouseY) && widget.visible) {
 //            if (widget.isHovered() && widget.visible) {
-                widget.renderToolTip(mouseX - 0, mouseY - 0);
+                widget.renderToolTip(stack, mouseX - 0, mouseY - 0);
                 break;
             }
         }

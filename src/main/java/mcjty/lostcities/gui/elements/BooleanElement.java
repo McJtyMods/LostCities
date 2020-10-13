@@ -1,7 +1,10 @@
 package mcjty.lostcities.gui.elements;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
 public class BooleanElement extends GuiElement {
 
@@ -15,12 +18,12 @@ public class BooleanElement extends GuiElement {
         this.gui = gui;
         this.attribute = attribute;
         Boolean c = gui.getLocalSetup().get().map(h -> (Boolean) h.toConfiguration().get(attribute)).orElse(false);
-        field = new ButtonExt(gui, x, y, 60, 16, c ? "On" : "Off", button -> {
-            String message = button.getMessage();
-            if ("On".equals(message)) {
-                button.setMessage("Off");
+        field = new ButtonExt(gui, x, y, 60, 16, c ? new StringTextComponent("On") : new StringTextComponent("Off"), button -> {
+            ITextComponent message = button.getMessage();
+            if ("On".equals(message.getString())) { // @todo 1.16 getString() is ugly here!
+                button.setMessage(new StringTextComponent("Off"));
             } else {
-                button.setMessage("On");
+                button.setMessage(new StringTextComponent("On"));
             }
             gui.getLocalSetup().get().ifPresent(profile -> {
                 Configuration configuration = profile.toConfiguration();
@@ -30,9 +33,9 @@ public class BooleanElement extends GuiElement {
             });
         }) {
             @Override
-            public void renderToolTip(int x, int y) {
+            public void renderToolTip(MatrixStack stack, int x, int y) {
                 gui.getLocalSetup().get().ifPresent(h -> {
-                    gui.renderTooltip(h.toConfiguration().getValue(attribute).getComment(), x, y);
+                    gui.renderTooltip(stack, h.toConfiguration().getValue(attribute).getComment(), x, y);
                 });
             }
         };
@@ -45,10 +48,10 @@ public class BooleanElement extends GuiElement {
     }
 
     @Override
-    public void render() {
+    public void render(MatrixStack stack) {
         if (label != null) {
             if (field.visible) {
-                gui.drawString(gui.getFont(), label, 10, y + 5, 0xffffffff);
+                gui.drawString(stack, gui.getFont(), label, 10, y + 5, 0xffffffff);
             }
         }
     }
@@ -57,7 +60,7 @@ public class BooleanElement extends GuiElement {
     public void update() {
         gui.getLocalSetup().get().ifPresent(profile -> {
             Boolean result = profile.toConfiguration().get(attribute);
-            field.setMessage(result ? "On" : "Off");
+            field.setMessage(result ? new StringTextComponent("On") : new StringTextComponent("Off"));
         });
     }
 

@@ -4,12 +4,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Teleporter;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 
-import javax.annotation.Nonnull;
+import java.util.function.Function;
 
 public class CustomTeleporter extends Teleporter {
 
@@ -25,20 +26,20 @@ public class CustomTeleporter extends Teleporter {
     private double x, y, z;
 
     @Override
-    public boolean placeInPortal(@Nonnull Entity entity, float rotationYaw) {
+    public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
         this.worldServer.getBlockState(new BlockPos((int) this.x, (int) this.y, (int) this.z));
 
         entity.setPosition(this.x, this.y, this.z);
         entity.setMotion(0, 0, 0);
-        return true;
+        return entity;
     }
 
-    public static void teleportToDimension(PlayerEntity player, DimensionType dimension, BlockPos pos){
+    public static void teleportToDimension(PlayerEntity player, RegistryKey<World> dimension, BlockPos pos){
         teleportToDimension(player, dimension, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
     }
 
-    public static void teleportToDimension(PlayerEntity player, DimensionType dimension, double x, double y, double z) {
-        DimensionType oldDimension = player.getEntityWorld().getDimension().getType();
+    public static void teleportToDimension(PlayerEntity player, RegistryKey<World> dimension, double x, double y, double z) {
+        RegistryKey<World> oldDimension = player.getEntityWorld().getDimensionKey();
         ServerPlayerEntity entityPlayerMP = (ServerPlayerEntity) player;
         MinecraftServer server = player.getEntityWorld().getServer();
         ServerWorld worldServer = server.getWorld(dimension);

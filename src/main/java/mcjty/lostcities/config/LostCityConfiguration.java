@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import mcjty.lostcities.LostCities;
 import net.minecraft.block.Blocks;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.io.FileUtils;
 
@@ -69,7 +68,7 @@ public class LostCityConfiguration {
 
     public static String DIMENSION_PROFILE = "default";
     public static String DEFAULT_PROFILE = "default";
-    public static DimensionType DIMENSION_ID;// @todo 1.14 = 111;
+//    public static RegistryKey<World> DIMENSION_ID;// @todo 1.14 = 111; 1.16
     public static boolean DIMENSION_BOP = true;
 
     public static boolean DEBUG = false;

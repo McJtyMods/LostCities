@@ -6,8 +6,10 @@ import com.google.common.collect.Lists;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.nio.file.Path;
@@ -22,7 +24,7 @@ public class Config {
     };
 
     private static ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_PROFILES;
-    private static Map<DimensionType, String> dimensionProfileCache = null;
+    private static Map<RegistryKey<World>, String> dimensionProfileCache = null;
 
     // Profile as selected by the client
     public static String profileFromClient = null;
@@ -30,7 +32,7 @@ public class Config {
     public static ForgeConfigSpec.ConfigValue<String> SELECTED_PROFILE;
     public static ForgeConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
 
-    public static String getProfileForDimension(DimensionType type) {
+    public static String getProfileForDimension(RegistryKey<World> type) {
         if (dimensionProfileCache == null) {
             dimensionProfileCache = new HashMap<>();
             for (String dp : DIMENSION_PROFILES.get()) {
@@ -38,7 +40,7 @@ public class Config {
                 if (split.length != 2) {
                     LostCities.getLogger().error("Bad format for config value: '" + dp +"'!");
                 } else {
-                    DimensionType dimensionType = DimensionType.byName(new ResourceLocation(split[0]));
+                    RegistryKey<World> dimensionType = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(split[0]));
                     if (dimensionType != null) {
                         String profileName = split[1];
                         LostCityProfile profile = LostCityConfiguration.standardProfiles.get(profileName);
@@ -68,7 +70,7 @@ public class Config {
                 }
             }
             if (!selectedProfile.isEmpty()) {
-                dimensionProfileCache.put(DimensionType.OVERWORLD, selectedProfile);
+                dimensionProfileCache.put(World.OVERWORLD, selectedProfile);
                 String json = Config.SELECTED_CUSTOM_JSON.get();
                 if (json != null && !json.isEmpty()) {
                     LostCityProfile profile = new LostCityProfile("customized", json);
@@ -79,10 +81,10 @@ public class Config {
                 }
             }
 
-            String profile = getProfileForDimension(DimensionType.OVERWORLD);
+            String profile = getProfileForDimension(World.OVERWORLD);
             if (profile != null && !profile.isEmpty()) {
                 if (LostCityConfiguration.standardProfiles.get(profile).GENERATE_NETHER) {
-                    dimensionProfileCache.put(DimensionType.THE_NETHER, "cavern");
+                    dimensionProfileCache.put(World.THE_NETHER, "cavern");
                 }
             }
         }

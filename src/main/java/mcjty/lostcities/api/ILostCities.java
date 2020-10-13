@@ -1,6 +1,7 @@
 package mcjty.lostcities.api;
 
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
@@ -17,5 +18,5 @@ public interface ILostCities {
      * as this is not compatible with Sponge
      */
     @Nullable
-    ILostChunkGenerator getLostGenerator(DimensionType dimension);
+    ILostChunkGenerator getLostGenerator(RegistryKey<World> dimension);
 }

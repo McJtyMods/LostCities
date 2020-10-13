@@ -1,13 +1,12 @@
 package mcjty.lostcities.varia;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -23,15 +22,15 @@ public class WorldTools {
 
     public static ServerWorld getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
+        return server.getWorld(World.OVERWORLD);
     }
 
     public static ServerWorld getOverworld(World world) {
         MinecraftServer server = world.getServer();
-        return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
+        return server.getWorld(World.OVERWORLD);
     }
 
-    public static ServerWorld loadWorld(DimensionType type) {
+    public static ServerWorld loadWorld(RegistryKey<World> type) {
         ServerWorld world = getWorld(type);
         if (world == null) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -40,14 +39,14 @@ public class WorldTools {
         return world;
     }
 
-    public static ServerWorld getWorld(DimensionType type) {
+    public static ServerWorld getWorld(RegistryKey<World> type) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return DimensionManager.getWorld(server, type, false, false);
+        return server.getWorld(type);
     }
 
-    public static ServerWorld getWorld(World world, DimensionType type) {
+    public static ServerWorld getWorld(World world, RegistryKey<World> type) {
         MinecraftServer server = world.getServer();
-        return DimensionManager.getWorld(server, type, false, false);
+        return server.getWorld(type);
     }
 
     /**

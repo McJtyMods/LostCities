@@ -3,26 +3,29 @@ package mcjty.lostcities.worldgen;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.AbstractChunkProvider;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerChunkProvider;
 
 import java.util.Random;
 
 public class DefaultDimensionInfo implements IDimensionInfo {
 
-    private IWorld world;
+    private ISeedReader world;
     private final LostCityProfile profile;
     private final WorldStyle style;
 
     private final LostCityTerrainFeature feature;
 
-    public DefaultDimensionInfo(IWorld world, LostCityProfile profile) {
+    public DefaultDimensionInfo(ISeedReader world, LostCityProfile profile) {
         this.world = world;
         this.profile = profile;
         style = AssetRegistries.WORLDSTYLES.get("standard");
@@ -31,7 +34,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     }
 
     @Override
-    public void setWorld(IWorld world) {
+    public void setWorld(ISeedReader world) {
         this.world = world;
     }
 
@@ -41,13 +44,13 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     }
 
     @Override
-    public IWorld getWorld() {
+    public ISeedReader getWorld() {
         return world;
     }
 
     @Override
-    public DimensionType getType() {
-        return world.getDimension().getType();
+    public RegistryKey<World> getType() {
+        return world.getWorld().getDimensionKey();
     }
 
     @Override
@@ -90,12 +93,12 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 //    }
 //
     @Override
-    public Biome getBiome(BlockPos pos) {
+    public RegistryKey<Biome> getBiome(BlockPos pos) {
         AbstractChunkProvider chunkProvider = getWorld().getChunkProvider();
         if (chunkProvider instanceof ServerChunkProvider) {
             BiomeProvider biomeProvider = ((ServerChunkProvider) chunkProvider).getChunkGenerator().getBiomeProvider();
-            // @todo 1.15 check if thi sis correct!
-            return biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ());
+            // @todo 1.15 check if this is correct!
+            return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ()).getRegistryName());
         }
         return Biomes.PLAINS;
     }

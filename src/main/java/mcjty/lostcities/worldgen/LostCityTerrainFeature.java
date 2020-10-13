@@ -18,7 +18,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.IChunk;
@@ -1048,8 +1048,8 @@ public class LostCityTerrainFeature {
         clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
-    public synchronized ChunkHeightmap getHeightmap(int chunkX, int chunkZ, @Nonnull IWorld world) {
-        ChunkCoord key = new ChunkCoord(world.getDimension().getType(), chunkX, chunkZ);
+    public synchronized ChunkHeightmap getHeightmap(int chunkX, int chunkZ, @Nonnull ISeedReader world) {
+        ChunkCoord key = new ChunkCoord(world.getWorld().getDimensionKey(), chunkX, chunkZ);
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
         } else {
@@ -1060,14 +1060,15 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void makeDummyChunk(int chunkX, int chunkZ, IWorld region, ChunkHeightmap heightmap) {
+    private void makeDummyChunk(int chunkX, int chunkZ, ISeedReader region, ChunkHeightmap heightmap) {
         DummyChunk primer = new DummyChunk(new ChunkPos(chunkX, chunkZ), heightmap);
-        AbstractChunkProvider chunkProvider = region.getDimension().getWorld().getChunkProvider();
+        AbstractChunkProvider chunkProvider = region.getWorld().getChunkProvider();
         if (chunkProvider instanceof ServerChunkProvider) {
             // @todo 1.15 check!
-            ChunkGenerator<?> generator = ((ServerChunkProvider) chunkProvider).getChunkGenerator();
-            generator.generateBiomes(primer);
-            generator.makeBase(region.getDimension().getWorld(), primer);
+            ChunkGenerator generator = ((ServerChunkProvider) chunkProvider).getChunkGenerator();
+            // @todo 1.16
+//            generator.generateBiomes(primer);
+//            generator.makeBase(region.getDimension().getWorld(), primer);
             generator.generateSurface((WorldGenRegion) region, primer);
         }
     }

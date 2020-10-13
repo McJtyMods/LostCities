@@ -3,11 +3,11 @@ package mcjty.lostcities.worldgen;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.Config;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.ISeedReader;
+import net.minecraft.world.World;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
@@ -19,14 +19,14 @@ import java.util.Random;
 
 public class LostCityFeature extends Feature<NoFeatureConfig> {
 
-    private Map<DimensionType, IDimensionInfo> dimensionInfo = new HashMap<>();
+    private Map<RegistryKey<World>, IDimensionInfo> dimensionInfo = new HashMap<>();
 
     public LostCityFeature() {
-        super(NoFeatureConfig::deserialize);
+        super(NoFeatureConfig.field_236558_a_);
     }
 
     @Override
-    public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+    public boolean func_241855_a(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
         if (world instanceof WorldGenRegion) {
             IDimensionInfo diminfo = getDimensionInfo(world);
             if (diminfo != null) {
@@ -43,8 +43,8 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
     }
 
     @Nullable
-    public IDimensionInfo getDimensionInfo(IWorld world) {
-        DimensionType type = world.getDimension().getType();
+    public IDimensionInfo getDimensionInfo(ISeedReader world) {
+        RegistryKey<World> type = world.getWorld().getDimensionKey();
         String profileName = Config.getProfileForDimension(type);
         if (profileName != null) {
             if (!dimensionInfo.containsKey(type)) {

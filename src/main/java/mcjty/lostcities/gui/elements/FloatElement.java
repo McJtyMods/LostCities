@@ -1,8 +1,10 @@
 package mcjty.lostcities.gui.elements;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.util.text.StringTextComponent;
 
 public class FloatElement extends GuiElement {
 
@@ -17,11 +19,11 @@ public class FloatElement extends GuiElement {
         this.gui = gui;
         this.attribute = attribute;
         Float c = gui.getLocalSetup().get().map(h -> (Float) h.toConfiguration().get(attribute)).orElse(0.0f);
-        field = new TextFieldWidget(gui.getFont(), x, y, 45, 16, Float.toString(c)) {
+        field = new TextFieldWidget(gui.getFont(), x, y, 45, 16, new StringTextComponent(Float.toString(c))) {
             @Override
-            public void renderToolTip(int x, int y) {
+            public void renderToolTip(MatrixStack stack, int x, int y) {
                     gui.getLocalSetup().get().ifPresent(h -> {
-                        gui.renderTooltip(h.toConfiguration().getValue(attribute).getComment(), x, y);
+                        gui.renderTooltip(stack, h.toConfiguration().getValue(attribute).getComment(), x, y);
                     });
             }
         };
@@ -64,13 +66,13 @@ public class FloatElement extends GuiElement {
     }
 
     @Override
-    public void render() {
+    public void render(MatrixStack stack) {
         if (field.visible) {
             if (label != null) {
-                gui.drawString(gui.getFont(), label, 10, y + 5, 0xffffffff);
+                gui.drawString(stack, gui.getFont(), label, 10, y + 5, 0xffffffff);
             }
             if (prefix != null) {
-                gui.drawString(gui.getFont(), prefix, x - 8, y + 5, 0xffffffff);
+                gui.drawString(stack, gui.getFont(), prefix, x - 8, y + 5, 0xffffffff);
             }
         }
     }

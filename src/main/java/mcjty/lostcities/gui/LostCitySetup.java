@@ -2,7 +2,6 @@ package mcjty.lostcities.gui;
 
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
-import net.minecraft.world.WorldType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,12 +87,13 @@ public class LostCitySetup {
 //        }
 //    }
 
-    public void toggleProfile(WorldType worldType) {
+    public void toggleProfile(/* @todo 1.16 WorldType worldType */) {
         if (profiles == null) {
             String preferedProfile = "default";
-            if ("lc_cavern".equals(worldType.getName())) {
-                preferedProfile = "cavern";
-            }
+            // @todo 1.16
+//            if ("lc_cavern".equals(worldType.getName())) {
+//                preferedProfile = "cavern";
+//            }
             profiles = new ArrayList<>(LostCityConfiguration.standardProfiles.keySet());
             String finalPreferedProfile = preferedProfile;
             profiles.sort((o1, o2) -> {

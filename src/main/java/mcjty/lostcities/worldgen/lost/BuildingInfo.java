@@ -11,10 +11,11 @@ import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -353,7 +354,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static synchronized LostChunkCharacteristics getChunkCharacteristics(int chunkX, int chunkZ, IDimensionInfo provider) {
-        DimensionType type = provider.getType();
+        RegistryKey<World> type = provider.getType();
         ChunkCoord key = new ChunkCoord(type, chunkX, chunkZ);
         if (cityInfoMap.containsKey(key)) {
             return cityInfoMap.get(key);
@@ -478,7 +479,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private static boolean checkBuildingPossibility(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, int section, int cityLevel, Random rand) {
         boolean b;
         float bc = rand.nextFloat();
-        DimensionType type = provider.getType();
+        RegistryKey<World> type = provider.getType();
 
         PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null) {
@@ -566,7 +567,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        DimensionType type = provider.getType();
+        RegistryKey<World> type = provider.getType();
         PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             return true;    // We don't need other tests. This is the top-left of a multibuilding
@@ -623,7 +624,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        DimensionType type = provider.getType();
+        RegistryKey<World> type = provider.getType();
         PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             // Regardless of other conditions, this is the top left of a multibuilding
@@ -687,7 +688,7 @@ public class BuildingInfo implements ILostChunkInfo {
         this.provider = provider;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        DimensionType type = provider.getType();
+        RegistryKey<World> type = provider.getType();
         this.coord = new ChunkCoord(type, chunkX, chunkZ);
 
         outsideChunk = provider.getProfile().isSpace() && !CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider);
