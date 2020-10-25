@@ -27,6 +27,9 @@ public class BiomeInfo {
             int chunkZ = coord.getChunkZ();
             RegistryKey<Biome> biomeKey = provider.getBiome(new BlockPos((chunkX << 4) + 8, 65, (chunkZ << 4) + 8));
             info.mainBiome = ForgeRegistries.BIOMES.getValue(biomeKey.getLocation());
+            if (info.mainBiome == null) {
+                System.out.println("BiomeInfo.getBiomeInfo");
+            }
             biomeInfoMap.put(coord, info);
         }
         return biomeInfoMap.get(coord);

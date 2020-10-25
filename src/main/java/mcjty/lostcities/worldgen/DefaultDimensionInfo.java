@@ -98,7 +98,12 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         if (chunkProvider instanceof ServerChunkProvider) {
             BiomeProvider biomeProvider = ((ServerChunkProvider) chunkProvider).getChunkGenerator().getBiomeProvider();
             // @todo 1.15 check if this is correct!
-            return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ()).getRegistryName());
+            Biome biome = biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ());
+            // @todo 1.16, why is this sometimes null?
+            if (biome.getRegistryName() == null) {
+                return Biomes.PLAINS;
+            }
+            return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
         }
         return Biomes.PLAINS;
     }

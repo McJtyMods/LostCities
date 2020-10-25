@@ -18,12 +18,14 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -1066,9 +1068,16 @@ public class LostCityTerrainFeature {
         if (chunkProvider instanceof ServerChunkProvider) {
             // @todo 1.15 check!
             ChunkGenerator generator = ((ServerChunkProvider) chunkProvider).getChunkGenerator();
-            // @todo 1.16
+
+            // @todo 1.16 CHECK
+            generator.func_242706_a(region.func_241828_r().getRegistry(Registry.BIOME_KEY), primer);
 //            generator.generateBiomes(primer);
-//            generator.makeBase(region.getDimension().getWorld(), primer);
+
+            // @todo 1.16 CHECK
+//      generator.makeBase(region.getDimension().getWorld(), primer);
+//            StructureManager structureManager = region.getWorld().func_241112_a_().func_241464_a_((WorldGenRegion) region);
+//            generator.func_230352_b_(region, structureManager, primer);
+
             generator.generateSurface((WorldGenRegion) region, primer);
         }
     }
