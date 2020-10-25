@@ -5,13 +5,9 @@ import mcjty.lostcities.config.ConfigSetup;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
-import mcjty.lostcities.worldtypes.CavernWorldType;
-import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -80,19 +76,6 @@ public class ModSetup {
 //            logger.info("Asset parts loaded: " + AssetRegistries.PARTS.getCount());
             AssetRegistries.showStatistics();
         }
-
-        DeferredWorkQueue.runLater(() -> {
-            for (Biome biome : ForgeRegistries.BIOMES) {
-                // @todo 1.16
-//                if (!BiomeDictionary.hasType(biome, BiomeDictionary.Type.VOID)) {
-//                    biome.addFeature(GenerationStage.Decoration.RAW_GENERATION, Registration.LOSTCITY_FEATURE
-//                            .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
-//                            .withPlacement(Placement.COUNT_RANGE.configure(new CountRangeConfig(1, 0, 0, 1)))
-//                    );
-//                }
-            }
-        });
-
     }
 
     private void setupModCompat() {

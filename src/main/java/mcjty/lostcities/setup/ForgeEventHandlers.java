@@ -1,7 +1,18 @@
 package mcjty.lostcities.setup;
 
 import mcjty.lostcities.commands.ModCommands;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.gen.placement.Placement;
+import net.minecraft.world.gen.placement.TopSolidRangeConfig;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ForgeEventHandlers {
@@ -9,6 +20,18 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void serverLoad(RegisterCommandsEvent event) {
         ModCommands.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onBiomeLoad(BiomeLoadingEvent event) {
+        RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, event.getName());
+        if (!BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.VOID)) {
+            ConfiguredFeature<?, ?> configuredFeature = Registration.LOSTCITY_FEATURE
+                    .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
+                    .withPlacement(Placement.field_242907_l.configure(new TopSolidRangeConfig(1, 0, 1)));
+
+            event.getGeneration().getFeatures(GenerationStage.Decoration.RAW_GENERATION).add(() -> configuredFeature);
+        }
     }
 
 //    @SubscribeEvent
