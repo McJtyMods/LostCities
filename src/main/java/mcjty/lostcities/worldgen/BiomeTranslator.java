@@ -178,15 +178,12 @@ public class BiomeTranslator {
         if (a == b) {
             return -1000;
         }
-        // @todo 1.16
-//        float dr = a.getRainfall() - b.getRainfall();
-//        float dt = a.getDefaultTemperature() - b.getDefaultTemperature();
-//        float dv = a.getHeightVariation() - b.getHeightVariation();
-//        float dh = a.getBaseHeight() - b.getBaseHeight();
+        float dr = a.getDownfall() - b.getDownfall();
+        float dt = a.getTemperature() - b.getTemperature();
+        float dv = a.getDepth() - b.getDepth();
+        float dh = a.getScale() - b.getScale();
 
-//        return Math.sqrt(dr * dr + dt * dt + dv * dv + dh * dh);
-        // @todo 1.14
-        return 0;
+        return Math.sqrt(dr * dr + dt * dt + dv * dv + dh * dh);
     }
 
 
