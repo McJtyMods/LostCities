@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.varia.Tools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -560,7 +561,7 @@ public class LostCityProfile {
                     String biomeId = split[0];
                     Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(biomeId));
                     if (biome != null) {
-                        biomeFactorMap.put(biome.getRegistryName(), f);
+                        biomeFactorMap.put(Tools.getBiomeId(biome), f);
                     } else {
                         LostCities.setup.getLogger().warn("Can't find biome " + biomeId);
                     }

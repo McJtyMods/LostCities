@@ -54,7 +54,7 @@ public class WorldStyle implements ILostCityAsset {
                 for (JsonElement el : ar) {
                     Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(el.getAsString()));
                     if (biome != null) {
-                        biomes.add(biome.getRegistryName());
+                        biomes.add(Tools.getBiomeId(biome));
                     }
                 }
                 predicate = info -> hasBiomes(info, biomes);
@@ -64,7 +64,7 @@ public class WorldStyle implements ILostCityAsset {
     }
 
     private boolean isValidBiome(Set<ResourceLocation> biomeSet, Biome biome) {
-        return biomeSet.contains(biome.getRegistryName());
+        return biomeSet.contains(Tools.getBiomeId(biome));
     }
 
     private boolean hasBiomes(Info info, Set<ResourceLocation> biomeSet) {

@@ -5,15 +5,22 @@ import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.RailShape;
 import net.minecraft.state.properties.SlabType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.fixes.BlockStateFlatteningMap;
 import net.minecraft.util.datafix.fixes.ItemStackDataFlattening;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.util.registry.MutableRegistry;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class Tools {
@@ -64,6 +71,16 @@ public class Tools {
             throw new RuntimeException("Cannot find block: '" + s + "'!");
         }
         return value.getDefaultState();
+    }
+
+    @Nonnull
+    public static ResourceLocation getBiomeId(Biome biome) {
+        if (biome.getRegistryName() == null) {
+            Optional<MutableRegistry<Biome>> biomeRegistry = DynamicRegistries.func_239770_b_().func_230521_a_(Registry.BIOME_KEY);
+            return biomeRegistry.map(r -> r.getOptionalKey(biome).map(RegistryKey::getLocation).orElseThrow(() -> new IllegalStateException("Bad biome"))).orElseThrow(() -> new IllegalStateException("Bad biome"));
+        } else {
+            return biome.getRegistryName();
+        }
     }
 
     private static BlockState getLadderState(int meta) {

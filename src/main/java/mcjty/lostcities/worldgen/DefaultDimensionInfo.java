@@ -1,13 +1,13 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -99,11 +99,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
             BiomeProvider biomeProvider = ((ServerChunkProvider) chunkProvider).getChunkGenerator().getBiomeProvider();
             // @todo 1.15 check if this is correct!
             Biome biome = biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ());
-            // @todo 1.16, why is this sometimes null?
-            if (biome.getRegistryName() == null) {
-                return Biomes.PLAINS;
-            }
-            return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
+            return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, Tools.getBiomeId(biome));
         }
         return Biomes.PLAINS;
     }
