@@ -252,7 +252,7 @@ public class City {
         try {
             f = map.get(object);
         } catch(NullPointerException e) {
-            throw new RuntimeException("Biome '" + Tools.getBiomeId(biome).toString() + "' (" + Tools.getBiomeId(biome).getPath() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
+            throw new RuntimeException("Biome '" + object.toString() + "' (" + object.getPath() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
         }
         if (f != null) {
             foundFactor = f;

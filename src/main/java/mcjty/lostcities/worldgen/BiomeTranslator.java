@@ -45,7 +45,7 @@ public class BiomeTranslator {
             Biome biome = findBiome(biomeId);
             Biome destBiome = findBiome(destBiomeId);
             if (biome != null && destBiome != null) {
-                mapping.add(Pair.of(Tools.getBiomeId(biome), destBiome));
+                mapping.add(Pair.of(new ResourceLocation(biomeId), destBiome));
             } else if (biome == null) {
                 LostCities.setup.getLogger().warn("Could not find biome '" + biomeId + "'!");
             } else if (destBiome == null) {
@@ -141,11 +141,14 @@ public class BiomeTranslator {
                 translationMap.put(biome.getRegistryName(), bestFit.get(0));
             } else {
                 // Fixed seed based on biome name so that we have a good chance of getting the same back in case of new biomes
-                long seed = Tools.getBiomeId(biome).hashCode();
-                Random random = new Random(seed);
-                random.nextFloat();
-                random.nextFloat();
-                translationMap.put(Tools.getBiomeId(biome), bestFit.get(random.nextInt(bestFit.size())));
+                ResourceLocation biomeId = Tools.getBiomeId(biome);
+                if (biomeId != null) {
+                    long seed = biomeId.hashCode();
+                    Random random = new Random(seed);
+                    random.nextFloat();
+                    random.nextFloat();
+                    translationMap.put(biomeId, bestFit.get(random.nextInt(bestFit.size())));
+                }
             }
         }
     }

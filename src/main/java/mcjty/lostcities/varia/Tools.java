@@ -17,7 +17,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,11 +73,11 @@ public class Tools {
         return value.getDefaultState();
     }
 
-    @Nonnull
+    @Nullable
     public static ResourceLocation getBiomeId(Biome biome) {
         if (biome.getRegistryName() == null) {
             Optional<MutableRegistry<Biome>> biomeRegistry = DynamicRegistries.func_239770_b_().func_230521_a_(Registry.BIOME_KEY);
-            return biomeRegistry.map(r -> r.getOptionalKey(biome).map(RegistryKey::getLocation).orElseThrow(() -> new IllegalStateException("Bad biome"))).orElseThrow(() -> new IllegalStateException("Bad biome"));
+            return biomeRegistry.map(r -> r.getOptionalKey(biome).map(RegistryKey::getLocation).orElse(null)).orElse(null);
         } else {
             return biome.getRegistryName();
         }

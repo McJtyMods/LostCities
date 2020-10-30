@@ -561,7 +561,7 @@ public class LostCityProfile {
                     String biomeId = split[0];
                     Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(biomeId));
                     if (biome != null) {
-                        biomeFactorMap.put(Tools.getBiomeId(biome), f);
+                        biomeFactorMap.put(new ResourceLocation(biomeId), f);
                     } else {
                         LostCities.setup.getLogger().warn("Can't find biome " + biomeId);
                     }
