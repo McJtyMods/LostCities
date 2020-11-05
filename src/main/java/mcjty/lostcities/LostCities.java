@@ -47,40 +47,6 @@ public class LostCities {
         return logger;
     }
 
-    // @todo 1.14
-//    @Mod.EventHandler
-//    public void preInit(FMLPreInitializationEvent e) {
-//        setup.preInit(e);
-//        proxy.preInit(e);
-//    }
-//
-//    @Mod.EventHandler
-//    public void init(FMLInitializationEvent e) {
-//        setup.init(e);
-//        proxy.init(e);
-//    }
-//
-//    @Mod.EventHandler
-//    public void postInit(FMLPostInitializationEvent e) {
-//        setup.postInit(e);
-//        proxy.postInit(e);
-//    }
-//
-//    @Mod.EventHandler
-//    public void serverLoad(FMLServerStartingEvent event) {
-//        event.registerServerCommand(new CommandDebug());
-//        event.registerServerCommand(new CommandExportBuilding());
-//        event.registerServerCommand(new CommandExportPart());
-//        event.registerServerCommand(new CommandBuildPart());
-//        cleanCaches();
-//    }
-//
-//    @Mod.EventHandler
-//    public void serverStopped(FMLServerStoppedEvent event) {
-//        cleanCaches();
-//        WorldTypeTools.cleanChunkGeneratorMap();
-//    }
-
     private void cleanCaches() {
         BuildingInfo.cleanCache();
         Highway.cleanCache();
@@ -88,7 +54,6 @@ public class LostCities {
         BiomeInfo.cleanCache();
         City.cleanCache();
         CitySphere.cleanCache();
-//        WorldTypeTools.cleanCache();
     }
 
     // @todo 1.14

@@ -74,19 +74,7 @@ public class BiomeTranslator {
     }
 
     private static Biome findBiome(String biomeId) {
-        Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(biomeId));
-        return biome;
-        // @todo 1.14
-//        if (biome == null) {
-//            for (Biome b : Biome.REGISTRY) {
-//                ResourceLocation registryName = b.getRegistryName();
-//                if (registryName != null && biomeId.equals(registryName.getResourcePath())) {
-//                    biome = b;
-//                    break;
-//                }
-//            }
-//        }
-//        return biome;
+        return ForgeRegistries.BIOMES.getValue(new ResourceLocation(biomeId));
     }
 
     private void dumpTranslationMap() {

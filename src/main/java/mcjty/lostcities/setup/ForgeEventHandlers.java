@@ -28,7 +28,7 @@ public class ForgeEventHandlers {
         if (!BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.VOID)) {
             ConfiguredFeature<?, ?> configuredFeature = Registration.LOSTCITY_FEATURE
                     .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
-                    .withPlacement(Placement.field_242907_l.configure(new TopSolidRangeConfig(1, 0, 1)));
+                    .withPlacement(Placement.RANGE.configure(new TopSolidRangeConfig(1, 0, 1)));
 
             event.getGeneration().getFeatures(GenerationStage.Decoration.RAW_GENERATION).add(() -> configuredFeature);
         }

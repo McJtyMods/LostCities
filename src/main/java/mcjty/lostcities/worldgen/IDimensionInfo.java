@@ -33,5 +33,5 @@ public interface IDimensionInfo {
 
 //    Biome[] getBiomes(int chunkX, int chunkZ);
 
-    RegistryKey<Biome> getBiome(BlockPos pos);
+    Biome getBiome(BlockPos pos);
 }

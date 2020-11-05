@@ -2,10 +2,8 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.IDimensionInfo;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +23,7 @@ public class BiomeInfo {
             BiomeInfo info = new BiomeInfo();
             int chunkX = coord.getChunkX();
             int chunkZ = coord.getChunkZ();
-            RegistryKey<Biome> biomeKey = provider.getBiome(new BlockPos((chunkX << 4) + 8, 65, (chunkZ << 4) + 8));
-            info.mainBiome = ForgeRegistries.BIOMES.getValue(biomeKey.getLocation());
+            info.mainBiome = provider.getBiome(new BlockPos((chunkX << 4) + 8, 65, (chunkZ << 4) + 8));
             if (info.mainBiome == null) {
                 System.out.println("BiomeInfo.getBiomeInfo");
             }

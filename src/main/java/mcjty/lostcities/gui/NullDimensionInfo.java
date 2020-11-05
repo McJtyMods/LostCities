@@ -9,6 +9,8 @@ import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -76,6 +78,7 @@ public class NullDimensionInfo implements IDimensionInfo {
     private final Random random;
     private final long seed;
 
+    private final Registry<Biome> biomeRegistry;
     private final LostCityTerrainFeature feature;
 
     public NullDimensionInfo(LostCityProfile profile, long seed) {
@@ -85,6 +88,7 @@ public class NullDimensionInfo implements IDimensionInfo {
         random = new Random(seed);
         feature = new LostCityTerrainFeature(this, profile, getRandom());
         feature.setupStates(profile);
+        biomeRegistry = DynamicRegistries.func_239770_b_().func_230521_a_(Registry.BIOME_KEY).get();
     }
 
     @Override
@@ -182,7 +186,7 @@ public class NullDimensionInfo implements IDimensionInfo {
 //    }
 
     @Override
-    public RegistryKey<Biome> getBiome(BlockPos pos) {
+    public Biome getBiome(BlockPos pos) {
         RegistryKey<Biome> biome = Biomes.PLAINS;
         ChunkPos cp = new ChunkPos(pos);
         char b = getBiomeChar(cp.x, cp.z);
@@ -195,6 +199,6 @@ public class NullDimensionInfo implements IDimensionInfo {
             case '*': biome = Biomes.BEACH; break;
             case 'd': biome = Biomes.DESERT; break;
         }
-        return biome;
+        return biomeRegistry.getOrDefault(biome.getLocation());
     }
 }

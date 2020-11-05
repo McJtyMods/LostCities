@@ -82,6 +82,12 @@ public class LostCityTerrainFeature {
     private final LostCityProfile profile;
     private final Random rand;
 
+    // Helper variables for correctTerrainShape
+    private final Integer[] mm00 = new Integer[2];
+    private final Integer[] mm10 = new Integer[2];
+    private final Integer[] mm01 = new Integer[2];
+    private final Integer[] mm11 = new Integer[2];
+
     private Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
 
     public LostCityTerrainFeature(IDimensionInfo provider, LostCityProfile profile, Random rand) {
@@ -798,7 +804,7 @@ public class LostCityTerrainFeature {
      * or up the top layer (6 thick) of the terrain. In a chunk these heights are interpolated
      * (bilinear interpolation).
      */
-    private void correctTerrainShape(int chunkX, int chunkZ) {
+    private synchronized void correctTerrainShape(int chunkX, int chunkZ) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
         Integer[] mm00 = info.getDesiredMaxHeightL2();
         Integer[] mm10 = info.getXmax().getDesiredMaxHeightL2();
@@ -1075,7 +1081,7 @@ public class LostCityTerrainFeature {
 
             // @todo 1.16 CHECK
 //      generator.makeBase(region.getDimension().getWorld(), primer);
-//            StructureManager structureManager = region.getWorld().func_241112_a_().func_241464_a_((WorldGenRegion) region);
+//            StructureManager structureManager = region.getWorld().func_241112_a_().getStructureManager((WorldGenRegion) region);
 //            generator.func_230352_b_(region, structureManager, primer);
 
             generator.generateSurface((WorldGenRegion) region, primer);

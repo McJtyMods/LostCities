@@ -26,7 +26,7 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
     }
 
     @Override
-    public boolean func_241855_a(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
         if (world instanceof WorldGenRegion) {
             IDimensionInfo diminfo = getDimensionInfo(world);
             if (diminfo != null) {

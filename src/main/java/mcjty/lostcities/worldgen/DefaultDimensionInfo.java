@@ -1,12 +1,11 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.World;
@@ -24,6 +23,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     private final LostCityProfile profile;
     private final WorldStyle style;
 
+    private final Registry<Biome> biomeRegistry;
     private final LostCityTerrainFeature feature;
 
     public DefaultDimensionInfo(ISeedReader world, LostCityProfile profile) {
@@ -32,6 +32,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         style = AssetRegistries.WORLDSTYLES.get("standard");
         feature = new LostCityTerrainFeature(this, profile, getRandom());
         feature.setupStates(profile);
+        biomeRegistry = DynamicRegistries.func_239770_b_().func_230521_a_(Registry.BIOME_KEY).get();
     }
 
     @Override
@@ -94,18 +95,14 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 //    }
 //
     @Override
-    public RegistryKey<Biome> getBiome(BlockPos pos) {
+    public Biome getBiome(BlockPos pos) {
         AbstractChunkProvider chunkProvider = getWorld().getChunkProvider();
         if (chunkProvider instanceof ServerChunkProvider) {
             BiomeProvider biomeProvider = ((ServerChunkProvider) chunkProvider).getChunkGenerator().getBiomeProvider();
             // @todo 1.15 check if this is correct!
-            Biome biome = biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ());
-            ResourceLocation biomeId = Tools.getBiomeId(biome);
-            if (biomeId == null) {
-                return Biomes.PLAINS;   // @todo 1.16 wrong!
-            }
-            return RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biomeId);
+            return biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ());
         }
-        return Biomes.PLAINS;
+        // @todo 1.16: is this right
+        return biomeRegistry.getOptional(Biomes.PLAINS.getLocation()).get();
     }
 }
