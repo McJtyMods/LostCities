@@ -1,3 +1,6 @@
+Upcoming:
+- Register the configured feature for Lost Cities so that it should improve compatibility with other mods generation
+
 1.16-4.0.1-alpha:
 - Some serious optimizations which will improve the speed of worldgen in combination with lost cities
 
