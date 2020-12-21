@@ -1063,16 +1063,37 @@ public class LostCityTerrainFeature {
             return cachedHeightmaps.get(key);
         } else {
             ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
-            makeDummyChunk(chunkX, chunkZ, world, heightmap);
+
+            // @todo 1.16 Making a dummy chunk doesn't work properly
+//            makeDummyChunk(chunkX, chunkZ, world, heightmap);
+            fillHeightmap(chunkX, chunkZ, world, heightmap);
+
+
             cachedHeightmaps.put(key, heightmap);
             return heightmap;
         }
     }
 
-    private void makeDummyChunk(int chunkX, int chunkZ, ISeedReader region, ChunkHeightmap heightmap) {
-        if (chunkX == 2 && chunkZ == -11) {
-            System.out.println("LostCityTerrainFeature.makeDummyChunk");
+    private void fillHeightmap(int chunkX, int chunkZ, ISeedReader region, ChunkHeightmap heightmap) {
+        AbstractChunkProvider chunkProvider = region.getWorld().getChunkProvider();
+        if (chunkProvider instanceof ServerChunkProvider) {
+            int cx = chunkX << 4;
+            int cz = chunkZ << 4;
+            for (int dx = 0 ; dx < 16 ; dx++) {
+                for (int dz = 0 ; dz < 16 ; dz++) {
+                    Biome biome = region.getBiome(new BlockPos(cx + dx, 65, cz + dz));
+                    biome.getScale()
+                    heightmap.setHeight(dx, dz, height);
+                }
+            }
         }
+    }
+
+    private void makeDummyChunk(int chunkX, int chunkZ, ISeedReader region, ChunkHeightmap heightmap) {
+//        if (chunkX == 2 && chunkZ == -11) {
+//            // @todo debug
+//            System.out.println("LostCityTerrainFeature.makeDummyChunk");
+//        }
         DummyChunk primer = new DummyChunk(new ChunkPos(chunkX, chunkZ), heightmap);
         AbstractChunkProvider chunkProvider = region.getWorld().getChunkProvider();
         if (chunkProvider instanceof ServerChunkProvider) {
@@ -1084,12 +1105,12 @@ public class LostCityTerrainFeature {
 //            generator.generateBiomes(primer);
 
             // @todo 1.16 CHECK
-//      generator.makeBase(region.getDimension().getWorld(), primer);
+//    generator.makeBase(region.getDimension().getWorld(), primer);
             StructureManager structureManager = region.getWorld().func_241112_a_().getStructureManager((WorldGenRegion) region);
-            primer.setStatus(ChunkStatus.STRUCTURE_REFERENCES);
-            generator.func_230352_b_(region, structureManager, primer);
+//            primer.setStatus(ChunkStatus.STRUCTURE_REFERENCES);
+            //generator.func_230352_b_(region, structureManager, primer);
 
-            primer.setStatus(ChunkStatus.SURFACE);
+//            primer.setStatus(ChunkStatus.SURFACE);
             generator.generateSurface((WorldGenRegion) region, primer);
         }
     }

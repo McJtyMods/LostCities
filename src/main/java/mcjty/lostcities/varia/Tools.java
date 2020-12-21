@@ -76,6 +76,7 @@ public class Tools {
 
     @Nullable
     public static ResourceLocation getBiomeId(Biome biome) {
+        // @todo use IWorld.func_241828_r()
         if (biome.getRegistryName() == null) {
             Optional<MutableRegistry<Biome>> biomeRegistry = DynamicRegistries.func_239770_b_().func_230521_a_(Registry.BIOME_KEY);
             return biomeRegistry.map(r -> r.getOptionalKey(biome).map(RegistryKey::getLocation).orElse(null)).orElse(null);

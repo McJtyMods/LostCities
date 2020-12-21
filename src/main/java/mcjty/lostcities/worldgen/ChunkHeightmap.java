@@ -63,6 +63,10 @@ public class ChunkHeightmap {
         return heightmap[z*16+x] & 0xff;
     }
 
+    public void setHeight(int x, int z, int height) {
+        heightmap[z*16+x] = (byte) height;
+    }
+
     private void calculateHeightInfo() {
         int max = 0;
         int min = 256;
