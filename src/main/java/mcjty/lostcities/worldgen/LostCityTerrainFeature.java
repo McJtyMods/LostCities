@@ -22,6 +22,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.AbstractChunkProvider;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
@@ -1069,6 +1070,9 @@ public class LostCityTerrainFeature {
     }
 
     private void makeDummyChunk(int chunkX, int chunkZ, ISeedReader region, ChunkHeightmap heightmap) {
+        if (chunkX == 2 && chunkZ == -11) {
+            System.out.println("LostCityTerrainFeature.makeDummyChunk");
+        }
         DummyChunk primer = new DummyChunk(new ChunkPos(chunkX, chunkZ), heightmap);
         AbstractChunkProvider chunkProvider = region.getWorld().getChunkProvider();
         if (chunkProvider instanceof ServerChunkProvider) {
@@ -1081,9 +1085,11 @@ public class LostCityTerrainFeature {
 
             // @todo 1.16 CHECK
 //      generator.makeBase(region.getDimension().getWorld(), primer);
-//            StructureManager structureManager = region.getWorld().func_241112_a_().getStructureManager((WorldGenRegion) region);
-//            generator.func_230352_b_(region, structureManager, primer);
+            StructureManager structureManager = region.getWorld().func_241112_a_().getStructureManager((WorldGenRegion) region);
+            primer.setStatus(ChunkStatus.STRUCTURE_REFERENCES);
+            generator.func_230352_b_(region, structureManager, primer);
 
+            primer.setStatus(ChunkStatus.SURFACE);
             generator.generateSurface((WorldGenRegion) region, primer);
         }
     }
@@ -1346,7 +1352,7 @@ public class LostCityTerrainFeature {
                                 if (getRailStates().contains(driver.getBlock())) {
                                     driver.block(rail);
                                 }
-                                driver.current(x, y, 9);;
+                                driver.current(x, y, 9);
                                 if (getRailStates().contains(driver.getBlock())) {
                                     driver.block(rail);
                                 }

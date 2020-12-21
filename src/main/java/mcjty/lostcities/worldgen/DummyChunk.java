@@ -1,10 +1,12 @@
 package mcjty.lostcities.worldgen;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.palette.UpgradeData;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.lighting.WorldLightManager;
 
 import javax.annotation.Nullable;
@@ -26,6 +28,21 @@ public class DummyChunk extends ChunkPrimer {
     public BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving) {
         heightmap.update(pos.getX() & 0xf, pos.getY(), pos.getZ() & 0xf, state);
         return super.setBlockState(pos, state, isMoving);
+    }
+
+    @Override
+    public BlockState getBlockState(BlockPos pos) {
+        if (pos.getY() >= heightmap.getHeight(pos.getX() & 0xf, pos.getZ() & 0xf)) {
+            return Blocks.AIR.getDefaultState();
+        } else {
+            return Blocks.STONE.getDefaultState();
+        }
+//        return super.getBlockState(pos);
+    }
+
+    @Override
+    public int getTopBlockY(Heightmap.Type type, int x, int z) {
+        return heightmap.getHeight(x & 0xf, z & 0xf);
     }
 
     @Override

@@ -12,6 +12,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.provider.OverworldBiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -55,6 +56,7 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
                 int chunkX = region.getMainChunkX();
                 int chunkZ = region.getMainChunkZ();
                 diminfo.setWorld(world);
+//                generator.getBiomeProvider() ->OverworldBiomeProvider
 //                diminfo.getFeature().generateDummy(region, region.getChunk(chunkX, chunkZ));
                 diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
                 return true;
