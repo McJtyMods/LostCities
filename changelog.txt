@@ -1,4 +1,4 @@
-Upcoming:
+1.16-4.0.3-alpha:
 - Considerably improved Lost City worldgen on world types that use the standard NoiseChunkGenerator
 
 1.16-4.0.2-alpha:
