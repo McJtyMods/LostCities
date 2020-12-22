@@ -1,3 +1,6 @@
+Upcoming:
+- Considerably improved Lost City worldgen on world types that use the standard NoiseChunkGenerator
+
 1.16-4.0.2-alpha:
 - Register the configured feature for Lost Cities so that it should improve compatibility with other mods generation
 

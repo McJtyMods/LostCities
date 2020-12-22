@@ -18,15 +18,16 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.AbstractChunkProvider;
-import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.NoiseChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -1064,9 +1065,20 @@ public class LostCityTerrainFeature {
         } else {
             ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
 
-            // @todo 1.16 Making a dummy chunk doesn't work properly
-//            makeDummyChunk(chunkX, chunkZ, world, heightmap);
-            fillHeightmap(chunkX, chunkZ, world, heightmap);
+            boolean doNoiseVariant = false;
+            AbstractChunkProvider chunkProvider = world.getWorld().getChunkProvider();
+            if (chunkProvider instanceof ServerChunkProvider) {
+                ChunkGenerator generator = ((ServerChunkProvider) chunkProvider).getChunkGenerator();
+                if (generator instanceof NoiseChunkGenerator) {
+                    doNoiseVariant = true;
+                }
+            }
+
+            if (doNoiseVariant) {
+                makeDummyChunkNoise(chunkX, chunkZ, world, heightmap);
+            } else {
+                makeDummyChunk(heightmap);
+            }
 
 
             cachedHeightmaps.put(key, heightmap);
@@ -1074,46 +1086,102 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void fillHeightmap(int chunkX, int chunkZ, ISeedReader region, ChunkHeightmap heightmap) {
-        AbstractChunkProvider chunkProvider = region.getWorld().getChunkProvider();
-        if (chunkProvider instanceof ServerChunkProvider) {
-            int cx = chunkX << 4;
-            int cz = chunkZ << 4;
-            for (int dx = 0 ; dx < 16 ; dx++) {
-                for (int dz = 0 ; dz < 16 ; dz++) {
-                    Biome biome = region.getBiome(new BlockPos(cx + dx, 65, cz + dz));
-                    biome.getScale()
-                    heightmap.setHeight(dx, dz, height);
-                }
+    private void makeDummyChunk(ChunkHeightmap heightmap) {
+        // This is for now the best we can do given that we don't know the type of terrain generator
+        for (int x = 0 ; x < 16 ; x++) {
+            for (int z = 0 ; z < 16 ; z++) {
+                heightmap.update(x, 70, z, Blocks.STONE.getDefaultState());
             }
         }
+
     }
 
-    private void makeDummyChunk(int chunkX, int chunkZ, ISeedReader region, ChunkHeightmap heightmap) {
-//        if (chunkX == 2 && chunkZ == -11) {
-//            // @todo debug
-//            System.out.println("LostCityTerrainFeature.makeDummyChunk");
-//        }
+    private void makeDummyChunkNoise(int chunkX, int chunkZ, ISeedReader region, ChunkHeightmap heightmap) {
         DummyChunk primer = new DummyChunk(new ChunkPos(chunkX, chunkZ), heightmap);
         AbstractChunkProvider chunkProvider = region.getWorld().getChunkProvider();
         if (chunkProvider instanceof ServerChunkProvider) {
-            // @todo 1.15 check!
             ChunkGenerator generator = ((ServerChunkProvider) chunkProvider).getChunkGenerator();
 
-            // @todo 1.16 CHECK
             generator.func_242706_a(region.func_241828_r().getRegistry(Registry.BIOME_KEY), primer);
-//            generator.generateBiomes(primer);
-
-            // @todo 1.16 CHECK
-//    generator.makeBase(region.getDimension().getWorld(), primer);
-            StructureManager structureManager = region.getWorld().func_241112_a_().getStructureManager((WorldGenRegion) region);
-//            primer.setStatus(ChunkStatus.STRUCTURE_REFERENCES);
-            //generator.func_230352_b_(region, structureManager, primer);
-
-//            primer.setStatus(ChunkStatus.SURFACE);
-            generator.generateSurface((WorldGenRegion) region, primer);
+            updateHeightmap((NoiseChunkGenerator) generator, primer, heightmap);
+//            generator.generateSurface((WorldGenRegion) region, primer);
         }
     }
+
+    public static void updateHeightmap(NoiseChunkGenerator chunkGenerator, IChunk chunk, ChunkHeightmap heightmap) {
+        ChunkPos chunkpos = chunk.getPos();
+        int chunkX = chunkpos.x;
+        int chunkZ = chunkpos.z;
+        int cx = chunkX << 4;
+        int cz = chunkZ << 4;
+
+        double[][][] noise = new double[2][chunkGenerator.noiseSizeZ + 1][chunkGenerator.noiseSizeY + 1];
+
+        for(int nz = 0; nz < chunkGenerator.noiseSizeZ + 1; ++nz) {
+            noise[0][nz] = new double[chunkGenerator.noiseSizeY + 1];
+            chunkGenerator.fillNoiseColumn(noise[0][nz], chunkX * chunkGenerator.noiseSizeX, chunkZ * chunkGenerator.noiseSizeZ + nz);
+            noise[1][nz] = new double[chunkGenerator.noiseSizeY + 1];
+        }
+
+        for(int nx = 0; nx < chunkGenerator.noiseSizeX; ++nx) {
+            int nz;
+            for(nz = 0; nz < chunkGenerator.noiseSizeZ + 1; ++nz) {
+                chunkGenerator.fillNoiseColumn(noise[1][nz], chunkX * chunkGenerator.noiseSizeX + nx + 1, chunkZ * chunkGenerator.noiseSizeZ + nz);
+            }
+
+            for(nz = 0; nz < chunkGenerator.noiseSizeZ; ++nz) {
+                for(int ny = chunkGenerator.noiseSizeY - 1; ny >= 0; --ny) {
+                    double d0 = noise[0][nz][ny];
+                    double d1 = noise[0][nz + 1][ny];
+                    double d2 = noise[1][nz][ny];
+                    double d3 = noise[1][nz + 1][ny];
+                    double d4 = noise[0][nz][ny + 1];
+                    double d5 = noise[0][nz + 1][ny + 1];
+                    double d6 = noise[1][nz][ny + 1];
+                    double d7 = noise[1][nz + 1][ny + 1];
+
+                    for(int l1 = chunkGenerator.verticalNoiseGranularity - 1; l1 >= 0; --l1) {
+                        int yy = ny * chunkGenerator.verticalNoiseGranularity + l1;
+                        int yyy = yy & 15;
+                        int chunkIndex = yy >> 4;
+
+                        double d8 = (double)l1 / (double)chunkGenerator.verticalNoiseGranularity;
+                        double d9 = MathHelper.lerp(d8, d0, d4);
+                        double d10 = MathHelper.lerp(d8, d2, d6);
+                        double d11 = MathHelper.lerp(d8, d1, d5);
+                        double d12 = MathHelper.lerp(d8, d3, d7);
+
+                        for(int l2 = 0; l2 < chunkGenerator.horizontalNoiseGranularity; ++l2) {
+                            int xx = cx + nx * chunkGenerator.horizontalNoiseGranularity + l2;
+                            int xxx = xx & 15;
+                            double d13 = (double)l2 / (double)chunkGenerator.horizontalNoiseGranularity;
+                            double d14 = MathHelper.lerp(d13, d9, d10);
+                            double d15 = MathHelper.lerp(d13, d11, d12);
+
+                            for(int k3 = 0; k3 < chunkGenerator.horizontalNoiseGranularity; ++k3) {
+                                int zz = cz + nz * chunkGenerator.horizontalNoiseGranularity + k3;
+                                int zzz = zz & 15;
+                                double d16 = (double)k3 / (double)chunkGenerator.horizontalNoiseGranularity;
+                                double d17 = MathHelper.lerp(d16, d14, d15);
+                                double d18 = MathHelper.clamp(d17 / 200.0D, -1.0D, 1.0D);
+
+                                BlockState blockstate = chunkGenerator.func_236086_a_(d18, yy);
+                                if (blockstate != air) {
+                                    heightmap.update(xxx, (chunkIndex << 4) + yyy, zzz, blockstate);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            double[][] adouble1 = noise[0];
+            noise[0] = noise[1];
+            noise[1] = adouble1;
+        }
+
+    }
+
 
     private void doCityChunk(int chunkX, int chunkZ, BuildingInfo info) {
         boolean building = info.hasBuilding;
