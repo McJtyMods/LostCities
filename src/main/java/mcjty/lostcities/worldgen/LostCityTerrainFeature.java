@@ -468,7 +468,10 @@ public class LostCityTerrainFeature {
                             int height = yy * 16;
                             driver.current(x, height, z);
                             for (int y = 0; y < 16; y++) {
-                                driver.add(((height + y) <= info.waterLevel) ? liquid : air);
+                                // @TODO BAD
+                                // @todo 1.16 this can occasionally cause a crash in the lighting engine
+                                // I suspect this might be a vanilla bug
+//                                driver.add(((height + y) <= info.waterLevel) ? liquid : air);
                             }
                         }
                     }

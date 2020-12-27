@@ -193,9 +193,9 @@ public class ChunkDriver {
     }
 
     private BlockState correct(BlockState state) {
-        int cx = current.getX() + primer.getPos().x * 16;
+        int cx = current.getX() + (primer.getPos().x << 4);
         int cy = current.getY();
-        int cz = current.getZ() + primer.getPos().z * 16;
+        int cz = current.getZ() + (primer.getPos().z << 4);
 
         IChunk thisChunk = region.getChunk(cx >> 4, cz >> 4);
         BlockState westState = updateAdjacent(state, Direction.EAST, pos.setPos(cx - 1, cy, cz), thisChunk);
@@ -219,12 +219,23 @@ public class ChunkDriver {
         return this;
     }
 
+//    private void validate() {
+//        if (current.getX() < 0 || current.getY() < 0 || current.getZ() < 0) {
+//            throw new RuntimeException("current: " + current.getX() + "," + current.getY() + "," + current.getZ());
+//        }
+//        if (current.getX() > 15 || current.getY() > 255 || current.getZ() > 15) {
+//            throw new RuntimeException("current: " + current.getX() + "," + current.getY() + "," + current.getZ());
+//        }
+//    }
+
     public ChunkDriver block(BlockState c) {
+//        validate();
         primer.setBlockState(current, correct(c), false);
         return this;
     }
 
     public ChunkDriver add(BlockState state) {
+//        validate();
         primer.setBlockState(current, correct(state), false);
         incY();
         return this;
