@@ -955,7 +955,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public static boolean isVoidChunk(int chunkX, int chunkZ, IDimensionInfo provider) {
 //        if (provider.otherGenerator != null) {
 //            return false;   // @todo Not supported yet
-//        } else if (provider.getProfile().isFloating()) {
+        if (provider.getProfile().isFloating()) {
             if (provider.getHeightmap(chunkX, chunkZ).getHeight(8, 8) <= 0) {
                 return true;
             }
@@ -969,10 +969,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 return true;
             }
             return provider.getHeightmap(chunkX, chunkZ).getHeight(12, 12) <= 0;
-
-//        } else {
-//            return false;
-//        }
+        } else {
+            return false;
+        }
     }
 
 

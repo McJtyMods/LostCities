@@ -23,7 +23,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.AbstractChunkProvider;
-import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.NoiseChunkGenerator;
@@ -298,6 +297,14 @@ public class LostCityTerrainFeature {
         driver.setPrimer(oldRegion, oldChunk);
     }
 
+    private boolean isVoid(int x, int z) {
+        driver.current(x, 255, z);
+        while (driver.getBlock() == air && driver.getY() > 0) {
+            driver.decY();
+        }
+        return driver.getY() == 0;
+    }
+
     public void generate(WorldGenRegion region, IChunk chunk) {
         WorldGenRegion oldRegion = driver.getRegion();
         IChunk oldChunk = driver.getPrimer();
@@ -315,7 +322,17 @@ public class LostCityTerrainFeature {
         street2 = info.getCompiledPalette().get(cityStyle.getStreetVariantBlock());
         streetBorder = (16 - cityStyle.getStreetWidth()) / 2;
 
-        if (info.isCity || (info.outsideChunk && info.hasBuilding)) {
+        boolean doCity = info.isCity || (info.outsideChunk && info.hasBuilding);
+        // If this chunk has a building or street but we're in a floating profile and
+        // we happen to have a void chunk we detect that here and go back to normal chunk generation
+        // anyway
+        if (doCity && provider.getProfile().CITY_AVOID_VOID && provider.getProfile().isFloating()) {
+            boolean v = isVoid(2, 2) || isVoid(2, 14) || isVoid(14, 2) || isVoid(14, 14) || isVoid(8, 8);
+            doCity = !v;
+        }
+
+
+        if (doCity) {
             doCityChunk(chunkX, chunkZ, info);
         } else {
             // We already have a prefilled core chunk (as generated from doCoreChunk)
@@ -2171,7 +2188,7 @@ public class LostCityTerrainFeature {
                 for (int z = 0; z < 16; z++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
-                    while (driver.getBlockDown() == air) {
+                    while (driver.getBlockDown() == air && driver.getY() > 0) {
                         driver.decY();
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - x));
@@ -2188,7 +2205,7 @@ public class LostCityTerrainFeature {
                 for (int z = 0; z < 16; z++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
-                    while (driver.getBlockDown() == air) {
+                    while (driver.getBlockDown() == air && driver.getY() > 0) {
                         driver.decY();
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS));
@@ -2205,7 +2222,7 @@ public class LostCityTerrainFeature {
                 for (int x = 0; x < 16; x++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
-                    while (driver.getBlockDown() == air) {
+                    while (driver.getBlockDown() == air && driver.getY() > 0) {
                         driver.decY();
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - z));
@@ -2222,7 +2239,7 @@ public class LostCityTerrainFeature {
                 for (int x = 0; x < 16; x++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
-                    while (driver.getBlockDown() == air) {
+                    while (driver.getBlockDown() == air && driver.getY() > 0) {
                         driver.decY();
                     }
                     float v = info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS);
@@ -2575,8 +2592,12 @@ public class LostCityTerrainFeature {
             // generated chunks as opposed to blank chunks with non-floating worlds
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
-                    int index = (x << 12) | (z << 8);
-                    int height = heightmap.getHeight(x, z);
+                    driver.current(x, 255, z);
+                    while (driver.getBlock() == air && driver.getY() > 0) {
+                        driver.decY();
+                    }
+
+                    int height = driver.getY();//heightmap.getHeight(x, z);
                     if (height > 1 && height < lowestLevel - 1) {
                         driver.setBlockRange(x, height+1, z, lowestLevel, base);
                     }

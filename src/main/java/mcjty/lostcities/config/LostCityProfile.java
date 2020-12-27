@@ -113,6 +113,8 @@ public class LostCityProfile {
     public int CITY_MAXRADIUS = 128;
     public float CITY_THRESHOLD = .2f;
 
+    public boolean CITY_AVOID_VOID = true;
+
     public float CITYSPHERE_FACTOR = 1.2f;
     public float CITYSPHERE_CHANCE = 0.7f;
     public float CITYSPHERE_SURFACE_VARIATION = 1.0f;
@@ -461,6 +463,7 @@ public class LostCityProfile {
         CITY_THRESHOLD = cfg.getFloat("cityThreshold", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_THRESHOLD, 0.0f, 1.0f, "The center and radius of a city define a sphere. " +
                 "This threshold indicates from which point a city is considered a city. " +
                 "This is important for calculating where cities are based on overlapping city circles (where the city thresholds are added)");
+        CITY_AVOID_VOID = cfg.getBoolean("cityAvoidVoid", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_AVOID_VOID, "Only used with floating landscape type: if true an additional detection is done to see if the chunk is void and in that case the city isn't generated there. Otherwise you might get city chunks on the border of islands which sometimes looks weird");
         CITY_BIOME_FACTORS = cfg.getStringList("cityBiomeFactors", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_BIOME_FACTORS, "List of biomes with a factor to affect the city factor in that biome. Using the value 0 you can disable city generation in biomes");
         CITY_DEFAULT_BIOME_FACTOR = cfg.getFloat("cityBiomeFactorDefault", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_DEFAULT_BIOME_FACTOR, 0.0f, 1.0f, "The default biome factor which is used if your biome is not specified in 'cityBiomeFactors'");
 
