@@ -2,6 +2,9 @@ Upcoming:
 - Temporary 'fix' to avoid what looks like a bug in Vanilla when clearing out large sections of a chunk. This bug manifests itself when clearing up chunks after being damaged by an explosion
 - Better city generation with 'floating' landscape type by improving the way the height of a chunk is detected
 - New 'cityAvoidVoid' config option: Only used with floating landscape type: if true an additional detection is done to see if the chunk is void and in that case the city isn't generated there. Otherwise you might get city chunks on the border of islands which sometimes looks weird
+- The 'dimensionProfiles' config option has been renamed to 'dimensionsWithProfiles' to force a regen
+- The bed with skulls (and diamond blocks) works again and will teleport to the 'lostcities:lostcity' dimension if present
+- New 'lostcities:lostcity' dimension in the datapack. You can reconfigure this with a datapack by replacing the lostcity dimension type and/or dimension
 
 1.16-4.0.3-alpha:
 - Considerably improved Lost City worldgen on world types that use the standard NoiseChunkGenerator

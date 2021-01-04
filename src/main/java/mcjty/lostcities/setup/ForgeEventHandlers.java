@@ -1,16 +1,30 @@
 package mcjty.lostcities.setup;
 
 import mcjty.lostcities.commands.ModCommands;
+import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.varia.CustomTeleporter;
+import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.LostCityFeature;
+import net.minecraft.block.*;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgeEventHandlers {
 
@@ -26,6 +40,7 @@ public class ForgeEventHandlers {
             event.getGeneration().getFeatures(GenerationStage.Decoration.RAW_GENERATION).add(() -> LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
         }
     }
+
 
 //    @SubscribeEvent
 //    public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
@@ -163,147 +178,147 @@ public class ForgeEventHandlers {
 //            }
 //        }
 //    }
-//
-//    private boolean isValidStandingPosition(World world, BlockPos pos) {
-//        BlockState state = world.getBlockState(pos);
-////        return state.getBlock().isTopSolid(state) && state.getBlock().isFullCube(state) && state.getBlock().isOpaqueCube(state) && world.isAirBlock(pos.up()) && world.isAirBlock(pos.up(2));
-//        // @todo 1.14
-//        return state.getBlock().isSolid(state);
-//    }
-//
-//    private boolean isValidSpawnBed(World world, BlockPos pos) {
-//        BlockState state = world.getBlockState(pos);
-//        if (!(state.getBlock() instanceof BedBlock)) {
-//            return false;
-//        }
-//        Direction direction = Blocks.BLACK_BED.getBedDirection(state, world, pos);
-//        Block b1 = world.getBlockState(pos.down()).getBlock();
-//        Block b2 = world.getBlockState(pos.offset(direction.getOpposite()).down()).getBlock();
-//        Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LostCityConfiguration.SPECIAL_BED_BLOCK));
-//        if (b1 != b || b2 != b) {
-//            return false;
-//        }
-//        // Check if the bed is surrounded by 6 skulls
-//        if (world.getBlockState(pos.offset(direction)).getBlock() != Blocks.SKELETON_SKULL) {   // @todo 1.14 other skulls!
-//            return false;
-//        }
-//        if (world.getBlockState(pos.offset(direction.rotateY())).getBlock() != Blocks.SKELETON_SKULL) {
-//            return false;
-//        }
-//        if (world.getBlockState(pos.offset(direction.rotateYCCW())).getBlock() != Blocks.SKELETON_SKULL) {
-//            return false;
-//        }
-//        if (world.getBlockState(pos.offset(direction.getOpposite(), 2)).getBlock() != Blocks.SKELETON_SKULL) {
-//            return false;
-//        }
-//        if (world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateY())).getBlock() != Blocks.SKELETON_SKULL) {
-//            return false;
-//        }
-//        if (world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateYCCW())).getBlock() != Blocks.SKELETON_SKULL) {
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//    private BlockPos findValidTeleportLocation(World world, BlockPos start) {
-//        int chunkX = start.getX()>>4;
-//        int chunkZ = start.getZ()>>4;
-//        int y = start.getY();
-//        BlockPos pos = findValidTeleportLocation(world, chunkX, chunkZ, y);
-//        if (pos != null) {
-//            return pos;
-//        }
-//        for (int r = 1 ; r < 50 ; r++) {
-//            for (int i = -r ; i < r ; i++) {
-//                pos = findValidTeleportLocation(world, chunkX + i, chunkZ - r, y);
-//                if (pos != null) {
-//                    return pos;
-//                }
-//                pos = findValidTeleportLocation(world, chunkX + r, chunkZ + i, y);
-//                if (pos != null) {
-//                    return pos;
-//                }
-//                pos = findValidTeleportLocation(world, chunkX + r - i, chunkZ + r, y);
-//                if (pos != null) {
-//                    return pos;
-//                }
-//                pos = findValidTeleportLocation(world, chunkX - r, chunkZ + r - i, y);
-//                if (pos != null) {
-//                    return pos;
-//                }
-//            }
-//        }
-//        return null;
-//    }
-//
-//    private BlockPos findValidTeleportLocation(World world, int chunkX, int chunkZ, int y) {
-//        BlockPos bestSpot = null;
-//        for (int dy = 0 ; dy < 255 ; dy++) {
-//            for (int x = 0 ; x < 16 ; x++) {
-//                for (int z = 0 ; z < 16 ; z++) {
-//                    if ((y + dy) < 250) {
-//                        BlockPos p = new BlockPos(chunkX * 16 + x, y + dy, chunkZ * 16 + z);
-//                        if (isValidSpawnBed(world, p)) {
-//                            return p.up();
-//                        }
-//                        if (bestSpot == null && isValidStandingPosition(world, p)) {
-//                            bestSpot = p.up();
-//                        }
-//                    }
-//                    if ((y - dy) > 1) {
-//                        BlockPos p = new BlockPos(chunkX * 16 + x, y - dy, chunkZ * 16 + z);
-//                        if (isValidSpawnBed(world, p)) {
-//                            return p.up();
-//                        }
-//                        if (bestSpot == null && isValidStandingPosition(world, p)) {
-//                            bestSpot = p.up();
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return bestSpot;
-//    }
-//
-//    @SubscribeEvent
-//    public void onPlayerSleepInBedEvent(PlayerSleepInBedEvent event) {
+
+    private boolean isValidStandingPosition(World world, BlockPos pos) {
+        BlockState state = world.getBlockState(pos);
+//        return state.getBlock().isTopSolid(state) && state.getBlock().isFullCube(state) && state.getBlock().isOpaqueCube(state) && world.isAirBlock(pos.up()) && world.isAirBlock(pos.up(2));
+        // @todo 1.14
+        return state.isSolid();
+    }
+
+    private boolean isValidSpawnBed(World world, BlockPos pos) {
+        BlockState state = world.getBlockState(pos);
+        if (!(state.getBlock() instanceof BedBlock)) {
+            return false;
+        }
+        Direction direction = Blocks.BLACK_BED.getBedDirection(state, world, pos);
+        Block b1 = world.getBlockState(pos.down()).getBlock();
+        Block b2 = world.getBlockState(pos.offset(direction.getOpposite()).down()).getBlock();
+        Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LostCityConfiguration.SPECIAL_BED_BLOCK));
+        if (b1 != b || b2 != b) {
+            return false;
+        }
+        // Check if the bed is surrounded by 6 skulls
+        if (!(world.getBlockState(pos.offset(direction)).getBlock() instanceof AbstractSkullBlock)) {   // @todo 1.14 other skulls!
+            return false;
+        }
+        if (!(world.getBlockState(pos.offset(direction.rotateY())).getBlock() instanceof AbstractSkullBlock)) {
+            return false;
+        }
+        if (!(world.getBlockState(pos.offset(direction.rotateYCCW())).getBlock() instanceof AbstractSkullBlock)) {
+            return false;
+        }
+        if (!(world.getBlockState(pos.offset(direction.getOpposite(), 2)).getBlock() instanceof AbstractSkullBlock)) {
+            return false;
+        }
+        if (!(world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateY())).getBlock() instanceof AbstractSkullBlock)) {
+            return false;
+        }
+        if (!(world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateYCCW())).getBlock() instanceof AbstractSkullBlock)) {
+            return false;
+        }
+        return true;
+    }
+
+    private BlockPos findValidTeleportLocation(World world, BlockPos start) {
+        int chunkX = start.getX()>>4;
+        int chunkZ = start.getZ()>>4;
+        int y = start.getY();
+        BlockPos pos = findValidTeleportLocation(world, chunkX, chunkZ, y);
+        if (pos != null) {
+            return pos;
+        }
+        for (int r = 1 ; r < 50 ; r++) {
+            for (int i = -r ; i < r ; i++) {
+                pos = findValidTeleportLocation(world, chunkX + i, chunkZ - r, y);
+                if (pos != null) {
+                    return pos;
+                }
+                pos = findValidTeleportLocation(world, chunkX + r, chunkZ + i, y);
+                if (pos != null) {
+                    return pos;
+                }
+                pos = findValidTeleportLocation(world, chunkX + r - i, chunkZ + r, y);
+                if (pos != null) {
+                    return pos;
+                }
+                pos = findValidTeleportLocation(world, chunkX - r, chunkZ + r - i, y);
+                if (pos != null) {
+                    return pos;
+                }
+            }
+        }
+        return null;
+    }
+
+    private BlockPos findValidTeleportLocation(World world, int chunkX, int chunkZ, int y) {
+        BlockPos bestSpot = null;
+        for (int dy = 0 ; dy < 255 ; dy++) {
+            for (int x = 0 ; x < 16 ; x++) {
+                for (int z = 0 ; z < 16 ; z++) {
+                    if ((y + dy) < 250) {
+                        BlockPos p = new BlockPos(chunkX * 16 + x, y + dy, chunkZ * 16 + z);
+                        if (isValidSpawnBed(world, p)) {
+                            return p.up();
+                        }
+                        if (bestSpot == null && isValidStandingPosition(world, p)) {
+                            bestSpot = p.up();
+                        }
+                    }
+                    if ((y - dy) > 1) {
+                        BlockPos p = new BlockPos(chunkX * 16 + x, y - dy, chunkZ * 16 + z);
+                        if (isValidSpawnBed(world, p)) {
+                            return p.up();
+                        }
+                        if (bestSpot == null && isValidStandingPosition(world, p)) {
+                            bestSpot = p.up();
+                        }
+                    }
+                }
+            }
+        }
+        return bestSpot;
+    }
+
+    @SubscribeEvent
+    public void onPlayerSleepInBedEvent(PlayerSleepInBedEvent event) {
 //        if (LostCityConfiguration.DIMENSION_ID == null) {
 //            return;
 //        }
-//
-//        World world = event.getEntityPlayer().getEntityWorld();
-//        if (world.isRemote) {
-//            return;
-//        }
-//        BlockPos bedLocation = event.getPos();
-//        if (!isValidSpawnBed(world, bedLocation)) {
-//            return;
-//        }
-//
-//        if (world.getDimension().getType() == LostCityConfiguration.DIMENSION_ID) {
-//            event.setResult(Event.Result.DENY);
-//            ServerWorld destWorld = WorldTools.getOverworld(world);
-//            BlockPos location = findLocation(bedLocation, destWorld);
-//            CustomTeleporter.teleportToDimension(event.getEntityPlayer(), DimensionType.OVERWORLD, location);
-//        } else {
-//            event.setResult(Event.Result.DENY);
-//            ServerWorld destWorld = event.getEntity().getEntityWorld().getServer().getWorld(LostCityConfiguration.DIMENSION_ID);
-//            BlockPos location = findLocation(bedLocation, destWorld);
-//            CustomTeleporter.teleportToDimension(event.getEntityPlayer(), LostCityConfiguration.DIMENSION_ID, location);
-//        }
-//    }
-//
-//    private BlockPos findLocation(BlockPos bedLocation, ServerWorld destWorld) {
-//        BlockPos top = destWorld.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, bedLocation);
+
+        World world = event.getPlayer().getEntityWorld();
+        if (world.isRemote) {
+            return;
+        }
+        BlockPos bedLocation = event.getPos();
+        if (!isValidSpawnBed(world, bedLocation)) {
+            return;
+        }
+
+        if (world.getDimensionKey() == Registration.DIMENSION) {
+            event.setResult(PlayerEntity.SleepResult.NOT_POSSIBLE_HERE);
+            ServerWorld destWorld = WorldTools.getOverworld(world);
+            BlockPos location = findLocation(bedLocation, destWorld);
+            CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
+        } else {
+            event.setResult(PlayerEntity.SleepResult.NOT_POSSIBLE_HERE);
+            ServerWorld destWorld = event.getEntity().getEntityWorld().getServer().getWorld(Registration.DIMENSION);
+            BlockPos location = findLocation(bedLocation, destWorld);
+            CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
+        }
+    }
+
+    private BlockPos findLocation(BlockPos bedLocation, ServerWorld destWorld) {
+        BlockPos top = bedLocation.up(5);//destWorld.getHeight(Heightmap.Type.MOTION_BLOCKING, bedLocation).up(10);
+        BlockPos location = top;
+        while (top.getY() > 1 && destWorld.getBlockState(location).isAir(destWorld, location)) {
+            location = location.down();
+        }
 //        BlockPos location = findValidTeleportLocation(destWorld, top);
-//        if (location == null) {
-//            location = top;
-//            if (destWorld.isAirBlock(top.down())) {
-//                // No place to teleport
-//                destWorld.setBlockState(bedLocation, Blocks.COBBLESTONE.getDefaultState());
-//                location = bedLocation.up();
-//            }
-//        }
-//        return location;
-//    }
+        if (destWorld.isAirBlock(location.down())) {
+            // No place to teleport
+            destWorld.setBlockState(bedLocation, Blocks.COBBLESTONE.getDefaultState());
+        }
+        return location.up(1);
+    }
 }

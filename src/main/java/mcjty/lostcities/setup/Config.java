@@ -21,6 +21,7 @@ public class Config {
     public static final String CATEGORY_PROFILES = "profiles";
 
     private static final String[] defaultDimensionProfiles = new String[] {
+            "lostcities:lostcity=default"
     };
 
     private static ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_PROFILES;
@@ -101,8 +102,8 @@ public class Config {
         SERVER_BUILDER.comment("General settings").push(CATEGORY_PROFILES);
 
         DIMENSION_PROFILES = COMMON_BUILDER
-                .comment("A list of dimensions with associated city generation profiles")
-                .defineList("dimensionProfiles", Lists.newArrayList(Config.defaultDimensionProfiles), s -> s instanceof String);
+                .comment("A list of dimensions with associated city generation profiles (format <dimensionid>=<profilename>")
+                .defineList("dimensionsWithProfiles", Lists.newArrayList(Config.defaultDimensionProfiles), s -> s instanceof String);
 
         SELECTED_PROFILE = SERVER_BUILDER.define("selectedProfile", "<CHECK>"); // Default is dummy value that tells the system to check in profileFromClient
         SELECTED_CUSTOM_JSON = SERVER_BUILDER.define("selectedCustomJson", "");
