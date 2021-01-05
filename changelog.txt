@@ -1,4 +1,4 @@
-Upcoming:
+1.16-4.0.5-alpha:
 - The 'assets' configuration works again so you can reconfigure how Lost Cities looks
 - All configuration files for Lost Cities are now in 'config/lostcities'. That makes it easier to find
 - There is a new examples/conditions.json which you can use as a sample to reconfigure loot and spawners
