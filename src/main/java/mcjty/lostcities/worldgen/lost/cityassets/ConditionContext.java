@@ -1,6 +1,5 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.common.base.Predicates;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ResourceLocation;
@@ -117,7 +116,7 @@ public abstract class ConditionContext {
             }
         }
         if (test == null) {
-            test = Predicates.alwaysTrue();
+            test = conditionContext -> true;
         }
         return test;
     }

@@ -1,7 +1,5 @@
 package mcjty.lostcities.setup;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.WritingMode;
 import com.google.common.collect.Lists;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
@@ -12,18 +10,34 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeConfigSpec;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Config {
+
     public static final String CATEGORY_PROFILES = "profiles";
 
-    private static final String[] defaultDimensionProfiles = new String[] {
+
+    public static final String[] DEFAULT_ASSETS = new String[] {
+            "/assets/lostcities/citydata/conditions.json",
+            "/assets/lostcities/citydata/palette.json",
+            "/assets/lostcities/citydata/palette_desert.json",
+            "/assets/lostcities/citydata/palette_chisel.json",
+            "/assets/lostcities/citydata/palette_chisel_desert.json",
+            "/assets/lostcities/citydata/highwayparts.json",
+            "/assets/lostcities/citydata/railparts.json",
+            "/assets/lostcities/citydata/monorailparts.json",
+            "/assets/lostcities/citydata/buildingparts.json",
+            "/assets/lostcities/citydata/library.json",
+            "$lostcities/userassets.json"
+    };
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> ASSETS;
+
+
+    private static final String[] DEFAULT_DIMENSION_PROFILES = new String[] {
             "lostcities:lostcity=default"
     };
-
     private static ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_PROFILES;
     private static Map<RegistryKey<World>, String> dimensionProfileCache = null;
 
@@ -32,6 +46,7 @@ public class Config {
     public static String jsonFromClient = null;
     public static ForgeConfigSpec.ConfigValue<String> SELECTED_PROFILE;
     public static ForgeConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
+
 
     public static String getProfileForDimension(RegistryKey<World> type) {
         if (dimensionProfileCache == null) {
@@ -103,7 +118,11 @@ public class Config {
 
         DIMENSION_PROFILES = COMMON_BUILDER
                 .comment("A list of dimensions with associated city generation profiles (format <dimensionid>=<profilename>")
-                .defineList("dimensionsWithProfiles", Lists.newArrayList(Config.defaultDimensionProfiles), s -> s instanceof String);
+                .defineList("dimensionsWithProfiles", Lists.newArrayList(Config.DEFAULT_DIMENSION_PROFILES), s -> s instanceof String);
+
+        ASSETS = COMMON_BUILDER
+                .comment("A list of assets that Lost Cities will use to load city data. Paths starting with '/' are relative to the Lost City resource pack. Paths starting with '$' are relative to the main config directory")
+                .defineList("assets", Lists.newArrayList(DEFAULT_ASSETS), s -> s instanceof String);
 
         SELECTED_PROFILE = SERVER_BUILDER.define("selectedProfile", "<CHECK>"); // Default is dummy value that tells the system to check in profileFromClient
         SELECTED_CUSTOM_JSON = SERVER_BUILDER.define("selectedCustomJson", "");
@@ -120,16 +139,4 @@ public class Config {
     public static ForgeConfigSpec COMMON_CONFIG;
     public static ForgeConfigSpec CLIENT_CONFIG;
     public static ForgeConfigSpec SERVER_CONFIG;
-
-    public static void loadConfig(ForgeConfigSpec spec, Path path) {
-
-        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
-                .sync()
-                .autosave()
-                .writingMode(WritingMode.REPLACE)
-                .build();
-
-        configData.load();
-        spec.setConfig(configData);
-    }
 }

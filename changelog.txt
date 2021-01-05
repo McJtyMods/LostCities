@@ -1,3 +1,8 @@
+Upcoming:
+- The 'assets' configuration works again so you can reconfigure how Lost Cities looks
+- All configuration files for Lost Cities are now in 'config/lostcities'. That makes it easier to find
+- There is a new examples/conditions.json which you can use as a sample to reconfigure loot and spawners
+
 1.16-4.0.4-alpha:
 - Temporary 'fix' to avoid what looks like a bug in Vanilla when clearing out large sections of a chunk. This bug manifests itself when clearing up chunks after being damaged by an explosion
 - Better city generation with 'floating' landscape type by improving the way the height of a chunk is detected

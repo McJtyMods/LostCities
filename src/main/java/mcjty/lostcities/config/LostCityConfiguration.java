@@ -41,20 +41,6 @@ public class LostCityConfiguration {
             "minecraft:magma"
     };
 
-    public static String[] ASSETS = new String[] {
-            "/assets/lostcities/citydata/conditions.json",
-            "/assets/lostcities/citydata/palette.json",
-            "/assets/lostcities/citydata/palette_desert.json",
-            "/assets/lostcities/citydata/palette_chisel.json",
-            "/assets/lostcities/citydata/palette_chisel_desert.json",
-            "/assets/lostcities/citydata/highwayparts.json",
-            "/assets/lostcities/citydata/railparts.json",
-            "/assets/lostcities/citydata/monorailparts.json",
-            "/assets/lostcities/citydata/buildingparts.json",
-            "/assets/lostcities/citydata/library.json"
-//            "$lostcities/userassets.json" @todo 1.14
-    };
-
     public static String[] ADDITIONAL_DIMENSIONS = new String[] {
 
     };
@@ -93,42 +79,7 @@ public class LostCityConfiguration {
 
         initStandardProfiles();
 
-        String[] profileList;
-
-        if (oldVersion != VERSION) {
-            LostCities.setup.getLogger().info("Upgrading Lost Cities config from " + oldVersion + " to " + VERSION + "!");
-            String[] configuredAssets = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, ASSET_COMMENT);
-            List<String> mergedAssets = new ArrayList<>();
-            Collections.addAll(mergedAssets, ASSETS);
-            for (String asset : configuredAssets) {
-                if (!mergedAssets.contains(asset)) {
-                    mergedAssets.add(asset);
-                }
-            }
-            cfg.getCategory(CATEGORY_GENERAL).remove("assets");
-            ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, mergedAssets.toArray(new String[mergedAssets.size()]), ASSET_COMMENT);
-
-
-            String[] defaultValues = DEFAULT_PROFILES;
-            profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                    defaultValues, PROFILES_COMMENT);
-            List<String> mergedProfiles = new ArrayList<>();
-            Collections.addAll(mergedProfiles, defaultValues);
-            for (String profile : profileList) {
-                if (!mergedProfiles.contains(profile)) {
-                    mergedProfiles.add(profile);
-                }
-            }
-            cfg.getCategory(CATEGORY_GENERAL).remove("profiles");
-            profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                    mergedProfiles.toArray(new String[mergedProfiles.size()]), PROFILES_COMMENT);
-        } else {
-            ASSETS = cfg.getStringList("assets", CATEGORY_GENERAL, ASSETS, ASSET_COMMENT);
-
-            profileList = cfg.getStringList("profiles", CATEGORY_GENERAL,
-                    DEFAULT_PROFILES, PROFILES_COMMENT);
-
-        }
+        String[] profileList = null;
 
         BLOCKS_REQUIRING_LIGHTING_UPDATES = cfg.getStringList("blocksRequiringLightingUpdates", CATEGORY_GENERAL, BLOCKS_REQUIRING_LIGHTING_UPDATES, LIGHTING_UPDATE_COMMENT);
 
@@ -510,11 +461,11 @@ public class LostCityConfiguration {
 
     public static void setupProfiles() {
         Path path = FMLPaths.CONFIGDIR.get();
-        Path profileDir = Paths.get(path.toString(), "lostcity_profiles");
+        Path profileDir = Paths.get(path.toString(), "lostcities/profiles");
 
-        LostCities.getLogger().info("Creating standard profiles into 'config/lostcity_profiles'");
+        LostCities.getLogger().info("Creating standard profiles into 'config/lostcities/profiles'");
         initStandardProfiles();
-        new File(profileDir.toString()).mkdir();
+        new File(profileDir.toString()).mkdirs();
         for (Map.Entry<String, LostCityProfile> entry : standardProfiles.entrySet()) {
             String name = entry.getKey();
             if (!"customized".equals(name)) {
@@ -532,7 +483,7 @@ public class LostCityConfiguration {
             }
         }
 
-        LostCities.getLogger().info("Reading existing profiles from 'config/lostcity_profiles'");
+        LostCities.getLogger().info("Reading existing profiles from 'config/lostcities/profiles'");
         readProfiles(profileDir);
     }
 
