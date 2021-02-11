@@ -180,7 +180,12 @@ task("uploadJars", dependsOn: "reobf") {
                         project {
                             name project.archivesBaseName
                             packaging 'jar'
-                            description project.archivesBaseName
+                            description 'LostCities'
+                            scm {
+                                url 'https://github.com/McJty/LostCities'
+                                connection 'scm:git:git@github.com:McJty/LostCities.git'
+                                developerConnection 'scm:git:git@github.com:McJty/LostCities.git'
+                            }
                             issueManagement {
                                 system 'github'
                                 url 'https://github.com/McJtyMods/LostCities/issues'
