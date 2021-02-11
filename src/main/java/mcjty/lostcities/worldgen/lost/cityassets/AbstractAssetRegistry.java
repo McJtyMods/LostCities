@@ -18,6 +18,10 @@ public class AbstractAssetRegistry<T extends ILostCityAsset> implements ILostCit
         assetNames.add(building.getName());
     }
 
+    public <S extends ILostCityAsset> ILostCityAssetRegistry<S> cast() {
+        return (ILostCityAssetRegistry<S>) this;
+    }
+
     @Override
     public T get(String name) {
         if (name == null) {

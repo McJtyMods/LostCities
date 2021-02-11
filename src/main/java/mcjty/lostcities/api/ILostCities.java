@@ -1,6 +1,5 @@
 package mcjty.lostcities.api;
 
-import net.minecraft.util.RegistryKey;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -13,10 +12,8 @@ import javax.annotation.Nullable;
 public interface ILostCities {
 
     /**
-     * If the given dimension is handled by Lost Cities then this will return the chunk generator. It is strongly
-     * recommended to use this instead of the now deprecated technique of doing instanceof ILostChunkGenerator
-     * as this is not compatible with Sponge
+     * Get Lost City information for a given dimension. Returns null if the dimension doesn't support Lost Cities
      */
     @Nullable
-    ILostChunkGenerator getLostGenerator(RegistryKey<World> dimension);
+    ILostCityInformation getLostInfo(World world);
 }

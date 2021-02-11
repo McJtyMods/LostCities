@@ -1,5 +1,6 @@
 package mcjty.lostcities;
 
+import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.setup.ClientSetup;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
@@ -9,7 +10,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +18,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Mod(LostCities.MODID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -40,14 +43,12 @@ public class LostCities {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG, "lostcities/common.toml");
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent event) -> setup.init(event));
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
+
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::init);
         });
-
-//        Config.loadConfig(Config.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("lostcities-client.toml"));
-//        Config.loadConfig(Config.COMMON_CONFIG, FMLPaths.CONFIGDIR.get().resolve("lostcities-common.toml"));
-//        Config.loadConfig(Config.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("lostcities-server.toml"));
     }
 
     public static Logger getLogger() {
@@ -63,18 +64,12 @@ public class LostCities {
         CitySphere.cleanCache();
     }
 
-    // @todo 1.14
-//    @Mod.EventHandler
-//    public void imcCallback(FMLInterModComms.IMCEvent event) {
-//        for (FMLInterModComms.IMCMessage message : event.getMessages()) {
-//            if (message.key.equalsIgnoreCase("getLostCities")) {
-//                Optional<Function<ILostCities, Void>> value = message.getFunctionValue(ILostCities.class, Void.class);
-//                if (value.isPresent()) {
-//                    value.get().apply(lostCitiesImp);
-//                } else {
-//                    setup.getLogger().warn("Some mod didn't return a valid result with getLostCities!");
-//                }
-//            }
-//        }
-//    }
+    private void processIMC(final InterModProcessEvent event) {
+        event.getIMCStream().forEach(message -> {
+            if ("getLostCities".equals(message.getMethod())) {
+                Supplier<Function<ILostCities, Void>> supplier = message.getMessageSupplier();
+                supplier.get().apply(new LostCitiesImp());
+            }
+        });
+    }
 }
