@@ -52,8 +52,6 @@ public class CommandDebug implements Command<CommandSource> {
                 System.out.println("tunnel1 = " + info.isTunnel(1));
                 System.out.println("getHighwayXLevel() = " + info.getHighwayXLevel());
                 System.out.println("getHighwayZLevel() = " + info.getHighwayZLevel());
-                System.out.println("getChestTodo().size() = " + info.getLootTodo().size());
-                System.out.println("getMobSpawnerTodo().size() = " + info.getMobSpawnerTodo().size());
 
                 float reldist = CitySphere.getRelativeDistanceToCityCenter(info.chunkX, info.chunkZ, dimInfo);
                 System.out.println("reldist = " + reldist);

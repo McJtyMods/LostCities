@@ -1,5 +1,6 @@
 package mcjty.lostcities.worldgen;
 
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
@@ -15,12 +16,16 @@ import net.minecraft.state.properties.DoorHingeSide;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.state.properties.RailShape;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tileentity.LockableLootTileEntity;
+import net.minecraft.tileentity.MobSpawnerTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.IChunk;
@@ -28,6 +33,7 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.NoiseChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.server.ServerChunkProvider;
+import net.minecraft.world.spawner.AbstractSpawner;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -2429,6 +2435,7 @@ public class LostCityTerrainFeature {
                         }
                         // We don't replace the world where the part is empty (air)
                         if (b != air) {
+                            Runnable action = null;
                             if (b == liquid) {
                                 if (info.profile.AVOID_WATER) {
                                     b = air;
@@ -2448,14 +2455,23 @@ public class LostCityTerrainFeature {
                                     }
                                 } else if (inf.getLoot() != null && !inf.getLoot().isEmpty()) {
                                     if (!info.noLoot) {
-                                        info.getTodoChunk(rx, rz).addLootTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
-                                                new BuildingInfo.ConditionTodo(inf.getLoot(), part.getName(), info));
+                                        BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
+                                        BlockState finalB = b;
+                                        action = () -> {
+                                            provider.getWorld().setBlockState(pos, finalB, 2);
+                                            generateLoot(info, provider.getWorld(), pos, new BuildingInfo.ConditionTodo(inf.getLoot(), part.getName(), info));
+                                        };
                                     }
                                 } else if (inf.getMobId() != null && !inf.getMobId().isEmpty()) {
                                     if (info.profile.GENERATE_SPAWNERS && !info.noLoot) {
                                         String mobid = inf.getMobId();
-                                        info.getTodoChunk(rx, rz).addSpawnerTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz),
-                                                new BuildingInfo.ConditionTodo(mobid, part.getName(), info));
+
+                                        BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
+                                        BlockState finalB1 = b;
+                                        action = () -> {
+                                            provider.getWorld().setBlockState(pos, finalB1, 2);
+                                            createSpawner(rand, provider, info, new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
+                                        };
                                     } else {
                                         b = air;
                                     }
@@ -2474,6 +2490,9 @@ public class LostCityTerrainFeature {
                                 }
                             }
                             driver.add(b);
+                            if (action != null) {
+                                action.run();
+                            }
                         } else {
                             driver.incY();
                         }
@@ -2483,6 +2502,96 @@ public class LostCityTerrainFeature {
         }
         return oy + part.getSliceCount();
     }
+
+    public static void createSpawner(Random random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
+        IWorld world = diminfo.getWorld();
+        TileEntity tileentity = world.getTileEntity(pos);
+        if (tileentity instanceof MobSpawnerTileEntity) {
+            MobSpawnerTileEntity spawner = (MobSpawnerTileEntity) tileentity;
+            String condition = todo.getCondition();
+            Condition cnd = AssetRegistries.CONDITIONS.get(condition);
+            if (cnd == null) {
+                throw new RuntimeException("Cannot find condition '" + condition + "'!");
+            }
+            int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / 6;
+            int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
+            ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
+                    todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
+                @Override
+                public boolean isSphere() {
+                    return CitySphere.isInSphere(info.chunkX, info.chunkZ, pos, diminfo);
+                }
+
+                @Override
+                public ResourceLocation getBiome() {
+                    return world.getBiome(pos).getRegistryName();
+                }
+            };
+            String randomValue = cnd.getRandomValue(random, conditionContext);
+            if (randomValue == null) {
+                throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
+            }
+            AbstractSpawner logic = spawner.getSpawnerBaseLogic();
+            logic.setEntityType(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(randomValue)));
+            spawner.markDirty();
+            if (LostCityConfiguration.DEBUG) {
+                LostCities.setup.getLogger().debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
+            }
+        } else if (tileentity != null) {
+            LostCities.setup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");
+        } else {
+            LostCities.setup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
+        }
+    }
+
+
+    private void generateLoot(BuildingInfo info, IWorld world, BlockPos pos, BuildingInfo.ConditionTodo condition) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof LockableLootTileEntity) {
+            if (this.provider.getProfile().GENERATE_LOOT) {
+                createLoot(info, rand, world, pos, condition, this.provider);
+            }
+        } else if (te == null) {
+            LostCities.setup.getLogger().error("Error setting loot at " + pos.getX() + "," + pos.getY() + "," + pos.getZ());
+        }
+    }
+
+    public static void createLoot(BuildingInfo info, Random random, IWorld world, BlockPos pos, BuildingInfo.ConditionTodo todo, IDimensionInfo diminfo) {
+        if (random.nextFloat() < diminfo.getProfile().CHEST_WITHOUT_LOOT_CHANCE) {
+            return;
+        }
+        TileEntity tileentity = world.getTileEntity(pos);
+        if (tileentity instanceof LockableLootTileEntity) {
+            if (todo != null) {
+                String lootTable = todo.getCondition();
+                int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / 6;
+                int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
+                ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
+                        todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
+                    @Override
+                    public boolean isSphere() {
+                        return CitySphere.isInSphere(info.chunkX, info.chunkZ, pos, diminfo);
+                    }
+
+                    @Override
+                    public ResourceLocation getBiome() {
+                        return world.getBiome(pos).getRegistryName();
+                    }
+                };
+                String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);
+                if (randomValue == null) {
+                    throw new RuntimeException("Condition '" + lootTable + "' did not return a table under certain conditions!");
+                }
+//                ((LockableLootTileEntity) tileentity).setLootTable(new ResourceLocation(randomValue), random.nextLong());
+//                tileentity.markDirty();
+//                if (LostCityConfiguration.DEBUG) {
+//                    LostCities.setup.getLogger().debug("createLootChest: loot=" + randomValue + " pos=" + pos.toString());
+//                }
+                LockableLootTileEntity.setLootTable(world, random, pos, new ResourceLocation(randomValue));
+            }
+        }
+    }
+
 
     private void generateDebris(Random rand, BuildingInfo info) {
         generateDebrisFromChunk(rand, info, info.getXmin(), (xx, zz) -> (15.0f - xx) / 16.0f);
