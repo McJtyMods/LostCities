@@ -1,4 +1,4 @@
-Upcoming:
+1.16-4.0.7-beta:
 - Fixed loot and spawner generation so that it happens more consistently now
 
 1.16-4.0.6-alpha:
