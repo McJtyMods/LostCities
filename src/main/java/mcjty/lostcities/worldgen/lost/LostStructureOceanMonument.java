@@ -7,7 +7,7 @@ import net.minecraft.world.gen.feature.structure.OceanMonumentStructure;
 public class LostStructureOceanMonument extends OceanMonumentStructure {
 
     public LostStructureOceanMonument() {
-        super(NoFeatureConfig.field_236558_a_);
+        super(NoFeatureConfig.CODEC);
     }
 
     public boolean hasStructure(World world, int chunkX, int chunkZ) {

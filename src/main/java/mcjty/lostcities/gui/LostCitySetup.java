@@ -26,6 +26,12 @@ public class LostCitySetup {
         return customizedProfile;
     }
 
+    public void reset() {
+        profiles = null;
+        profile = null;
+        customizedProfile = null;
+    }
+
     public boolean isCustomizable() {
         if (profile == null) {
             return false;

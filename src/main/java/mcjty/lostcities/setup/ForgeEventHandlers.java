@@ -2,6 +2,7 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.commands.ModCommands;
 import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.gui.LostCitySetup;
 import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.LostCityFeature;
@@ -15,21 +16,20 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgeEventHandlers {
 
     @SubscribeEvent
-    public void serverLoad(RegisterCommandsEvent event) {
+    public void commandRegister(RegisterCommandsEvent event) {
         ModCommands.register(event.getDispatcher());
     }
 
@@ -41,6 +41,11 @@ public class ForgeEventHandlers {
         }
     }
 
+    @SubscribeEvent
+    public void onServerStop(FMLServerStoppingEvent event) {
+        LostCitySetup.CLIENT_SETUP.reset();
+        Config.reset();
+    }
 
 //    @SubscribeEvent
 //    public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {

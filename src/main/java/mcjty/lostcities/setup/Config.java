@@ -47,6 +47,11 @@ public class Config {
     public static ForgeConfigSpec.ConfigValue<String> SELECTED_PROFILE;
     public static ForgeConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
 
+    public static void reset() {
+        profileFromClient = null;
+        jsonFromClient = null;
+        dimensionProfileCache = null;
+    }
 
     public static String getProfileForDimension(RegistryKey<World> type) {
         if (dimensionProfileCache == null) {

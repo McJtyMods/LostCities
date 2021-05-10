@@ -12,7 +12,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.provider.OverworldBiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -44,7 +43,7 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
 
 
     public LostCityFeature() {
-        super(NoFeatureConfig.field_236558_a_);
+        super(NoFeatureConfig.CODEC);
     }
 
     @Override
