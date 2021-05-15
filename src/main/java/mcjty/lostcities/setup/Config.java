@@ -117,6 +117,9 @@ public class Config {
     private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
 
     static {
+
+        LostCityConfiguration.init(SERVER_BUILDER);
+
         COMMON_BUILDER.comment("General settings").push(CATEGORY_PROFILES);
         CLIENT_BUILDER.comment("General settings").push(CATEGORY_PROFILES);
         SERVER_BUILDER.comment("General settings").push(CATEGORY_PROFILES);

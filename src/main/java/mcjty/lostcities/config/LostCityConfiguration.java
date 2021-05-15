@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import mcjty.lostcities.LostCities;
-import net.minecraft.block.Blocks;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.io.FileUtils;
 
@@ -14,7 +14,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LostCityConfiguration {
 
@@ -59,49 +60,19 @@ public class LostCityConfiguration {
 
     public static boolean DEBUG = false;
 
-    public static String SPECIAL_BED_BLOCK = Blocks.DIAMOND_BLOCK.getRegistryName().toString();
+    public static ForgeConfigSpec.ConfigValue<String> SPECIAL_BED_BLOCK;// = "minecraft:diamond_block";
 
 
 
 
-    public static String[] init(Configuration cfg) {
-        cfg.addCustomCategoryComment(CATEGORY_GENERAL, "General settings");
+    public static void init(ForgeConfigSpec.Builder SERVER_BUILDER) {
+        SERVER_BUILDER.comment("General settings").push(CATEGORY_GENERAL);
 
-        int oldVersion = 0;
-        if (cfg.hasKey(CATEGORY_GENERAL, "version")) {
-            oldVersion = cfg.getInt("version", CATEGORY_GENERAL, VERSION, 0, 10000, "Config version. Do not modify this manually!");
-        }
+        SPECIAL_BED_BLOCK = SERVER_BUILDER
+                .comment("Block to put underneath a bed so that it qualifies as a teleporter bed")
+                .define("specialBedBlock", "minecraft:diamond_block");
 
-        // @todo 1.14
-//        Property versionProperty = new Property("version", Integer.toString(VERSION), Property.Type.INTEGER);
-//        versionProperty.setComment("Config version. Do not modify this manually!");
-//        cfg.getCategory(CATEGORY_GENERAL).put("version", versionProperty);
-
-        initStandardProfiles();
-
-        String[] profileList = null;
-
-        BLOCKS_REQUIRING_LIGHTING_UPDATES = cfg.getStringList("blocksRequiringLightingUpdates", CATEGORY_GENERAL, BLOCKS_REQUIRING_LIGHTING_UPDATES, LIGHTING_UPDATE_COMMENT);
-
-        ADAPTING_WORLDTYPES = cfg.getStringList("adaptingWorldTypes", CATEGORY_GENERAL, ADAPTING_WORLDTYPES, WORLDTYPES_COMMENT);
-
-        ADDITIONAL_DIMENSIONS = cfg.getStringList("additionalDimensions", CATEGORY_GENERAL, ADDITIONAL_DIMENSIONS, ADDITIONAL_DIMENSIONS_COMMENT);
-
-        DIMENSION_PROFILE = cfg.getString("dimensionProfile", CATEGORY_GENERAL, DIMENSION_PROFILE, "The 'profile' to use for generation of the Lost City dimension");
-        DEFAULT_PROFILE = cfg.getString("defaultProfile", CATEGORY_GENERAL, DEFAULT_PROFILE, "The default 'profile' to use for the overworld");
-        // @todo 1.14
-//        DIMENSION_ID = cfg.getInt("dimensionId", CATEGORY_GENERAL, DIMENSION_ID, -10000, 10000, "The 'ID' of the Lost City Dimension. Set to -1 if you don't want this dimension");
-        DIMENSION_BOP = cfg.getBoolean("dimensionBoP", CATEGORY_GENERAL, DIMENSION_BOP, "If true and if Biomes O Plenty is present the dimension will use BoP biomes");
-        SPECIAL_BED_BLOCK = cfg.getString("specialBedBlock", CATEGORY_GENERAL, SPECIAL_BED_BLOCK, "Block to put underneath a bed so that it qualifies as a teleporter bed");
-
-        DEBUG = cfg.getBoolean("debug", CATEGORY_GENERAL, DEBUG, "Enable debugging/logging");
-
-        return profileList;
-    }
-
-    public static String[] getPrivateProfiles(Configuration cfg) {
-        return cfg.getStringList("privateProfiles", CATEGORY_GENERAL,
-                PRIVATE_PROFILES, PRIVATE_PROFILES_COMMENT);
+        SERVER_BUILDER.pop();
     }
 
     private static void initStandardProfiles() {

@@ -1,3 +1,6 @@
+Upcoming:
+- Added back the specialBedBlock config (in lostcities-server.toml) so that you can change the diamond block under the bed
+
 1.16-4.0.8-beta:
 - Fixed a problem with creation of multiple worlds where the settings of the first world would persist for future worlds. This also fixes the saving of the selected profile in serverconfig/lostcities-server.toml
 
