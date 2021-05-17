@@ -1,5 +1,7 @@
 Upcoming:
 - Added back the specialBedBlock config (in lostcities-server.toml) so that you can change the diamond block under the bed
+- It is now possible to specify blocks using the standard BlockState format in the palette (for example: minecraft:quartz_slab[type=bottom]) giving many more options for custom assets
+
 
 1.16-4.0.8-beta:
 - Fixed a problem with creation of multiple worlds where the settings of the first world would persist for future worlds. This also fixes the saving of the selected profile in serverconfig/lostcities-server.toml

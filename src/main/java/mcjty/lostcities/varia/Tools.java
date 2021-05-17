@@ -1,7 +1,9 @@
 package mcjty.lostcities.varia;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.block.*;
-import net.minecraft.nbt.NBTUtil;
+import net.minecraft.command.arguments.BlockStateParser;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.RailShape;
 import net.minecraft.state.properties.SlabType;
@@ -30,8 +32,16 @@ public class Tools {
         if ("minecraft:double_stone_slab".equals(s)) {
             return Blocks.SMOOTH_STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
         }
-        String original = s;
         int meta = 0;
+        if (s.contains("[")) {
+            BlockStateParser parser = new BlockStateParser(new StringReader(s), false);
+            try {
+                parser.parse(false);
+            } catch (CommandSyntaxException e) {
+                throw new RuntimeException(e);
+            }
+            return parser.getState();
+        }
         if (s.contains("@")) {
             // Temporary fix to just remove the meta to get things rolling
             String[] split = s.split("@");
