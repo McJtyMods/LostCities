@@ -22,11 +22,11 @@ public class LostCitiesImp implements ILostCities {
     public ILostCityInformation getLostInfo(World world) {
         IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo((ISeedReader) world);
         if (dimensionInfo != null) {
-            if (!info.containsKey(world.getDimensionKey())) {
+            if (!info.containsKey(world.dimension())) {
                 LostCityInformation gen = new LostCityInformation(dimensionInfo);
-                info.put(world.getDimensionKey(), gen);
+                info.put(world.dimension(), gen);
             }
-            return info.get(world.getDimensionKey());
+            return info.get(world.dimension());
         }
         return null;
     }

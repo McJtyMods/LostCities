@@ -61,7 +61,7 @@ public class Config {
                 if (split.length != 2) {
                     LostCities.getLogger().error("Bad format for config value: '" + dp +"'!");
                 } else {
-                    RegistryKey<World> dimensionType = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(split[0]));
+                    RegistryKey<World> dimensionType = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(split[0]));
                     if (dimensionType != null) {
                         String profileName = split[1];
                         LostCityProfile profile = LostCityConfiguration.standardProfiles.get(profileName);
@@ -105,7 +105,7 @@ public class Config {
             String profile = getProfileForDimension(World.OVERWORLD);
             if (profile != null && !profile.isEmpty()) {
                 if (LostCityConfiguration.standardProfiles.get(profile).GENERATE_NETHER) {
-                    dimensionProfileCache.put(World.THE_NETHER, "cavern");
+                    dimensionProfileCache.put(World.NETHER, "cavern");
                 }
             }
         }

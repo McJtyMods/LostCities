@@ -77,7 +77,7 @@ public class GuiLCConfig extends Screen {
     @Override
     protected void init() {
         super.init();
-        this.minecraft.keyboardListener.enableRepeatEvents(true);
+        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
         profileButton = addButton(new ButtonExt(this, 70, 10, 100, 20, new StringTextComponent(localSetup.getProfileLabel()), p -> {
             localSetup.toggleProfile(/* @todo 1.16 worldType*/);
@@ -429,7 +429,7 @@ public class GuiLCConfig extends Screen {
 
     private void cancel() {
         refreshPreview();
-        Minecraft.getInstance().displayGuiScreen(parent);
+        Minecraft.getInstance().setScreen(parent);
     }
 
     private void done() {
@@ -443,7 +443,7 @@ public class GuiLCConfig extends Screen {
             selectProfile(localSetup.getProfile(), null);
         }
 
-        Minecraft.getInstance().displayGuiScreen(parent);
+        Minecraft.getInstance().setScreen(parent);
     }
 
     @Override

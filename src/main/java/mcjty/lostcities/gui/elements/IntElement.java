@@ -87,15 +87,15 @@ public class IntElement extends GuiElement {
 
     private void setValue(Object result) {
         if (result instanceof Float) {
-            field.setText(Float.toString((Float)result));
+            field.setValue(Float.toString((Float)result));
         } else if (result instanceof Integer) {
-            field.setText(Integer.toString((Integer)result));
+            field.setValue(Integer.toString((Integer)result));
         }
     }
 
     @Override
     public void setEnabled(boolean b) {
-        field.setEnabled(b);
+        field.setEditable(b);
     }
 
     @Override

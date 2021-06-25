@@ -22,17 +22,17 @@ public class CommandDebug implements Command<CommandSource> {
 
     public static ArgumentBuilder<CommandSource, ?> register(CommandDispatcher<CommandSource> dispatcher) {
         return Commands.literal("debug")
-                .requires(cs -> cs.hasPermissionLevel(0))
+                .requires(cs -> cs.hasPermission(0))
                 .executes(CMD);
     }
 
 
     @Override
     public int run(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().asPlayer();
+        ServerPlayerEntity player = context.getSource().getPlayerOrException();
         if (player != null) {
-            BlockPos position = player.getPosition();
-            IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getServerWorld());
+            BlockPos position = player.blockPosition();
+            IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getLevel());
             if (dimInfo != null) {
                 BuildingInfo info = BuildingInfo.getBuildingInfo(position.getX() >> 4, position.getZ() >> 4, dimInfo);
                 System.out.println("profile = " + info.profile.getName());
@@ -67,7 +67,7 @@ public class CommandDebug implements Command<CommandSource> {
                 System.out.println("sphere.isEnabled() = " + sphere.isEnabled());
                 System.out.println("sphere.radius = " + sphere.getRadius());
 
-                ChunkHeightmap heightmap = dimInfo.getFeature().getHeightmap(info.chunkX, info.chunkZ, player.getServerWorld());
+                ChunkHeightmap heightmap = dimInfo.getFeature().getHeightmap(info.chunkX, info.chunkZ, player.getLevel());
                 int avg = 0;
                 for (int x = 0 ; x < 16 ; x++) {
                     for (int z = 0 ; z < 16 ; z++) {

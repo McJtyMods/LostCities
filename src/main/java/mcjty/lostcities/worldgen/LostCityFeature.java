@@ -35,8 +35,8 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
         Registry<ConfiguredFeature<?, ?>> registry = WorldGenRegistries.CONFIGURED_FEATURE;
 
         LOSTCITY_CONFIGURED_FEATURE = Registration.LOSTCITY_FEATURE
-                .withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG)
-                .withPlacement(Placement.RANGE.configure(new TopSolidRangeConfig(1, 0, 1)));
+                .configured(NoFeatureConfig.NONE)
+                .decorated(Placement.RANGE.configured(new TopSolidRangeConfig(1, 0, 1)));
 
         Registry.register(registry, new ResourceLocation(LostCities.MODID, "configured_feature"), LOSTCITY_CONFIGURED_FEATURE);
     }
@@ -47,13 +47,13 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
     }
 
     @Override
-    public boolean generate(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+    public boolean place(ISeedReader world, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
         if (world instanceof WorldGenRegion) {
             IDimensionInfo diminfo = getDimensionInfo(world);
             if (diminfo != null) {
                 WorldGenRegion region = (WorldGenRegion) world;
-                int chunkX = region.getMainChunkX();
-                int chunkZ = region.getMainChunkZ();
+                int chunkX = region.getCenterX();
+                int chunkZ = region.getCenterZ();
                 diminfo.setWorld(world);
 //                generator.getBiomeProvider() ->OverworldBiomeProvider
 //                diminfo.getFeature().generateDummy(region, region.getChunk(chunkX, chunkZ));
@@ -66,7 +66,7 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
 
     @Nullable
     public IDimensionInfo getDimensionInfo(ISeedReader world) {
-        RegistryKey<World> type = world.getWorld().getDimensionKey();
+        RegistryKey<World> type = world.getLevel().dimension();
         String profileName = Config.getProfileForDimension(type);
         if (profileName != null) {
             if (!dimensionInfo.containsKey(type)) {

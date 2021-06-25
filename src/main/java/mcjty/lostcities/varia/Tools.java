@@ -30,7 +30,7 @@ public class Tools {
 
     public static BlockState stringToState(String s) {
         if ("minecraft:double_stone_slab".equals(s)) {
-            return Blocks.SMOOTH_STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+            return Blocks.SMOOTH_STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
         }
         int meta = 0;
         if (s.contains("[")) {
@@ -50,17 +50,17 @@ public class Tools {
         }
 
         if (s.equals("minecraft:stone_brick_stairs")) {
-            return getStairsState(meta, Blocks.STONE_BRICK_STAIRS.getDefaultState());
+            return getStairsState(meta, Blocks.STONE_BRICK_STAIRS.defaultBlockState());
         } else if (s.equals("minecraft:quartz_stairs")) {
-            return getStairsState(meta, Blocks.QUARTZ_STAIRS.getDefaultState());
+            return getStairsState(meta, Blocks.QUARTZ_STAIRS.defaultBlockState());
         } else if (s.equals("minecraft:stone_stairs")) {
-            return getStairsState(meta, Blocks.STONE_STAIRS.getDefaultState());
+            return getStairsState(meta, Blocks.STONE_STAIRS.defaultBlockState());
         } else if (s.equals("minecraft:rail")) {
-            return getRailState(meta, Blocks.RAIL.getDefaultState());
+            return getRailState(meta, Blocks.RAIL.defaultBlockState());
         } else if (s.equals("minecraft:golden_rail")) {
-            return getPoweredRailState(meta, Blocks.POWERED_RAIL.getDefaultState());
+            return getPoweredRailState(meta, Blocks.POWERED_RAIL.defaultBlockState());
         } else if (s.equals("minecraft:stone_slab")) {
-            return getStoneSlabState(meta, Blocks.SMOOTH_STONE_SLAB.getDefaultState());
+            return getStoneSlabState(meta, Blocks.SMOOTH_STONE_SLAB.defaultBlockState());
         } else if (s.equals("minecraft:redstone_torch")) {
             return getRedstoneTorchState(meta);
         } else if (s.equals("minecraft:ladder")) {
@@ -71,7 +71,7 @@ public class Tools {
         if (converted != null) {
             s = converted;
         } else {
-            converted = BlockStateFlatteningMap.updateName(s);
+            converted = BlockStateFlatteningMap.upgradeBlock(s);
             if (converted != null) {
                 s = converted;
             }
@@ -81,15 +81,15 @@ public class Tools {
         if (value == null) {
             throw new RuntimeException("Cannot find block: '" + s + "'!");
         }
-        return value.getDefaultState();
+        return value.defaultBlockState();
     }
 
     @Nullable
     public static ResourceLocation getBiomeId(Biome biome) {
-        // @todo use IWorld.func_241828_r()
+        // @todo use IWorld.registryAccess()
         if (biome.getRegistryName() == null) {
-            Optional<MutableRegistry<Biome>> biomeRegistry = DynamicRegistries.func_239770_b_().func_230521_a_(Registry.BIOME_KEY);
-            return biomeRegistry.map(r -> r.getOptionalKey(biome).map(RegistryKey::getLocation).orElse(null)).orElse(null);
+            Optional<MutableRegistry<Biome>> biomeRegistry = DynamicRegistries.builtin().registry(Registry.BIOME_REGISTRY);
+            return biomeRegistry.map(r -> r.getResourceKey(biome).map(RegistryKey::location).orElse(null)).orElse(null);
         } else {
             return biome.getRegistryName();
         }
@@ -100,39 +100,39 @@ public class Tools {
         if (direction.getAxis() == Direction.Axis.Y) {
             direction = Direction.NORTH;
         }
-        return Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, direction);
+        return Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, direction);
     }
 
     private static BlockState getRedstoneTorchState(int meta) {
         switch (meta) {
-            case 1: return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST);
-            case 2: return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST);
-            case 3: return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
-            case 4: return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH);
-            case 5: return Blocks.REDSTONE_TORCH.getDefaultState();
+            case 1: return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.EAST);
+            case 2: return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.WEST);
+            case 3: return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
+            case 4: return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH);
+            case 5: return Blocks.REDSTONE_TORCH.defaultBlockState();
         }
 
-        return Blocks.REDSTONE_TORCH.getDefaultState();
+        return Blocks.REDSTONE_TORCH.defaultBlockState();
     }
 
     private static BlockState getStoneSlabState(int meta, BlockState state) {
-        state.with (SlabBlock.TYPE, (meta & 8) > 0 ? SlabType.TOP : SlabType.BOTTOM);
+        state.setValue (SlabBlock.TYPE, (meta & 8) > 0 ? SlabType.TOP : SlabType.BOTTOM);
         return state;
     }
 
     private static BlockState getRailState(int meta, BlockState state) {
-        return state.with(RailBlock.SHAPE, getRailShape(meta, false));
+        return state.setValue(RailBlock.SHAPE, getRailShape(meta, false));
     }
 
     private static BlockState getPoweredRailState(int meta, BlockState state) {
-        return state.with(PoweredRailBlock.SHAPE, getRailShape(meta, true))
-                .with(PoweredRailBlock.POWERED, (meta & 8) > 0);
+        return state.setValue(PoweredRailBlock.SHAPE, getRailShape(meta, true))
+                .setValue(PoweredRailBlock.POWERED, (meta & 8) > 0);
     }
 
     private static BlockState getStairsState(int meta, BlockState state) {
         return state
-                .with(StairsBlock.FACING, getStairsDirection(meta))
-                .with(StairsBlock.HALF, getStairsHalf(meta));
+                .setValue(StairsBlock.FACING, getStairsDirection(meta))
+                .setValue(StairsBlock.HALF, getStairsHalf(meta));
     }
 
     private static Direction getStairsDirection(int meta) {

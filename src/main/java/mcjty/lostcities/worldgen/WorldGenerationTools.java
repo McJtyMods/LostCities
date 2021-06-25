@@ -11,8 +11,8 @@ public class WorldGenerationTools {
 
     public static int findUpsideDownEmptySpot(World world, int x, int z) {
         for (int y = 90 ; y > 0 ; y--) {
-            if (world.isAirBlock(new BlockPos(x, y, z)) && world.isAirBlock(new BlockPos(x, y+1, z)) && world.isAirBlock(new BlockPos(x, y+2, z))
-                    && world.isAirBlock(new BlockPos(x, y+3, z)) && world.isAirBlock(new BlockPos(x, y+4, z))) {
+            if (world.isEmptyBlock(new BlockPos(x, y, z)) && world.isEmptyBlock(new BlockPos(x, y+1, z)) && world.isEmptyBlock(new BlockPos(x, y+2, z))
+                    && world.isEmptyBlock(new BlockPos(x, y+3, z)) && world.isEmptyBlock(new BlockPos(x, y+4, z))) {
                 return y;
             }
         }
@@ -22,22 +22,22 @@ public class WorldGenerationTools {
 
 
     public static int findSuitableEmptySpot(World world, int x, int z) {
-        int y = world.getHeight(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, new BlockPos(x, 0, z)).getY();
+        int y = world.getHeightmapPos(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, new BlockPos(x, 0, z)).getY();
         if (y == -1) {
             return -1;
         }
 
         y--;            // y should now be at a solid or liquid block.
 
-        if (y > world.getHeight() - 5) {
-            y = world.getHeight() / 2;
+        if (y > world.getMaxBuildHeight() - 5) {
+            y = world.getMaxBuildHeight() / 2;
         }
 
 
         BlockState state = world.getBlockState(new BlockPos(x, y + 1, z));
         while (state.getMaterial().isLiquid()) {
             y++;
-            if (y > world.getHeight()-10) {
+            if (y > world.getMaxBuildHeight()-10) {
                 return -1;
             }
             state = world.getBlockState(new BlockPos(x, y + 1, z));
@@ -48,16 +48,16 @@ public class WorldGenerationTools {
 
     // Return true if this block is solid.
     public static boolean isSolid(World world, int x, int y, int z) {
-        if (world.isAirBlock(new BlockPos(x, y, z))) {
+        if (world.isEmptyBlock(new BlockPos(x, y, z))) {
             return false;
         }
         BlockState state = world.getBlockState(new BlockPos(x, y, z));
-        return state.getMaterial().blocksMovement();
+        return state.getMaterial().blocksMotion();
     }
 
     // Return true if this block is solid.
     public static boolean isAir(World world, int x, int y, int z) {
-        if (world.isAirBlock(new BlockPos(x, y, z))) {
+        if (world.isEmptyBlock(new BlockPos(x, y, z))) {
             return true;
         }
         Block block = world.getBlockState(new BlockPos(x, y, z)).getBlock();
@@ -68,7 +68,7 @@ public class WorldGenerationTools {
     // non-air block is encountered.
     public static void fillEmptyWithStone(World world, int x, int y, int z) {
         while (y > 0 && !isSolid(world, x, y, z)) {
-            world.setBlockState(new BlockPos(x, y, z), Blocks.STONE.getDefaultState(), 2);
+            world.setBlock(new BlockPos(x, y, z), Blocks.STONE.defaultBlockState(), 2);
             y--;
         }
     }

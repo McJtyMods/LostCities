@@ -40,7 +40,7 @@ public class PredefinedCity implements ILostCityAsset {
     @Override
     public void readFromJSon(JsonObject object) {
         name = object.get("name").getAsString();
-        dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(object.get("dimension").getAsString()));
+        dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(object.get("dimension").getAsString()));
         chunkX = object.get("chunkx").getAsInt();
         chunkZ = object.get("chunkz").getAsInt();
         radius = object.get("radius").getAsInt();

@@ -88,7 +88,7 @@ public class NullDimensionInfo implements IDimensionInfo {
         random = new Random(seed);
         feature = new LostCityTerrainFeature(this, profile, getRandom());
         feature.setupStates(profile);
-        biomeRegistry = DynamicRegistries.func_239770_b_().func_230521_a_(Registry.BIOME_KEY).get();
+        biomeRegistry = DynamicRegistries.builtin().registry(Registry.BIOME_REGISTRY).get();
     }
 
     @Override
@@ -199,6 +199,6 @@ public class NullDimensionInfo implements IDimensionInfo {
             case '*': biome = Biomes.BEACH; break;
             case 'd': biome = Biomes.DESERT; break;
         }
-        return biomeRegistry.getOrDefault(biome.getLocation());
+        return biomeRegistry.get(biome.location());
     }
 }

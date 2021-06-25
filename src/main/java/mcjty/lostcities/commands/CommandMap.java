@@ -20,17 +20,17 @@ public class CommandMap implements Command<CommandSource> {
 
     public static ArgumentBuilder<CommandSource, ?> register(CommandDispatcher<CommandSource> dispatcher) {
         return Commands.literal("map")
-                .requires(cs -> cs.hasPermissionLevel(0))
+                .requires(cs -> cs.hasPermission(0))
                 .executes(CMD);
     }
 
 
     @Override
     public int run(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().asPlayer();
+        ServerPlayerEntity player = context.getSource().getPlayerOrException();
         if (player != null) {
-            BlockPos position = player.getPosition();
-            IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getServerWorld());
+            BlockPos position = player.blockPosition();
+            IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getLevel());
             if (dimInfo != null) {
                 ChunkPos pos = new ChunkPos(position);
                 for (int z = pos.z - 40 ; z <= pos.z + 40 ; z++) {

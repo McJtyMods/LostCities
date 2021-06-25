@@ -36,7 +36,7 @@ public class PerlinNoiseGenerator14 implements INoiseGenerator {
       return d0;
    }
 
-   public double noiseAt(double x, double y, double z, double p_215460_7_) {
+   public double getSurfaceNoiseValue(double x, double y, double z, double p_215460_7_) {
       return this.noiseAt(x, y, true) * 0.55D;
    }
 }

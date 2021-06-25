@@ -32,17 +32,17 @@ public class ChunkDriver {
     }
 
     public ChunkDriver current(int x, int y, int z) {
-        current.setPos(x, y, z);
+        current.set(x, y, z);
         return this;
     }
 
     public ChunkDriver current(BlockPos i) {
-        current.setPos(i);
+        current.set(i);
         return this;
     }
 
     public BlockPos getCurrentCopy() {
-        return current.toImmutable();
+        return current.immutable();
     }
 
     public void incY() {
@@ -78,7 +78,7 @@ public class ChunkDriver {
     }
 
     public void setBlockRange(int x, int y, int z, int y2, BlockState state) {
-        pos.setPos(x, y, z);
+        pos.set(x, y, z);
         while (y < y2) {
             if (primer.getBlockState(pos) != state) {
                 primer.setBlockState(pos, state, false);
@@ -89,7 +89,7 @@ public class ChunkDriver {
     }
 
     public void setBlockRange(int x, int y, int z, int y2, BlockState state, Predicate<BlockState> test) {
-        pos.setPos(x, y, z);
+        pos.set(x, y, z);
         while (y < y2) {
             BlockState st = primer.getBlockState(pos);
             if (st != state && test.test(st)) {
@@ -101,7 +101,7 @@ public class ChunkDriver {
     }
 
     public void setBlockRangeSafe(int x, int y, int z, int y2, BlockState state) {
-        pos.setPos(x, y, z);
+        pos.set(x, y, z);
         while (y < y2) {
             if (primer.getBlockState(pos) != state) {
                 primer.setBlockState(pos, state, false);
@@ -112,7 +112,7 @@ public class ChunkDriver {
     }
 
     public void setBlockRangeSafe(int x, int y, int z, int y2, BlockState state, Predicate<BlockState> test) {
-        pos.setPos(x, y, z);
+        pos.set(x, y, z);
         while (y < y2) {
             BlockState st = primer.getBlockState(pos);
             if (st != state && test.test(st)) {
@@ -130,15 +130,15 @@ public class ChunkDriver {
         }
         BlockState newAdjacent = null;
         try {
-            newAdjacent = adjacent.updatePostPlacement(direction, state, region, pos, pos.offset(direction));
+            newAdjacent = adjacent.updateShape(direction, state, region, pos, pos.relative(direction));
         } catch (Exception e) {
             // We got an exception. For example for beehives there can potentially be a problem so in this case we just ignore it
             return adjacent;
         }
         if (newAdjacent != adjacent) {
             IChunk chunk = region.getChunk(pos);
-            if (chunk == thisChunk || chunk.getStatus().isAtLeast(ChunkStatus.FULL)) {
-                region.setBlockState(pos, newAdjacent, 0);
+            if (chunk == thisChunk || chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
+                region.setBlock(pos, newAdjacent, 0);
             }
         }
         return newAdjacent;
@@ -149,17 +149,17 @@ public class ChunkDriver {
     }
 
     private static boolean isDifferentStairs(BlockState state, IBlockReader worldIn, BlockPos pos, Direction face) {
-        BlockState blockstate = worldIn.getBlockState(pos.offset(face));
-        return !isBlockStairs(blockstate) || blockstate.get(StairsBlock.FACING) != state.get(StairsBlock.FACING) || blockstate.get(StairsBlock.HALF) != state.get(StairsBlock.HALF);
+        BlockState blockstate = worldIn.getBlockState(pos.relative(face));
+        return !isBlockStairs(blockstate) || blockstate.getValue(StairsBlock.FACING) != state.getValue(StairsBlock.FACING) || blockstate.getValue(StairsBlock.HALF) != state.getValue(StairsBlock.HALF);
     }
 
     private static StairsShape getShapeProperty(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        Direction direction = state.get(StairsBlock.FACING);
-        BlockState blockstate = worldIn.getBlockState(pos.offset(direction));
-        if (isBlockStairs(blockstate) && state.get(StairsBlock.HALF) == blockstate.get(StairsBlock.HALF)) {
-            Direction direction1 = blockstate.get(StairsBlock.FACING);
-            if (direction1.getAxis() != state.get(StairsBlock.FACING).getAxis() && isDifferentStairs(state, worldIn, pos, direction1.getOpposite())) {
-                if (direction1 == direction.rotateYCCW()) {
+        Direction direction = state.getValue(StairsBlock.FACING);
+        BlockState blockstate = worldIn.getBlockState(pos.relative(direction));
+        if (isBlockStairs(blockstate) && state.getValue(StairsBlock.HALF) == blockstate.getValue(StairsBlock.HALF)) {
+            Direction direction1 = blockstate.getValue(StairsBlock.FACING);
+            if (direction1.getAxis() != state.getValue(StairsBlock.FACING).getAxis() && isDifferentStairs(state, worldIn, pos, direction1.getOpposite())) {
+                if (direction1 == direction.getCounterClockWise()) {
                     return StairsShape.OUTER_LEFT;
                 }
 
@@ -167,11 +167,11 @@ public class ChunkDriver {
             }
         }
 
-        BlockState blockstate1 = worldIn.getBlockState(pos.offset(direction.getOpposite()));
-        if (isBlockStairs(blockstate1) && state.get(StairsBlock.HALF) == blockstate1.get(StairsBlock.HALF)) {
-            Direction direction2 = blockstate1.get(StairsBlock.FACING);
-            if (direction2.getAxis() != state.get(StairsBlock.FACING).getAxis() && isDifferentStairs(state, worldIn, pos, direction2)) {
-                if (direction2 == direction.rotateYCCW()) {
+        BlockState blockstate1 = worldIn.getBlockState(pos.relative(direction.getOpposite()));
+        if (isBlockStairs(blockstate1) && state.getValue(StairsBlock.HALF) == blockstate1.getValue(StairsBlock.HALF)) {
+            Direction direction2 = blockstate1.getValue(StairsBlock.FACING);
+            if (direction2.getAxis() != state.getValue(StairsBlock.FACING).getAxis() && isDifferentStairs(state, worldIn, pos, direction2)) {
+                if (direction2 == direction.getCounterClockWise()) {
                     return StairsShape.INNER_LEFT;
                 }
 
@@ -186,10 +186,10 @@ public class ChunkDriver {
         if (state.isAir()) {
             return false;
         }
-        if (state.isSolid()) {
+        if (state.canOcclude()) {
             return true;
         }
-        return !Block.cannotAttach(state.getBlock());
+        return !Block.isExceptionForConnection(state.getBlock());
     }
 
     private BlockState correct(BlockState state) {
@@ -198,18 +198,18 @@ public class ChunkDriver {
         int cz = current.getZ() + (primer.getPos().z << 4);
 
         IChunk thisChunk = region.getChunk(cx >> 4, cz >> 4);
-        BlockState westState = updateAdjacent(state, Direction.EAST, pos.setPos(cx - 1, cy, cz), thisChunk);
-        BlockState eastState = updateAdjacent(state, Direction.WEST, pos.setPos(cx + 1, cy, cz), thisChunk);
-        BlockState northState = updateAdjacent(state, Direction.SOUTH, pos.setPos(cx, cy, cz - 1), thisChunk);
-        BlockState southState = updateAdjacent(state, Direction.NORTH, pos.setPos(cx, cy, cz + 1), thisChunk);
+        BlockState westState = updateAdjacent(state, Direction.EAST, pos.set(cx - 1, cy, cz), thisChunk);
+        BlockState eastState = updateAdjacent(state, Direction.WEST, pos.set(cx + 1, cy, cz), thisChunk);
+        BlockState northState = updateAdjacent(state, Direction.SOUTH, pos.set(cx, cy, cz - 1), thisChunk);
+        BlockState southState = updateAdjacent(state, Direction.NORTH, pos.set(cx, cy, cz + 1), thisChunk);
 
         if (state.getBlock() instanceof FourWayBlock) {
-            state = state.with(FourWayBlock.WEST, canAttach(westState));
-            state = state.with(FourWayBlock.EAST, canAttach(eastState));
-            state = state.with(FourWayBlock.NORTH, canAttach(northState));
-            state = state.with(FourWayBlock.SOUTH, canAttach(southState));
+            state = state.setValue(FourWayBlock.WEST, canAttach(westState));
+            state = state.setValue(FourWayBlock.EAST, canAttach(eastState));
+            state = state.setValue(FourWayBlock.NORTH, canAttach(northState));
+            state = state.setValue(FourWayBlock.SOUTH, canAttach(southState));
         } else if (state.getBlock() instanceof StairsBlock) {
-            state = state.with(StairsBlock.SHAPE, getShapeProperty(state, region, pos.setPos(cx, cy, cz)));
+            state = state.setValue(StairsBlock.SHAPE, getShapeProperty(state, region, pos.set(cx, cy, cz)));
         }
         return state;
     }
@@ -246,27 +246,27 @@ public class ChunkDriver {
     }
 
     public BlockState getBlockDown() {
-        return primer.getBlockState(pos.setPos(current.getX(), current.getY()-1, current.getZ()));
+        return primer.getBlockState(pos.set(current.getX(), current.getY()-1, current.getZ()));
     }
 
     public BlockState getBlockEast() {
-        return primer.getBlockState(pos.setPos(current.getX()+1, current.getY(), current.getZ()));
+        return primer.getBlockState(pos.set(current.getX()+1, current.getY(), current.getZ()));
     }
 
     public BlockState getBlockWest() {
-        return primer.getBlockState(pos.setPos(current.getX()-1, current.getY(), current.getZ()));
+        return primer.getBlockState(pos.set(current.getX()-1, current.getY(), current.getZ()));
     }
 
     public BlockState getBlockSouth() {
-        return primer.getBlockState(pos.setPos(current.getX(), current.getY(), current.getZ()+1));
+        return primer.getBlockState(pos.set(current.getX(), current.getY(), current.getZ()+1));
     }
 
     public BlockState getBlockNorth() {
-        return primer.getBlockState(pos.setPos(current.getX(), current.getY(), current.getZ()-1));
+        return primer.getBlockState(pos.set(current.getX(), current.getY(), current.getZ()-1));
     }
 
 
     public BlockState getBlock(int x, int y, int z) {
-        return primer.getBlockState(pos.setPos(x, y, z));
+        return primer.getBlockState(pos.set(x, y, z));
     }
 }

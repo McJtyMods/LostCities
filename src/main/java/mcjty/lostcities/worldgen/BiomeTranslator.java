@@ -171,7 +171,7 @@ public class BiomeTranslator {
             return -1000;
         }
         float dr = a.getDownfall() - b.getDownfall();
-        float dt = a.getTemperature() - b.getTemperature();
+        float dt = a.getBaseTemperature() - b.getBaseTemperature();
         float dv = a.getDepth() - b.getDepth();
         float dh = a.getScale() - b.getScale();
 

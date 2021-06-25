@@ -39,7 +39,7 @@ public class ChunkFixer {
         int maxHeight = info.getMaxHeight();
 
         if (info.hasBuilding) {
-            if (world.getChunk(chunkX + 1, chunkZ).getStatus().isAtLeast(ChunkStatus.FEATURES)) {
+            if (world.getChunk(chunkX + 1, chunkZ).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getXmax();
                 int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
                 for (int z = 0; z < 15; z++) {
@@ -52,7 +52,7 @@ public class ChunkFixer {
             }
         }
         if (info.getXmax().hasBuilding) {
-            if (world.getChunk(chunkX + 1, chunkZ).getStatus().isAtLeast(ChunkStatus.FEATURES)) {
+            if (world.getChunk(chunkX + 1, chunkZ).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getXmax();
                 int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
                 for (int z = 0; z < 15; z++) {
@@ -66,7 +66,7 @@ public class ChunkFixer {
         }
 
         if (info.hasBuilding) {
-            if (world.getChunk(chunkX, chunkZ + 1).getStatus().isAtLeast(ChunkStatus.FEATURES)) {
+            if (world.getChunk(chunkX, chunkZ + 1).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getZmax();
                 int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
                 for (int x = 0; x < 15; x++) {
@@ -79,7 +79,7 @@ public class ChunkFixer {
             }
         }
         if (info.getZmax().hasBuilding) {
-            if (world.getChunk(chunkX, chunkZ + 1).getStatus().isAtLeast(ChunkStatus.FEATURES)) {
+            if (world.getChunk(chunkX, chunkZ + 1).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getZmax();
                 int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
                 for (int x = 0; x < 15; x++) {
@@ -94,21 +94,21 @@ public class ChunkFixer {
     }
 
     private static void createVineStrip(IWorld world, int bottom, BooleanProperty direction, BlockPos pos, BlockPos vineHolderPos) {
-        if (world.isAirBlock(vineHolderPos)) {
+        if (world.isEmptyBlock(vineHolderPos)) {
             return;
         }
-        if (!world.isAirBlock(pos)) {
+        if (!world.isEmptyBlock(pos)) {
             return;
         }
-        BlockState state = Blocks.VINE.getDefaultState().with(direction, true);
-        world.setBlockState(pos, state, 0);
-        pos = pos.down();
+        BlockState state = Blocks.VINE.defaultBlockState().setValue(direction, true);
+        world.setBlock(pos, state, 0);
+        pos = pos.below();
         while (pos.getY() >= bottom && world.getRandom().nextFloat() < .8f) {
-            if (!world.isAirBlock(pos)) {
+            if (!world.isEmptyBlock(pos)) {
                 return;
             }
-            world.setBlockState(pos, state, 0);
-            pos = pos.down();
+            world.setBlock(pos, state, 0);
+            pos = pos.below();
         }
     }
 

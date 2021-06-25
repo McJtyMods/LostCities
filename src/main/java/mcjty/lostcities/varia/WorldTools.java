@@ -16,37 +16,37 @@ public class WorldTools {
         if (world == null || pos == null) {
             return false;
         }
-        return world.isBlockLoaded(pos);
+        return world.hasChunkAt(pos);
 //        return world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null && world.getChunkFromBlockCoords(pos).isLoaded();
     }
 
     public static ServerWorld getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return server.getWorld(World.OVERWORLD);
+        return server.getLevel(World.OVERWORLD);
     }
 
     public static ServerWorld getOverworld(World world) {
         MinecraftServer server = world.getServer();
-        return server.getWorld(World.OVERWORLD);
+        return server.getLevel(World.OVERWORLD);
     }
 
     public static ServerWorld loadWorld(RegistryKey<World> type) {
         ServerWorld world = getWorld(type);
         if (world == null) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            return server.getWorld(type);
+            return server.getLevel(type);
         }
         return world;
     }
 
     public static ServerWorld getWorld(RegistryKey<World> type) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return server.getWorld(type);
+        return server.getLevel(type);
     }
 
     public static ServerWorld getWorld(World world, RegistryKey<World> type) {
         MinecraftServer server = world.getServer();
-        return server.getWorld(type);
+        return server.getLevel(type);
     }
 
     /**

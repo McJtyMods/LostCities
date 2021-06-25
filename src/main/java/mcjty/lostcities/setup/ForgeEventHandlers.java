@@ -35,7 +35,7 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onBiomeLoad(BiomeLoadingEvent event) {
-        RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, event.getName());
+        RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, event.getName());
         if (!BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.VOID)) {
             event.getGeneration().getFeatures(GenerationStage.Decoration.RAW_GENERATION).add(() -> LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
         }
@@ -188,7 +188,7 @@ public class ForgeEventHandlers {
         BlockState state = world.getBlockState(pos);
 //        return state.getBlock().isTopSolid(state) && state.getBlock().isFullCube(state) && state.getBlock().isOpaqueCube(state) && world.isAirBlock(pos.up()) && world.isAirBlock(pos.up(2));
         // @todo 1.14
-        return state.isSolid();
+        return state.canOcclude();
     }
 
     private boolean isValidSpawnBed(World world, BlockPos pos) {
@@ -197,29 +197,29 @@ public class ForgeEventHandlers {
             return false;
         }
         Direction direction = Blocks.BLACK_BED.getBedDirection(state, world, pos);
-        Block b1 = world.getBlockState(pos.down()).getBlock();
-        Block b2 = world.getBlockState(pos.offset(direction.getOpposite()).down()).getBlock();
+        Block b1 = world.getBlockState(pos.below()).getBlock();
+        Block b2 = world.getBlockState(pos.relative(direction.getOpposite()).below()).getBlock();
         Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LostCityConfiguration.SPECIAL_BED_BLOCK.get()));
         if (b1 != b || b2 != b) {
             return false;
         }
         // Check if the bed is surrounded by 6 skulls
-        if (!(world.getBlockState(pos.offset(direction)).getBlock() instanceof AbstractSkullBlock)) {   // @todo 1.14 other skulls!
+        if (!(world.getBlockState(pos.relative(direction)).getBlock() instanceof AbstractSkullBlock)) {   // @todo 1.14 other skulls!
             return false;
         }
-        if (!(world.getBlockState(pos.offset(direction.rotateY())).getBlock() instanceof AbstractSkullBlock)) {
+        if (!(world.getBlockState(pos.relative(direction.getClockWise())).getBlock() instanceof AbstractSkullBlock)) {
             return false;
         }
-        if (!(world.getBlockState(pos.offset(direction.rotateYCCW())).getBlock() instanceof AbstractSkullBlock)) {
+        if (!(world.getBlockState(pos.relative(direction.getCounterClockWise())).getBlock() instanceof AbstractSkullBlock)) {
             return false;
         }
-        if (!(world.getBlockState(pos.offset(direction.getOpposite(), 2)).getBlock() instanceof AbstractSkullBlock)) {
+        if (!(world.getBlockState(pos.relative(direction.getOpposite(), 2)).getBlock() instanceof AbstractSkullBlock)) {
             return false;
         }
-        if (!(world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateY())).getBlock() instanceof AbstractSkullBlock)) {
+        if (!(world.getBlockState(pos.relative(direction.getOpposite()).relative(direction.getOpposite().getClockWise())).getBlock() instanceof AbstractSkullBlock)) {
             return false;
         }
-        if (!(world.getBlockState(pos.offset(direction.getOpposite()).offset(direction.getOpposite().rotateYCCW())).getBlock() instanceof AbstractSkullBlock)) {
+        if (!(world.getBlockState(pos.relative(direction.getOpposite()).relative(direction.getOpposite().getCounterClockWise())).getBlock() instanceof AbstractSkullBlock)) {
             return false;
         }
         return true;
@@ -264,19 +264,19 @@ public class ForgeEventHandlers {
                     if ((y + dy) < 250) {
                         BlockPos p = new BlockPos(chunkX * 16 + x, y + dy, chunkZ * 16 + z);
                         if (isValidSpawnBed(world, p)) {
-                            return p.up();
+                            return p.above();
                         }
                         if (bestSpot == null && isValidStandingPosition(world, p)) {
-                            bestSpot = p.up();
+                            bestSpot = p.above();
                         }
                     }
                     if ((y - dy) > 1) {
                         BlockPos p = new BlockPos(chunkX * 16 + x, y - dy, chunkZ * 16 + z);
                         if (isValidSpawnBed(world, p)) {
-                            return p.up();
+                            return p.above();
                         }
                         if (bestSpot == null && isValidStandingPosition(world, p)) {
-                            bestSpot = p.up();
+                            bestSpot = p.above();
                         }
                     }
                 }
@@ -291,8 +291,8 @@ public class ForgeEventHandlers {
 //            return;
 //        }
 
-        World world = event.getPlayer().getEntityWorld();
-        if (world.isRemote) {
+        World world = event.getPlayer().getCommandSenderWorld();
+        if (world.isClientSide) {
             return;
         }
         BlockPos bedLocation = event.getPos();
@@ -300,30 +300,30 @@ public class ForgeEventHandlers {
             return;
         }
 
-        if (world.getDimensionKey() == Registration.DIMENSION) {
+        if (world.dimension() == Registration.DIMENSION) {
             event.setResult(PlayerEntity.SleepResult.NOT_POSSIBLE_HERE);
             ServerWorld destWorld = WorldTools.getOverworld(world);
             BlockPos location = findLocation(bedLocation, destWorld);
             CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
         } else {
             event.setResult(PlayerEntity.SleepResult.NOT_POSSIBLE_HERE);
-            ServerWorld destWorld = event.getEntity().getEntityWorld().getServer().getWorld(Registration.DIMENSION);
+            ServerWorld destWorld = event.getEntity().getCommandSenderWorld().getServer().getLevel(Registration.DIMENSION);
             BlockPos location = findLocation(bedLocation, destWorld);
             CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
         }
     }
 
     private BlockPos findLocation(BlockPos bedLocation, ServerWorld destWorld) {
-        BlockPos top = bedLocation.up(5);//destWorld.getHeight(Heightmap.Type.MOTION_BLOCKING, bedLocation).up(10);
+        BlockPos top = bedLocation.above(5);//destWorld.getHeight(Heightmap.Type.MOTION_BLOCKING, bedLocation).up(10);
         BlockPos location = top;
         while (top.getY() > 1 && destWorld.getBlockState(location).isAir(destWorld, location)) {
-            location = location.down();
+            location = location.below();
         }
 //        BlockPos location = findValidTeleportLocation(destWorld, top);
-        if (destWorld.isAirBlock(location.down())) {
+        if (destWorld.isEmptyBlock(location.below())) {
             // No place to teleport
-            destWorld.setBlockState(bedLocation, Blocks.COBBLESTONE.getDefaultState());
+            destWorld.setBlockAndUpdate(bedLocation, Blocks.COBBLESTONE.defaultBlockState());
         }
-        return location.up(1);
+        return location.above(1);
     }
 }

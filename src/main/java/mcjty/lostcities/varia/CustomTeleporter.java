@@ -31,8 +31,8 @@ public class CustomTeleporter extends Teleporter {
     public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
         this.worldServer.getBlockState(new BlockPos((int) this.x, (int) this.y, (int) this.z));
 
-        entity.setPosition(this.x, this.y, this.z);
-        entity.setMotion(0, 0, 0);
+        entity.setPos(this.x, this.y, this.z);
+        entity.setDeltaMovement(0, 0, 0);
         return entity;
     }
 
@@ -45,7 +45,7 @@ public class CustomTeleporter extends Teleporter {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
                 entity = repositionEntity.apply(false);
-                entity.setPositionAndUpdate(x, y, z);
+                entity.teleportTo(x, y, z);
                 return entity;
             }
         });

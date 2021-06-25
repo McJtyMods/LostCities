@@ -1313,14 +1313,14 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isOcean != null) {
             return isOcean;
         }
-        isOcean = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome().getCategory() == Biome.Category.OCEAN;
+        isOcean = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome().getBiomeCategory() == Biome.Category.OCEAN;
         return isOcean;
     }
 
     private static boolean isOcean(Biome[] biomes) {
         int cnt = 0;
         for (Biome biome : biomes) {
-            Biome.Category category = biome.getCategory();
+            Biome.Category category = biome.getBiomeCategory();
             if (category == Biome.Category.OCEAN) {
                 cnt++;
             }

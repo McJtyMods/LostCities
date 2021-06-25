@@ -13,11 +13,11 @@ public class PacketRequestProfile {
     private RegistryKey<World> dimension;
 
     public PacketRequestProfile(PacketBuffer buf) {
-        dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, buf.readResourceLocation());
+        dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
     }
 
     public void toBytes(PacketBuffer buf) {
-        buf.writeResourceLocation(dimension.getLocation());
+        buf.writeResourceLocation(dimension.location());
     }
 
     public PacketRequestProfile() {

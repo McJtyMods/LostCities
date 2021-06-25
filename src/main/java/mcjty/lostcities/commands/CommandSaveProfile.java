@@ -26,7 +26,7 @@ public class CommandSaveProfile implements Command<CommandSource> {
 
     public static ArgumentBuilder<CommandSource, ?> register(CommandDispatcher<CommandSource> dispatcher) {
         return Commands.literal("saveprofile")
-                .requires(cs -> cs.hasPermissionLevel(0))
+                .requires(cs -> cs.hasPermission(0))
                 .then(Commands.argument("profile", StringArgumentType.word())
                     .executes(CMD));
     }
@@ -37,7 +37,7 @@ public class CommandSaveProfile implements Command<CommandSource> {
         String name = context.getArgument("profile", String.class);
         LostCityProfile profile = LostCityConfiguration.standardProfiles.get(name);
         if (profile == null) {
-            context.getSource().sendFeedback(new StringTextComponent(TextFormatting.RED + "Could not find profile '" + name + "'!"), true);
+            context.getSource().sendSuccess(new StringTextComponent(TextFormatting.RED + "Could not find profile '" + name + "'!"), true);
             return 0;
         }
         JsonObject jsonObject = profile.toJson(false);
@@ -48,10 +48,10 @@ public class CommandSaveProfile implements Command<CommandSource> {
                 writer.flush();
             }
         } catch (FileNotFoundException e) {
-            context.getSource().sendFeedback(new StringTextComponent(TextFormatting.RED + "Error saving profile '" + name + "'!"), true);
+            context.getSource().sendSuccess(new StringTextComponent(TextFormatting.RED + "Error saving profile '" + name + "'!"), true);
             return 0;
         }
-        context.getSource().sendFeedback(new StringTextComponent(TextFormatting.GREEN + "Saved profile '" + name + "'!"), true);
+        context.getSource().sendSuccess(new StringTextComponent(TextFormatting.GREEN + "Saved profile '" + name + "'!"), true);
         return 0;
     }
 }

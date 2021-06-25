@@ -41,9 +41,9 @@ public class CitySphere implements ILostSphere {
     private boolean monorailWestCandidate;
     private boolean monorailEastCandidate;
 
-    private BlockState glassBlock = Blocks.AIR.getDefaultState();
-    private BlockState baseBlock = Blocks.AIR.getDefaultState();
-    private BlockState sideBlock = Blocks.AIR.getDefaultState();
+    private BlockState glassBlock = Blocks.AIR.defaultBlockState();
+    private BlockState baseBlock = Blocks.AIR.defaultBlockState();
+    private BlockState sideBlock = Blocks.AIR.defaultBlockState();
 
     private CitySphere(ChunkCoord center, float radius, BlockPos centerPos, boolean enabled) {
         this.enabled = enabled;
@@ -53,7 +53,7 @@ public class CitySphere implements ILostSphere {
     }
 
     public static void initSphere(CitySphere sphere, IDimensionInfo provider) {
-        if (sphere.getBaseBlock() != Blocks.AIR.getDefaultState()) {
+        if (sphere.getBaseBlock() != Blocks.AIR.defaultBlockState()) {
             return;
         }
 

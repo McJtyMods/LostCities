@@ -33,30 +33,30 @@ public class DummyChunk extends ChunkPrimer {
     @Override
     public BlockState getBlockState(BlockPos pos) {
         if (pos.getY() >= heightmap.getHeight(pos.getX() & 0xf, pos.getZ() & 0xf)) {
-            return Blocks.AIR.getDefaultState();
+            return Blocks.AIR.defaultBlockState();
         } else {
-            return Blocks.STONE.getDefaultState();
+            return Blocks.STONE.defaultBlockState();
         }
 //        return super.getBlockState(pos);
     }
 
     @Override
-    public int getTopBlockY(Heightmap.Type type, int x, int z) {
+    public int getHeight(Heightmap.Type type, int x, int z) {
         return heightmap.getHeight(x & 0xf, z & 0xf);
     }
 
     @Override
-    public void addLightValue(short packedPosition, int lightValue) {
+    public void addLight(short packedPosition, int lightValue) {
         // Do nothing
     }
 
     @Override
-    public void addLightPosition(BlockPos lightPos) {
+    public void addLight(BlockPos lightPos) {
         // Do nothing
     }
 
     @Override
-    public void setLightManager(WorldLightManager p_217306_1_) {
-        super.setLightManager(p_217306_1_);
+    public void setLightEngine(WorldLightManager p_217306_1_) {
+        super.setLightEngine(p_217306_1_);
     }
 }

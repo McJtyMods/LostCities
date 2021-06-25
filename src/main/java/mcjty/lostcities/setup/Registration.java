@@ -20,8 +20,8 @@ public class Registration {
     @ObjectHolder("lostcities:lostcityfeature")
     public static LostCityFeature LOSTCITY_FEATURE;
 
-    public static final RegistryKey<DimensionType> DIMENSION_TYPE = RegistryKey.getOrCreateKey(Registry.DIMENSION_TYPE_KEY, new ResourceLocation(LostCities.MODID, "lostcity"));
-    public static final RegistryKey<World> DIMENSION = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(LostCities.MODID, "lostcity"));
+    public static final RegistryKey<DimensionType> DIMENSION_TYPE = RegistryKey.create(Registry.DIMENSION_TYPE_REGISTRY, new ResourceLocation(LostCities.MODID, "lostcity"));
+    public static final RegistryKey<World> DIMENSION = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(LostCities.MODID, "lostcity"));
 
     @SubscribeEvent
     public static void registerFeatures(final RegistryEvent.Register<Feature<?>> event) {

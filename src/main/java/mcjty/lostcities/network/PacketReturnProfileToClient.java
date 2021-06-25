@@ -14,13 +14,13 @@ public class PacketReturnProfileToClient {
     private String profile;
 
     public PacketReturnProfileToClient(PacketBuffer buf) {
-        dimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, buf.readResourceLocation());
-        profile = buf.readString(32767);
+        dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
+        profile = buf.readUtf(32767);
     }
 
     public void toBytes(PacketBuffer buf) {
-        buf.writeResourceLocation(dimension.getLocation());
-        buf.writeString(profile);
+        buf.writeResourceLocation(dimension.location());
+        buf.writeUtf(profile);
     }
 
     public PacketReturnProfileToClient() {

@@ -32,7 +32,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         style = AssetRegistries.WORLDSTYLES.get("standard");
         feature = new LostCityTerrainFeature(this, profile, getRandom());
         feature.setupStates(profile);
-        biomeRegistry = DynamicRegistries.func_239770_b_().func_230521_a_(Registry.BIOME_KEY).get();
+        biomeRegistry = DynamicRegistries.builtin().registry(Registry.BIOME_REGISTRY).get();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 
     @Override
     public RegistryKey<World> getType() {
-        return world.getWorld().getDimensionKey();
+        return world.getLevel().dimension();
     }
 
     @Override
@@ -96,13 +96,13 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 //
     @Override
     public Biome getBiome(BlockPos pos) {
-        AbstractChunkProvider chunkProvider = getWorld().getChunkProvider();
+        AbstractChunkProvider chunkProvider = getWorld().getChunkSource();
         if (chunkProvider instanceof ServerChunkProvider) {
-            BiomeProvider biomeProvider = ((ServerChunkProvider) chunkProvider).getChunkGenerator().getBiomeProvider();
+            BiomeProvider biomeProvider = ((ServerChunkProvider) chunkProvider).getGenerator().getBiomeSource();
             // @todo 1.15 check if this is correct!
             return biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ());
         }
         // @todo 1.16: is this right
-        return biomeRegistry.getOptional(Biomes.PLAINS.getLocation()).get();
+        return biomeRegistry.getOptional(Biomes.PLAINS.location()).get();
     }
 }

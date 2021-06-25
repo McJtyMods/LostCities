@@ -212,7 +212,7 @@ public class LostCityProfile {
     }
 
     public LostCityProfile(String name, PacketBuffer buf) {
-        this(name, buf.readString(32767));
+        this(name, buf.readUtf(32767));
     }
 
     public LostCityProfile(String name, String json) {
@@ -593,9 +593,9 @@ public class LostCityProfile {
             Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LIQUID_BLOCK));
             if (b == null) {
                 LostCities.setup.getLogger().error("Bad liquid block: " + LIQUID_BLOCK + "!");
-                liquidBlock = Blocks.WATER.getDefaultState();
+                liquidBlock = Blocks.WATER.defaultBlockState();
             } else {
-                liquidBlock = b.getDefaultState();
+                liquidBlock = b.defaultBlockState();
             }
         }
         return liquidBlock;
@@ -606,9 +606,9 @@ public class LostCityProfile {
             Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(BASE_BLOCK));
             if (b == null) {
                 LostCities.setup.getLogger().error("Bad base block: " + BASE_BLOCK + "!");
-                baseBlock = Blocks.STONE.getDefaultState();
+                baseBlock = Blocks.STONE.defaultBlockState();
             } else {
-                baseBlock = b.getDefaultState();
+                baseBlock = b.defaultBlockState();
             }
         }
         return baseBlock;
@@ -628,7 +628,7 @@ public class LostCityProfile {
 
     public void toBytes(PacketBuffer buf) {
         JsonObject jsonObject = toJson(false);
-        buf.writeString(jsonObject.toString());
+        buf.writeUtf(jsonObject.toString());
     }
 
     public Configuration toConfiguration() {
