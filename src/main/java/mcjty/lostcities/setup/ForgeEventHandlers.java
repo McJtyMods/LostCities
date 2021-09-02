@@ -301,12 +301,12 @@ public class ForgeEventHandlers {
         }
 
         if (world.dimension() == Registration.DIMENSION) {
-            event.setResult(PlayerEntity.SleepResult.NOT_POSSIBLE_HERE);
+            event.setResult(PlayerEntity.SleepResult.OTHER_PROBLEM);
             ServerWorld destWorld = WorldTools.getOverworld(world);
             BlockPos location = findLocation(bedLocation, destWorld);
             CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
         } else {
-            event.setResult(PlayerEntity.SleepResult.NOT_POSSIBLE_HERE);
+            event.setResult(PlayerEntity.SleepResult.OTHER_PROBLEM);
             ServerWorld destWorld = event.getEntity().getCommandSenderWorld().getServer().getLevel(Registration.DIMENSION);
             BlockPos location = findLocation(bedLocation, destWorld);
             CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
