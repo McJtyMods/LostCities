@@ -309,6 +309,9 @@ public class LostCityConfiguration {
         profile.setIconFile("textures/gui/icon_safe.png");
         profile.GENERATE_SPAWNERS = false;
         profile.GENERATE_LIGHTING = true;
+        profile.GENERATE_UNDERGROUNDFILLER = true;
+        profile.GENERATE_FRONTDOOR = true;
+        profile.GENERATE_DUNGEONRAIL = true;
         profile.GENERATE_LOOT = false;
         standardProfiles.put(profile.getName(), profile);
 

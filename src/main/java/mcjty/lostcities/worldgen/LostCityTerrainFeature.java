@@ -695,13 +695,17 @@ public class LostCityTerrainFeature {
 
     private void generateBridge(BuildingInfo info, BuildingPart bt, Orientation orientation) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
+        Palette localPalette = bt.getLocalPalette();
+        if (localPalette != null) {
+            compiledPalette = new CompiledPalette(compiledPalette, localPalette);
+        }
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 driver.current(x, mainGroundLevel+1, z);
                 int l = 0;
                 while (l < bt.getSliceCount()) {
                     Character c = orientation == Orientation.X ? bt.getPaletteChar(x, l, z) : bt.getPaletteChar(z, l, x); // @todo general rotation system?
-                    BlockState b = info.getCompiledPalette().get(c);
+                    BlockState b = compiledPalette.get(c);
                     CompiledPalette.Info inf = compiledPalette.getInfo(c);
                     if (inf != null) {
                         if (inf.isTorch()) {
@@ -1392,106 +1396,110 @@ public class LostCityTerrainFeature {
             }
         }
 
-        Character railMainBlock = info.getCityStyle().getRailMainBlock();
-        BlockState rail = info.getCompiledPalette().get(railMainBlock);
+        if (info.profile.GENERATE_DUNGEONRAIL)
+        {
+        	Character railMainBlock = info.getCityStyle().getRailMainBlock();
+            BlockState rail = info.getCompiledPalette().get(railMainBlock);
 
-        if (type == RailChunkType.HORIZONTAL) {
-            // If there is a rail dungeon north or south we must make a connection here
-            if (info.getZmin().railDungeon != null) {
-                for (int z = 0; z < 4; z++) {
-                    driver.current(6, height + 1, z).add(rail).add(air).add(air);
-                    driver.current(7, height + 1, z).add(rail).add(air).add(air);
-                }
-                for (int z = 0; z < 3; z++) {
-                    driver.current(5, height+2, z).add(rail).add(rail).add(rail);
-
-                    driver.current(6, height+4, z).block(rail);
-                    driver.current(7, height+4, z).block(rail);
-
-                    driver.current(8, height+2, z).add(rail).add(rail).add(rail);
-                }
-            }
-
-            if (info.getZmax().railDungeon != null) {
-                for (int z = 0; z < 5; z++) {
-                    driver.current(6, height+1, 15-z).add(rail).add(air).add(air);
-                    driver.current(7, height+1, 15-z).add(rail).add(air).add(air);
-                }
-                for (int z = 0; z < 4; z++) {
-                    driver.current(5, height+2, 15-z).add(rail).add(rail).add(rail);
-
-                    driver.current(6, height+4, 15-z).block(rail);
-
-                    driver.current(7, height+4, 15-z).block(rail);
-
-                    driver.current(8, height+2, 15-z).add(rail).add(rail).add(rail);
-                }
-            }
-        }
-
-        if (railInfo.getRails() < 3) {
-            // We may have to reduce number of rails
-            int index;
-            switch (railInfo.getType()) {
-                case NONE:
-                    break;
-                case STATION_SURFACE:
-                case STATION_UNDERGROUND:
-                case STATION_EXTENSION_SURFACE:
-                case STATION_EXTENSION_UNDERGROUND:
-                case HORIZONTAL: {
-                    if (railInfo.getRails() == 1) {
-                        driver.current(0, height+1, 5);
-                        for (int x = 0; x < 16; x++) {
-                            driver.block(rail).incX();
-                        }
-                        driver.current(0, height+1, 9);
-                        for (int x = 0; x < 16; x++) {
-                            driver.block(rail).incX();
-                        }
-                    } else {
-                        driver.current(0, height+1, 7);
-                        for (int x = 0; x < 16; x++) {
-                            driver.block(rail).incX();
-                        }
+            if (type == RailChunkType.HORIZONTAL) {
+                // If there is a rail dungeon north or south we must make a connection here
+                if (info.getZmin().railDungeon != null) {
+                    for (int z = 0; z < 4; z++) {
+                        driver.current(6, height + 1, z).add(rail).add(air).add(air);
+                        driver.current(7, height + 1, z).add(rail).add(air).add(air);
                     }
-                    break;
+                    for (int z = 0; z < 3; z++) {
+                        driver.current(5, height+2, z).add(rail).add(rail).add(rail);
+
+                        driver.current(6, height+4, z).block(rail);
+                        driver.current(7, height+4, z).block(rail);
+
+                        driver.current(8, height+2, z).add(rail).add(rail).add(rail);
+                    }
                 }
-                case GOING_DOWN_TWO_FROM_SURFACE:
-                case GOING_DOWN_ONE_FROM_SURFACE:
-                case GOING_DOWN_FURTHER:
-                    if (railInfo.getRails() == 1) {
-                        for (int x = 0; x < 16; x++) {
-                            for (int y = height + 1; y < height + part.getSliceCount(); y++) {
-                                driver.current(x, y, 5);
-                                if (getRailStates().contains(driver.getBlock())) {
-                                    driver.block(rail);
+
+                if (info.getZmax().railDungeon != null) {
+                    for (int z = 0; z < 5; z++) {
+                        driver.current(6, height+1, 15-z).add(rail).add(air).add(air);
+                        driver.current(7, height+1, 15-z).add(rail).add(air).add(air);
+                    }
+                    for (int z = 0; z < 4; z++) {
+                        driver.current(5, height+2, 15-z).add(rail).add(rail).add(rail);
+
+                        driver.current(6, height+4, 15-z).block(rail);
+
+                        driver.current(7, height+4, 15-z).block(rail);
+
+                        driver.current(8, height+2, 15-z).add(rail).add(rail).add(rail);
+                    }
+                }
+            }
+
+            if (railInfo.getRails() < 3) {
+                // We may have to reduce number of rails
+                int index;
+                switch (railInfo.getType()) {
+                    case NONE:
+                        break;
+                    case STATION_SURFACE:
+                    case STATION_UNDERGROUND:
+                    case STATION_EXTENSION_SURFACE:
+                    case STATION_EXTENSION_UNDERGROUND:
+                    case HORIZONTAL: {
+                        if (railInfo.getRails() == 1) {
+                            driver.current(0, height+1, 5);
+                            for (int x = 0; x < 16; x++) {
+                                driver.block(rail).incX();
+                            }
+                            driver.current(0, height+1, 9);
+                            for (int x = 0; x < 16; x++) {
+                                driver.block(rail).incX();
+                            }
+                        } else {
+                            driver.current(0, height+1, 7);
+                            for (int x = 0; x < 16; x++) {
+                                driver.block(rail).incX();
+                            }
+                        }
+                        break;
+                    }
+                    case GOING_DOWN_TWO_FROM_SURFACE:
+                    case GOING_DOWN_ONE_FROM_SURFACE:
+                    case GOING_DOWN_FURTHER:
+                        if (railInfo.getRails() == 1) {
+                            for (int x = 0; x < 16; x++) {
+                                for (int y = height + 1; y < height + part.getSliceCount(); y++) {
+                                    driver.current(x, y, 5);
+                                    if (getRailStates().contains(driver.getBlock())) {
+                                        driver.block(rail);
+                                    }
+                                    driver.current(x, y, 9);
+                                    if (getRailStates().contains(driver.getBlock())) {
+                                        driver.block(rail);
+                                    }
                                 }
-                                driver.current(x, y, 9);
-                                if (getRailStates().contains(driver.getBlock())) {
-                                    driver.block(rail);
+                            }
+                        } else {
+                            for (int x = 0; x < 16; x++) {
+                                for (int y = height + 1; y < height + part.getSliceCount(); y++) {
+                                    driver.current(x, y, 7);
+                                    if (getRailStates().contains(driver.getBlock())) {
+                                        driver.block(rail);
+                                    }
                                 }
                             }
                         }
-                    } else {
-                        for (int x = 0; x < 16; x++) {
-                            for (int y = height + 1; y < height + part.getSliceCount(); y++) {
-                                driver.current(x, y, 7);
-                                if (getRailStates().contains(driver.getBlock())) {
-                                    driver.block(rail);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case THREE_SPLIT:
-                    break;
-                case VERTICAL:
-                    break;
-                case DOUBLE_BEND:
-                    break;
+                        break;
+                    case THREE_SPLIT:
+                        break;
+                    case VERTICAL:
+                        break;
+                    case DOUBLE_BEND:
+                        break;
+                }
             }
         }
+        
 
         if (needsStaircase) {
             part = AssetRegistries.PARTS.get("station_staircase");
@@ -1969,14 +1977,16 @@ public class LostCityTerrainFeature {
                     part = info.fountainType;
                 }
                 generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+            } else
+            {
+            	// For not letting FrontPart and Parks overlapping with each other
+                generateFrontPart(info, height, info.getXmin(), Transform.ROTATE_NONE);
+                generateFrontPart(info, height, info.getZmin(), Transform.ROTATE_90);
+                generateFrontPart(info, height, info.getXmax(), Transform.ROTATE_180);
+                generateFrontPart(info, height, info.getZmax(), Transform.ROTATE_270);	
             }
 
             generateRandomVegetation(info, rand, height);
-
-            generateFrontPart(info, height, info.getXmin(), Transform.ROTATE_NONE);
-            generateFrontPart(info, height, info.getZmin(), Transform.ROTATE_90);
-            generateFrontPart(info, height, info.getXmax(), Transform.ROTATE_180);
-            generateFrontPart(info, height, info.getZmax(), Transform.ROTATE_270);
         }
 
         generateBorders(info, canDoParks);
@@ -2769,14 +2779,14 @@ public class LostCityTerrainFeature {
 
             // Check for doors
             boolean isTop = f == info.getNumFloors();   // The top does not need generated doors
-            if (!isTop) {
+            if (!isTop && profile.GENERATE_FRONTDOOR) {
                 generateDoors(info, height + 1, f);
             }
 
             height += 6;    // We currently only support 6 here
         }
 
-        if (info.floorsBelowGround > 0) {
+        if (info.floorsBelowGround > 0 && info.profile.GENERATE_UNDERGROUNDFILLER) {
             // Underground we replace the glass with the filler
             for (int x = 0; x < 16; x++) {
                 // Use safe version because this may end up being lower

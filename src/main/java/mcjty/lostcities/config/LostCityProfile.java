@@ -91,6 +91,9 @@ public class LostCityProfile {
     public boolean EXPLOSIONS_IN_CITIES_ONLY = true;
 
     public boolean GENERATE_NETHER = false;
+    public boolean GENERATE_DUNGEONRAIL = true;
+    public boolean GENERATE_UNDERGROUNDFILLER = true;
+    public boolean GENERATE_FRONTDOOR = true;
     public boolean GENERATE_SPAWNERS = true;
     public boolean GENERATE_LOOT = true;
     public boolean GENERATE_LIGHTING = false;
@@ -429,6 +432,12 @@ public class LostCityProfile {
 
         GENERATE_NETHER = cfg.getBoolean("generateNether", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).GENERATE_NETHER,
                 "If true then generate a cavern type world in the Nether");
+        GENERATE_FRONTDOOR = cfg.getBoolean("generateFrontDoor", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).GENERATE_FRONTDOOR,
+                "If true spawn doors in front of building");
+        GENERATE_DUNGEONRAIL = cfg.getBoolean("generateDungeonRail", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).GENERATE_DUNGEONRAIL,
+                "If true generate a rail connection to the rail dungeon");
+        GENERATE_UNDERGROUNDFILLER = cfg.getBoolean("generateUndergroundFiller", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).GENERATE_UNDERGROUNDFILLER,
+                "If true generate filler for the underground borders");
         GENERATE_SPAWNERS = cfg.getBoolean("generateSpawners", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).GENERATE_SPAWNERS,
                 "If true then the buildings will be full of spawners");
         GENERATE_LOOT = cfg.getBoolean("generateLoot", LostCityProfile.CATEGORY_LOSTCITY, inheritFrom.orElse(this).GENERATE_LOOT,
