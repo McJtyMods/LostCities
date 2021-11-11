@@ -23,7 +23,7 @@ public class BiomeInfo {
             BiomeInfo info = new BiomeInfo();
             int chunkX = coord.getChunkX();
             int chunkZ = coord.getChunkZ();
-            info.biomesForBiomeCheck = provider.worldObj.getBiomeProvider().getBiomesForGeneration(info.biomesForBiomeCheck, (chunkX - 1) * 4 - 2, chunkZ * 4 - 2, 10, 10);
+            info.biomesForBiomeCheck = provider.worldObj.getBiomeProvider().getBiomesForGeneration(info.biomesForBiomeCheck, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
             biomeInfoMap.put(coord, info);
         }
         return biomeInfoMap.get(coord);
