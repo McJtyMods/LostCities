@@ -91,7 +91,7 @@ public class City {
                 // No sphere
                 return rand.nextFloat() < provider.getOutsideProfile().CITY_CHANCE;
             }
-            if (sphere.getCenter().getChunkX() == chunkX && sphere.getCenter().getChunkZ() == chunkZ) {
+            if (sphere.getCenter().chunkX() == chunkX && sphere.getCenter().chunkZ() == chunkZ) {
                 // This chunk is the center of a city
                 return rand.nextFloat() < provider.getProfile().CITY_CHANCE;
             }

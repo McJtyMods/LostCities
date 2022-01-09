@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.gui.GuiLCConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.resources.ResourceLocation;
@@ -45,20 +46,18 @@ public class ClientEventHandlers {
 
     @SubscribeEvent
     public void onGuiDraw(ScreenEvent.DrawScreenEvent event) {
-        if (event.getScreen() instanceof CreateWorldScreen && lostCitiesButton != null) {
-            CreateWorldScreen screen = (CreateWorldScreen) event.getScreen();
+        if (event.getScreen() instanceof CreateWorldScreen screen && lostCitiesButton != null) {
             lostCitiesButton.visible = screen.worldGenSettingsVisible;
             if (lostCitiesButton.visible) {
                 RenderSystem.setShaderTexture(0, new ResourceLocation(LostCities.MODID, "textures/gui/configicon.png"));
-                screen.blit(event.getPoseStack(), screen.width - 100, 30, 70, 70, 256, 256, 256, 256, 256, 256);
+                GuiComponent.blit(event.getPoseStack(), screen.width - 100, 30, 70, 70, 256, 256, 256, 256, 256, 256);
             }
         }
     }
 
     @SubscribeEvent
     public void onGuiPost(ScreenEvent.InitScreenEvent.Post event) {
-        if (event.getScreen() instanceof CreateWorldScreen) {
-            CreateWorldScreen screen = (CreateWorldScreen) event.getScreen();
+        if (event.getScreen() instanceof CreateWorldScreen screen) {
             lostCitiesButton = new Button(screen.width - 100, 10, 70, 20, new TextComponent("Cities"), p_onPress_1_ -> {
 //                WorldType worldType = WorldType.WORLD_TYPES[screen.selectedIndex];
                 Minecraft.getInstance().setScreen(new GuiLCConfig(screen /* @todo 1.16, worldType*/));

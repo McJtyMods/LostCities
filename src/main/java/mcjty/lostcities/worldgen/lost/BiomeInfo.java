@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class BiomeInfo {
 
-    private static Map<ChunkCoord, BiomeInfo> biomeInfoMap = new HashMap<>();
+    private static final Map<ChunkCoord, BiomeInfo> biomeInfoMap = new HashMap<>();
 
     private Biome mainBiome;
 
@@ -21,8 +21,8 @@ public class BiomeInfo {
     public static BiomeInfo getBiomeInfo(IDimensionInfo provider, ChunkCoord coord) {
         if (!biomeInfoMap.containsKey(coord)) {
             BiomeInfo info = new BiomeInfo();
-            int chunkX = coord.getChunkX();
-            int chunkZ = coord.getChunkZ();
+            int chunkX = coord.chunkX();
+            int chunkZ = coord.chunkZ();
             info.mainBiome = provider.getBiome(new BlockPos((chunkX << 4) + 8, 65, (chunkZ << 4) + 8));
             if (info.mainBiome == null) {
                 System.out.println("BiomeInfo.getBiomeInfo");

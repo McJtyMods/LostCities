@@ -1,9 +1,9 @@
 package mcjty.lostcities.worldgen;
 
-import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.NoiseGeneratorPerlin;
@@ -29,9 +29,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -76,13 +74,13 @@ public class LostCityTerrainFeature {
     private BlockState street2;
     private int streetBorder;
 
-    private NoiseGeneratorPerlin rubbleNoise;
-    private NoiseGeneratorPerlin leavesNoise;
-    private NoiseGeneratorPerlin ruinNoise;
+    private final NoiseGeneratorPerlin rubbleNoise;
+    private final NoiseGeneratorPerlin leavesNoise;
+    private final NoiseGeneratorPerlin ruinNoise;
 
-    private static BlockState randomLeafs[] = null;
+    private static BlockState[] randomLeafs = null;
 
-    private ChunkDriver driver;
+    private final ChunkDriver driver;
 
     private final IDimensionInfo provider;
     private final LostCityProfile profile;
@@ -94,7 +92,7 @@ public class LostCityTerrainFeature {
     private final Integer[] mm01 = new Integer[2];
     private final Integer[] mm11 = new Integer[2];
 
-    private Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
+    private final Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
 
     public LostCityTerrainFeature(IDimensionInfo provider, LostCityProfile profile, Random rand) {
         this.provider = provider;
@@ -206,9 +204,7 @@ public class LostCityTerrainFeature {
     }
 
     private static void addStates(Block block, Set<BlockState> set) {
-        for (BlockState state : block.getStateDefinition().getPossibleStates()) {
-            set.add(state);
-        }
+        set.addAll(block.getStateDefinition().getPossibleStates());
     }
 
     public void setupStates(LostCityProfile profile) {
@@ -1089,51 +1085,21 @@ public class LostCityTerrainFeature {
             return cachedHeightmaps.get(key);
         } else {
             ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
-
-            boolean doNoiseVariant = false;
-            ChunkSource chunkProvider = world.getLevel().getChunkSource();
-            if (chunkProvider instanceof ServerChunkCache) {
-                ChunkGenerator generator = ((ServerChunkCache) chunkProvider).getGenerator();
-                if (generator instanceof NoiseBasedChunkGenerator) {
-                    doNoiseVariant = true;
-                }
-            }
-
-            if (doNoiseVariant) {
-                makeDummyChunkNoise(chunkX, chunkZ, world, heightmap);
-            } else {
-                makeDummyChunk(heightmap);
-            }
-
-
+            generateHeightmap(chunkX, chunkZ, world, heightmap);
             cachedHeightmaps.put(key, heightmap);
             return heightmap;
         }
     }
 
-    private void makeDummyChunk(ChunkHeightmap heightmap) {
-        // This is for now the best we can do given that we don't know the type of terrain generator
-        for (int x = 0 ; x < 16 ; x++) {
-            for (int z = 0 ; z < 16 ; z++) {
-                heightmap.update(x, 70, z, Blocks.STONE.defaultBlockState());
-            }
-        }
-
-    }
-
-    private void makeDummyChunkNoise(int chunkX, int chunkZ, WorldGenLevel region, ChunkHeightmap heightmap) {
+    private void generateHeightmap(int chunkX, int chunkZ, WorldGenLevel region, ChunkHeightmap heightmap) {
         ServerChunkCache chunkProvider = region.getLevel().getChunkSource();
         ChunkGenerator generator = chunkProvider.getGenerator();
-        updateHeightmap(chunkX, chunkZ, generator, region, heightmap);
-    }
-
-    public static void updateHeightmap(int chunkX, int chunkZ, ChunkGenerator generator, WorldGenLevel level, ChunkHeightmap heightmap) {
         int cx = chunkX << 4;
         int cz = chunkZ << 4;
-        int height00 = generator.getBaseHeight(cx + 3, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, level);
-        int height10 = generator.getBaseHeight(cx + 12, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, level);
-        int height01 = generator.getBaseHeight(cx + 3, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, level);
-        int height11 = generator.getBaseHeight(cx + 12, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, level);
+        int height00 = generator.getBaseHeight(cx + 3, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region);
+        int height10 = generator.getBaseHeight(cx + 12, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region);
+        int height01 = generator.getBaseHeight(cx + 3, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region);
+        int height11 = generator.getBaseHeight(cx + 12, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region);
         for (int x = 0 ; x < 16 ; x++) {
             for (int z = 0 ; z < 16 ; z++) {
                 int y;
@@ -1346,10 +1312,8 @@ public class LostCityTerrainFeature {
                 }
                 for (int z = 0; z < 3; z++) {
                     driver.current(5, height+2, z).add(rail).add(rail).add(rail);
-
                     driver.current(6, height+4, z).block(rail);
                     driver.current(7, height+4, z).block(rail);
-
                     driver.current(8, height+2, z).add(rail).add(rail).add(rail);
                 }
             }
@@ -1361,11 +1325,8 @@ public class LostCityTerrainFeature {
                 }
                 for (int z = 0; z < 4; z++) {
                     driver.current(5, height+2, 15-z).add(rail).add(rail).add(rail);
-
                     driver.current(6, height+4, 15-z).block(rail);
-
                     driver.current(7, height+4, 15-z).block(rail);
-
                     driver.current(8, height+2, 15-z).add(rail).add(rail).add(rail);
                 }
             }
@@ -1453,22 +1414,12 @@ public class LostCityTerrainFeature {
             BuildingPart stairs = info.stairType;
             Transform transform;
             int oy = info.getCityGroundLevel() + 1;
-            switch (stairDirection) {
-                case XMIN:
-                    transform = Transform.ROTATE_NONE;
-                    break;
-                case XMAX:
-                    transform = Transform.ROTATE_180;
-                    break;
-                case ZMIN:
-                    transform = Transform.ROTATE_90;
-                    break;
-                case ZMAX:
-                    transform = Transform.ROTATE_270;
-                    break;
-                default:
-                    throw new RuntimeException("Cannot happen!");
-            }
+            transform = switch (stairDirection) {
+                case XMIN -> Transform.ROTATE_NONE;
+                case XMAX -> Transform.ROTATE_180;
+                case ZMIN -> Transform.ROTATE_90;
+                case ZMAX -> Transform.ROTATE_270;
+            };
 
             generatePart(info, stairs, transform, 0, oy, 0, false);
         }
@@ -1892,14 +1843,9 @@ public class LostCityTerrainFeature {
             }
 
             switch (streetType) {
-                case NORMAL:
-                    generateNormalStreetSection(info, height);
-                    break;
-                case FULL:
-                    generateFullStreetSection(height);
-                    break;
-                case PARK:
-                    generateParkSection(info, height, elevated);
+                case NORMAL -> generateNormalStreetSection(info, height);
+                case FULL -> generateFullStreetSection(height);
+                case PARK -> generateParkSection(info, height, elevated);
             }
             height++;
 
@@ -1928,18 +1874,10 @@ public class LostCityTerrainFeature {
         Character borderBlock = info.getCityStyle().getBorderBlock();
 
         switch (info.profile.LANDSCAPE_TYPE) {
-            case DEFAULT:
-                fillToBedrockStreetBlock(info);
-                break;
-            case FLOATING:
-                fillMainStreetBlock(info, borderBlock, 3);
-                break;
-            case CAVERN:
-                fillMainStreetBlock(info, borderBlock, 2);
-                break;
-            case SPACE:
-                fillToGroundStreetBlock(info, info.getCityGroundLevel());
-                break;
+            case DEFAULT -> fillToBedrockStreetBlock(info);
+            case FLOATING -> fillMainStreetBlock(info, borderBlock, 3);
+            case CAVERN -> fillMainStreetBlock(info, borderBlock, 2);
+            case SPACE -> fillToGroundStreetBlock(info, info.getCityGroundLevel());
         }
 
         if (doBorder(info, Direction.XMIN)) {
@@ -2024,37 +1962,35 @@ public class LostCityTerrainFeature {
         BlockState wall = info.getCompiledPalette().get(wallBlock);
 
         switch (info.profile.LANDSCAPE_TYPE) {
-            case DEFAULT:
-                // We do the ocean border 12 lower then groundlevel
-                setBlocksFromPalette(x, info.groundLevel - 12, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
-                break;
-            case SPACE: {
+            case DEFAULT ->
+                    // We do the ocean border 12 lower then groundlevel
+                    setBlocksFromPalette(x, info.groundLevel - 12, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+            case SPACE -> {
                 int adjacentY = info.getCityGroundLevel() - 8;
                 if (adjacent.isCity) {
                     adjacentY = Math.min(adjacentY, adjacent.getCityGroundLevel());
                 } else {
                     ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.chunkX, adjacent.chunkZ, provider.getWorld());
                     int minimumHeight = adjacentHeightmap.getMinimumHeight();
-                    adjacentY = Math.min(adjacentY, minimumHeight-2);
+                    adjacentY = Math.min(adjacentY, minimumHeight - 2);
                 }
 
                 if (adjacentY > 5) {
                     setBlocksFromPalette(x, adjacentY, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
                 }
-                break;
             }
-            case FLOATING:
+            case FLOATING -> {
                 setBlocksFromPalette(x, info.getCityGroundLevel() - 3, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
                 if (isCorner(x, z)) {
                     generateBorderSupport(info, wall, x, z, 3);
                 }
-                break;
-            case CAVERN:
+            }
+            case CAVERN -> {
                 setBlocksFromPalette(x, info.getCityGroundLevel() - 2, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
                 if (isCorner(x, z)) {
                     generateBorderSupport(info, wall, x, z, 2);
                 }
-                break;
+            }
         }
         if (canDoParks) {
             if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
@@ -2448,8 +2384,7 @@ public class LostCityTerrainFeature {
     public static void createSpawner(Random random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
         LevelAccessor world = diminfo.getWorld();
         BlockEntity tileentity = world.getBlockEntity(pos);
-        if (tileentity instanceof SpawnerBlockEntity) {
-            SpawnerBlockEntity spawner = (SpawnerBlockEntity) tileentity;
+        if (tileentity instanceof SpawnerBlockEntity spawner) {
             String condition = todo.getCondition();
             Condition cnd = AssetRegistries.CONDITIONS.get(condition);
             if (cnd == null) {
@@ -2477,12 +2412,12 @@ public class LostCityTerrainFeature {
             logic.setEntityId(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(randomValue)));
             spawner.setChanged();
             if (LostCityConfiguration.DEBUG) {
-                LostCities.setup.getLogger().debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
+                ModSetup.getLogger().debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
             }
         } else if (tileentity != null) {
-            LostCities.setup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");
+            ModSetup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");
         } else {
-            LostCities.setup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
+            ModSetup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
         }
     }
 
@@ -2494,7 +2429,7 @@ public class LostCityTerrainFeature {
                 createLoot(info, rand, world, pos, condition, this.provider);
             }
         } else if (te == null) {
-            LostCities.setup.getLogger().error("Error setting loot at " + pos.getX() + "," + pos.getY() + "," + pos.getZ());
+            ModSetup.getLogger().error("Error setting loot at " + pos.getX() + "," + pos.getY() + "," + pos.getZ());
         }
     }
 
@@ -2569,13 +2504,10 @@ public class LostCityTerrainFeature {
                         }
                         // Fix for FLOATING // @todo!
                         BlockState b;
-                        switch (rand.nextInt(5)) {
-                            case 0:
-                                b = ironbars;
-                                break;
-                            default:
-                                b = filler;     // Filler from adjacent building
-                                break;
+                        if (rand.nextInt(5) == 0) {
+                            b = ironbars;
+                        } else {
+                            b = filler;     // Filler from adjacent building
                         }
                         driver.current(x, h+1, z).block(b);
                     }

@@ -20,7 +20,9 @@ public class CustomTeleporter extends PortalForcer {
     }
 
     private final ServerLevel worldServer;
-    private double x, y, z;
+    private final double x;
+    private final double y;
+    private final double z;
 
     @Override
     public Entity placeEntity(Entity entity, ServerLevel currentWorld, ServerLevel destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {

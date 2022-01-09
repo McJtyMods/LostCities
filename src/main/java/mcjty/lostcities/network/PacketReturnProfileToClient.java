@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 
 public class PacketReturnProfileToClient {
 
-    private ResourceKey<Level> dimension;
-    private String profile;
+    private final ResourceKey<Level> dimension;
+    private final String profile;
 
     public PacketReturnProfileToClient(FriendlyByteBuf buf) {
         dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
@@ -21,9 +21,6 @@ public class PacketReturnProfileToClient {
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceLocation(dimension.location());
         buf.writeUtf(profile);
-    }
-
-    public PacketReturnProfileToClient() {
     }
 
     public PacketReturnProfileToClient(ResourceKey<Level> dimension, String profileName) {

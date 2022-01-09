@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
 
-    private Map<ResourceKey<Level>, IDimensionInfo> dimensionInfo = new HashMap<>();
+    private final Map<ResourceKey<Level>, IDimensionInfo> dimensionInfo = new HashMap<>();
 
     public static PlacedFeature LOSTCITY_CONFIGURED_FEATURE;
 

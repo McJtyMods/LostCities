@@ -3,6 +3,7 @@ package mcjty.lostcities.worldgen.lost;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostSphere;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.BiomeTranslator;
 import mcjty.lostcities.worldgen.IDimensionInfo;
@@ -25,7 +26,7 @@ import java.util.*;
 
 public class CitySphere implements ILostSphere {
 
-    private static Map<ChunkCoord, CitySphere> citySphereCache = new HashMap<>();
+    private static final Map<ChunkCoord, CitySphere> citySphereCache = new HashMap<>();
 
     public static final CitySphere EMPTY = new CitySphere(new ChunkCoord(Level.OVERWORLD, 0, 0), 0.0f, new BlockPos(0, 0, 0), false);
 
@@ -58,10 +59,10 @@ public class CitySphere implements ILostSphere {
         }
 
         ChunkCoord center = sphere.getCenter();
-        BuildingInfo info = BuildingInfo.getBuildingInfo(center.getChunkX(), center.getChunkZ(), provider);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(center.chunkX(), center.chunkZ(), provider);
         CityStyle cs = info.getCityStyle();
 
-        Random rand = new Random(info.provider.getSeed() + center.getChunkX() * 837971201L + center.getChunkZ() * 961744153L);
+        Random rand = new Random(info.provider.getSeed() + center.chunkX() * 837971201L + center.chunkZ() * 961744153L);
         rand.nextFloat();
         rand.nextFloat();
 
@@ -256,7 +257,7 @@ public class CitySphere implements ILostSphere {
      * From the center
      */
     private static float getSphereRadius(ChunkCoord center, IDimensionInfo provider, Random rand) {
-        PredefinedCity city = City.getPredefinedCity(center.getChunkX(), center.getChunkZ(), provider.getType());
+        PredefinedCity city = City.getPredefinedCity(center.chunkX(), center.chunkZ(), provider.getType());
         LostCityProfile profile = provider.getProfile();
         if (city != null) {
             return city.getRadius() * profile.CITYSPHERE_FACTOR;
@@ -365,8 +366,8 @@ public class CitySphere implements ILostSphere {
      * Return a city sphere for this city center chunk
      */
     private static CitySphere getSphereAtCenter(ChunkCoord center, IDimensionInfo provider, @Nullable PredefinedSphere predef) {
-        int chunkX = center.getChunkX();
-        int chunkZ = center.getChunkZ();
+        int chunkX = center.chunkX();
+        int chunkZ = center.chunkZ();
         Random rand = new Random(provider.getSeed() + chunkX * 961744153L + chunkZ * 837971201L);
         rand.nextFloat();
         rand.nextFloat();
@@ -386,7 +387,7 @@ public class CitySphere implements ILostSphere {
             if (predef != null && predef.getBiome() != null) {
                 citySphere.biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(predef.getBiome()));
                 if (citySphere.biome == null) {
-                    LostCities.setup.getLogger().warn("Could not find biome '" + predef.getBiome() + "'!");
+                    ModSetup.getLogger().warn("Could not find biome '" + predef.getBiome() + "'!");
                 }
             } else if (profile.CITYSPHERE_SINGLE_BIOME) {
                 if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
@@ -461,8 +462,8 @@ public class CitySphere implements ILostSphere {
         }
         for (int cx = centerPos.getX() - radius-16 ; cx <= centerPos.getX() + radius+16 ; cx += 16) {
             for (int cz = centerPos.getZ() - radius-16 ; cz <= centerPos.getZ()+radius+16 ; cz += 16) {
-                ChunkCoord cc = new ChunkCoord(sphere.getCenter().getDimension(), cx >> 4, cz >> 4);
-                if (intersectChunkWithSphere(cc.getChunkX(), cc.getChunkZ(), radius, centerPos)) {
+                ChunkCoord cc = new ChunkCoord(sphere.getCenter().dimension(), cx >> 4, cz >> 4);
+                if (intersectChunkWithSphere(cc.chunkX(), cc.chunkZ(), radius, centerPos)) {
                     citySphereCache.put(cc, sphere);
                 }
             }
@@ -473,8 +474,8 @@ public class CitySphere implements ILostSphere {
      * Given a sphere center, return the actual position of the center
      */
     private static BlockPos getSphereCenterPosition(ChunkCoord center, IDimensionInfo provider, Random rand) {
-        int cx = center.getChunkX() * 16 + rand.nextInt(16) - 8;
-        int cz = center.getChunkZ() * 16 + rand.nextInt(16) - 8;
+        int cx = center.chunkX() * 16 + rand.nextInt(16) - 8;
+        int cz = center.chunkZ() * 16 + rand.nextInt(16) - 8;
         return new BlockPos(cx, provider.getProfile().GROUNDLEVEL, cz);
     }
 }

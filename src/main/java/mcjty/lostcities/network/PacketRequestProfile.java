@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public class PacketRequestProfile {
 
-    private ResourceKey<Level> dimension;
+    private final ResourceKey<Level> dimension;
 
     public PacketRequestProfile(FriendlyByteBuf buf) {
         dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
@@ -18,9 +18,6 @@ public class PacketRequestProfile {
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceLocation(dimension.location());
-    }
-
-    public PacketRequestProfile() {
     }
 
     public PacketRequestProfile(ResourceKey<Level> dimension) {

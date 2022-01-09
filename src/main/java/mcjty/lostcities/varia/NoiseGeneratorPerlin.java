@@ -1,5 +1,6 @@
 package mcjty.lostcities.varia;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class NoiseGeneratorPerlin {
@@ -29,9 +30,7 @@ public class NoiseGeneratorPerlin {
 
     public double[] getRegion(double[] buffer, double p_151599_2_, double p_151599_4_, int p_151599_6_, int p_151599_7_, double p_151599_8_, double p_151599_10_, double p_151599_12_) {
         if (buffer != null && buffer.length >= p_151599_6_ * p_151599_7_) {
-            for (int i = 0; i < buffer.length; ++i) {
-                buffer[i] = 0.0D;
-            }
+            Arrays.fill(buffer, 0.0D);
         } else {
             buffer = new double[p_151599_6_ * p_151599_7_];
         }

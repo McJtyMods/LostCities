@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityAsset;
+import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +35,7 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     String refPaletteName;
 
 
-    private Map<String, Object> metadata = new HashMap<>();
+    private final Map<String, Object> metadata = new HashMap<>();
 
     public BuildingPart(JsonObject object) {
         readFromJSon(object);
@@ -115,7 +116,7 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
         if (localPalette == null && refPaletteName != null) {
             localPalette = AssetRegistries.PALETTES.get(refPaletteName);
             if (localPalette == null) {
-                LostCities.setup.getLogger().error("Could not find palette '" + refPaletteName + "'!");
+                ModSetup.getLogger().error("Could not find palette '" + refPaletteName + "'!");
                 throw new RuntimeException("Could not find palette '" + refPaletteName + "'!");
             }
         }

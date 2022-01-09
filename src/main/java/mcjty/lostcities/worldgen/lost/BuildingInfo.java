@@ -128,8 +128,8 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     // BuildingInfo cache
-    private static Map<ChunkCoord, BuildingInfo> buildingInfoMap = new HashMap<>();
-    private static Map<ChunkCoord, LostChunkCharacteristics> cityInfoMap = new HashMap<>();
+    private static final Map<ChunkCoord, BuildingInfo> buildingInfoMap = new HashMap<>();
+    private static final Map<ChunkCoord, LostChunkCharacteristics> cityInfoMap = new HashMap<>();
 
     public void addSaplingTodo(BlockPos pos) {
         saplingTodo.add(pos);
@@ -190,7 +190,7 @@ public class BuildingInfo implements ILostChunkInfo {
             return this;
         } else if (x < 8 && z >= 8) {
             return getXmin();
-        } else if (x >= 8 && z < 8) {
+        } else if (x >= 8) {
             return getZmin();
         } else {
             return getXmin().getZmin();
@@ -362,7 +362,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 Counter<String> counter = new Counter<>();
                 for (int cx = -1 ; cx <= 1 ; cx++) {
                     for (int cz = -1 ; cz <= 1 ; cz++) {
-                        cityStyle = City.getCityStyle(coord.getChunkX()+cx, coord.getChunkZ()+cz, provider, profile);
+                        cityStyle = City.getCityStyle(coord.chunkX()+cx, coord.chunkZ()+cz, provider, profile);
                         counter.add(cityStyle.getName());
                         if (cx == 0 && cz == 0) {
                             counter.add(cityStyle.getName());   // Add this chunk again for a bias
@@ -381,17 +381,10 @@ public class BuildingInfo implements ILostChunkInfo {
                 characteristics.multiBuilding = topleft.multiBuilding;
                 if (characteristics.multiBuilding != null) {
                     switch (characteristics.section) {
-                        case 1:
-                            characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(1, 0));
-                            break;
-                        case 2:
-                            characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(0, 1));
-                            break;
-                        case 3:
-                            characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(1, 1));
-                            break;
-                        default:
-                            throw new RuntimeException("What 2!");
+                        case 1 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(1, 0));
+                        case 2 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(0, 1));
+                        case 3 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(1, 1));
+                        default -> throw new RuntimeException("What 2!");
                     }
                 } else {
                     characteristics.buildingType = topleft.buildingType;
@@ -511,33 +504,23 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private BuildingInfo calculateTopLeft() {
-        switch (building2x2Section) {
-            case 0:
-                return this;
-            case 1:
-                return getXmin();
-            case 2:
-                return getZmin();
-            case 3:
-                return getXmin().getZmin();
-            default:
-                throw new RuntimeException("What!");
-        }
+        return switch (building2x2Section) {
+            case 0 -> this;
+            case 1 -> getXmin();
+            case 2 -> getZmin();
+            case 3 -> getXmin().getZmin();
+            default -> throw new RuntimeException("What!");
+        };
     }
 
     private static LostChunkCharacteristics getTopLeftCityInfo(LostChunkCharacteristics thisone, int chunkX, int chunkZ, IDimensionInfo provider) {
-        switch (thisone.section) {
-            case 0:
-                return thisone;
-            case 1:
-                return getChunkCharacteristics(chunkX-1, chunkZ, provider);
-            case 2:
-                return getChunkCharacteristics(chunkX, chunkZ-1, provider);
-            case 3:
-                return getChunkCharacteristics(chunkX-1, chunkZ-1, provider);
-            default:
-                throw new RuntimeException("What!");
-        }
+        return switch (thisone.section) {
+            case 0 -> thisone;
+            case 1 -> getChunkCharacteristics(chunkX - 1, chunkZ, provider);
+            case 2 -> getChunkCharacteristics(chunkX, chunkZ - 1, provider);
+            case 3 -> getChunkCharacteristics(chunkX - 1, chunkZ - 1, provider);
+            default -> throw new RuntimeException("What!");
+        };
     }
 
     private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
@@ -1072,33 +1055,16 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private Block getRandomDoor(Random rand) {
-        Block doorBlock;
-        switch (rand.nextInt(7)) {
-            case 0:
-                doorBlock = Blocks.BIRCH_DOOR;
-                break;
-            case 1:
-                doorBlock = Blocks.ACACIA_DOOR;
-                break;
-            case 2:
-                doorBlock = Blocks.DARK_OAK_DOOR;
-                break;
-            case 3:
-                doorBlock = Blocks.SPRUCE_DOOR;
-                break;
-            case 4:
-                doorBlock = Blocks.OAK_DOOR;
-                break;
-            case 5:
-                doorBlock = Blocks.JUNGLE_DOOR;
-                break;
-            case 6:
-                doorBlock = Blocks.IRON_DOOR;
-                break;
-            default:
-                doorBlock = Blocks.OAK_DOOR;
-        }
-        return doorBlock;
+        return switch (rand.nextInt(7)) {
+            case 0 -> Blocks.BIRCH_DOOR;
+            case 1 -> Blocks.ACACIA_DOOR;
+            case 2 -> Blocks.DARK_OAK_DOOR;
+            case 3 -> Blocks.SPRUCE_DOOR;
+            case 4 -> Blocks.OAK_DOOR;
+            case 5 -> Blocks.JUNGLE_DOOR;
+            case 6 -> Blocks.IRON_DOOR;
+            default -> Blocks.OAK_DOOR;
+        };
     }
 
     public boolean isStreetSection() {
@@ -1176,13 +1142,10 @@ public class BuildingInfo implements ILostChunkInfo {
 
 
     public BuildingPart hasBridge(IDimensionInfo provider, Orientation orientation) {
-        switch (orientation) {
-            case X:
-                return hasXBridge(provider);
-            case Z:
-                return hasZBridge(provider);
-        }
-        return null;
+        return switch (orientation) {
+            case X -> hasXBridge(provider);
+            case Z -> hasZBridge(provider);
+        };
     }
 
     // To prevent adjacent bridges of the same direction we give the bridges at even chunk Z coordinates higher priority
@@ -1442,13 +1405,10 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public boolean hasConnectionAt(int level, Orientation orientation) {
-        switch (orientation) {
-            case X:
-                return hasConnectionAtX(level);
-            case Z:
-                return hasConnectionAtZ(level);
-        }
-        throw new IllegalStateException("Cannot happen!");
+        return switch (orientation) {
+            case X -> hasConnectionAtX(level);
+            case Z -> hasConnectionAtZ(level);
+        };
     }
 
     // Call this from the street reference with the (potential building) as 'adj'

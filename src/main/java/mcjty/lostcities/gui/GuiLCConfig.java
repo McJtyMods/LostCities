@@ -242,7 +242,7 @@ public class GuiLCConfig extends Screen {
 
     private void renderExtra(PoseStack stack) {
         drawString(stack, font, "Profile:", 10, 16, 0xffffffff);
-        elements.stream().forEach(el -> el.render(stack));
+        elements.forEach(el -> el.render(stack));
 
         localSetup.get().ifPresent(profile -> {
             if ("Cities".equals(mode)) {

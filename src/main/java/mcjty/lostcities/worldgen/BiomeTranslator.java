@@ -3,6 +3,7 @@ package mcjty.lostcities.worldgen;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.BiomeSelectionStrategy;
 import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.Tools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
@@ -47,9 +48,9 @@ public class BiomeTranslator {
             if (biome != null && destBiome != null) {
                 mapping.add(Pair.of(new ResourceLocation(biomeId), destBiome));
             } else if (biome == null) {
-                LostCities.setup.getLogger().warn("Could not find biome '" + biomeId + "'!");
+                ModSetup.getLogger().warn("Could not find biome '" + biomeId + "'!");
             } else if (destBiome == null) {
-                LostCities.setup.getLogger().warn("Could not find biome '" + destBiomeId + "'!");
+                ModSetup.getLogger().warn("Could not find biome '" + destBiomeId + "'!");
             }
         }
         return mapping;
@@ -67,7 +68,7 @@ public class BiomeTranslator {
             if (biome != null) {
                 biomes.add(Pair.of(f, biome));
             } else {
-                LostCities.setup.getLogger().warn("Could not find biome '" + biomeId + "'!");
+                ModSetup.getLogger().warn("Could not find biome '" + biomeId + "'!");
             }
         }
         return biomes;
@@ -78,10 +79,10 @@ public class BiomeTranslator {
     }
 
     private void dumpTranslationMap() {
-        LostCities.setup.getLogger().info("Dumping biome mapping");
+        ModSetup.getLogger().info("Dumping biome mapping");
         for (Map.Entry<ResourceLocation, Biome> entry : translationMap.entrySet()) {
             ResourceLocation biomeKey = ForgeRegistries.BIOMES.getKey(entry.getValue());
-            LostCities.setup.getLogger().info("biome: " + entry.getKey() + " -> " + entry.getValue().getRegistryName().toString() + " (" + biomeKey.toString() + ")");
+            ModSetup.getLogger().info("biome: " + entry.getKey() + " -> " + entry.getValue().getRegistryName().toString() + " (" + biomeKey.toString() + ")");
         }
     }
 

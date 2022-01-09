@@ -113,15 +113,15 @@ public class Tools {
     }
 
     private static BlockState getRedstoneTorchState(int meta) {
-        switch (meta) {
-            case 1: return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.EAST);
-            case 2: return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.WEST);
-            case 3: return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
-            case 4: return Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH);
-            case 5: return Blocks.REDSTONE_TORCH.defaultBlockState();
-        }
+        return switch (meta) {
+            case 1 -> Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.EAST);
+            case 2 -> Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.WEST);
+            case 3 -> Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
+            case 4 -> Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH);
+            case 5 -> Blocks.REDSTONE_TORCH.defaultBlockState();
+            default -> Blocks.REDSTONE_TORCH.defaultBlockState();
+        };
 
-        return Blocks.REDSTONE_TORCH.defaultBlockState();
     }
 
     private static BlockState getStoneSlabState(int meta, BlockState state) {
@@ -157,19 +157,19 @@ public class Tools {
         if (powered) {
             meta = meta & 7;
         }
-        switch (meta) {
-            case 0: return RailShape.NORTH_SOUTH;
-            case 1: return RailShape.EAST_WEST;
-            case 2: return RailShape.ASCENDING_EAST;
-            case 3: return RailShape.ASCENDING_WEST;
-            case 4: return RailShape.ASCENDING_NORTH;
-            case 5: return RailShape.ASCENDING_SOUTH;
-            case 6: return RailShape.SOUTH_EAST;
-            case 7: return RailShape.SOUTH_WEST;
-            case 8: return RailShape.NORTH_WEST;
-            case 9: return RailShape.NORTH_EAST;
-        }
-        return RailShape.NORTH_SOUTH;
+        return switch (meta) {
+            case 0 -> RailShape.NORTH_SOUTH;
+            case 1 -> RailShape.EAST_WEST;
+            case 2 -> RailShape.ASCENDING_EAST;
+            case 3 -> RailShape.ASCENDING_WEST;
+            case 4 -> RailShape.ASCENDING_NORTH;
+            case 5 -> RailShape.ASCENDING_SOUTH;
+            case 6 -> RailShape.SOUTH_EAST;
+            case 7 -> RailShape.SOUTH_WEST;
+            case 8 -> RailShape.NORTH_WEST;
+            case 9 -> RailShape.NORTH_EAST;
+            default -> RailShape.NORTH_SOUTH;
+        };
     }
 
     public static String stateToString(BlockState state) {

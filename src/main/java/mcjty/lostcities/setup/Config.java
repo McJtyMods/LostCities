@@ -38,7 +38,7 @@ public class Config {
     private static final String[] DEFAULT_DIMENSION_PROFILES = new String[] {
             "lostcities:lostcity=default"
     };
-    private static ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_PROFILES;
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_PROFILES;
     private static Map<ResourceKey<Level>, String> dimensionProfileCache = null;
 
     // Profile as selected by the client

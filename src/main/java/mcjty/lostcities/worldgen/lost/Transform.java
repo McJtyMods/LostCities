@@ -22,63 +22,39 @@ public enum Transform {
     }
 
     public Transform getOpposite() {
-        switch (this) {
-            case ROTATE_NONE:
-                return ROTATE_NONE;
-            case ROTATE_270:
-                return ROTATE_90;
-            case ROTATE_180:
-                return ROTATE_180;
-            case ROTATE_90:
-                return ROTATE_270;
-            case MIRROR_X:
-                return MIRROR_X;
-            case MIRROR_Z:
-                return MIRROR_Z;
-            case MIRROR_90_X:
-                return MIRROR_90_X;
-        }
-        throw new IllegalStateException("Cannot happen!");
+        return switch (this) {
+            case ROTATE_NONE -> ROTATE_NONE;
+            case ROTATE_270 -> ROTATE_90;
+            case ROTATE_180 -> ROTATE_180;
+            case ROTATE_90 -> ROTATE_270;
+            case MIRROR_X -> MIRROR_X;
+            case MIRROR_Z -> MIRROR_Z;
+            case MIRROR_90_X -> MIRROR_90_X;
+        };
     }
 
     public int rotateX(int x, int z) {
-        switch (this) {
-            case ROTATE_NONE:
-                return x;
-            case ROTATE_90:
-                return 15-z;
-            case ROTATE_180:
-                return 15-x;
-            case ROTATE_270:
-                return z;
-            case MIRROR_X:
-                return 15-x;
-            case MIRROR_Z:
-                return x;
-            case MIRROR_90_X:
-                return z;
-        }
-        throw new IllegalStateException("Cannot happen!");
+        return switch (this) {
+            case ROTATE_NONE -> x;
+            case ROTATE_90 -> 15 - z;
+            case ROTATE_180 -> 15 - x;
+            case ROTATE_270 -> z;
+            case MIRROR_X -> 15 - x;
+            case MIRROR_Z -> x;
+            case MIRROR_90_X -> z;
+        };
     }
 
     public int rotateZ(int x, int z) {
-        switch (this) {
-            case ROTATE_NONE:
-                return z;
-            case ROTATE_90:
-                return x;
-            case ROTATE_180:
-                return 15-z;
-            case ROTATE_270:
-                return 15-x;
-            case MIRROR_X:
-                return z;
-            case MIRROR_Z:
-                return 15-z;
-            case MIRROR_90_X:
-                return x;
-        }
-        throw new IllegalStateException("Cannot happen!");
+        return switch (this) {
+            case ROTATE_NONE -> z;
+            case ROTATE_90 -> x;
+            case ROTATE_180 -> 15 - z;
+            case ROTATE_270 -> 15 - x;
+            case MIRROR_X -> z;
+            case MIRROR_Z -> 15 - z;
+            case MIRROR_90_X -> x;
+        };
     }
 
     public RailShape transform(RailShape shape) {

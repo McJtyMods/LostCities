@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Counter<T> {
-    private Map<T, Integer> internalMap = new HashMap<>();
+    private final Map<T, Integer> internalMap = new HashMap<>();
 
     public void add(T key) {
         if (!internalMap.containsKey(key)) {
@@ -18,11 +18,7 @@ public class Counter<T> {
     }
 
     public int get(T key) {
-        if (internalMap.containsKey(key)) {
-            return internalMap.get(key);
-        } else {
-            return 0;
-        }
+        return internalMap.getOrDefault(key, 0);
     }
 
     public T getMostOccuring() {

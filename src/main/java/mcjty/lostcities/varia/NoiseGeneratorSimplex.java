@@ -12,10 +12,6 @@ public class NoiseGeneratorSimplex {
     private static final double F2 = 0.5D * (SQRT_3 - 1.0D);
     private static final double G2 = (3.0D - SQRT_3) / 6.0D;
 
-    public NoiseGeneratorSimplex() {
-        this(new Random());
-    }
-
     public NoiseGeneratorSimplex(Random seed) {
         this.p = new int[512];
         this.xo = seed.nextDouble() * 256.0D;
