@@ -1,6 +1,6 @@
 package mcjty.lostcities.gui.elements;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 public class GuiElement {
 
@@ -19,7 +19,7 @@ public class GuiElement {
 
     }
 
-    public void render(MatrixStack stack) {
+    public void render(PoseStack stack) {
 
     }
 

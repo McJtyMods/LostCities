@@ -9,31 +9,30 @@ import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.NoiseGeneratorPerlin;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.properties.DoorHingeSide;
-import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.state.properties.RailShape;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tileentity.LockableLootTileEntity;
-import net.minecraft.tileentity.MobSpawnerTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.AbstractChunkProvider;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.NoiseChunkGenerator;
-import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.server.ServerChunkProvider;
-import net.minecraft.world.spawner.AbstractSpawner;
+import net.minecraft.world.level.BaseSpawner;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.RailShape;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.chunk.ChunkSource;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -254,10 +253,10 @@ public class LostCityTerrainFeature {
         return (gSeed >> 16) & 0x7F;
     }
 
-    public void generateDummy(WorldGenRegion region, IChunk chunk) {
+    public void generateDummy(WorldGenRegion region, ChunkAccess chunk) {
 
         WorldGenRegion oldRegion = driver.getRegion();
-        IChunk oldChunk = driver.getPrimer();
+        ChunkAccess oldChunk = driver.getPrimer();
         driver.setPrimer(region, chunk);
 
         street = Blocks.STONE_BRICKS.defaultBlockState();
@@ -311,9 +310,9 @@ public class LostCityTerrainFeature {
         return driver.getY() == 0;
     }
 
-    public void generate(WorldGenRegion region, IChunk chunk) {
+    public void generate(WorldGenRegion region, ChunkAccess chunk) {
         WorldGenRegion oldRegion = driver.getRegion();
-        IChunk oldChunk = driver.getPrimer();
+        ChunkAccess oldChunk = driver.getPrimer();
         driver.setPrimer(region, chunk);
 
         int chunkX = chunk.getPos().x;
@@ -447,13 +446,13 @@ public class LostCityTerrainFeature {
             if (driver.getBlockDown() != air) {
                 driver.block(Blocks.TORCH.defaultBlockState());
             } else if (x > 0 && driver.getBlockWest() != air) {
-                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.util.Direction.EAST));
+                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.EAST));
             } else if (x < 15 && driver.getBlockEast() != air) {
-                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.util.Direction.WEST));
+                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.WEST));
             } else if (z > 0 && driver.getBlockNorth() != air) {
-                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.util.Direction.SOUTH));
+                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.SOUTH));
             } else if (z < 15 && driver.getBlockSouth() != air) {
-                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.util.Direction.NORTH));
+                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH));
             }
         }
         info.clearTorchTodo();
@@ -587,7 +586,7 @@ public class LostCityTerrainFeature {
     }
 
     private static boolean isClearableAboveHighway(BlockState st) {
-        return !st.getBlock().is(BlockTags.LEAVES) && !st.getBlock().is(BlockTags.LOGS);
+        return !st.is(BlockTags.LEAVES) && !st.is(BlockTags.LOGS);
     }
 
     private void generateHighwayPart(BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix) {
@@ -1059,8 +1058,8 @@ public class LostCityTerrainFeature {
     }
 
     private static boolean isWaterBiome(Biome biome) {
-        Biome.Category category = biome.getBiomeCategory();
-        return category.equals(Biome.Category.OCEAN) || category.equals(Biome.Category.BEACH) || category.equals(Biome.Category.RIVER);
+        Biome.BiomeCategory category = biome.getBiomeCategory();
+        return category.equals(Biome.BiomeCategory.OCEAN) || category.equals(Biome.BiomeCategory.BEACH) || category.equals(Biome.BiomeCategory.RIVER);
     }
 
     @Deprecated
@@ -1084,7 +1083,7 @@ public class LostCityTerrainFeature {
         clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
-    public synchronized ChunkHeightmap getHeightmap(int chunkX, int chunkZ, @Nonnull ISeedReader world) {
+    public synchronized ChunkHeightmap getHeightmap(int chunkX, int chunkZ, @Nonnull WorldGenLevel world) {
         ChunkCoord key = new ChunkCoord(world.getLevel().dimension(), chunkX, chunkZ);
         if (cachedHeightmaps.containsKey(key)) {
             return cachedHeightmaps.get(key);
@@ -1092,10 +1091,10 @@ public class LostCityTerrainFeature {
             ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
 
             boolean doNoiseVariant = false;
-            AbstractChunkProvider chunkProvider = world.getLevel().getChunkSource();
-            if (chunkProvider instanceof ServerChunkProvider) {
-                ChunkGenerator generator = ((ServerChunkProvider) chunkProvider).getGenerator();
-                if (generator instanceof NoiseChunkGenerator) {
+            ChunkSource chunkProvider = world.getLevel().getChunkSource();
+            if (chunkProvider instanceof ServerChunkCache) {
+                ChunkGenerator generator = ((ServerChunkCache) chunkProvider).getGenerator();
+                if (generator instanceof NoiseBasedChunkGenerator) {
                     doNoiseVariant = true;
                 }
             }
@@ -1122,90 +1121,97 @@ public class LostCityTerrainFeature {
 
     }
 
-    private void makeDummyChunkNoise(int chunkX, int chunkZ, ISeedReader region, ChunkHeightmap heightmap) {
-        DummyChunk primer = new DummyChunk(new ChunkPos(chunkX, chunkZ), heightmap);
-        AbstractChunkProvider chunkProvider = region.getLevel().getChunkSource();
-        if (chunkProvider instanceof ServerChunkProvider) {
-            ChunkGenerator generator = ((ServerChunkProvider) chunkProvider).getGenerator();
+    private void makeDummyChunkNoise(int chunkX, int chunkZ, WorldGenLevel region, ChunkHeightmap heightmap) {
+        // @todo 1.18
+//        DummyChunk primer = new DummyChunk(new ChunkPos(chunkX, chunkZ), heightmap);
+        ChunkSource chunkProvider = region.getLevel().getChunkSource();
+        if (chunkProvider instanceof ServerChunkCache) {
+            ChunkGenerator generator = ((ServerChunkCache) chunkProvider).getGenerator();
 
-            generator.createBiomes(region.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), primer);
-            updateHeightmap((NoiseChunkGenerator) generator, primer, heightmap);
+            // @todo 1.18
+//            generator.createBiomes(region.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY),
+//                    null, Blender.of(region),
+//                    region.getLevel().structureFeatureManager(), primer);
+
+//            generator.createBiomes(region.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), primer);
+//            updateHeightmap((NoiseBasedChunkGenerator) generator, primer, heightmap);//@todo 1.18
 //            generator.generateSurface((WorldGenRegion) region, primer);
         }
     }
 
-    public static void updateHeightmap(NoiseChunkGenerator chunkGenerator, IChunk chunk, ChunkHeightmap heightmap) {
-        ChunkPos chunkpos = chunk.getPos();
-        int chunkX = chunkpos.x;
-        int chunkZ = chunkpos.z;
-        int cx = chunkX << 4;
-        int cz = chunkZ << 4;
-
-        double[][][] noise = new double[2][chunkGenerator.chunkCountZ + 1][chunkGenerator.chunkCountY + 1];
-
-        for(int nz = 0; nz < chunkGenerator.chunkCountZ + 1; ++nz) {
-            noise[0][nz] = new double[chunkGenerator.chunkCountY + 1];
-            chunkGenerator.fillNoiseColumn(noise[0][nz], chunkX * chunkGenerator.chunkCountX, chunkZ * chunkGenerator.chunkCountZ + nz);
-            noise[1][nz] = new double[chunkGenerator.chunkCountY + 1];
-        }
-
-        for(int nx = 0; nx < chunkGenerator.chunkCountX; ++nx) {
-            int nz;
-            for(nz = 0; nz < chunkGenerator.chunkCountZ + 1; ++nz) {
-                chunkGenerator.fillNoiseColumn(noise[1][nz], chunkX * chunkGenerator.chunkCountX + nx + 1, chunkZ * chunkGenerator.chunkCountZ + nz);
-            }
-
-            for(nz = 0; nz < chunkGenerator.chunkCountZ; ++nz) {
-                for(int ny = chunkGenerator.chunkCountY - 1; ny >= 0; --ny) {
-                    double d0 = noise[0][nz][ny];
-                    double d1 = noise[0][nz + 1][ny];
-                    double d2 = noise[1][nz][ny];
-                    double d3 = noise[1][nz + 1][ny];
-                    double d4 = noise[0][nz][ny + 1];
-                    double d5 = noise[0][nz + 1][ny + 1];
-                    double d6 = noise[1][nz][ny + 1];
-                    double d7 = noise[1][nz + 1][ny + 1];
-
-                    for(int l1 = chunkGenerator.chunkHeight - 1; l1 >= 0; --l1) {
-                        int yy = ny * chunkGenerator.chunkHeight + l1;
-                        int yyy = yy & 15;
-                        int chunkIndex = yy >> 4;
-
-                        double d8 = (double)l1 / (double)chunkGenerator.chunkHeight;
-                        double d9 = MathHelper.lerp(d8, d0, d4);
-                        double d10 = MathHelper.lerp(d8, d2, d6);
-                        double d11 = MathHelper.lerp(d8, d1, d5);
-                        double d12 = MathHelper.lerp(d8, d3, d7);
-
-                        for(int l2 = 0; l2 < chunkGenerator.chunkWidth; ++l2) {
-                            int xx = cx + nx * chunkGenerator.chunkWidth + l2;
-                            int xxx = xx & 15;
-                            double d13 = (double)l2 / (double)chunkGenerator.chunkWidth;
-                            double d14 = MathHelper.lerp(d13, d9, d10);
-                            double d15 = MathHelper.lerp(d13, d11, d12);
-
-                            for(int k3 = 0; k3 < chunkGenerator.chunkWidth; ++k3) {
-                                int zz = cz + nz * chunkGenerator.chunkWidth + k3;
-                                int zzz = zz & 15;
-                                double d16 = (double)k3 / (double)chunkGenerator.chunkWidth;
-                                double d17 = MathHelper.lerp(d16, d14, d15);
-                                double d18 = MathHelper.clamp(d17 / 200.0D, -1.0D, 1.0D);
-
-                                BlockState blockstate = chunkGenerator.generateBaseState(d18, yy);
-                                if (blockstate != air) {
-                                    heightmap.update(xxx, (chunkIndex << 4) + yyy, zzz, blockstate);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            double[][] adouble1 = noise[0];
-            noise[0] = noise[1];
-            noise[1] = adouble1;
-        }
-
+    public static void updateHeightmap(NoiseBasedChunkGenerator chunkGenerator, ChunkAccess chunk, ChunkHeightmap heightmap) {
+        // @todo 1.18
+//        ChunkPos chunkpos = chunk.getPos();
+//        int chunkX = chunkpos.x;
+//        int chunkZ = chunkpos.z;
+//        int cx = chunkX << 4;
+//        int cz = chunkZ << 4;
+//
+//        double[][][] noise = new double[2][chunkGenerator.chunkCountZ + 1][chunkGenerator.chunkCountY + 1];
+//
+//        for(int nz = 0; nz < chunkGenerator.chunkCountZ + 1; ++nz) {
+//            noise[0][nz] = new double[chunkGenerator.chunkCountY + 1];
+//            chunkGenerator.fillNoiseColumn(noise[0][nz], chunkX * chunkGenerator.chunkCountX, chunkZ * chunkGenerator.chunkCountZ + nz);
+//            noise[1][nz] = new double[chunkGenerator.chunkCountY + 1];
+//        }
+//
+//        for(int nx = 0; nx < chunkGenerator.chunkCountX; ++nx) {
+//            int nz;
+//            for(nz = 0; nz < chunkGenerator.chunkCountZ + 1; ++nz) {
+//                chunkGenerator.fillNoiseColumn(noise[1][nz], chunkX * chunkGenerator.chunkCountX + nx + 1, chunkZ * chunkGenerator.chunkCountZ + nz);
+//            }
+//
+//            for(nz = 0; nz < chunkGenerator.chunkCountZ; ++nz) {
+//                for(int ny = chunkGenerator.chunkCountY - 1; ny >= 0; --ny) {
+//                    double d0 = noise[0][nz][ny];
+//                    double d1 = noise[0][nz + 1][ny];
+//                    double d2 = noise[1][nz][ny];
+//                    double d3 = noise[1][nz + 1][ny];
+//                    double d4 = noise[0][nz][ny + 1];
+//                    double d5 = noise[0][nz + 1][ny + 1];
+//                    double d6 = noise[1][nz][ny + 1];
+//                    double d7 = noise[1][nz + 1][ny + 1];
+//
+//                    for(int l1 = chunkGenerator.chunkHeight - 1; l1 >= 0; --l1) {
+//                        int yy = ny * chunkGenerator.chunkHeight + l1;
+//                        int yyy = yy & 15;
+//                        int chunkIndex = yy >> 4;
+//
+//                        double d8 = (double)l1 / (double)chunkGenerator.chunkHeight;
+//                        double d9 = Mth.lerp(d8, d0, d4);
+//                        double d10 = Mth.lerp(d8, d2, d6);
+//                        double d11 = Mth.lerp(d8, d1, d5);
+//                        double d12 = Mth.lerp(d8, d3, d7);
+//
+//                        for(int l2 = 0; l2 < chunkGenerator.chunkWidth; ++l2) {
+//                            int xx = cx + nx * chunkGenerator.chunkWidth + l2;
+//                            int xxx = xx & 15;
+//                            double d13 = (double)l2 / (double)chunkGenerator.chunkWidth;
+//                            double d14 = Mth.lerp(d13, d9, d10);
+//                            double d15 = Mth.lerp(d13, d11, d12);
+//
+//                            for(int k3 = 0; k3 < chunkGenerator.chunkWidth; ++k3) {
+//                                int zz = cz + nz * chunkGenerator.chunkWidth + k3;
+//                                int zzz = zz & 15;
+//                                double d16 = (double)k3 / (double)chunkGenerator.chunkWidth;
+//                                double d17 = Mth.lerp(d16, d14, d15);
+//                                double d18 = Mth.clamp(d17 / 200.0D, -1.0D, 1.0D);
+//
+//                                BlockState blockstate = chunkGenerator.generateBaseState(d18, yy);
+//                                if (blockstate != air) {
+//                                    heightmap.update(xxx, (chunkIndex << 4) + yyy, zzz, blockstate);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            double[][] adouble1 = noise[0];
+//            noise[0] = noise[1];
+//            noise[1] = adouble1;
+//        }
+//
     }
 
 
@@ -2504,10 +2510,10 @@ public class LostCityTerrainFeature {
     }
 
     public static void createSpawner(Random random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
-        IWorld world = diminfo.getWorld();
-        TileEntity tileentity = world.getBlockEntity(pos);
-        if (tileentity instanceof MobSpawnerTileEntity) {
-            MobSpawnerTileEntity spawner = (MobSpawnerTileEntity) tileentity;
+        LevelAccessor world = diminfo.getWorld();
+        BlockEntity tileentity = world.getBlockEntity(pos);
+        if (tileentity instanceof SpawnerBlockEntity) {
+            SpawnerBlockEntity spawner = (SpawnerBlockEntity) tileentity;
             String condition = todo.getCondition();
             Condition cnd = AssetRegistries.CONDITIONS.get(condition);
             if (cnd == null) {
@@ -2531,7 +2537,7 @@ public class LostCityTerrainFeature {
             if (randomValue == null) {
                 throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
             }
-            AbstractSpawner logic = spawner.getSpawner();
+            BaseSpawner logic = spawner.getSpawner();
             logic.setEntityId(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(randomValue)));
             spawner.setChanged();
             if (LostCityConfiguration.DEBUG) {
@@ -2545,9 +2551,9 @@ public class LostCityTerrainFeature {
     }
 
 
-    private void generateLoot(BuildingInfo info, IWorld world, BlockPos pos, BuildingInfo.ConditionTodo condition) {
-        TileEntity te = world.getBlockEntity(pos);
-        if (te instanceof LockableLootTileEntity) {
+    private void generateLoot(BuildingInfo info, LevelAccessor world, BlockPos pos, BuildingInfo.ConditionTodo condition) {
+        BlockEntity te = world.getBlockEntity(pos);
+        if (te instanceof RandomizableContainerBlockEntity) {
             if (this.provider.getProfile().GENERATE_LOOT) {
                 createLoot(info, rand, world, pos, condition, this.provider);
             }
@@ -2556,12 +2562,12 @@ public class LostCityTerrainFeature {
         }
     }
 
-    public static void createLoot(BuildingInfo info, Random random, IWorld world, BlockPos pos, BuildingInfo.ConditionTodo todo, IDimensionInfo diminfo) {
+    public static void createLoot(BuildingInfo info, Random random, LevelAccessor world, BlockPos pos, BuildingInfo.ConditionTodo todo, IDimensionInfo diminfo) {
         if (random.nextFloat() < diminfo.getProfile().CHEST_WITHOUT_LOOT_CHANCE) {
             return;
         }
-        TileEntity tileentity = world.getBlockEntity(pos);
-        if (tileentity instanceof LockableLootTileEntity) {
+        BlockEntity tileentity = world.getBlockEntity(pos);
+        if (tileentity instanceof RandomizableContainerBlockEntity) {
             if (todo != null) {
                 String lootTable = todo.getCondition();
                 int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / 6;
@@ -2587,7 +2593,7 @@ public class LostCityTerrainFeature {
 //                if (LostCityConfiguration.DEBUG) {
 //                    LostCities.setup.getLogger().debug("createLootChest: loot=" + randomValue + " pos=" + pos.toString());
 //                }
-                LockableLootTileEntity.setLootTable(world, random, pos, new ResourceLocation(randomValue));
+                RandomizableContainerBlockEntity.setLootTable(world, random, pos, new ResourceLocation(randomValue));
             }
         }
     }
@@ -2825,7 +2831,7 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private BlockState getDoor(Block door, boolean upper, boolean left, net.minecraft.util.Direction facing) {
+    private BlockState getDoor(Block door, boolean upper, boolean left, net.minecraft.core.Direction facing) {
         return door.defaultBlockState()
                 .setValue(DoorBlock.HALF, upper ? DoubleBlockHalf.UPPER : DoubleBlockHalf.LOWER)
                 .setValue(DoorBlock.HINGE, left ? DoorHingeSide.LEFT : DoorHingeSide.RIGHT)
@@ -2853,13 +2859,13 @@ public class LostCityTerrainFeature {
 
                 driver.current(x, height, 7)
                         .add(filler)
-                        .add(getDoor(info.doorBlock, false, true, net.minecraft.util.Direction.EAST))
-                        .add(getDoor(info.doorBlock, true, true, net.minecraft.util.Direction.EAST))
+                        .add(getDoor(info.doorBlock, false, true, net.minecraft.core.Direction.EAST))
+                        .add(getDoor(info.doorBlock, true, true, net.minecraft.core.Direction.EAST))
                         .add(filler);
                 driver.current(x, height, 8)
                         .add(filler)
-                        .add(getDoor(info.doorBlock, false, false, net.minecraft.util.Direction.EAST))
-                        .add(getDoor(info.doorBlock, true, false, net.minecraft.util.Direction.EAST))
+                        .add(getDoor(info.doorBlock, false, false, net.minecraft.core.Direction.EAST))
+                        .add(getDoor(info.doorBlock, true, false, net.minecraft.core.Direction.EAST))
                         .add(filler);
             }
         }
@@ -2875,13 +2881,13 @@ public class LostCityTerrainFeature {
             driver.setBlockRange(x, height, 9, height + 4, filler);
             driver.current(x, height, 7)
                 .add(filler)
-                .add(getDoor(info.doorBlock, false, false, net.minecraft.util.Direction.WEST))
-                .add(getDoor(info.doorBlock, true, false, net.minecraft.util.Direction.WEST))
+                .add(getDoor(info.doorBlock, false, false, net.minecraft.core.Direction.WEST))
+                .add(getDoor(info.doorBlock, true, false, net.minecraft.core.Direction.WEST))
                 .add(filler);
             driver.current(x, height, 8)
                 .add(filler)
-                .add(getDoor(info.doorBlock, false, true, net.minecraft.util.Direction.WEST))
-                .add(getDoor(info.doorBlock, true, true, net.minecraft.util.Direction.WEST))
+                .add(getDoor(info.doorBlock, false, true, net.minecraft.core.Direction.WEST))
+                .add(getDoor(info.doorBlock, true, true, net.minecraft.core.Direction.WEST))
                 .add(filler);
         }
         if (info.hasConnectionAtZ(f + info.floorsBelowGround)) {
@@ -2896,13 +2902,13 @@ public class LostCityTerrainFeature {
                 driver.setBlockRange(9, height, z, height + 4, filler);
                 driver.current(7, height, z)
                     .add(filler)
-                    .add(getDoor(info.doorBlock, false, true, net.minecraft.util.Direction.NORTH))
-                    .add(getDoor(info.doorBlock, true, true, net.minecraft.util.Direction.NORTH))
+                    .add(getDoor(info.doorBlock, false, true, net.minecraft.core.Direction.NORTH))
+                    .add(getDoor(info.doorBlock, true, true, net.minecraft.core.Direction.NORTH))
                     .add(filler);
                 driver.current(8, height, z)
                     .add(filler)
-                    .add(getDoor(info.doorBlock, false, false, net.minecraft.util.Direction.NORTH))
-                    .add(getDoor(info.doorBlock, true, false, net.minecraft.util.Direction.NORTH))
+                    .add(getDoor(info.doorBlock, false, false, net.minecraft.core.Direction.NORTH))
+                    .add(getDoor(info.doorBlock, true, false, net.minecraft.core.Direction.NORTH))
                     .add(filler);
             }
         }
@@ -2918,13 +2924,13 @@ public class LostCityTerrainFeature {
             driver.setBlockRange(9, height, z, height + 4, filler);
             driver.current(7, height, z)
                 .add(filler)
-                .add(getDoor(info.doorBlock, false, false, net.minecraft.util.Direction.SOUTH))
-                .add(getDoor(info.doorBlock, true, false, net.minecraft.util.Direction.SOUTH))
+                .add(getDoor(info.doorBlock, false, false, net.minecraft.core.Direction.SOUTH))
+                .add(getDoor(info.doorBlock, true, false, net.minecraft.core.Direction.SOUTH))
                 .add(filler);
             driver.current(8, height, z)
                 .add(filler)
-                .add(getDoor(info.doorBlock, false, true, net.minecraft.util.Direction.SOUTH))
-                .add(getDoor(info.doorBlock, true, true, net.minecraft.util.Direction.SOUTH))
+                .add(getDoor(info.doorBlock, false, true, net.minecraft.core.Direction.SOUTH))
+                .add(getDoor(info.doorBlock, true, true, net.minecraft.core.Direction.SOUTH))
                 .add(filler);
         }
     }

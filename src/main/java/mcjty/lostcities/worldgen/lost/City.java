@@ -7,10 +7,10 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -30,7 +30,7 @@ public class City {
         predefinedStreetMap = null;
     }
 
-    public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, RegistryKey<World> type) {
+    public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, ResourceKey<Level> type) {
         if (predefinedCityMap == null) {
             predefinedCityMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -43,7 +43,7 @@ public class City {
         return predefinedCityMap.get(new ChunkCoord(type, chunkX, chunkZ));
     }
 
-    public static PredefinedCity.PredefinedBuilding getPredefinedBuilding(int chunkX, int chunkZ, RegistryKey<World> type) {
+    public static PredefinedCity.PredefinedBuilding getPredefinedBuilding(int chunkX, int chunkZ, ResourceKey<Level> type) {
         if (predefinedBuildingMap == null) {
             predefinedBuildingMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -59,7 +59,7 @@ public class City {
         return predefinedBuildingMap.get(new ChunkCoord(type, chunkX, chunkZ));
     }
 
-    public static PredefinedCity.PredefinedStreet getPredefinedStreet(int chunkX, int chunkZ, RegistryKey<World> type) {
+    public static PredefinedCity.PredefinedStreet getPredefinedStreet(int chunkX, int chunkZ, ResourceKey<Level> type) {
         if (predefinedStreetMap == null) {
             predefinedStreetMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -174,7 +174,7 @@ public class City {
     }
 
     public static float getCityFactor(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        RegistryKey<World> type = provider.getType();
+        ResourceKey<Level> type = provider.getType();
         // If we have a predefined building here we force a high city factor
 
         PredefinedCity.PredefinedBuilding predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ, type);

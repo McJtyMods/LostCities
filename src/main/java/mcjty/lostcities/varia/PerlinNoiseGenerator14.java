@@ -1,21 +1,19 @@
 package mcjty.lostcities.varia;
 
-import net.minecraft.world.gen.INoiseGenerator;
-import net.minecraft.world.gen.SimplexNoiseGenerator;
-
-import java.util.Random;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
+import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 
 // @todo 1.15 copy from 1.14: use the 1.15 version!
-public class PerlinNoiseGenerator14 implements INoiseGenerator {
-   private final SimplexNoiseGenerator[] noiseLevels;
+public class PerlinNoiseGenerator14 {
+   private final SimplexNoise[] noiseLevels;
    private final int levels;
 
-   public PerlinNoiseGenerator14(Random seed, int levelsIn) {
+   public PerlinNoiseGenerator14(long seed, int levelsIn) {
       this.levels = levelsIn;
-      this.noiseLevels = new SimplexNoiseGenerator[levelsIn];
+      this.noiseLevels = new SimplexNoise[levelsIn];
 
       for(int i = 0; i < levelsIn; ++i) {
-         this.noiseLevels[i] = new SimplexNoiseGenerator(seed);
+         this.noiseLevels[i] = new SimplexNoise(new LegacyRandomSource(seed));
       }
 
    }

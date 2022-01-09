@@ -1,6 +1,6 @@
 package mcjty.lostcities.api;
 
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
@@ -15,5 +15,5 @@ public interface ILostCities {
      * Get Lost City information for a given dimension. Returns null if the dimension doesn't support Lost Cities
      */
     @Nullable
-    ILostCityInformation getLostInfo(World world);
+    ILostCityInformation getLostInfo(Level world);
 }

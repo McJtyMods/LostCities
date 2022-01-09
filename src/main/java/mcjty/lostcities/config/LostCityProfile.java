@@ -5,12 +5,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.varia.Tools;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
@@ -211,7 +211,7 @@ public class LostCityProfile {
         this.isPublic = isPublic;
     }
 
-    public LostCityProfile(String name, PacketBuffer buf) {
+    public LostCityProfile(String name, FriendlyByteBuf buf) {
         this(name, buf.readUtf(32767));
     }
 
@@ -626,7 +626,7 @@ public class LostCityProfile {
         return config.toJson(readonly);
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         JsonObject jsonObject = toJson(false);
         buf.writeUtf(jsonObject.toString());
     }

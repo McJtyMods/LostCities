@@ -9,13 +9,13 @@ import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nonnull;
@@ -328,7 +328,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static synchronized LostChunkCharacteristics getChunkCharacteristics(int chunkX, int chunkZ, IDimensionInfo provider) {
-        RegistryKey<World> type = provider.getType();
+        ResourceKey<Level> type = provider.getType();
         ChunkCoord key = new ChunkCoord(type, chunkX, chunkZ);
         if (cityInfoMap.containsKey(key)) {
             return cityInfoMap.get(key);
@@ -453,7 +453,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private static boolean checkBuildingPossibility(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, int section, int cityLevel, Random rand) {
         boolean b;
         float bc = rand.nextFloat();
-        RegistryKey<World> type = provider.getType();
+        ResourceKey<Level> type = provider.getType();
 
         PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null) {
@@ -541,7 +541,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        RegistryKey<World> type = provider.getType();
+        ResourceKey<Level> type = provider.getType();
         PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             return true;    // We don't need other tests. This is the top-left of a multibuilding
@@ -598,7 +598,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        RegistryKey<World> type = provider.getType();
+        ResourceKey<Level> type = provider.getType();
         PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
             // Regardless of other conditions, this is the top left of a multibuilding
@@ -662,7 +662,7 @@ public class BuildingInfo implements ILostChunkInfo {
         this.provider = provider;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        RegistryKey<World> type = provider.getType();
+        ResourceKey<Level> type = provider.getType();
         this.coord = new ChunkCoord(type, chunkX, chunkZ);
 
         outsideChunk = provider.getProfile().isSpace() && !CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider);
@@ -1313,15 +1313,15 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isOcean != null) {
             return isOcean;
         }
-        isOcean = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome().getBiomeCategory() == Biome.Category.OCEAN;
+        isOcean = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome().getBiomeCategory() == Biome.BiomeCategory.OCEAN;
         return isOcean;
     }
 
     private static boolean isOcean(Biome[] biomes) {
         int cnt = 0;
         for (Biome biome : biomes) {
-            Biome.Category category = biome.getBiomeCategory();
-            if (category == Biome.Category.OCEAN) {
+            Biome.BiomeCategory category = biome.getBiomeCategory();
+            if (category == Biome.BiomeCategory.OCEAN) {
                 cnt++;
             }
         }

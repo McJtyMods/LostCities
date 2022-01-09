@@ -6,24 +6,28 @@ import mcjty.lostcities.gui.LostCitySetup;
 import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.LostCityFeature;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.AbstractSkullBlock;
+import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgeEventHandlers {
@@ -35,14 +39,14 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onBiomeLoad(BiomeLoadingEvent event) {
-        RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, event.getName());
+        ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, event.getName());
         if (!BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.VOID)) {
-            event.getGeneration().getFeatures(GenerationStage.Decoration.RAW_GENERATION).add(() -> LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
+            event.getGeneration().getFeatures(GenerationStep.Decoration.RAW_GENERATION).add(() -> LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
         }
     }
 
     @SubscribeEvent
-    public void onServerStop(FMLServerStoppingEvent event) {
+    public void onServerStop(ServerStoppingEvent event) {
         LostCitySetup.CLIENT_SETUP.reset();
         Config.reset();
     }
@@ -184,14 +188,14 @@ public class ForgeEventHandlers {
 //        }
 //    }
 
-    private boolean isValidStandingPosition(World world, BlockPos pos) {
+    private boolean isValidStandingPosition(Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
 //        return state.getBlock().isTopSolid(state) && state.getBlock().isFullCube(state) && state.getBlock().isOpaqueCube(state) && world.isAirBlock(pos.up()) && world.isAirBlock(pos.up(2));
         // @todo 1.14
         return state.canOcclude();
     }
 
-    private boolean isValidSpawnBed(World world, BlockPos pos) {
+    private boolean isValidSpawnBed(Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof BedBlock)) {
             return false;
@@ -225,7 +229,7 @@ public class ForgeEventHandlers {
         return true;
     }
 
-    private BlockPos findValidTeleportLocation(World world, BlockPos start) {
+    private BlockPos findValidTeleportLocation(Level world, BlockPos start) {
         int chunkX = start.getX()>>4;
         int chunkZ = start.getZ()>>4;
         int y = start.getY();
@@ -256,7 +260,7 @@ public class ForgeEventHandlers {
         return null;
     }
 
-    private BlockPos findValidTeleportLocation(World world, int chunkX, int chunkZ, int y) {
+    private BlockPos findValidTeleportLocation(Level world, int chunkX, int chunkZ, int y) {
         BlockPos bestSpot = null;
         for (int dy = 0 ; dy < 255 ; dy++) {
             for (int x = 0 ; x < 16 ; x++) {
@@ -291,7 +295,7 @@ public class ForgeEventHandlers {
 //            return;
 //        }
 
-        World world = event.getPlayer().getCommandSenderWorld();
+        Level world = event.getPlayer().getCommandSenderWorld();
         if (world.isClientSide) {
             return;
         }
@@ -301,22 +305,22 @@ public class ForgeEventHandlers {
         }
 
         if (world.dimension() == Registration.DIMENSION) {
-            event.setResult(PlayerEntity.SleepResult.OTHER_PROBLEM);
-            ServerWorld destWorld = WorldTools.getOverworld(world);
+            event.setResult(Player.BedSleepingProblem.OTHER_PROBLEM);
+            ServerLevel destWorld = WorldTools.getOverworld(world);
             BlockPos location = findLocation(bedLocation, destWorld);
             CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
         } else {
-            event.setResult(PlayerEntity.SleepResult.OTHER_PROBLEM);
-            ServerWorld destWorld = event.getEntity().getCommandSenderWorld().getServer().getLevel(Registration.DIMENSION);
+            event.setResult(Player.BedSleepingProblem.OTHER_PROBLEM);
+            ServerLevel destWorld = event.getEntity().getCommandSenderWorld().getServer().getLevel(Registration.DIMENSION);
             BlockPos location = findLocation(bedLocation, destWorld);
             CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
         }
     }
 
-    private BlockPos findLocation(BlockPos bedLocation, ServerWorld destWorld) {
+    private BlockPos findLocation(BlockPos bedLocation, ServerLevel destWorld) {
         BlockPos top = bedLocation.above(5);//destWorld.getHeight(Heightmap.Type.MOTION_BLOCKING, bedLocation).up(10);
         BlockPos location = top;
-        while (top.getY() > 1 && destWorld.getBlockState(location).isAir(destWorld, location)) {
+        while (top.getY() > 1 && destWorld.getBlockState(location).isAir()) {
             location = location.below();
         }
 //        BlockPos location = findValidTeleportLocation(destWorld, top);

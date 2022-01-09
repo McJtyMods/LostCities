@@ -1,21 +1,21 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SaplingBlock;
-import net.minecraft.block.VineBlock;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.level.block.VineBlock;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.chunk.ChunkStatus;
 
 import java.util.Random;
 
 public class ChunkFixer {
 
 
-    private static void generateTrees(Random random, int chunkX, int chunkZ, IWorld world, IDimensionInfo provider) {
+    private static void generateTrees(Random random, int chunkX, int chunkZ, LevelAccessor world, IDimensionInfo provider) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
         for (BlockPos pos : info.getSaplingTodo()) {
             BlockState state = world.getBlockState(pos);
@@ -27,7 +27,7 @@ public class ChunkFixer {
         info.clearSaplingTodo();
     }
 
-    private static void generateVines(Random random, int chunkX, int chunkZ, IWorld world, IDimensionInfo provider) {
+    private static void generateVines(Random random, int chunkX, int chunkZ, LevelAccessor world, IDimensionInfo provider) {
         float vineChance = provider.getProfile().VINE_CHANCE;
         if (vineChance < 0.000001) {
             return;
@@ -93,7 +93,7 @@ public class ChunkFixer {
         }
     }
 
-    private static void createVineStrip(IWorld world, int bottom, BooleanProperty direction, BlockPos pos, BlockPos vineHolderPos) {
+    private static void createVineStrip(LevelAccessor world, int bottom, BooleanProperty direction, BlockPos pos, BlockPos vineHolderPos) {
         if (world.isEmptyBlock(vineHolderPos)) {
             return;
         }

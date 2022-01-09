@@ -7,7 +7,7 @@ import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;

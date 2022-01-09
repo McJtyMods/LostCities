@@ -5,9 +5,9 @@ import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -15,12 +15,12 @@ import java.util.Map;
 
 public class LostCitiesImp implements ILostCities {
 
-    private final Map<RegistryKey<World>, LostCityInformation> info = new HashMap<>();
+    private final Map<ResourceKey<Level>, LostCityInformation> info = new HashMap<>();
 
     @Nullable
     @Override
-    public ILostCityInformation getLostInfo(World world) {
-        IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo((ISeedReader) world);
+    public ILostCityInformation getLostInfo(Level world) {
+        IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo((WorldGenLevel) world);
         if (dimensionInfo != null) {
             if (!info.containsKey(world.dimension())) {
                 LostCityInformation gen = new LostCityInformation(dimensionInfo);

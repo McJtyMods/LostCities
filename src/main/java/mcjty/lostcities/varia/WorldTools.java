@@ -1,18 +1,18 @@
 package mcjty.lostcities.varia;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class WorldTools {
 
-    public static boolean chunkLoaded(World world, BlockPos pos) {
+    public static boolean chunkLoaded(Level world, BlockPos pos) {
         if (world == null || pos == null) {
             return false;
         }
@@ -20,18 +20,18 @@ public class WorldTools {
 //        return world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null && world.getChunkFromBlockCoords(pos).isLoaded();
     }
 
-    public static ServerWorld getOverworld() {
+    public static ServerLevel getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return server.getLevel(World.OVERWORLD);
+        return server.getLevel(Level.OVERWORLD);
     }
 
-    public static ServerWorld getOverworld(World world) {
+    public static ServerLevel getOverworld(Level world) {
         MinecraftServer server = world.getServer();
-        return server.getLevel(World.OVERWORLD);
+        return server.getLevel(Level.OVERWORLD);
     }
 
-    public static ServerWorld loadWorld(RegistryKey<World> type) {
-        ServerWorld world = getWorld(type);
+    public static ServerLevel loadWorld(ResourceKey<Level> type) {
+        ServerLevel world = getWorld(type);
         if (world == null) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             return server.getLevel(type);
@@ -39,12 +39,12 @@ public class WorldTools {
         return world;
     }
 
-    public static ServerWorld getWorld(RegistryKey<World> type) {
+    public static ServerLevel getWorld(ResourceKey<Level> type) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return server.getLevel(type);
     }
 
-    public static ServerWorld getWorld(World world, RegistryKey<World> type) {
+    public static ServerLevel getWorld(Level world, ResourceKey<Level> type) {
         MinecraftServer server = world.getServer();
         return server.getLevel(type);
     }

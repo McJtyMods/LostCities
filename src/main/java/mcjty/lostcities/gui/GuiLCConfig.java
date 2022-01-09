@@ -1,6 +1,6 @@
 package mcjty.lostcities.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
@@ -11,11 +11,12 @@ import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.Highway;
 import mcjty.lostcities.worldgen.lost.Railway;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.TextComponent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class GuiLCConfig extends Screen {
     private LostCitySetup localSetup = new LostCitySetup(this::refreshPreview);
 
     public GuiLCConfig(Screen parent) { // @todo 1.16}, WorldType worldType) {
-        super(new StringTextComponent("Lost City Configuration"));
+        super(new TextComponent("Lost City Configuration"));
         this.parent = parent;
 //        this.worldType = worldType;
         localSetup.copyFrom(LostCitySetup.CLIENT_SETUP);
@@ -65,7 +66,7 @@ public class GuiLCConfig extends Screen {
         return localSetup;
     }
 
-    public FontRenderer getFont() {
+    public Font getFont() {
         return this.font;
     }
 
@@ -79,23 +80,23 @@ public class GuiLCConfig extends Screen {
         super.init();
         this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
-        profileButton = addButton(new ButtonExt(this, 70, 10, 100, 20, new StringTextComponent(localSetup.getProfileLabel()), p -> {
+        profileButton = addRenderableWidget(new ButtonExt(this, 70, 10, 100, 20, new TextComponent(localSetup.getProfileLabel()), p -> {
             localSetup.toggleProfile(/* @todo 1.16 worldType*/);
             updateValues();
-        }).tooltip(new StringTextComponent("Select a standard profile for your Lost City worldgen")));
-        customizeButton = addButton(new ButtonExt(this, 180, 10, 100, 20, new StringTextComponent("Customize"), p -> {
+        }).tooltip(new TextComponent("Select a standard profile for your Lost City worldgen")));
+        customizeButton = addRenderableWidget(new ButtonExt(this, 180, 10, 100, 20, new TextComponent("Customize"), p -> {
             localSetup.customize();
             updateValues();
-        }).tooltip(new StringTextComponent("Create a customized version of the currently selected profile")));
-        modeButton = addButton(new ButtonExt(this, 290, 10, 100, 20, new StringTextComponent(mode), p -> toggleMode())
-            .tooltip(new StringTextComponent("Switch between different configuration pages")));
+        }).tooltip(new TextComponent("Create a customized version of the currently selected profile")));
+        modeButton = addRenderableWidget(new ButtonExt(this, 290, 10, 100, 20, new TextComponent(mode), p -> toggleMode())
+            .tooltip(new TextComponent("Switch between different configuration pages")));
 
-        Button doneButton = addButton(new Button(10, this.height - 30, 120, 20,
-                new StringTextComponent("Done"), p -> done()));
-        Button cancelButton = addButton(new Button(this.width - 130, this.height - 30, 120, 20,
-                new StringTextComponent("Cancel"), p -> cancel()));
-        Button randomizeButton = addButton(new ButtonExt(this, this.width - 35, 35, 30, 20, new StringTextComponent("Rnd"), p -> randomizePreview())
-                .tooltip(new StringTextComponent("Randomize the seed for the preview (does not affect the generated world)")));
+        Button doneButton = addRenderableWidget(new Button(10, this.height - 30, 120, 20,
+                new TextComponent("Done"), p -> done()));
+        Button cancelButton = addRenderableWidget(new Button(this.width - 130, this.height - 30, 120, 20,
+                new TextComponent("Cancel"), p -> cancel()));
+        Button randomizeButton = addRenderableWidget(new ButtonExt(this, this.width - 35, 35, 30, 20, new TextComponent("Rnd"), p -> randomizePreview())
+                .tooltip(new TextComponent("Randomize the seed for the preview (does not affect the generated world)")));
 
         initCities(110);
         initBuildings(110);
@@ -213,7 +214,7 @@ public class GuiLCConfig extends Screen {
             idx = 0;
         }
         mode = MODES.get(idx);
-        modeButton.setMessage(new StringTextComponent(mode));
+        modeButton.setMessage(new TextComponent(mode));
     }
 
     private GuiElement add(GuiElement el) {
@@ -221,9 +222,10 @@ public class GuiLCConfig extends Screen {
         return el;
     }
 
-    public <T extends Widget> T addWidget(T widget) {
-        this.buttons.add(widget);
-        this.children.add(widget);
+    public <T extends AbstractWidget> T addWidget(T widget) {
+        this.addRenderableWidget(widget);
+//        this.buttons.add(widget); // @todo 1.18
+//        this.children.add(widget);
         return widget;
     }
 
@@ -238,7 +240,7 @@ public class GuiLCConfig extends Screen {
         Railway.cleanCache();
     }
 
-    private void renderExtra(MatrixStack stack) {
+    private void renderExtra(PoseStack stack) {
         drawString(stack, font, "Profile:", 10, 16, 0xffffffff);
         elements.stream().forEach(el -> el.render(stack));
 
@@ -256,7 +258,7 @@ public class GuiLCConfig extends Screen {
         });
     }
 
-    private void renderPreviewTransports(MatrixStack stack, LostCityProfile profile) {
+    private void renderPreviewTransports(PoseStack stack, LostCityProfile profile) {
         renderPreviewMap(stack, profile, true);
         Random rand = new Random(seed);
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
@@ -285,7 +287,7 @@ public class GuiLCConfig extends Screen {
         }
     }
 
-    private void renderPreviewCity(MatrixStack stack, LostCityProfile profile, boolean showDamage) {
+    private void renderPreviewCity(PoseStack stack, LostCityProfile profile, boolean showDamage) {
         int base = 50 + 120;
         int leftRender = this.width - 157;
         fill(stack, leftRender, 50, leftRender + 150, base, 0xff0099bb);
@@ -379,7 +381,7 @@ public class GuiLCConfig extends Screen {
         return color;
     }
 
-    private void renderPreviewMap(MatrixStack stack, LostCityProfile profile, boolean soft) {
+    private void renderPreviewMap(PoseStack stack, LostCityProfile profile, boolean soft) {
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
         for (int z = 0; z < 50; z++) {
             for (int x = 0; x < 50; x++) {
@@ -415,7 +417,7 @@ public class GuiLCConfig extends Screen {
     }
 
     private void refreshButtons() {
-        profileButton.setMessage(new StringTextComponent(localSetup.getProfileLabel()));
+        profileButton.setMessage(new TextComponent(localSetup.getProfileLabel()));
         customizeButton.active = localSetup.isCustomizable();
 
         boolean isCustomized = "customized".equals(localSetup.getProfileLabel());
@@ -447,16 +449,18 @@ public class GuiLCConfig extends Screen {
     }
 
     @Override
-    public void render(MatrixStack stack, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(stack);
         refreshButtons();
         renderExtra(stack);
         super.render(stack, mouseX, mouseY, partialTicks);
-        for(Widget widget : this.buttons) {
-            if (widget.isMouseOver(mouseX, mouseY) && widget.visible) {
+        for(GuiEventListener listener : this.children()) {
+            if (listener instanceof AbstractWidget widget) {
+                if (widget.isMouseOver(mouseX, mouseY) && widget.visible) {
 //            if (widget.isHovered() && widget.visible) {
-                widget.renderToolTip(stack, mouseX - 0, mouseY - 0);
-                break;
+                    widget.renderToolTip(stack, mouseX - 0, mouseY - 0);
+                    break;
+                }
             }
         }
     }

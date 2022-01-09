@@ -2,21 +2,25 @@
 // For those who want the bleeding edge
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://maven.parchmentmc.org' }
         maven { url 'https://plugins.gradle.org/m2/' }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.parchmentmc:librarian:1.+'
         classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'maven-publish'
+apply from: 'https://raw.githubusercontent.com/SizableShrimp/Forge-Class-Remapper/main/classremapper.gradle'
 
 repositories {
     maven { // JEI
@@ -25,27 +29,16 @@ repositories {
     maven { // Patchouli
         url "https://maven.blamejared.com"
     }
-    maven {
-        name 'OC Repo'
-        url "http://maven.cil.li/"
-    }
     maven { // TOP
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
     maven { // McJtyLib
-        url "http://maven.k-4u.nl"
-    }
-    maven { // OC Repo
-        url "http://maven.cil.li/"
+        url "https://maven.k-4u.nl"
     }
     maven {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-    maven {
-        name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
     }
 }
 
@@ -56,15 +49,16 @@ if (System.getenv('BUILD_NUMBER') != null) {
     version += "-${System.getenv('BUILD_NUMBER')}"
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'official', version: "1.16.5"
+    mappings channel: 'parchment' , version: '2021.12.19-1.18.1'
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client = {
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             // recommended logging data for a userdev environment
             properties 'forge.logging.markers': 'REGISTRYDUMP'
             // recommended logging level for the console
@@ -73,6 +67,8 @@ minecraft {
             source sourceSets.main
         }
         server = {
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             // recommended logging data for a userdev environment
             properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
             // recommended logging level for the console
@@ -81,6 +77,8 @@ minecraft {
             source sourceSets.main
         }
         data = {
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             workingDirectory project.file('run').canonicalPath
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
@@ -106,10 +104,14 @@ jar {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
+
     if (findProject(':TheOneProbe') != null) {
-        compile project(':TheOneProbe')
+        implementation project(':TheOneProbe')
     } else {
-        compile fg.deobf(project.dependencies.create("mcjty.theoneprobe:TheOneProbe-${top_version}") {
+        implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:theoneprobe:${top_version}") {
             transitive = false
         })
     }

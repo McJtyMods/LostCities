@@ -4,9 +4,9 @@ import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.BiomeSelectionStrategy;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.varia.Tools;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -145,15 +145,9 @@ public class BiomeTranslator {
         if (translationMap.isEmpty()) {
             List<Pair<Float, Biome>> biomes = parseBiomes(allowedBiomeFactors);
             switch (strategy) {
-                case ORIGINAL:
-                    generateTranslationMapOriginal(biomes);
-                    break;
-                case RANDOMIZED:
-                    generateTranslationMapNG(biomes, 0.2f);
-                    break;
-                case VARIED:
-                    generateTranslationMapNG(biomes, 1.0f);
-                    break;
+                case ORIGINAL -> generateTranslationMapOriginal(biomes);
+                case RANDOMIZED -> generateTranslationMapNG(biomes, 0.2f);
+                case VARIED -> generateTranslationMapNG(biomes, 1.0f);
             }
             List<Pair<ResourceLocation, Biome>> manualMappings = parseManualBiomes(manualBiomeMappings);
             for (Pair<ResourceLocation, Biome> pair : manualMappings) {
@@ -172,10 +166,11 @@ public class BiomeTranslator {
         }
         float dr = a.getDownfall() - b.getDownfall();
         float dt = a.getBaseTemperature() - b.getBaseTemperature();
-        float dv = a.getDepth() - b.getDepth();
-        float dh = a.getScale() - b.getScale();
-
-        return Math.sqrt(dr * dr + dt * dt + dv * dv + dh * dh);
+        // @todo 1.18
+//        float dv = a.getDepth() - b.getDepth();
+//        float dh = a.getScale() - b.getScale();
+//        return Math.sqrt(dr * dr + dt * dt + dv * dv + dh * dh);
+        return Math.sqrt(dr * dr + dt * dt);
     }
 
 

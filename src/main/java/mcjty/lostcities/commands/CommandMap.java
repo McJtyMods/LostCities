@@ -8,17 +8,17 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 
-public class CommandMap implements Command<CommandSource> {
+public class CommandMap implements Command<CommandSourceStack> {
 
     private static final CommandMap CMD = new CommandMap();
 
-    public static ArgumentBuilder<CommandSource, ?> register(CommandDispatcher<CommandSource> dispatcher) {
+    public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         return Commands.literal("map")
                 .requires(cs -> cs.hasPermission(0))
                 .executes(CMD);
@@ -26,8 +26,8 @@ public class CommandMap implements Command<CommandSource> {
 
 
     @Override
-    public int run(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayerOrException();
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
         if (player != null) {
             BlockPos position = player.blockPosition();
             IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getLevel());

@@ -4,10 +4,10 @@ import com.google.common.collect.Lists;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.HashMap;
@@ -39,7 +39,7 @@ public class Config {
             "lostcities:lostcity=default"
     };
     private static ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_PROFILES;
-    private static Map<RegistryKey<World>, String> dimensionProfileCache = null;
+    private static Map<ResourceKey<Level>, String> dimensionProfileCache = null;
 
     // Profile as selected by the client
     public static String profileFromClient = null;
@@ -53,7 +53,7 @@ public class Config {
         dimensionProfileCache = null;
     }
 
-    public static String getProfileForDimension(RegistryKey<World> type) {
+    public static String getProfileForDimension(ResourceKey<Level> type) {
         if (dimensionProfileCache == null) {
             dimensionProfileCache = new HashMap<>();
             for (String dp : DIMENSION_PROFILES.get()) {
@@ -61,7 +61,7 @@ public class Config {
                 if (split.length != 2) {
                     LostCities.getLogger().error("Bad format for config value: '" + dp +"'!");
                 } else {
-                    RegistryKey<World> dimensionType = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(split[0]));
+                    ResourceKey<Level> dimensionType = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(split[0]));
                     if (dimensionType != null) {
                         String profileName = split[1];
                         LostCityProfile profile = LostCityConfiguration.standardProfiles.get(profileName);
@@ -91,7 +91,7 @@ public class Config {
                 }
             }
             if (!selectedProfile.isEmpty()) {
-                dimensionProfileCache.put(World.OVERWORLD, selectedProfile);
+                dimensionProfileCache.put(Level.OVERWORLD, selectedProfile);
                 String json = Config.SELECTED_CUSTOM_JSON.get();
                 if (json != null && !json.isEmpty()) {
                     LostCityProfile profile = new LostCityProfile("customized", json);
@@ -102,10 +102,10 @@ public class Config {
                 }
             }
 
-            String profile = getProfileForDimension(World.OVERWORLD);
+            String profile = getProfileForDimension(Level.OVERWORLD);
             if (profile != null && !profile.isEmpty()) {
                 if (LostCityConfiguration.standardProfiles.get(profile).GENERATE_NETHER) {
-                    dimensionProfileCache.put(World.NETHER, "cavern");
+                    dimensionProfileCache.put(Level.NETHER, "cavern");
                 }
             }
         }

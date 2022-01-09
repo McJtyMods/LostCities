@@ -11,16 +11,16 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.CitySphere;
 import mcjty.lostcities.worldgen.lost.Railway;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
 
-public class CommandDebug implements Command<CommandSource> {
+public class CommandDebug implements Command<CommandSourceStack> {
 
     private static final CommandDebug CMD = new CommandDebug();
 
-    public static ArgumentBuilder<CommandSource, ?> register(CommandDispatcher<CommandSource> dispatcher) {
+    public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         return Commands.literal("debug")
                 .requires(cs -> cs.hasPermission(0))
                 .executes(CMD);
@@ -28,8 +28,8 @@ public class CommandDebug implements Command<CommandSource> {
 
 
     @Override
-    public int run(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        ServerPlayerEntity player = context.getSource().getPlayerOrException();
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
         if (player != null) {
             BlockPos position = player.blockPosition();
             IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getLevel());

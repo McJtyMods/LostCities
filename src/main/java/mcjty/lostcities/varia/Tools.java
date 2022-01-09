@@ -2,21 +2,20 @@ package mcjty.lostcities.varia;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.*;
-import net.minecraft.command.arguments.BlockStateParser;
-import net.minecraft.state.properties.Half;
-import net.minecraft.state.properties.RailShape;
-import net.minecraft.state.properties.SlabType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.datafix.fixes.BlockStateFlatteningMap;
-import net.minecraft.util.datafix.fixes.ItemStackDataFlattening;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.util.registry.MutableRegistry;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.commands.arguments.blocks.BlockStateParser;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.RailShape;
+import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.datafix.fixes.BlockStateData;
+import net.minecraft.util.datafix.fixes.ItemStackTheFlatteningFix;
+import net.minecraft.util.Mth;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -25,6 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.PoweredRailBlock;
+import net.minecraft.world.level.block.RailBlock;
+import net.minecraft.world.level.block.RedstoneWallTorchBlock;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class Tools {
 
@@ -67,11 +76,11 @@ public class Tools {
             return getLadderState(meta);
         }
 
-        String converted = ItemStackDataFlattening.updateItem(s, meta);
+        String converted = ItemStackTheFlatteningFix.updateItem(s, meta);
         if (converted != null) {
             s = converted;
         } else {
-            converted = BlockStateFlatteningMap.upgradeBlock(s);
+            converted = BlockStateData.upgradeBlock(s);
             if (converted != null) {
                 s = converted;
             }
@@ -88,15 +97,15 @@ public class Tools {
     public static ResourceLocation getBiomeId(Biome biome) {
         // @todo use IWorld.registryAccess()
         if (biome.getRegistryName() == null) {
-            Optional<MutableRegistry<Biome>> biomeRegistry = DynamicRegistries.builtin().registry(Registry.BIOME_REGISTRY);
-            return biomeRegistry.map(r -> r.getResourceKey(biome).map(RegistryKey::location).orElse(null)).orElse(null);
+            Optional<? extends Registry<Biome>> biomeRegistry = RegistryAccess.builtin().registry(Registry.BIOME_REGISTRY);
+            return biomeRegistry.map(r -> r.getResourceKey(biome).map(ResourceKey::location).orElse(null)).orElse(null);
         } else {
             return biome.getRegistryName();
         }
     }
 
     private static BlockState getLadderState(int meta) {
-        Direction direction = Direction.values()[MathHelper.abs(meta % Direction.values().length)];
+        Direction direction = Direction.values()[Mth.abs(meta % Direction.values().length)];
         if (direction.getAxis() == Direction.Axis.Y) {
             direction = Direction.NORTH;
         }
@@ -131,13 +140,13 @@ public class Tools {
 
     private static BlockState getStairsState(int meta, BlockState state) {
         return state
-                .setValue(StairsBlock.FACING, getStairsDirection(meta))
-                .setValue(StairsBlock.HALF, getStairsHalf(meta));
+                .setValue(StairBlock.FACING, getStairsDirection(meta))
+                .setValue(StairBlock.HALF, getStairsHalf(meta));
     }
 
     private static Direction getStairsDirection(int meta) {
         int index = 5 - (meta & 3);
-        return Direction.values()[MathHelper.abs(index % Direction.values().length)];
+        return Direction.values()[Mth.abs(index % Direction.values().length)];
     }
 
     private static Half getStairsHalf(int meta) {

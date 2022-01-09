@@ -7,25 +7,22 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.function.Function;
 
 public class Highway {
 
     private static PerlinNoiseGenerator14 perlinX = null;
     private static PerlinNoiseGenerator14 perlinZ = null;
-    private static Map<ChunkCoord, Integer> xHighwayLevelCache = new HashMap<>();
-    private static Map<ChunkCoord, Integer> zHighwayLevelCache = new HashMap<>();
+    private static final Map<ChunkCoord, Integer> xHighwayLevelCache = new HashMap<>();
+    private static final Map<ChunkCoord, Integer> zHighwayLevelCache = new HashMap<>();
 
 
     private static void makePerlin(long seed) {
         if (perlinX == null) {
-            Random random = new Random(seed);
-            perlinX = new PerlinNoiseGenerator14(random, 4);
+            perlinX = new PerlinNoiseGenerator14(seed, 4);
         }
         if (perlinZ == null) {
-            Random random = new Random(seed ^ 879190747L);
-            perlinZ = new PerlinNoiseGenerator14(random, 4);
+            perlinZ = new PerlinNoiseGenerator14(seed, 4);
         }
     }
 

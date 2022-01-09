@@ -1,29 +1,29 @@
 package mcjty.lostcities.network;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class PacketRequestProfile {
 
-    private RegistryKey<World> dimension;
+    private ResourceKey<Level> dimension;
 
-    public PacketRequestProfile(PacketBuffer buf) {
-        dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
+    public PacketRequestProfile(FriendlyByteBuf buf) {
+        dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceLocation(dimension.location());
     }
 
     public PacketRequestProfile() {
     }
 
-    public PacketRequestProfile(RegistryKey<World> dimension) {
+    public PacketRequestProfile(ResourceKey<Level> dimension) {
         this.dimension = dimension;
     }
 

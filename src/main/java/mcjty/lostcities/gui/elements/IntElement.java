@@ -1,17 +1,17 @@
 package mcjty.lostcities.gui.elements;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.TextComponent;
 
 public class IntElement extends GuiElement {
 
     private final GuiLCConfig gui;
     private String label = null;
     private String prefix = null;
-    private final TextFieldWidget field;
+    private final EditBox field;
     private final String attribute;
 
     public IntElement(GuiLCConfig gui, String page, int x, int y, String attribute) {
@@ -19,9 +19,9 @@ public class IntElement extends GuiElement {
         this.gui = gui;
         this.attribute = attribute;
         Integer c = gui.getLocalSetup().get().map(h -> (Integer) h.toConfiguration().get(attribute)).orElse(0);
-        field = new TextFieldWidget(gui.getFont(), x, y, 45, 16, new StringTextComponent(Integer.toString(c))) {
+        field = new EditBox(gui.getFont(), x, y, 45, 16, new TextComponent(Integer.toString(c))) {
             @Override
-            public void renderToolTip(MatrixStack stack, int x, int y) {
+            public void renderToolTip(PoseStack stack, int x, int y) {
                 gui.getLocalSetup().get().ifPresent(h -> {
                     gui.renderTooltip(stack, h.toConfiguration().getValue(attribute).getComment(), x, y);
                 });
@@ -66,7 +66,7 @@ public class IntElement extends GuiElement {
     }
 
     @Override
-    public void render(MatrixStack stack) {
+    public void render(PoseStack stack) {
         if (field.visible) {
             if (label != null) {
                 gui.drawString(stack, gui.getFont(), label, 10, y + 5, 0xffffffff);

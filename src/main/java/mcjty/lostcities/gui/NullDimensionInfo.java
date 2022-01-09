@@ -6,15 +6,15 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 
 import java.util.Random;
 
@@ -88,11 +88,11 @@ public class NullDimensionInfo implements IDimensionInfo {
         random = new Random(seed);
         feature = new LostCityTerrainFeature(this, profile, getRandom());
         feature.setupStates(profile);
-        biomeRegistry = DynamicRegistries.builtin().registry(Registry.BIOME_REGISTRY).get();
+        biomeRegistry = RegistryAccess.builtin().registry(Registry.BIOME_REGISTRY).get();
     }
 
     @Override
-    public void setWorld(ISeedReader world) {
+    public void setWorld(WorldGenLevel world) {
     }
 
     @Override
@@ -101,13 +101,13 @@ public class NullDimensionInfo implements IDimensionInfo {
     }
 
     @Override
-    public ISeedReader getWorld() {
+    public WorldGenLevel getWorld() {
         return null;
     }
 
     @Override
-    public RegistryKey<World> getType() {
-        return World.OVERWORLD;
+    public ResourceKey<Level> getType() {
+        return Level.OVERWORLD;
     }
 
     @Override
@@ -187,18 +187,21 @@ public class NullDimensionInfo implements IDimensionInfo {
 
     @Override
     public Biome getBiome(BlockPos pos) {
-        RegistryKey<Biome> biome = Biomes.PLAINS;
+        ResourceKey<Biome> biome = Biomes.PLAINS;
         ChunkPos cp = new ChunkPos(pos);
         char b = getBiomeChar(cp.x, cp.z);
-        switch (b) {
-            case 'p': biome = Biomes.PLAINS; break;
-            case '-': biome = Biomes.OCEAN; break;
-            case '=': biome = Biomes.RIVER; break;
-            case '#': biome = Biomes.MOUNTAIN_EDGE; break;
-            case '+': biome = Biomes.MOUNTAINS; break;
-            case '*': biome = Biomes.BEACH; break;
-            case 'd': biome = Biomes.DESERT; break;
-        }
+        biome = switch (b) {
+            case 'p' -> Biomes.PLAINS;
+            case '-' -> Biomes.OCEAN;
+            case '=' -> Biomes.RIVER;
+            case '#' -> Biomes.STONY_PEAKS;
+            // @todo 1.18
+            case '+' -> Biomes.JAGGED_PEAKS;
+            // @todo 1.18
+            case '*' -> Biomes.BEACH;
+            case 'd' -> Biomes.DESERT;
+            default -> Biomes.PLAINS;
+        };
         return biomeRegistry.get(biome.location());
     }
 }

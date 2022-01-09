@@ -1,24 +1,24 @@
 package mcjty.lostcities.network;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class PacketReturnProfileToClient {
 
-    private RegistryKey<World> dimension;
+    private ResourceKey<Level> dimension;
     private String profile;
 
-    public PacketReturnProfileToClient(PacketBuffer buf) {
-        dimension = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
+    public PacketReturnProfileToClient(FriendlyByteBuf buf) {
+        dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
         profile = buf.readUtf(32767);
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceLocation(dimension.location());
         buf.writeUtf(profile);
     }
@@ -26,7 +26,7 @@ public class PacketReturnProfileToClient {
     public PacketReturnProfileToClient() {
     }
 
-    public PacketReturnProfileToClient(RegistryKey<World> dimension, String profileName) {
+    public PacketReturnProfileToClient(ResourceKey<Level> dimension, String profileName) {
         this.dimension = dimension;
         this.profile = profileName;
     }

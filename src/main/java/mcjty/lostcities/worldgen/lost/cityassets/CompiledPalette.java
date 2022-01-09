@@ -2,7 +2,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
 

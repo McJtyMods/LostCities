@@ -1,15 +1,15 @@
 package mcjty.lostcities.worldgen;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 public class WorldGenerationTools {
 
-    public static int findUpsideDownEmptySpot(World world, int x, int z) {
+    public static int findUpsideDownEmptySpot(Level world, int x, int z) {
         for (int y = 90 ; y > 0 ; y--) {
             if (world.isEmptyBlock(new BlockPos(x, y, z)) && world.isEmptyBlock(new BlockPos(x, y+1, z)) && world.isEmptyBlock(new BlockPos(x, y+2, z))
                     && world.isEmptyBlock(new BlockPos(x, y+3, z)) && world.isEmptyBlock(new BlockPos(x, y+4, z))) {
@@ -21,8 +21,8 @@ public class WorldGenerationTools {
 
 
 
-    public static int findSuitableEmptySpot(World world, int x, int z) {
-        int y = world.getHeightmapPos(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, new BlockPos(x, 0, z)).getY();
+    public static int findSuitableEmptySpot(Level world, int x, int z) {
+        int y = world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, new BlockPos(x, 0, z)).getY();
         if (y == -1) {
             return -1;
         }
@@ -47,7 +47,7 @@ public class WorldGenerationTools {
     }
 
     // Return true if this block is solid.
-    public static boolean isSolid(World world, int x, int y, int z) {
+    public static boolean isSolid(Level world, int x, int y, int z) {
         if (world.isEmptyBlock(new BlockPos(x, y, z))) {
             return false;
         }
@@ -56,7 +56,7 @@ public class WorldGenerationTools {
     }
 
     // Return true if this block is solid.
-    public static boolean isAir(World world, int x, int y, int z) {
+    public static boolean isAir(Level world, int x, int y, int z) {
         if (world.isEmptyBlock(new BlockPos(x, y, z))) {
             return true;
         }
@@ -66,7 +66,7 @@ public class WorldGenerationTools {
 
     // Starting at the current height, go down and fill all air blocks with stone until a
     // non-air block is encountered.
-    public static void fillEmptyWithStone(World world, int x, int y, int z) {
+    public static void fillEmptyWithStone(Level world, int x, int y, int z) {
         while (y > 0 && !isSolid(world, x, y, z)) {
             world.setBlock(new BlockPos(x, y, z), Blocks.STONE.defaultBlockState(), 2);
             y--;

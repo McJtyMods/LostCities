@@ -2,7 +2,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Predicate;

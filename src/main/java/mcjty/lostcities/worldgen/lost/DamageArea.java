@@ -5,9 +5,9 @@ import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class DamageArea {
     private final int chunkX;
     private final int chunkZ;
     private final List<Explosion> explosions = new ArrayList<>();
-    private final AxisAlignedBB chunkBox;
+    private final AABB chunkBox;
     private final LostCityProfile profile;
 
     public DamageArea(int chunkX, int chunkZ, IDimensionInfo provider, BuildingInfo info) {
@@ -29,7 +29,7 @@ public class DamageArea {
         this.profile = info.profile;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
-        chunkBox = new AxisAlignedBB(chunkX * 16, 0, chunkZ * 16, chunkX * 16 + 15, 256, chunkZ * 16 + 15);
+        chunkBox = new AABB(chunkX * 16, 0, chunkZ * 16, chunkX * 16 + 15, 256, chunkZ * 16 + 15);
 
         Random rand = new Random(seed + chunkZ * 295075153L + chunkX * 899826547L);
         rand.nextFloat();
@@ -124,7 +124,7 @@ public class DamageArea {
 
     // Return true if this subchunk (every 16 blocks) is affected by explosions
     public boolean hasExplosions(int y) {
-        AxisAlignedBB box = new AxisAlignedBB(chunkX * 16, y * 16, chunkZ * 16, chunkX * 16 + 15, y * 16 + 15, chunkZ * 16 + 15);
+        AABB box = new AABB(chunkX * 16, y * 16, chunkZ * 16, chunkX * 16 + 15, y * 16 + 15, chunkZ * 16 + 15);
         for (Explosion explosion : explosions) {
             double dmin = GeometryTools.squaredDistanceBoxPoint(box, explosion.getCenter());
             if (dmin <= explosion.getRadius() * explosion.getRadius()) {
@@ -136,7 +136,7 @@ public class DamageArea {
 
     // Return true if this subchunk is completely destroyed by an explosion
     public boolean isCompletelyDestroyed(int y) {
-        AxisAlignedBB box = new AxisAlignedBB(chunkX * 16, y * 16, chunkZ * 16, chunkX * 16 + 15, y * 16 + 15, chunkZ * 16 + 15);
+        AABB box = new AABB(chunkX * 16, y * 16, chunkZ * 16, chunkX * 16 + 15, y * 16 + 15, chunkZ * 16 + 15);
         for (Explosion explosion : explosions) {
             double dmax = GeometryTools.maxSquaredDistanceBoxPoint(box, explosion.getCenter());
             int sqdist = explosion.getRadius() * explosion.getRadius();
