@@ -1,3 +1,6 @@
+Upcoming:
+- Better at preventing cities where there are villages
+
 1.18-5.0.0:
 - First port of Lost Cities to 1.18
 

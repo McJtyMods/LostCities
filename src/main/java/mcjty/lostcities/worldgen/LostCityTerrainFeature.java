@@ -1,5 +1,6 @@
 package mcjty.lostcities.worldgen;
 
+import it.unimi.dsi.fastutil.longs.LongSet;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -324,6 +326,15 @@ public class LostCityTerrainFeature {
         streetBorder = (16 - cityStyle.getStreetWidth()) / 2;
 
         boolean doCity = info.isCity || (info.outsideChunk && info.hasBuilding);
+
+        // Check if there is no village here
+        Map<StructureFeature<?>, LongSet> references = region.getChunk(chunkX, chunkZ).getAllReferences();
+        if (references.containsKey(StructureFeature.VILLAGE)) {
+            if (!references.get(StructureFeature.VILLAGE).isEmpty()) {
+                doCity = false;
+            }
+        }
+
         // If this chunk has a building or street but we're in a floating profile and
         // we happen to have a void chunk we detect that here and go back to normal chunk generation
         // anyway
