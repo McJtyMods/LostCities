@@ -2,7 +2,6 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.commands.ModCommands;
 import mcjty.lostcities.config.LostCityConfiguration;
-import mcjty.lostcities.gui.LostCitySetup;
 import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.LostCityFeature;
@@ -24,7 +23,6 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -45,12 +43,12 @@ public class ForgeEventHandlers {
         }
     }
 
-    @SubscribeEvent
-    public void onServerStop(ServerStoppingEvent event) {
-        LostCitySetup.CLIENT_SETUP.reset();
-        Config.reset();
-    }
-
+//    @SubscribeEvent
+//    public void onServerStop(ServerStoppingEvent event) {
+//        LostCitySetup.CLIENT_SETUP.reset();
+//        Config.reset();
+//    }
+//
 //    @SubscribeEvent
 //    public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
 //        IWorld world = event.getWorld();
