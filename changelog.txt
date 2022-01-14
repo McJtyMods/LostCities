@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem with the bedrock layer generating at 0 under city buildings
+
 1.18-5.0.1:
 - Better at preventing cities where there are villages
 

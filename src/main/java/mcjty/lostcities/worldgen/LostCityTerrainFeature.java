@@ -17,6 +17,7 @@ import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.*;
@@ -251,61 +252,13 @@ public class LostCityTerrainFeature {
         return (gSeed >> 16) & 0x7F;
     }
 
-    public void generateDummy(WorldGenRegion region, ChunkAccess chunk) {
-
-        WorldGenRegion oldRegion = driver.getRegion();
-        ChunkAccess oldChunk = driver.getPrimer();
-        driver.setPrimer(region, chunk);
-
-        street = Blocks.STONE_BRICKS.defaultBlockState();
-
-        int chunkX = chunk.getPos().x;
-        int chunkZ = chunk.getPos().z;
-        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
-        ChunkHeightmap heightmap = getHeightmap(chunkX, chunkZ, region);
-        Random r = new Random(chunkX * 257017164707L + chunkZ * 101754694003L);
-        r.nextFloat();
-        if (r.nextFloat() < .4) {
-            for (int x = 0 ; x < 16 ; x++) {
-                for (int z = 0 ; z < 16 ; z++) {
-                    int height = r.nextInt(50) + 30;
-                    driver.current(x, 30, z);
-                    while (height > 0) {
-                        if (r.nextFloat() < 0.01) {
-                            driver.add(glowstone);
-                        } else {
-                            driver.add(street);
-                        }
-                        height--;
-                    }
-                }
-            }
-        } else if (r.nextFloat() < .4) {
-            for (int x = 0 ; x < 16 ; x++) {
-                for (int z = 0 ; z < 16 ; z++) {
-                    int height = r.nextInt(50) + 30;
-                    driver.current(x, 30, z);
-                    while (height > 0) {
-                        if (r.nextFloat() < 0.01) {
-                            driver.add(glowstone);
-                        } else {
-                            driver.add(air);
-                        }
-                        height--;
-                    }
-                }
-            }
-        }
-
-        driver.setPrimer(oldRegion, oldChunk);
-    }
-
     private boolean isVoid(int x, int z) {
         driver.current(x, 255, z);
-        while (driver.getBlock() == air && driver.getY() > 0) {
+        int minHeight = provider.getWorld().getMinBuildHeight();
+        while (driver.getBlock() == air && driver.getY() > minHeight) {
             driver.decY();
         }
-        return driver.getY() == 0;
+        return driver.getY() == minHeight;
     }
 
     public void generate(WorldGenRegion region, ChunkAccess chunk) {
@@ -922,8 +875,9 @@ public class LostCityTerrainFeature {
     private void moveUp(BuildingInfo info, int x, int z, int height, boolean dowater) {
         // Find the first non-empty block starting at the given height
         driver.current(x, height, z);
+        int minHeight = provider.getWorld().getMinBuildHeight();
         // We assume here we are not in a void chunk
-        while (isEmpty(driver.getBlock()) && driver.getY() > 0) {
+        while (isEmpty(driver.getBlock()) && driver.getY() > minHeight) {
             driver.decY();
         }
 
@@ -1071,8 +1025,9 @@ public class LostCityTerrainFeature {
 
     @Deprecated
     private void flattenChunkBorder(BuildingInfo info, int x, int offset, int z, Random rand, int level) {
-        driver.current(x, 0, z);
-        for (int y = 0; y <= (level - offset - rand.nextInt(2)); y++) {
+        int minHeight = provider.getWorld().getMinBuildHeight();
+        driver.current(x, minHeight, z);
+        for (int y = minHeight; y <= (level - offset - rand.nextInt(2)); y++) {
             BlockState b = driver.getBlock();
             if (b != bedrock) {
                 driver.add(base);
@@ -1138,9 +1093,10 @@ public class LostCityTerrainFeature {
         rand.nextFloat();
 
         if (info.profile.isDefault()) {
+            int minHeight = provider.getWorld().getMinBuildHeight();
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
-                    driver.setBlockRange(x, 0, z, info.profile.BEDROCK_LAYER, bedrock);
+                    driver.setBlockRange(x, minHeight, z, minHeight + info.profile.BEDROCK_LAYER, bedrock);
                 }
             }
 
@@ -1450,10 +1406,10 @@ public class LostCityTerrainFeature {
         private float avgdamage;
         private int cntMindamage;  // Number of blocks that receive almost no damage
 
-        public Blob(int starty) {
+        public Blob(int starty, LevelReader levelReader) {
             this.starty = starty;
-            lowestY = 256;
-            highestY = 0;
+            lowestY = levelReader.getMaxBuildHeight();
+            highestY = levelReader.getMinBuildHeight();
         }
 
         public float getAvgdamage() {
@@ -1630,7 +1586,7 @@ public class LostCityTerrainFeature {
                     if (p != air && p != liquid) {
                         Blob blob = findBlob(blobs, driver.getCurrentCopy());
                         if (blob == null) {
-                            blob = new Blob(start);
+                            blob = new Blob(start, provider.getWorld());
                             // We must make a copy of the driver here so that we can safely modify it
                             BlockPos current = driver.getCurrentCopy();
                             blob.scan(info, driver, air, liquid, new BlockPos(x, y, z));
@@ -1656,7 +1612,7 @@ public class LostCityTerrainFeature {
 //            }
 //        }
 
-        Blob blocksToMove = new Blob(0);
+        Blob blocksToMove = new Blob(provider.getWorld().getMinBuildHeight(), provider.getWorld());
 
         // Sort all blobs we delete with lowest first
         blobs.stream().filter(blob -> blob.destroyOrMoveThis(provider, info)).sorted().forEachOrdered(blob -> {
@@ -1922,11 +1878,14 @@ public class LostCityTerrainFeature {
      */
     private void fillToBedrockStreetBlock(BuildingInfo info) {
         // Base blocks below streets
+        int minHeight = provider.getWorld().getMinBuildHeight();
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int y = info.getCityGroundLevel()-1;
                 driver.current(x, y, z);
-                while (driver.getY() > info.profile.BEDROCK_LAYER && isEmpty(driver.getBlock())) {
+                while (true) {
+                    if (!(driver.getY() > (minHeight + info.profile.BEDROCK_LAYER) && isEmpty(driver.getBlock())))
+                        break;
                     driver.block(base);
                     driver.decY();
                 }
@@ -2083,6 +2042,7 @@ public class LostCityTerrainFeature {
                 for (int z = 0; z < 16; z++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
+                    // It's ok to only go down to 0 as we are not expecting to go lower then that
                     while (driver.getBlockDown() == air && driver.getY() > 0) {
                         driver.decY();
                     }
@@ -2100,6 +2060,7 @@ public class LostCityTerrainFeature {
                 for (int z = 0; z < 16; z++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
+                    // It's ok to only go down to 0 as we are not expecting to go lower then that
                     while (driver.getBlockDown() == air && driver.getY() > 0) {
                         driver.decY();
                     }
@@ -2117,6 +2078,7 @@ public class LostCityTerrainFeature {
                 for (int x = 0; x < 16; x++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
+                    // It's ok to only go down to 0 as we are not expecting to go lower then that
                     while (driver.getBlockDown() == air && driver.getY() > 0) {
                         driver.decY();
                     }
@@ -2134,6 +2096,7 @@ public class LostCityTerrainFeature {
                 for (int x = 0; x < 16; x++) {
                     driver.current(x, height, z);
                     // @todo can be more optimal? Only go down to non air in case random succeeds?
+                    // It's ok to only go down to 0 as we are not expecting to go lower then that
                     while (driver.getBlockDown() == air && driver.getY() > 0) {
                         driver.decY();
                     }
@@ -2586,13 +2549,14 @@ public class LostCityTerrainFeature {
             // generated chunks as opposed to blank chunks with non-floating worlds
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
-                    driver.current(x, 255, z);
-                    while (driver.getBlock() == air && driver.getY() > 0) {
+                    driver.current(x, provider.getWorld().getMaxBuildHeight()-1, z);
+                    int minHeight = provider.getWorld().getMinBuildHeight();
+                    while (driver.getBlock() == air && driver.getY() > minHeight) {
                         driver.decY();
                     }
 
                     int height = driver.getY();//heightmap.getHeight(x, z);
-                    if (height > 1 && height < lowestLevel - 1) {
+                    if (height > minHeight+1 && height < lowestLevel - 1) {
                         driver.setBlockRange(x, height+1, z, lowestLevel, base);
                     }
                     // Also clear the inside of buildings to avoid geometry that doesn't really belong there
