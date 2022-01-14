@@ -27,7 +27,16 @@ import java.util.Random;
 
 public class LostCityFeature extends Feature<NoFeatureConfig> {
 
-    private Map<RegistryKey<World>, IDimensionInfo> dimensionInfo = new HashMap<>();
+    /**
+     * On dedicated servers the dimensionInfo cache is no problem. The server starts only once
+     * and will have the correct dimension info and for the clients it doesn't matter.
+     * However, to make sure that on a single player world this cache is cleared when the player
+     * exits the world and creates a new one we keep a static flag which is incremented whenever
+     * the player exits the world. That is then used to help clear this cache
+     */
+    private final Map<RegistryKey<World>, IDimensionInfo> dimensionInfo = new HashMap<>();
+    public static int globalDimensionInfoDirtyCounter = 0;
+    private int dimensionInfoDirtyCounter = -1;
 
     public static ConfiguredFeature<?, ?> LOSTCITY_CONFIGURED_FEATURE;
 
@@ -66,6 +75,11 @@ public class LostCityFeature extends Feature<NoFeatureConfig> {
 
     @Nullable
     public IDimensionInfo getDimensionInfo(ISeedReader world) {
+        if (globalDimensionInfoDirtyCounter != dimensionInfoDirtyCounter) {
+            // Force clear of cache
+            dimensionInfo.clear();
+            dimensionInfoDirtyCounter = globalDimensionInfoDirtyCounter;
+        }
         RegistryKey<World> type = world.getLevel().dimension();
         String profileName = Config.getProfileForDimension(type);
         if (profileName != null) {

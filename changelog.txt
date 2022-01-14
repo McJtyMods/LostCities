@@ -1,3 +1,6 @@
+Upcoming:
+- Properly fixed the problem on single player where exiting the world would not reset everything and keep settings for the next created world
+
 1.16-4.0.10-beta:
 - Fixed the problem where beds would explode right after teleporting to and from the Lost City dimension
 

@@ -2,7 +2,6 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.commands.ModCommands;
 import mcjty.lostcities.config.LostCityConfiguration;
-import mcjty.lostcities.gui.LostCitySetup;
 import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.LostCityFeature;
@@ -23,7 +22,6 @@ import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgeEventHandlers {
@@ -39,12 +37,6 @@ public class ForgeEventHandlers {
         if (!BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.VOID)) {
             event.getGeneration().getFeatures(GenerationStage.Decoration.RAW_GENERATION).add(() -> LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
         }
-    }
-
-    @SubscribeEvent
-    public void onServerStop(FMLServerStoppingEvent event) {
-        LostCitySetup.CLIENT_SETUP.reset();
-        Config.reset();
     }
 
 //    @SubscribeEvent

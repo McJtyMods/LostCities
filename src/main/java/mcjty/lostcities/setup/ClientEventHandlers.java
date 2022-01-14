@@ -2,12 +2,15 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.gui.GuiLCConfig;
+import mcjty.lostcities.gui.LostCitySetup;
+import mcjty.lostcities.worldgen.LostCityFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.CreateWorldScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ClientEventHandlers {
@@ -64,5 +67,13 @@ public class ClientEventHandlers {
             });
             event.addWidget(lostCitiesButton);
         }
+    }
+
+    // To clean up client-side and single player
+    @SubscribeEvent
+    public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        LostCitySetup.CLIENT_SETUP.reset();
+        Config.reset();
+        LostCityFeature.globalDimensionInfoDirtyCounter++;
     }
 }
