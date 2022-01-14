@@ -4,7 +4,6 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
-import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
@@ -28,13 +27,20 @@ import java.util.Map;
 
 public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
 
+    /**
+     * On dedicated servers the dimensionInfo cache is no problem. The server starts only once
+     * and will have the correct dimension info and for the clients it doesn't matter.
+     * However, to make sure that on a single player world this cache is cleared when the player
+     * exits the world and creates a new one we keep a static flag which is incremented whenever
+     * the player exits the world. That is then used to help clear this cache
+     */
     private final Map<ResourceKey<Level>, IDimensionInfo> dimensionInfo = new HashMap<>();
+    public static int globalDimensionInfoDirtyCounter = 0;
+    private int dimensionInfoDirtyCounter = -1;
 
     public static PlacedFeature LOSTCITY_CONFIGURED_FEATURE;
 
     public static void registerConfiguredFeatures() {
-        Registry<ConfiguredFeature<?, ?>> registry = BuiltinRegistries.CONFIGURED_FEATURE;
-
         LOSTCITY_CONFIGURED_FEATURE = registerPlacedFeature("configured_feature", Registration.LOSTCITY_FEATURE.configured(NoneFeatureConfiguration.INSTANCE),
                 CountPlacement.of(1));
     }
@@ -71,6 +77,11 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
 
     @Nullable
     public IDimensionInfo getDimensionInfo(WorldGenLevel world) {
+        if (globalDimensionInfoDirtyCounter != dimensionInfoDirtyCounter) {
+            // Force clear of cache
+            dimensionInfo.clear();
+            dimensionInfoDirtyCounter = globalDimensionInfoDirtyCounter;
+        }
         ResourceKey<Level> type = world.getLevel().dimension();
         String profileName = Config.getProfileForDimension(type);
         if (profileName != null) {

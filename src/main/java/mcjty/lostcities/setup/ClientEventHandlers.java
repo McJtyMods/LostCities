@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.gui.GuiLCConfig;
 import mcjty.lostcities.gui.LostCitySetup;
+import mcjty.lostcities.worldgen.LostCityFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
@@ -73,5 +74,6 @@ public class ClientEventHandlers {
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         LostCitySetup.CLIENT_SETUP.reset();
         Config.reset();
+        LostCityFeature.globalDimensionInfoDirtyCounter++;
     }
 }

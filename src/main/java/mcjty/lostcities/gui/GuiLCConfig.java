@@ -12,10 +12,10 @@ import mcjty.lostcities.worldgen.lost.Highway;
 import mcjty.lostcities.worldgen.lost.Railway;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
 
 import javax.annotation.Nullable;
@@ -41,11 +41,11 @@ public class GuiLCConfig extends Screen {
     private String mode = MODES.get(0);
 
     private long seed = 3439249320423L;
-    private Random random = new Random();
+    private final Random random = new Random();
 
-    private List<GuiElement> elements = new ArrayList<>();
+    private final List<GuiElement> elements = new ArrayList<>();
 
-    private LostCitySetup localSetup = new LostCitySetup(this::refreshPreview);
+    private final LostCitySetup localSetup = new LostCitySetup(this::refreshPreview);
 
     public GuiLCConfig(Screen parent) { // @todo 1.16}, WorldType worldType) {
         super(new TextComponent("Lost City Configuration"));
@@ -72,7 +72,7 @@ public class GuiLCConfig extends Screen {
 
     @Override
     public void tick() {
-        elements.stream().forEach(GuiElement::tick);
+        elements.forEach(GuiElement::tick);
     }
 
     @Override
@@ -91,11 +91,11 @@ public class GuiLCConfig extends Screen {
         modeButton = addRenderableWidget(new ButtonExt(this, 290, 10, 100, 20, new TextComponent(mode), p -> toggleMode())
             .tooltip(new TextComponent("Switch between different configuration pages")));
 
-        Button doneButton = addRenderableWidget(new Button(10, this.height - 30, 120, 20,
+        addRenderableWidget(new Button(10, this.height - 30, 120, 20,
                 new TextComponent("Done"), p -> done()));
-        Button cancelButton = addRenderableWidget(new Button(this.width - 130, this.height - 30, 120, 20,
+        addRenderableWidget(new Button(this.width - 130, this.height - 30, 120, 20,
                 new TextComponent("Cancel"), p -> cancel()));
-        Button randomizeButton = addRenderableWidget(new ButtonExt(this, this.width - 35, 35, 30, 20, new TextComponent("Rnd"), p -> randomizePreview())
+        addRenderableWidget(new ButtonExt(this, this.width - 35, 35, 30, 20, new TextComponent("Rnd"), p -> randomizePreview())
                 .tooltip(new TextComponent("Randomize the seed for the preview (does not affect the generated world)")));
 
         initCities(110);
@@ -260,7 +260,6 @@ public class GuiLCConfig extends Screen {
 
     private void renderPreviewTransports(PoseStack stack, LostCityProfile profile) {
         renderPreviewMap(stack, profile, true);
-        Random rand = new Random(seed);
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
         for (int z = 0; z < 50; z++) {
             for (int x = 0; x < 50; x++) {
@@ -387,17 +386,17 @@ public class GuiLCConfig extends Screen {
             for (int x = 0; x < 50; x++) {
                 int sx = x * 3 + this.width - 160;
                 int sz = z * 3 + 50;
-                int color = 0x005500;
                 char b = diminfo.getBiomeChar(x, z);
-                switch (b) {
-                    case 'p': color = 0x005500; break;
-                    case '-': color = 0x000066; break;
-                    case '=': color = 0x000066; break;
-                    case '#': color = 0x447744; break;
-                    case '+': color = 0x335533; break;
-                    case '*': color = 0xcccc55; break;
-                    case 'd': color = 0xcccc55; break;
-                }
+                int color = switch (b) {
+                    case 'p' -> 0x005500;
+                    case '-' -> 0x000066;
+                    case '=' -> 0x000066;
+                    case '#' -> 0x447744;
+                    case '+' -> 0x335533;
+                    case '*' -> 0xcccc55;
+                    case 'd' -> 0xcccc55;
+                    default -> 0x005500;
+                };
                 fill(stack, sx, sz, sx + 3, sz + 3, 0xff000000 + soften(color, soft));
                 LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(x, z, diminfo);
                 if (characteristics.isCity) {
@@ -412,7 +411,7 @@ public class GuiLCConfig extends Screen {
     }
 
     private void updateValues() {
-        elements.stream().forEach(GuiElement::update);
+        elements.forEach(GuiElement::update);
         refreshPreview();
     }
 
@@ -422,7 +421,7 @@ public class GuiLCConfig extends Screen {
 
         boolean isCustomized = "customized".equals(localSetup.getProfileLabel());
         modeButton.active = localSetup.isCustomizable() || isCustomized;
-        elements.stream().forEach(s -> {
+        elements.forEach(s -> {
             s.setEnabled(isCustomized);
             s.setBasedOnMode(mode);
         });

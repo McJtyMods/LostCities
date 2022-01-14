@@ -44,12 +44,6 @@ public class ForgeEventHandlers {
     }
 
 //    @SubscribeEvent
-//    public void onServerStop(ServerStoppingEvent event) {
-//        LostCitySetup.CLIENT_SETUP.reset();
-//        Config.reset();
-//    }
-//
-//    @SubscribeEvent
 //    public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
 //        IWorld world = event.getWorld();
 //        if (!world.isRemote()) {
