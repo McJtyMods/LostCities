@@ -5,6 +5,7 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.LostCityFeature;
+import mcjty.lostcities.worldgen.lost.*;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
@@ -22,6 +23,8 @@ import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgeEventHandlers {
@@ -29,6 +32,16 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void commandRegister(RegisterCommandsEvent event) {
         ModCommands.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public void onServerStarting(FMLServerStartingEvent event) {
+        BuildingInfo.cleanCache();
+        Highway.cleanCache();
+        Railway.cleanCache();
+        BiomeInfo.cleanCache();
+        City.cleanCache();
+        CitySphere.cleanCache();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

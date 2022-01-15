@@ -4,7 +4,6 @@ import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.setup.ClientSetup;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
-import mcjty.lostcities.worldgen.lost.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -53,15 +52,6 @@ public class LostCities {
 
     public static Logger getLogger() {
         return logger;
-    }
-
-    private void cleanCaches() {
-        BuildingInfo.cleanCache();
-        Highway.cleanCache();
-        Railway.cleanCache();
-        BiomeInfo.cleanCache();
-        City.cleanCache();
-        CitySphere.cleanCache();
     }
 
     private void processIMC(final InterModProcessEvent event) {
