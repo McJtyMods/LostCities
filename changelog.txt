@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.0.3:
 - Fixed the Lost City dimension. Also added a safety check when trying to teleport to such a dimension (with the bed)
 
 1.18-5.0.2:
