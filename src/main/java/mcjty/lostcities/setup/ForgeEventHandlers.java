@@ -6,9 +6,12 @@ import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -316,8 +319,12 @@ public class ForgeEventHandlers {
         } else {
             event.setResult(Player.BedSleepingProblem.OTHER_PROBLEM);
             ServerLevel destWorld = event.getEntity().getCommandSenderWorld().getServer().getLevel(Registration.DIMENSION);
-            BlockPos location = findLocation(bedLocation, destWorld);
-            CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
+            if (destWorld == null) {
+                event.getPlayer().sendMessage(new TextComponent("Error finding Lost City dimension: " + Registration.DIMENSION.getRegistryName() + "!").withStyle(ChatFormatting.RED), Util.NIL_UUID);
+            } else {
+                BlockPos location = findLocation(bedLocation, destWorld);
+                CustomTeleporter.teleportToDimension(event.getPlayer(), destWorld, location);
+            }
         }
     }
 

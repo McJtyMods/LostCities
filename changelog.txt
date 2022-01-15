@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed the Lost City dimension. Also added a safety check when trying to teleport to such a dimension (with the bed)
+
 1.18-5.0.2:
 - Properly fixed the problem on single player where exiting the world would not reset everything and keep settings for the next created world
 - Fixed a problem with the bedrock layer generating at 0 under city buildings
