@@ -55,15 +55,6 @@ public class LostCities {
         return logger;
     }
 
-    private void cleanCaches() {
-        BuildingInfo.cleanCache();
-        Highway.cleanCache();
-        Railway.cleanCache();
-        BiomeInfo.cleanCache();
-        City.cleanCache();
-        CitySphere.cleanCache();
-    }
-
     private void processIMC(final InterModProcessEvent event) {
         event.getIMCStream().forEach(message -> {
             if ("getLostCities".equals(message.getMethod())) {
