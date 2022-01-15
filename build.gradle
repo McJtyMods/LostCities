@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
     }
 }
@@ -25,27 +25,13 @@ repositories {
     maven { // Patchouli
         url "https://maven.blamejared.com"
     }
-    maven {
-        name 'OC Repo'
-        url "http://maven.cil.li/"
-    }
     maven { // TOP
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
-    maven { // McJtyLib
-        url "http://maven.k-4u.nl"
-    }
-    maven { // OC Repo
-        url "http://maven.cil.li/"
-    }
     maven {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-    maven {
-        name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
     }
 }
 
@@ -107,9 +93,9 @@ jar {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     if (findProject(':TheOneProbe') != null) {
-        compile project(':TheOneProbe')
+        implementation project(':TheOneProbe')
     } else {
-        compile fg.deobf(project.dependencies.create("mcjty.theoneprobe:TheOneProbe-${top_version}") {
+        implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:TheOneProbe-${top_version}") {
             transitive = false
         })
     }
