@@ -1,5 +1,6 @@
 package mcjty.lostcities.api;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -16,4 +17,9 @@ public interface ILostCities {
      */
     @Nullable
     ILostCityInformation getLostInfo(Level world);
+
+    /**
+     * Register a lost city profile with a dimension
+     */
+    void registerDimension(ResourceKey<Level> key, String profile);
 }

@@ -1,13 +1,14 @@
 package mcjty.lostcities;
 
 import mcjty.lostcities.api.*;
+import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -29,6 +30,11 @@ public class LostCitiesImp implements ILostCities {
             return info.get(world.dimension());
         }
         return null;
+    }
+
+    @Override
+    public void registerDimension(ResourceKey<Level> key, String profile) {
+        Config.registerLostCityDimension(key, profile);
     }
 
     public static class LostCityInformation implements ILostCityInformation {

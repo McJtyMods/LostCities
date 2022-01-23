@@ -53,6 +53,14 @@ public class Config {
         dimensionProfileCache = null;
     }
 
+    // @todo BAD
+    public static void registerLostCityDimension(ResourceKey<Level> type, String profile) {
+        String profileForDimension = getProfileForDimension(type);
+        if (profileForDimension == null) {
+            dimensionProfileCache.put(type, profile);
+        }
+    }
+
     public static String getProfileForDimension(ResourceKey<Level> type) {
         if (dimensionProfileCache == null) {
             dimensionProfileCache = new HashMap<>();
