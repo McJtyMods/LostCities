@@ -19,7 +19,9 @@ public interface ILostCities {
     ILostCityInformation getLostInfo(Level world);
 
     /**
-     * Register a lost city profile with a dimension
+     * Register a lost city profile with a dimension. Note that this is not remembered!
+     * You need to do this again after loading your world. Preferably in the chunkGenerator
+     * (for example in buildSurface)
      */
     void registerDimension(ResourceKey<Level> key, String profile);
 }
