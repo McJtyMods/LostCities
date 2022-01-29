@@ -210,6 +210,18 @@ task("uploadJars", dependsOn: "reobf") {
 
 }
 
+task apiJar(type: Jar) {
+    classifier = "api"
+    from(sourceSets.main.output) {
+        include "mcjty/lostcities/api/**"
+    }
+}
+
+artifacts {
+    archives apiJar
+}
+
+
 publishing {
     publications.create('mavenJava', MavenPublication) {
         from components.java
