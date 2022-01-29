@@ -1,19 +1,17 @@
 package mcjty.lostcities.worldgen;
 
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.properties.WallSide;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.server.level.WorldGenRegion;
 
 import java.util.function.Predicate;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.CrossCollisionBlock;
-import net.minecraft.world.level.block.LadderBlock;
-import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ChunkDriver {
@@ -187,6 +185,10 @@ public class ChunkDriver {
         return StairsShape.STRAIGHT;
     }
 
+    private static WallSide canAttachWall(BlockState state) {
+        return canAttach(state) ? WallSide.LOW : WallSide.NONE;
+    }
+
     private static boolean canAttach(BlockState state) {
         if (state.isAir()) {
             return false;
@@ -213,6 +215,11 @@ public class ChunkDriver {
             state = state.setValue(CrossCollisionBlock.EAST, canAttach(eastState));
             state = state.setValue(CrossCollisionBlock.NORTH, canAttach(northState));
             state = state.setValue(CrossCollisionBlock.SOUTH, canAttach(southState));
+        } else if (state.getBlock() instanceof WallBlock) {
+            state = state.setValue(WallBlock.WEST_WALL, canAttachWall(westState));
+            state = state.setValue(WallBlock.EAST_WALL, canAttachWall(eastState));
+            state = state.setValue(WallBlock.NORTH_WALL, canAttachWall(northState));
+            state = state.setValue(WallBlock.SOUTH_WALL, canAttachWall(southState));
         } else if (state.getBlock() instanceof StairBlock) {
             state = state.setValue(StairBlock.SHAPE, getShapeProperty(state, region, pos.set(cx, cy, cz)));
         }
