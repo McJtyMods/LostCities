@@ -209,3 +209,48 @@ task("uploadJars", dependsOn: "reobf") {
     }
 
 }
+
+publishing {
+    publications.create('mavenJava', MavenPublication) {
+        from components.java
+        artifact apiJar
+
+        artifactId = project.archivesBaseName
+        pom {
+            name = 'LostCities'
+            description = 'Lost Cities'
+            scm {
+                url = 'https://github.com/McJtyMods/LostCities'
+                connection = 'scm:git:git@github.com:McJtyMods/LostCities.git'
+                developerConnection = 'scm:git:git@github.com:McJtyMods/LostCities.git'
+            }
+            issueManagement {
+                system = 'github'
+                url = 'https://github.com/McJtyMods/LostCities/issues'
+            }
+            licenses {
+                license {
+                    name = 'MIT'
+                    distribution = 'repo'
+                }
+            }
+            developers {
+                developer {
+                    id = 'McJty'
+                    name = 'McJty'
+                    roles = ['developer']
+                }
+            }
+        }
+    }
+    repositories {
+        if (System.getenv('local_maven') != null) {
+            maven {
+                name = 'local'
+                url = 'file://' + System.getenv('local_maven')
+            }
+        }
+    }
+}
+
+
