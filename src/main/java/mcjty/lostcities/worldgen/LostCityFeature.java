@@ -5,11 +5,8 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
 import net.minecraft.core.Holder;
-import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -51,10 +48,8 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     }
 
     private static <C extends FeatureConfiguration, F extends Feature<C>> Holder<PlacedFeature> registerPlacedFeature(PlacementModifier... placementModifiers) {
-        Holder<ConfiguredFeature<NoneFeatureConfiguration, ?>> configuredFeatureHolder = FeatureUtils.register("lc_configured_1", Registration.LOSTCITY_FEATURE, NoneFeatureConfiguration.NONE);
-        Holder<ConfiguredFeature<?, ?>> holder = BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_FEATURE, new ResourceLocation("lc_configured_2"), configuredFeatureHolder.value());
-        Holder<PlacedFeature> placedFeature = PlacementUtils.register("lc_configured", holder, placementModifiers);
-        return placedFeature;
+        Holder<ConfiguredFeature<NoneFeatureConfiguration, ?>> configuredFeatureHolder = Holder.direct(new ConfiguredFeature<>(Registration.LOSTCITY_FEATURE, FeatureConfiguration.NONE));
+        return PlacementUtils.register("lc_configured", configuredFeatureHolder, placementModifiers);
     }
 
 

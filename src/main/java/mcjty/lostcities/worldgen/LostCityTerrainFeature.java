@@ -144,6 +144,7 @@ public class LostCityTerrainFeature {
 
     public static Set<BlockState> getGlassStates() {
         if (glassStates == null) {
+            glassStates = new HashSet<>();
             for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(Tags.Blocks.GLASS)) {
                 addStates(bh.value(), glassStates);
             }
@@ -164,10 +165,10 @@ public class LostCityTerrainFeature {
         if (statesNeedingTodo == null) {
             statesNeedingTodo = new HashSet<>();
             for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(BlockTags.SAPLINGS)) {
-                addStates(bh.value(), glassStates);
+                addStates(bh.value(), statesNeedingTodo);
             }
             for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(BlockTags.SMALL_FLOWERS)) {
-                addStates(bh.value(), glassStates);
+                addStates(bh.value(), statesNeedingTodo);
             }
         }
         return statesNeedingTodo;
