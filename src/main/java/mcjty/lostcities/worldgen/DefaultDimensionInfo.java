@@ -34,7 +34,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         style = AssetRegistries.WORLDSTYLES.get("standard");
         feature = new LostCityTerrainFeature(this, profile, getRandom());
         feature.setupStates(profile);
-        biomeRegistry = RegistryAccess.builtin().registry(Registry.BIOME_REGISTRY).get();
+        biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();
     }
 
     @Override
@@ -103,7 +103,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
             ChunkGenerator generator = ((ServerChunkCache) chunkProvider).getGenerator();
             BiomeSource biomeProvider = generator.getBiomeSource();
             // @todo 1.15 check if this is correct!
-            return biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ(), generator.climateSampler());
+            return biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ(), generator.climateSampler()).value();
         }
         // @todo 1.16: is this right
         return biomeRegistry.getOptional(Biomes.PLAINS.location()).get();

@@ -97,7 +97,7 @@ public class Tools {
     public static ResourceLocation getBiomeId(Biome biome) {
         // @todo use IWorld.registryAccess()
         if (biome.getRegistryName() == null) {
-            Optional<? extends Registry<Biome>> biomeRegistry = RegistryAccess.builtin().registry(Registry.BIOME_REGISTRY);
+            Optional<? extends Registry<Biome>> biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY);
             return biomeRegistry.map(r -> r.getResourceKey(biome).map(ResourceKey::location).orElse(null)).orElse(null);
         } else {
             return biome.getRegistryName();

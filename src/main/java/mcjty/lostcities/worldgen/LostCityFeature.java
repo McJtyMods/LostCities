@@ -4,7 +4,9 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
+import net.minecraft.core.Holder;
 import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -38,20 +40,21 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     public static int globalDimensionInfoDirtyCounter = 0;
     private int dimensionInfoDirtyCounter = -1;
 
-    public static PlacedFeature LOSTCITY_CONFIGURED_FEATURE;
+    public static Holder<PlacedFeature> LOSTCITY_CONFIGURED_FEATURE;
 
     public static void registerConfiguredFeatures() {
-        LOSTCITY_CONFIGURED_FEATURE = registerPlacedFeature("configured_feature", Registration.LOSTCITY_FEATURE.configured(NoneFeatureConfiguration.INSTANCE),
-                CountPlacement.of(1));
+        LOSTCITY_CONFIGURED_FEATURE = registerPlacedFeature(CountPlacement.of(1));
     }
 
     public LostCityFeature() {
         super(NoneFeatureConfiguration.CODEC);
     }
 
-    private static <C extends FeatureConfiguration, F extends Feature<C>> PlacedFeature registerPlacedFeature(String registryName, ConfiguredFeature<C, F> feature, PlacementModifier... placementModifiers) {
-        PlacedFeature placed = BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_FEATURE, new ResourceLocation(registryName), feature).placed(placementModifiers);
-        return PlacementUtils.register(registryName, placed);
+    private static <C extends FeatureConfiguration, F extends Feature<C>> Holder<PlacedFeature> registerPlacedFeature(PlacementModifier... placementModifiers) {
+        Holder<ConfiguredFeature<NoneFeatureConfiguration, ?>> configuredFeatureHolder = FeatureUtils.register("lc_configured_1", Registration.LOSTCITY_FEATURE, NoneFeatureConfiguration.NONE);
+        Holder<ConfiguredFeature<?, ?>> holder = BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_FEATURE, new ResourceLocation("lc_configured_2"), configuredFeatureHolder.value());
+        Holder<PlacedFeature> placedFeature = PlacementUtils.register("lc_configured", holder, placementModifiers);
+        return placedFeature;
     }
 
 

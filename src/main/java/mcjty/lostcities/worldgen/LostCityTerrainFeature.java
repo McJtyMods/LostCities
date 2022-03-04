@@ -11,6 +11,8 @@ import mcjty.lostcities.varia.NoiseGeneratorPerlin;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.WorldGenRegion;
@@ -32,6 +34,7 @@ import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.Tags;
@@ -141,18 +144,17 @@ public class LostCityTerrainFeature {
 
     public static Set<BlockState> getGlassStates() {
         if (glassStates == null) {
-            glassStates = new HashSet<>();
-            for (Block block : Tags.Blocks.GLASS.getValues()) {
-                addStates(block, glassStates);
+            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(Tags.Blocks.GLASS)) {
+                addStates(bh.value(), glassStates);
             }
-            for (Block block : Tags.Blocks.STAINED_GLASS.getValues()) {
-                addStates(block, glassStates);
+            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(Tags.Blocks.STAINED_GLASS)) {
+                addStates(bh.value(), glassStates);
             }
-            for (Block block : Tags.Blocks.GLASS_PANES.getValues()) {
-                addStates(block, glassStates);
+            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(Tags.Blocks.GLASS_PANES)) {
+                addStates(bh.value(), glassStates);
             }
-            for (Block block : Tags.Blocks.STAINED_GLASS_PANES.getValues()) {
-                addStates(block, glassStates);
+            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(Tags.Blocks.STAINED_GLASS_PANES)) {
+                addStates(bh.value(), glassStates);
             }
         }
         return glassStates;
@@ -161,11 +163,11 @@ public class LostCityTerrainFeature {
     public static Set<BlockState> getStatesNeedingTodo() {
         if (statesNeedingTodo == null) {
             statesNeedingTodo = new HashSet<>();
-            for (Block block : BlockTags.SAPLINGS.getValues()) {
-                addStates(block, statesNeedingTodo);
+            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(BlockTags.SAPLINGS)) {
+                addStates(bh.value(), glassStates);
             }
-            for (Block block : BlockTags.SMALL_FLOWERS.getValues()) {
-                addStates(block, statesNeedingTodo);
+            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(BlockTags.SMALL_FLOWERS)) {
+                addStates(bh.value(), glassStates);
             }
         }
         return statesNeedingTodo;
@@ -281,10 +283,16 @@ public class LostCityTerrainFeature {
         boolean doCity = info.isCity || (info.outsideChunk && info.hasBuilding);
 
         // Check if there is no village here
-        Map<StructureFeature<?>, LongSet> references = region.getChunk(chunkX, chunkZ).getAllReferences();
-        if (references.containsKey(StructureFeature.VILLAGE)) {
-            if (!references.get(StructureFeature.VILLAGE).isEmpty()) {
-                doCity = false;
+        ChunkAccess ch = region.getChunk(chunkX, chunkZ);
+        if (ch.hasAnyStructureReferences()) {
+            Map<ConfiguredStructureFeature<?, ?>, LongSet> references = ch.getAllReferences();
+//            BuiltinRegistries.CONFIGURED_FEATURE.get(StructureFeature.VILLAGE)
+            // @todo we can do this more optimally if we first find all configured structures for village
+            for (Map.Entry<ConfiguredStructureFeature<?, ?>, LongSet> entry : references.entrySet()) {
+                if (entry.getKey().feature == StructureFeature.VILLAGE && !entry.getValue().isEmpty()) {
+                    doCity = false;
+                    break;
+                }
             }
         }
 
@@ -1019,7 +1027,7 @@ public class LostCityTerrainFeature {
     }
 
     private static boolean isWaterBiome(Biome biome) {
-        Biome.BiomeCategory category = biome.getBiomeCategory();
+        Biome.BiomeCategory category = Biome.getBiomeCategory(Holder.direct(biome));
         return category.equals(Biome.BiomeCategory.OCEAN) || category.equals(Biome.BiomeCategory.BEACH) || category.equals(Biome.BiomeCategory.RIVER);
     }
 
@@ -2375,7 +2383,7 @@ public class LostCityTerrainFeature {
 
                 @Override
                 public ResourceLocation getBiome() {
-                    return world.getBiome(pos).getRegistryName();
+                    return world.getBiome(pos).value().getRegistryName();
                 }
             };
             String randomValue = cnd.getRandomValue(random, conditionContext);
@@ -2426,7 +2434,7 @@ public class LostCityTerrainFeature {
 
                     @Override
                     public ResourceLocation getBiome() {
-                        return world.getBiome(pos).getRegistryName();
+                        return world.getBiome(pos).value().getRegistryName();
                     }
                 };
                 String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);

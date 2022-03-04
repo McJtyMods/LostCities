@@ -6,13 +6,13 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Registry;
-import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 
@@ -88,7 +88,7 @@ public class NullDimensionInfo implements IDimensionInfo {
         random = new Random(seed);
         feature = new LostCityTerrainFeature(this, profile, getRandom());
         feature.setupStates(profile);
-        biomeRegistry = RegistryAccess.builtin().registry(Registry.BIOME_REGISTRY).get();
+        biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();
     }
 
     @Override

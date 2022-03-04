@@ -10,6 +10,7 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -794,7 +795,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
                 @Override
                 public ResourceLocation getBiome() {
-                    return provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).getRegistryName();
+                    return provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value().getRegistryName();
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
@@ -1276,14 +1277,16 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isOcean != null) {
             return isOcean;
         }
-        isOcean = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome().getBiomeCategory() == Biome.BiomeCategory.OCEAN;
+        Biome mainBiome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
+        Biome.BiomeCategory category = Biome.getBiomeCategory(Holder.direct(mainBiome));
+        isOcean = category == Biome.BiomeCategory.OCEAN;
         return isOcean;
     }
 
     private static boolean isOcean(Biome[] biomes) {
         int cnt = 0;
         for (Biome biome : biomes) {
-            Biome.BiomeCategory category = biome.getBiomeCategory();
+            Biome.BiomeCategory category = Biome.getBiomeCategory(Holder.direct(biome));
             if (category == Biome.BiomeCategory.OCEAN) {
                 cnt++;
             }

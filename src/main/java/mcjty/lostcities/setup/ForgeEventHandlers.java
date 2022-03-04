@@ -44,7 +44,7 @@ public class ForgeEventHandlers {
     public void onBiomeLoad(BiomeLoadingEvent event) {
         ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, event.getName());
         if (!BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.VOID)) {
-            event.getGeneration().getFeatures(GenerationStep.Decoration.RAW_GENERATION).add(() -> LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
+            event.getGeneration().getFeatures(GenerationStep.Decoration.RAW_GENERATION).add(LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
         }
     }
 

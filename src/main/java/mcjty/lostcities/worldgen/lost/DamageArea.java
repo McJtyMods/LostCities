@@ -5,9 +5,9 @@ import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,7 +177,7 @@ public class DamageArea {
     public float getDamageFactor() {
         float damage = 0.0f;
         for (Explosion explosion : explosions) {
-            double sq = explosion.getCenter().distSqr(chunkX * 16.0, (double) explosion.getCenter().getY(), chunkZ * 16.0, true);
+            double sq = explosion.getCenter().distToCenterSqr(chunkX * 16.0, (double) explosion.getCenter().getY(), chunkZ * 16.0);
             if (sq < explosion.getSqradius()) {
                 double d = Math.sqrt(sq);
                 damage += 3.0f * (explosion.getRadius() - d) / explosion.getRadius();
@@ -190,7 +190,7 @@ public class DamageArea {
     public float getDamage(int x, int y, int z) {
         float damage = 0.0f;
         for (Explosion explosion : explosions) {
-            double sq = explosion.getCenter().distSqr(x, y, z, true);
+            double sq = explosion.getCenter().distToCenterSqr(x, y, z);
             if (sq < explosion.getSqradius()) {
                 double d = Math.sqrt(sq);
                 damage += 3.0f * (explosion.getRadius() - d) / explosion.getRadius();

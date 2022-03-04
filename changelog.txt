@@ -1,3 +1,6 @@
+Upcoming:
+- Port to 1.18.2
+
 1.18-5.0.4:
 - API for registering Lost City dimensions
 - Improved placement of wallblocks
