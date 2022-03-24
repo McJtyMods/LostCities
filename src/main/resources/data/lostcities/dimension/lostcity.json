@@ -8,5 +8,6 @@
       "type": "minecraft:multi_noise",
       "preset": "overworld"
     }
-  }
+  },
+  "forge:use_server_seed": true
 }
