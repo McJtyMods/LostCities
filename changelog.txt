@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.1.1:
 - Fixed a problem with the seed of the custom dimension
 
 1.18-5.1.0:
