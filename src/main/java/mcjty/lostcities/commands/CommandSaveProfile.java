@@ -11,10 +11,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.varia.ComponentFactory;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,7 +37,7 @@ public class CommandSaveProfile implements Command<CommandSourceStack> {
         String name = context.getArgument("profile", String.class);
         LostCityProfile profile = LostCityConfiguration.standardProfiles.get(name);
         if (profile == null) {
-            context.getSource().sendSuccess(new TextComponent(ChatFormatting.RED + "Could not find profile '" + name + "'!"), true);
+            context.getSource().sendSuccess(ComponentFactory.literal(ChatFormatting.RED + "Could not find profile '" + name + "'!"), true);
             return 0;
         }
         JsonObject jsonObject = profile.toJson(false);
@@ -48,10 +48,10 @@ public class CommandSaveProfile implements Command<CommandSourceStack> {
                 writer.flush();
             }
         } catch (FileNotFoundException e) {
-            context.getSource().sendSuccess(new TextComponent(ChatFormatting.RED + "Error saving profile '" + name + "'!"), true);
+            context.getSource().sendSuccess(ComponentFactory.literal(ChatFormatting.RED + "Error saving profile '" + name + "'!"), true);
             return 0;
         }
-        context.getSource().sendSuccess(new TextComponent(ChatFormatting.GREEN + "Saved profile '" + name + "'!"), true);
+        context.getSource().sendSuccess(ComponentFactory.literal(ChatFormatting.GREEN + "Saved profile '" + name + "'!"), true);
         return 0;
     }
 }

@@ -4,8 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.varia.ComponentFactory;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -20,7 +20,7 @@ public class Configuration {
         private final Comparator<T> comparator;
 
         public Value(String comment, T value, T min, T max, @Nonnull Comparator<T> comparator) {
-            this.comment = new TextComponent(comment);
+            this.comment = ComponentFactory.literal(comment);
             this.value = value;
             this.min = min;
             this.max = max;

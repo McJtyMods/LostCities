@@ -3,8 +3,8 @@ package mcjty.lostcities.gui.elements;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
+import mcjty.lostcities.varia.ComponentFactory;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.TextComponent;
 
 public class IntElement extends GuiElement {
 
@@ -19,7 +19,7 @@ public class IntElement extends GuiElement {
         this.gui = gui;
         this.attribute = attribute;
         Integer c = gui.getLocalSetup().get().map(h -> (Integer) h.toConfiguration().get(attribute)).orElse(0);
-        field = new EditBox(gui.getFont(), x, y, 45, 16, new TextComponent(Integer.toString(c))) {
+        field = new EditBox(gui.getFont(), x, y, 45, 16, ComponentFactory.literal(Integer.toString(c))) {
             @Override
             public void renderToolTip(PoseStack stack, int x, int y) {
                 gui.getLocalSetup().get().ifPresent(h -> {

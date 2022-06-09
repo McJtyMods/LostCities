@@ -3,8 +3,8 @@ package mcjty.lostcities.gui.elements;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
+import mcjty.lostcities.varia.ComponentFactory;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 public class BooleanElement extends GuiElement {
 
@@ -18,12 +18,12 @@ public class BooleanElement extends GuiElement {
         this.gui = gui;
         this.attribute = attribute;
         Boolean c = gui.getLocalSetup().get().map(h -> (Boolean) h.toConfiguration().get(attribute)).orElse(false);
-        field = new ButtonExt(gui, x, y, 60, 16, c ? new TextComponent("On") : new TextComponent("Off"), button -> {
+        field = new ButtonExt(gui, x, y, 60, 16, c ? ComponentFactory.literal("On") : ComponentFactory.literal("Off"), button -> {
             Component message = button.getMessage();
             if ("On".equals(message.getString())) { // @todo 1.16 getString() is ugly here!
-                button.setMessage(new TextComponent("Off"));
+                button.setMessage(ComponentFactory.literal("Off"));
             } else {
-                button.setMessage(new TextComponent("On"));
+                button.setMessage(ComponentFactory.literal("On"));
             }
             gui.getLocalSetup().get().ifPresent(profile -> {
                 Configuration configuration = profile.toConfiguration();
@@ -60,7 +60,7 @@ public class BooleanElement extends GuiElement {
     public void update() {
         gui.getLocalSetup().get().ifPresent(profile -> {
             Boolean result = profile.toConfiguration().get(attribute);
-            field.setMessage(result ? new TextComponent("On") : new TextComponent("Off"));
+            field.setMessage(result ? ComponentFactory.literal("On") : ComponentFactory.literal("Off"));
         });
     }
 

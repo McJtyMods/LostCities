@@ -1,3 +1,6 @@
+Upcoming:
+- Created ComponentFactory to help with porting to 1.19
+
 1.18-5.1.1:
 - Fixed a problem with the seed of the custom dimension
 

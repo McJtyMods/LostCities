@@ -7,6 +7,7 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.gui.elements.*;
 import mcjty.lostcities.setup.Config;
+import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.Highway;
 import mcjty.lostcities.worldgen.lost.Railway;
@@ -16,7 +17,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class GuiLCConfig extends Screen {
     private final LostCitySetup localSetup = new LostCitySetup(this::refreshPreview);
 
     public GuiLCConfig(Screen parent) { // @todo 1.16}, WorldType worldType) {
-        super(new TextComponent("Lost City Configuration"));
+        super(ComponentFactory.literal("Lost City Configuration"));
         this.parent = parent;
 //        this.worldType = worldType;
         localSetup.copyFrom(LostCitySetup.CLIENT_SETUP);
@@ -80,23 +80,23 @@ public class GuiLCConfig extends Screen {
         super.init();
         this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
-        profileButton = addRenderableWidget(new ButtonExt(this, 70, 10, 100, 20, new TextComponent(localSetup.getProfileLabel()), p -> {
+        profileButton = addRenderableWidget(new ButtonExt(this, 70, 10, 100, 20, ComponentFactory.literal(localSetup.getProfileLabel()), p -> {
             localSetup.toggleProfile(/* @todo 1.16 worldType*/);
             updateValues();
-        }).tooltip(new TextComponent("Select a standard profile for your Lost City worldgen")));
-        customizeButton = addRenderableWidget(new ButtonExt(this, 180, 10, 100, 20, new TextComponent("Customize"), p -> {
+        }).tooltip(ComponentFactory.literal("Select a standard profile for your Lost City worldgen")));
+        customizeButton = addRenderableWidget(new ButtonExt(this, 180, 10, 100, 20, ComponentFactory.literal("Customize"), p -> {
             localSetup.customize();
             updateValues();
-        }).tooltip(new TextComponent("Create a customized version of the currently selected profile")));
-        modeButton = addRenderableWidget(new ButtonExt(this, 290, 10, 100, 20, new TextComponent(mode), p -> toggleMode())
-            .tooltip(new TextComponent("Switch between different configuration pages")));
+        }).tooltip(ComponentFactory.literal("Create a customized version of the currently selected profile")));
+        modeButton = addRenderableWidget(new ButtonExt(this, 290, 10, 100, 20, ComponentFactory.literal(mode), p -> toggleMode())
+            .tooltip(ComponentFactory.literal("Switch between different configuration pages")));
 
         addRenderableWidget(new Button(10, this.height - 30, 120, 20,
-                new TextComponent("Done"), p -> done()));
+                ComponentFactory.literal("Done"), p -> done()));
         addRenderableWidget(new Button(this.width - 130, this.height - 30, 120, 20,
-                new TextComponent("Cancel"), p -> cancel()));
-        addRenderableWidget(new ButtonExt(this, this.width - 35, 35, 30, 20, new TextComponent("Rnd"), p -> randomizePreview())
-                .tooltip(new TextComponent("Randomize the seed for the preview (does not affect the generated world)")));
+                ComponentFactory.literal("Cancel"), p -> cancel()));
+        addRenderableWidget(new ButtonExt(this, this.width - 35, 35, 30, 20, ComponentFactory.literal("Rnd"), p -> randomizePreview())
+                .tooltip(ComponentFactory.literal("Randomize the seed for the preview (does not affect the generated world)")));
 
         initCities(110);
         initBuildings(110);
@@ -214,7 +214,7 @@ public class GuiLCConfig extends Screen {
             idx = 0;
         }
         mode = MODES.get(idx);
-        modeButton.setMessage(new TextComponent(mode));
+        modeButton.setMessage(ComponentFactory.literal(mode));
     }
 
     private GuiElement add(GuiElement el) {
@@ -416,7 +416,7 @@ public class GuiLCConfig extends Screen {
     }
 
     private void refreshButtons() {
-        profileButton.setMessage(new TextComponent(localSetup.getProfileLabel()));
+        profileButton.setMessage(ComponentFactory.literal(localSetup.getProfileLabel()));
         customizeButton.active = localSetup.isCustomizable();
 
         boolean isCustomized = "customized".equals(localSetup.getProfileLabel());

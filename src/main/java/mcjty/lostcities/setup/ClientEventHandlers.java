@@ -4,12 +4,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.gui.GuiLCConfig;
 import mcjty.lostcities.gui.LostCitySetup;
+import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.LostCityFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -61,7 +61,7 @@ public class ClientEventHandlers {
     @SubscribeEvent
     public void onGuiPost(ScreenEvent.InitScreenEvent.Post event) {
         if (event.getScreen() instanceof CreateWorldScreen screen) {
-            lostCitiesButton = new Button(screen.width - 100, 10, 70, 20, new TextComponent("Cities"), p_onPress_1_ -> {
+            lostCitiesButton = new Button(screen.width - 100, 10, 70, 20, ComponentFactory.literal("Cities"), p_onPress_1_ -> {
 //                WorldType worldType = WorldType.WORLD_TYPES[screen.selectedIndex];
                 Minecraft.getInstance().setScreen(new GuiLCConfig(screen /* @todo 1.16, worldType*/));
             });
