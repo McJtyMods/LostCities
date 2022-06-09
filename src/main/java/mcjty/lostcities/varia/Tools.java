@@ -174,7 +174,7 @@ public class Tools {
 
     public static String stateToString(BlockState state) {
         // @todo 1.14
-        return state.getBlock().getRegistryName().toString();
+        return Tools.getId(state).toString();
     }
 
     public static String getRandomFromList(Random random, List<Pair<Float, String>> list) {
