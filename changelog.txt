@@ -1,5 +1,6 @@
 Upcoming:
-- Created ComponentFactory to help with porting to 1.19
+- Much more stable way to generate the Lost City chunks. No more worldgen warnings and tallbuildings profile works again
+- MUCH faster way to detect (and delete) floating building parts after being damaged by explosions. It is however slightly less accurate
 
 1.18-5.1.1:
 - Fixed a problem with the seed of the custom dimension

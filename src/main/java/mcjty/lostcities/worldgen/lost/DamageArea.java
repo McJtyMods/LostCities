@@ -155,6 +155,7 @@ public class DamageArea {
 
     // Get the lowest height that is affected by an explosion
     public int getLowestExplosionHeight() {
+        // @todo Technically not correct (should also cover below 0 and above 256)
         for (int yy = 0 ; yy < 16 ; yy++) {
             if (hasExplosions(yy)) {
                 return yy * 16;
@@ -165,6 +166,7 @@ public class DamageArea {
 
     // Get the lowest height that is affected by an explosion
     public int getHighestExplosionHeight() {
+        // @todo Technically not correct (should also cover below 0 and above 256)
         for (int yy = 15 ; yy >= 0 ; yy--) {
             if (hasExplosions(yy)) {
                 return yy * 16 + 15;

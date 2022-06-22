@@ -334,7 +334,8 @@ public class LostCityTerrainFeature {
 //        if (!MinecraftForge.EVENT_BUS.post(event)) {
             if (info.getDamageArea().hasExplosions()) {
                 breakBlocksForDamage(chunkX, chunkZ, info);
-                fixAfterExplosionNew(info, rand);
+//                fixAfterExplosionNew(info, rand);
+                fixAfterExplosionNewest(info, rand);
             }
             generateDebris(rand, info);
 //        }
@@ -1582,6 +1583,37 @@ public class LostCityTerrainFeature {
         return null;
     }
 
+    private boolean isSliceEmpty(int y) {
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                if (driver.getBlock(x, y, z) == air) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /// Fix floating blocks after an explosion
+    private void fixAfterExplosionNewest(BuildingInfo info, Random rand) {
+        int start = info.getDamageArea().getLowestExplosionHeight();
+        if (start == -1) {
+            // Nothing is affected
+            return;
+        }
+        int end = info.getDamageArea().getHighestExplosionHeight();
+
+        for (int y = start ; y <= end ; y++) {
+            if (isSliceEmpty(y)) {
+                // Empty! That means everything above this can be deleted
+                for (int x = 0 ; x < 16 ; x++) {
+                    for (int z = 0 ; z < 16 ; z++) {
+                        driver.setBlockRangeToAir(x, y+1, z, 256);  // @todo hardcoded height
+                    }
+                }
+            }
+        }
+    }
 
     /// Fix floating blocks after an explosion
     private void fixAfterExplosionNew(BuildingInfo info, Random rand) {
