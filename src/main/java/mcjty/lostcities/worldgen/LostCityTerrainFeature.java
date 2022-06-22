@@ -341,6 +341,7 @@ public class LostCityTerrainFeature {
 
         ChunkFixer.fix(provider, chunkX, chunkZ);
 
+        driver.actuallyGenerate();
         driver.setPrimer(oldRegion, oldChunk);
     }
 
