@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.1.2:
 - Much more stable way to generate the Lost City chunks. No more worldgen warnings and tallbuildings profile works again
 - MUCH faster way to detect (and delete) floating building parts after being damaged by explosions. It is however slightly less accurate
 
