@@ -1,18 +1,17 @@
 package mcjty.lostcities.worldgen;
 
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.state.properties.StairsShape;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.state.properties.WallSide;
-import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.world.level.block.state.properties.WallSide;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 
 import java.util.function.Predicate;
-
-import net.minecraft.world.level.block.state.BlockState;
 
 public class ChunkDriver {
 
@@ -20,6 +19,9 @@ public class ChunkDriver {
     private ChunkAccess primer;
     private final BlockPos.MutableBlockPos current = new BlockPos.MutableBlockPos();
     private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+
+    private static int minY = Integer.MAX_VALUE;
+    private static int maxY = Integer.MIN_VALUE;
 
     public void setPrimer(WorldGenRegion region, ChunkAccess primer) {
         this.region = region;
@@ -35,12 +37,17 @@ public class ChunkDriver {
     }
 
     public ChunkDriver current(int x, int y, int z) {
-        current.set(x, y, z);
+        current.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
         return this;
     }
 
-    public ChunkDriver current(BlockPos i) {
-        current.set(i);
+    public ChunkDriver currentAbsolute(BlockPos pos) {
+        current.set(pos);
+        return this;
+    }
+
+    public ChunkDriver currentRelative(BlockPos pos) {
+        current(pos.getX(), pos.getY(), pos.getZ());
         return this;
     }
 
@@ -81,22 +88,48 @@ public class ChunkDriver {
     }
 
     public void setBlockRange(int x, int y, int z, int y2, BlockState state) {
-        pos.set(x, y, z);
+        BlockState air = Blocks.AIR.defaultBlockState();
+        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
         while (y < y2) {
-            if (primer.getBlockState(pos) != state) {
-                primer.setBlockState(pos, state, false);
+            if (region.getBlockState(pos) != state) {
+                region.setBlock(pos, state, 0);
             }
             y++;
             pos.setY(y);
         }
     }
 
-    public void setBlockRange(int x, int y, int z, int y2, BlockState state, Predicate<BlockState> test) {
-        pos.set(x, y, z);
+    public void setBlockRangeToAir(int x, int y, int z, int y2) {
+        BlockState air = Blocks.AIR.defaultBlockState();
+        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
         while (y < y2) {
-            BlockState st = primer.getBlockState(pos);
-            if (st != state && test.test(st)) {
-                primer.setBlockState(pos, state, false);
+            if (region.getBlockState(pos) != air) {
+                region.setBlock(pos, air, 0);
+            }
+            y++;
+            pos.setY(y);
+        }
+    }
+
+    public void setBlockRangeToAir(int x, int y, int z, int y2, Predicate<BlockState> test) {
+        BlockState air = Blocks.AIR.defaultBlockState();
+        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
+        while (y < y2) {
+            BlockState st = region.getBlockState(pos);
+            if (st != air && test.test(st)) {
+                region.setBlock(pos, air, 0);
+            }
+            y++;
+            pos.setY(y);
+        }
+    }
+
+    public void setBlockRangeToAirSafe(int x, int y, int z, int y2) {
+        BlockState air = Blocks.AIR.defaultBlockState();
+        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
+        while (y < y2) {
+            if (region.getBlockState(pos) != air) {
+                region.setBlock(pos, air, 0);
             }
             y++;
             pos.setY(y);
@@ -104,10 +137,10 @@ public class ChunkDriver {
     }
 
     public void setBlockRangeSafe(int x, int y, int z, int y2, BlockState state) {
-        pos.set(x, y, z);
+        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
         while (y < y2) {
-            if (primer.getBlockState(pos) != state) {
-                primer.setBlockState(pos, state, false);
+            if (region.getBlockState(pos) != state) {
+                region.setBlock(pos, state, 0);
             }
             y++;
             pos.setY(y);
@@ -115,11 +148,24 @@ public class ChunkDriver {
     }
 
     public void setBlockRangeSafe(int x, int y, int z, int y2, BlockState state, Predicate<BlockState> test) {
-        pos.set(x, y, z);
+        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
         while (y < y2) {
-            BlockState st = primer.getBlockState(pos);
+            BlockState st = region.getBlockState(pos);
             if (st != state && test.test(st)) {
-                primer.setBlockState(pos, state, false);
+                region.setBlock(pos, state, 0);
+            }
+            y++;
+            pos.setY(y);
+        }
+    }
+
+    public void setBlockRangeToAirSafe(int x, int y, int z, int y2, Predicate<BlockState> test) {
+        BlockState air = Blocks.AIR.defaultBlockState();
+        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
+        while (y < y2) {
+            BlockState st = region.getBlockState(pos);
+            if (st != air && test.test(st)) {
+                region.setBlock(pos, air, 0);
             }
             y++;
             pos.setY(y);
@@ -200,9 +246,9 @@ public class ChunkDriver {
     }
 
     private BlockState correct(BlockState state) {
-        int cx = current.getX() + (primer.getPos().x << 4);
+        int cx = current.getX();
         int cy = current.getY();
-        int cz = current.getZ() + (primer.getPos().z << 4);
+        int cz = current.getZ();
 
         ChunkAccess thisChunk = region.getChunk(cx >> 4, cz >> 4);
         BlockState westState = updateAdjacent(state, Direction.EAST, pos.set(cx - 1, cy, cz), thisChunk);
@@ -227,7 +273,7 @@ public class ChunkDriver {
     }
 
     public ChunkDriver blockImm(BlockState c) {
-        primer.setBlockState(current, c, false);
+        region.setBlock(pos, c, 0);
         return this;
     }
 
@@ -242,43 +288,43 @@ public class ChunkDriver {
 
     public ChunkDriver block(BlockState c) {
 //        validate();
-        primer.setBlockState(current, correct(c), false);
+        region.setBlock(current, c, 0);
         return this;
     }
 
     public ChunkDriver add(BlockState state) {
 //        validate();
-        primer.setBlockState(current, correct(state), false);
+        region.setBlock(current, state, 0);
         incY();
         return this;
     }
 
     public BlockState getBlock() {
-        return primer.getBlockState(current);
+        return region.getBlockState(current);
     }
 
     public BlockState getBlockDown() {
-        return primer.getBlockState(pos.set(current.getX(), current.getY()-1, current.getZ()));
+        return region.getBlockState(pos.set(current.getX(), current.getY()-1, current.getZ()));
     }
 
     public BlockState getBlockEast() {
-        return primer.getBlockState(pos.set(current.getX()+1, current.getY(), current.getZ()));
+        return region.getBlockState(pos.set(current.getX()+1, current.getY(), current.getZ()));
     }
 
     public BlockState getBlockWest() {
-        return primer.getBlockState(pos.set(current.getX()-1, current.getY(), current.getZ()));
+        return region.getBlockState(pos.set(current.getX()-1, current.getY(), current.getZ()));
     }
 
     public BlockState getBlockSouth() {
-        return primer.getBlockState(pos.set(current.getX(), current.getY(), current.getZ()+1));
+        return region.getBlockState(pos.set(current.getX(), current.getY(), current.getZ()+1));
     }
 
     public BlockState getBlockNorth() {
-        return primer.getBlockState(pos.set(current.getX(), current.getY(), current.getZ()-1));
+        return region.getBlockState(pos.set(current.getX(), current.getY(), current.getZ()-1));
     }
 
 
     public BlockState getBlock(int x, int y, int z) {
-        return primer.getBlockState(pos.set(x, y, z));
+        return region.getBlockState(pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4)));
     }
 }

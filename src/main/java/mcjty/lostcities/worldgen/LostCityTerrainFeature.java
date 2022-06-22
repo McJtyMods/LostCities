@@ -406,22 +406,28 @@ public class LostCityTerrainFeature {
             return;
         }
 
-        for (BlockPos idx : torches) {
-            driver.current(idx);
+//        ChunkPos cp = driver.getPrimer().getPos();
+        BlockState torchState = Blocks.WALL_TORCH.defaultBlockState();
+        for (BlockPos pos : torches) {
+//            driver.current(pos);
 
-            BlockState torchState = Blocks.WALL_TORCH.defaultBlockState();
-            int x = driver.getX();
-            int z = driver.getZ();
+            int x = pos.getX();
+            int z = pos.getZ();
             if (driver.getBlockDown() != air) {
-                driver.block(Blocks.TORCH.defaultBlockState());
+                driver.getRegion().setBlock(pos, Blocks.TORCH.defaultBlockState(), Block.UPDATE_CLIENTS);
+//                driver.block(Blocks.TORCH.defaultBlockState());
             } else if (x > 0 && driver.getBlockWest() != air) {
-                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.EAST));
+                driver.getRegion().setBlock(pos, torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.EAST), Block.UPDATE_CLIENTS);
+//                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.EAST));
             } else if (x < 15 && driver.getBlockEast() != air) {
-                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.WEST));
+                driver.getRegion().setBlock(pos, torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.WEST), Block.UPDATE_CLIENTS);
+//                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.WEST));
             } else if (z > 0 && driver.getBlockNorth() != air) {
-                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.SOUTH));
+                driver.getRegion().setBlock(pos, torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.SOUTH), Block.UPDATE_CLIENTS);
+//                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.SOUTH));
             } else if (z < 15 && driver.getBlockSouth() != air) {
-                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH));
+                driver.getRegion().setBlock(pos, torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH), Block.UPDATE_CLIENTS);
+//                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH));
             }
         }
         info.clearTorchTodo();
@@ -628,9 +634,9 @@ public class LostCityTerrainFeature {
         if (dowater) {
             // Special case for drowned city
             driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquid);
-            driver.setBlockRangeSafe(x, info.waterLevel+1, z, height2, air);
+            driver.setBlockRangeToAirSafe(x, info.waterLevel+1, z, height2);
         } else {
-            driver.setBlockRange(x, height1, z, height2, air);
+            driver.setBlockRangeToAir(x, height1, z, height2);
         }
     }
 
@@ -638,9 +644,9 @@ public class LostCityTerrainFeature {
         if (dowater) {
             // Special case for drowned city
             driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquid, test);
-            driver.setBlockRangeSafe(x, info.waterLevel+1, z, height2, air, test);
+            driver.setBlockRangeToAirSafe(x, info.waterLevel+1, z, height2, test);
         } else {
-            driver.setBlockRange(x, height1, z, height2, air, test);
+            driver.setBlockRangeToAir(x, height1, z, height2, test);
         }
     }
 
@@ -1600,7 +1606,7 @@ public class LostCityTerrainFeature {
                             BlockPos current = driver.getCurrentCopy();
                             blob.scan(info, driver, air, liquid, new BlockPos(x, y, z));
                             blobs.add(blob);
-                            driver.current(current);
+                            driver.currentAbsolute(current);
                         }
                     }
                     driver.incY();
@@ -1628,7 +1634,7 @@ public class LostCityTerrainFeature {
             if (rand.nextFloat() < info.profile.DESTROY_OR_MOVE_CHANCE || blob.connectedBlocks.size() < info.profile.DESTROY_SMALL_SECTIONS_SIZE
                     || blob.connections < 5) {
                 for (BlockPos index : blob.connectedBlocks) {
-                    driver.current(index);
+                    driver.currentRelative(index);
                     driver.block(((driver.getY()) < info.waterLevel) ? liquid : air);
                 }
             } else {
@@ -1636,7 +1642,7 @@ public class LostCityTerrainFeature {
             }
         });
         for (BlockPos index : blocksToMove.connectedBlocks) {
-            driver.current(index);
+            driver.currentRelative(index);
             BlockState c = driver.getBlock();
             driver.block(((driver.getY()) < info.waterLevel) ? liquid : air);
             driver.decY();
@@ -2791,25 +2797,25 @@ public class LostCityTerrainFeature {
         if (info.getXmin().hasXCorridor()) {
             int x = 0;
             for (int z = 7; z <= 10; z++) {
-                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, air);
+                driver.setBlockRangeToAir(x, info.groundLevel-5, z, info.groundLevel-2);
             }
         }
         if (info.getXmax().hasXCorridor()) {
             int x = 15;
             for (int z = 7; z <= 10; z++) {
-                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, air);
+                driver.setBlockRangeToAir(x, info.groundLevel-5, z, info.groundLevel-2);
             }
         }
         if (info.getZmin().hasXCorridor()) {
             int z = 0;
             for (int x = 7; x <= 10; x++) {
-                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, air);
+                driver.setBlockRangeToAir(x, info.groundLevel-5, z, info.groundLevel-2);
             }
         }
         if (info.getZmax().hasXCorridor()) {
             int z = 15;
             for (int x = 7; x <= 10; x++) {
-                driver.setBlockRange(x, info.groundLevel-5, z, info.groundLevel-2, air);
+                driver.setBlockRangeToAir(x, info.groundLevel-5, z, info.groundLevel-2);
             }
         }
     }
