@@ -179,7 +179,7 @@ public class DamageArea {
     public float getDamageFactor() {
         float damage = 0.0f;
         for (Explosion explosion : explosions) {
-            double sq = explosion.getCenter().distToCenterSqr(chunkX * 16.0, (double) explosion.getCenter().getY(), chunkZ * 16.0);
+            double sq = explosion.getCenter().distToCenterSqr(chunkX * 16.0, explosion.getCenter().getY(), chunkZ * 16.0);
             if (sq < explosion.getSqradius()) {
                 double d = Math.sqrt(sq);
                 damage += 3.0f * (explosion.getRadius() - d) / explosion.getRadius();
@@ -200,4 +200,5 @@ public class DamageArea {
         }
         return damage;
     }
+
 }

@@ -334,7 +334,7 @@ public class LostCityTerrainFeature {
 //        LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.getWorld().getWorld(), provider, chunkX, chunkZ, driver.getPrimer());
 //        if (!MinecraftForge.EVENT_BUS.post(event)) {
             if (info.getDamageArea().hasExplosions()) {
-                breakBlocksForDamage(chunkX, chunkZ, info);
+                breakBlocksForDamageNew(chunkX, chunkZ, info);
 //                fixAfterExplosionNew(info, rand);
                 fixAfterExplosionNewest(info, rand);
             }
@@ -451,6 +451,87 @@ public class LostCityTerrainFeature {
         generateHighways(chunkX, chunkZ, info);
     }
 
+    private void breakBlocksForDamageNew(int chunkX, int chunkZ, BuildingInfo info) {
+        int cx = chunkX * 16;
+        int cz = chunkZ * 16;
+
+        DamageArea damageArea = info.getDamageArea();
+
+        float damageFactor = 1.0f;
+
+        boolean hasCollectedDamage = false;
+        float[][] collectedDamage = new float[16][16];
+
+        // @todo this only supports explosions between 0 and 256 for now
+        for (int yy = 0; yy < 16; yy++) {
+            boolean hasExplosions = damageArea.hasExplosions(yy);
+            for (int y = 0 ; y < 16 ; y++) {
+                if (hasExplosions) {
+                    int cntDamaged = 0;
+                    int cntAir = 0;
+                    int cury = yy * 16 + y;
+                    for (int x = 0; x < 16; x++) {
+                        driver.current(x, cury, 0);
+                        for (int z = 0; z < 16; z++) {
+                            BlockState d = driver.getBlock();
+                            if (d != air || cury <= info.waterLevel) {
+                                float damage = damageArea.getDamage(cx + x, cury, cz + z) * damageFactor;
+                                if (damage >= 0.001) {
+                                    collectedDamage[x][z] += damage;
+                                    hasCollectedDamage = true;
+                                }
+                            }
+                            driver.incZ();
+                        }
+                    }
+                }
+                if (hasCollectedDamage) {
+                    int cntDamaged = 0;
+                    int cntAir = 0;
+                    int cury = yy * 16 + y;
+                    hasCollectedDamage = false;
+                    for (int x = 0; x < 16; x++) {
+                        driver.current(x, cury, 0);
+                        for (int z = 0; z < 16; z++) {
+                            BlockState d = driver.getBlock();
+                            if (d != air || cury <= info.waterLevel) {
+                                float damage = collectedDamage[x][z];
+                                if (damage >= 0.001) {
+                                    BlockState newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette(), liquid);
+                                    if (newd != d) {
+                                        driver.block(newd);
+                                        cntDamaged++;
+                                    }
+                                }
+                            } else {
+                                cntAir++;
+                            }
+                            driver.incZ();
+//                            collectedDamage[x][z] -= .75f;
+                            collectedDamage[x][z] /= 1.4f;
+//                            collectedDamage[x][z] = 0;
+                            if (collectedDamage[x][z] <= 0) {
+                                collectedDamage[x][z] = 0;
+                            } else {
+                                hasCollectedDamage = true;
+                            }
+                        }
+                    }
+
+                    int tot = cntDamaged + cntAir;
+                    if (tot > 250) {
+                        damageFactor = 200;
+                    } else if (tot > 220) {
+                        damageFactor = damageFactor * 1.4f;
+                    } else if (tot > 180) {
+                        damageFactor = damageFactor * 1.2f;
+                    }
+
+                }
+            }
+        }
+    }
+
     private void breakBlocksForDamage(int chunkX, int chunkZ, BuildingInfo info) {
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
@@ -460,21 +541,22 @@ public class LostCityTerrainFeature {
         boolean clear = false;
         float damageFactor = 1.0f;
 
+        // @todo this only supports explosions between 0 and 256 for now
         for (int yy = 0; yy < 16; yy++) {
             if (clear || damageArea.hasExplosions(yy)) {
                 if (clear || damageArea.isCompletelyDestroyed(yy)) {
-                    for (int x = 0; x < 16; x++) {
-                        for (int z = 0; z < 16; z++) {
-                            int height = yy * 16;
-                            driver.current(x, height, z);
-                            for (int y = 0; y < 16; y++) {
-                                // @TODO BAD
-                                // @todo 1.16 this can occasionally cause a crash in the lighting engine
-                                // I suspect this might be a vanilla bug
+                    // @TODO BAD
+                    // @todo 1.16 this can occasionally cause a crash in the lighting engine
+//                    for (int x = 0; x < 16; x++) {
+//                        for (int z = 0; z < 16; z++) {
+//                            int height = yy * 16;
+//                            driver.current(x, height, z);
+//                            for (int y = 0; y < 16; y++) {
+                                // @todo I suspect this might be a vanilla bug
 //                                driver.add(((height + y) <= info.waterLevel) ? liquid : air);
-                            }
-                        }
-                    }
+//                            }
+//                        }
+//                    }
                     // All further subchunks will also be totally cleared
                     clear = true;
                 } else {

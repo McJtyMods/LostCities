@@ -2,6 +2,7 @@ Upcoming:
 - Another optimization on worldgen
 - Fixed a problem with connecting walls and glass slabs that got broken in the previous release
 - Fixed a bug in the explosion correction code
+- Much better explosion damage propagation upwards so that there is less floating geometry
 
 1.18-5.1.2:
 - Much more stable way to generate the Lost City chunks. No more worldgen warnings and tallbuildings profile works again
