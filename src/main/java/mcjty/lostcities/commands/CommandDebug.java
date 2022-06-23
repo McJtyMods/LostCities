@@ -67,6 +67,9 @@ public class CommandDebug implements Command<CommandSourceStack> {
                 System.out.println("sphere.isEnabled() = " + sphere.isEnabled());
                 System.out.println("sphere.radius = " + sphere.getRadius());
 
+                int explosions = info.getExplosions().size();
+                System.out.println("explosions = " + explosions);
+
                 ChunkHeightmap heightmap = dimInfo.getFeature().getHeightmap(info.chunkX, info.chunkZ, player.getLevel());
                 int avg = 0;
                 for (int x = 0 ; x < 16 ; x++) {

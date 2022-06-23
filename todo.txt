@@ -1,0 +1,1 @@
+- Make explosions go upwards more for a more realistic shape
