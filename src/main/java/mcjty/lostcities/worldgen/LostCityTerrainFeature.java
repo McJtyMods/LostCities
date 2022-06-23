@@ -271,6 +271,7 @@ public class LostCityTerrainFeature {
 
         int chunkX = chunk.getPos().x;
         int chunkZ = chunk.getPos().z;
+
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
 
         // @todo this setup is not very clean
@@ -1586,7 +1587,7 @@ public class LostCityTerrainFeature {
     private boolean isSliceEmpty(int y) {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                if (driver.getBlock(x, y, z) == air) {
+                if (driver.getBlock(x, y, z) != air) {
                     return false;
                 }
             }
