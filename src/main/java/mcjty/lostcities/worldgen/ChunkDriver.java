@@ -20,7 +20,7 @@ import static net.minecraft.world.level.chunk.LevelChunkSection.*;
 
 public class ChunkDriver {
 
-    private WorldGenRegion region;
+    private LevelAccessor region;
     private ChunkAccess primer;
     private final BlockPos.MutableBlockPos current = new BlockPos.MutableBlockPos();
     private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
@@ -29,7 +29,7 @@ public class ChunkDriver {
     private int cx;
     private int cz;
 
-    public void setPrimer(WorldGenRegion region, ChunkAccess primer) {
+    public void setPrimer(LevelAccessor region, ChunkAccess primer) {
         this.region = region;
         this.primer = primer;
         if (primer != null) {
@@ -64,7 +64,7 @@ public class ChunkDriver {
         return state;
     }
 
-    public WorldGenRegion getRegion() {
+    public LevelAccessor getRegion() {
         return region;
     }
 

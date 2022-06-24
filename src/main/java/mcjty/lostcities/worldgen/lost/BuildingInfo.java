@@ -31,15 +31,15 @@ public class BuildingInfo implements ILostChunkInfo {
     public final LostCityProfile profile;       // Profile cactive for this chunk: can be different in city sphere worlds
 
     public final boolean outsideChunk;  // Only used for citysphere worlds and when this chunk is outside
-    public final int groundLevel;
+    public int groundLevel;
     public final int waterLevel;
 
     public final boolean isCity;
-    public final boolean hasBuilding;
+    public boolean hasBuilding;
     public final int building2x2Section;    // -1 for not, 0 for top left, 1 for top right, 2 for bottom left, 3 for bottom right
 
     public final ILostCityMultiBuilding multiBuilding;
-    public final ILostCityBuilding buildingType;
+    public ILostCityBuilding buildingType;
     public final BuildingPart fountainType;
     public final BuildingPart parkType;
     public final BuildingPart bridgeType;
@@ -48,10 +48,12 @@ public class BuildingInfo implements ILostChunkInfo {
     private final float stairPriority;      // A random number that indicates if this chunk should get a stair if there are competing stairs around it. The highest wins
     public final BuildingPart railDungeon;    // Dungeon next to rails. Will only generate if there are actually rails next to it
     public final StreetType streetType;
-    private final int floors;
-    public final int floorsBelowGround;
-    public final BuildingPart[] floorTypes;
-    public final BuildingPart[] floorTypes2;
+
+    private int floors;
+    public int cellars;
+    public BuildingPart[] floorTypes;
+    public BuildingPart[] floorTypes2;
+
     public final boolean[] connectionAtX;
     public final boolean[] connectionAtZ;
     public final boolean noLoot;
@@ -288,15 +290,15 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public boolean isValidFloor(int l) {
-        return (l + floorsBelowGround) >= 0 && (l + floorsBelowGround) < floorTypes.length;
+        return (l + cellars) >= 0 && (l + cellars) < floorTypes.length;
     }
 
     public BuildingPart getFloor(int l) {
-        return floorTypes[l + floorsBelowGround];
+        return floorTypes[l + cellars];
     }
 
     public BuildingPart getFloorPart2(int l) {
-        return floorTypes2[l + floorsBelowGround];
+        return floorTypes2[l + cellars];
     }
 
     public ILostCityBuilding getBuilding() {
@@ -617,7 +619,7 @@ public class BuildingInfo implements ILostChunkInfo {
         cityInfoMap.clear();
     }
 
-    public static synchronized  BuildingInfo getBuildingInfo(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static synchronized BuildingInfo getBuildingInfo(int chunkX, int chunkZ, IDimensionInfo provider) {
         ChunkCoord key = new ChunkCoord(provider.getType(), chunkX, chunkZ);
         if (buildingInfoMap.containsKey(key)) {
             return buildingInfoMap.get(key);
@@ -639,6 +641,45 @@ public class BuildingInfo implements ILostChunkInfo {
             }
         } else {
             return provider.getProfile();
+        }
+    }
+
+    // Only used for editing!
+    public void setBuildingType(Building building, int cellars, int floors, int groundLevel) {
+        buildingType = building;
+        hasBuilding = true;
+        this.floors = floors;
+        this.cellars = cellars;
+        this.groundLevel = groundLevel;
+
+        floorTypes = new BuildingPart[floors + cellars + 1];
+        floorTypes2 = new BuildingPart[floors + cellars + 1];
+
+        Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
+        rand.nextFloat();       // Compatibility?
+
+        for (int i = 0; i <= floors + cellars; i++) {
+            ConditionContext conditionContext = new ConditionContext(cityLevel + i - cellars, i - cellars, cellars, floors, "<none>", building.getName(),
+                    chunkX, chunkZ) {
+                @Override
+                public boolean isBuilding() {
+                    return true;
+                }
+
+                @Override
+                public boolean isSphere() {
+                    return CitySphere.isInSphere(chunkX, chunkZ, new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8), provider);
+                }
+
+                @Override
+                public ResourceLocation getBiome() {
+                    return provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value().getRegistryName();
+                }
+            };
+            String randomPart = building.getRandomPart(rand, conditionContext);
+            floorTypes[i] = Validate.notNull(AssetRegistries.PARTS.get(randomPart), "Null part for " + randomPart);
+            randomPart = building.getRandomPart2(rand, conditionContext);
+            floorTypes2[i] = AssetRegistries.PARTS.get(randomPart);
         }
     }
 
@@ -699,7 +740,7 @@ public class BuildingInfo implements ILostChunkInfo {
             fountainType = topleft.fountainType;
             parkType = topleft.parkType;
             floors = topleft.floors;
-            floorsBelowGround = topleft.floorsBelowGround;
+            cellars = topleft.cellars;
             doorBlock = topleft.doorBlock;
             bridgeType = topleft.bridgeType;
             stairType = topleft.stairType;
@@ -757,7 +798,7 @@ public class BuildingInfo implements ILostChunkInfo {
                     fb = 0;
                 }
             }
-            floorsBelowGround = fb;
+            cellars = fb;
 
             doorBlock = getRandomDoor(rand);
             bridgeType = AssetRegistries.PARTS.get(cs.getRandomBridge(rand));
@@ -774,14 +815,14 @@ public class BuildingInfo implements ILostChunkInfo {
             }
         }
 
-        floorTypes = new BuildingPart[floors + floorsBelowGround + 1];
-        floorTypes2 = new BuildingPart[floors + floorsBelowGround + 1];
+        floorTypes = new BuildingPart[floors + cellars + 1];
+        floorTypes2 = new BuildingPart[floors + cellars + 1];
 
-        connectionAtX = new boolean[floors + floorsBelowGround + 1];
-        connectionAtZ = new boolean[floors + floorsBelowGround + 1];
+        connectionAtX = new boolean[floors + cellars + 1];
+        connectionAtZ = new boolean[floors + cellars + 1];
         Building building = (Building) getBuilding();
-        for (int i = 0; i <= floors + floorsBelowGround; i++) {
-            ConditionContext conditionContext = new ConditionContext(cityLevel + i - floorsBelowGround, i - floorsBelowGround, floorsBelowGround, floors, "<none>", building.getName(),
+        for (int i = 0; i <= floors + cellars; i++) {
+            ConditionContext conditionContext = new ConditionContext(cityLevel + i - cellars, i - cellars, cellars, floors, "<none>", building.getName(),
                     chunkX, chunkZ) {
                 @Override
                 public boolean isBuilding() {
@@ -806,7 +847,7 @@ public class BuildingInfo implements ILostChunkInfo {
             connectionAtZ[i] = isCity(chunkX, chunkZ - 1, provider) && (rand.nextFloat() < profile.BUILDING_DOORWAYCHANCE);
         }
 
-        if (hasBuilding && floorsBelowGround > 0) {
+        if (hasBuilding && cellars > 0) {
             xRailCorridor = false;
             zRailCorridor = false;
         } else {
@@ -823,7 +864,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         if (rand.nextFloat() < profile.RAILWAY_DUNGEON_CHANCE) {
-            if (!hasBuilding || (Railway.RAILWAY_LEVEL_OFFSET < (cityLevel - floorsBelowGround))) {
+            if (!hasBuilding || (Railway.RAILWAY_LEVEL_OFFSET < (cityLevel - cellars))) {
                 railDungeon = AssetRegistries.PARTS.get(getCityStyle().getRandomRailDungeon(rand));
             } else {
                 railDungeon = null;
@@ -1311,14 +1352,14 @@ public class BuildingInfo implements ILostChunkInfo {
         while (i.canRailGoThrough() && i.xRailCorridor) {
             i = i.getXmin();
         }
-        if ((!i.hasBuilding) || i.floorsBelowGround == 0) {
+        if ((!i.hasBuilding) || i.cellars == 0) {
             return false;
         }
         i = getXmax();
         while (i.canRailGoThrough() && i.xRailCorridor) {
             i = i.getXmax();
         }
-        return !((!i.hasBuilding) || i.floorsBelowGround == 0);
+        return !((!i.hasBuilding) || i.cellars == 0);
     }
 
     public boolean hasZCorridor() {
@@ -1329,14 +1370,14 @@ public class BuildingInfo implements ILostChunkInfo {
         while (i.canRailGoThrough() && i.zRailCorridor) {
             i = i.getZmin();
         }
-        if ((!i.hasBuilding) || i.floorsBelowGround == 0) {
+        if ((!i.hasBuilding) || i.cellars == 0) {
             return false;
         }
         i = getZmax();
         while (i.canRailGoThrough() && i.zRailCorridor) {
             i = i.getZmax();
         }
-        return !((!i.hasBuilding) || i.floorsBelowGround == 0);
+        return !((!i.hasBuilding) || i.cellars == 0);
     }
 
     // Return true if it is possible for a rail section to go through here
@@ -1350,7 +1391,7 @@ public class BuildingInfo implements ILostChunkInfo {
             return true;
         }
         // Otherwise we can only pass if this building has no floors below ground
-        return floorsBelowGround == 0;
+        return cellars == 0;
     }
 
     // Return true if it is possible for a water corridor to go through here
@@ -1364,7 +1405,7 @@ public class BuildingInfo implements ILostChunkInfo {
             return true;
         }
         // Otherwise we can only pass if this building has at most one floor below ground
-        return floorsBelowGround <= 1;
+        return cellars <= 1;
     }
 
     // Return true if the road from a neighbouring chunk can extend into this chunk
@@ -1685,7 +1726,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
     @Override
     public int getNumCellars() {
-        return floorsBelowGround;
+        return cellars;
     }
 
     @Override

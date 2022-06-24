@@ -1,3 +1,6 @@
+Upcoming:
+- New createbuilding command to create a building
+
 1.18-5.2.0:
 - Another optimization on worldgen
 - Fixed a problem with connecting walls and glass slabs that got broken in the previous release

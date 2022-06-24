@@ -33,9 +33,9 @@ public class CommandMap implements Command<CommandSourceStack> {
             IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getLevel());
             if (dimInfo != null) {
                 ChunkPos pos = new ChunkPos(position);
-                for (int z = pos.z - 40 ; z <= pos.z + 40 ; z++) {
+                for (int z = pos.z - 20 ; z <= pos.z + 20 ; z++) {
                     String buf = "";
-                    for (int x = pos.x - 40 ; x <= pos.x + 40 ; x++) {
+                    for (int x = pos.x - 20 ; x <= pos.x + 20 ; x++) {
                         BuildingInfo info = BuildingInfo.getBuildingInfo(pos.x + x, pos.z + z, dimInfo);
                         if (info.isCity && info.hasBuilding) {
                             buf += "B";

@@ -266,7 +266,7 @@ public class LostCityTerrainFeature {
     }
 
     public void generate(WorldGenRegion region, ChunkAccess chunk) {
-        WorldGenRegion oldRegion = driver.getRegion();
+        LevelAccessor oldRegion = driver.getRegion();
         ChunkAccess oldChunk = driver.getPrimer();
         driver.setPrimer(region, chunk);
 
@@ -1398,10 +1398,6 @@ public class LostCityTerrainFeature {
         }
     }
 
-    public long getSeed() {
-        return driver.getRegion().getSeed();
-    }
-
     private int countNotEmpty(int y, int max) {
         int cnt = 0;
         for (int x = 0; x < 16; x++) {
@@ -2182,7 +2178,7 @@ public class LostCityTerrainFeature {
             }
             int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / FLOORHEIGHT;
             int floor = (pos.getY() - info.getCityGroundLevel()) / FLOORHEIGHT;
-            ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
+            ConditionContext conditionContext = new ConditionContext(level, floor, info.cellars, info.getNumFloors(),
                     todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
                 @Override
                 public boolean isSphere() {
@@ -2233,7 +2229,7 @@ public class LostCityTerrainFeature {
                 String lootTable = todo.getCondition();
                 int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / FLOORHEIGHT;
                 int floor = (pos.getY() - info.getCityGroundLevel()) / FLOORHEIGHT;
-                ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
+                ConditionContext conditionContext = new ConditionContext(level, floor, info.cellars, info.getNumFloors(),
                         todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
                     @Override
                     public boolean isSphere() {
@@ -2353,7 +2349,7 @@ public class LostCityTerrainFeature {
     }
 
     private void generateBuilding(BuildingInfo info, ChunkHeightmap heightmap) {
-        int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * FLOORHEIGHT;
+        int lowestLevel = info.getCityGroundLevel() - info.cellars * FLOORHEIGHT;
 
         Character borderBlock = info.getCityStyle().getBorderBlock();
         CompiledPalette palette = info.getCompiledPalette();
@@ -2417,7 +2413,7 @@ public class LostCityTerrainFeature {
         }
 
         int height = lowestLevel;
-        for (int f = -info.floorsBelowGround; f <= info.getNumFloors(); f++) {
+        for (int f = -info.cellars; f <= info.getNumFloors(); f++) {
             // In default landscape type we clear the landscape on top of the building when we are at the top floor
             if (f == info.getNumFloors()) {
                 if (profile.isDefault()) {
@@ -2441,7 +2437,7 @@ public class LostCityTerrainFeature {
             height += FLOORHEIGHT;    // We currently only support 6 here
         }
 
-        if (info.floorsBelowGround > 0) {
+        if (info.cellars > 0) {
             // Underground we replace the glass with the filler
             for (int x = 0; x < 16; x++) {
                 // Use safe version because this may end up being lower
@@ -2454,13 +2450,14 @@ public class LostCityTerrainFeature {
             }
         }
 
-        if (info.floorsBelowGround >= 1) {
+        if (info.cellars >= 1) {
             // We have to potentially connect to corridors
             generateCorridorConnections(info);
         }
     }
 
     private void clearToMax(BuildingInfo info, ChunkHeightmap heightmap, int height) {
+        // @todo 255 max height!
         int maximumHeight = Math.min(255, heightmap.getMaximumHeight() + 10);
         if (height < maximumHeight) {
             for (int x = 0; x < 16; x++) {
@@ -2503,7 +2500,7 @@ public class LostCityTerrainFeature {
 
         height--;       // Start generating doors one below for the filler
 
-        if (info.hasConnectionAtX(f + info.floorsBelowGround)) {
+        if (info.hasConnectionAtX(f + info.cellars)) {
             int x = 0;
             if (hasConnectionWithBuilding(f, info, info.getXmin())) {
                 driver.setBlockRange(x, height, 6, height + 4, filler);
@@ -2534,7 +2531,7 @@ public class LostCityTerrainFeature {
             driver.setBlockRange(x, height, 9, height + 4, filler);
             driver.current(x, height, 7).add(filler).add(air).add(air).add(filler);
             driver.current(x, height, 8).add(filler).add(air).add(air).add(filler);
-        } else if (hasConnectionToTopOrOutside(f, info, info.getXmax()) && (info.getXmax().hasConnectionAtXFromStreet(f + info.getXmax().floorsBelowGround))) {
+        } else if (hasConnectionToTopOrOutside(f, info, info.getXmax()) && (info.getXmax().hasConnectionAtXFromStreet(f + info.getXmax().cellars))) {
             int x = 15;
             driver.setBlockRange(x, height, 6, height + 4, filler);
             driver.setBlockRange(x, height, 9, height + 4, filler);
@@ -2549,7 +2546,7 @@ public class LostCityTerrainFeature {
                 .add(getDoor(info.doorBlock, true, true, net.minecraft.core.Direction.WEST))
                 .add(filler);
         }
-        if (info.hasConnectionAtZ(f + info.floorsBelowGround)) {
+        if (info.hasConnectionAtZ(f + info.cellars)) {
             int z = 0;
             if (hasConnectionWithBuilding(f, info, info.getZmin())) {
                 driver.setBlockRange(6, height, z, height + 4, filler);
@@ -2577,7 +2574,7 @@ public class LostCityTerrainFeature {
             driver.setBlockRange(9, height, z, height + 4, filler);
             driver.current(7, height, z).add(filler).add(air).add(air).add(filler);
             driver.current(8, height, z).add(filler).add(air).add(air).add(filler);
-        } else if (hasConnectionToTopOrOutside(f, info, info.getZmax()) && (info.getZmax().hasConnectionAtZFromStreet(f + info.getZmax().floorsBelowGround))) {
+        } else if (hasConnectionToTopOrOutside(f, info, info.getZmax()) && (info.getZmax().hasConnectionAtZFromStreet(f + info.getZmax().cellars))) {
             int z = 15;
             driver.setBlockRange(6, height, z, height + 4, filler);
             driver.setBlockRange(9, height, z, height + 4, filler);
@@ -2630,8 +2627,8 @@ public class LostCityTerrainFeature {
         if (info2.isValidFloor(localAdjacent) && info2.getFloor(localAdjacent).getMetaBoolean("dontconnect")) {
             return false;
         }
-        int level = localAdjacent + info2.floorsBelowGround;
-        return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.floorsBelowGround)) && info2.hasConnectionAt(level, x);
+        int level = localAdjacent + info2.cellars;
+        return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.cellars)) && info2.hasConnectionAt(level, x);
     }
 
     private boolean hasConnectionToTopOrOutside(int localLevel, BuildingInfo info, BuildingInfo info2) {
@@ -2647,7 +2644,7 @@ public class LostCityTerrainFeature {
     private boolean hasConnectionWithBuilding(int localLevel, BuildingInfo info, BuildingInfo info2) {
         int globalLevel = info.localToGlobal(localLevel);
         int localAdjacent = info2.globalToLocal(globalLevel);
-        return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.floorsBelowGround));
+        return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.cellars));
     }
 
     private boolean isSide(int x, int z) {

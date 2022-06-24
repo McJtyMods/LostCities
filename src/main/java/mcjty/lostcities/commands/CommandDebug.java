@@ -39,7 +39,7 @@ public class CommandDebug implements Command<CommandSourceStack> {
 //            System.out.println("provider.hasMansion = " + info.provider.hasMansion(info.chunkX, info.chunkZ));
                 System.out.println("buildingType = " + info.buildingType.getName());
                 System.out.println("floors = " + info.getNumFloors());
-                System.out.println("floorsBelowGround = " + info.floorsBelowGround);
+                System.out.println("floorsBelowGround = " + info.cellars);
                 System.out.println("cityLevel = " + info.cityLevel);
                 System.out.println("cityGroundLevel = " + info.getCityGroundLevel());
                 System.out.println("isCity = " + info.isCity);
