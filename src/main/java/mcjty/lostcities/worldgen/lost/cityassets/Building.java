@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityBuilding;
+import mcjty.lostcities.setup.ModSetup;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -23,6 +24,9 @@ public class Building implements ILostCityBuilding {
     private char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
     private float prefersLonely = 0.0f; // The chance this this building is alone. If 1.0f this building wants to be alone all the time
 
+    private Palette localPalette = null;
+    String refPaletteName;
+
     private final List<Pair<Predicate<ConditionContext>, String>> parts = new ArrayList<>();
     private final List<Pair<Predicate<ConditionContext>, String>> parts2 = new ArrayList<>();
 
@@ -37,6 +41,18 @@ public class Building implements ILostCityBuilding {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Palette getLocalPalette() {
+        if (localPalette == null && refPaletteName != null) {
+            localPalette = AssetRegistries.PALETTES.get(refPaletteName);
+            if (localPalette == null) {
+                ModSetup.getLogger().error("Could not find palette '" + refPaletteName + "'!");
+                throw new RuntimeException("Could not find palette '" + refPaletteName + "'!");
+            }
+        }
+        return localPalette;
     }
 
     @Override
@@ -62,6 +78,16 @@ public class Building implements ILostCityBuilding {
             fillerBlock = object.get("filler").getAsCharacter();
         } else {
             throw new RuntimeException("'filler' is required for building '" + name + "'!");
+        }
+
+        if (object.has("palette")) {
+            if (object.get("palette").isJsonArray()) {
+                JsonArray palette = object.get("palette").getAsJsonArray();
+                localPalette = new Palette();
+                localPalette.parsePaletteArray(palette);
+            } else {
+                refPaletteName = object.get("palette").getAsString();
+            }
         }
 
         readParts(object, this.parts, "parts");

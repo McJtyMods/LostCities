@@ -369,7 +369,7 @@
     },
     "buildings": [
       {
-        "factor": 0.4,
+        "factor": 0.3,
         "building": "building1"
       },
       {
@@ -387,6 +387,18 @@
       {
         "factor": 0.3,
         "building": "building5"
+      },
+      {
+        "factor": 0.2,
+        "building": "building6"
+      },
+      {
+        "factor": 0.2,
+        "building": "building7"
+      },
+      {
+        "factor": 0.4,
+        "building": "building8"
       }
     ],
     "multibuildings": [
@@ -3258,6 +3270,199 @@
       {
         "top": false,
         "part": "building5_4"
+      },
+      {
+        "top": true,
+        "part": "top1x1_2"
+      },
+      {
+        "top": true,
+        "part": "top1x1_3"
+      },
+      {
+        "top": true,
+        "part": "top1x1_4"
+      },
+      {
+        "top": true,
+        "part": "top1x1_5"
+      }
+    ]
+  },
+
+  {
+    "type": "building",
+    "name": "building6",
+    "filler": "#",
+    "palette": [
+      {
+        "char": "#",
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:cracked_deepslate_tiles"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:deepslate_tiles"
+          }
+        ]
+      }
+    ],
+    "parts": [
+      {
+        "top": false,
+        "part": "building5_1"
+      },
+      {
+        "top": false,
+        "part": "building5_2"
+      },
+      {
+        "top": false,
+        "part": "building5_3"
+      },
+      {
+        "top": false,
+        "part": "building5_4"
+      },
+      {
+        "top": true,
+        "part": "top1x1_2"
+      },
+      {
+        "top": true,
+        "part": "top1x1_3"
+      },
+      {
+        "top": true,
+        "part": "top1x1_4"
+      },
+      {
+        "top": true,
+        "part": "top1x1_5"
+      }
+    ]
+  },
+
+  {
+    "type": "building",
+    "name": "building7",
+    "filler": "#",
+    "palette": [
+      {
+        "char": "#",
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:polished_blackstone_bricks"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:cracked_polished_blackstone_bricks"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:polished_blackstone"
+          }
+        ]
+      }
+    ],
+    "parts": [
+      {
+        "top": false,
+        "part": "building4_1"
+      },
+      {
+        "top": false,
+        "part": "building4_2"
+      },
+      {
+        "top": false,
+        "part": "building4_3"
+      },
+      {
+        "top": false,
+        "part": "building4_4"
+      },
+      {
+        "top": true,
+        "part": "top4_1"
+      },
+      {
+        "top": true,
+        "part": "top4_2"
+      },
+      {
+        "top": true,
+        "part": "top4_3"
+      }
+    ]
+  },
+
+  {
+    "type": "building",
+    "name": "building8",
+    "filler": "#",
+    "palette": [
+      {
+        "char": "#",
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:cracked_stone_bricks"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:stone_bricks"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:stone"
+          }
+        ]
+      }
+    ],
+    "parts": [
+      {
+        "top": false,
+        "part": "building1_1"
+      },
+      {
+        "top": false,
+        "part": "building1_2"
+      },
+      {
+        "top": false,
+        "part": "building1_3"
+      },
+      {
+        "top": false,
+        "part": "building1_4"
+      },
+      {
+        "top": false,
+        "part": "building1_5"
+      },
+      {
+        "top": false,
+        "part": "building1_6"
+      },
+      {
+        "top": false,
+        "part": "building1_7"
+      },
+      {
+        "top": false,
+        "part": "building1_8"
+      },
+      {
+        "top": false,
+        "part": "building1_9"
+      },
+      {
+        "top": true,
+        "part": "top1x1_1"
       },
       {
         "top": true,

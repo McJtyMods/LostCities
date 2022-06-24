@@ -69,26 +69,28 @@ public class CompiledPalette {
     public void addPalettes(Palette[] palettes) {
         // First add the straight palette entries
         for (Palette p : palettes) {
-            for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {
-                Object value = entry.getValue();
-                if (value instanceof BlockState) {
-                    palette.put(entry.getKey(), value);
-                } else if (value instanceof Pair[]) {
-                    Pair<Integer, BlockState>[] r = (Pair<Integer, BlockState>[]) value;
-                    BlockState[] randomBlocks = new BlockState[128];
-                    int idx = 0;
-                    for (Pair<Integer, BlockState> pair : r) {
-                        idx = addEntries(randomBlocks, idx, pair.getRight(), pair.getLeft());
-                        if (idx >= randomBlocks.length) {
-                            break;
+            if (p != null) {
+                for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {
+                    Object value = entry.getValue();
+                    if (value instanceof BlockState) {
+                        palette.put(entry.getKey(), value);
+                    } else if (value instanceof Pair[]) {
+                        Pair<Integer, BlockState>[] r = (Pair<Integer, BlockState>[]) value;
+                        BlockState[] randomBlocks = new BlockState[128];
+                        int idx = 0;
+                        for (Pair<Integer, BlockState> pair : r) {
+                            idx = addEntries(randomBlocks, idx, pair.getRight(), pair.getLeft());
+                            if (idx >= randomBlocks.length) {
+                                break;
+                            }
                         }
+                        palette.put(entry.getKey(), randomBlocks);
+                    } else if (!(value instanceof String)) {
+                        if (value == null) {
+                            throw new RuntimeException("Invalid palette entry for '" + entry.getKey() + "'!");
+                        }
+                        palette.put(entry.getKey(), value);
                     }
-                    palette.put(entry.getKey(), randomBlocks);
-                } else if (!(value instanceof String)) {
-                    if (value == null) {
-                        throw new RuntimeException("Invalid palette entry for '" + entry.getKey() + "'!");
-                    }
-                    palette.put(entry.getKey(), value);
                 }
             }
         }
@@ -99,14 +101,16 @@ public class CompiledPalette {
 
             // Now add the palette entries that refer to other palette entries
             for (Palette p : palettes) {
-                for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {
-                    Object value = entry.getValue();
-                    if (value instanceof String) {
-                        char c = ((String) value).charAt(0);
-                        if (palette.containsKey(c) && !palette.containsKey(entry.getKey())) {
-                            Object s = palette.get(c);
-                            palette.put(entry.getKey(), s);
-                            dirty = true;
+                if (p != null) {
+                    for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {
+                        Object value = entry.getValue();
+                        if (value instanceof String) {
+                            char c = ((String) value).charAt(0);
+                            if (palette.containsKey(c) && !palette.containsKey(entry.getKey())) {
+                                Object s = palette.get(c);
+                                palette.put(entry.getKey(), s);
+                                dirty = true;
+                            }
                         }
                     }
                 }
@@ -114,20 +118,22 @@ public class CompiledPalette {
         }
 
         for (Palette p : palettes) {
-            for (Map.Entry<BlockState, BlockState> entry : p.getDamaged().entrySet()) {
-                BlockState c = entry.getKey();
-                damagedToBlock.put(c, entry.getValue());
-            }
-            for (Map.Entry<Character, String> entry : p.getMobIds().entrySet()) {
-                Character c = entry.getKey();
-                information.put(c, new Info(entry.getValue(), null, false));
-            }
-            for (Map.Entry<Character, String> entry : p.getLootTables().entrySet()) {
-                Character c = entry.getKey();
-                information.put(c, new Info(null, entry.getValue(), false));
-            }
-            for (Character c : p.getTorches()) {
-                information.put(c, new Info(null, null, true));
+            if (p != null) {
+                for (Map.Entry<BlockState, BlockState> entry : p.getDamaged().entrySet()) {
+                    BlockState c = entry.getKey();
+                    damagedToBlock.put(c, entry.getValue());
+                }
+                for (Map.Entry<Character, String> entry : p.getMobIds().entrySet()) {
+                    Character c = entry.getKey();
+                    information.put(c, new Info(entry.getValue(), null, false));
+                }
+                for (Map.Entry<Character, String> entry : p.getLootTables().entrySet()) {
+                    Character c = entry.getKey();
+                    information.put(c, new Info(null, entry.getValue(), false));
+                }
+                for (Character c : p.getTorches()) {
+                    information.put(c, new Info(null, null, true));
+                }
             }
         }
     }

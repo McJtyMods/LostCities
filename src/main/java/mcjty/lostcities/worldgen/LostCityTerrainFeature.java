@@ -2067,9 +2067,10 @@ public class LostCityTerrainFeature {
                              int ox, int oy, int oz, boolean airWaterLevel) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
         // Cache the combined palette?
-        Palette localPalette = part.getLocalPalette();
-        if (localPalette != null) {
-            compiledPalette = new CompiledPalette(compiledPalette, localPalette);
+        Palette partPalette = part.getLocalPalette();
+        Palette buildingPalette = info.getBuilding().getLocalPalette();
+        if (partPalette != null || buildingPalette != null) {
+            compiledPalette = new CompiledPalette(compiledPalette, partPalette, buildingPalette);
         }
 
         boolean nowater = part.getMetaBoolean("nowater");

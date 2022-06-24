@@ -4,6 +4,8 @@ Upcoming:
 - Fixed a bug in the explosion correction code
 - Much better explosion damage propagation upwards so that there is less floating geometry
 - Code cleanups and small fixes
+- New feature where a building can override the palette used by the parts
+- Added 3 new building types using that feature with more modern building blocks
 
 1.18-5.1.2:
 - Much more stable way to generate the Lost City chunks. No more worldgen warnings and tallbuildings profile works again
