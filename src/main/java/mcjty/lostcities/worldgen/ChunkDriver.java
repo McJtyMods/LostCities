@@ -124,10 +124,21 @@ public class ChunkDriver {
     }
 
     public void setBlockRange(int x, int y, int z, int y2, BlockState state) {
-        BlockState air = Blocks.AIR.defaultBlockState();
         pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
         while (y < y2) {
             setBlock(pos, state);
+            y++;
+            pos.setY(y);
+        }
+    }
+
+    public void setBlockRange(int x, int y, int z, int y2, BlockState state, Predicate<BlockState> test) {
+        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
+        while (y < y2) {
+            BlockState st = getBlock(pos);
+            if (st != state && test.test(st)) {
+                setBlock(pos, state);
+            }
             y++;
             pos.setY(y);
         }
@@ -144,50 +155,6 @@ public class ChunkDriver {
     }
 
     public void setBlockRangeToAir(int x, int y, int z, int y2, Predicate<BlockState> test) {
-        BlockState air = Blocks.AIR.defaultBlockState();
-        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
-        while (y < y2) {
-            BlockState st = getBlock(pos);
-            if (st != air && test.test(st)) {
-                setBlock(pos, air);
-            }
-            y++;
-            pos.setY(y);
-        }
-    }
-
-    public void setBlockRangeToAirSafe(int x, int y, int z, int y2) {
-        BlockState air = Blocks.AIR.defaultBlockState();
-        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
-        while (y < y2) {
-            setBlock(pos, air);
-            y++;
-            pos.setY(y);
-        }
-    }
-
-    public void setBlockRangeSafe(int x, int y, int z, int y2, BlockState state) {
-        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
-        while (y < y2) {
-            setBlock(pos, state);
-            y++;
-            pos.setY(y);
-        }
-    }
-
-    public void setBlockRangeSafe(int x, int y, int z, int y2, BlockState state, Predicate<BlockState> test) {
-        pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
-        while (y < y2) {
-            BlockState st = getBlock(pos);
-            if (st != state && test.test(st)) {
-                setBlock(pos, state);
-            }
-            y++;
-            pos.setY(y);
-        }
-    }
-
-    public void setBlockRangeToAirSafe(int x, int y, int z, int y2, Predicate<BlockState> test) {
         BlockState air = Blocks.AIR.defaultBlockState();
         pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
         while (y < y2) {

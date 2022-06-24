@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
 import mcjty.lostcities.api.RailChunkType;
+import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.ModSetup;
@@ -19,7 +20,6 @@ import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.*;
@@ -46,6 +46,8 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 public class LostCityTerrainFeature {
+
+    public static int FLOORHEIGHT = 6;
 
     private static int gSeed = 123456789;
     private final int mainGroundLevel;
@@ -335,8 +337,7 @@ public class LostCityTerrainFeature {
 //        if (!MinecraftForge.EVENT_BUS.post(event)) {
             if (info.getDamageArea().hasExplosions()) {
                 breakBlocksForDamageNew(chunkX, chunkZ, info);
-//                fixAfterExplosionNew(info, rand);
-                fixAfterExplosionNewest(info, rand);
+                fixAfterExplosion(info, rand);
             }
             generateDebris(rand, info);
 //        }
@@ -532,94 +533,6 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void breakBlocksForDamage(int chunkX, int chunkZ, BuildingInfo info) {
-        int cx = chunkX * 16;
-        int cz = chunkZ * 16;
-
-        DamageArea damageArea = info.getDamageArea();
-
-        boolean clear = false;
-        float damageFactor = 1.0f;
-
-        // @todo this only supports explosions between 0 and 256 for now
-        for (int yy = 0; yy < 16; yy++) {
-            if (clear || damageArea.hasExplosions(yy)) {
-                if (clear || damageArea.isCompletelyDestroyed(yy)) {
-                    // @TODO BAD
-                    // @todo 1.16 this can occasionally cause a crash in the lighting engine
-//                    for (int x = 0; x < 16; x++) {
-//                        for (int z = 0; z < 16; z++) {
-//                            int height = yy * 16;
-//                            driver.current(x, height, z);
-//                            for (int y = 0; y < 16; y++) {
-                                // @todo I suspect this might be a vanilla bug
-//                                driver.add(((height + y) <= info.waterLevel) ? liquid : air);
-//                            }
-//                        }
-//                    }
-                    // All further subchunks will also be totally cleared
-                    clear = true;
-                } else {
-                    for (int y = 0; y < 16; y++) {
-                        int cntDamaged = 0;
-                        int cntAir = 0;
-                        int cury = yy * 16 + y;
-                        for (int x = 0; x < 16; x++) {
-                            driver.current(x, cury, 0);
-                            for (int z = 0; z < 16; z++) {
-                                BlockState d = driver.getBlock();
-                                if (d != air || cury <= info.waterLevel) {
-                                    float damage = damageArea.getDamage(cx + x, cury, cz + z) * damageFactor;
-                                    if (damage >= 0.001) {
-                                        BlockState newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette(), liquid);
-                                        if (newd != d) {
-                                            driver.block(newd);
-                                            cntDamaged++;
-                                        }
-                                    }
-                                } else {
-                                    cntAir++;
-                                }
-                                driver.incZ();
-                            }
-                        }
-
-                        int tot = cntDamaged + cntAir;
-                        if (tot > 250) {
-                            damageFactor = 200;
-                            clear = true;
-                        } else if (tot > 220) {
-                            damageFactor = damageFactor * 1.4f;
-                        } else if (tot > 180) {
-                            damageFactor = damageFactor * 1.2f;
-                        }
-
-                    }
-
-//                    for (int x = 0; x < 16; x++) {
-//                        for (int z = 0; z < 16; z++) {
-//                            int index = (x << 12) | (z << 8) + yy * 16;
-//                            for (int y = 0; y < 16; y++) {
-//                                char d = primer.data[index];
-//                                if (d != airChar || (index & 0xff) < waterLevel) {
-//                                    int cury = yy * 16 + y;
-//                                    float damage = damageArea.getDamage(cx + x, cury, cz + z);
-//                                    if (damage >= 0.001) {
-//                                        Character newd = damageArea.damageBlock(d, provider, cury, damage, info.getCompiledPalette());
-//                                        if (newd != d) {
-//                                            primer.data[index] = newd;
-//                                        }
-//                                    }
-//                                }
-//                                index++;
-//                            }
-//                        }
-//                    }
-                }
-            }
-        }
-    }
-
     private void generateHighways(int chunkX, int chunkZ, BuildingInfo info) {
         int levelX = Highway.getXHighwayLevel(chunkX, chunkZ, provider, info.profile);
         int levelZ = Highway.getZHighwayLevel(chunkX, chunkZ, provider, info.profile);
@@ -650,7 +563,7 @@ public class LostCityTerrainFeature {
     }
 
     private void generateHighwayPart(BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix) {
-        int highwayGroundLevel = info.groundLevel + level * 6;
+        int highwayGroundLevel = info.groundLevel + level * FLOORHEIGHT;
 
         BuildingPart part;
         if (info.isTunnel(level)) {
@@ -718,8 +631,8 @@ public class LostCityTerrainFeature {
     private void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater) {
         if (dowater) {
             // Special case for drowned city
-            driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquid);
-            driver.setBlockRangeToAirSafe(x, info.waterLevel+1, z, height2);
+            driver.setBlockRange(x, height1, z, info.waterLevel, liquid);
+            driver.setBlockRangeToAir(x, info.waterLevel+1, z, height2);
         } else {
             driver.setBlockRangeToAir(x, height1, z, height2);
         }
@@ -728,8 +641,8 @@ public class LostCityTerrainFeature {
     private void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater, Predicate<BlockState> test) {
         if (dowater) {
             // Special case for drowned city
-            driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquid, test);
-            driver.setBlockRangeToAirSafe(x, info.waterLevel+1, z, height2, test);
+            driver.setBlockRange(x, height1, z, info.waterLevel, liquid, test);
+            driver.setBlockRangeToAir(x, info.waterLevel+1, z, height2, test);
         } else {
             driver.setBlockRangeToAir(x, height1, z, height2, test);
         }
@@ -1030,8 +943,8 @@ public class LostCityTerrainFeature {
 //
 //        if (dowater) {
 //            // Special case for drowned city
-//            driver.setBlockRangeSafe(x, height1, z, info.waterLevel, liquid);
-//            driver.setBlockRangeSafe(x, info.waterLevel+1, z, height2, air);
+//            driver.setBlockRange(x, height1, z, info.waterLevel, liquid);
+//            driver.setBlockRange(x, info.waterLevel+1, z, height2, air);
 //        } else {
 //            driver.setBlockRange(x, height1, z, height2, air);
 //        }
@@ -1065,7 +978,7 @@ public class LostCityTerrainFeature {
                     } else if (info2.getMaxHighwayLevel() >= 0 && !info2.isTunnel(info2.getMaxHighwayLevel())) {
                         // There is a highway but no tunnel. So we need to smooth downwards
                         GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
-                        box.height = info.groundLevel + info2.getMaxHighwayLevel() * 6;
+                        box.height = info.groundLevel + info2.getMaxHighwayLevel() * FLOORHEIGHT;
                         boxesDownwards.add(box);
                     }
                 }
@@ -1251,13 +1164,13 @@ public class LostCityTerrainFeature {
         }
         if (info.getZmin().getRailInfo().getType() == RailChunkType.HORIZONTAL ||
                 info.getZmax().getRailInfo().getType() == RailChunkType.HORIZONTAL) {
-            int height = info.groundLevel + Railway.RAILWAY_LEVEL_OFFSET * 6;
+            int height = info.groundLevel + Railway.RAILWAY_LEVEL_OFFSET * FLOORHEIGHT;
             generatePart(info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0, false);
         }
     }
 
     private void generateRailways(BuildingInfo info, Railway.RailChunkInfo railInfo) {
-        int height = info.groundLevel + railInfo.getLevel() * 6;
+        int height = info.groundLevel + railInfo.getLevel() * FLOORHEIGHT;
         RailChunkType type = railInfo.getType();
         BuildingPart part;
         Transform transform = Transform.ROTATE_NONE;
@@ -1466,10 +1379,10 @@ public class LostCityTerrainFeature {
         if (needsStaircase) {
             part = AssetRegistries.PARTS.get("station_staircase");
             for (int i = railInfo.getLevel() + 1; i < info.cityLevel; i++) {
-                height = info.groundLevel + i * 6;
+                height = info.groundLevel + i * FLOORHEIGHT;
                 generatePart(info, part, transform, 0, height, 0, false);
             }
-            height = info.groundLevel + info.cityLevel * 6;
+            height = info.groundLevel + info.cityLevel * FLOORHEIGHT;
             part = AssetRegistries.PARTS.get("station_staircase_surface");
             generatePart(info, part, transform, 0, height, 0, false);
         }
@@ -1496,189 +1409,28 @@ public class LostCityTerrainFeature {
         return driver.getRegion().getSeed();
     }
 
-    private static class Blob implements Comparable<Blob> {
-        private final int starty;
-        private final Set<BlockPos> connectedBlocks = new HashSet<>();
-        private final Map<Integer, Integer> blocksPerY = new HashMap<>();
-        private int connections = 0;
-        private int lowestY;
-        private int highestY;
-        private float avgdamage;
-        private int cntMindamage;  // Number of blocks that receive almost no damage
-
-        public Blob(int starty, LevelReader levelReader) {
-            this.starty = starty;
-            lowestY = levelReader.getMaxBuildHeight();
-            highestY = levelReader.getMinBuildHeight();
-        }
-
-        public float getAvgdamage() {
-            return avgdamage;
-        }
-
-        public int getCntMindamage() {
-            return cntMindamage;
-        }
-
-        public boolean contains(BlockPos index) {
-            return connectedBlocks.contains(index);
-        }
-
-        public int getLowestY() {
-            return lowestY;
-        }
-
-        public int getHighestY() {
-            return highestY;
-        }
-
-//        public Set<IIndex> cut(int y) {
-//            Set<IIndex> toRemove = new HashSet<>();
-//            for (IIndex block : connectedBlocks) {
-//                if ((block.getY()) >= y) {
-//                    toRemove.add(block);
-//                }
-//            }
-//            connectedBlocks.removeAll(toRemove);
-//            return toRemove;
-//        }
-//
-        public int needsSplitting() {
-            float averageBlocksPerLevel = (float) connectedBlocks.size() / (highestY - lowestY + 1);
-            int connectionThreshold = (int) (averageBlocksPerLevel / 10);
-            if (connectionThreshold <= 0) {
-                // Too small to split
-                return -1;
-            }
-            int cuttingY = -1;      // Where we will cut
-            int cuttingCount = 1000000;
-            for (int y = lowestY; y <= highestY; y++) {
-                if (y >= 3 && blocksPerY.get(y) <= connectionThreshold) {
-                    if (blocksPerY.get(y) < cuttingCount) {
-                        cuttingCount = blocksPerY.get(y);
-                        cuttingY = y;
-                    } else if (blocksPerY.get(y) > cuttingCount * 4) {
-                        return cuttingY;
-                    }
-                }
-            }
-            return -1;
-        }
-
-        public boolean destroyOrMoveThis(IDimensionInfo provider, BuildingInfo info) {
-            return connections < 5 || (((float) connections / connectedBlocks.size()) < info.profile.DESTROY_LONE_BLOCKS_FACTOR);
-        }
-
-        private boolean isOutside(BuildingInfo info, int x, int y, int z) {
-            if (x < 0) {
-                if (y <= info.getXmin().getMaxHeight() + 3) {
-                    connections++;
-                }
-                return true;
-            }
-            if (x > 15) {
-                if (y <= info.getXmax().getMaxHeight() + 3) {
-                    connections++;
-                }
-                return true;
-            }
-            if (z < 0) {
-                if (y <= info.getZmin().getMaxHeight() + 3) {
-                    connections++;
-                }
-                return true;
-            }
-            if (z > 15) {
-                if (y <= info.getZmax().getMaxHeight() + 3) {
-                    connections++;
-                }
-                return true;
-            }
-            if (y < starty) {
-                connections += 5;
-                return true;
-            }
-            return false;
-        }
-
-        public void scan(BuildingInfo info, ChunkDriver driver, BlockState air, BlockState liquid, BlockPos pos) {
-            DamageArea damageArea = info.getDamageArea();
-            avgdamage = 0;
-            cntMindamage = 0;
-            Queue<BlockPos> todo = new ArrayDeque<>();
-            todo.add(pos);
-
-            while (!todo.isEmpty()) {
-                pos = todo.poll();
-                int x = pos.getX();
-                int y = pos.getY();
-                int z = pos.getZ();
-                if (connectedBlocks.contains(pos)) {
-                    continue;
-                }
-                if (isOutside(info, x, y, z)) {
-                    continue;
-                }
-                driver.current(x, y, z);
-                if (isEmpty(driver.getBlock())) {
-                    continue;
-                }
-                connectedBlocks.add(pos);
-                float damage = damageArea.getDamage(x, y, z);
-                if (damage < 0.01f) {
-                    cntMindamage++;
-                }
-                avgdamage += damage;
-                if (!blocksPerY.containsKey(y)) {
-                    blocksPerY.put(y, 1);
-                } else {
-                    blocksPerY.put(y, blocksPerY.get(y) + 1);
-                }
-                if (y < lowestY) {
-                    lowestY = y;
-                }
-                if (y > highestY) {
-                    highestY = y;
-                }
-                todo.add(pos.above());
-                todo.add(pos.below());
-                todo.add(pos.east());
-                todo.add(pos.west());
-                todo.add(pos.south());
-                todo.add(pos.north());
-            }
-
-            avgdamage /= (float) connectedBlocks.size();
-        }
-
-        @Override
-        public int compareTo(Blob o) {
-            return this.lowestY - o.lowestY;
-        }
-    }
-
-    private Blob findBlob(List<Blob> blobs, BlockPos index) {
-        for (Blob blob : blobs) {
-            if (blob.contains(index)) {
-                return blob;
-            }
-        }
-        return null;
-    }
-
-    private boolean isSliceEmpty(int y) {
+    private int countNotEmpty(int y, int max) {
+        int cnt = 0;
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 if (driver.getBlock(x, y, z) != air) {
-                    return false;
+                    cnt++;
+                    if (cnt >= max) {
+                        return cnt;
+                    }
                 }
             }
         }
-        return true;
+        return cnt;
     }
 
     /// Fix floating blocks after an explosion
-    private void fixAfterExplosionNewest(BuildingInfo info, Random rand) {
+    private void fixAfterExplosion(BuildingInfo info, Random rand) {
+        if (info.profile.isCavern() && !info.hasBuilding) {
+            // In a cavern we only do this correction when there is a building
+            return;
+        }
+
         int start = info.getDamageArea().getLowestExplosionHeight();
         if (start == -1) {
             // Nothing is affected
@@ -1687,88 +1439,27 @@ public class LostCityTerrainFeature {
         int end = info.getDamageArea().getHighestExplosionHeight();
 
         for (int y = start ; y <= end ; y++) {
-            if (isSliceEmpty(y)) {
-                // Empty! That means everything above this can be deleted
-                for (int x = 0 ; x < 16 ; x++) {
-                    for (int z = 0 ; z < 16 ; z++) {
-                        driver.setBlockRangeToAir(x, y+1, z, 256);  // @todo hardcoded height
-                    }
-                }
-            }
-        }
-    }
-
-    /// Fix floating blocks after an explosion
-    private void fixAfterExplosionNew(BuildingInfo info, Random rand) {
-        int start = info.getDamageArea().getLowestExplosionHeight();
-        if (start == -1) {
-            // Nothing is affected
-            return;
-        }
-        int end = info.getDamageArea().getHighestExplosionHeight();
-
-        List<Blob> blobs = new ArrayList<>();
-
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                driver.current(x, start, z);
-                for (int y = start; y < end; y++) {
-                    BlockState p = driver.getBlock();
-                    if (p != air && p != liquid) {
-                        Blob blob = findBlob(blobs, driver.getCurrentCopy());
-                        if (blob == null) {
-                            blob = new Blob(start, provider.getWorld());
-                            // We must make a copy of the driver here so that we can safely modify it
-                            BlockPos current = driver.getCurrentCopy();
-                            blob.scan(info, driver, air, liquid, new BlockPos(x, y, z));
-                            blobs.add(blob);
-                            driver.currentAbsolute(current);
+            int count = countNotEmpty(y, 20);
+            if (count < 16) {   // @todo configurable?
+                // (Almost) empty! That means everything above this can be deleted
+                // Except in a cavern, there we only delete the building
+                if (info.profile.isCavern()) {
+                    // We know we have a building
+                    int maxY = info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT;
+                    for (int x = 0; x < 16; x++) {
+                        for (int z = 0; z < 16; z++) {
+                            driver.setBlockRangeToAir(x, y + 1, z, maxY);
                         }
                     }
-                    driver.incY();
+                } else {
+                    for (int x = 0; x < 16; x++) {
+                        for (int z = 0; z < 16; z++) {
+                            driver.setBlockRangeToAir(x, y + 1, z, 256);  // @todo hardcoded height
+                        }
+                    }
                 }
+                break;
             }
-        }
-
-//        // Split large blobs that have very thin connections in Y direction
-//        for (Blob blob : blobs) {
-//            if (blob.getAvgdamage() > .3f && blob.getCntMindamage() < 10) { // @todo configurable?
-//                int y = blob.needsSplitting();
-//                if (y != -1) {
-//                    Set<Integer> toRemove = blob.cut(y);
-//                    for (Integer index : toRemove) {
-//                        primer.data[index] = ((index & 0xff) < waterLevel) ? liquidChar : airChar;
-//                    }
-//                }
-//            }
-//        }
-
-        Blob blocksToMove = new Blob(provider.getWorld().getMinBuildHeight(), provider.getWorld());
-
-        // Sort all blobs we delete with lowest first
-        blobs.stream().filter(blob -> blob.destroyOrMoveThis(provider, info)).sorted().forEachOrdered(blob -> {
-            if (rand.nextFloat() < info.profile.DESTROY_OR_MOVE_CHANCE || blob.connectedBlocks.size() < info.profile.DESTROY_SMALL_SECTIONS_SIZE
-                    || blob.connections < 5) {
-                for (BlockPos index : blob.connectedBlocks) {
-                    driver.currentRelative(index);
-                    driver.block(((driver.getY()) < info.waterLevel) ? liquid : air);
-                }
-            } else {
-                blocksToMove.connectedBlocks.addAll(blob.connectedBlocks);
-            }
-        });
-        for (BlockPos index : blocksToMove.connectedBlocks) {
-            driver.currentRelative(index);
-            BlockState c = driver.getBlock();
-            driver.block(((driver.getY()) < info.waterLevel) ? liquid : air);
-            driver.decY();
-            int y = driver.getY();
-            while (y > 2 && (blocksToMove.contains(driver.getCurrentCopy()) || isEmpty(driver.getBlock()))) {
-                driver.decY();
-                y--;
-            }
-            driver.incY();
-            driver.block(c);
         }
     }
 
@@ -1867,7 +1558,7 @@ public class LostCityTerrainFeature {
             this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
         }
 
-        int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * 6.0f));
+        int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * (float)FLOORHEIGHT));
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -2495,8 +2186,8 @@ public class LostCityTerrainFeature {
             if (cnd == null) {
                 throw new RuntimeException("Cannot find condition '" + condition + "'!");
             }
-            int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / 6;
-            int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
+            int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / FLOORHEIGHT;
+            int floor = (pos.getY() - info.getCityGroundLevel()) / FLOORHEIGHT;
             ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
                     todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
                 @Override
@@ -2546,8 +2237,8 @@ public class LostCityTerrainFeature {
         if (tileentity instanceof RandomizableContainerBlockEntity) {
             if (todo != null) {
                 String lootTable = todo.getCondition();
-                int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / 6;
-                int floor = (pos.getY() - info.getCityGroundLevel()) / 6;
+                int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / FLOORHEIGHT;
+                int floor = (pos.getY() - info.getCityGroundLevel()) / FLOORHEIGHT;
                 ConditionContext conditionContext = new ConditionContext(level, floor, info.floorsBelowGround, info.getNumFloors(),
                         todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
                     @Override
@@ -2657,7 +2348,7 @@ public class LostCityTerrainFeature {
     private void setBlocksFromPalette(int x, int y, int z, int y2, CompiledPalette palette, char character) {
         if (palette.isSimple(character)) {
             BlockState b = palette.get(character);
-            driver.setBlockRangeSafe(x, y, z, y2, b);
+            driver.setBlockRange(x, y, z, y2, b);
         } else {
             driver.current(x, y, z);
             while (y < y2) {
@@ -2668,7 +2359,7 @@ public class LostCityTerrainFeature {
     }
 
     private void generateBuilding(BuildingInfo info, ChunkHeightmap heightmap) {
-        int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * 6;
+        int lowestLevel = info.getCityGroundLevel() - info.floorsBelowGround * FLOORHEIGHT;
 
         Character borderBlock = info.getCityStyle().getBorderBlock();
         CompiledPalette palette = info.getCompiledPalette();
@@ -2691,7 +2382,7 @@ public class LostCityTerrainFeature {
                         driver.setBlockRange(x, height+1, z, lowestLevel, base);
                     }
                     // Also clear the inside of buildings to avoid geometry that doesn't really belong there
-                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, info.waterLevel > info.groundLevel);
+                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, info.waterLevel > info.groundLevel);
                 }
             }
         } else if (info.profile.isSpace()) {
@@ -2699,7 +2390,7 @@ public class LostCityTerrainFeature {
             // Also clear the inside of buildings to avoid geometry that doesn't really belong there
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
-                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, false);     // Never water in bubbles?
+                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, false);     // Never water in bubbles?
                 }
             }
         } else {
@@ -2724,8 +2415,8 @@ public class LostCityTerrainFeature {
 
 //                    if (info.profile.isCavern()) {
                         // Also clear the inside of buildings to avoid geometry that doesn't really belong there
-//                        clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, waterLevel > mainGroundLevel);
-                        clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * 6, info.waterLevel > info.groundLevel);
+//                        clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, waterLevel > mainGroundLevel);
+                        clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, info.waterLevel > info.groundLevel);
 //                    }
                 }
             }
@@ -2753,7 +2444,7 @@ public class LostCityTerrainFeature {
                 generateDoors(info, height + 1, f);
             }
 
-            height += 6;    // We currently only support 6 here
+            height += FLOORHEIGHT;    // We currently only support 6 here
         }
 
         if (info.floorsBelowGround > 0) {
