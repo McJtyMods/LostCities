@@ -2,7 +2,6 @@ package mcjty.lostcities.worldgen;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
 import mcjty.lostcities.api.RailChunkType;
-import mcjty.lostcities.config.LandscapeType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.ModSetup;
@@ -410,28 +409,22 @@ public class LostCityTerrainFeature {
             return;
         }
 
-//        ChunkPos cp = driver.getPrimer().getPos();
         BlockState torchState = Blocks.WALL_TORCH.defaultBlockState();
         for (BlockPos pos : torches) {
-//            driver.current(pos);
 
-            int x = pos.getX();
-            int z = pos.getZ();
+            int x = pos.getX() & 0xf;
+            int z = pos.getZ() & 0xf;
+            driver.currentAbsolute(pos);
             if (driver.getBlockDown() != air) {
-                driver.getRegion().setBlock(pos, Blocks.TORCH.defaultBlockState(), Block.UPDATE_CLIENTS);
-//                driver.block(Blocks.TORCH.defaultBlockState());
+                driver.block(Blocks.TORCH.defaultBlockState());
             } else if (x > 0 && driver.getBlockWest() != air) {
-                driver.getRegion().setBlock(pos, torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.EAST), Block.UPDATE_CLIENTS);
-//                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.EAST));
+                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.EAST));
             } else if (x < 15 && driver.getBlockEast() != air) {
-                driver.getRegion().setBlock(pos, torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.WEST), Block.UPDATE_CLIENTS);
-//                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.WEST));
+                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.WEST));
             } else if (z > 0 && driver.getBlockNorth() != air) {
-                driver.getRegion().setBlock(pos, torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.SOUTH), Block.UPDATE_CLIENTS);
-//                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.SOUTH));
+                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.SOUTH));
             } else if (z < 15 && driver.getBlockSouth() != air) {
-                driver.getRegion().setBlock(pos, torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH), Block.UPDATE_CLIENTS);
-//                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH));
+                driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH));
             }
         }
         info.clearTorchTodo();
