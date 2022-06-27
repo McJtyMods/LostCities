@@ -341,10 +341,10 @@ public class LostCityTerrainFeature {
             generateDebris(rand, info);
 //        }
 
-        ChunkFixer.fix(provider, chunkX, chunkZ);
-
         driver.actuallyGenerate();
         driver.setPrimer(oldRegion, oldChunk);
+
+        ChunkFixer.fix(provider, chunkX, chunkZ);
     }
 
 
@@ -411,7 +411,6 @@ public class LostCityTerrainFeature {
 
         BlockState torchState = Blocks.WALL_TORCH.defaultBlockState();
         for (BlockPos pos : torches) {
-
             int x = pos.getX() & 0xf;
             int z = pos.getZ() & 0xf;
             driver.currentAbsolute(pos);
@@ -426,6 +425,12 @@ public class LostCityTerrainFeature {
             } else if (z < 15 && driver.getBlockSouth() != air) {
                 driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH));
             }
+            info.addPostTodo(pos, () -> {
+                WorldGenLevel world = provider.getWorld();
+                BlockState state = world.getBlockState(pos);
+                world.setBlock(pos, air, Block.UPDATE_CLIENTS);
+                world.setBlock(pos, state, Block.UPDATE_CLIENTS);
+            });
         }
         info.clearTorchTodo();
     }
@@ -797,7 +802,7 @@ public class LostCityTerrainFeature {
      * or up the top layer (6 thick) of the terrain. In a chunk these heights are interpolated
      * (bilinear interpolation).
      */
-    private synchronized void correctTerrainShape(int chunkX, int chunkZ) {
+    private void correctTerrainShape(int chunkX, int chunkZ) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
         Integer[] mm00 = info.getDesiredMaxHeightL2();
         Integer[] mm10 = info.getXmax().getDesiredMaxHeightL2();
@@ -1051,15 +1056,17 @@ public class LostCityTerrainFeature {
         clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
-    public synchronized ChunkHeightmap getHeightmap(int chunkX, int chunkZ, @Nonnull WorldGenLevel world) {
+    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ, @Nonnull WorldGenLevel world) {
         ChunkCoord key = new ChunkCoord(world.getLevel().dimension(), chunkX, chunkZ);
-        if (cachedHeightmaps.containsKey(key)) {
-            return cachedHeightmaps.get(key);
-        } else {
-            ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
-            generateHeightmap(chunkX, chunkZ, world, heightmap);
-            cachedHeightmaps.put(key, heightmap);
-            return heightmap;
+        synchronized (this) {
+            if (cachedHeightmaps.containsKey(key)) {
+                return cachedHeightmaps.get(key);
+            } else {
+                ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+                generateHeightmap(chunkX, chunkZ, world, heightmap);
+                cachedHeightmaps.put(key, heightmap);
+                return heightmap;
+            }
         }
     }
 
@@ -1834,8 +1841,14 @@ public class LostCityTerrainFeature {
 
                     if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
                         BlockState glass = palette.get(corridorGlassBlock);
-                        info.addLightingUpdateTodo(new BlockPos(x, height, z));
-                        driver.add(glass).add(glowstone);
+                        driver.add(glass);
+                        BlockPos pos = driver.getCurrentCopy();
+                        driver.add(glowstone);
+                        info.addPostTodo(pos, () -> {
+                            WorldGenLevel world = provider.getWorld();
+                            world.setBlock(pos, air, Block.UPDATE_CLIENTS);
+                            world.setBlock(pos, glowstone, Block.UPDATE_CLIENTS);
+                        });
                     } else {
                         BlockState roof = palette.get(corridorRoofBlock);
                         driver.add(roof).add(roof);
@@ -2119,12 +2132,12 @@ public class LostCityTerrainFeature {
                                     }
                                 } else if (inf.getLoot() != null && !inf.getLoot().isEmpty()) {
                                     if (!info.noLoot) {
-                                        BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
+                                        BlockPos pos = driver.getCurrentCopy();
                                         BlockState finalB = b;
-                                        action = () -> {
-                                            provider.getWorld().setBlock(pos, finalB, 2);
+                                        info.addPostTodo(pos, () -> {
+                                            provider.getWorld().setBlock(pos, finalB, Block.UPDATE_CLIENTS);
                                             generateLoot(info, provider.getWorld(), pos, new BuildingInfo.ConditionTodo(inf.getLoot(), part.getName(), info));
-                                        };
+                                        });
                                     }
                                 } else if (inf.getMobId() != null && !inf.getMobId().isEmpty()) {
                                     if (info.profile.GENERATE_SPAWNERS && !info.noLoot) {
@@ -2141,7 +2154,13 @@ public class LostCityTerrainFeature {
                                     }
                                 }
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
-                                info.getTodoChunk(rx, rz).addLightingUpdateTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
+                                BlockPos pos = driver.getCurrentCopy();
+                                BlockState finalB2 = b;
+                                info.addPostTodo(pos, () -> {
+                                    WorldGenLevel world = provider.getWorld();
+                                    world.setBlock(pos, air, Block.UPDATE_CLIENTS);
+                                    world.setBlock(pos, finalB2, Block.UPDATE_CLIENTS);
+                                });
                             } else if (getStatesNeedingTodo().contains(b)) {
                                 BlockState bs = b;
                                 Block block = bs.getBlock();
@@ -2149,7 +2168,16 @@ public class LostCityTerrainFeature {
                                     if (info.profile.AVOID_FOLIAGE) {
                                         b = air;
                                     } else {
-                                        info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
+                                        BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
+                                        info.getTodoChunk(rx, rz).addPostTodo(pos,
+                                                () -> {
+                                                    BlockState state = provider.getWorld().getBlockState(pos);
+                                                    if (state.getBlock() instanceof SaplingBlock) {
+                                                        // @todo 1.15 how to do this?
+//                ((SaplingBlock) state.getBlock()).grow((ServerWorld)world, random, pos, state);
+                                                    }
+
+                                                });
                                     }
                                 }
                             }

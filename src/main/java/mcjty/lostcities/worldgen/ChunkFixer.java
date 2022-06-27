@@ -1,13 +1,12 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SaplingBlock;
-import net.minecraft.world.level.block.VineBlock;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.VineBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.chunk.ChunkStatus;
 
 import java.util.Random;
@@ -15,16 +14,10 @@ import java.util.Random;
 public class ChunkFixer {
 
 
-    private static void generateTrees(Random random, int chunkX, int chunkZ, LevelAccessor world, IDimensionInfo provider) {
+    private static void executePostTodo(Random random, int chunkX, int chunkZ, IDimensionInfo provider) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
-        for (BlockPos pos : info.getSaplingTodo()) {
-            BlockState state = world.getBlockState(pos);
-            if (state.getBlock() instanceof SaplingBlock) {
-                // @todo 1.15 how to do this?
-//                ((SaplingBlock) state.getBlock()).grow((ServerWorld)world, random, pos, state);
-            }
-        }
-        info.clearSaplingTodo();
+        info.getPostTodo().forEach((pos, runnable) -> runnable.run());
+        info.clearPostTodo();
     }
 
     private static void generateVines(Random random, int chunkX, int chunkZ, LevelAccessor world, IDimensionInfo provider) {
@@ -114,7 +107,7 @@ public class ChunkFixer {
 
 
     public static void fix(IDimensionInfo info, int chunkX, int chunkZ) {
-        generateTrees(info.getRandom(), chunkX, chunkZ, info.getWorld(), info);
         generateVines(info.getRandom(), chunkX, chunkZ, info.getWorld(), info);
+        executePostTodo(info.getRandom(), chunkX, chunkZ, info);
     }
 }

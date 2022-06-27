@@ -98,9 +98,8 @@ public class BuildingInfo implements ILostChunkInfo {
     private Integer[] desiredMaxHeight1 = null;
 
     // A list of todo's
-    private final List<BlockPos> lightingUpdateTodo = new ArrayList<>();
     private final List<BlockPos> torchTodo = new ArrayList<>();
-    private final List<BlockPos> saplingTodo = new ArrayList<>();
+    private final Map<BlockPos, Runnable> postTodo = new HashMap<>();
 
     public static class ConditionTodo {
         private final String condition;
@@ -134,18 +133,6 @@ public class BuildingInfo implements ILostChunkInfo {
     private static final Map<ChunkCoord, BuildingInfo> buildingInfoMap = new HashMap<>();
     private static final Map<ChunkCoord, LostChunkCharacteristics> cityInfoMap = new HashMap<>();
 
-    public void addSaplingTodo(BlockPos pos) {
-        saplingTodo.add(pos);
-    }
-
-    public List<BlockPos> getSaplingTodo() {
-        return saplingTodo;
-    }
-
-    public void clearSaplingTodo() {
-        saplingTodo.clear();
-    }
-
     public void addTorchTodo(BlockPos index) {
         torchTodo.add(index);
     }
@@ -158,16 +145,16 @@ public class BuildingInfo implements ILostChunkInfo {
         torchTodo.clear();
     }
 
-    public void addLightingUpdateTodo(BlockPos pos) {
-        lightingUpdateTodo.add(pos);
+    public void addPostTodo(BlockPos index, Runnable inf) {
+        postTodo.put(index, inf);
     }
 
-    public List<BlockPos> getLightingUpdateTodo() {
-        return lightingUpdateTodo;
+    public Map<BlockPos, Runnable> getPostTodo() {
+        return postTodo;
     }
 
-    public void clearLightingUpdateTodo() {
-        lightingUpdateTodo.clear();
+    public void clearPostTodo() {
+        postTodo.clear();
     }
 
     public CompiledPalette getCompiledPalette() {

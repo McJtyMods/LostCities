@@ -1,5 +1,7 @@
 Upcoming:
 - New createbuilding command to create a building
+- Fixes in chest generation and lighting updates
+- Fixed a potential race conditions with mods using the Lost Cities API
 
 1.18-5.2.0:
 - Another optimization on worldgen
