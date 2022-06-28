@@ -1,7 +1,7 @@
 Upcoming:
 - New method in the API to load additional assets
 - New API so that other mods can add custom profiles
-TODO: FIX BUG WITH FLOATING CHESTS!
+- Chests could float if the building around it was destroyed by explosions
 
 1.18-5.2.1:
 - New createbuilding command to create a building

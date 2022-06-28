@@ -1846,8 +1846,10 @@ public class LostCityTerrainFeature {
                         driver.add(glowstone);
                         info.addPostTodo(pos, () -> {
                             WorldGenLevel world = provider.getWorld();
-                            world.setBlock(pos, air, Block.UPDATE_CLIENTS);
-                            world.setBlock(pos, glowstone, Block.UPDATE_CLIENTS);
+                            if (!world.getBlockState(pos).isAir()) {
+                                world.setBlock(pos, air, Block.UPDATE_CLIENTS);
+                                world.setBlock(pos, glowstone, Block.UPDATE_CLIENTS);
+                            }
                         });
                     } else {
                         BlockState roof = palette.get(corridorRoofBlock);
@@ -2135,8 +2137,11 @@ public class LostCityTerrainFeature {
                                         BlockPos pos = driver.getCurrentCopy();
                                         BlockState finalB = b;
                                         info.addPostTodo(pos, () -> {
-                                            provider.getWorld().setBlock(pos, finalB, Block.UPDATE_CLIENTS);
-                                            generateLoot(info, provider.getWorld(), pos, new BuildingInfo.ConditionTodo(inf.getLoot(), part.getName(), info));
+                                            WorldGenLevel world = provider.getWorld();
+                                            if (!world.getBlockState(pos).isAir()) {
+                                                world.setBlock(pos, finalB, Block.UPDATE_CLIENTS);
+                                                generateLoot(info, world, pos, new BuildingInfo.ConditionTodo(inf.getLoot(), part.getName(), info));
+                                            }
                                         });
                                     }
                                 } else if (inf.getMobId() != null && !inf.getMobId().isEmpty()) {
@@ -2146,8 +2151,11 @@ public class LostCityTerrainFeature {
                                         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
                                         BlockState finalB1 = b;
                                         action = () -> {
-                                            provider.getWorld().setBlock(pos, finalB1, 2);
-                                            createSpawner(rand, provider, info, new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
+                                            WorldGenLevel world = provider.getWorld();
+                                            if (!world.getBlockState(pos).isAir()) {
+                                                world.setBlock(pos, finalB1, Block.UPDATE_CLIENTS);
+                                                createSpawner(rand, provider, info, new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
+                                            }
                                         };
                                     } else {
                                         b = air;
@@ -2158,8 +2166,10 @@ public class LostCityTerrainFeature {
                                 BlockState finalB2 = b;
                                 info.addPostTodo(pos, () -> {
                                     WorldGenLevel world = provider.getWorld();
-                                    world.setBlock(pos, air, Block.UPDATE_CLIENTS);
-                                    world.setBlock(pos, finalB2, Block.UPDATE_CLIENTS);
+                                    if (!world.getBlockState(pos).isAir()) {
+                                        world.setBlock(pos, air, Block.UPDATE_CLIENTS);
+                                        world.setBlock(pos, finalB2, Block.UPDATE_CLIENTS);
+                                    }
                                 });
                             } else if (getStatesNeedingTodo().contains(b)) {
                                 BlockState bs = b;
