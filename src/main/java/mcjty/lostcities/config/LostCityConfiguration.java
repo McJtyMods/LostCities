@@ -435,7 +435,13 @@ public class LostCityConfiguration {
         Path profileDir = Paths.get(path.toString(), "lostcities/profiles");
 
         LostCities.getLogger().info("Creating standard profiles into 'config/lostcities/profiles'");
+
         initStandardProfiles();
+        LostCityProfileSetupImp setupImp = new LostCityProfileSetupImp();
+        LostCities.setup.profileSetups.forEach(consumer -> {
+            consumer.accept(setupImp);
+        });
+
         new File(profileDir.toString()).mkdirs();
         for (Map.Entry<String, LostCityProfile> entry : standardProfiles.entrySet()) {
             String name = entry.getKey();

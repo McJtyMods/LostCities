@@ -4,13 +4,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.varia.Tools;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
+import mcjty.lostcities.api.ILostCityProfile;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class LostCityProfile {
+public class LostCityProfile implements ILostCityProfile {
 
     public static final String CATEGORY_LOSTCITY = "lostcity";
     public static final String CATEGORY_STRUCTURES = "structures";
@@ -528,6 +528,7 @@ public class LostCityProfile {
         return name;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
@@ -544,6 +545,7 @@ public class LostCityProfile {
         this.extraDescription = extraDescription;
     }
 
+    @Override
     public void setWorldStyle(String worldStyle) {
         this.worldStyle = worldStyle;
     }

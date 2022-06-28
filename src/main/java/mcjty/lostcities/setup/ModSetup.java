@@ -1,6 +1,7 @@
 package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.api.ILostCityProfileSetup;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.worldgen.LostCityFeature;
@@ -15,6 +16,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ModSetup {
 
@@ -23,6 +27,8 @@ public class ModSetup {
     public static boolean atg = false;
 
     public static Logger logger = null;
+
+    public List<Consumer<ILostCityProfileSetup>> profileSetups = new ArrayList<>();
 
     public static Logger getLogger() {
         return logger;
