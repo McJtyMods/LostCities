@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.2.2:
 - New method in the API to load additional assets
 - New API so that other mods can add custom profiles
 - Chests could float if the building around it was destroyed by explosions
