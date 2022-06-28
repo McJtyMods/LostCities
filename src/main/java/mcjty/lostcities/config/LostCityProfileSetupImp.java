@@ -11,7 +11,8 @@ public class LostCityProfileSetupImp implements ILostCityProfileSetup {
         if (lcp == null) {
             throw new RuntimeException("Unknown base profile '" + baseProfile + "'!");
         }
-        LostCityProfile profile = new LostCityProfile(name, lcp, true);
+        LostCityProfile profile = new LostCityProfile(name, true);
+        profile.copyFrom(lcp);
         LostCityConfiguration.standardProfiles.put(profile.getName(), profile);
         return profile;
     }

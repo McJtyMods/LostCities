@@ -1,6 +1,7 @@
 Upcoming:
 - New method in the API to load additional assets
 - New API so that other mods can add custom profiles
+TODO: FIX BUG WITH FLOATING CHESTS!
 
 1.18-5.2.1:
 - New createbuilding command to create a building
