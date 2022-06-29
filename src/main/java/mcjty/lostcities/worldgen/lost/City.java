@@ -89,15 +89,15 @@ public class City {
             CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
             if (!sphere.isEnabled()) {
                 // No sphere
-                return rand.nextFloat() < provider.getOutsideProfile().CITY_CHANCE;
+                return rand.nextDouble() < provider.getOutsideProfile().CITY_CHANCE;
             }
             if (sphere.getCenter().chunkX() == chunkX && sphere.getCenter().chunkZ() == chunkZ) {
                 // This chunk is the center of a city
-                return rand.nextFloat() < provider.getProfile().CITY_CHANCE;
+                return rand.nextDouble() < provider.getProfile().CITY_CHANCE;
             }
             return false;
         } else {
-            return rand.nextFloat() < provider.getProfile().CITY_CHANCE;
+            return rand.nextDouble() < provider.getProfile().CITY_CHANCE;
         }
     }
 

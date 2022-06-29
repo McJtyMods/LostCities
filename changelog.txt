@@ -1,3 +1,10 @@
+Upcoming:
+- It's now possible to use random block palettes for streets too
+- Big speed improvement in the Lost City profile selection screen when rendering the world preview
+- Saplings in Lost City parks will generate trees again
+- 'cityChance' now has double precision which makes it possible to make cities even more rare
+- More expansions to the lost city api
+
 1.18-5.2.2:
 - New method in the API to load additional assets
 - New API so that other mods can add custom profiles

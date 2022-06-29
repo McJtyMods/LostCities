@@ -113,6 +113,12 @@ public class GuiLCConfig extends Screen {
         return el;
     }
 
+    private DoubleElement addDouble(int left, String attribute) {
+        DoubleElement el = new DoubleElement(this, curpage, left, y, attribute);
+        add(el);
+        return el;
+    }
+
     private FloatElement addFloat(int left, String attribute) {
         FloatElement el = new FloatElement(this, curpage, left, y, attribute);
         add(el);
@@ -194,7 +200,7 @@ public class GuiLCConfig extends Screen {
 
     private void initCities(int left) {
         start("Cities");
-        addFloat(left,"cities.cityChance").label("Rarity:"); nl();
+        addDouble(left,"cities.cityChance").label("Rarity:"); nl();
         addFloat(left,"cities.cityThreshold").label("Threshold:"); nl();
 
         addInt(left,"cities.cityMinRadius").label("Radius:");
@@ -398,7 +404,7 @@ public class GuiLCConfig extends Screen {
                     default -> 0x005500;
                 };
                 fill(stack, sx, sz, sx + 3, sz + 3, 0xff000000 + soften(color, soft));
-                LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(x, z, diminfo);
+                LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristicsGui(x, z, diminfo);
                 if (characteristics.isCity) {
                     color = 0x995555;
                     if (BuildingInfo.hasBuildingGui(x, z, diminfo, characteristics)) {

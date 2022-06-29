@@ -108,7 +108,7 @@ public class LostCityProfile implements ILostCityProfile {
     public int MINI_EXPLOSION_MINHEIGHT = 60;
     public int MINI_EXPLOSION_MAXHEIGHT = 100;
 
-    public float CITY_CHANCE = .01f;
+    public double CITY_CHANCE = .01;
     public int CITY_MINRADIUS = 50;
     public int CITY_MAXRADIUS = 128;
     public float CITY_THRESHOLD = .2f;
@@ -457,7 +457,7 @@ public class LostCityProfile implements ILostCityProfile {
     }
 
     private void initCities(Configuration cfg) {
-        CITY_CHANCE = cfg.getFloat("cityChance", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_CHANCE, 0.0f, 1.0f, "The chance this chunk will be the center of a city");
+        CITY_CHANCE = cfg.getDouble("cityChance", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_CHANCE, 0.0, 1.0, "The chance this chunk will be the center of a city");
         CITY_MINRADIUS = cfg.getInt("cityMinRadius", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_MINRADIUS, 1, 2000, "The minimum radius of a city");
         CITY_MAXRADIUS = cfg.getInt("cityMaxRadius", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_MAXRADIUS, 1, 2000, "The maximum radius of a city");
         CITY_THRESHOLD = cfg.getFloat("cityThreshold", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_THRESHOLD, 0.0f, 1.0f, "The center and radius of a city define a sphere. " +
@@ -552,6 +552,18 @@ public class LostCityProfile implements ILostCityProfile {
 
     public String getWorldStyle() {
         return worldStyle;
+    }
+
+    @Override
+    public void setCityChancle(double chance) {
+        this.CITY_CHANCE = chance;
+    }
+
+    @Override
+    public void setRuinChance(float chance, float minPercent, float maxPercent) {
+        this.RUIN_CHANCE = chance;
+        this.RUIN_MINLEVEL_PERCENT = minPercent;
+        this.RUIN_MAXLEVEL_PERCENT = maxPercent;
     }
 
     public Map<ResourceLocation, Float> getBiomeFactorMap() {

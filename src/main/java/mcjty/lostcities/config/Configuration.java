@@ -181,6 +181,18 @@ public class Configuration {
         }
     }
 
+    public double getDouble(String name, String category, double defaultValue, double minValue, double maxValue, String description) {
+        Category cat = getValueCategory(name, category, defaultValue, description, minValue, maxValue, Double::compareTo);
+        Object value = cat.valueMap.get(name).value;
+        if (value instanceof Double) {
+            return (Double) value;
+        } else if (value instanceof Float) {
+            return (Float) value;
+        } else {
+            return ((Integer) value).doubleValue();
+        }
+    }
+
     public boolean getBoolean(String name, String category, boolean defaultValue, String description) {
         Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0);
         return (Boolean) cat.valueMap.get(name).value;

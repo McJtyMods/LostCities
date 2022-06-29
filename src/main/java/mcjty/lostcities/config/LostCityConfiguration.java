@@ -269,7 +269,7 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("rarecities", true);
         profile.setDescription("Cities are rare");
         profile.setIconFile("textures/gui/icon_rarecities.png");
-        profile.CITY_CHANCE = 0.001f;
+        profile.CITY_CHANCE = 0.001;
         profile.RUIN_CHANCE = 0;
         profile.HIGHWAY_REQUIRES_TWO_CITIES = false;
         profile.RAILWAYS_CAN_END = true;
@@ -278,7 +278,7 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("onlycities", true);
         profile.setDescription("The entire world is a city");
         profile.setIconFile("textures/gui/icon_onlycities.png");
-        profile.CITY_CHANCE = 0.2f;
+        profile.CITY_CHANCE = 0.2;
         profile.CITY_MAXRADIUS = 256;
         profile.CITY_BIOME_FACTORS = new String[] { "river=.5", "frozen_river=.5", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.6" };
         standardProfiles.put(profile.getName(), profile);
@@ -314,7 +314,7 @@ public class LostCityConfiguration {
 
         profile = new LostCityProfile("ancient", true);
         profile.setDescription("Ancient jungle city, vines and leafs, ruined buildings");
-        profile.setExtraDescription("Note! This disables many biomes like deserts, plains, extreme hills, ...");
+//        profile.setExtraDescription("Note! This disables many biomes like deserts, plains, extreme hills, ...");
         profile.setIconFile("textures/gui/icon_ancient.png");
         profile.THICKNESS_OF_RANDOM_LEAFBLOCKS = 6;
         profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.05f;
@@ -327,7 +327,7 @@ public class LostCityConfiguration {
         profile.RUBBLE_LEAVE_SCALE = 2.0f;
         profile.RUIN_CHANCE = 0.9f;
         profile.RUIN_MINLEVEL_PERCENT = 0.0f;
-        profile.RUIN_MAXLEVEL_PERCENT = 0.8f;
+        profile.RUIN_MAXLEVEL_PERCENT = 0.9f;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2", "ocean=8", "beaches=20", "river=5" };
         standardProfiles.put(profile.getName(), profile);
 

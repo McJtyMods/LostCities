@@ -302,19 +302,25 @@ public class BuildingInfo implements ILostChunkInfo {
         rand.nextFloat();       // Compatibility?
 
         int building2x2Section = characteristics.section;
-        boolean b = characteristics.couldHaveBuilding;
-        if (b && building2x2Section < 0) {
-            if (rand.nextFloat() < getChunkCharacteristics(chunkX - 1, chunkZ, provider).buildingType.getPrefersLonely()) {
-                b = false;
-            } else if (rand.nextFloat() < getChunkCharacteristics(chunkX + 1, chunkZ, provider).buildingType.getPrefersLonely()) {
-                b = false;
-            } else if (rand.nextFloat() < getChunkCharacteristics(chunkX, chunkZ - 1, provider).buildingType.getPrefersLonely()) {
-                b = false;
-            } else if (rand.nextFloat() < getChunkCharacteristics(chunkX, chunkZ + 1, provider).buildingType.getPrefersLonely()) {
-                b = false;
-            }
+        return characteristics.couldHaveBuilding;
+    }
+
+    public static synchronized LostChunkCharacteristics getChunkCharacteristicsGui(int chunkX, int chunkZ, IDimensionInfo provider) {
+        ResourceKey<Level> type = provider.getType();
+        ChunkCoord key = new ChunkCoord(type, chunkX, chunkZ);
+        if (cityInfoMap.containsKey(key)) {
+            return cityInfoMap.get(key);
+        } else {
+            LostCityProfile profile = getProfile(chunkX, chunkZ, provider);
+            LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
+
+            characteristics.isCity = isCityRaw(chunkX, chunkZ, provider, profile);
+            characteristics.cityLevel = getCityLevel(chunkX, chunkZ, provider);
+            Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
+            characteristics.couldHaveBuilding = characteristics.isCity && rand.nextFloat() < profile.BUILDING_CHANCE;
+            cityInfoMap.put(key, characteristics);
+            return characteristics;
         }
-        return b;
     }
 
     public static synchronized LostChunkCharacteristics getChunkCharacteristics(int chunkX, int chunkZ, IDimensionInfo provider) {
