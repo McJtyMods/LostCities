@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.2.3:
 - It's now possible to use random block palettes for streets too
 - Big speed improvement in the Lost City profile selection screen when rendering the world preview
 - Saplings in Lost City parks will generate trees again
