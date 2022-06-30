@@ -1,6 +1,8 @@
 package mcjty.lostcities.worldgen;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
+import mcjty.lostcities.LostCities;
+import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
@@ -37,6 +39,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -337,14 +340,14 @@ public class LostCityTerrainFeature {
         // primer vs generating it here
         rand.setSeed(chunkX * 257017164707L + chunkZ * 101754694003L);
 
-//        LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.getWorld().getWorld(), provider, chunkX, chunkZ, driver.getPrimer());
-//        if (!MinecraftForge.EVENT_BUS.post(event)) {
-        if (info.getDamageArea().hasExplosions()) {
-            breakBlocksForDamageNew(chunkX, chunkZ, info);
-            fixAfterExplosion(info, rand);
+        LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
+        if (!MinecraftForge.EVENT_BUS.post(event)) {
+            if (info.getDamageArea().hasExplosions()) {
+                breakBlocksForDamageNew(chunkX, chunkZ, info);
+                fixAfterExplosion(info, rand);
+            }
+            generateDebris(rand, info);
         }
-        generateDebris(rand, info);
-//        }
 
         driver.actuallyGenerate();
         driver.setPrimer(oldRegion, oldChunk);
@@ -442,9 +445,8 @@ public class LostCityTerrainFeature {
 //            flattenChunkToCityBorder(chunkX, chunkZ);
         }
 
-        // @todo 1.14
-//        LostCityEvent.PostGenOutsideChunkEvent postevent = new LostCityEvent.PostGenOutsideChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
-//        MinecraftForge.EVENT_BUS.post(postevent);
+        LostCityEvent.PostGenOutsideChunkEvent postevent = new LostCityEvent.PostGenOutsideChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
+        MinecraftForge.EVENT_BUS.post(postevent);
 
         generateBridges(info);
         generateHighways(chunkX, chunkZ, info);
@@ -1124,17 +1126,16 @@ public class LostCityTerrainFeature {
             }
         }
 
-        // @todo 1.14
-//        LostCityEvent.PreGenCityChunkEvent event = new LostCityEvent.PreGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
-//        if (!MinecraftForge.EVENT_BUS.post(event)) {
-        if (building) {
-            generateBuilding(info, heightmap);
-        } else {
-            generateStreet(info, heightmap, rand);
+        LostCityEvent.PreGenCityChunkEvent event = new LostCityEvent.PreGenCityChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
+        if (!MinecraftForge.EVENT_BUS.post(event)) {
+            if (building) {
+                generateBuilding(info, heightmap);
+            } else {
+                generateStreet(info, heightmap, rand);
+            }
         }
-//        }
-//        LostCityEvent.PostGenCityChunkEvent postevent = new LostCityEvent.PostGenCityChunkEvent(provider.worldObj, provider, chunkX, chunkZ, driver.getPrimer());
-//        MinecraftForge.EVENT_BUS.post(postevent);
+        LostCityEvent.PostGenCityChunkEvent postevent = new LostCityEvent.PostGenCityChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
+        MinecraftForge.EVENT_BUS.post(postevent);
 
         if (info.profile.RUIN_CHANCE > 0.0) {
             generateRuins(info);

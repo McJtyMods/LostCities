@@ -1,5 +1,6 @@
 package mcjty.lostcities.worldgen.lost;
 
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.common.MinecraftForge;
 import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nonnull;
@@ -404,10 +406,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             }
 
-            // @todo 1.14
-//            LostCityEvent.CharacteristicsEvent event = new LostCityEvent.CharacteristicsEvent(provider.worldObj, provider,
-//                    chunkX, chunkZ, characteristics);
-//            MinecraftForge.EVENT_BUS.post(event);
+            LostCityEvent.CharacteristicsEvent event = new LostCityEvent.CharacteristicsEvent(provider.getWorld(), LostCities.lostCitiesImp,
+                    chunkX, chunkZ, characteristics);
+            MinecraftForge.EVENT_BUS.post(event);
 
             cityInfoMap.put(key, characteristics);
             return characteristics;

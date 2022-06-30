@@ -1,7 +1,7 @@
 package mcjty.lostcities.api;
 
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
@@ -15,24 +15,24 @@ import net.minecraftforge.eventbus.api.Event;
  **/
 public class LostCityEvent extends Event {
 
-    private final Level world;
-    private final ILostCityInformation generator;
+    private final WorldGenLevel world;
+    private final ILostCities lostCities;
     private final int chunkX;
     private final int chunkZ;
 
-    public LostCityEvent(Level world, ILostCityInformation generator, int chunkX, int chunkZ) {
+    public LostCityEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ) {
         this.world = world;
-        this.generator = generator;
+        this.lostCities = lostCities;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
     }
 
-    public Level getWorld() {
+    public WorldGenLevel getWorld() {
         return world;
     }
 
-    public ILostCityInformation getGenerator() {
-        return generator;
+    public ILostCities getLostCities() {
+        return lostCities;
     }
 
     public int getChunkX() {
@@ -64,8 +64,8 @@ public class LostCityEvent extends Event {
     public static class CharacteristicsEvent extends LostCityEvent {
         private final LostChunkCharacteristics characteristics;
 
-        public CharacteristicsEvent(Level world, ILostCityInformation generator, int chunkX, int chunkZ, LostChunkCharacteristics characteristics) {
-            super(world, generator, chunkX, chunkZ);
+        public CharacteristicsEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, LostChunkCharacteristics characteristics) {
+            super(world, lostCities, chunkX, chunkZ);
             this.characteristics = characteristics;
         }
 
@@ -92,14 +92,14 @@ public class LostCityEvent extends Event {
      **/
     @Cancelable
     public static class PreGenCityChunkEvent extends LostCityEvent {
-        private final ProtoChunk primer;
+        private final ChunkAccess primer;
 
-        public PreGenCityChunkEvent(Level world, ILostCityInformation generator, int chunkX, int chunkZ, ProtoChunk primer) {
-            super(world, generator, chunkX, chunkZ);
+        public PreGenCityChunkEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
+            super(world, lostCities, chunkX, chunkZ);
             this.primer = primer;
         }
 
-        public ProtoChunk getPrimer() {
+        public ChunkAccess getChunkAccess() {
             return primer;
         }
     }
@@ -119,14 +119,14 @@ public class LostCityEvent extends Event {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
     public static class PostGenCityChunkEvent extends LostCityEvent {
-        private final ProtoChunk primer;
+        private final ChunkAccess primer;
 
-        public PostGenCityChunkEvent(Level world, ILostCityInformation generator, int chunkX, int chunkZ, ProtoChunk primer) {
-            super(world, generator, chunkX, chunkZ);
+        public PostGenCityChunkEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
+            super(world, lostCities, chunkX, chunkZ);
             this.primer = primer;
         }
 
-        public ProtoChunk getPrimer() {
+        public ChunkAccess getChunkAccess() {
             return primer;
         }
     }
@@ -145,14 +145,14 @@ public class LostCityEvent extends Event {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
     public static class PostGenOutsideChunkEvent extends LostCityEvent {
-        private final ProtoChunk primer;
+        private final ChunkAccess primer;
 
-        public PostGenOutsideChunkEvent(Level world, ILostCityInformation generator, int chunkX, int chunkZ, ProtoChunk primer) {
-            super(world, generator, chunkX, chunkZ);
+        public PostGenOutsideChunkEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
+            super(world, lostCities, chunkX, chunkZ);
             this.primer = primer;
         }
 
-        public ProtoChunk getPrimer() {
+        public ChunkAccess getChunkAccess() {
             return primer;
         }
     }
@@ -173,14 +173,14 @@ public class LostCityEvent extends Event {
      **/
     @Cancelable
     public static class PreExplosionEvent extends LostCityEvent {
-        private final ProtoChunk primer;
+        private final ChunkAccess primer;
 
-        public PreExplosionEvent(Level world, ILostCityInformation generator, int chunkX, int chunkZ, ProtoChunk primer) {
-            super(world, generator, chunkX, chunkZ);
+        public PreExplosionEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
+            super(world, lostCities, chunkX, chunkZ);
             this.primer = primer;
         }
 
-        public ProtoChunk getPrimer() {
+        public ChunkAccess getChunkAccess() {
             return primer;
         }
     }

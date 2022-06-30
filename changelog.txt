@@ -1,5 +1,6 @@
 Upcoming:
 - All mob spawners were spawning pigs. This is fixed now
+- The Lost Cities events are back (useful for mods who want to do something special to LC worldgen)
 
 1.18-5.2.3:
 - It's now possible to use random block palettes for streets too
