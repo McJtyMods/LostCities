@@ -99,8 +99,8 @@ public class BuildingInfo implements ILostChunkInfo {
     private Boolean horizontalMonorail = null;
     private Boolean verticalMonorail = null;
 
-    private Integer[] desiredTerrainCorrectionHeights = null;
-    private Integer[] desiredMaxHeight1 = null;
+    private MinMax desiredTerrainCorrectionHeights = null;
+    private MinMax desiredMaxHeight1 = null;
 
     // A list of todo's
     private final List<BlockPos> torchTodo = new ArrayList<>();
@@ -1594,7 +1594,7 @@ public class BuildingInfo implements ILostChunkInfo {
      * landscape to (minimum/maximum). This is calculated for the reference position of this chunk (0,0 point)
      * This is the level 1 version which looks at adjacent heights only
      */
-    private Integer[] getDesiredMaxHeightL1() {
+    private MinMax getDesiredMaxHeightL1() {
         if (desiredMaxHeight1 == null) {
             int h = getLowestCityHeightAtChunkCorner();
 
@@ -1604,13 +1604,13 @@ public class BuildingInfo implements ILostChunkInfo {
             // @todo build limit
             if (h < 256) {
                 // The L0 height at this corner is fixed so we return that
-                desiredMaxHeight1 = new Integer[]{
+                desiredMaxHeight1 = new MinMax(
                         h + LostCityTerrainFeature.getRandomizedOffset(cx, cz, profile.TERRAIN_FIX_LOWER_MIN_OFFSET, profile.TERRAIN_FIX_LOWER_MAX_OFFSET),
-                        h + LostCityTerrainFeature.getRandomizedOffset(cx, cz, profile.TERRAIN_FIX_UPPER_MIN_OFFSET, profile.TERRAIN_FIX_UPPER_MAX_OFFSET)};
+                        h + LostCityTerrainFeature.getRandomizedOffset(cx, cz, profile.TERRAIN_FIX_UPPER_MIN_OFFSET, profile.TERRAIN_FIX_UPPER_MAX_OFFSET));
                 return desiredMaxHeight1;
             }
 
-            Integer[] minMax = new Integer[]{100000, 100000};
+            MinMax minMax = new MinMax();
 
             getXmin().getZmin().updateMinMaxL1(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL1(cx - 1, cz - 1));
             getXmin().updateMinMaxL1(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL1(cx - 1, cz));
@@ -1628,25 +1628,44 @@ public class BuildingInfo implements ILostChunkInfo {
         return desiredMaxHeight1;
     }
 
+    public static class MinMax {
+        public int min;
+        public int max;
+
+        public MinMax(int min, int max) {
+            this.min = min;
+            this.max = max;
+        }
+
+        public MinMax(MinMax mm) {
+            min = mm.min;
+            max = mm.max;
+        }
+
+        public MinMax() {
+            min = max = 100000;
+        }
+    }
+
     /**
      * Given adjacent (city) chunks, calculate the desired height to interpolate the
      * landscape too. This is calculated for the reference position of this chunk (0,0 point)
      * This is the level 2 version which looks at L1 heights of adjacent chunks
      */
-    public Integer[] getDesiredMaxHeightL2() {
+    public MinMax getDesiredMaxHeightL2() {
         if (desiredTerrainCorrectionHeights == null) {
-            Integer[] mm = getDesiredMaxHeightL1();
+            MinMax mm = getDesiredMaxHeightL1();
             // @todo build limit
-            if (mm[0] < 256) {
+            if (mm.min < 256) {
                 // The L1 height at this corner is fixed so we return that
-                desiredTerrainCorrectionHeights = new Integer[] { mm[0], mm[1] };
+                desiredTerrainCorrectionHeights = new MinMax(mm);
                 return desiredTerrainCorrectionHeights;
             }
 
             int cx = chunkX;
             int cz = chunkZ;
 
-            Integer[] minMax = new Integer[]{100000, 100000};
+            MinMax minMax = new MinMax();
 
             getXmin().getZmin().updateMinMaxL2(minMax, 25 + LostCityTerrainFeature.getHeightOffsetL2(cx - 1, cz - 1));
             getXmin().updateMinMaxL2(minMax, 20 + LostCityTerrainFeature.getHeightOffsetL2(cx - 1, cz));
@@ -1663,24 +1682,24 @@ public class BuildingInfo implements ILostChunkInfo {
         return desiredTerrainCorrectionHeights;
     }
 
-    public void updateMinMaxL2(Integer[] minMax, int offs) {
-        Integer[] h = getDesiredMaxHeightL1();
-        if ((h[0]-offs) < minMax[0]) {
-            minMax[0] = h[0]-offs;
+    public void updateMinMaxL2(MinMax minMax, int offs) {
+        MinMax h = getDesiredMaxHeightL1();
+        if ((h.min-offs) < minMax.min) {
+            minMax.min = h.min-offs;
         }
-        if ((h[1]+offs) < minMax[1]) {
-            minMax[1] = h[1]+offs;
+        if ((h.max+offs) < minMax.max) {
+            minMax.max = h.max+offs;
         }
     }
 
 
-    private void updateMinMaxL1(Integer[] minMax, int offs) {
+    private void updateMinMaxL1(MinMax minMax, int offs) {
         int h = getLowestCityHeightAtChunkCorner();
-        if ((h-offs) < minMax[0]) {
-            minMax[0] = h-offs;
+        if ((h-offs) < minMax.min) {
+            minMax.min = h-offs;
         }
-        if ((h+offs) < minMax[1]) {
-            minMax[1] = h+offs;
+        if ((h+offs) < minMax.max) {
+            minMax.max = h+offs;
         }
     }
 

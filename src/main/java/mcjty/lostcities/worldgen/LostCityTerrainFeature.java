@@ -808,20 +808,20 @@ public class LostCityTerrainFeature {
      */
     private void correctTerrainShape(int chunkX, int chunkZ) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
-        Integer[] mm00 = info.getDesiredMaxHeightL2();
-        Integer[] mm10 = info.getXmax().getDesiredMaxHeightL2();
-        Integer[] mm01 = info.getZmax().getDesiredMaxHeightL2();
-        Integer[] mm11 = info.getXmax().getZmax().getDesiredMaxHeightL2();
+        BuildingInfo.MinMax mm00 = info.getDesiredMaxHeightL2();
+        BuildingInfo.MinMax mm10 = info.getXmax().getDesiredMaxHeightL2();
+        BuildingInfo.MinMax mm01 = info.getZmax().getDesiredMaxHeightL2();
+        BuildingInfo.MinMax mm11 = info.getXmax().getZmax().getDesiredMaxHeightL2();
 
         // @todo correct for build height change
-        float min00 = mm00[0];
-        float min10 = mm10[0];
-        float min01 = mm01[0];
-        float min11 = mm11[0];
-        float max00 = mm00[1];
-        float max10 = mm10[1];
-        float max01 = mm01[1];
-        float max11 = mm11[1];
+        float min00 = mm00.min;
+        float min10 = mm10.min;
+        float min01 = mm01.min;
+        float min11 = mm11.min;
+        float max00 = mm00.max;
+        float max10 = mm10.max;
+        float max01 = mm01.max;
+        float max11 = mm11.max;
         if (max00 < 256 || max10 < 256 || max01 < 256 || max11 < 256 ||
                 min00 < 256 || min10 < 256 || min01 < 256 || min11 < 256) {
             // We need to fit the terrain between the upper and lower mesh here
