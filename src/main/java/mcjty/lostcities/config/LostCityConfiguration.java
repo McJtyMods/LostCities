@@ -38,6 +38,7 @@ public class LostCityConfiguration {
 
     public static String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
             "minecraft:glowstone",
+            "minecraft:redstone_torch",
             "minecraft:lit_pumpkin",
             "minecraft:magma"
     };
