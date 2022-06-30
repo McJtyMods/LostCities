@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityConfiguration;
@@ -599,7 +600,7 @@ public class LostCityTerrainFeature {
             }
         }
 
-        Character support = part.getMetaChar("support");
+        Character support = part.getMetaChar(ILostCities.META_SUPPORT);
         if (info.profile.HIGHWAY_SUPPORTS && support != null) {
             BlockState sup = info.getCompiledPalette().get(support);
             int x1 = transform.rotateX(0, 15);
@@ -690,7 +691,7 @@ public class LostCityTerrainFeature {
             }
         }
 
-        Character support = bt.getMetaChar("support");
+        Character support = bt.getMetaChar(ILostCities.META_SUPPORT);
         if (info.profile.BRIDGE_SUPPORTS && support != null) {
             BlockState sup = compiledPalette.get(support);
             BuildingInfo minDir = orientation.getMinDir().get(info);
@@ -2042,8 +2043,8 @@ public class LostCityTerrainFeature {
                 BuildingInfo adjacent = direction.get(info);
                 if (adjacent.getActualStairDirection() == direction.getOpposite()) {
                     BuildingPart stairType = adjacent.stairType;
-                    Integer z1 = stairType.getMetaInteger("z1");
-                    Integer z2 = stairType.getMetaInteger("z2");
+                    Integer z1 = stairType.getMetaInteger(ILostCities.META_Z_1);
+                    Integer z2 = stairType.getMetaInteger(ILostCities.META_Z_2);
                     Transform transform = direction.getOpposite().getRotation();
                     int xx1 = transform.rotateX(15, z1);
                     int zz1 = transform.rotateZ(15, z1);
@@ -2076,7 +2077,7 @@ public class LostCityTerrainFeature {
             compiledPalette = new CompiledPalette(compiledPalette, partPalette, buildingPalette);
         }
 
-        boolean nowater = part.getMetaBoolean("nowater");
+        boolean nowater = part.getMetaBoolean(ILostCities.META_NOWATER);
 
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
@@ -2645,12 +2646,12 @@ public class LostCityTerrainFeature {
     }
 
     private boolean hasConnectionWithBuildingMax(int localLevel, BuildingInfo info, BuildingInfo info2, Orientation x) {
-        if (info.isValidFloor(localLevel) && info.getFloor(localLevel).getMetaBoolean("dontconnect")) {
+        if (info.isValidFloor(localLevel) && info.getFloor(localLevel).getMetaBoolean(ILostCities.META_DONTCONNECT)) {
             return false;
         }
         int globalLevel = info.localToGlobal(localLevel);
         int localAdjacent = info2.globalToLocal(globalLevel);
-        if (info2.isValidFloor(localAdjacent) && info2.getFloor(localAdjacent).getMetaBoolean("dontconnect")) {
+        if (info2.isValidFloor(localAdjacent) && info2.getFloor(localAdjacent).getMetaBoolean(ILostCities.META_DONTCONNECT)) {
             return false;
         }
         int level = localAdjacent + info2.cellars;
@@ -2660,7 +2661,7 @@ public class LostCityTerrainFeature {
     private boolean hasConnectionToTopOrOutside(int localLevel, BuildingInfo info, BuildingInfo info2) {
         int globalLevel = info.localToGlobal(localLevel);
         int localAdjacent = info2.globalToLocal(globalLevel);
-        if (info.getFloor(localLevel).getMetaBoolean("dontconnect")) {
+        if (info.getFloor(localLevel).getMetaBoolean(ILostCities.META_DONTCONNECT)) {
             return false;
         }
         return (info2.isCity && !info2.hasBuilding && localLevel == 0 && localAdjacent == 0) || (info2.hasBuilding && localAdjacent == info2.getNumFloors());

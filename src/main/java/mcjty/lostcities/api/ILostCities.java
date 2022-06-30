@@ -14,11 +14,20 @@ import java.io.InputStream;
  */
 public interface ILostCities {
 
+    // MODID for Lost Cities
     String LOSTCITIES = "lostcities";
+
     // IMC message for getting ILostCities
     String GET_LOST_CITIES = "getLostCities";
     // IMC message for getting ILostCitiesPre
     String GET_LOST_CITIES_PRE = "getLostCitiesPre";
+
+    // Meta values that you can use in assets
+    String META_DONTCONNECT = "dontconnect";
+    String META_SUPPORT = "support";
+    String META_Z_1 = "z1";
+    String META_Z_2 = "z2";
+    String META_NOWATER = "nowater";
 
     /**
      * Get Lost City information for a given dimension. Returns null if the dimension doesn't support Lost Cities

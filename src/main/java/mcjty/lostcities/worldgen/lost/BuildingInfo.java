@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class BuildingInfo implements ILostChunkInfo {
+
     public final int chunkX;
     public final int chunkZ;
     public final ChunkCoord coord;
@@ -1471,7 +1472,7 @@ public class BuildingInfo implements ILostChunkInfo {
             }
 
             int local = adj.globalToLocal(cityLevel);
-            if (adj.isValidFloor(local) && adj.getFloor(local).getMetaBoolean("dontconnect")) {
+            if (adj.isValidFloor(local) && adj.getFloor(local).getMetaBoolean(ILostCities.META_DONTCONNECT)) {
                 return false;
             }
         } else {
@@ -1492,7 +1493,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (level < 0 || level >= connectionAtX.length) {
             return false;
         }
-        if (level < floorTypes.length && floorTypes[level].getMetaBoolean("dontconnect")) {
+        if (level < floorTypes.length && floorTypes[level].getMetaBoolean(ILostCities.META_DONTCONNECT)) {
             return false;       // No connection supported
         }
         if (getXmin().hasFrontPartFrom(this)) {
@@ -1529,7 +1530,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (level < 0 || level >= connectionAtZ.length) {
             return false;
         }
-        if (level < floorTypes.length && floorTypes[level].getMetaBoolean("dontconnect")) {
+        if (level < floorTypes.length && floorTypes[level].getMetaBoolean(ILostCities.META_DONTCONNECT)) {
             return false;       // No connection supported
         }
         if (getZmin().hasFrontPartFrom(this)) {
