@@ -1,3 +1,6 @@
+Upcoming:
+- All mob spawners were spawning pigs. This is fixed now
+
 1.18-5.2.3:
 - It's now possible to use random block palettes for streets too
 - Big speed improvement in the Lost City profile selection screen when rendering the world preview

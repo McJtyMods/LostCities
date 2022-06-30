@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BaseSpawner;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
@@ -429,12 +430,7 @@ public class LostCityTerrainFeature {
             } else if (z < 15 && driver.getBlockSouth() != air) {
                 driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH));
             }
-            info.addPostTodo(pos, () -> {
-                WorldGenLevel world = provider.getWorld();
-                BlockState state = world.getBlockState(pos);
-                world.setBlock(pos, air, Block.UPDATE_CLIENTS);
-                world.setBlock(pos, state, Block.UPDATE_CLIENTS);
-            });
+            updateNeeded(info, pos);
         }
         info.clearTorchTodo();
     }
@@ -1849,13 +1845,7 @@ public class LostCityTerrainFeature {
                         driver.add(glass);
                         BlockPos pos = driver.getCurrentCopy();
                         driver.add(glowstone);
-                        info.addPostTodo(pos, () -> {
-                            WorldGenLevel world = provider.getWorld();
-                            if (!world.getBlockState(pos).isAir()) {
-                                world.setBlock(pos, air, Block.UPDATE_CLIENTS);
-                                world.setBlock(pos, glowstone, Block.UPDATE_CLIENTS);
-                            }
-                        });
+                        updateNeeded(info, pos);
                     } else {
                         BlockState roof = palette.get(corridorRoofBlock);
                         driver.add(roof).add(roof);
@@ -2122,7 +2112,6 @@ public class LostCityTerrainFeature {
                         }
                         // We don't replace the world where the part is empty (air)
                         if (b != air) {
-                            Runnable action = null;
                             if (b == liquid) {
                                 if (info.profile.AVOID_WATER) {
                                     b = air;
@@ -2158,27 +2147,20 @@ public class LostCityTerrainFeature {
 
                                         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
                                         BlockState finalB1 = b;
-                                        action = () -> {
-                                            WorldGenLevel world = provider.getWorld();
-                                            if (!world.getBlockState(pos).isAir()) {
-                                                world.setBlock(pos, finalB1, Block.UPDATE_CLIENTS);
-                                                createSpawner(rand, provider, info, new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
+                                        GlobalTodo.addTodo(provider.getWorld().getLevel().dimension(), pos, level -> {
+                                            if (level.getBlockState(pos).getBlock() == finalB1.getBlock()) {
+                                                level.setBlock(pos, air, Block.UPDATE_CLIENTS);
+                                                level.setBlock(pos, finalB1, Block.UPDATE_CLIENTS);
+                                                createSpawner(level, rand, provider, info, new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
                                             }
-                                        };
+                                        });
                                     } else {
                                         b = air;
                                     }
                                 }
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
                                 BlockPos pos = driver.getCurrentCopy();
-                                BlockState finalB2 = b;
-                                info.addPostTodo(pos, () -> {
-                                    WorldGenLevel world = provider.getWorld();
-                                    if (!world.getBlockState(pos).isAir()) {
-                                        world.setBlock(pos, air, Block.UPDATE_CLIENTS);
-                                        world.setBlock(pos, finalB2, Block.UPDATE_CLIENTS);
-                                    }
-                                });
+                                updateNeeded(info, pos);
                             } else if (getStatesNeedingTodo().contains(b)) {
                                 BlockState bs = b;
                                 Block block = bs.getBlock();
@@ -2197,36 +2179,10 @@ public class LostCityTerrainFeature {
                                             });
 
                                         }
-
-//
-//                                        info.getTodoChunk(rx, rz).addPostTodo(pos,
-//                                                () -> {
-//                                                    BlockState state = provider.getWorld().getBlockState(pos);
-//                                                    if (state.getBlock() instanceof SaplingBlock saplingBlock) {
-//                                                        GlobalTodo.addTodo(provider.getWorld().getLevel().dimension(), pos, () -> {
-//                                                            System.out.println("pos = " + pos);
-//                                                            provider.getWorld().setBlock(pos, state.setValue(SaplingBlock.STAGE, 1), Block.UPDATE_CLIENTS);
-//                                                            saplingBlock.advanceTree(provider.getWorld().getLevel(), pos, state, rand);
-//                                                        });
-//                                                        // @todo 1.15 how to do this?
-////                                                        ConfiguredFeature<TreeConfiguration, ?> value = TreeFeatures.OAK.value();
-////                                                        ChunkGenerator generator = provider.getWorld().getLevel().getChunkSource().getGenerator();
-////                                                        value.place(provider.getWorld(), generator, rand, pos);
-//
-////                                                        provider.getWorld().setBlock(pos, state.setValue(SaplingBlock.STAGE, 1), Block.UPDATE_CLIENTS);
-////                                                        saplingBlock.advanceTree(provider.getWorld().getLevel(), pos, state, rand);
-//
-////                ((SaplingBlock) state.getBlock()).grow((ServerWorld)world, random, pos, state);
-//                                                    }
-//
-//                                                });
                                     }
                                 }
                             }
                             driver.add(b);
-                            if (action != null) {
-                                action.run();
-                            }
                         } else {
                             driver.incY();
                         }
@@ -2237,8 +2193,7 @@ public class LostCityTerrainFeature {
         return oy + part.getSliceCount();
     }
 
-    public static void createSpawner(Random random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
-        LevelAccessor world = diminfo.getWorld();
+    public static void createSpawner(Level world, Random random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
         BlockEntity tileentity = world.getBlockEntity(pos);
         if (tileentity instanceof SpawnerBlockEntity spawner) {
             String condition = todo.getCondition();
@@ -2728,4 +2683,16 @@ public class LostCityTerrainFeature {
     private boolean isStreetBorder(int x, int z) {
         return x <= streetBorder || x >= (15 - streetBorder) || z <= streetBorder || z >= (15 - streetBorder);
     }
+
+    private void updateNeeded(BuildingInfo info, BlockPos pos) {
+        info.addPostTodo(pos, () -> {
+            WorldGenLevel world = provider.getWorld();
+            BlockState state = world.getBlockState(pos);
+            if (!state.isAir()) {
+                world.setBlock(pos, air, Block.UPDATE_CLIENTS);
+                world.setBlock(pos, state, Block.UPDATE_CLIENTS);
+            }
+        });
+    }
+
 }
