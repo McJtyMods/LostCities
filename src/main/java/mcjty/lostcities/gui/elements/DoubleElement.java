@@ -19,7 +19,7 @@ public class DoubleElement extends GuiElement {
         this.gui = gui;
         this.attribute = attribute;
         Double c = gui.getLocalSetup().get().map(h -> (Double) h.toConfiguration().get(attribute)).orElse(0.0);
-        field = new EditBox(gui.getFont(), x, y, 45, 16, ComponentFactory.literal(Double.toString(c))) {
+        field = new EditBox(gui.getFont(), x, y, 120, 16, ComponentFactory.literal(Double.toString(c))) {
             @Override
             public void renderToolTip(PoseStack stack, int x, int y) {
                     gui.getLocalSetup().get().ifPresent(h -> {

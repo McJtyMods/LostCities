@@ -136,7 +136,7 @@ public class Configuration {
                 JsonElement valueEl = elementEntry.getValue();
                 if (valueEl.isJsonPrimitive()) {
                     if (valueEl.getAsJsonPrimitive().isNumber()) {
-                        getFloat(elementEntry.getKey(), category, valueEl.getAsFloat(), 0.0f, 0.0f, "");
+                        getDouble(elementEntry.getKey(), category, valueEl.getAsDouble(), 0.0, 0.0, "");
                     } else if (valueEl.getAsJsonPrimitive().isString()) {
                         getString(elementEntry.getKey(), category, valueEl.getAsString(), "");
                     } else if (valueEl.getAsJsonPrimitive().isBoolean()) {
@@ -176,6 +176,8 @@ public class Configuration {
         Object value = cat.valueMap.get(name).value;
         if (value instanceof Float) {
             return (Float) value;
+        } else if (value instanceof Double) {
+            return ((Double) value).floatValue();
         } else {
             return ((Integer) value).floatValue();
         }
@@ -203,6 +205,8 @@ public class Configuration {
         Object value = cat.valueMap.get(name).value;
         if (value instanceof Float) {
             return ((Float) value).intValue();
+        } else if (value instanceof Double) {
+            return ((Double) value).intValue();
         } else {
             return (Integer) value;
         }
