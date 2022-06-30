@@ -91,6 +91,10 @@ public class ChunkDriver {
         return current.immutable();
     }
 
+    public BlockPos.MutableBlockPos getCurrent() {
+        return current;
+    }
+
     public void incY() {
         current.setY(current.getY()+1);
     }

@@ -51,7 +51,7 @@ import java.util.function.Predicate;
 
 public class LostCityTerrainFeature {
 
-    public static int FLOORHEIGHT = 6;
+    public static final int FLOORHEIGHT = 6;
 
     private static int gSeed = 123456789;
     private final int mainGroundLevel;
@@ -1060,6 +1060,45 @@ public class LostCityTerrainFeature {
         clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
+    /**
+     * This function returns the height at a given point in this chunk
+     * If the point is at a border and the adjacent chunk at that point happens to be lower
+     * then this will return the minimum height
+     * @param info
+     * @return
+     */
+    public int getMinHeightAt(BuildingInfo info, int x, int z) {
+        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, info.provider.getWorld());
+        int height = heightmap.getHeight(x, z);
+        ChunkHeightmap adjacentHeightmap;
+        WorldGenLevel world = info.provider.getWorld();
+        int adjacent;
+        if (x == 0) {
+            if (z == 0) {
+                adjacent = getHeightmap(info.chunkX - 1, info.chunkZ - 1, world).getHeight(15, 15);
+            } else if (z == 15) {
+                adjacent = getHeightmap(info.chunkX - 1, info.chunkZ + 1, world).getHeight(15, 0);
+            } else {
+                adjacent = getHeightmap(info.chunkX - 1, info.chunkZ, world).getHeight(15, z);
+            }
+        } else if (x == 15) {
+            if (z == 0) {
+                adjacent = getHeightmap(info.chunkX + 1, info.chunkZ - 1, world).getHeight(0, 15);
+            } else if (z == 15) {
+                adjacent = getHeightmap(info.chunkX + 1, info.chunkZ + 1, world).getHeight(0, 0);
+            } else {
+                adjacent = getHeightmap(info.chunkX + 1, info.chunkZ, world).getHeight(0, z);
+            }
+        } else if (z == 0) {
+            adjacent = getHeightmap(info.chunkX, info.chunkZ - 1, world).getHeight(x, 15);
+        } else if (z == 15) {
+            adjacent = getHeightmap(info.chunkX, info.chunkZ + 1, world).getHeight(x, 0);
+        } else {
+            return height;
+        }
+        return Math.min(height, adjacent);
+    }
+
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ, @Nonnull WorldGenLevel world) {
         ChunkCoord key = new ChunkCoord(world.getLevel().dimension(), chunkX, chunkZ);
         synchronized (this) {
@@ -1753,9 +1792,17 @@ public class LostCityTerrainFeature {
         BlockState wall = info.getCompiledPalette().get(wallBlock);
 
         switch (info.profile.LANDSCAPE_TYPE) {
-            case DEFAULT ->
-                // We do the ocean border 12 lower then groundlevel
-                    setBlocksFromPalette(x, info.groundLevel - 12, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+            case DEFAULT -> {
+                ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, info.provider.getWorld());
+                int y = getMinHeightAt(info, x, z);
+                if (y < info.getCityGroundLevel()+1) {
+                    // We are above heightmap level. Generated a border from that level to our ground level
+                    setBlocksFromPalette(x, y-1, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                } else {
+                    // We are below heightmap level. Generate a thin border anyway
+                    setBlocksFromPalette(x, info.getCityGroundLevel()-3, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                }
+            }
             case SPACE -> {
                 int adjacentY = info.getCityGroundLevel() - 8;
                 if (adjacent.isCity) {
@@ -2378,66 +2425,10 @@ public class LostCityTerrainFeature {
     private void generateBuilding(BuildingInfo info, ChunkHeightmap heightmap) {
         int lowestLevel = info.getCityGroundLevel() - info.cellars * FLOORHEIGHT;
 
-        Character borderBlock = info.getCityStyle().getBorderBlock();
         CompiledPalette palette = info.getCompiledPalette();
+        makeRoomForBuilding(info, lowestLevel, heightmap, palette);
+
         char fillerBlock = info.getBuilding().getFillerBlock();
-
-        if (info.profile.isFloating()) {
-            // For floating worldgen we try to fit the underside of the building better with the island
-            // We also remove all blocks from the inside because we generate buildings on top of
-            // generated chunks as opposed to blank chunks with non-floating worlds
-            for (int x = 0; x < 16; ++x) {
-                for (int z = 0; z < 16; ++z) {
-                    driver.current(x, provider.getWorld().getMaxBuildHeight() - 1, z);
-                    int minHeight = provider.getWorld().getMinBuildHeight();
-                    while (driver.getBlock() == air && driver.getY() > minHeight) {
-                        driver.decY();
-                    }
-
-                    int height = driver.getY();//heightmap.getHeight(x, z);
-                    if (height > minHeight + 1 && height < lowestLevel - 1) {
-                        driver.setBlockRange(x, height + 1, z, lowestLevel, base);
-                    }
-                    // Also clear the inside of buildings to avoid geometry that doesn't really belong there
-                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, info.waterLevel > info.groundLevel);
-                }
-            }
-        } else if (info.profile.isSpace()) {
-            fillToGround(info, lowestLevel, borderBlock);
-            // Also clear the inside of buildings to avoid geometry that doesn't really belong there
-            for (int x = 0; x < 16; ++x) {
-                for (int z = 0; z < 16; ++z) {
-                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, false);     // Never water in bubbles?
-                }
-            }
-        } else {
-            // For normal worldgen (non floating) or cavern we have a thin layer of 'border' blocks because that looks nicer
-            for (int x = 0; x < 16; ++x) {
-                for (int z = 0; z < 16; ++z) {
-                    if (isSide(x, z)) {
-//                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel - 10, base);
-                        int y = lowestLevel - 10;
-                        driver.current(x, y, z);
-                        while (y < lowestLevel) {
-                            driver.add(palette.get(borderBlock));
-                            y++;
-                        }
-                    } else if (info.profile.isDefault()) {
-//                        driver.setBlockRange(x, info.profile.BEDROCK_LAYER, z, lowestLevel, base);
-                    }
-                    if (driver.getBlock(x, lowestLevel, z) == air) {
-                        BlockState filler = palette.get(fillerBlock);
-                        driver.current(x, lowestLevel, z).block(filler); // There is nothing below so we fill this with the filler
-                    }
-
-//                    if (info.profile.isCavern()) {
-                    // Also clear the inside of buildings to avoid geometry that doesn't really belong there
-//                        clearRange(primer, index, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, waterLevel > mainGroundLevel);
-                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, info.waterLevel > info.groundLevel);
-//                    }
-                }
-            }
-        }
 
         int height = lowestLevel;
         for (int f = -info.cellars; f <= info.getNumFloors(); f++) {
@@ -2480,6 +2471,91 @@ public class LostCityTerrainFeature {
         if (info.cellars >= 1) {
             // We have to potentially connect to corridors
             generateCorridorConnections(info);
+        }
+    }
+
+    /*
+     * Make sure the space for the building is cleared and everything below the building is ok
+     */
+    private void makeRoomForBuilding(BuildingInfo info, int lowestLevel, ChunkHeightmap heightmap, CompiledPalette palette) {
+        char borderBlock = info.getCityStyle().getBorderBlock();
+        char fillerBlock = info.getBuilding().getFillerBlock();
+
+        if (info.profile.isFloating()) {
+            // For floating worldgen we try to fit the underside of the building better with the island
+            // We also remove all blocks from the inside because we generate buildings on top of
+            // generated chunks as opposed to blank chunks with non-floating worlds
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    driver.current(x, provider.getWorld().getMaxBuildHeight() - 1, z);
+                    int minHeight = provider.getWorld().getMinBuildHeight();
+                    while (driver.getBlock() == air && driver.getY() > minHeight) {
+                        driver.decY();
+                    }
+
+                    int height = driver.getY();//heightmap.getHeight(x, z);
+                    if (height > minHeight + 1 && height < lowestLevel - 1) {
+                        driver.setBlockRange(x, height + 1, z, lowestLevel, base);
+                    }
+                    // Also clear the inside of buildings to avoid geometry that doesn't really belong there
+                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, info.waterLevel > info.groundLevel);
+                }
+            }
+        } else if (info.profile.isSpace()) {
+            fillToGround(info, lowestLevel, borderBlock);
+            // Also clear the inside of buildings to avoid geometry that doesn't really belong there
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, false);     // Never water in bubbles?
+                }
+            }
+        } else if (info.profile.isCavern()) {
+            // For normal cavern we have a thin layer of 'border' blocks because that looks nicer
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    if (isSide(x, z)) {
+                        int y = lowestLevel - 10;
+                        driver.current(x, y, z);
+                        while (y < lowestLevel) {
+                            driver.add(palette.get(borderBlock));
+                            y++;
+                        }
+                    }
+                    if (driver.getBlock(x, lowestLevel, z) == air) {
+                        BlockState filler = palette.get(fillerBlock);
+                        driver.current(x, lowestLevel, z).block(filler); // There is nothing below so we fill this with the filler
+                    }
+
+                    // Also clear the inside of buildings to avoid geometry that doesn't really belong there
+                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, info.waterLevel > info.groundLevel);
+                }
+            }
+        } else {
+            // For normal worldgen we have a thin layer of 'border' blocks because that looks nicer
+            // We try to avoid this layer in big caves though
+            for (int x = 0; x < 16; ++x) {
+                for (int z = 0; z < 16; ++z) {
+                    if (isSide(x, z)) {
+                        int y = getMinHeightAt(info, x, z);
+                        if (y >= lowestLevel) {
+                            // The building generates below heightmap height. So we generate a border of 3 only
+                            y = lowestLevel-3;
+                        }
+                        driver.current(x, y, z);
+                        while (y < lowestLevel) {
+                            driver.add(palette.get(borderBlock));
+                            y++;
+                        }
+                    }
+                    if (driver.getBlock(x, lowestLevel, z) == air) {
+                        BlockState filler = palette.get(fillerBlock);
+                        driver.current(x, lowestLevel, z).block(filler); // There is nothing below so we fill this with the filler
+                    }
+
+                    // Also clear the inside of buildings to avoid geometry that doesn't really belong there
+                    clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, info.waterLevel > info.groundLevel);
+                }
+            }
         }
     }
 

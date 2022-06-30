@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * A heightmap for a chunk
  */
 public class ChunkHeightmap {
-    private final byte[] heightmap = new byte[16*16];
+    private final short[] heightmap = new short[16*16];
     private final LandscapeType type;
     private final int groundLevel;
     private final BlockState baseState;
@@ -21,7 +21,7 @@ public class ChunkHeightmap {
         this.baseState = baseState;
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                heightmap[z * 16 + x] = 0;
+                heightmap[z * 16 + x] = Short.MIN_VALUE;
             }
         }
     }
@@ -32,7 +32,7 @@ public class ChunkHeightmap {
             return;
         }
 
-        int current = heightmap[z * 16 + x] & 0xff;
+        int current = heightmap[z * 16 + x];
         if (y <= current) {
             return;
         }
@@ -47,29 +47,29 @@ public class ChunkHeightmap {
                 heightmap[z * 16 + x] = (byte) 127;
                 return;
             }
-            heightmap[z * 16 + x] = (byte) y;
+            heightmap[z * 16 + x] = (short) y;
         } else if (type == LandscapeType.SPACE) {
             // Here we ignore the glass from the spheres (we only look at the base state)
             if (state != baseState) {
                 return;
             }
-            heightmap[z * 16 + x] = (byte) y;
+            heightmap[z * 16 + x] = (short) y;
         } else {
-            heightmap[z * 16 + x] = (byte) y;
+            heightmap[z * 16 + x] = (short) y;
         }
     }
 
     public int getHeight(int x, int z) {
-        return heightmap[z*16+x] & 0xff;
+        return heightmap[z*16+x];
     }
 
     public void setHeight(int x, int z, int height) {
-        heightmap[z*16+x] = (byte) height;
+        heightmap[z*16+x] = (short) height;
     }
 
     private void calculateHeightInfo() {
-        int max = 0;
-        int min = 256;
+        int max = Short.MAX_VALUE;
+        int min = Short.MAX_VALUE;
         int avg = 0;
         for (int x = 0 ; x < 16 ; x++) {
             for (int z = 0 ; z < 16 ; z++) {
