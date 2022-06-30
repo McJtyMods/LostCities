@@ -12,8 +12,10 @@ import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -1313,21 +1315,10 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isOcean != null) {
             return isOcean;
         }
-        Biome mainBiome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
-        Biome.BiomeCategory category = Biome.getBiomeCategory(Holder.direct(mainBiome));
-        isOcean = category == Biome.BiomeCategory.OCEAN;
+        Holder<Biome> mainBiome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
+        var reg = provider.getWorld().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+        isOcean = mainBiome.is(BiomeTags.IS_OCEAN) || mainBiome.is(BiomeTags.IS_DEEP_OCEAN);
         return isOcean;
-    }
-
-    private static boolean isOcean(Biome[] biomes) {
-        int cnt = 0;
-        for (Biome biome : biomes) {
-            Biome.BiomeCategory category = Biome.getBiomeCategory(Holder.direct(biome));
-            if (category == Biome.BiomeCategory.OCEAN) {
-                cnt++;
-            }
-        }
-        return (cnt * 100 / biomes.length) > 50;
     }
 
 
@@ -1610,6 +1601,7 @@ public class BuildingInfo implements ILostChunkInfo {
             int cx = chunkX;
             int cz = chunkZ;
 
+            // @todo build limit
             if (h < 256) {
                 // The L0 height at this corner is fixed so we return that
                 desiredMaxHeight1 = new Integer[]{
@@ -1644,6 +1636,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public Integer[] getDesiredMaxHeightL2() {
         if (desiredTerrainCorrectionHeights == null) {
             Integer[] mm = getDesiredMaxHeightL1();
+            // @todo build limit
             if (mm[0] < 256) {
                 // The L1 height at this corner is fixed so we return that
                 desiredTerrainCorrectionHeights = new Integer[] { mm[0], mm[1] };

@@ -83,6 +83,7 @@ public class CommandDebug implements Command<CommandSourceStack> {
                 System.out.println("dimInfo.getProfile().BUILDING_MINFLOORS = " + dimInfo.getProfile().BUILDING_MINFLOORS);
                 System.out.println("dimInfo.getProfile().BUILDING_MAXFLOORS = " + dimInfo.getProfile().BUILDING_MAXFLOORS);
                 System.out.println("dimInfo.getProfile().CITY_CHANCE = " + dimInfo.getProfile().CITY_CHANCE);
+                System.out.println("info.isOcean() = " + info.isOcean());
             }
         }
         return 0;

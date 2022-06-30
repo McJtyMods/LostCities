@@ -68,7 +68,7 @@ public class ChunkHeightmap {
     }
 
     private void calculateHeightInfo() {
-        int max = Short.MAX_VALUE;
+        int max = Short.MIN_VALUE;
         int min = Short.MAX_VALUE;
         int avg = 0;
         for (int x = 0 ; x < 16 ; x++) {

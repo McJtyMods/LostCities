@@ -3,19 +3,19 @@ package mcjty.lostcities.worldgen;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkSource;
-import net.minecraft.server.level.ServerChunkCache;
 
 import java.util.Random;
 
@@ -97,15 +97,13 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 //    }
 //
     @Override
-    public Biome getBiome(BlockPos pos) {
+    public Holder<Biome> getBiome(BlockPos pos) {
         ChunkSource chunkProvider = getWorld().getChunkSource();
         if (chunkProvider instanceof ServerChunkCache) {
             ChunkGenerator generator = ((ServerChunkCache) chunkProvider).getGenerator();
             BiomeSource biomeProvider = generator.getBiomeSource();
-            // @todo 1.15 check if this is correct!
-            return biomeProvider.getNoiseBiome(pos.getX(), pos.getY(), pos.getZ(), generator.climateSampler()).value();
+            return biomeProvider.getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2, generator.climateSampler());
         }
-        // @todo 1.16: is this right
-        return biomeRegistry.getOptional(Biomes.PLAINS.location()).get();
+        return biomeRegistry.getHolderOrThrow(Biomes.PLAINS);
     }
 }

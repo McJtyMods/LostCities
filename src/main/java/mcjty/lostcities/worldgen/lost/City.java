@@ -7,6 +7,7 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -245,9 +246,9 @@ public class City {
 //        }
 
         float foundFactor = profile.CITY_DEFAULT_BIOME_FACTOR;
-        Biome biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX, chunkZ)).getMainBiome();
+        Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX, chunkZ)).getMainBiome();
         Map<ResourceLocation, Float> map = profile.getBiomeFactorMap();
-        ResourceLocation object = Tools.getBiomeId(biome);
+        ResourceLocation object = Tools.getBiomeId(biome.value());
         Float f;
         try {
             f = map.get(object);
@@ -260,12 +261,4 @@ public class City {
 
         return Math.min(Math.max(factor * foundFactor, 0), 1);
     }
-
-    public static boolean isTooHighForBuilding(Biome[] biomes) {
-        // @todo 1.14
-//        return biomes[55].getBaseHeight() > 4 || biomes[54].getBaseHeight() > 4 || biomes[56].getBaseHeight() > 4
-//                || biomes[5].getBaseHeight() > 4 || biomes[95].getBaseHeight() > 4;
-        return false;
-    }
-
 }

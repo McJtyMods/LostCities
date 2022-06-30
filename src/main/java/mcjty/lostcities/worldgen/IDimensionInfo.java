@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.WorldGenLevel;
@@ -33,5 +34,5 @@ public interface IDimensionInfo {
 
 //    Biome[] getBiomes(int chunkX, int chunkZ);
 
-    Biome getBiome(BlockPos pos);
+    Holder<Biome> getBiome(BlockPos pos);
 }

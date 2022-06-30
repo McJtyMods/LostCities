@@ -10,6 +10,7 @@ import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BiomeInfo;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -63,12 +64,12 @@ public class WorldStyle implements ILostCityAsset {
         }
     }
 
-    private boolean isValidBiome(Set<ResourceLocation> biomeSet, Biome biome) {
-        return biomeSet.contains(Tools.getBiomeId(biome));
+    private boolean isValidBiome(Set<ResourceLocation> biomeSet, Holder<Biome> biome) {
+        return biomeSet.contains(Tools.getBiomeId(biome.value()));
     }
 
     private boolean hasBiomes(Info info, Set<ResourceLocation> biomeSet) {
-        Biome biome = info.biome;
+        Holder<Biome> biome = info.biome;
         return isValidBiome(biomeSet, biome);
     }
 
@@ -96,8 +97,8 @@ public class WorldStyle implements ILostCityAsset {
 
 
     public String getRandomCityStyle(IDimensionInfo provider, int chunkX, int chunkZ, Random random) {
-        Biome biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
-        Info info = new Info(biomes, chunkX, chunkZ);
+        Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
+        Info info = new Info(biome, chunkX, chunkZ);
         List<Pair<Float, String>> ct = new ArrayList<>();
         for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {
             if (pair.getKey().test(info)) {
@@ -109,11 +110,11 @@ public class WorldStyle implements ILostCityAsset {
     }
 
     private static class Info {
-        private Biome biome;
+        private Holder<Biome> biome;
         private int chunkX;
         private int chunkZ;
 
-        public Info(Biome biome, int chunkX, int chunkZ) {
+        public Info(Holder<Biome> biome, int chunkX, int chunkZ) {
             this.biome = biome;
             this.chunkX = chunkX;
             this.chunkZ = chunkZ;

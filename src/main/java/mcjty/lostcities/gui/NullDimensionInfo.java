@@ -7,6 +7,7 @@ import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -188,7 +189,7 @@ public class NullDimensionInfo implements IDimensionInfo {
 //    }
 
     @Override
-    public Biome getBiome(BlockPos pos) {
+    public Holder<Biome> getBiome(BlockPos pos) {
         ResourceKey<Biome> biome = Biomes.PLAINS;
         ChunkPos cp = new ChunkPos(pos);
         char b = getBiomeChar(cp.x, cp.z);
@@ -204,6 +205,6 @@ public class NullDimensionInfo implements IDimensionInfo {
             case 'd' -> Biomes.DESERT;
             default -> Biomes.PLAINS;
         };
-        return biomeRegistry.get(biome.location());
+        return biomeRegistry.getHolderOrThrow(biome);
     }
 }

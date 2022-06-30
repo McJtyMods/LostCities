@@ -4,8 +4,10 @@ Upcoming:
 - Cellars at level -1 didn't correctly connect to adjacent corridors in Z direction
 - Fixed a problem with heightmaps being stored with bytes. But worldheight no longer fits in a byte. This could cause worldgen issues
 - Made borders below buildings and streets only go as deep as needed. This means that you will no longer have ugly borders going down into caves from buildings on top of it
+- The test if a chunk is an ocean chunk was totally wrong. This caused some generation to be ugly. Cleaned up biome test code
 
 @TODO setBlocksFromPalette
+Height=70
 
 1.18-5.2.3:
 - It's now possible to use random block palettes for streets too

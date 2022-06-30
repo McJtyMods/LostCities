@@ -19,6 +19,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.Level;
@@ -812,6 +813,11 @@ public class LostCityTerrainFeature {
         Integer[] mm01 = info.getZmax().getDesiredMaxHeightL2();
         Integer[] mm11 = info.getXmax().getZmax().getDesiredMaxHeightL2();
 
+        if (chunkX == 13 && chunkZ == 17) {
+            System.out.println("LostCityTerrainFeature.correctTerrainShape");
+        }
+
+        // @todo correct for build height change
         float min00 = mm00[0];
         float min10 = mm10[0];
         float min01 = mm01[0];
@@ -1029,13 +1035,12 @@ public class LostCityTerrainFeature {
 
     public static boolean isWaterBiome(IDimensionInfo provider, ChunkCoord coord) {
         BiomeInfo biomeInfo = BiomeInfo.getBiomeInfo(provider, coord);
-        Biome mainBiome = biomeInfo.getMainBiome();
+        Holder<Biome> mainBiome = biomeInfo.getMainBiome();
         return isWaterBiome(mainBiome);
     }
 
-    private static boolean isWaterBiome(Biome biome) {
-        Biome.BiomeCategory category = Biome.getBiomeCategory(Holder.direct(biome));
-        return category.equals(Biome.BiomeCategory.OCEAN) || category.equals(Biome.BiomeCategory.BEACH) || category.equals(Biome.BiomeCategory.RIVER);
+    private static boolean isWaterBiome(Holder<Biome> biome) {
+        return biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_DEEP_OCEAN) || biome.is(BiomeTags.IS_BEACH) || biome.is(BiomeTags.IS_RIVER);
     }
 
     @Deprecated
