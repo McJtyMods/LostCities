@@ -2630,13 +2630,13 @@ public class LostCityTerrainFeature {
                 driver.setBlockRangeToAir(x, info.groundLevel - 5, z, info.groundLevel - 2);
             }
         }
-        if (info.getZmin().hasXCorridor()) {
+        if (info.getZmin().hasZCorridor()) {
             int z = 0;
             for (int x = 7; x <= 10; x++) {
                 driver.setBlockRangeToAir(x, info.groundLevel - 5, z, info.groundLevel - 2);
             }
         }
-        if (info.getZmax().hasXCorridor()) {
+        if (info.getZmax().hasZCorridor()) {
             int z = 15;
             for (int x = 7; x <= 10; x++) {
                 driver.setBlockRangeToAir(x, info.groundLevel - 5, z, info.groundLevel - 2);
