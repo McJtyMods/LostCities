@@ -813,10 +813,6 @@ public class LostCityTerrainFeature {
         Integer[] mm01 = info.getZmax().getDesiredMaxHeightL2();
         Integer[] mm11 = info.getXmax().getZmax().getDesiredMaxHeightL2();
 
-        if (chunkX == 13 && chunkZ == 17) {
-            System.out.println("LostCityTerrainFeature.correctTerrainShape");
-        }
-
         // @todo correct for build height change
         float min00 = mm00[0];
         float min10 = mm10[0];
@@ -2519,12 +2515,7 @@ public class LostCityTerrainFeature {
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     if (isSide(x, z)) {
-                        int y = lowestLevel - 10;
-                        driver.current(x, y, z);
-                        while (y < lowestLevel) {
-                            driver.add(palette.get(borderBlock));
-                            y++;
-                        }
+                        setBlocksFromPalette(x, lowestLevel-10, z, lowestLevel, palette, borderBlock);
                     }
                     if (driver.getBlock(x, lowestLevel, z) == air) {
                         BlockState filler = palette.get(fillerBlock);
@@ -2546,11 +2537,7 @@ public class LostCityTerrainFeature {
                             // The building generates below heightmap height. So we generate a border of 3 only
                             y = lowestLevel-3;
                         }
-                        driver.current(x, y, z);
-                        while (y < lowestLevel) {
-                            driver.add(palette.get(borderBlock));
-                            y++;
-                        }
+                        setBlocksFromPalette(x, y, z, lowestLevel, palette, borderBlock);
                     }
                     if (driver.getBlock(x, lowestLevel, z) == air) {
                         BlockState filler = palette.get(fillerBlock);
