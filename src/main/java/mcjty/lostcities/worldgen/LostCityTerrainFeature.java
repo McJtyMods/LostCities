@@ -14,6 +14,7 @@ import mcjty.lostcities.varia.NoiseGeneratorPerlin;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -49,6 +50,7 @@ import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class LostCityTerrainFeature {
 
@@ -59,19 +61,9 @@ public class LostCityTerrainFeature {
     private boolean statesSetup = false;
     public static BlockState air;
     public static BlockState hardAir;
-    public static BlockState glowstone;
-    public static BlockState gravel;
-    public static BlockState glass;       // E: for space: depend on city style
-    public static BlockState leaves;
-    public static BlockState leaves2;
-    public static BlockState leaves3;
-    public static BlockState ironbars;
-    public static BlockState grass;
     public static BlockState bedrock;
     public static BlockState endportal;
     public static BlockState endportalFrame;
-    public static BlockState goldBlock;
-    public static BlockState diamondBlock;
 
     public BlockState liquid;
     public BlockState base;
@@ -100,12 +92,6 @@ public class LostCityTerrainFeature {
     private final LostCityProfile profile;
     private final Random rand;
 
-    // Helper variables for correctTerrainShape
-    private final Integer[] mm00 = new Integer[2];
-    private final Integer[] mm10 = new Integer[2];
-    private final Integer[] mm01 = new Integer[2];
-    private final Integer[] mm11 = new Integer[2];
-
     private final Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
 
     public LostCityTerrainFeature(IDimensionInfo provider, LostCityProfile profile, Random rand) {
@@ -126,6 +112,10 @@ public class LostCityTerrainFeature {
 
     public static BlockState getRandomLeaf() {
         if (randomLeafs == null) {
+            BlockState leaves = Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+            BlockState leaves2 = Blocks.JUNGLE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+            BlockState leaves3 = Blocks.SPRUCE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+
             randomLeafs = new BlockState[128];
             int i = 0;
             while (i < 20) {
@@ -201,20 +191,8 @@ public class LostCityTerrainFeature {
     public static Set<BlockState> getRotatableStates() {
         if (rotatableStates == null) {
             rotatableStates = new HashSet<>();
-            addStates(Blocks.ACACIA_STAIRS, rotatableStates);
-            addStates(Blocks.BIRCH_STAIRS, rotatableStates);
-            addStates(Blocks.BRICK_STAIRS, rotatableStates);
-            addStates(Blocks.QUARTZ_STAIRS, rotatableStates);
-            addStates(Blocks.STONE_BRICK_STAIRS, rotatableStates);
-            addStates(Blocks.DARK_OAK_STAIRS, rotatableStates);
-            addStates(Blocks.JUNGLE_STAIRS, rotatableStates);
-            addStates(Blocks.NETHER_BRICK_STAIRS, rotatableStates);
-            addStates(Blocks.OAK_STAIRS, rotatableStates);
-            addStates(Blocks.PURPUR_STAIRS, rotatableStates);
-            addStates(Blocks.RED_SANDSTONE_STAIRS, rotatableStates);
-            addStates(Blocks.SANDSTONE_STAIRS, rotatableStates);
-            addStates(Blocks.SPRUCE_STAIRS, rotatableStates);
-            addStates(Blocks.STONE_STAIRS, rotatableStates);
+            DefaultedRegistry<Block> registry = Registry.BLOCK;
+            registry.getTagOrEmpty(BlockTags.STAIRS).forEach(holder -> addStates(holder.value(), rotatableStates));
             addStates(Blocks.LADDER, rotatableStates);
         }
         return rotatableStates;
@@ -228,30 +206,13 @@ public class LostCityTerrainFeature {
         if (!statesSetup) {
             air = Blocks.AIR.defaultBlockState();
             hardAir = Blocks.COMMAND_BLOCK.defaultBlockState();
-            glowstone = Blocks.GLOWSTONE.defaultBlockState();
-            gravel = Blocks.GRAVEL.defaultBlockState();
 
             base = profile.getBaseBlock();
             liquid = profile.getLiquidBlock();
 
-            // @todo
-            glass = Blocks.GLASS.defaultBlockState();
-
-            // @todo 1.14
-            leaves = Blocks.OAK_LEAVES.defaultBlockState()
-                    .setValue(LeavesBlock.PERSISTENT, true);
-            leaves2 = Blocks.JUNGLE_LEAVES.defaultBlockState()
-                    .setValue(LeavesBlock.PERSISTENT, true);
-            leaves3 = Blocks.SPRUCE_LEAVES.defaultBlockState()
-                    .setValue(LeavesBlock.PERSISTENT, true);
-
-            ironbars = Blocks.IRON_BARS.defaultBlockState();
-            grass = Blocks.GRASS_BLOCK.defaultBlockState();
             bedrock = Blocks.BEDROCK.defaultBlockState();
             endportal = Blocks.END_PORTAL.defaultBlockState();
             endportalFrame = Blocks.END_PORTAL_FRAME.defaultBlockState();
-            goldBlock = Blocks.GOLD_BLOCK.defaultBlockState();
-            diamondBlock = Blocks.DIAMOND_BLOCK.defaultBlockState();
             statesSetup = true;
         }
     }
@@ -1106,7 +1067,7 @@ public class LostCityTerrainFeature {
             if (cachedHeightmaps.containsKey(key)) {
                 return cachedHeightmaps.get(key);
             } else {
-                ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+                ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL);
                 generateHeightmap(chunkX, chunkZ, world, heightmap);
                 cachedHeightmaps.put(key, heightmap);
                 return heightmap;
@@ -1135,7 +1096,7 @@ public class LostCityTerrainFeature {
                 } else {
                     y = height11;
                 }
-                heightmap.update(x, y, z, Blocks.STONE.defaultBlockState());
+                heightmap.update(x, y, z);
             }
         }
     }
@@ -1599,6 +1560,14 @@ public class LostCityTerrainFeature {
 
         int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * (float) FLOORHEIGHT));
 
+        CompiledPalette palette = info.getCompiledPalette();
+
+        BlockState ironbarsState = Blocks.IRON_BARS.defaultBlockState();
+        Character infobarsChar = info.getCityStyle().getIronbarsBlock();
+        Supplier<BlockState> ironbars = infobarsChar == null ? () -> ironbarsState : () -> palette.get(infobarsChar);
+        Set<BlockState> infoBarSet = infobarsChar == null ? Collections.singleton(ironbarsState) : palette.getAll(infobarsChar);
+        Predicate<BlockState> checkIronbars = infobarsChar == null ? s -> s == ironbarsState : infoBarSet::contains;
+
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 double v = ruinBuffer[x + z * 16];
@@ -1612,10 +1581,11 @@ public class LostCityTerrainFeature {
 //                    vl = (int) (info.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesNoise.getValue(x / 64.0, z / 64.0) / 4.0 * info.profile.RUBBLE_LEAVE_SCALE);
                 }
                 while (height > 0) {
-                    BlockState damage = info.getCompiledPalette().canBeDamagedToIronBars(driver.getBlock());
+                    BlockState damage = palette.canBeDamagedToIronBars(driver.getBlock());
                     BlockState c = driver.getBlockDown();
-                    if ((damage != null || c == ironbars) && c != air && c != liquid && rand.nextFloat() < .2f) {
-                        driver.add(ironbars);
+
+                    if ((damage != null || checkIronbars.test(c)) && c != air && c != liquid && rand.nextFloat() < .2f) {
+                        driver.add(ironbars.get());
                     } else {
                         if (vl > 0) {
                             c = driver.getBlockDown();
@@ -1891,9 +1861,10 @@ public class LostCityTerrainFeature {
                     driver.current(x, height, z).add(palette.get(corridorRoofBlock)).add(b).add(air).add(air);
 
                     if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
-                        BlockState glass = palette.get(corridorGlassBlock);
-                        driver.add(glass);
+                        driver.add(palette.get(corridorGlassBlock));
                         BlockPos pos = driver.getCurrentCopy();
+                        Character glowstoneChar = info.getCityStyle().getGlowstoneBlock();
+                        BlockState glowstone = glowstoneChar == null ? Blocks.GLOWSTONE.defaultBlockState() : palette.get(glowstoneChar);
                         driver.add(glowstone);
                         updateNeeded(info, pos);
                     } else {
@@ -1993,6 +1964,11 @@ public class LostCityTerrainFeature {
         boolean el12 = info.getZmax().isElevatedParkSection();
         boolean el22 = info.getXmax().getZmax().isElevatedParkSection();
         CompiledPalette compiledPalette = info.getCompiledPalette();
+
+        Character grassChar = info.getCityStyle().getGrassBlock();
+        BlockState grassBlock = Blocks.GRASS_BLOCK.defaultBlockState();
+        Supplier<BlockState> grass = (grassChar == null) ? () -> grassBlock : () -> compiledPalette.get(grassChar);
+
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 if (x == 0 || x == 15 || z == 0 || z == 15) {
@@ -2000,35 +1976,35 @@ public class LostCityTerrainFeature {
                     if (elevated) {
                         if (x == 0 && z == 0) {
                             if (el01 && el00 && el10) {
-                                b = grass;
+                                b = grass.get();
                             }
                         } else if (x == 15 && z == 0) {
                             if (el21 && el20 && el10) {
-                                b = grass;
+                                b = grass.get();
                             }
                         } else if (x == 0 && z == 15) {
                             if (el01 && el02 && el12) {
-                                b = grass;
+                                b = grass.get();
                             }
                         } else if (x == 15 && z == 15) {
                             if (el12 && el22 && el21) {
-                                b = grass;
+                                b = grass.get();
                             }
                         } else if (x == 0) {
                             if (el01) {
-                                b = grass;
+                                b = grass.get();
                             }
                         } else if (x == 15) {
                             if (el21) {
-                                b = grass;
+                                b = grass.get();
                             }
                         } else if (z == 0) {
                             if (el10) {
-                                b = grass;
+                                b = grass.get();
                             }
                         } else if (z == 15) {
                             if (el12) {
-                                b = grass;
+                                b = grass.get();
                             }
                         }
                         if (b == null) {
@@ -2038,7 +2014,7 @@ public class LostCityTerrainFeature {
                         b = compiledPalette.get(street);
                     }
                 } else {
-                    b = grass;
+                    b = grass.get();
                 }
                 driver.current(x, height, z).block(b);
             }
@@ -2354,6 +2330,12 @@ public class LostCityTerrainFeature {
                 // How many go this direction (approx, based on cardinal directions from building as well as number that simply fall down)
                 destroyedBlocks /= info.profile.DEBRIS_TO_NEARBYCHUNK_FACTOR;
                 int h = adjacentInfo.getMaxHeight() + 10;
+
+                CompiledPalette palette = info.getCompiledPalette();
+                BlockState ironbarsState = Blocks.IRON_BARS.defaultBlockState();
+                Character infobarsChar = info.getCityStyle().getIronbarsBlock();
+                Supplier<BlockState> ironbars = infobarsChar == null ? () -> ironbarsState : () -> palette.get(infobarsChar);
+
                 for (int i = 0; i < destroyedBlocks; i++) {
                     int x = rand.nextInt(16);
                     int z = rand.nextInt(16);
@@ -2366,7 +2348,7 @@ public class LostCityTerrainFeature {
                         // Fix for FLOATING // @todo!
                         BlockState b;
                         if (rand.nextInt(5) == 0) {
-                            b = ironbars;
+                            b = ironbars.get();
                         } else {
                             b = filler;     // Filler from adjacent building
                         }

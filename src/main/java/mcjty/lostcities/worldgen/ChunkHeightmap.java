@@ -10,15 +10,13 @@ public class ChunkHeightmap {
     private final short[] heightmap = new short[16*16];
     private final LandscapeType type;
     private final int groundLevel;
-    private final BlockState baseState;
     private Integer maxHeight = null;
     private Integer minHeight = null;
     private Integer avgHeight = null;
 
-    public ChunkHeightmap(LandscapeType type, int groundLevel, BlockState baseState) {
+    public ChunkHeightmap(LandscapeType type, int groundLevel) {
         this.groundLevel = groundLevel;
         this.type = type;
-        this.baseState = baseState;
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 heightmap[z * 16 + x] = Short.MIN_VALUE;
@@ -26,12 +24,7 @@ public class ChunkHeightmap {
         }
     }
 
-    public void update(int x, int y, int z, BlockState state) {
-        BlockState air = LostCityTerrainFeature.air;
-        if (state == air) {
-            return;
-        }
-
+    public void update(int x, int y, int z) {
         int current = heightmap[z * 16 + x];
         if (y <= current) {
             return;
@@ -49,10 +42,6 @@ public class ChunkHeightmap {
             }
             heightmap[z * 16 + x] = (short) y;
         } else if (type == LandscapeType.SPACE) {
-            // Here we ignore the glass from the spheres (we only look at the base state)
-            if (state != baseState) {
-                return;
-            }
             heightmap[z * 16 + x] = (short) y;
         } else {
             heightmap[z * 16 + x] = (short) y;

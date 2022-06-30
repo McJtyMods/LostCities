@@ -6,10 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * More efficient representation of a palette useful for a single chunk
@@ -185,6 +182,22 @@ public class CompiledPalette {
             return null;
         }
 
+    }
+
+    public Set<BlockState> getAll(char c) {
+        try {
+            Object o = palette.get(c);
+            if (o instanceof BlockState) {
+                return Collections.singleton((BlockState) o);
+            } else if (o == null) {
+                return Collections.emptySet();
+            } else {
+                BlockState[] randomBlocks = (BlockState[]) o;
+                return Set.of(randomBlocks);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public BlockState get(char c) {

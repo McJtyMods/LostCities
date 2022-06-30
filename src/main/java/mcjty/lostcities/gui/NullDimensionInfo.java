@@ -16,7 +16,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Random;
 
@@ -139,22 +138,21 @@ public class NullDimensionInfo implements IDimensionInfo {
 
     @Override
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
-        BlockState base = getFeature().base;
-        ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, base);
+        ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL);
         char b = getBiomeChar(chunkX, chunkZ);
-        int y = 65;
-        switch (b) {
-            case 'p': y = 65; break;
-            case '-': y = 60; break;
-            case '=': y = 65; break;
-            case '#': y = 95; break;
-            case '+': y = 125; break;
-            case '*': y = 65; break;
-            case 'd': y = 65; break;
-        }
+        int y = switch (b) {
+            case 'p' -> 65;
+            case '-' -> 60;
+            case '=' -> 65;
+            case '#' -> 95;
+            case '+' -> 125;
+            case '*' -> 65;
+            case 'd' -> 65;
+            default -> 65;
+        };
         for (int x = 0 ; x < 16 ; x++) {
             for (int z = 0 ; z < 16 ; z++) {
-                heightmap.update(x, y, z, base);
+                heightmap.update(x, y, z);
             }
         }
         return heightmap;

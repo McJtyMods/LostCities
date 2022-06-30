@@ -46,6 +46,9 @@ public class CityStyle implements ILostCityCityStyle {
     private Character sphereBlock;          // Used for 'space' landscape type
     private Character sphereSideBlock;      // Used for 'space' landscape type
     private Character sphereGlassBlock;     // Used for 'space' landscape type
+    private Character grassBlock;
+    private Character ironbarsBlock;
+    private Character glowstoneBlock;
 
     private String inherit;
     private boolean resolveInherit = false;
@@ -96,6 +99,21 @@ public class CityStyle implements ILostCityCityStyle {
     @Override
     public Integer getMaxCellarCount() {
         return maxCellarCount;
+    }
+
+    @Override
+    public Character getGrassBlock() {
+        return grassBlock;
+    }
+
+    @Override
+    public Character getIronbarsBlock() {
+        return ironbarsBlock;
+    }
+
+    @Override
+    public Character getGlowstoneBlock() {
+        return glowstoneBlock;
     }
 
     @Override
@@ -249,6 +267,16 @@ public class CityStyle implements ILostCityCityStyle {
             explosionChance = object.get("explosionchance").getAsFloat();
         }
 
+        if (object.has("generalblocks")) {
+            JsonObject s = object.get("generalblocks").getAsJsonObject();
+            if (s.has("ironbars")) {
+                ironbarsBlock = s.get("ironbars").getAsCharacter();
+            }
+            if (s.has("glowstone")) {
+                glowstoneBlock = s.get("glowstone").getAsCharacter();
+            }
+        }
+
         if (object.has("streetblocks")) {
             JsonObject s = object.get("streetblocks").getAsJsonObject();
             if (s.has("border")) {
@@ -292,6 +320,9 @@ public class CityStyle implements ILostCityCityStyle {
         if (object.has("parkblocks")) {
             JsonObject s = object.get("parkblocks").getAsJsonObject();
             parkElevationBlock = s.get("elevation").getAsCharacter();
+            if (s.has("grass")) {
+                grassBlock = s.get("grass").getAsCharacter();
+            }
         }
         if (object.has("corridorblocks")) {
             JsonObject s = object.get("corridorblocks").getAsJsonObject();

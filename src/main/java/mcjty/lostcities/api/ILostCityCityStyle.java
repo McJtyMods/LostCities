@@ -33,4 +33,19 @@ public interface ILostCityCityStyle extends ILostCityAsset {
     Character getBorderBlock();
 
     Character getWallBlock();
+
+    /**
+     * If this returns null it will be the default minecraft:grass_block
+     */
+    Character getGrassBlock();
+
+    /**
+     * If this returns null it will be the default minecraft:iron_bars
+     */
+    Character getIronbarsBlock();
+
+    /**
+     * If this returns null it will be the default minecraft:glowstone
+     */
+    Character getGlowstoneBlock();
 }
