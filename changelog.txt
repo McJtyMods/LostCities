@@ -4,6 +4,7 @@ Upcoming:
 - Saplings in Lost City parks will generate trees again
 - 'cityChance' now has double precision which makes it possible to make cities even more rare
 - More expansions to the lost city api
+- Fixed a problem with corridor generation. Too often it resulted in floating rails
 
 1.18-5.2.2:
 - New method in the API to load additional assets

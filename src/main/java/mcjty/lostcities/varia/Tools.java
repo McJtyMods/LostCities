@@ -116,7 +116,7 @@ public class Tools {
     }
 
     private static BlockState getStoneSlabState(int meta, BlockState state) {
-        state.setValue (SlabBlock.TYPE, (meta & 8) > 0 ? SlabType.TOP : SlabType.BOTTOM);
+        state.setValue(SlabBlock.TYPE, (meta & 8) > 0 ? SlabType.TOP : SlabType.BOTTOM);
         return state;
     }
 

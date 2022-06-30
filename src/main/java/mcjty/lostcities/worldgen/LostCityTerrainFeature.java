@@ -1834,7 +1834,7 @@ public class LostCityTerrainFeature {
             for (int z = 0; z < 16; ++z) {
                 BlockState b;
                 if ((xRail && z >= 7 && z <= 10) || (zRail && x >= 7 && x <= 10)) {
-                    int height = info.groundLevel - 5;
+                    int height = info.groundLevel - 6;
                     if (xRail && z == 10) {
                         b = railx;
                     } else if (zRail && x == 10) {
@@ -1842,7 +1842,7 @@ public class LostCityTerrainFeature {
                     } else {
                         b = air;
                     }
-                    driver.current(x, height, z).add(b).add(air).add(air);
+                    driver.current(x, height, z).add(palette.get(corridorRoofBlock)).add(b).add(air).add(air);
 
                     if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
                         BlockState glass = palette.get(corridorGlassBlock);
