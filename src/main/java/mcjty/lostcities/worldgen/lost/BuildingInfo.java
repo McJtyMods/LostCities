@@ -1581,8 +1581,8 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isCity) {
             return getCityGroundLevel();
         } else {
-            if (isOcean()) {    // @todo check?
-                return groundLevel - 4;
+            if (isOcean()) {
+                return groundLevel - profile.OCEAN_CORRECTION_BORDER;
             } else {
                 return 100000;
             }

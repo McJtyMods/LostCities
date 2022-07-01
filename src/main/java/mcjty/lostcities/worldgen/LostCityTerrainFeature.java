@@ -9,7 +9,6 @@ import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
-import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.NoiseGeneratorPerlin;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
@@ -720,32 +719,6 @@ public class LostCityTerrainFeature {
         return rand.nextInt(5);
     }
 
-    /**
-     * Get the lowest height of a corner of four chunks
-     * info: reference to the bottom-right chunk. The 0,0 position of this chunk is the reference
-     */
-    @Deprecated
-    private int getHeightAt00Corner(BuildingInfo info) {
-        int h = getHeightForChunk(info);
-        h = Math.min(h, getHeightForChunk(info.getXmin()));
-        h = Math.min(h, getHeightForChunk(info.getZmin()));
-        h = Math.min(h, getHeightForChunk(info.getXmin().getZmin()));
-        return h;
-    }
-
-    @Deprecated
-    private int getHeightForChunk(BuildingInfo info) {
-        if (info.isCity) {
-            return info.getCityGroundLevel();
-        } else {
-            if (info.isOcean()) {
-                return info.groundLevel - 4;
-            } else {
-                return info.getCityGroundLevel();
-            }
-        }
-    }
-
     /*
      * This routine is used on a normal (non-city) chunk to make sure the landscape nicely fits
      * with any possible adjacent city chunks. It works by creating two meshes that are overlayed
@@ -917,79 +890,6 @@ public class LostCityTerrainFeature {
     }
 
 
-    @Deprecated
-    private void flattenChunkToCityBorder(int chunkX, int chunkZ) {
-        int cx = chunkX * 16;
-        int cz = chunkZ * 16;
-
-        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
-        float h00 = getHeightAt00Corner(info);
-        float h10 = getHeightAt00Corner(info.getXmax());
-        float h01 = getHeightAt00Corner(info.getZmax());
-        float h11 = getHeightAt00Corner(info.getXmax().getZmax());
-
-        List<GeometryTools.AxisAlignedBB2D> boxes = new ArrayList<>();
-        List<GeometryTools.AxisAlignedBB2D> boxesDownwards = new ArrayList<>();
-
-        for (int x = -1; x <= 1; x++) {
-            for (int z = -1; z <= 1; z++) {
-                if (x != 0 || z != 0) {
-                    int ccx = chunkX + x;
-                    int ccz = chunkZ + z;
-                    BuildingInfo info2 = BuildingInfo.getBuildingInfo(ccx, ccz, provider);
-                    if (info2.isCity) {
-                        GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
-                        boxes.add(box);
-                    } else if (info2.getMaxHighwayLevel() >= 0 && !info2.isTunnel(info2.getMaxHighwayLevel())) {
-                        // There is a highway but no tunnel. So we need to smooth downwards
-                        GeometryTools.AxisAlignedBB2D box = new GeometryTools.AxisAlignedBB2D(ccx * 16, ccz * 16, ccx * 16 + 15, ccz * 16 + 15);
-                        box.height = info.groundLevel + info2.getMaxHighwayLevel() * FLOORHEIGHT;
-                        boxesDownwards.add(box);
-                    }
-                }
-            }
-        }
-        if (!boxes.isEmpty()) {
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    double mindist = 1000000000.0;
-                    int height = bipolate(h11, h01, h10, h00, x, z);
-//                    int height = bipolate(h00, h10, h01, h11, x, z);
-                    for (GeometryTools.AxisAlignedBB2D box : boxes) {
-                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
-                        if (dist < mindist) {
-                            mindist = dist;
-                        }
-                    }
-
-                    int offset = (int) (Math.sqrt(mindist) * 2);
-                    flattenChunkBorder(info, x, offset, z, rand, height);
-                }
-            }
-        }
-        if (!boxesDownwards.isEmpty()) {
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    double mindist = 1000000000.0;
-                    int minheight = 1000000000;
-                    for (GeometryTools.AxisAlignedBB2D box : boxesDownwards) {
-                        double dist = GeometryTools.squaredDistanceBoxPoint(box, cx + x, cz + z);
-                        if (dist < mindist) {
-                            mindist = dist;
-                        }
-                        if (box.height < minheight) {
-                            minheight = box.height;
-                        }
-                    }
-                    int height = minheight;//info.getCityGroundLevel();
-
-                    int offset = (int) (Math.sqrt(mindist) * 2);
-                    flattenChunkBorderDownwards(info, x, offset, z, rand, height);
-                }
-            }
-        }
-    }
-
     public static boolean isWaterBiome(IDimensionInfo provider, ChunkCoord coord) {
         BiomeInfo biomeInfo = BiomeInfo.getBiomeInfo(provider, coord);
         Holder<Biome> mainBiome = biomeInfo.getMainBiome();
@@ -998,28 +898,6 @@ public class LostCityTerrainFeature {
 
     private static boolean isWaterBiome(Holder<Biome> biome) {
         return biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_DEEP_OCEAN) || biome.is(BiomeTags.IS_BEACH) || biome.is(BiomeTags.IS_RIVER);
-    }
-
-    @Deprecated
-    private void flattenChunkBorder(BuildingInfo info, int x, int offset, int z, Random rand, int level) {
-        int minHeight = provider.getWorld().getMinBuildHeight();
-        driver.current(x, minHeight, z);
-        for (int y = minHeight; y <= (level - offset - rand.nextInt(2)); y++) {
-            BlockState b = driver.getBlock();
-            if (b != bedrock) {
-                driver.add(base);
-            } else {
-                driver.incY();
-            }
-        }
-        int r = rand.nextInt(2);
-        clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
-    }
-
-    @Deprecated
-    private void flattenChunkBorderDownwards(BuildingInfo info, int x, int offset, int z, Random rand, int level) {
-        int r = rand.nextInt(2);
-        clearRange(info, x, z, level + offset + r, 230, info.waterLevel > info.groundLevel);
     }
 
     /**

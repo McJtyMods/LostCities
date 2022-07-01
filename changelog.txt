@@ -8,6 +8,7 @@ Upcoming:
 - Small optimizations
 - Added a new 'grass' block to the 'parkblocks' in the city style so that you can use the full palette system for grass in parks
 - Added a new 'generalblocks' section to city style so you can specify a few more blocks ('ironbars', 'glowstone', ...)
+- New configuration option 'oceanCorrectionBorder' that can be used to change how chunks adjacent to ocean/city chunks will be corrected
 
 1.18-5.2.3:
 - It's now possible to use random block palettes for streets too

@@ -12,4 +12,10 @@ public interface ILostCityProfile {
     void setCityChancle(double chance);
 
     void setRuinChance(float chance, float minPercent, float maxPercent);
+
+    void setGroundLevel(int level);
+
+    void setCityLevelHeights(int l0, int l1, int l2, int l3);
+
+    void setOceanCorrectionBorder(int border);
 }

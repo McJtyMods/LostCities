@@ -134,6 +134,8 @@ public class LostCityProfile implements ILostCityProfile {
     public int CITY_LEVEL2_HEIGHT = 91;
     public int CITY_LEVEL3_HEIGHT = 99;
 
+    public int OCEAN_CORRECTION_BORDER = 4;
+
     public int TERRAIN_FIX_LOWER_MIN_OFFSET = -4;
     public int TERRAIN_FIX_LOWER_MAX_OFFSET = -3;
     public int TERRAIN_FIX_UPPER_MIN_OFFSET = -1;
@@ -475,6 +477,9 @@ public class LostCityProfile implements ILostCityProfile {
                 "Below this chunk height cities will be level 2");
         CITY_LEVEL3_HEIGHT = cfg.getInt("cityLevel3Height", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_LEVEL3_HEIGHT, 1, 255,
                 "Below this chunk height cities will be level 3");
+
+        OCEAN_CORRECTION_BORDER = cfg.getInt("oceanCorrectionBorder", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).OCEAN_CORRECTION_BORDER, -255, 255,
+                "Terrain correction offset that is used for chunks adjacent to city chunks that are in ocean biomes");
     }
 
     private void initExplosions(Configuration cfg) {
@@ -564,6 +569,24 @@ public class LostCityProfile implements ILostCityProfile {
         this.RUIN_CHANCE = chance;
         this.RUIN_MINLEVEL_PERCENT = minPercent;
         this.RUIN_MAXLEVEL_PERCENT = maxPercent;
+    }
+
+    @Override
+    public void setGroundLevel(int level) {
+        this.GROUNDLEVEL = level;
+    }
+
+    @Override
+    public void setCityLevelHeights(int l0, int l1, int l2, int l3) {
+        this.CITY_LEVEL0_HEIGHT = l0;
+        this.CITY_LEVEL1_HEIGHT = l1;
+        this.CITY_LEVEL2_HEIGHT = l2;
+        this.CITY_LEVEL3_HEIGHT = l3;
+    }
+
+    @Override
+    public void setOceanCorrectionBorder(int border) {
+        this.OCEAN_CORRECTION_BORDER = border;
     }
 
     public Map<ResourceLocation, Float> getBiomeFactorMap() {
