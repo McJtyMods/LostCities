@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.2.4:
 - All mob spawners were spawning pigs. This is fixed now
 - The Lost Cities events are back (useful for mods who want to do something special to LC worldgen)
 - Cellars at level -1 didn't correctly connect to adjacent corridors in Z direction
