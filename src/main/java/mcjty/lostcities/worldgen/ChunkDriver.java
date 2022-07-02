@@ -2,7 +2,6 @@ package mcjty.lostcities.worldgen;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
@@ -97,10 +96,6 @@ public class ChunkDriver {
 
     public void incY() {
         current.setY(current.getY()+1);
-    }
-
-    public void incY(int amount) {
-        current.setY(current.getY()+amount);
     }
 
     public void decY() {
@@ -348,7 +343,7 @@ public class ChunkDriver {
         private final int maxY;
         private final int cx;
         private final int cz;
-        private S[] cache;
+        private final S[] cache;
 
         private SectionCache(LevelAccessor level, int cx, int cz) {
             minY = level.getMinBuildHeight();

@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
@@ -86,11 +85,11 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
             vslices = new char[xSize * zSize][];
             for (int x = 0 ; x < xSize ; x++) {
                 for (int z = 0 ; z < zSize ; z++) {
-                    String vs = "";
+                    StringBuilder vs = new StringBuilder();
                     boolean empty = true;
                     for (int y = 0; y < slices.length; y++) {
                         Character c = getC(x, y, z);
-                        vs += c;
+                        vs.append(c);
                         if (c != ' ') {
                             empty = false;
                         }
@@ -98,7 +97,7 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
                     if (empty) {
                         vslices[z*xSize+x] = null;
                     } else {
-                        vslices[z*xSize+x] = vs.toCharArray();
+                        vslices[z*xSize+x] = vs.toString().toCharArray();
                     }
                 }
             }
@@ -133,11 +132,11 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
         int i = 0;
         for (JsonElement element : sliceArray) {
             JsonArray a = element.getAsJsonArray();
-            String slice = "";
+            StringBuilder slice = new StringBuilder();
             for (JsonElement el : a) {
-                slice += el.getAsString();
+                slice.append(el.getAsString());
             }
-            slices[i++] = slice;
+            slices[i++] = slice.toString();
         }
         if (object.has("palette")) {
             if (object.get("palette").isJsonArray()) {

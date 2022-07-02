@@ -13,6 +13,7 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -25,7 +26,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -52,7 +53,7 @@ public class ForgeEventHandlers {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onBiomeLoad(BiomeLoadingEvent event) {
         ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, event.getName());
-        if (!BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.VOID)) {
+        if (!BuiltinRegistries.BIOME.getHolderOrThrow(biomeKey).is(Tags.Biomes.IS_VOID)) {
             event.getGeneration().getFeatures(GenerationStep.Decoration.RAW_GENERATION).add(LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
         }
     }

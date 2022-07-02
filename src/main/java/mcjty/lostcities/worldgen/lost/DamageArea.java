@@ -42,7 +42,8 @@ public class DamageArea {
                     Explosion explosion = getExplosionAt(cx, cz, provider);
                     if (explosion != null) {
                         if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
-                            Float chance = BuildingInfo.getBuildingInfo(cx, cz, provider).getChunkCharacteristics(cx, cz, provider).cityStyle.getExplosionChance();
+//                            Float chance = BuildingInfo.getBuildingInfo(cx, cz, provider).getChunkCharacteristics(cx, cz, provider).cityStyle.getExplosionChance();
+                            Float chance = BuildingInfo.getChunkCharacteristics(cx, cz, provider).cityStyle.getExplosionChance();
                             if (chance == null || rand.nextFloat() < chance) {
                                 explosions.add(explosion);
                             }
@@ -51,7 +52,8 @@ public class DamageArea {
                     explosion = getMiniExplosionAt(cx, cz, provider);
                     if (explosion != null) {
                         if (intersectsWith(explosion.getCenter(), explosion.getRadius())) {
-                            Float chance = BuildingInfo.getBuildingInfo(cx, cz, provider).getChunkCharacteristics(cx, cz, provider).cityStyle.getExplosionChance();
+//                            Float chance = BuildingInfo.getBuildingInfo(cx, cz, provider).getChunkCharacteristics(cx, cz, provider).cityStyle.getExplosionChance();
+                            Float chance = BuildingInfo.getChunkCharacteristics(cx, cz, provider).cityStyle.getExplosionChance();
                             if (chance == null || rand.nextFloat() < chance) {
                                 explosions.add(explosion);
                             }

@@ -3,7 +3,6 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import mcjty.lostcities.LostCities;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.Counter;
 
@@ -102,9 +101,9 @@ public class AssetRegistries {
     private static void printChars(String prefix, Counter<Character> counter) {
         List<Character> chars = new ArrayList<>(counter.getMap().keySet());
         chars.sort(Character::compareTo);
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for (Character character : chars) {
-            s += character;
+            s.append(character);
         }
         ModSetup.getLogger().info(prefix + s);
     }
@@ -112,16 +111,16 @@ public class AssetRegistries {
     private static void printMap(Map<Character, Set<String>> usersPerCharacter, List<Map.Entry<Character, Integer>> map) {
         for (Map.Entry<Character, Integer> entry : map) {
             Set<String> users = usersPerCharacter.get(entry.getKey());
-            String s = "    " + entry.getKey() + ": " + entry.getValue() + " Uses";
+            StringBuilder s = new StringBuilder("    " + entry.getKey() + ": " + entry.getValue() + " Uses");
             if (users.size() < 10) {
-                s += ", Used by: ";
+                s.append(", Used by: ");
                 for (String user : users) {
-                    s += user + ",";
+                    s.append(user).append(",");
                 }
             } else {
-                s += ", Used " + users.size() + " times";
+                s.append(", Used ").append(users.size()).append(" times");
             }
-            ModSetup.getLogger().info(s);
+            ModSetup.getLogger().info(s.toString());
         }
     }
 

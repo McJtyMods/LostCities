@@ -36,7 +36,7 @@ public class LostCityConfiguration {
     public static final String[] DEFAULT_PROFILES = new String[]{"default", "cavern", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
     public static final String[] PRIVATE_PROFILES = new String[]{"bio_wasteland", "water_empty"};
 
-    public static String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
+    public static final String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
             "minecraft:glowstone",
             "minecraft:redstone_torch",
             "minecraft:lit_pumpkin",
@@ -59,7 +59,7 @@ public class LostCityConfiguration {
 //    public static RegistryKey<World> DIMENSION_ID;// @todo 1.14 = 111; 1.16
     public static boolean DIMENSION_BOP = true;
 
-    public static boolean DEBUG = false;
+    public static final boolean DEBUG = false;
 
     public static ForgeConfigSpec.ConfigValue<String> SPECIAL_BED_BLOCK;// = "minecraft:diamond_block";
 

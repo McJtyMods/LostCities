@@ -28,11 +28,11 @@ import java.util.function.Supplier;
 public class LostCities {
     public static final String MODID = "lostcities";
 
-    public static Logger logger = LogManager.getLogger(LostCities.MODID);
+    public static final Logger logger = LogManager.getLogger(LostCities.MODID);
 
-    public static ModSetup setup = new ModSetup();
+    public static final ModSetup setup = new ModSetup();
     public static LostCities instance;
-    public static LostCitiesImp lostCitiesImp = new LostCitiesImp();
+    public static final LostCitiesImp lostCitiesImp = new LostCitiesImp();
 
     public LostCities() {
         instance = this;

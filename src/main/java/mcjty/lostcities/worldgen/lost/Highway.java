@@ -98,25 +98,16 @@ public class Highway {
                 }
                 if (valid) {
                     // We have at least one city. Valid highway:
-                    switch (profile.HIGHWAY_LEVEL_FROM_CITIES_MODE) {
-                        case 0:
-                            level = BuildingInfo.getCityLevel(lower.chunkX(), lower.chunkZ(), provider);
-                            break;
-                        case 1:
-                            level = Math.min(BuildingInfo.getCityLevel(lower.chunkX(), lower.chunkZ(), provider),
-                                    BuildingInfo.getCityLevel(higher.chunkX(), higher.chunkZ(), provider));
-                            break;
-                        case 2:
-                            level = Math.max(BuildingInfo.getCityLevel(lower.chunkX(), lower.chunkZ(), provider),
-                                    BuildingInfo.getCityLevel(higher.chunkX(), higher.chunkZ(), provider));
-                            break;
-                        case 3:
-                            level = (BuildingInfo.getCityLevel(lower.chunkX(), lower.chunkZ(), provider) +
-                                    BuildingInfo.getCityLevel(higher.chunkX(), higher.chunkZ(), provider)) / 2;
-                            break;
-                        default:
-                            throw new RuntimeException("Bad value for 'highwayLevelFromCities'!");
-                    }
+                    level = switch (profile.HIGHWAY_LEVEL_FROM_CITIES_MODE) {
+                        case 0 -> BuildingInfo.getCityLevel(lower.chunkX(), lower.chunkZ(), provider);
+                        case 1 -> Math.min(BuildingInfo.getCityLevel(lower.chunkX(), lower.chunkZ(), provider),
+                                BuildingInfo.getCityLevel(higher.chunkX(), higher.chunkZ(), provider));
+                        case 2 -> Math.max(BuildingInfo.getCityLevel(lower.chunkX(), lower.chunkZ(), provider),
+                                BuildingInfo.getCityLevel(higher.chunkX(), higher.chunkZ(), provider));
+                        case 3 -> (BuildingInfo.getCityLevel(lower.chunkX(), lower.chunkZ(), provider) +
+                                BuildingInfo.getCityLevel(higher.chunkX(), higher.chunkZ(), provider)) / 2;
+                        default -> throw new RuntimeException("Bad value for 'highwayLevelFromCities'!");
+                    };
                     for (ChunkCoord cc = lower; cc.getCoord(orientation) <= higher.getCoord(orientation); cc = cc.higher(orientation)) {
                         cache.put(cc, level);
                     }

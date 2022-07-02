@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
 import mcjty.lostcities.varia.ComponentFactory;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.network.chat.Component;
 
 public class BooleanElement extends GuiElement {
@@ -51,7 +52,7 @@ public class BooleanElement extends GuiElement {
     public void render(PoseStack stack) {
         if (label != null) {
             if (field.visible) {
-                gui.drawString(stack, gui.getFont(), label, 10, y + 5, 0xffffffff);
+                GuiComponent.drawString(stack, gui.getFont(), label, 10, y + 5, 0xffffffff);
             }
         }
     }

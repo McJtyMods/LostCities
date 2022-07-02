@@ -1,6 +1,5 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.common.base.Predicates;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,7 +23,7 @@ public class WorldStyle implements ILostCityAsset {
     private String name;
     private String outsideStyle;
 
-    private final List<Pair<Predicate<Info>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
+    private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
 
     public WorldStyle(JsonObject object) {
         readFromJSon(object);
@@ -48,7 +47,7 @@ public class WorldStyle implements ILostCityAsset {
             JsonObject o = element.getAsJsonObject();
             float factor = o.get("factor").getAsFloat();
             String building = o.get("citystyle").getAsString();
-            Predicate<Info> predicate = Predicates.alwaysTrue();
+            Predicate<Holder<Biome>> predicate = biomeHolder -> true;
             if (o.has("biomes")) {
                 JsonArray ar = o.get("biomes").getAsJsonArray();
                 Set<ResourceLocation> biomes = new HashSet<>();
@@ -68,8 +67,7 @@ public class WorldStyle implements ILostCityAsset {
         return biomeSet.contains(Tools.getBiomeId(biome.value()));
     }
 
-    private boolean hasBiomes(Info info, Set<ResourceLocation> biomeSet) {
-        Holder<Biome> biome = info.biome;
+    private boolean hasBiomes(Holder<Biome> biome, Set<ResourceLocation> biomeSet) {
         return isValidBiome(biomeSet, biome);
     }
 
@@ -84,7 +82,7 @@ public class WorldStyle implements ILostCityAsset {
         object.add("outsidestyle", new JsonPrimitive(outsideStyle));
 
         JsonArray array = new JsonArray();
-        for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {
+        for (Pair<Predicate<Holder<Biome>>, Pair<Float, String>> pair : cityStyleSelector) {
             JsonObject o = new JsonObject();
             Pair<Float, String> ff = pair.getValue();
             o.add("factor", new JsonPrimitive(ff.getKey()));
@@ -98,26 +96,13 @@ public class WorldStyle implements ILostCityAsset {
 
     public String getRandomCityStyle(IDimensionInfo provider, int chunkX, int chunkZ, Random random) {
         Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
-        Info info = new Info(biome, chunkX, chunkZ);
         List<Pair<Float, String>> ct = new ArrayList<>();
-        for (Pair<Predicate<Info>, Pair<Float, String>> pair : cityStyleSelector) {
-            if (pair.getKey().test(info)) {
+        for (Pair<Predicate<Holder<Biome>>, Pair<Float, String>> pair : cityStyleSelector) {
+            if (pair.getKey().test(biome)) {
                 ct.add(pair.getValue());
             }
         }
 
         return Tools.getRandomFromList(random, ct);
-    }
-
-    private static class Info {
-        private Holder<Biome> biome;
-        private int chunkX;
-        private int chunkZ;
-
-        public Info(Holder<Biome> biome, int chunkX, int chunkZ) {
-            this.biome = biome;
-            this.chunkX = chunkX;
-            this.chunkZ = chunkZ;
-        }
     }
 }

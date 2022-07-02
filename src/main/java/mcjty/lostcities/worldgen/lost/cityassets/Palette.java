@@ -146,8 +146,7 @@ public class Palette implements ILostCityAsset {
         for (Map.Entry<Character, Object> entry : palette.entrySet()) {
             JsonObject o = new JsonObject();
             o.add("char", new JsonPrimitive(entry.getKey()));
-            if (entry.getValue() instanceof BlockState) {
-                BlockState state = (BlockState) entry.getValue();
+            if (entry.getValue() instanceof BlockState state) {
                 o.add("block", new JsonPrimitive(Tools.stateToString(state)));
                 if (damaged.containsKey(state)) {
                     o.add("damaged", new JsonPrimitive(Tools.stateToString(damaged.get(state))));
@@ -175,7 +174,7 @@ public class Palette implements ILostCityAsset {
     }
 
     @SafeVarargs
-    private final Palette addMappingViaState(char c, Pair<Integer, BlockState>... randomBlocks) {
+    private Palette addMappingViaState(char c, Pair<Integer, BlockState>... randomBlocks) {
         palette.put(c, randomBlocks);
         return this;
     }

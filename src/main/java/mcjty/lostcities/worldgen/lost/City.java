@@ -50,7 +50,7 @@ public class City {
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
                 for (PredefinedCity.PredefinedBuilding building : city.getPredefinedBuildings()) {
                     predefinedBuildingMap.put(new ChunkCoord(city.getDimension(),
-                            city.getChunkX() + building.getRelChunkX(), city.getChunkZ() + building.getRelChunkZ()), building);
+                            city.getChunkX() + building.relChunkX(), city.getChunkZ() + building.relChunkZ()), building);
                 }
             }
         }
@@ -66,7 +66,7 @@ public class City {
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
                 for (PredefinedCity.PredefinedStreet street : city.getPredefinedStreets()) {
                     predefinedStreetMap.put(new ChunkCoord(city.getDimension(),
-                            city.getChunkX() + street.getRelChunkX(), city.getChunkZ() + street.getRelChunkZ()), street);
+                            city.getChunkX() + street.relChunkX(), city.getChunkZ() + street.relChunkZ()), street);
                 }
             }
         }
@@ -188,15 +188,15 @@ public class City {
         }
 
         predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ, type);
-        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+        if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return 1.0f;
         }
         predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ-1, type);
-        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+        if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return 1.0f;
         }
         predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ-1, type);
-        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+        if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return 1.0f;
         }
 

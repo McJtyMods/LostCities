@@ -49,13 +49,7 @@ public class LostCitiesImp implements ILostCities {
         AssetRegistries.load(input, path);
     }
 
-    public static class LostCityInformation implements ILostCityInformation {
-
-        private final IDimensionInfo dimensionInfo;
-
-        public LostCityInformation(IDimensionInfo dimensionInfo) {
-            this.dimensionInfo = dimensionInfo;
-        }
+    public record LostCityInformation(IDimensionInfo dimensionInfo) implements ILostCityInformation {
 
         @Override
         public ILostChunkInfo getChunkInfo(int chunkX, int chunkZ) {

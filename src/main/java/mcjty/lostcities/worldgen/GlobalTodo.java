@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 public class GlobalTodo {
 
-    private static Map<ResourceKey<Level>, Map<BlockPos, Consumer<ServerLevel>>> todo = new HashMap<>();
+    private static final Map<ResourceKey<Level>, Map<BlockPos, Consumer<ServerLevel>>> todo = new HashMap<>();
 
     public static void cleanCache() {
         todo.clear();

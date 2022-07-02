@@ -30,8 +30,7 @@ public class QualityRandom extends Random {
         long x = u ^ (u << 21);
         x ^= x >>> 35;
         x ^= x << 4;
-        long ret = (x + v) ^ w;
-        return ret;
+        return (x + v) ^ w;
     }
 
     @Override

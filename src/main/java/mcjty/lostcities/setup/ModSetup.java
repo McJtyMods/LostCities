@@ -28,7 +28,7 @@ public class ModSetup {
 
     public static Logger logger = null;
 
-    public List<Consumer<ILostCityProfileSetup>> profileSetups = new ArrayList<>();
+    public final List<Consumer<ILostCityProfileSetup>> profileSetups = new ArrayList<>();
 
     public static Logger getLogger() {
         return logger;

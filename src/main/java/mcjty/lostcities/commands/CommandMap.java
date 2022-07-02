@@ -28,27 +28,25 @@ public class CommandMap implements Command<CommandSourceStack> {
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        if (player != null) {
-            BlockPos position = player.blockPosition();
-            IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getLevel());
-            if (dimInfo != null) {
-                ChunkPos pos = new ChunkPos(position);
-                for (int z = pos.z - 20 ; z <= pos.z + 20 ; z++) {
-                    String buf = "";
-                    for (int x = pos.x - 20 ; x <= pos.x + 20 ; x++) {
-                        BuildingInfo info = BuildingInfo.getBuildingInfo(pos.x + x, pos.z + z, dimInfo);
-                        if (info.isCity && info.hasBuilding) {
-                            buf += "B";
-                        } else if (info.isCity) {
-                            buf += "+";
-                        } else if (info.highwayXLevel >= 0 || info.highwayZLevel >= 0) {
-                            buf += ".";
-                        } else {
-                            buf += " ";
-                        }
+        BlockPos position = player.blockPosition();
+        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getLevel());
+        if (dimInfo != null) {
+            ChunkPos pos = new ChunkPos(position);
+            for (int z = pos.z - 20 ; z <= pos.z + 20 ; z++) {
+                StringBuilder buf = new StringBuilder();
+                for (int x = pos.x - 20 ; x <= pos.x + 20 ; x++) {
+                    BuildingInfo info = BuildingInfo.getBuildingInfo(pos.x + x, pos.z + z, dimInfo);
+                    if (info.isCity && info.hasBuilding) {
+                        buf.append("B");
+                    } else if (info.isCity) {
+                        buf.append("+");
+                    } else if (info.highwayXLevel >= 0 || info.highwayZLevel >= 0) {
+                        buf.append(".");
+                    } else {
+                        buf.append(" ");
                     }
-                    System.out.println(buf);
                 }
+                System.out.println(buf);
             }
         }
         return 0;

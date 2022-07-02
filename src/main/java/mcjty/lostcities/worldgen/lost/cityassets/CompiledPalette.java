@@ -17,30 +17,8 @@ public class CompiledPalette {
     private final Map<BlockState, BlockState> damagedToBlock = new HashMap<>();
     private final Map<Character, Info> information = new HashMap<>();
 
-    public static class Info {
-        private final String mobId;
-        private final String loot;
-        private final boolean isTorch;
-
-        public Info(String mobId, String loot, boolean isTorch) {
-            this.mobId = mobId;
-            this.loot = loot;
-            this.isTorch = isTorch;
-        }
-
-        public String getMobId() {
-            return mobId;
-        }
-
-        public String getLoot() {
-            return loot;
-        }
-
-        public boolean isTorch() {
-            return isTorch;
-        }
+    public record Info(String mobId, String loot, boolean isTorch) {
     }
-
 
     public CompiledPalette(CompiledPalette other, Palette... palettes) {
         this.palette.putAll(other.palette);

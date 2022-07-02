@@ -1,6 +1,5 @@
 package mcjty.lostcities.worldgen;
 
-import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.BiomeSelectionStrategy;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.setup.ModSetup;

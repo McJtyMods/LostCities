@@ -34,10 +34,6 @@ public class Building implements ILostCityBuilding {
         readFromJSon(object);
     }
 
-    public Building(String name) {
-        this.name = name;
-    }
-
     @Override
     public String getName() {
         return name;

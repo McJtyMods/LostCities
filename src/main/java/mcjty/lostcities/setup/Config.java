@@ -32,7 +32,7 @@ public class Config {
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
     };
-    public static ForgeConfigSpec.ConfigValue<List<? extends String>> ASSETS;
+    public final static ForgeConfigSpec.ConfigValue<List<? extends String>> ASSETS;
 
 
     private static final String[] DEFAULT_DIMENSION_PROFILES = new String[] {
@@ -44,8 +44,8 @@ public class Config {
     // Profile as selected by the client
     public static String profileFromClient = null;
     public static String jsonFromClient = null;
-    public static ForgeConfigSpec.ConfigValue<String> SELECTED_PROFILE;
-    public static ForgeConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
+    public static final ForgeConfigSpec.ConfigValue<String> SELECTED_PROFILE;
+    public static final ForgeConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
 
     public static void reset() {
         profileFromClient = null;
@@ -70,16 +70,12 @@ public class Config {
                     LostCities.getLogger().error("Bad format for config value: '" + dp +"'!");
                 } else {
                     ResourceKey<Level> dimensionType = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(split[0]));
-                    if (dimensionType != null) {
-                        String profileName = split[1];
-                        LostCityProfile profile = LostCityConfiguration.standardProfiles.get(profileName);
-                        if (profile != null) {
-                            dimensionProfileCache.put(dimensionType, profileName);
-                        } else {
-                            LostCities.getLogger().error("Cannot find profile: " + profileName + " for dimension " + split[0] + "!");
-                        }
+                    String profileName = split[1];
+                    LostCityProfile profile = LostCityConfiguration.standardProfiles.get(profileName);
+                    if (profile != null) {
+                        dimensionProfileCache.put(dimensionType, profileName);
                     } else {
-                        LostCities.getLogger().error("Cannot find dimension: " + split[0] + "!");
+                        LostCities.getLogger().error("Cannot find profile: " + profileName + " for dimension " + split[0] + "!");
                     }
                 }
             }
@@ -152,7 +148,7 @@ public class Config {
         SERVER_CONFIG = SERVER_BUILDER.build();
     }
 
-    public static ForgeConfigSpec COMMON_CONFIG;
-    public static ForgeConfigSpec CLIENT_CONFIG;
-    public static ForgeConfigSpec SERVER_CONFIG;
+    public static final ForgeConfigSpec COMMON_CONFIG;
+    public static final ForgeConfigSpec CLIENT_CONFIG;
+    public static final ForgeConfigSpec SERVER_CONFIG;
 }

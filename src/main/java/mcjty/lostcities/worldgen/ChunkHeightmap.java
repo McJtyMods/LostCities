@@ -1,7 +1,6 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LandscapeType;
-import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * A heightmap for a chunk

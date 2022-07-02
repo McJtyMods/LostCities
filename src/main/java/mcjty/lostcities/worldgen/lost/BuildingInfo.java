@@ -12,7 +12,6 @@ import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
@@ -176,22 +175,6 @@ public class BuildingInfo implements ILostChunkInfo {
         return damageArea;
     }
 
-    /**
-     * Based on which part of the chunk we have something for we find the correct
-     * info object where we have to add the todo.
-     */
-    public BuildingInfo getTodoChunk(int x, int z) {
-        if (x >= 8 && z >= 8) {
-            return this;
-        } else if (x < 8 && z >= 8) {
-            return getXmin();
-        } else if (x >= 8) {
-            return getZmin();
-        } else {
-            return getXmin().getZmin();
-        }
-    }
-
     public Style getOutsideStyle() {
         return AssetRegistries.STYLES.get(provider.getWorldStyle().getOutsideStyle());
     }
@@ -208,21 +191,6 @@ public class BuildingInfo implements ILostChunkInfo {
             }
         }
         palette = style.getRandomPalette(provider, rand);
-    }
-
-    // x between 0 and 15, z between 0 and 15
-    public BuildingInfo getAdjacent(int x, int z) {
-        if (x == 0) {
-            return getXmin();
-        } else if (x == 15) {
-            return getXmax();
-        } else if (z == 0) {
-            return getZmin();
-        } else if (z == 15) {
-            return getZmax();
-        } else {
-            return null;
-        }
     }
 
     public BuildingInfo getXmin() {
@@ -306,7 +274,6 @@ public class BuildingInfo implements ILostChunkInfo {
         Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
         rand.nextFloat();       // Compatibility?
 
-        int building2x2Section = characteristics.section;
         return characteristics.couldHaveBuilding;
     }
 
@@ -395,7 +362,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 if (characteristics.section == 0) {
                     String name = cityStyle.getRandomMultiBuilding(rand);
                     if (predefinedBuilding != null) {
-                        name = predefinedBuilding.getBuilding();
+                        name = predefinedBuilding.building();
                     }
                     characteristics.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(name);
                     characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(0, 0));
@@ -403,7 +370,7 @@ public class BuildingInfo implements ILostChunkInfo {
                     characteristics.multiBuilding = null;
                     String name = cityStyle.getRandomBuilding(rand);
                     if (predefinedBuilding != null) {
-                        name = predefinedBuilding.getBuilding();
+                        name = predefinedBuilding.building();
                     }
                     characteristics.buildingType = AssetRegistries.BUILDINGS.get(name);
                 }
@@ -526,7 +493,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
         ResourceKey<Level> type = provider.getType();
         PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
-        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+        if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return true;    // We don't need other tests. This is the top-left of a multibuilding
         }
         PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
@@ -583,7 +550,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
         ResourceKey<Level> type = provider.getType();
         PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
-        if (predefinedBuilding != null && predefinedBuilding.isMulti()) {
+        if (predefinedBuilding != null && predefinedBuilding.multi()) {
             // Regardless of other conditions, this is the top left of a multibuilding
             return true;
         }
@@ -764,13 +731,13 @@ public class BuildingInfo implements ILostChunkInfo {
             parkType = AssetRegistries.PARTS.get(cs.getRandomPark(rand));
             float cityFactor = City.getCityFactor(chunkX, chunkZ, provider, profile);
 
-            int maxfloors = getMaxfloors(provider, cs);
+            int maxfloors = getMaxfloors(cs);
             int f = profile.BUILDING_MINFLOORS + rand.nextInt((int) (profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (profile.BUILDING_MAXFLOORS_CHANCE - profile.BUILDING_MINFLOORS_CHANCE)));
             f++;
             if (f > maxfloors+1) {
                 f = maxfloors+1;
             }
-            int minfloors = getMinfloors(provider, cs);
+            int minfloors = getMinfloors(cs);
             if (f < minfloors) {
                 f = minfloors;
             }
@@ -805,7 +772,7 @@ public class BuildingInfo implements ILostChunkInfo {
             float r = rand.nextFloat();
             noLoot = building2x2Section == -1 && r < profile.BUILDING_WITHOUT_LOOT_CHANCE;
             r = rand.nextFloat();
-            if (rand.nextFloat() < profile.RUIN_CHANCE && (predefinedBuilding == null || !predefinedBuilding.isPreventRuins())) {
+            if (rand.nextFloat() < profile.RUIN_CHANCE && (predefinedBuilding == null || !predefinedBuilding.preventRuins())) {
                 ruinHeight = profile.RUIN_MINLEVEL_PERCENT + (profile.RUIN_MAXLEVEL_PERCENT - profile.RUIN_MINLEVEL_PERCENT) * r;
             } else {
                 ruinHeight = -1;
@@ -912,7 +879,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return maxcellars;
     }
 
-    private int getMinfloors(IDimensionInfo provider, CityStyle cs) {
+    private int getMinfloors(CityStyle cs) {
         int minfloors = profile.BUILDING_MINFLOORS + 1;    // +1 because this doesn't count the top
         if (buildingType.getMinFloors() != -1) {
             minfloors = Math.max(minfloors, buildingType.getMinFloors());
@@ -923,7 +890,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return minfloors;
     }
 
-    private int getMaxfloors(IDimensionInfo provider, CityStyle cs) {
+    private int getMaxfloors(CityStyle cs) {
         int maxfloors = profile.BUILDING_MAXFLOORS;
         if (buildingType.getMaxFloors() != -1) {
             maxfloors = Math.min(maxfloors, buildingType.getMaxFloors());
@@ -1316,7 +1283,6 @@ public class BuildingInfo implements ILostChunkInfo {
             return isOcean;
         }
         Holder<Biome> mainBiome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
-        var reg = provider.getWorld().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
         isOcean = mainBiome.is(BiomeTags.IS_OCEAN) || mainBiome.is(BiomeTags.IS_DEEP_OCEAN);
         return isOcean;
     }

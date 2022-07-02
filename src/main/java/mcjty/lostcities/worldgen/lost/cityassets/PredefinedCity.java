@@ -118,57 +118,10 @@ public class PredefinedCity implements ILostCityAsset {
         return cityStyle;
     }
 
-    public static class PredefinedStreet {
-        private final int relChunkX;
-        private final int relChunkZ;
-
-        public PredefinedStreet(int relChunkX, int relChunkZ) {
-            this.relChunkX = relChunkX;
-            this.relChunkZ = relChunkZ;
-        }
-
-        public int getRelChunkX() {
-            return relChunkX;
-        }
-
-        public int getRelChunkZ() {
-            return relChunkZ;
-        }
+    public record PredefinedStreet(int relChunkX, int relChunkZ) {
     }
 
-    public static class PredefinedBuilding {
-        private final String building;
-        private final int relChunkX;
-        private final int relChunkZ;
-        private final boolean multi;
-        private final boolean preventRuins;
-
-        public PredefinedBuilding(String building, int relChunkX, int relChunkZ, boolean multi, boolean preventRuins) {
-            this.building = building;
-            this.relChunkX = relChunkX;
-            this.relChunkZ = relChunkZ;
-            this.multi = multi;
-            this.preventRuins = preventRuins;
-        }
-
-        public String getBuilding() {
-            return building;
-        }
-
-        public int getRelChunkX() {
-            return relChunkX;
-        }
-
-        public int getRelChunkZ() {
-            return relChunkZ;
-        }
-
-        public boolean isMulti() {
-            return multi;
-        }
-
-        public boolean isPreventRuins() {
-            return preventRuins;
-        }
+    public record PredefinedBuilding(String building, int relChunkX, int relChunkZ, boolean multi,
+                                     boolean preventRuins) {
     }
 }

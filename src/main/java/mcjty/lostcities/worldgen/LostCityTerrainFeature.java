@@ -796,11 +796,11 @@ public class LostCityTerrainFeature {
                 float minh1 = min10 + (min00 - min10) * factor;
                 for (int z = 0; z < 16; z++) {
                     float maxheight = maxh0 + (maxh1 - maxh0) * (15.0f - z) / 15.0f;
-                    boolean moved = moveDown(info, x, z, (int) maxheight, info.waterLevel > info.groundLevel);
+                    boolean moved = moveDown(x, z, (int) maxheight, info.waterLevel > info.groundLevel);
 
                     if (!moved) {
                         float minheight = minh0 + (minh1 - minh0) * (15.0f - z) / 15.0f;
-                        moveUp(info, x, z, (int) minheight, info.waterLevel > info.groundLevel);
+                        moveUp(x, z, (int) minheight, info.waterLevel > info.groundLevel);
                     }
                 }
             }
@@ -822,7 +822,7 @@ public class LostCityTerrainFeature {
         return false;
     }
 
-    private void moveUp(BuildingInfo info, int x, int z, int height, boolean dowater) {
+    private void moveUp(int x, int z, int height, boolean dowater) {
         // Find the first non-empty block starting at the given height
         driver.current(x, height, z);
         int minHeight = provider.getWorld().getMinBuildHeight();
@@ -844,12 +844,13 @@ public class LostCityTerrainFeature {
             }
             driver.block(blockToMove);
             driver.decY();
-            ;
             idx--;
         }
     }
 
-    private boolean moveDown(BuildingInfo info, int x, int z, int height, boolean dowater) {
+    private final BlockState[] buffer = new BlockState[6];
+
+    private boolean moveDown(int x, int z, int height, boolean dowater) {
         int y = 255;
         driver.current(x, y, z);
         // We assume here we are not in a void chunk
@@ -862,7 +863,6 @@ public class LostCityTerrainFeature {
         }
 
         // We arrived at our first non-air block
-        BlockState[] buffer = new BlockState[6];
         int bufferIdx = 0;
         while (driver.getY() >= height) {
             if (bufferIdx < buffer.length) {
@@ -1592,9 +1592,7 @@ public class LostCityTerrainFeature {
             for (int z = 0; z < 16; ++z) {
                 int y = info.getCityGroundLevel() - 1;
                 driver.current(x, y, z);
-                while (true) {
-                    if (!(driver.getY() > (minHeight + info.profile.BEDROCK_LAYER) && isEmpty(driver.getBlock())))
-                        break;
+                while (driver.getY() > (minHeight + info.profile.BEDROCK_LAYER) && isEmpty(driver.getBlock())) {
                     driver.block(base);
                     driver.decY();
                 }
@@ -2033,7 +2031,7 @@ public class LostCityTerrainFeature {
                                     } else {
                                         b = air;        // No torches
                                     }
-                                } else if (inf.getLoot() != null && !inf.getLoot().isEmpty()) {
+                                } else if (inf.loot() != null && !inf.loot().isEmpty()) {
                                     if (!info.noLoot) {
                                         BlockPos pos = driver.getCurrentCopy();
                                         BlockState finalB = b;
@@ -2041,13 +2039,13 @@ public class LostCityTerrainFeature {
                                             WorldGenLevel world = provider.getWorld();
                                             if (!world.getBlockState(pos).isAir()) {
                                                 world.setBlock(pos, finalB, Block.UPDATE_CLIENTS);
-                                                generateLoot(info, world, pos, new BuildingInfo.ConditionTodo(inf.getLoot(), part.getName(), info));
+                                                generateLoot(info, world, pos, new BuildingInfo.ConditionTodo(inf.loot(), part.getName(), info));
                                             }
                                         });
                                     }
-                                } else if (inf.getMobId() != null && !inf.getMobId().isEmpty()) {
+                                } else if (inf.mobId() != null && !inf.mobId().isEmpty()) {
                                     if (info.profile.GENERATE_SPAWNERS && !info.noLoot) {
-                                        String mobid = inf.getMobId();
+                                        String mobid = inf.mobId();
 
                                         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
                                         BlockState finalB1 = b;
@@ -2127,7 +2125,7 @@ public class LostCityTerrainFeature {
             logic.setEntityId(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(randomValue)));
             spawner.setChanged();
             if (LostCityConfiguration.DEBUG) {
-                ModSetup.getLogger().debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos.toString());
+                ModSetup.getLogger().debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos);
             }
         } else if (tileentity != null) {
             ModSetup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");

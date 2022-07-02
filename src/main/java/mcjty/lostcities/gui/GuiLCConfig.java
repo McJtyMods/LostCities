@@ -259,7 +259,6 @@ public class GuiLCConfig extends Screen {
                 renderPreviewCity(stack, profile, true);
             } else if ("Transport".equals(mode)) {
                 renderPreviewTransports(stack, profile);
-            } else {
             }
         });
     }

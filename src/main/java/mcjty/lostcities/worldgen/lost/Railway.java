@@ -86,7 +86,7 @@ public class Railway {
         }
     }
 
-    private static Map<ChunkCoord, RailChunkInfo> railInfo = new HashMap<>();
+    private static final Map<ChunkCoord, RailChunkInfo> railInfo = new HashMap<>();
 
     public static void cleanCache() {
         railInfo.clear();
