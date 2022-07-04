@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem where spawners might not be correctly set if the Lost City world is exited and loaded again
+
 1.18-5.2.4:
 - All mob spawners were spawning pigs. This is fixed now
 - The Lost Cities events are back (useful for mods who want to do something special to LC worldgen)

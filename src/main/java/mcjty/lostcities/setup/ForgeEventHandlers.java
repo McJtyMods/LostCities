@@ -46,7 +46,7 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent event) {
         if (event.phase == TickEvent.Phase.END && event.world instanceof ServerLevel serverLevel) {
-            GlobalTodo.executeAndClearTodo(serverLevel);
+            GlobalTodo.getData(serverLevel).executeAndClearTodo(serverLevel);
         }
     }
 
@@ -66,7 +66,6 @@ public class ForgeEventHandlers {
         BiomeInfo.cleanCache();
         City.cleanCache();
         CitySphere.cleanCache();
-        GlobalTodo.cleanCache();
     }
 
 //    @SubscribeEvent

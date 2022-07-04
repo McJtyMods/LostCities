@@ -2048,14 +2048,9 @@ public class LostCityTerrainFeature {
                                         String mobid = inf.mobId();
 
                                         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
-                                        BlockState finalB1 = b;
-                                        GlobalTodo.addTodo(provider.getWorld().getLevel().dimension(), pos, level -> {
-                                            if (level.getBlockState(pos).getBlock() == finalB1.getBlock()) {
-                                                level.setBlock(pos, air, Block.UPDATE_CLIENTS);
-                                                level.setBlock(pos, finalB1, Block.UPDATE_CLIENTS);
-                                                createSpawner(level, rand, provider, info, new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
-                                            }
-                                        });
+                                        ResourceLocation randomValue = getRandomSpawnerMob(provider.getWorld().getLevel(), rand, provider, info,
+                                                new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
+                                        GlobalTodo.getData(provider.getWorld().getLevel()).addSpawnerTodo(pos, b, randomValue);
                                     } else {
                                         b = air;
                                     }
@@ -2072,14 +2067,13 @@ public class LostCityTerrainFeature {
                                     } else {
                                         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
                                         if (block instanceof SaplingBlock saplingBlock) {
-                                            GlobalTodo.addTodo(provider.getWorld().getLevel().dimension(), pos, (level) -> {
+                                            GlobalTodo.getData(provider.getWorld().getLevel()).addTodo(pos, (level) -> {
                                                 BlockState state = bs.setValue(SaplingBlock.STAGE, 1);
                                                 if (level.isAreaLoaded(pos, 1)) {
                                                     level.setBlock(pos, state, Block.UPDATE_CLIENTS);
                                                     saplingBlock.advanceTree(level, pos, state, rand);
                                                 }
                                             });
-
                                         }
                                     }
                                 }
@@ -2095,43 +2089,47 @@ public class LostCityTerrainFeature {
         return oy + part.getSliceCount();
     }
 
-    public static void createSpawner(Level world, Random random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
+    public static void createSpawner(Level world, BlockPos pos, ResourceLocation randomEntity) {
         BlockEntity tileentity = world.getBlockEntity(pos);
         if (tileentity instanceof SpawnerBlockEntity spawner) {
-            String condition = todo.getCondition();
-            Condition cnd = AssetRegistries.CONDITIONS.get(condition);
-            if (cnd == null) {
-                throw new RuntimeException("Cannot find condition '" + condition + "'!");
-            }
-            int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / FLOORHEIGHT;
-            int floor = (pos.getY() - info.getCityGroundLevel()) / FLOORHEIGHT;
-            ConditionContext conditionContext = new ConditionContext(level, floor, info.cellars, info.getNumFloors(),
-                    todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
-                @Override
-                public boolean isSphere() {
-                    return CitySphere.isInSphere(info.chunkX, info.chunkZ, pos, diminfo);
-                }
-
-                @Override
-                public ResourceLocation getBiome() {
-                    return world.getBiome(pos).value().getRegistryName();
-                }
-            };
-            String randomValue = cnd.getRandomValue(random, conditionContext);
-            if (randomValue == null) {
-                throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
-            }
             BaseSpawner logic = spawner.getSpawner();
-            logic.setEntityId(ForgeRegistries.ENTITIES.getValue(new ResourceLocation(randomValue)));
+            logic.setEntityId(ForgeRegistries.ENTITIES.getValue(randomEntity));
             spawner.setChanged();
             if (LostCityConfiguration.DEBUG) {
-                ModSetup.getLogger().debug("generateLootSpawners: mob=" + randomValue + " pos=" + pos);
+                ModSetup.getLogger().debug("generateLootSpawners: mob=" + randomEntity.toString() + " pos=" + pos);
             }
         } else if (tileentity != null) {
             ModSetup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");
         } else {
             ModSetup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
         }
+    }
+
+    public static ResourceLocation getRandomSpawnerMob(Level world, Random random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
+        String condition = todo.getCondition();
+        Condition cnd = AssetRegistries.CONDITIONS.get(condition);
+        if (cnd == null) {
+            throw new RuntimeException("Cannot find condition '" + condition + "'!");
+        }
+        int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / FLOORHEIGHT;
+        int floor = (pos.getY() - info.getCityGroundLevel()) / FLOORHEIGHT;
+        ConditionContext conditionContext = new ConditionContext(level, floor, info.cellars, info.getNumFloors(),
+                todo.getPart(), todo.getBuilding(), info.chunkX, info.chunkZ) {
+            @Override
+            public boolean isSphere() {
+                return CitySphere.isInSphere(info.chunkX, info.chunkZ, pos, diminfo);
+            }
+
+            @Override
+            public ResourceLocation getBiome() {
+                return world.getBiome(pos).value().getRegistryName();
+            }
+        };
+        String randomValue = cnd.getRandomValue(random, conditionContext);
+        if (randomValue == null) {
+            throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
+        }
+        return new ResourceLocation(randomValue);
     }
 
 
