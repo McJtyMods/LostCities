@@ -460,7 +460,7 @@ public class LostCityProfile implements ILostCityProfile {
     }
 
     private void initCities(Configuration cfg) {
-        CITY_CHANCE = cfg.getDouble("cityChance", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_CHANCE, 0.0, 1.0, "The chance this chunk will be the center of a city");
+        CITY_CHANCE = cfg.getDouble("cityChance", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_CHANCE, -1.0, 1.0, "The chance this chunk will be the center of a city");
         CITY_MINRADIUS = cfg.getInt("cityMinRadius", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_MINRADIUS, 1, 2000, "The minimum radius of a city");
         CITY_MAXRADIUS = cfg.getInt("cityMaxRadius", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_MAXRADIUS, 1, 2000, "The maximum radius of a city");
         CITY_THRESHOLD = cfg.getFloat("cityThreshold", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_THRESHOLD, 0.0f, 1.0f, "The center and radius of a city define a sphere. " +

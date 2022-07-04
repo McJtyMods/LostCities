@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
+import mcjty.lostcities.varia.PerlinNoiseGenerator14;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
@@ -11,6 +12,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -25,10 +27,18 @@ public class City {
     private static Map<ChunkCoord, PredefinedCity.PredefinedBuilding> predefinedBuildingMap = null;
     private static Map<ChunkCoord, PredefinedCity.PredefinedStreet> predefinedStreetMap = null;
 
+    // If cityChance == -1 then this is used to control where cities are
+    private static final Map<ResourceKey<Level>, CityRarityMap> cityRarityMap = new HashMap<>();
+
     public static void cleanCache() {
         predefinedCityMap = null;
         predefinedBuildingMap = null;
         predefinedStreetMap = null;
+        cityRarityMap.clear();
+    }
+
+    public static CityRarityMap getCityRarityMap(ResourceKey<Level> level, long seed) {
+        return cityRarityMap.computeIfAbsent(level, k -> new CityRarityMap(seed));
     }
 
     public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, ResourceKey<Level> type) {
@@ -146,25 +156,33 @@ public class City {
 
     // Calculate the citystyle based on all surrounding cities
     public static CityStyle getCityStyle(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
+        List<Pair<Float, String>> styles = new ArrayList<>();
         Random rand = new Random(provider.getSeed() + chunkZ * 593441843L + chunkX * 217645177L);
         rand.nextFloat();
         rand.nextFloat();
 
-        int offset = (profile.CITY_MAXRADIUS+15) / 16;
-        List<Pair<Float, String>> styles = new ArrayList<>();
-        for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
-            for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                if (isCityCenter(cx, cz, provider)) {
-                    float radius = getCityRadius(cx, cz, provider);
-                    float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
-                    if (sqdist < radius * radius) {
-                        float dist = (float) Math.sqrt(sqdist);
-                        float factor = (radius - dist) / radius;
-                        styles.add(Pair.of(factor, getCityStyleForCityCenter(chunkX, chunkZ, provider)));
+        if (profile.CITY_CHANCE < 0) {
+            WorldGenLevel world = provider.getWorld();
+            CityRarityMap rarityMap = getCityRarityMap(world.getLevel().dimension(), world.getSeed());
+            // @todo base city style from the city factor?
+            styles.add(Pair.of(rarityMap.getCityFactor(chunkX, chunkZ), getCityStyleForCityCenter(chunkX, chunkZ, provider)));
+        } else {
+            int offset = (profile.CITY_MAXRADIUS + 15) / 16;
+            for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
+                for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
+                    if (isCityCenter(cx, cz, provider)) {
+                        float radius = getCityRadius(cx, cz, provider);
+                        float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
+                        if (sqdist < radius * radius) {
+                            float dist = (float) Math.sqrt(sqdist);
+                            float factor = (radius - dist) / radius;
+                            styles.add(Pair.of(factor, getCityStyleForCityCenter(chunkX, chunkZ, provider)));
+                        }
                     }
                 }
             }
         }
+
         String cityStyleName;
         if (styles.isEmpty()) {
             cityStyleName = provider.getWorldStyle().getRandomCityStyle(provider, chunkX, chunkZ, rand);
@@ -200,36 +218,31 @@ public class City {
             return 1.0f;
         }
 
-        for (int cx = -4 ; cx <= 4 ; cx++) {
-            for (int cz = -4 ; cz <= 4 ; cz++) {
-                // @todo 1.14
-//                if (provider.hasMansion(chunkX+cx, chunkZ+cz)) {
-//                    return 0.0f;
-//                }
-            }
-        }
-
-        for (int cx = -2 ; cx <= 2 ; cx++) {
-            for (int cz = -2 ; cz <= 2 ; cz++) {
-                // @todo 1.14
-//                if (provider.hasOceanMonument(chunkX+cx, chunkZ+cz)) {
-//                    return 0.0f;
-//                }
-            }
-        }
-
         float factor = 0;
-        int offset = (profile.CITY_MAXRADIUS+15) / 16;
-        for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
-            for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                LostCityProfile pro = BuildingInfo.getProfile(cx, cz, provider);
-                // Only count cities that are in the same 'profile' as this one
-                if (pro == profile && isCityCenter(cx, cz, provider)) {
-                    float radius = getCityRadius(cx, cz, provider);
-                    float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
-                    if (sqdist < radius * radius) {
-                        float dist = (float) Math.sqrt(sqdist);
-                        factor += (radius - dist) / radius;
+        if (profile.CITY_CHANCE < 0) {
+            WorldGenLevel world = provider.getWorld();
+            CityRarityMap rarityMap;
+            if (world == null) {
+                rarityMap = getCityRarityMap(null, 123456789);
+            } else {
+                rarityMap = getCityRarityMap(world.getLevel().dimension(), world.getSeed());
+            }
+            return rarityMap.getCityFactor(chunkX, chunkZ);
+        } else {
+            int offset = (profile.CITY_MAXRADIUS + 15) / 16;
+            for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
+                for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
+                    LostCityProfile pro = BuildingInfo.getProfile(cx, cz, provider);
+                    // Only count cities that are in the same 'profile' as this one
+                    if (pro == profile) {
+                        if (isCityCenter(cx, cz, provider)) {
+                            float radius = getCityRadius(cx, cz, provider);
+                            float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
+                            if (sqdist < radius * radius) {
+                                float dist = (float) Math.sqrt(sqdist);
+                                factor += (radius - dist) / radius;
+                            }
+                        }
                     }
                 }
             }

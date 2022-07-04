@@ -1731,6 +1731,7 @@ public class BuildingInfo implements ILostChunkInfo {
     @Nullable
     @Override
     public ILostCityInfo getCityInfo() {
+        // @todo REWRITE FOR THE NEW CITY FACTOR
         if (City.isCityCenter(chunkX, chunkZ, provider)) {
             return new ILostCityInfo() {
                 @Override

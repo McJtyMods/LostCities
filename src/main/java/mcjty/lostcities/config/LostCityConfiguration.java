@@ -33,9 +33,6 @@ public class LostCityConfiguration {
     public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
     public static final String PRIVATE_PROFILES_COMMENT = "List of privatep profiles that cannot be selected by the player but are only used as a child profile of another one";
 
-    public static final String[] DEFAULT_PROFILES = new String[]{"default", "cavern", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
-    public static final String[] PRIVATE_PROFILES = new String[]{"bio_wasteland", "water_empty"};
-
     public static final String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
             "minecraft:glowstone",
             "minecraft:redstone_torch",
@@ -427,6 +424,11 @@ public class LostCityConfiguration {
 //        profile.GENERATE_VILLAGES = false;
 //        profile.GENERATE_STRONGHOLDS = true;
 //        profile.ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
+//        standardProfiles.put(profile.getName(), profile);
+
+//        profile = new LostCityProfile("largecities", true);
+//        profile.setIconFile("textures/gui/icon_default.png");
+//        profile.CITY_CHANCE = -1;
 //        standardProfiles.put(profile.getName(), profile);
 
     }
