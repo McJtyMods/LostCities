@@ -5,12 +5,15 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
@@ -19,6 +22,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 import net.minecraft.world.level.levelgen.placement.CountPlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import net.minecraftforge.common.Tags;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -61,6 +65,11 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
             if (diminfo != null) {
                 WorldGenRegion region = (WorldGenRegion) level;
                 ChunkPos center = region.getCenter();
+                Holder<Biome> biome = region.getBiome(center.getMiddleBlockPosition(60));
+                if (biome.is(Tags.Biomes.IS_VOID)) {
+                    return false;
+                }
+
                 int chunkX = center.x;
                 int chunkZ = center.z;
                 diminfo.setWorld(level);

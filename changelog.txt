@@ -5,6 +5,7 @@ Upcoming:
 - Removed the non functional chisel worldstyle and palettes
 - Having a missing asset file is no longer a crashing error but it will put an error in the log and ignore the asset
 - Citystyles can now override the building chance
+- Fixed a bug with feature placement for datapack biomes
 
 1.18-5.2.5:
 - Fixed a problem where spawners might not be correctly set if the Lost City world is exited and loaded again
