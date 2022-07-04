@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.2.6:
 - New system to control city rarity based on perlin maps. If the cityChance setting is -1 then cityPerlinScale and cityPerlinOffset will be used for a more natural city style
 - New 'cityStyleThreshold' and 'cityStyleAlternative' that can be used to select another city style for low city thresholds
 - New 'largecities' profile using the new setting. It presents very large cities that are relatively rare. It also uses an alternative city style at the borders of the city
