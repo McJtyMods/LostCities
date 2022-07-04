@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.2.5:
 - Fixed a problem where spawners might not be correctly set if the Lost City world is exited and loaded again
 
 1.18-5.2.4:
