@@ -31,6 +31,7 @@ public class CityStyle implements ILostCityCityStyle {
     private Integer minCellarCount;
     private Integer maxFloorCount;
     private Integer maxCellarCount;
+    private Float buildingChance;   // Optional build chance override
 
     private Float explosionChance;
 
@@ -99,6 +100,11 @@ public class CityStyle implements ILostCityCityStyle {
     @Override
     public Integer getMaxCellarCount() {
         return maxCellarCount;
+    }
+
+    @Override
+    public Float getBuildingChance() {
+        return buildingChance;
     }
 
     @Override
@@ -211,6 +217,9 @@ public class CityStyle implements ILostCityCityStyle {
                 if (maxCellarCount == null) {
                     maxCellarCount = inheritFrom.maxCellarCount;
                 }
+                if (buildingChance == null) {
+                    buildingChance = inheritFrom.buildingChance;
+                }
                 if (streetBlock == null) {
                     streetBlock = inheritFrom.streetBlock;
                 }
@@ -311,6 +320,9 @@ public class CityStyle implements ILostCityCityStyle {
             }
             if (s.has("mincellars")) {
                 minCellarCount = s.get("mincellars").getAsInt();
+            }
+            if (s.has("buildingchance")) {
+                buildingChance = s.get("buildingchance").getAsFloat();
             }
         }
         if (object.has("railblocks")) {
@@ -494,5 +506,9 @@ public class CityStyle implements ILostCityCityStyle {
 
     public String getRandomMultiBuilding(Random random) {
         return Tools.getRandomFromList(random, multiBuildingSelector);
+    }
+
+    public boolean hasMultiBuildings() {
+        return !multiBuildingSelector.isEmpty();
     }
 }

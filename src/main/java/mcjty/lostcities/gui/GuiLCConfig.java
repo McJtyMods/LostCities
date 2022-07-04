@@ -9,6 +9,7 @@ import mcjty.lostcities.gui.elements.*;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
+import mcjty.lostcities.worldgen.lost.City;
 import mcjty.lostcities.worldgen.lost.Highway;
 import mcjty.lostcities.worldgen.lost.Railway;
 import net.minecraft.client.Minecraft;
@@ -44,6 +45,8 @@ public class GuiLCConfig extends Screen {
     private final Random random = new Random();
 
     private final List<GuiElement> elements = new ArrayList<>();
+    private DoubleElement perlinScaleElement;
+    private DoubleElement perlinOffsetElement;
 
     private final LostCitySetup localSetup = new LostCitySetup(this::refreshPreview);
 
@@ -113,8 +116,8 @@ public class GuiLCConfig extends Screen {
         return el;
     }
 
-    private DoubleElement addDouble(int left, String attribute) {
-        DoubleElement el = new DoubleElement(this, curpage, left, y, attribute);
+    private DoubleElement addDouble(int left, int w, String attribute) {
+        DoubleElement el = new DoubleElement(this, curpage, left, y, w, attribute);
         add(el);
         return el;
     }
@@ -200,7 +203,9 @@ public class GuiLCConfig extends Screen {
 
     private void initCities(int left) {
         start("Cities");
-        addDouble(left,"cities.cityChance").label("Rarity:"); nl();
+        addDouble(left,120, "cities.cityChance").label("Rarity:"); nl();
+        perlinScaleElement = addDouble(left,45, "cities.cityPerlinScale").label("Scale/Offset:");
+        perlinOffsetElement = addDouble(left + 55,45, "cities.cityPerlinOffset"); nl();
         addFloat(left,"cities.cityThreshold").label("Threshold:"); nl();
 
         addInt(left,"cities.cityMinRadius").label("Radius:");
@@ -244,6 +249,7 @@ public class GuiLCConfig extends Screen {
         BuildingInfo.cleanCache();
         Highway.cleanCache();
         Railway.cleanCache();
+        City.cleanCache();
     }
 
     private void renderExtra(PoseStack stack) {
@@ -429,6 +435,12 @@ public class GuiLCConfig extends Screen {
         elements.forEach(s -> {
             s.setEnabled(isCustomized);
             s.setBasedOnMode(mode);
+        });
+
+        localSetup.get().ifPresent(profile -> {
+            boolean perlin = profile.CITY_CHANCE < 0;
+            perlinScaleElement.setEnabled(perlin && isCustomized);
+            perlinOffsetElement.setEnabled(perlin && isCustomized);
         });
     }
 

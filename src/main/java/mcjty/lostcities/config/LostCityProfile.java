@@ -109,10 +109,20 @@ public class LostCityProfile implements ILostCityProfile {
     public int MINI_EXPLOSION_MINHEIGHT = 60;
     public int MINI_EXPLOSION_MAXHEIGHT = 100;
 
-    public double CITY_CHANCE = .01;
-    public int CITY_MINRADIUS = 50;
-    public int CITY_MAXRADIUS = 128;
+    public double CITY_CHANCE = .01;    // If this is -1 we use perlin noise for rarity
+    public int CITY_MINRADIUS = 50;     // Only used for cityChance type
+    public int CITY_MAXRADIUS = 128;    // Only used for cityChance type
+
+    public double CITY_PERLIN_SCALE = 3;       // Used if CITY_CHANCE == -1
+    public double CITY_PERLIN_INNERSCALE = .1; // Used if CITY_CHANCE == -1
+    public double CITY_PERLIN_OFFSET = .1;     // Used if CITY_CHANCE == -1
+
+    // This threshold is used for both the cityChance variation as the perlin variation
     public float CITY_THRESHOLD = .2f;
+
+    // This threshold is used to select another citystyle if the city factor goes below this
+    public float CITY_STYLE_THRESHOLD = -1f;
+    public String CITY_STYLE_ALTERNATIVE = "";
 
     public boolean CITY_AVOID_VOID = true;
 
@@ -460,12 +470,18 @@ public class LostCityProfile implements ILostCityProfile {
     }
 
     private void initCities(Configuration cfg) {
-        CITY_CHANCE = cfg.getDouble("cityChance", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_CHANCE, -1.0, 1.0, "The chance this chunk will be the center of a city");
+        CITY_CHANCE = cfg.getDouble("cityChance", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_CHANCE, -1.0, 1.0, "The chance this chunk will be the center of a city (use -1 for perlin noise variant)");
         CITY_MINRADIUS = cfg.getInt("cityMinRadius", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_MINRADIUS, 1, 2000, "The minimum radius of a city");
         CITY_MAXRADIUS = cfg.getInt("cityMaxRadius", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_MAXRADIUS, 1, 2000, "The maximum radius of a city");
+        CITY_PERLIN_SCALE = cfg.getDouble("cityPerlinScale", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_PERLIN_SCALE, -1000000, 1000000, "The scale for the city rarity perlin map");
+        CITY_PERLIN_OFFSET = cfg.getDouble("cityPerlinOffset", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_PERLIN_OFFSET, -1000000, 1000000, "The offset for the city rarity perlin map");
+        CITY_PERLIN_INNERSCALE = cfg.getDouble("cityPerlinInnerScale", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_PERLIN_INNERSCALE, -1000000, 1000000, "The internal scale for the city rarity perlin map");
         CITY_THRESHOLD = cfg.getFloat("cityThreshold", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_THRESHOLD, 0.0f, 1.0f, "The center and radius of a city define a sphere. " +
                 "This threshold indicates from which point a city is considered a city. " +
                 "This is important for calculating where cities are based on overlapping city circles (where the city thresholds are added)");
+        CITY_STYLE_THRESHOLD = cfg.getFloat("cityStyleThreshold", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_STYLE_THRESHOLD, 0.0f, 1.0f, "A city factor below this threshold will use the city style " +
+                "specified in 'cityStyleAlternative'");
+        CITY_STYLE_ALTERNATIVE = cfg.getString("cityStyleAlternative", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_STYLE_ALTERNATIVE, "Alternative city style. Used with cityStyleThreshold");
         CITY_AVOID_VOID = cfg.getBoolean("cityAvoidVoid", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_AVOID_VOID, "Only used with floating landscape type: if true an additional detection is done to see if the chunk is void and in that case the city isn't generated there. Otherwise you might get city chunks on the border of islands which sometimes looks weird");
         CITY_BIOME_FACTORS = cfg.getStringList("cityBiomeFactors", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_BIOME_FACTORS, "List of biomes with a factor to affect the city factor in that biome. Using the value 0 you can disable city generation in biomes");
         CITY_DEFAULT_BIOME_FACTOR = cfg.getFloat("cityBiomeFactorDefault", LostCityProfile.CATEGORY_CITIES, inheritFrom.orElse(this).CITY_DEFAULT_BIOME_FACTOR, 0.0f, 1.0f, "The default biome factor which is used if your biome is not specified in 'cityBiomeFactors'");

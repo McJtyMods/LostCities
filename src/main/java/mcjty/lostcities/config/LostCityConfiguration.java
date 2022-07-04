@@ -426,11 +426,19 @@ public class LostCityConfiguration {
 //        profile.ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
 //        standardProfiles.put(profile.getName(), profile);
 
-//        profile = new LostCityProfile("largecities", true);
-//        profile.setIconFile("textures/gui/icon_default.png");
-//        profile.CITY_CHANCE = -1;
-//        standardProfiles.put(profile.getName(), profile);
-
+        profile = new LostCityProfile("largecities", true);
+        profile.setIconFile("textures/gui/icon_default.png");
+        profile.CITY_CHANCE = -1;
+        profile.CITY_PERLIN_SCALE = 7.0;
+        profile.CITY_PERLIN_OFFSET = 0.2;
+        profile.CITY_PERLIN_INNERSCALE = 0.1;
+        profile.CITY_THRESHOLD = .1f;
+        profile.CITY_STYLE_THRESHOLD = .4f;
+        profile.CITY_STYLE_ALTERNATIVE = "citystyle_border";
+        profile.BUILDING_MAXFLOORS = 9;
+        profile.BUILDING_MAXFLOORS_CHANCE = 7;
+        profile.BUILDING_CHANCE = .4f;
+        standardProfiles.put(profile.getName(), profile);
     }
 
     public static void setupProfiles() {

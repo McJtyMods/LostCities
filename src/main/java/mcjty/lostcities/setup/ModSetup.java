@@ -90,9 +90,13 @@ public class ModSetup {
         for (String path : Config.ASSETS.get()) {
             if (path.startsWith("/")) {
                 try(InputStream inputstream = LostCities.class.getResourceAsStream(path)) {
-                    AssetRegistries.load(inputstream, path);
+                    if (inputstream != null) {
+                        AssetRegistries.load(inputstream, path);
+                    } else {
+                        LostCities.logger.error("Can't load asset file '" + path + "'!");
+                    }
                 } catch (IOException ex) {
-                    throw new UncheckedIOException(ex);
+                    LostCities.logger.error("Can't load asset file '" + path + "'!");
                 }
             } else if (path.startsWith("$")) {
                 Path configPath = FMLPaths.CONFIGDIR.get();

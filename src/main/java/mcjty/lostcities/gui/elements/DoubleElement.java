@@ -15,12 +15,12 @@ public class DoubleElement extends GuiElement {
     private final EditBox field;
     private final String attribute;
 
-    public DoubleElement(GuiLCConfig gui, String page, int x, int y, String attribute) {
+    public DoubleElement(GuiLCConfig gui, String page, int x, int y, int w, String attribute) {
         super(page, x, y);
         this.gui = gui;
         this.attribute = attribute;
         Double c = gui.getLocalSetup().get().map(h -> (Double) h.toConfiguration().get(attribute)).orElse(0.0);
-        field = new EditBox(gui.getFont(), x, y, 120, 16, ComponentFactory.literal(Double.toString(c))) {
+        field = new EditBox(gui.getFont(), x, y, w, 16, ComponentFactory.literal(Double.toString(c))) {
             @Override
             public void renderToolTip(PoseStack stack, int x, int y) {
                     gui.getLocalSetup().get().ifPresent(h -> {

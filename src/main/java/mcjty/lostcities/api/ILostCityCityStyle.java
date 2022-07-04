@@ -16,6 +16,8 @@ public interface ILostCityCityStyle extends ILostCityAsset {
 
     Integer getMaxCellarCount();
 
+    Float getBuildingChance();
+
     Character getStreetBlock();
 
     Character getStreetBaseBlock();

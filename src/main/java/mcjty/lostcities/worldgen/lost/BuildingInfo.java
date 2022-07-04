@@ -424,10 +424,16 @@ public class BuildingInfo implements ILostChunkInfo {
             return false;   // No building here
         }
 
+        CityStyle style = City.getCityStyle(chunkX, chunkZ, provider, profile);
+        float buildingChance = profile.BUILDING_CHANCE;
+        if (style.getBuildingChance() != null) {
+            buildingChance = style.getBuildingChance();
+        }
+
         if (section >= 0) {
             // Part of multi-building. We have checked everything above
             b = true;
-        } else if (bc >= profile.BUILDING_CHANCE) {
+        } else if (bc >= buildingChance) {
             // Random says we should have no building here
             b = false;
         } else if (hasHighway(chunkX, chunkZ, provider, profile)) {
@@ -490,7 +496,7 @@ public class BuildingInfo implements ILostChunkInfo {
         };
     }
 
-    private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
+    private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, CityStyle cityStyle) {
         ResourceKey<Level> type = provider.getType();
         PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
@@ -500,7 +506,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (predefinedStreet != null) {
             return false;   // There is a street here so no building
         }
-        if (isMultiBuildingCandidate(chunkX, chunkZ, provider, profile)) {
+        if (isMultiBuildingCandidate(chunkX, chunkZ, provider, profile, cityStyle)) {
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
             return rand.nextFloat() < profile.BUILDING2X2_CHANCE;
         } else {
@@ -508,8 +514,17 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
-    private static boolean isMultiBuildingCandidate(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        return isCityRaw(chunkX, chunkZ, provider, profile) && !hasHighway(chunkX, chunkZ, provider, profile) && !hasRailway(chunkX, chunkZ, provider, profile);
+    private static boolean isMultiBuildingCandidate(int chunkX, int chunkZ, IDimensionInfo provider,
+                                                    LostCityProfile profile, CityStyle cityStyle) {
+        boolean result = isCityRaw(chunkX, chunkZ, provider, profile) && !hasHighway(chunkX, chunkZ, provider, profile) && !hasRailway(chunkX, chunkZ, provider, profile);
+        if (result) {
+            CityStyle style = City.getCityStyle(chunkX, chunkZ, provider, profile);
+            return style.getName().equals(cityStyle.getName());
+        }
+        if (!cityStyle.hasMultiBuildings()) {
+            return false;
+        }
+        return result;
     }
 
     private static boolean hasHighway(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
@@ -555,24 +570,28 @@ public class BuildingInfo implements ILostChunkInfo {
             return true;
         }
 
-        if (isCandidateForTopLeftOf2x2Building(chunkX, chunkZ, provider, profile) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ, provider, profile) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider, profile) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ - 1, provider, profile) &&
+        CityStyle cityStyle = City.getCityStyle(chunkX, chunkZ, provider, profile);
+        if (!cityStyle.hasMultiBuildings()) {
+            return false;
+        }
+        if (isCandidateForTopLeftOf2x2Building(chunkX, chunkZ, provider, profile, cityStyle) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ, provider, profile, cityStyle) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider, profile, cityStyle) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ - 1, provider, profile, cityStyle) &&
 
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ - 1, provider, profile) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ, provider, profile) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ + 1, provider, profile) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, provider, profile) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, provider, profile)
+                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ - 1, provider, profile, cityStyle) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ, provider, profile, cityStyle) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ + 1, provider, profile, cityStyle) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, provider, profile, cityStyle) &&
+                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, provider, profile, cityStyle)
                 ) {
             PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
             if (predefinedStreet != null) {
                 return false;   // There is a street here so no building
             }
-            return isMultiBuildingCandidate(chunkX + 1, chunkZ, provider, profile) &&
-                    isMultiBuildingCandidate(chunkX + 1, chunkZ + 1, provider, profile) &&
-                    isMultiBuildingCandidate(chunkX, chunkZ + 1, provider, profile);
+            return isMultiBuildingCandidate(chunkX + 1, chunkZ, provider, profile, cityStyle) &&
+                    isMultiBuildingCandidate(chunkX + 1, chunkZ + 1, provider, profile, cityStyle) &&
+                    isMultiBuildingCandidate(chunkX, chunkZ + 1, provider, profile, cityStyle);
         } else {
             return false;
         }

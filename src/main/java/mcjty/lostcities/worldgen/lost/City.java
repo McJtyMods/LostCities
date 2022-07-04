@@ -37,8 +37,8 @@ public class City {
         cityRarityMap.clear();
     }
 
-    public static CityRarityMap getCityRarityMap(ResourceKey<Level> level, long seed) {
-        return cityRarityMap.computeIfAbsent(level, k -> new CityRarityMap(seed));
+    public static CityRarityMap getCityRarityMap(ResourceKey<Level> level, long seed, double scale, double offset, double innerScale) {
+        return cityRarityMap.computeIfAbsent(level, k -> new CityRarityMap(seed, scale, offset, innerScale));
     }
 
     public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, ResourceKey<Level> type) {
@@ -163,9 +163,14 @@ public class City {
 
         if (profile.CITY_CHANCE < 0) {
             WorldGenLevel world = provider.getWorld();
-            CityRarityMap rarityMap = getCityRarityMap(world.getLevel().dimension(), world.getSeed());
-            // @todo base city style from the city factor?
-            styles.add(Pair.of(rarityMap.getCityFactor(chunkX, chunkZ), getCityStyleForCityCenter(chunkX, chunkZ, provider)));
+            CityRarityMap rarityMap = getCityRarityMap(world.getLevel().dimension(), world.getSeed(),
+                    profile.CITY_PERLIN_SCALE, profile.CITY_PERLIN_OFFSET, profile.CITY_PERLIN_INNERSCALE);
+            float factor = rarityMap.getCityFactor(chunkX, chunkZ);
+            if (factor < profile.CITY_STYLE_THRESHOLD) {
+                styles.add(Pair.of(factor, profile.CITY_STYLE_ALTERNATIVE));
+            } else {
+                styles.add(Pair.of(factor, getCityStyleForCityCenter(chunkX, chunkZ, provider)));
+            }
         } else {
             int offset = (profile.CITY_MAXRADIUS + 15) / 16;
             for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
@@ -176,7 +181,11 @@ public class City {
                         if (sqdist < radius * radius) {
                             float dist = (float) Math.sqrt(sqdist);
                             float factor = (radius - dist) / radius;
-                            styles.add(Pair.of(factor, getCityStyleForCityCenter(chunkX, chunkZ, provider)));
+                            if (factor < profile.CITY_STYLE_THRESHOLD) {
+                                styles.add(Pair.of(factor, profile.CITY_STYLE_ALTERNATIVE));
+                            } else {
+                                styles.add(Pair.of(factor, getCityStyleForCityCenter(chunkX, chunkZ, provider)));
+                            }
                         }
                     }
                 }
@@ -223,9 +232,11 @@ public class City {
             WorldGenLevel world = provider.getWorld();
             CityRarityMap rarityMap;
             if (world == null) {
-                rarityMap = getCityRarityMap(null, 123456789);
+                rarityMap = getCityRarityMap(null, 123456789,
+                        profile.CITY_PERLIN_SCALE, profile.CITY_PERLIN_OFFSET, profile.CITY_PERLIN_INNERSCALE);
             } else {
-                rarityMap = getCityRarityMap(world.getLevel().dimension(), world.getSeed());
+                rarityMap = getCityRarityMap(world.getLevel().dimension(), world.getSeed(),
+                        profile.CITY_PERLIN_SCALE, profile.CITY_PERLIN_OFFSET, profile.CITY_PERLIN_INNERSCALE);
             }
             return rarityMap.getCityFactor(chunkX, chunkZ);
         } else {

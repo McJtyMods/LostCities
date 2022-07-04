@@ -311,29 +311,6 @@
     ]
   },
   {
-    "type": "worldstyle",
-    "name": "chisel",
-    "outsidestyle": "outside_chisel",
-    "citystyles": [
-      {
-        "factor": 0.5,
-        "citystyle": "citystyle_chisel_standard"
-      },
-      {
-        "factor": 9.0,
-        "biomes": [
-          "desert",
-          "desert_hills",
-          "mesa",
-          "mesa_rock",
-          "mesa_clear_rock"
-        ],
-        "citystyle": "citystyle_chisel_desert"
-      }
-    ]
-  },
-
-  {
     "type": "citystyle",
     "name": "citystyle_config",
     "streetblocks": {
@@ -559,16 +536,163 @@
   },
   {
     "type": "citystyle",
-    "name": "citystyle_chisel_desert",
-    "style": "desert_chisel",
-    "inherit": "citystyle_common"
+    "name": "citystyle_border",
+    "style": "standard_border",
+    "inherit": "citystyle_config",
+
+    "buildingsettings": {
+      "maxfloors": 1,
+      "maxcellars": 1,
+      "buildingchance": 0.2
+    },
+    "streetblocks": {
+      "border": "y",
+      "wall": "w",
+      "street": "S",
+      "streetbase": "b",
+      "streetvariant": "B"
+    },
+    "parkblocks": {
+      "elevation": "x"
+    },
+    "corridorblocks": {
+      "roof": "x",
+      "glass": "+"
+    },
+    "railblocks": {
+      "railmain": "y"
+    },
+    "sphereblocks": {
+      "glass": "Z",
+      "border": "9",
+      "inner": "b"
+    },
+    "buildings": [
+      {
+        "factor": 0.3,
+        "building": "building1"
+      },
+      {
+        "factor": 0.4,
+        "building": "building2"
+      },
+      {
+        "factor": 0.2,
+        "building": "building3"
+      },
+      {
+        "factor": 0.2,
+        "building": "building4"
+      },
+      {
+        "factor": 0.3,
+        "building": "building5"
+      }
+    ],
+    "multibuildings": [
+    ],
+    "bridges": [
+      {
+        "factor": 1.0,
+        "bridge": "bridge_open"
+      },
+      {
+        "factor": 1.0,
+        "bridge": "bridge_covered"
+      }
+    ],
+    "fronts": [
+      {
+        "factor": 1.0,
+        "front": "building_front1"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front2"
+      },
+      {
+        "factor": 1.0,
+        "front": "building_front3"
+      }
+    ],
+    "stairs": [
+      {
+        "factor": 1.0,
+        "stair": "stairs1"
+      },
+      {
+        "factor": 1.0,
+        "stair": "stairs2"
+      },
+      {
+        "factor": 1.0,
+        "stair": "stairsnormal"
+      },
+      {
+        "factor": 1.0,
+        "stair": "stairsbig"
+      }
+    ],
+    "fountains": [
+      {
+        "factor": 1.0,
+        "fountain": "fountain1"
+      },
+      {
+        "factor": 1.0,
+        "fountain": "fountain2"
+      },
+      {
+        "factor": 1.0,
+        "fountain": "fountain3"
+      }
+    ],
+    "parks": [
+      {
+        "factor": 1.0,
+        "park": "park_pool"
+      },
+      {
+        "factor": 1.0,
+        "park": "park_plants"
+      },
+      {
+        "factor": 1.0,
+        "park": "park_trees"
+      },
+      {
+        "factor": 1.0,
+        "park": "park_plants_pillars"
+      },
+      {
+        "factor": 0.8,
+        "park": "park_fountain1"
+      },
+      {
+        "factor": 0.8,
+        "park": "park_fountain2"
+      },
+      {
+        "factor": 0.3,
+        "park": "park_building"
+      },
+      {
+        "factor": 0.3,
+        "park": "park_building2"
+      }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "dungeon": "rail_dungeon2"
+      }
+    ]
   },
-  {
-    "type": "citystyle",
-    "name": "citystyle_chisel_standard",
-    "style": "standard_chisel",
-    "inherit": "citystyle_common"
-  },
+
 
   {
     "type": "part",
