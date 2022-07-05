@@ -16,6 +16,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkSource;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
@@ -105,5 +106,11 @@ public class DefaultDimensionInfo implements IDimensionInfo {
             return biomeProvider.getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2, generator.climateSampler());
         }
         return biomeRegistry.getHolderOrThrow(Biomes.PLAINS);
+    }
+
+    @Nullable
+    @Override
+    public ResourceKey<Level> dimension() {
+        return world.getLevel().dimension();
     }
 }

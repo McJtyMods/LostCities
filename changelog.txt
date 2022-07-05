@@ -1,3 +1,6 @@
+Upcoming:
+- Various improvements to the configuration GUI. The preview is now larger too
+
 1.18-5.2.6:
 - New system to control city rarity based on perlin maps. If the cityChance setting is -1 then cityPerlinScale and cityPerlinOffset will be used for a more natural city style
 - New 'cityStyleThreshold' and 'cityStyleAlternative' that can be used to select another city style for low city thresholds

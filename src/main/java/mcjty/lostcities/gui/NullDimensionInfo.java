@@ -21,57 +21,68 @@ import java.util.Random;
 
 public class NullDimensionInfo implements IDimensionInfo {
 
+    public static final int PREVIEW_WIDTH = 62;
+    public static final int PREVIEW_HEIGHT = 58;
+
     private final String[] biomeMap = new String[] {
-            "ddddddddddddddddddddddppppppppppppppp==ppppppppppp",
-            "ddddddddddddddddddddpppppppppppppppp==pppppppppppp",
-            "ddddddddddddddddddddpppppppppppppp===ppppppppppppp",
-            "pddddddddddddddddpppppppppppppppppp==ppppppppppppp",
-            "pppdddddddppppppppppppppppppppppppp==ppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppp==pppppppppp--",
-            "ppppppppppppppppppppppppppppppppppppp==ppppppp----",
-            "pppppppppppppppppppppppppppppppppppppp==ppppp-----",
-            "pppppppppppppppppppppppppppppppppppppp===pppp-----",
-            "ppppppppppppppppppppppppppppppppppppppp===ppppp---",
-            "pppppppppppppppppppppppppppppppppppppppp==--pp----",
-            "pppppppppppppppppppppppppppppppppppppppp*---------",
-            "pppppppppppppppppppppppppppppppppppppp****--------",
-            "ppppppppppppppppppppppppppppppppppppp***----------",
-            "pppppppppppppppppppppppppppppppppppp**------------",
-            "ppppppppppppppppppppppppppppppppppppp**-----------",
-            "ppppppppppppppppppppppppppppppppppppppp*----------",
-            "pppppppppppppppppppppppppppppppppppppp**----------",
-            "ppppp###pppppppppppppppppppppppppppppp**----------",
-            "ppppp####ppppppp#####pppppppppppppppppp*----------",
-            "pppppp#####pp##+++#####ppppppppppppp*****---------",
-            "pppppppp#####++++####pppppppppppppp**------pp----p",
-            "ppppppppp##++++++###pppppppppppppppp***---pppp--pp",
-            "ppppppppp###+++++++#####ppppppppppppp---pppppppppp",
-            "pppppppp##p##+++++++###ppppppppppppppppppppppppppp",
-            "pppppppppp#####++++####ppppppppppppppppppppppppppp",
-            "pppppppppppp###+++++###ppppppppppppppppppppppppppp",
-            "ppppppppppppp####++++####ppppppppppppppppppppppppp",
-            "pppppppppppppp####++######pppppppppppppppppppppppp",
-            "ppppppppppppppp#+++####ppppppppppppppppppppppppppp",
-            "ppppppppppppp####pp#####pppppppppppppppppppppppppp",
-            "pppppppppp#####ppppppppppppppppppppppppppppppppppp",
-            "ppppppppppp###pppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp",
-            "pppppppppppppppppppppppppppppppppppppppppppppppppp"
+            "ddddddddddddddddddddddppppppppppppppp==ppppppppppppppppppppppp",
+            "ddddddddddddddddddddpppppppppppppppp==pppppppppppppppppppppppp",
+            "ddddddddddddddddddddpppppppppppppp===ppppppppppppppppppppppppp",
+            "pddddddddddddddddpppppppppppppppppp==ppppppppppppppppppppppppp",
+            "pppdddddddppppppppppppppppppppppppp==ppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppp==pppppppppp----------pppp",
+            "ppppppppppppppppppppppppppppppppppppp==ppppppp--------------pp",
+            "pppppppppppppppppppppppppppppppppppppp==ppppp-----------------",
+            "pppppppppppppppppppppppppppppppppppppp===pppp-----------------",
+            "ppppppppppppppppppppppppppppppppppppppp===ppppp---------------",
+            "pppppppppppppppppppppppppppppppppppppppp==--pp----------------",
+            "pppppppppppppppppppppppppppppppppppppppp*---------------------",
+            "pppppppppppppppppppppppppppppppppppppp****--------------------",
+            "ppppppppppppppppppppppppppppppppppppp***----------------------",
+            "pppppppppppppppppppppppppppppppppppp**------------------------",
+            "ppppppppppppppppppppppppppppppppppppp**-----------------------",
+            "ppppppppppppppppppppppppppppppppppppppp*----------------------",
+            "pppppppppppppppppppppppppppppppppppppp**----------------------",
+            "ppppp###pppppppppppppppppppppppppppppp**----------------------",
+            "ppppp####ppppppp#####pppppppppppppppppp*----------------------",
+            "pppppp#####pp##+++#####ppppppppppppp*****---------------------",
+            "pppppppp#####++++####pppppppppppppp**------pp----p------------",
+            "ppppppppp##++++++###pppppppppppppppp***---pppp--ppp-----------",
+            "ppppppppp###+++++++#####ppppppppppppp---pppppppppppp---------p",
+            "pppppppp##p##+++++++###ppppppppppppppppppppppppppppp---------p",
+            "pppppppppp#####++++####ppppppppppppppppppppppppppppppppp----pp",
+            "pppppppppppp###+++++###ppppppppppppppppppppppppppppppppppppppp",
+            "ppppppppppppp####++++####ppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppp####++######pppppppppppppppppppppppppppppppppppp",
+            "ppppppppppppppp#+++####ppppppppppppppppppppppppppppppppppppppp",
+            "ppppppppppppp####pp#####pppppppppppppppppppppppppppppppppppppp",
+            "pppppppppp#####ppppppppppppppppppppppppppppppppppppppppppppppp",
+            "ppppppppppp###pppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp",
+            "pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp"
     };
 
     private final LostCityProfile profile;
@@ -159,7 +170,7 @@ public class NullDimensionInfo implements IDimensionInfo {
     }
 
     public char getBiomeChar(int chunkX, int chunkZ) {
-        if (chunkX >= 0 && chunkX < 50 && chunkZ >= 0 && chunkZ < 50) {
+        if (chunkX >= 0 && chunkX < PREVIEW_WIDTH && chunkZ >= 0 && chunkZ < PREVIEW_HEIGHT) {
             return biomeMap[chunkZ].charAt(chunkX);
         } else {
             return 'p';
@@ -203,5 +214,10 @@ public class NullDimensionInfo implements IDimensionInfo {
             default -> Biomes.PLAINS;
         };
         return biomeRegistry.getHolderOrThrow(biome);
+    }
+
+    @Override
+    public ResourceKey<Level> dimension() {
+        return null;
     }
 }

@@ -47,6 +47,7 @@ public class GuiLCConfig extends Screen {
     private final List<GuiElement> elements = new ArrayList<>();
     private DoubleElement perlinScaleElement;
     private DoubleElement perlinOffsetElement;
+    private DoubleElement perlinInnerScaleElement;
 
     private final LostCitySetup localSetup = new LostCitySetup(this::refreshPreview);
 
@@ -182,6 +183,9 @@ public class GuiLCConfig extends Screen {
 
     private void initBuildings(int left) {
         start("Buildings");
+        addFloat(left,"lostcity.buildingChance").label("Buildings:"); nl();
+        addFloat(left,"lostcity.building2x2Chance").label("Buildings 2x2:"); nl();
+        nl();
         addInt(left, "lostcity.buildingMinFloors").label("Floors:");
         addInt(left + 55, "lostcity.buildingMaxFloors");
         nl();
@@ -206,14 +210,13 @@ public class GuiLCConfig extends Screen {
         addDouble(left,120, "cities.cityChance").label("Rarity:"); nl();
         perlinScaleElement = addDouble(left,45, "cities.cityPerlinScale").label("Scale/Offset:");
         perlinOffsetElement = addDouble(left + 55,45, "cities.cityPerlinOffset"); nl();
+        perlinInnerScaleElement = addDouble(left,45, "cities.cityPerlinInnerScale").label("Inner scale"); nl();
         addFloat(left,"cities.cityThreshold").label("Threshold:"); nl();
 
         addInt(left,"cities.cityMinRadius").label("Radius:");
         addInt(left + 55, "cities.cityMaxRadius");
         nl();
 
-        addFloat(left,"lostcity.buildingChance").label("Buildings:"); nl();
-        addFloat(left,"lostcity.building2x2Chance").label("Buildings 2x2:"); nl();
         addFloat(left,"lostcity.parkChance").label("Parks:"); nl();
         addFloat(left,"lostcity.fountainChance").label("Fountains:"); nl();
     }
@@ -272,10 +275,10 @@ public class GuiLCConfig extends Screen {
     private void renderPreviewTransports(PoseStack stack, LostCityProfile profile) {
         renderPreviewMap(stack, profile, true);
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
-        for (int z = 0; z < 50; z++) {
-            for (int x = 0; x < 50; x++) {
-                int sx = x * 3 + this.width - 160;
-                int sz = z * 3 + 50;
+        for (int z = 0; z < NullDimensionInfo.PREVIEW_HEIGHT; z++) {
+            for (int x = 0; x < NullDimensionInfo.PREVIEW_WIDTH; x++) {
+                int sx = x * 3 + this.width - 190;
+                int sz = z * 3 + 32;
                 int color = 0;
                 Railway.RailChunkInfo type = Railway.getRailChunkType(x, z, diminfo, profile);
                 if (type.getType() != RailChunkType.NONE) {
@@ -393,10 +396,10 @@ public class GuiLCConfig extends Screen {
 
     private void renderPreviewMap(PoseStack stack, LostCityProfile profile, boolean soft) {
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
-        for (int z = 0; z < 50; z++) {
-            for (int x = 0; x < 50; x++) {
-                int sx = x * 3 + this.width - 160;
-                int sz = z * 3 + 50;
+        for (int z = 0; z < NullDimensionInfo.PREVIEW_HEIGHT; z++) {
+            for (int x = 0; x < NullDimensionInfo.PREVIEW_WIDTH; x++) {
+                int sx = x * 3 + this.width - 190;
+                int sz = z * 3 + 32;
                 char b = diminfo.getBiomeChar(x, z);
                 int color = switch (b) {
                     case 'p' -> 0x005500;

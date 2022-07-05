@@ -2,7 +2,6 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
-import mcjty.lostcities.varia.PerlinNoiseGenerator14;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
@@ -229,15 +228,8 @@ public class City {
 
         float factor = 0;
         if (profile.CITY_CHANCE < 0) {
-            WorldGenLevel world = provider.getWorld();
-            CityRarityMap rarityMap;
-            if (world == null) {
-                rarityMap = getCityRarityMap(null, 123456789,
-                        profile.CITY_PERLIN_SCALE, profile.CITY_PERLIN_OFFSET, profile.CITY_PERLIN_INNERSCALE);
-            } else {
-                rarityMap = getCityRarityMap(world.getLevel().dimension(), world.getSeed(),
-                        profile.CITY_PERLIN_SCALE, profile.CITY_PERLIN_OFFSET, profile.CITY_PERLIN_INNERSCALE);
-            }
+            CityRarityMap rarityMap = getCityRarityMap(provider.dimension(), provider.getSeed(),
+                    profile.CITY_PERLIN_SCALE, profile.CITY_PERLIN_OFFSET, profile.CITY_PERLIN_INNERSCALE);
             return rarityMap.getCityFactor(chunkX, chunkZ);
         } else {
             int offset = (profile.CITY_MAXRADIUS + 15) / 16;

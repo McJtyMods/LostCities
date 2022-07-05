@@ -9,6 +9,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
+import javax.annotation.Nullable;
 import java.util.Random;
 
 public interface IDimensionInfo {
@@ -35,4 +36,7 @@ public interface IDimensionInfo {
 //    Biome[] getBiomes(int chunkX, int chunkZ);
 
     Holder<Biome> getBiome(BlockPos pos);
+
+    @Nullable
+    ResourceKey<Level> dimension();
 }
