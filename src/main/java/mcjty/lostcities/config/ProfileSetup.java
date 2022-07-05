@@ -374,7 +374,6 @@ public class ProfileSetup {
         profile.CITY_STYLE_ALTERNATIVE = "citystyle_border";
         profile.BUILDING_MAXFLOORS = 9;
         profile.BUILDING_MAXFLOORS_CHANCE = 7;
-        profile.FORCE_SPAWN_IN_BUILDING = true;
         profile.BUILDING_CHANCE = .4f;
         standardProfiles.put(profile.getName(), profile);
     }
