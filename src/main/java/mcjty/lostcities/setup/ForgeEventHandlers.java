@@ -1,12 +1,18 @@
 package mcjty.lostcities.setup;
 
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.commands.ModCommands;
+import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.GlobalTodo;
+import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.*;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
+import mcjty.lostcities.worldgen.lost.cityassets.PredefinedSphere;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -15,20 +21,28 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.AbstractSkullBlock;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import javax.annotation.Nonnull;
+import java.util.Random;
+import java.util.function.Predicate;
 
 public class ForgeEventHandlers {
 
@@ -59,142 +73,142 @@ public class ForgeEventHandlers {
         CitySphere.cleanCache();
     }
 
-//    @SubscribeEvent
-//    public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
-//        IWorld world = event.getWorld();
-//        if (!world.isRemote()) {
-//            if (!WorldTypeTools.isLostCities(world)) {
-//                return;
-//            }
-//
-//            LostCityProfile profile = WorldTypeTools.getProfile(world);
-//            if (profile == null) {
-//                return;
-//            }
-//
-//            LostCityChunkGenerator provider = WorldTypeTools.getLostCityChunkGenerator(world.getWorld());
-//
-//            Predicate<BlockPos> isSuitable = pos -> true;
-//            boolean needsCheck = false;
-//
-//            if (!profile.SPAWN_BIOME.isEmpty()) {
-//                final Biome spawnBiome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(profile.SPAWN_BIOME));
-//                if (spawnBiome == null) {
-//                    LostCities.setup.getLogger().error("Cannot find biome '" + profile.SPAWN_BIOME + "' for the player to spawn in !");
-//                } else {
-//                    isSuitable = blockPos -> world.getBiome(blockPos) == spawnBiome;
-//                    needsCheck = true;
-//                }
-//            } else if (!profile.SPAWN_CITY.isEmpty()) {
-//                final PredefinedCity city = AssetRegistries.PREDEFINED_CITIES.get(profile.SPAWN_CITY);
-//                if (city == null) {
-//                    LostCities.setup.getLogger().error("Cannot find city '" + profile.SPAWN_CITY + "' for the player to spawn in !");
-//                } else {
-//                    float sqradius = getSqRadius(city.getRadius(), 0.8f);
-//                    isSuitable = blockPos -> city.getDimension() == world.getWorld().getDimension().getType() &&
-//                            CitySphere.squaredDistance(city.getChunkX()*16+8, city.getChunkZ()*16+8, blockPos.getX(), blockPos.getZ()) < sqradius;
-//                    needsCheck = true;
-//                }
-//            } else if (!profile.SPAWN_SPHERE.isEmpty()) {
-//                if ("<in>".equals(profile.SPAWN_SPHERE)) {
-//                    isSuitable = blockPos -> {
-//                        CitySphere sphere = CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, provider);
-//                        if (!sphere.isEnabled()) {
-//                            return false;
-//                        }
-//                        float sqradius = getSqRadius((int) sphere.getRadius(), 0.8f);
-//                        return sphere.getCenterPos().distanceSq(blockPos) < sqradius;
-//                    };
-//                    needsCheck = true;
-//                } else if ("<out>".equals(profile.SPAWN_SPHERE)) {
-//                    isSuitable = blockPos -> {
-//                        CitySphere sphere = CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, provider);
-//                        if (!sphere.isEnabled()) {
-//                            return true;
-//                        }
-//                        float sqradius = sphere.getRadius() * sphere.getRadius();
-//                        return sphere.getCenterPos().distanceSq(new BlockPos(blockPos.getX(), sphere.getCenterPos().getY(), blockPos.getZ())) > sqradius;
-//                    };
-//                    needsCheck = true;
-//                } else {
-//                    final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(profile.SPAWN_SPHERE);
-//                    if (sphere == null) {
-//                        LostCities.setup.getLogger().error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
-//                    } else {
-//                        float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
-//                        isSuitable = blockPos -> sphere.getDimension() == world.getDimension().getType() &&
-//                                CitySphere.squaredDistance(sphere.getChunkX() * 16 + 8, sphere.getChunkZ() * 16 + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
-//                        needsCheck = true;
-//                    }
-//                }
-//            }
-//
-//            if (profile.SPAWN_NOT_IN_BUILDING) {
-//                isSuitable = isSuitable.and(blockPos -> isOutsideBuilding(provider, blockPos));
-//                needsCheck = true;
-//            }
-//
-//            // Potentially set the spawn point
-//            switch (profile.LANDSCAPE_TYPE) {
-//                case DEFAULT:
-//                case CAVERN:
-//                    if (needsCheck) {
-//                        findSafeSpawnPoint(world.getWorld(), provider, isSuitable);
-//                        event.setCanceled(true);
-//                    }
-//                    break;
-//                case FLOATING:
-//                case SPACE:
-//                    findSafeSpawnPoint(world.getWorld(), provider, isSuitable);
-//                    event.setCanceled(true);
-//                    break;
-//            }
-//        }
-//    }
-//
-//    private boolean isOutsideBuilding(LostCityChunkGenerator provider, BlockPos pos) {
-//        BuildingInfo info = BuildingInfo.getBuildingInfo(pos.getX() >> 4, pos.getZ() >> 4, provider);
-//        return !(info.isCity() && info.hasBuilding);
-//    }
-//
-//    private int getSqRadius(int radius, float pct) {
-//        return (int) ((radius * pct) * (radius * pct));
-//    }
-//
-//    private void findSafeSpawnPoint(World world, LostCityChunkGenerator provider, @Nonnull Predicate<BlockPos> isSuitable) {
-//        Random rand = new Random(world.getSeed());
-//        rand.nextFloat();
-//        rand.nextFloat();
-//        int radius = 200;
-//        int attempts = 0;
-////        int bottom = world.getWorldType().getMinimumSpawnHeight(world);
-//        while (true) {
-//            for (int i = 0 ; i < 200 ; i++) {
-//                int x = rand.nextInt(radius * 2) - radius;
-//                int z = rand.nextInt(radius * 2) - radius;
-//                attempts++;
-//
-//                if (!isSuitable.test(new BlockPos(x, 128, z))) {
-//                    continue;
-//                }
-//
-//                LostCityProfile profile = BuildingInfo.getProfile(x >> 4, z >> 4, provider);
-//
-//                for (int y = profile.GROUNDLEVEL-5 ; y < 125 ; y++) {
-//                    BlockPos pos = new BlockPos(x, y, z);
-//                    if (isValidStandingPosition(world, pos)) {
-//                        world.setSpawnPoint(pos.up());
-//                        return;
-//                    }
-//                }
-//            }
-//            radius += 100;
-//            if (attempts > 10000) {
-//                LostCities.setup.getLogger().error("Can't find a valid spawn position!");
-//                throw new RuntimeException("Can't find a valid spawn position!");
-//            }
-//        }
-//    }
+    @SubscribeEvent
+    public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
+        LevelAccessor world = event.getWorld();
+        if (world instanceof ServerLevel serverLevel) {
+            IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(serverLevel);
+            if (dimensionInfo == null) {
+                return;
+            }
+            LostCityProfile profile = dimensionInfo.getProfile();
+
+            Predicate<BlockPos> isSuitable = pos -> true;
+            boolean needsCheck = false;
+
+            if (!profile.SPAWN_BIOME.isEmpty()) {
+                final Biome spawnBiome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(profile.SPAWN_BIOME));
+                if (spawnBiome == null) {
+                    LostCities.setup.getLogger().error("Cannot find biome '" + profile.SPAWN_BIOME + "' for the player to spawn in !");
+                } else {
+                    isSuitable = blockPos -> world.getBiome(blockPos).value() == spawnBiome;
+                    needsCheck = true;
+                }
+            } else if (!profile.SPAWN_CITY.isEmpty()) {
+                final PredefinedCity city = AssetRegistries.PREDEFINED_CITIES.get(profile.SPAWN_CITY);
+                if (city == null) {
+                    LostCities.setup.getLogger().error("Cannot find city '" + profile.SPAWN_CITY + "' for the player to spawn in !");
+                } else {
+                    float sqradius = getSqRadius(city.getRadius(), 0.8f);
+                    isSuitable = blockPos -> city.getDimension() == serverLevel.dimension() &&
+                            CitySphere.squaredDistance(city.getChunkX()*16+8, city.getChunkZ()*16+8, blockPos.getX(), blockPos.getZ()) < sqradius;
+                    needsCheck = true;
+                }
+            } else if (!profile.SPAWN_SPHERE.isEmpty()) {
+                if ("<in>".equals(profile.SPAWN_SPHERE)) {
+                    isSuitable = blockPos -> {
+                        CitySphere sphere = CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, dimensionInfo);
+                        if (!sphere.isEnabled()) {
+                            return false;
+                        }
+                        float sqradius = getSqRadius((int) sphere.getRadius(), 0.8f);
+                        return sphere.getCenterPos().distSqr(blockPos) < sqradius;
+                    };
+                    needsCheck = true;
+                } else if ("<out>".equals(profile.SPAWN_SPHERE)) {
+                    isSuitable = blockPos -> {
+                        CitySphere sphere = CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, dimensionInfo);
+                        if (!sphere.isEnabled()) {
+                            return true;
+                        }
+                        float sqradius = sphere.getRadius() * sphere.getRadius();
+                        return sphere.getCenterPos().distSqr(new BlockPos(blockPos.getX(), sphere.getCenterPos().getY(), blockPos.getZ())) > sqradius;
+                    };
+                    needsCheck = true;
+                } else {
+                    final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(profile.SPAWN_SPHERE);
+                    if (sphere == null) {
+                        LostCities.setup.getLogger().error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
+                    } else {
+                        float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
+                        isSuitable = blockPos -> sphere.getDimension() == serverLevel.dimension() &&
+                                CitySphere.squaredDistance(sphere.getChunkX() * 16 + 8, sphere.getChunkZ() * 16 + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
+                        needsCheck = true;
+                    }
+                }
+            }
+
+            if (profile.SPAWN_NOT_IN_BUILDING) {
+                isSuitable = isSuitable.and(blockPos -> isOutsideBuilding(dimensionInfo, blockPos));
+                needsCheck = true;
+            } else if (profile.FORCE_SPAWN_IN_BUILDING) {
+                isSuitable = isSuitable.and(blockPos -> !isOutsideBuilding(dimensionInfo, blockPos));
+                needsCheck = true;
+            }
+
+            // Potentially set the spawn point
+            switch (profile.LANDSCAPE_TYPE) {
+                case DEFAULT:
+                case CAVERN:
+                    if (needsCheck) {
+                        findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                        event.setCanceled(true);
+                    }
+                    break;
+                case FLOATING:
+                case SPACE:
+                    findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                    event.setCanceled(true);
+                    break;
+            }
+        }
+    }
+
+    private boolean isOutsideBuilding(IDimensionInfo provider, BlockPos pos) {
+        BuildingInfo info = BuildingInfo.getBuildingInfo(pos.getX() >> 4, pos.getZ() >> 4, provider);
+        return !(info.isCity() && info.hasBuilding);
+    }
+
+    private int getSqRadius(int radius, float pct) {
+        return (int) ((radius * pct) * (radius * pct));
+    }
+
+    private void findSafeSpawnPoint(Level world, IDimensionInfo provider, @Nonnull Predicate<BlockPos> isSuitable,
+                                    @Nonnull ServerLevelData serverLevelData) {
+        Random rand = new Random(provider.getSeed());
+        rand.nextFloat();
+        rand.nextFloat();
+        int radius = 200;
+        int attempts = 0;
+//        int bottom = world.getWorldType().getMinimumSpawnHeight(world);
+        while (true) {
+            for (int i = 0 ; i < 200 ; i++) {
+                int x = rand.nextInt(radius * 2) - radius;
+                int z = rand.nextInt(radius * 2) - radius;
+                attempts++;
+
+                if (!isSuitable.test(new BlockPos(x, 128, z))) {
+                    continue;
+                }
+
+                LostCityProfile profile = BuildingInfo.getProfile(x >> 4, z >> 4, provider);
+
+                for (int y = profile.GROUNDLEVEL-5 ; y < 125 ; y++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    if (isValidStandingPosition(world, pos)) {
+                        serverLevelData.setSpawn(pos.above(), 0.0f);
+//                        ((ServerLevel)world).setDefaultSpawnPos(pos.above(), 0.0f);
+                        return;
+                    }
+                }
+            }
+            radius += 100;
+            if (attempts > 10000) {
+                LostCities.setup.getLogger().error("Can't find a valid spawn position!");
+                throw new RuntimeException("Can't find a valid spawn position!");
+            }
+        }
+    }
 
     private boolean isValidStandingPosition(Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);

@@ -1,7 +1,7 @@
 package mcjty.lostcities.worldgen;
 
-import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
 import net.minecraft.core.Holder;

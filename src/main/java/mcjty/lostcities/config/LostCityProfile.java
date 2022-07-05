@@ -179,6 +179,7 @@ public class LostCityProfile implements ILostCityProfile {
     public String SPAWN_CITY = "";
     public String SPAWN_SPHERE = "";
     public boolean SPAWN_NOT_IN_BUILDING = false;
+    public boolean FORCE_SPAWN_IN_BUILDING = false;
 
     public LandscapeType LANDSCAPE_TYPE = LandscapeType.DEFAULT;
 
@@ -280,6 +281,7 @@ public class LostCityProfile implements ILostCityProfile {
         SPAWN_CITY = cfg.getString("spawnCity", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_CITY, "When this is set the player will always spawn in the given predefined city");
         SPAWN_SPHERE = cfg.getString("spawnSphere", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_SPHERE, "When this is set the player will always spawn in the given predefined sphere. If you use <in> the player will always spawn in a random sphere. If you use <out> the player will always spawn outside a sphere");
         SPAWN_NOT_IN_BUILDING = cfg.getBoolean("spawnNotInBuilding", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_NOT_IN_BUILDING, "If this is true the player will not spawn in a building. This can be used in combination with the other spawn settings");
+        FORCE_SPAWN_IN_BUILDING = cfg.getBoolean("forceSpawnInBuilding", LostCityProfile.CATEGORY_LOSTCITY, FORCE_SPAWN_IN_BUILDING, "If this is true the player will spawn in a building. This can be used in combination with the other spawn settings");
 
         TERRAIN_FIX_LOWER_MIN_OFFSET = cfg.getInt("terrainFixLowerMinOffset", LostCityProfile.CATEGORY_LOSTCITY, TERRAIN_FIX_LOWER_MIN_OFFSET, -40, 40, "To fix terrain adjacent to cities, this is the minimum offset (relative to city base level) for the lower mesh used to potentially raise the terrain");
         TERRAIN_FIX_LOWER_MAX_OFFSET = cfg.getInt("terrainFixLowerMaxOffset", LostCityProfile.CATEGORY_LOSTCITY, TERRAIN_FIX_LOWER_MAX_OFFSET, -40, 40, "To fix terrain adjacent to cities, this is the maximum offset (relative to city base level) for the lower mesh used to potentially raise the terrain");

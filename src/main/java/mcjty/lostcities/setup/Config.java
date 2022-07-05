@@ -30,7 +30,7 @@ public class Config {
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
     };
-    public final static ForgeConfigSpec.ConfigValue<List<? extends String>> ASSETS;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ASSETS;
 
     public static final String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
             "minecraft:glowstone",
