@@ -5,8 +5,8 @@ import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.NoiseGeneratorPerlin;
@@ -177,7 +177,7 @@ public class LostCityTerrainFeature {
     public static Set<BlockState> getStatesNeedingLightingUpdate() {
         if (statesNeedingLightingUpdate == null) {
             statesNeedingLightingUpdate = new HashSet<>();
-            for (String s : LostCityConfiguration.BLOCKS_REQUIRING_LIGHTING_UPDATES) {
+            for (String s : Config.BLOCKS_REQUIRING_LIGHTING_UPDATES) {
                 Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(s));
                 if (block != null) {
                     addStates(block, statesNeedingLightingUpdate);
@@ -2095,7 +2095,7 @@ public class LostCityTerrainFeature {
             BaseSpawner logic = spawner.getSpawner();
             logic.setEntityId(ForgeRegistries.ENTITIES.getValue(randomEntity));
             spawner.setChanged();
-            if (LostCityConfiguration.DEBUG) {
+            if (Config.DEBUG) {
                 ModSetup.getLogger().debug("generateLootSpawners: mob=" + randomEntity.toString() + " pos=" + pos);
             }
         } else if (tileentity != null) {

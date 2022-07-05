@@ -1,12 +1,10 @@
 package mcjty.lostcities.worldgen;
 
-import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.WorldGenRegion;
@@ -93,7 +91,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
         String profileName = Config.getProfileForDimension(type);
         if (profileName != null) {
             if (!dimensionInfo.containsKey(type)) {
-                LostCityProfile profile = LostCityConfiguration.standardProfiles.get(profileName);
+                LostCityProfile profile = ProfileSetup.standardProfiles.get(profileName);
                 IDimensionInfo diminfo = new DefaultDimensionInfo(world, profile);
                 dimensionInfo.put(type, diminfo);
             }

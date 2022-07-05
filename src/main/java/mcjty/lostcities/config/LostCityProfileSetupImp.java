@@ -7,13 +7,13 @@ public class LostCityProfileSetupImp implements ILostCityProfileSetup {
 
     @Override
     public ILostCityProfile createProfile(String name, String baseProfile) {
-        LostCityProfile lcp = LostCityConfiguration.standardProfiles.get(baseProfile);
+        LostCityProfile lcp = ProfileSetup.standardProfiles.get(baseProfile);
         if (lcp == null) {
             throw new RuntimeException("Unknown base profile '" + baseProfile + "'!");
         }
         LostCityProfile profile = new LostCityProfile(name, true);
         profile.copyFrom(lcp);
-        LostCityConfiguration.standardProfiles.put(profile.getName(), profile);
+        ProfileSetup.standardProfiles.put(profile.getName(), profile);
         return profile;
     }
 }

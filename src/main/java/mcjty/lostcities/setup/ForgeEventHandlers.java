@@ -1,7 +1,6 @@
 package mcjty.lostcities.setup;
 
 import mcjty.lostcities.commands.ModCommands;
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
@@ -212,7 +211,7 @@ public class ForgeEventHandlers {
         Direction direction = Blocks.BLACK_BED.getBedDirection(state, world, pos);
         Block b1 = world.getBlockState(pos.below()).getBlock();
         Block b2 = world.getBlockState(pos.relative(direction.getOpposite()).below()).getBlock();
-        Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LostCityConfiguration.SPECIAL_BED_BLOCK.get()));
+        Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(Config.SPECIAL_BED_BLOCK.get()));
         if (b1 != b || b2 != b) {
             return false;
         }

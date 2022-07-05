@@ -2,11 +2,11 @@ package mcjty.lostcities.setup;
 
 import com.google.common.collect.Lists;
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.config.LostCityProfile;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 public class Config {
 
     public static final String CATEGORY_PROFILES = "profiles";
-
+    public static final String CATEGORY_GENERAL = "general";
 
     public static final String[] DEFAULT_ASSETS = new String[] {
             "/assets/lostcities/citydata/conditions.json",
@@ -32,6 +32,15 @@ public class Config {
     };
     public final static ForgeConfigSpec.ConfigValue<List<? extends String>> ASSETS;
 
+    public static final String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
+            "minecraft:glowstone",
+            "minecraft:redstone_torch",
+            "minecraft:lit_pumpkin",
+            "minecraft:magma"
+    };
+    public static final boolean DEBUG = false;
+
+    public static ForgeConfigSpec.ConfigValue<String> SPECIAL_BED_BLOCK;// = "minecraft:diamond_block";
 
     private static final String[] DEFAULT_DIMENSION_PROFILES = new String[] {
             "lostcities:lostcity=default"
@@ -69,7 +78,7 @@ public class Config {
                 } else {
                     ResourceKey<Level> dimensionType = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(split[0]));
                     String profileName = split[1];
-                    LostCityProfile profile = LostCityConfiguration.standardProfiles.get(profileName);
+                    LostCityProfile profile = ProfileSetup.standardProfiles.get(profileName);
                     if (profile != null) {
                         dimensionProfileCache.put(dimensionType, profileName);
                     } else {
@@ -97,16 +106,16 @@ public class Config {
                 String json = Config.SELECTED_CUSTOM_JSON.get();
                 if (json != null && !json.isEmpty()) {
                     LostCityProfile profile = new LostCityProfile("customized", json);
-                    if (!LostCityConfiguration.standardProfiles.containsKey("customized")) {
-                        LostCityConfiguration.standardProfiles.put("customized", new LostCityProfile("customized", false));
+                    if (!ProfileSetup.standardProfiles.containsKey("customized")) {
+                        ProfileSetup.standardProfiles.put("customized", new LostCityProfile("customized", false));
                     }
-                    LostCityConfiguration.standardProfiles.get("customized").copyFrom(profile);
+                    ProfileSetup.standardProfiles.get("customized").copyFrom(profile);
                 }
             }
 
             String profile = getProfileForDimension(Level.OVERWORLD);
             if (profile != null && !profile.isEmpty()) {
-                if (LostCityConfiguration.standardProfiles.get(profile).GENERATE_NETHER) {
+                if (ProfileSetup.standardProfiles.get(profile).GENERATE_NETHER) {
                     dimensionProfileCache.put(Level.NETHER, "cavern");
                 }
             }
@@ -119,9 +128,6 @@ public class Config {
     private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
 
     static {
-
-        LostCityConfiguration.init(SERVER_BUILDER);
-
         COMMON_BUILDER.comment("General settings").push(CATEGORY_PROFILES);
         CLIENT_BUILDER.comment("General settings").push(CATEGORY_PROFILES);
         SERVER_BUILDER.comment("General settings").push(CATEGORY_PROFILES);
@@ -129,6 +135,10 @@ public class Config {
         DIMENSION_PROFILES = COMMON_BUILDER
                 .comment("A list of dimensions with associated city generation profiles (format <dimensionid>=<profilename>")
                 .defineList("dimensionsWithProfiles", Lists.newArrayList(Config.DEFAULT_DIMENSION_PROFILES), s -> s instanceof String);
+
+        SPECIAL_BED_BLOCK = SERVER_BUILDER
+                .comment("Block to put underneath a bed so that it qualifies as a teleporter bed")
+                .define("specialBedBlock", "minecraft:diamond_block");
 
         ASSETS = COMMON_BUILDER
                 .comment("A list of assets that Lost Cities will use to load city data. Paths starting with '/' are relative to the Lost City resource pack. Paths starting with '$' are relative to the main config directory")
@@ -149,4 +159,5 @@ public class Config {
     public static final ForgeConfigSpec COMMON_CONFIG;
     public static final ForgeConfigSpec CLIENT_CONFIG;
     public static final ForgeConfigSpec SERVER_CONFIG;
+
 }

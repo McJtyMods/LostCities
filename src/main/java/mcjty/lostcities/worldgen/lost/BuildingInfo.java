@@ -934,8 +934,6 @@ public class BuildingInfo implements ILostChunkInfo {
      * not use the cache so it is safe to use when the cache is building
      */
     public static boolean isVoidChunk(int chunkX, int chunkZ, IDimensionInfo provider) {
-//        if (provider.otherGenerator != null) {
-//            return false;   // @todo Not supported yet
         if (provider.getProfile().isFloating()) {
             if (provider.getHeightmap(chunkX, chunkZ).getHeight(8, 8) <= 0) {
                 return true;
@@ -960,9 +958,6 @@ public class BuildingInfo implements ILostChunkInfo {
      * This function does not use the cache. So safe to use when the cache is building
      */
     public static int getCityLevel(int chunkX, int chunkZ, IDimensionInfo provider) {
-//        if (provider.otherGenerator != null) {
-//            int height = provider.otherGenerator.getHeight(chunkX, chunkZ, 8, 8);
-//            return getLevelBasedOnHeight(height, provider.getProfile());
         if (provider.getProfile().isSpace()) {
             return getCityLevelSpace(chunkX, chunkZ, provider);
         } else if (provider.getProfile().isFloating()) {
@@ -1003,29 +998,6 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static int getCityLevelNormal(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        // OLD METHOD:
-//        Biome[] biomes = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getBiomes();
-//        float h = 0.0f;
-//        for (Biome biome : biomes) {
-//            h += biome.getDepth();
-//        }
-//        h /= biomes.length;
-//
-//        int height = 0;
-//
-//        if (h < 0.15f) {
-//            height = 70;
-//        } else if (h < 0.4f) {
-//            height = 79;
-//        } else if (h < 0.7f) {
-//            height = 88;
-//        } else if (h < 1.3) {
-//            height = 95;
-//        } else {
-//            height = 100;
-//        }
-//        int level1 = getLevelBasedOnHeight(height, profile);
-
         ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
         int height = heightmap.getAverageHeight();
         return getLevelBasedOnHeight(height, profile);

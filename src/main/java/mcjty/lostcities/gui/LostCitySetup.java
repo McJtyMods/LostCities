@@ -1,6 +1,6 @@
 package mcjty.lostcities.gui;
 
-import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.config.LostCityProfile;
 
 import java.util.ArrayList;
@@ -65,8 +65,8 @@ public class LostCitySetup {
             throw new IllegalStateException("Cannot happen!");
         }
         customizedProfile = new LostCityProfile("customized", false);
-        LostCityProfile original = LostCityConfiguration.standardProfiles.get(profile);
-        LostCityConfiguration.standardProfiles.put("customized", customizedProfile);
+        LostCityProfile original = ProfileSetup.standardProfiles.get(profile);
+        ProfileSetup.standardProfiles.put("customized", customizedProfile);
         profiles.add("customized");
         customizedProfile.copyFrom(original);
         profile = "customized";
@@ -79,7 +79,7 @@ public class LostCitySetup {
         } else if ("customized".equals(profile)) {
             return Optional.ofNullable(customizedProfile);
         } else {
-            return Optional.of(LostCityConfiguration.standardProfiles.get(profile));
+            return Optional.of(ProfileSetup.standardProfiles.get(profile));
         }
     }
 
@@ -100,7 +100,7 @@ public class LostCitySetup {
 //            if ("lc_cavern".equals(worldType.getName())) {
 //                preferedProfile = "cavern";
 //            }
-            profiles = new ArrayList<>(LostCityConfiguration.standardProfiles.keySet());
+            profiles = new ArrayList<>(ProfileSetup.standardProfiles.keySet());
             profiles.sort((o1, o2) -> {
                 if (preferedProfile.equals(o1)) {
                     return -1;

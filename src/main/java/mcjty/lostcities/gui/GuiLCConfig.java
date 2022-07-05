@@ -3,7 +3,7 @@ package mcjty.lostcities.gui;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.api.RailChunkType;
-import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.gui.elements.*;
 import mcjty.lostcities.setup.Config;
@@ -61,7 +61,7 @@ public class GuiLCConfig extends Screen {
     private static void selectProfile(String profileName, @Nullable LostCityProfile profile) {
         Config.profileFromClient = profileName;
         if (profile != null) {
-            LostCityConfiguration.standardProfiles.get("customized").copyFrom(profile);
+            ProfileSetup.standardProfiles.get("customized").copyFrom(profile);
             Config.jsonFromClient = profile.toJson(false).toString();
         }
     }
@@ -458,7 +458,7 @@ public class GuiLCConfig extends Screen {
         LostCitySetup.CLIENT_SETUP.copyFrom(localSetup);
         LostCityProfile customizedProfile = localSetup.getCustomizedProfile();
         if ("customized".equals(localSetup.getProfile()) && customizedProfile != null) {
-            LostCityConfiguration.standardProfiles.get("customized").copyFrom(customizedProfile);
+            ProfileSetup.standardProfiles.get("customized").copyFrom(customizedProfile);
             selectProfile(localSetup.getProfile(), customizedProfile);
         } else {
             selectProfile(localSetup.getProfile(), null);

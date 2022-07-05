@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import mcjty.lostcities.LostCities;
-import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.commons.io.FileUtils;
 
@@ -17,61 +16,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LostCityConfiguration {
+public class ProfileSetup {
 
-    /*
-    {"coordinateScale":375.0,"heightScale":6000.0,"lowerLimitScale":1025.0,"upperLimitScale":200.0,"depthNoiseScaleX":200.0,"depthNoiseScaleZ":200.0,"depthNoiseScaleExponent":0.5,"mainNoiseScaleX":80.0,"mainNoiseScaleY":160.0,"mainNoiseScaleZ":80.0,"baseSize":1.0,"stretchY":5.65,"biomeDepthWeight":1.0,"biomeDepthOffset":0.0,"biomeScaleWeight":1.0,"biomeScaleOffset":0.0,"seaLevel":47,"useCaves":true,"useDungeons":true,"dungeonChance":100,"useStrongholds":true,"useVillages":true,"useMineShafts":true,"useTemples":true,"useMonuments":true,"useRavines":true,"useWaterLakes":true,"waterLakeChance":1,"useLavaLakes":true,"lavaLakeChance":80,"useLavaOceans":false,"fixedBiome":-1,"biomeSize":1,"riverSize":5,"dirtSize":18,"dirtCount":8,"dirtMinHeight":0,"dirtMaxHeight":256,"gravelSize":22,"gravelCount":8,"gravelMinHeight":0,"gravelMaxHeight":256,"graniteSize":22,"graniteCount":8,"graniteMinHeight":95,"graniteMaxHeight":255,"dioriteSize":22,"dioriteCount":8,"dioriteMinHeight":95,"dioriteMaxHeight":255,"andesiteSize":22,"andesiteCount":8,"andesiteMinHeight":95,"andesiteMaxHeight":255,"coalSize":17,"coalCount":20,"coalMinHeight":125,"coalMaxHeight":255,"ironSize":9,"ironCount":23,"ironMinHeight":134,"ironMaxHeight":255,"goldSize":9,"goldCount":4,"goldMinHeight":175,"goldMaxHeight":255,"redstoneSize":8,"redstoneCount":8,"redstoneMinHeight":175,"redstoneMaxHeight":255,"diamondSize":8,"diamondCount":3,"diamondMinHeight":175,"diamondMaxHeight":255,"lapisSize":7,"lapisCount":2,"lapisCenterHeight":150,"lapisSpread":16}
-     */
-    public static final String CATEGORY_GENERAL = "general";
-
-    public static final String ADDITIONAL_DIMENSIONS_COMMENT = "List of additional Lost City dimensions. Format '<id>:<profile>'";
-    public static final String LIGHTING_UPDATE_COMMENT = "List of blocks for which a lighting update is needed";
-    public static final String ASSET_COMMENT = "List of asset libraries loaded in the specified order. " +
-            "If the path starts with '/' it is going to be loaded directly from the classpath. If the path starts with '$' it is loaded from the config directory";
-    public static final String WORLDTYPES_COMMENT = "List of other worldtypes (id) that this mod will try " +
-            "to work with. The worldtype has to support the IChunkPrimerFactory API for this to work";
-    public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
-    public static final String PRIVATE_PROFILES_COMMENT = "List of privatep profiles that cannot be selected by the player but are only used as a child profile of another one";
-
-    public static final String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
-            "minecraft:glowstone",
-            "minecraft:redstone_torch",
-            "minecraft:lit_pumpkin",
-            "minecraft:magma"
-    };
-
-    public static String[] ADDITIONAL_DIMENSIONS = new String[] {
-
-    };
-
-    public static String[] ADAPTING_WORLDTYPES = new String[] {};
-
-    public static int VERSION = 7;
-
-    public static final Map<String, LostCityProfile> profiles = new HashMap<>();
     public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
-
-    public static String DIMENSION_PROFILE = "default";
-    public static String DEFAULT_PROFILE = "default";
-//    public static RegistryKey<World> DIMENSION_ID;// @todo 1.14 = 111; 1.16
-    public static boolean DIMENSION_BOP = true;
-
-    public static final boolean DEBUG = false;
-
-    public static ForgeConfigSpec.ConfigValue<String> SPECIAL_BED_BLOCK;// = "minecraft:diamond_block";
-
-
-
-
-    public static void init(ForgeConfigSpec.Builder SERVER_BUILDER) {
-        SERVER_BUILDER.comment("General settings").push(CATEGORY_GENERAL);
-
-        SPECIAL_BED_BLOCK = SERVER_BUILDER
-                .comment("Block to put underneath a bed so that it qualifies as a teleporter bed")
-                .define("specialBedBlock", "minecraft:diamond_block");
-
-        SERVER_BUILDER.pop();
-    }
 
     private static void initStandardProfiles() {
         LostCityProfile profile;
@@ -97,8 +44,6 @@ public class LostCityConfiguration {
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
         profile.GENERATE_LIGHTING = true;
-        profile.GENERATE_LAKES = false;
-        profile.GENERATE_VILLAGES = false;
         profile.RAILWAYS_ENABLED = false;
         profile.GROUNDLEVEL = 40;
         profile.SEALEVEL = 32;
@@ -117,8 +62,6 @@ public class LostCityConfiguration {
         profile.MINI_EXPLOSION_CHANCE = 0;
         profile.RUIN_CHANCE = 0;
         profile.RUBBLELAYER = false;
-        profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
-        profile.MAX_CAVE_HEIGHT = 64;
         standardProfiles.put(profile.getName(), profile);
 
 //        profile = new LostCityProfile("floating", true);
@@ -334,8 +277,6 @@ public class LostCityConfiguration {
         profile.setExtraDescription("This profile works best with Biomes O Plenty");
         profile.setIconFile("textures/gui/icon_wasteland.png");
 //        profile.WATERLEVEL_OFFSET = 70;
-        profile.GENERATE_LAKES = false;
-        profile.GENERATE_OCEANMONUMENTS = false;
         profile.VINE_CHANCE = 0.003f;
         profile.CHANCE_OF_RANDOM_LEAFBLOCKS = 0.01f;
         profile.RUBBLELAYER = true;
@@ -346,10 +287,6 @@ public class LostCityConfiguration {
         profile.RUIN_MAXLEVEL_PERCENT = 0.9f;
         profile.AVOID_WATER = true;
         profile.AVOID_FOLIAGE = true;
-        profile.AVOID_GENERATED_LAKE_WATER = true;
-        profile.AVOID_GENERATED_LILYPADS = true;
-        profile.AVOID_GENERATED_FLOWERS = true;
-        profile.AVOID_GENERATED_REEDS = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         standardProfiles.put(profile.getName(), profile);
 

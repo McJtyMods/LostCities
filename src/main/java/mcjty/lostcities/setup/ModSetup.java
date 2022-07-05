@@ -2,7 +2,7 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityProfileSetup;
-import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
@@ -38,7 +38,7 @@ public class ModSetup {
     public void init(FMLCommonSetupEvent e) {
         logger = LogManager.getLogger();
 
-        LostCityConfiguration.setupProfiles();
+        ProfileSetup.setupProfiles();
 
         PacketHandler.registerMessages("lostcities");
         LostCityFeature.registerConfiguredFeatures();
@@ -107,7 +107,7 @@ public class ModSetup {
             }
         }
 
-        if (LostCityConfiguration.DEBUG) {
+        if (Config.DEBUG) {
             // @todo 1.14
 //            logger.info("Asset parts loaded: " + AssetRegistries.PARTS.getCount());
             AssetRegistries.showStatistics();

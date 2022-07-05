@@ -1,7 +1,7 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.BiomeSelectionStrategy;
-import mcjty.lostcities.config.LostCityConfiguration;
+import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.Tools;
 import net.minecraft.resources.ResourceLocation;
@@ -153,7 +153,7 @@ public class BiomeTranslator {
             for (Pair<ResourceLocation, Biome> pair : manualMappings) {
                 translationMap.put(pair.getKey(), pair.getValue());
             }
-            if (LostCityConfiguration.DEBUG) {
+            if (Config.DEBUG) {
                 dumpTranslationMap();
             }
         }
