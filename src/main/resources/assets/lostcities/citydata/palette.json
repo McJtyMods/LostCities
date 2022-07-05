@@ -250,6 +250,24 @@
           }
         ],
         "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "}",
+        "blocks": [
+          {
+            "random": 9,
+            "block": "minecraft:stonebrick@2"
+          },
+          {
+            "random": 8,
+            "block": "minecraft:stonebrick@1"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:stonebrick"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
       }
     ]
   },
@@ -269,6 +287,20 @@
       },
       {
         "char": "#",
+        "blocks": [
+          {
+            "random": 10,
+            "block": "minecraft:bricks"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:red_terracotta"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "}",
         "blocks": [
           {
             "random": 10,
@@ -310,6 +342,20 @@
           }
         ],
         "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "}",
+        "blocks": [
+          {
+            "random": 10,
+            "block": "minecraft:quartz_bricks"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:smooth_quartz"
+          }
+        ],
+        "damaged": "minecraft:iron_bars"
       }
     ]
   },
@@ -329,6 +375,11 @@
       },
       {
         "char": "#",
+        "block": "minecraft:stained_hardened_clay@9",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "}",
         "block": "minecraft:stained_hardened_clay@9",
         "damaged": "minecraft:iron_bars"
       }
@@ -352,6 +403,11 @@
         "char": "#",
         "block": "minecraft:stained_hardened_clay@7",
         "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "}",
+        "block": "minecraft:stained_hardened_clay@7",
+        "damaged": "minecraft:iron_bars"
       }
     ]
   },
@@ -371,6 +427,11 @@
       },
       {
         "char": "#",
+        "block": "minecraft:stained_hardened_clay@8",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "}",
         "block": "minecraft:stained_hardened_clay@8",
         "damaged": "minecraft:iron_bars"
       }

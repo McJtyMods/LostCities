@@ -2,6 +2,8 @@ package mcjty.lostcities.api;
 
 import mcjty.lostcities.worldgen.lost.cityassets.Palette;
 
+import javax.annotation.Nullable;
+
 public interface ILostCityBuilding extends ILostCityAsset {
 
     Palette getLocalPalette();
@@ -31,4 +33,12 @@ public interface ILostCityBuilding extends ILostCityAsset {
      * features (like the blocks around a door)
      */
     char getFillerBlock();
+
+    /**
+     * The rubble block (from the palette) used to generate debris to adjacent
+     * chunks when this building is destroyed. If this is null getFillerBlock()
+     * should be used
+     */
+    @Nullable
+    Character getRubbleBlock();
 }

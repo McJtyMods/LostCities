@@ -72,9 +72,6 @@ public class LostCityProfile implements ILostCityProfile {
     public boolean RAILWAYS_ENABLED = true;
     public boolean RAILWAY_STATIONS_ENABLED = true;
 
-    public float DESTROY_LONE_BLOCKS_FACTOR = .05f;
-    public float DESTROY_OR_MOVE_CHANCE = .4f;
-    public int DESTROY_SMALL_SECTIONS_SIZE = 50;
     public boolean EXPLOSIONS_IN_CITIES_ONLY = true;
 
     public boolean GENERATE_NETHER = false;
@@ -441,14 +438,6 @@ public class LostCityProfile implements ILostCityProfile {
 
     private void initExplosions(Configuration cfg) {
         DEBRIS_TO_NEARBYCHUNK_FACTOR = cfg.getInt("debrisToNearbyChunkFactor", LostCityProfile.CATEGORY_EXPLOSIONS, DEBRIS_TO_NEARBYCHUNK_FACTOR, 1, 10000, "A factor that determines how much debris will overflow from nearby damaged chunks. Bigger numbers mean less debris");
-
-        DESTROY_LONE_BLOCKS_FACTOR = cfg.getFloat("destroyLoneBlocksFactor", LostCityProfile.CATEGORY_EXPLOSIONS, DESTROY_LONE_BLOCKS_FACTOR, 0.0f, 1.0f, "When a section of blocks in in an explosion the generator will count the number of " +
-                "blocks that are connected. The number of connections divided by the total number of blocks in a connected section is compared with this number. " +
-                "If it is smaller then the section of blocks is destroyed or moved down with gravity");
-        DESTROY_OR_MOVE_CHANCE = cfg.getFloat("destroyOrMoveChance", LostCityProfile.CATEGORY_EXPLOSIONS, DESTROY_OR_MOVE_CHANCE, 0.0f, 1.0f, "When a section of blocks is to be moved or destroyed " +
-                "this chance gives the chance of removal (as opposed to moving with gravity)");
-        DESTROY_SMALL_SECTIONS_SIZE = cfg.getInt("destroySmallSectionsSize", LostCityProfile.CATEGORY_EXPLOSIONS, DESTROY_SMALL_SECTIONS_SIZE, 1, 5000, "A section of blocks that is about to be moved or destroyed " +
-                "is always destroyed if it is smaller then this size");
 
         EXPLOSION_CHANCE = cfg.getFloat("explosionChance", LostCityProfile.CATEGORY_EXPLOSIONS, EXPLOSION_CHANCE, 0.0f, 1.0f, "The chance that a chunk will contain an explosion");
         EXPLOSION_MINRADIUS = cfg.getInt("explosionMinRadius", LostCityProfile.CATEGORY_EXPLOSIONS, EXPLOSION_MINRADIUS, 1, 1000, "The minimum radius of an explosion");

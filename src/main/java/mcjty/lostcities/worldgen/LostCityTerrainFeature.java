@@ -2194,7 +2194,11 @@ public class LostCityTerrainFeature {
 
     private void generateDebrisFromChunk(Random rand, BuildingInfo info, BuildingInfo adjacentInfo, BiFunction<Integer, Integer, Float> locationFactor) {
         if (adjacentInfo.hasBuilding) {
-            BlockState filler = adjacentInfo.getCompiledPalette().get(adjacentInfo.getBuilding().getFillerBlock());
+            Character rubbleBlock = adjacentInfo.getBuilding().getRubbleBlock();
+            if (rubbleBlock == null) {
+                rubbleBlock = adjacentInfo.getBuilding().getFillerBlock();
+            }
+            CompiledPalette adjacentPalette = adjacentInfo.getCompiledPalette();
             float damageFactor = adjacentInfo.getDamageArea().getDamageFactor();
             if (damageFactor > .5f) {
                 // An estimate of the amount of blocks
@@ -2224,7 +2228,7 @@ public class LostCityTerrainFeature {
                         if (rand.nextInt(5) == 0) {
                             b = ironbars.get();
                         } else {
-                            b = filler;     // Filler from adjacent building
+                            b = adjacentPalette.get(rubbleBlock);     // Filler from adjacent building
                         }
                         driver.current(x, h + 1, z).block(b);
                     }

@@ -7,6 +7,7 @@ import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityBuilding;
 import mcjty.lostcities.setup.ModSetup;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ public class Building implements ILostCityBuilding {
     private int maxFloors = -1;         // -1 means default from level
     private int maxCellars = -1;        // -1 means default frmo level
     private char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
+    private Character rubbleBlock;      // Block used for destroyed building rubble
     private float prefersLonely = 0.0f; // The chance this this building is alone. If 1.0f this building wants to be alone all the time
 
     private Palette localPalette = null;
@@ -74,6 +76,9 @@ public class Building implements ILostCityBuilding {
             fillerBlock = object.get("filler").getAsCharacter();
         } else {
             throw new RuntimeException("'filler' is required for building '" + name + "'!");
+        }
+        if (object.has("rubble")) {
+            rubbleBlock = object.get("rubble").getAsCharacter();
         }
 
         if (object.has("palette")) {
@@ -153,6 +158,12 @@ public class Building implements ILostCityBuilding {
     @Override
     public char getFillerBlock() {
         return fillerBlock;
+    }
+
+    @Nullable
+    @Override
+    public Character getRubbleBlock() {
+        return rubbleBlock;
     }
 
     public String getRandomPart(Random random, ConditionContext info) {

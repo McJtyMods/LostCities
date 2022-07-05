@@ -232,8 +232,6 @@ public class ProfileSetup {
         profile.BUILDING_MAXFLOORS_CHANCE = 15;
         profile.BUILDING_MAXFLOORS = 19;
         profile.DEBRIS_TO_NEARBYCHUNK_FACTOR = 175;
-        profile.DESTROY_LONE_BLOCKS_FACTOR = 0.08f;
-        profile.DESTROY_OR_MOVE_CHANCE = 0.2f;
         profile.EXPLOSION_CHANCE = 0.006f;
         profile.EXPLOSION_MAXHEIGHT = 256;
         profile.EXPLOSION_MAXRADIUS = 60;

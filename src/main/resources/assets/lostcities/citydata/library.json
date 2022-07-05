@@ -2350,6 +2350,7 @@
     "type": "building",
     "name": "center00",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -2377,6 +2378,7 @@
     "type": "building",
     "name": "center11",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -2404,6 +2406,7 @@
     "type": "building",
     "name": "shopping00",
     "filler": "#",
+    "rubble": "}",
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
@@ -2448,6 +2451,7 @@
     "type": "building",
     "name": "shopping01",
     "filler": "#",
+    "rubble": "}",
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
@@ -2521,6 +2525,7 @@
     "type": "building",
     "name": "shopping10",
     "filler": "#",
+    "rubble": "}",
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
@@ -2593,6 +2598,7 @@
     "type": "building",
     "name": "shopping11",
     "filler": "#",
+    "rubble": "}",
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
@@ -2655,6 +2661,7 @@
     "type": "building",
     "name": "shopping_open00",
     "filler": "#",
+    "rubble": "}",
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
@@ -2699,6 +2706,7 @@
     "type": "building",
     "name": "shopping_open01",
     "filler": "#",
+    "rubble": "}",
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
@@ -2772,6 +2780,7 @@
     "type": "building",
     "name": "shopping_open10",
     "filler": "#",
+    "rubble": "}",
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
@@ -2844,6 +2853,7 @@
     "type": "building",
     "name": "shopping_open11",
     "filler": "#",
+    "rubble": "}",
     "maxcellars": 0,
     "minfloors": 4,
     "maxfloors": 6,
@@ -2907,6 +2917,7 @@
     "type": "building",
     "name": "town00",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "cellar": true,
@@ -2952,6 +2963,7 @@
     "type": "building",
     "name": "town01",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "cellar": true,
@@ -3021,6 +3033,7 @@
     "type": "building",
     "name": "town10",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "cellar": true,
@@ -3086,6 +3099,7 @@
     "type": "building",
     "name": "town11",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "cellar": true,
@@ -3154,6 +3168,7 @@
     "type": "building",
     "name": "building1",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3217,6 +3232,7 @@
     "type": "building",
     "name": "center10",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3256,6 +3272,7 @@
     "type": "building",
     "name": "building2",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3299,6 +3316,7 @@
     "type": "building",
     "name": "building3",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3342,6 +3360,7 @@
     "type": "building",
     "name": "building4",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3378,6 +3397,7 @@
     "type": "building",
     "name": "building5",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3418,6 +3438,7 @@
     "type": "building",
     "name": "building6",
     "filler": "#",
+    "rubble": "}",
     "palette": [
       {
         "char": "#",
