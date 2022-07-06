@@ -3452,6 +3452,27 @@
             "block": "minecraft:deepslate_tiles"
           }
         ]
+      },
+      {
+        "char": "}",
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:cracked_deepslate_tiles"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:cobbled_deepslate_slab"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:cobbled_deepslate_stairs"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:deepslate_tiles"
+          }
+        ]
       }
     ],
     "parts": [
@@ -3494,6 +3515,7 @@
     "type": "building",
     "name": "building7",
     "filler": "#",
+    "rubble": "}",
     "palette": [
       {
         "char": "#",
@@ -3505,6 +3527,31 @@
           {
             "random": 32,
             "block": "minecraft:cracked_polished_blackstone_bricks"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:polished_blackstone"
+          }
+        ]
+      },
+      {
+        "char": "}",
+        "blocks": [
+          {
+            "random": 20,
+            "block": "minecraft:polished_blackstone_bricks"
+          },
+          {
+            "random": 20,
+            "block": "minecraft:cracked_polished_blackstone_bricks"
+          },
+          {
+            "random": 20,
+            "block": "minecraft:polished_blackstone_slab"
+          },
+          {
+            "random": 20,
+            "block": "minecraft:polished_blackstone_stairs"
           },
           {
             "random": 1000,
@@ -3549,6 +3596,7 @@
     "type": "building",
     "name": "building8",
     "filler": "#",
+    "rubble": "}",
     "palette": [
       {
         "char": "#",
@@ -3560,6 +3608,31 @@
           {
             "random": 32,
             "block": "minecraft:stone_bricks"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:stone"
+          }
+        ]
+      },
+      {
+        "char": "}",
+        "blocks": [
+          {
+            "random": 20,
+            "block": "minecraft:cracked_stone_bricks"
+          },
+          {
+            "random": 20,
+            "block": "minecraft:stone_bricks"
+          },
+          {
+            "random": 20,
+            "block": "minecraft:stone_slab"
+          },
+          {
+            "random": 20,
+            "block": "minecraft:stone_stairs"
           },
           {
             "random": 1000,
@@ -3632,6 +3705,7 @@
     "type": "building",
     "name": "center01",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3663,6 +3737,7 @@
     "type": "building",
     "name": "library00",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3682,6 +3757,7 @@
     "type": "building",
     "name": "library11",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3713,6 +3789,7 @@
     "type": "building",
     "name": "library10",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,
@@ -3756,6 +3833,7 @@
     "type": "building",
     "name": "library01",
     "filler": "#",
+    "rubble": "}",
     "parts": [
       {
         "top": false,

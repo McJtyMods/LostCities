@@ -1445,6 +1445,7 @@ public class LostCityTerrainFeature {
         Supplier<BlockState> ironbars = infobarsChar == null ? () -> ironbarsState : () -> palette.get(infobarsChar);
         Set<BlockState> infoBarSet = infobarsChar == null ? Collections.singleton(ironbarsState) : palette.getAll(infobarsChar);
         Predicate<BlockState> checkIronbars = infobarsChar == null ? s -> s == ironbarsState : infoBarSet::contains;
+        Character rubbleBlock = info.getBuilding().getRubbleBlock();
 
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -1458,11 +1459,15 @@ public class LostCityTerrainFeature {
                     vl = (int) (info.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesBuffer[x + z * 16] / info.profile.RUBBLE_LEAVE_SCALE);
 //                    vl = (int) (info.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesNoise.getValue(x / 64.0, z / 64.0) / 4.0 * info.profile.RUBBLE_LEAVE_SCALE);
                 }
+                boolean doRubble = rubbleBlock != null;
                 while (height > 0) {
                     BlockState damage = palette.canBeDamagedToIronBars(driver.getBlock());
                     BlockState c = driver.getBlockDown();
 
-                    if ((damage != null || checkIronbars.test(c)) && c != air && c != liquid && rand.nextFloat() < .2f) {
+                    if (doRubble && !checkIronbars.test(c) && c != air && c != liquid && rand.nextFloat() < .2f) {      // @todo hardcoded random
+                        doRubble = false;
+                        driver.add(palette.get(rubbleBlock));
+                    } else if ((damage != null || checkIronbars.test(c)) && c != air && c != liquid && rand.nextFloat() < .2f) {    // @todo hardcoded random
                         driver.add(ironbars.get());
                     } else {
                         if (vl > 0) {
@@ -2229,6 +2234,9 @@ public class LostCityTerrainFeature {
                             b = ironbars.get();
                         } else {
                             b = adjacentPalette.get(rubbleBlock);     // Filler from adjacent building
+                        }
+                        if (b == null) {
+                            System.out.println("LostCityTerrainFeature.generateDebrisFromChunk");
                         }
                         driver.current(x, h + 1, z).block(b);
                     }

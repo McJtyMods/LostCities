@@ -117,24 +117,6 @@ public class CompiledPalette {
         return palette.keySet();
     }
 
-    public BlockState getStraight(char c) {
-        try {
-            Object o = palette.get(c);
-            if (o instanceof BlockState) {
-                return (BlockState) o;
-            } else if (o instanceof Character) {
-                throw new IllegalStateException("BAD!");
-//                return Block.BLOCK_STATE_IDS.getByValue((Character) o);
-            } else {
-                BlockState[] randomBlocks = (BlockState[]) o;
-                return randomBlocks[0];
-            }
-        } catch (Exception e) {
-            LostCities.logger.log(Level.ERROR, e);
-            return null;
-        }
-    }
-
     /**
      * Return true if this is a simple character that can have only one value in the palette
      */
