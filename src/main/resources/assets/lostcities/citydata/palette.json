@@ -235,46 +235,12 @@
       },
       {
         "char": "#",
-        "blocks": [
-          {
-            "random": 9,
-            "block": "minecraft:stonebrick@2"
-          },
-          {
-            "random": 8,
-            "block": "minecraft:stonebrick@1"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:stonebrick"
-          }
-        ],
+        "variant": "stonebrick",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "}",
-        "blocks": [
-          {
-            "random": 9,
-            "block": "minecraft:stonebrick@2"
-          },
-          {
-            "random": 8,
-            "block": "minecraft:stonebrick@1"
-          },
-          {
-            "random": 5,
-            "block": "minecraft:stone_brick_stairs"
-          },
-          {
-            "random": 15,
-            "block": "minecraft:stone_brick_slab"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:stonebrick"
-          }
-        ],
+        "variant": "stonebrick_rubble",
         "damaged": "minecraft:iron_bars"
       }
     ]
@@ -295,38 +261,12 @@
       },
       {
         "char": "#",
-        "blocks": [
-          {
-            "random": 10,
-            "block": "minecraft:bricks"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:red_terracotta"
-          }
-        ],
+        "variant": "bricks",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "}",
-        "blocks": [
-          {
-            "random": 10,
-            "block": "minecraft:bricks"
-          },
-          {
-            "random": 10,
-            "block": "minecraft:brick_stairs"
-          },
-          {
-            "random": 10,
-            "block": "minecraft:brick_slab"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:red_terracotta"
-          }
-        ],
+        "variant": "bricks_rubble",
         "damaged": "minecraft:iron_bars"
       }
     ]
@@ -347,38 +287,12 @@
       },
       {
         "char": "#",
-        "blocks": [
-          {
-            "random": 10,
-            "block": "minecraft:quartz_bricks"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:smooth_quartz"
-          }
-        ],
+        "variant": "quartz",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "}",
-        "blocks": [
-          {
-            "random": 10,
-            "block": "minecraft:quartz_bricks"
-          },
-          {
-            "random": 8,
-            "block": "minecraft:quartz_stairs"
-          },
-          {
-            "random": 10,
-            "block": "minecraft:quartz_slab"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:smooth_quartz"
-          }
-        ],
+        "variant": "quartz_rubble",
         "damaged": "minecraft:iron_bars"
       }
     ]
@@ -718,56 +632,17 @@
       },
       {
         "char": "v",
-        "blocks": [
-          {
-            "random": 9,
-            "block": "minecraft:stonebrick@2"
-          },
-          {
-            "random": 8,
-            "block": "minecraft:stonebrick@1"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:stonebrick"
-          }
-        ],
+        "variant": "stonebrick",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "y",
-        "blocks": [
-          {
-            "random": 9,
-            "block": "minecraft:stonebrick@2"
-          },
-          {
-            "random": 8,
-            "block": "minecraft:stonebrick@1"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:stonebrick"
-          }
-        ],
+        "variant": "stonebrick",
         "damaged": "minecraft:iron_bars"
       },
       {
         "char": "x",
-        "blocks": [
-          {
-            "random": 9,
-            "block": "minecraft:stonebrick@2"
-          },
-          {
-            "random": 8,
-            "block": "minecraft:stonebrick@1"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:stonebrick"
-          }
-        ],
+        "variant": "stonebrick",
         "damaged": "minecraft:iron_bars"
       },
       {

@@ -20,6 +20,7 @@ public class Config {
     public static final String CATEGORY_GENERAL = "general";
 
     public static final String[] DEFAULT_ASSETS = new String[] {
+            "/assets/lostcities/citydata/variants.json",
             "/assets/lostcities/citydata/conditions.json",
             "/assets/lostcities/citydata/palette.json",
             "/assets/lostcities/citydata/palette_desert.json",

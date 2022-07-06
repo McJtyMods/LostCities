@@ -1,0 +1,242 @@
+[
+  {
+    "type": "variant",
+    "name": "stonebrick",
+    "blocks": [
+      {
+        "random": 9,
+        "block": "minecraft:stonebrick@2"
+      },
+      {
+        "random": 8,
+        "block": "minecraft:stonebrick@1"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:stonebrick"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "stonebrick_rubble",
+    "blocks": [
+      {
+        "random": 9,
+        "block": "minecraft:stonebrick@2"
+      },
+      {
+        "random": 8,
+        "block": "minecraft:stonebrick@1"
+      },
+      {
+        "random": 5,
+        "block": "minecraft:stone_brick_stairs"
+      },
+      {
+        "random": 15,
+        "block": "minecraft:stone_brick_slab"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:stonebrick"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "stoneandbrick",
+    "blocks": [
+      {
+        "random": 32,
+        "block": "minecraft:cracked_stone_bricks"
+      },
+      {
+        "random": 32,
+        "block": "minecraft:stone_bricks"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:stone"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "stoneandbrick_rubble",
+    "blocks": [
+      {
+        "random": 20,
+        "block": "minecraft:cracked_stone_bricks"
+      },
+      {
+        "random": 20,
+        "block": "minecraft:stone_bricks"
+      },
+      {
+        "random": 20,
+        "block": "minecraft:stone_slab"
+      },
+      {
+        "random": 20,
+        "block": "minecraft:stone_stairs"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:stone"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "quartz",
+    "blocks": [
+      {
+        "random": 10,
+        "block": "minecraft:quartz_bricks"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:smooth_quartz"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "quartz_rubble",
+    "blocks": [
+      {
+        "random": 10,
+        "block": "minecraft:quartz_bricks"
+      },
+      {
+        "random": 8,
+        "block": "minecraft:quartz_stairs"
+      },
+      {
+        "random": 10,
+        "block": "minecraft:quartz_slab"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:smooth_quartz"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "bricks",
+    "blocks": [
+      {
+        "random": 10,
+        "block": "minecraft:bricks"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:red_terracotta"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "bricks_rubble",
+    "blocks": [
+      {
+        "random": 10,
+        "block": "minecraft:bricks"
+      },
+      {
+        "random": 10,
+        "block": "minecraft:brick_stairs"
+      },
+      {
+        "random": 10,
+        "block": "minecraft:brick_slab"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:red_terracotta"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "deepslate",
+    "blocks": [
+      {
+        "random": 32,
+        "block": "minecraft:cracked_deepslate_tiles"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:deepslate_tiles"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "deepslate_rubble",
+    "blocks": [
+      {
+        "random": 32,
+        "block": "minecraft:cracked_deepslate_tiles"
+      },
+      {
+        "random": 32,
+        "block": "minecraft:cobbled_deepslate_slab"
+      },
+      {
+        "random": 32,
+        "block": "minecraft:cobbled_deepslate_stairs"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:deepslate_tiles"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "blackstone",
+    "blocks": [
+      {
+        "random": 32,
+        "block": "minecraft:polished_blackstone_bricks"
+      },
+      {
+        "random": 32,
+        "block": "minecraft:cracked_polished_blackstone_bricks"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:polished_blackstone"
+      }
+    ]
+  },
+  {
+    "type": "variant",
+    "name": "blackstone_rubble",
+    "blocks": [
+      {
+        "random": 20,
+        "block": "minecraft:polished_blackstone_bricks"
+      },
+      {
+        "random": 20,
+        "block": "minecraft:cracked_polished_blackstone_bricks"
+      },
+      {
+        "random": 20,
+        "block": "minecraft:polished_blackstone_slab"
+      },
+      {
+        "random": 20,
+        "block": "minecraft:polished_blackstone_stairs"
+      },
+      {
+        "random": 1000,
+        "block": "minecraft:polished_blackstone"
+      }
+    ]
+  }
+]

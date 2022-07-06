@@ -12,6 +12,7 @@ import java.util.*;
 
 public class AssetRegistries {
 
+    public static final AbstractAssetRegistry<Variant> VARIANTS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Condition> CONDITIONS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<WorldStyle> WORLDSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
@@ -24,6 +25,7 @@ public class AssetRegistries {
     public static final AbstractAssetRegistry<PredefinedSphere> PREDEFINED_SPHERES = new AbstractAssetRegistry<>();
 
     public static void reset() {
+        VARIANTS.reset();
         CONDITIONS.reset();
         WORLDSTYLES.reset();
         PARTS.reset();
@@ -133,6 +135,8 @@ public class AssetRegistries {
                 String type = object.get("type").getAsString();
                 if ("style".equals(type)) {
                     STYLES.register(new Style(object));
+                } else if ("variant".equals(type)) {
+                    VARIANTS.register(new Variant(object));
                 } else if ("condition".equals(type)) {
                     CONDITIONS.register(new Condition(object));
                 } else if ("palette".equals(type)) {

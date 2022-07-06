@@ -3442,37 +3442,13 @@
     "palette": [
       {
         "char": "#",
-        "blocks": [
-          {
-            "random": 32,
-            "block": "minecraft:cracked_deepslate_tiles"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:deepslate_tiles"
-          }
-        ]
+        "variant": "deepslate",
+        "damaged": "minecraft:iron_bars"
       },
       {
         "char": "}",
-        "blocks": [
-          {
-            "random": 32,
-            "block": "minecraft:cracked_deepslate_tiles"
-          },
-          {
-            "random": 32,
-            "block": "minecraft:cobbled_deepslate_slab"
-          },
-          {
-            "random": 32,
-            "block": "minecraft:cobbled_deepslate_stairs"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:deepslate_tiles"
-          }
-        ]
+        "variant": "deepslate_rubble",
+        "damaged": "minecraft:iron_bars"
       }
     ],
     "parts": [
@@ -3519,45 +3495,13 @@
     "palette": [
       {
         "char": "#",
-        "blocks": [
-          {
-            "random": 32,
-            "block": "minecraft:polished_blackstone_bricks"
-          },
-          {
-            "random": 32,
-            "block": "minecraft:cracked_polished_blackstone_bricks"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:polished_blackstone"
-          }
-        ]
+        "variant": "blackstone",
+        "damaged": "minecraft:iron_bars"
       },
       {
         "char": "}",
-        "blocks": [
-          {
-            "random": 20,
-            "block": "minecraft:polished_blackstone_bricks"
-          },
-          {
-            "random": 20,
-            "block": "minecraft:cracked_polished_blackstone_bricks"
-          },
-          {
-            "random": 20,
-            "block": "minecraft:polished_blackstone_slab"
-          },
-          {
-            "random": 20,
-            "block": "minecraft:polished_blackstone_stairs"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:polished_blackstone"
-          }
-        ]
+        "variant": "blackstone_rubble",
+        "damaged": "minecraft:iron_bars"
       }
     ],
     "parts": [
@@ -3600,45 +3544,13 @@
     "palette": [
       {
         "char": "#",
-        "blocks": [
-          {
-            "random": 32,
-            "block": "minecraft:cracked_stone_bricks"
-          },
-          {
-            "random": 32,
-            "block": "minecraft:stone_bricks"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:stone"
-          }
-        ]
+        "variant": "stoneandbrick",
+        "damaged": "minecraft:iron_bars"
       },
       {
         "char": "}",
-        "blocks": [
-          {
-            "random": 20,
-            "block": "minecraft:cracked_stone_bricks"
-          },
-          {
-            "random": 20,
-            "block": "minecraft:stone_bricks"
-          },
-          {
-            "random": 20,
-            "block": "minecraft:stone_slab"
-          },
-          {
-            "random": 20,
-            "block": "minecraft:stone_stairs"
-          },
-          {
-            "random": 1000,
-            "block": "minecraft:stone"
-          }
-        ]
+        "variant": "stoneandbrick_rubble",
+        "damaged": "minecraft:iron_bars"
       }
     ],
     "parts": [

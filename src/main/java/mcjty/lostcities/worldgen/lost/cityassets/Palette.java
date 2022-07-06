@@ -107,6 +107,19 @@ public class Palette implements ILostCityAsset {
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }
+            } else if (o.has("variant")) {
+                String variantName = o.get("variant").getAsString();
+                Variant variant = AssetRegistries.VARIANTS.get(variantName);
+                if (variant == null) {
+                    throw new RuntimeException("Variant '" + variantName + "' is missing!");
+                }
+                List<Pair<Integer, BlockState>> blocks = variant.getBlocks();
+                if (dmg != null) {
+                    for (Pair<Integer, BlockState> pair : blocks) {
+                        damaged.put(pair.getRight(), dmg);
+                    }
+                }
+                addMappingViaState(c, blocks.toArray(new Pair[blocks.size()]));
             } else if (o.has("frompalette")) {
                 value = o.get("frompalette").getAsString();
                 palette.put(c, value);
