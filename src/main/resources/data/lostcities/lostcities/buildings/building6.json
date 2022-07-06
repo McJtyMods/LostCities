@@ -1,0 +1,52 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "palette": {
+    "palette": [
+      {
+        "char": "#",
+        "variant": "deepslate",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "}",
+        "variant": "deepslate_rubble",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  "parts": [
+    {
+      "top": false,
+      "part": "building5_1"
+    },
+    {
+      "top": false,
+      "part": "building5_2"
+    },
+    {
+      "top": false,
+      "part": "building5_3"
+    },
+    {
+      "top": false,
+      "part": "building5_4"
+    },
+    {
+      "top": true,
+      "part": "top1x1_2"
+    },
+    {
+      "top": true,
+      "part": "top1x1_3"
+    },
+    {
+      "top": true,
+      "part": "top1x1_4"
+    },
+    {
+      "top": true,
+      "part": "top1x1_5"
+    }
+  ]
+}

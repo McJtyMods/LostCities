@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,6 +34,89 @@ public abstract class ConditionContext {
             return newTest;
         }
         return levelInfo -> orig.test(levelInfo) && newTest.test(levelInfo);
+    }
+
+    public static Predicate<ConditionContext> parseTest(BuildingRE.PartRef element) {
+        Predicate<ConditionContext> test = null;
+        if (element.getTop() != null) {
+            boolean top = element.getTop();
+            if (top) {
+                test = combine(test, ConditionContext::isTopOfBuilding);
+            } else {
+                test = combine(test, levelInfo -> !levelInfo.isTopOfBuilding());
+            }
+        }
+        if (element.getGround()) {
+            boolean ground = element.getGround();
+            if (ground) {
+                test = combine(test, ConditionContext::isGroundFloor);
+            } else {
+                test = combine(test, levelInfo -> !levelInfo.isGroundFloor());
+            }
+        }
+        if (element.getIsbuilding()) {
+            boolean ground = element.getIsbuilding();
+            if (ground) {
+                test = combine(test, ConditionContext::isBuilding);
+            } else {
+                test = combine(test, levelInfo -> !levelInfo.isBuilding());
+            }
+        }
+        if (obj.has("issphere")) {
+            boolean ground = obj.get("issphere").getAsBoolean();
+            if (ground) {
+                test = combine(test, ConditionContext::isSphere);
+            } else {
+                test = combine(test, levelInfo -> !levelInfo.isSphere());
+            }
+        }
+        if (obj.has("chunkx")) {
+            int chunkX = obj.get("chunkx").getAsInt();
+            test = combine(test, context -> chunkX == context.getChunkX());
+        }
+        if (obj.has("chunkz")) {
+            int chunkZ = obj.get("chunkz").getAsInt();
+            test = combine(test, context -> chunkZ == context.getChunkZ());
+        }
+        if (obj.has("inpart")) {
+            String part = obj.get("inpart").getAsString();
+            test = combine(test, context -> part.equals(context.getPart()));
+        }
+        if (obj.has("inbuilding")) {
+            String building = obj.get("inbuilding").getAsString();
+            test = combine(test, context -> building.equals(context.getBuilding()));
+        }
+        if (obj.has("inbiome")) {
+            String biome = obj.get("inbiome").getAsString();
+            test = combine(test, context -> biome.equals(context.getBiome().toString()));
+        }
+        if (obj.has("cellar")) {
+            boolean cellar = obj.get("cellar").getAsBoolean();
+            if (cellar) {
+                test = combine(test, ConditionContext::isCellar);
+            } else {
+                test = combine(test, levelInfo -> !levelInfo.isCellar());
+            }
+        }
+        if (obj.has("floor")) {
+            int level = obj.get("floor").getAsInt();
+            test = combine(test, levelInfo -> levelInfo.isFloor(level));
+        }
+        if (obj.has("range")) {
+            String range = obj.get("range").getAsString();
+            String[] split = StringUtils.split(range, ',');
+            try {
+                int l1 = Integer.parseInt(split[0]);
+                int l2 = Integer.parseInt(split[1]);
+                test = combine(test, levelInfo -> levelInfo.isRange(l1, l2));
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                throw new RuntimeException("Bad range specification: <l1>,<l2>!");
+            }
+        }
+        if (test == null) {
+            test = conditionContext -> true;
+        }
+        return test;
     }
 
     public static Predicate<ConditionContext> parseTest(JsonElement element) {

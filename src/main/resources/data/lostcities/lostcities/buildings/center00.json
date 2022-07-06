@@ -1,0 +1,26 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "parts": [
+    {
+      "top": false,
+      "part": "center00_1"
+    },
+    {
+      "top": false,
+      "part": "center00_2"
+    },
+    {
+      "top": false,
+      "part": "center00_3"
+    },
+    {
+      "top": true,
+      "part": "top_center00_1"
+    },
+    {
+      "top": true,
+      "part": "top_center00_2"
+    }
+  ]
+}

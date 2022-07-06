@@ -1,0 +1,43 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "maxcellars": 0,
+  "minfloors": 4,
+  "maxfloors": 6,
+  "preferslonely": 0.9,
+  "parts": [
+    {
+      "floor": 0,
+      "part": "shopping00_0"
+    },
+    {
+      "floor": 1,
+      "part": "shopping00_1"
+    },
+    {
+      "floor": 2,
+      "part": "shopping00_2"
+    },
+    {
+      "top": false,
+      "range": "3,100",
+      "part": "shopping00_r1"
+    },
+    {
+      "top": true,
+      "part": "top_center_1"
+    },
+    {
+      "top": true,
+      "part": "top_center_2"
+    },
+    {
+      "top": true,
+      "part": "top_center_3"
+    },
+    {
+      "top": true,
+      "part": "top_center_4"
+    }
+  ]
+}

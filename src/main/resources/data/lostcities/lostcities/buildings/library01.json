@@ -1,0 +1,34 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "parts": [
+    {
+      "top": false,
+      "part": "library01_1"
+    },
+    {
+      "top": false,
+      "part": "library01_2"
+    },
+    {
+      "top": false,
+      "part": "library01_3"
+    },
+    {
+      "top": true,
+      "part": "top_library_1"
+    },
+    {
+      "top": true,
+      "part": "top_library_2"
+    },
+    {
+      "top": true,
+      "part": "top_library_3"
+    },
+    {
+      "top": true,
+      "part": "top_library_4"
+    }
+  ]
+}

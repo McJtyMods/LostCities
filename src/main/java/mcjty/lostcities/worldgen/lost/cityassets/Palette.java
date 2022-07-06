@@ -17,7 +17,7 @@ import java.util.*;
 public class Palette implements ILostCityAsset {
 
     private String name;
-    final Map<Character, Object> palette = new HashMap<>();
+    private final Map<Character, Object> palette = new HashMap<>();
     private final Map<BlockState, BlockState> damaged = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
     private final Map<Character, String> lootTables = new HashMap<>(); // For chests
@@ -119,7 +119,7 @@ public class Palette implements ILostCityAsset {
                         damaged.put(pair.getRight(), dmg);
                     }
                 }
-                addMappingViaState(c, blocks.toArray(new Pair[blocks.size()]));
+                addMappingViaState(c, blocks);
             } else if (o.has("frompalette")) {
                 value = o.get("frompalette").getAsString();
                 palette.put(c, value);
@@ -136,7 +136,7 @@ public class Palette implements ILostCityAsset {
                         damaged.put(state, dmg);
                     }
                 }
-                addMappingViaState(c, blocks.toArray(new Pair[blocks.size()]));
+                addMappingViaState(c, blocks);
             } else {
                 throw new RuntimeException("Illegal palette!");
             }
@@ -181,14 +181,8 @@ public class Palette implements ILostCityAsset {
         return object;
     }
 
-    public Palette addMapping(char c, BlockState state) {
-        palette.put(c, state);
-        return this;
-    }
-
-    @SafeVarargs
-    private Palette addMappingViaState(char c, Pair<Integer, BlockState>... randomBlocks) {
-        palette.put(c, randomBlocks);
+    private Palette addMappingViaState(char c, List<Pair<Integer, BlockState>> randomBlocks) {
+        palette.put(c, randomBlocks.toArray(new Pair[randomBlocks.size()]));
         return this;
     }
 }

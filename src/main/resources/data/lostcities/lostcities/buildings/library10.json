@@ -1,0 +1,42 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "parts": [
+    {
+      "top": false,
+      "part": "library10_1"
+    },
+    {
+      "top": false,
+      "part": "library10_2"
+    },
+    {
+      "top": false,
+      "part": "library10_3"
+    },
+    {
+      "top": false,
+      "part": "library10_4"
+    },
+    {
+      "top": false,
+      "part": "library10_5"
+    },
+    {
+      "top": true,
+      "part": "top_library_1"
+    },
+    {
+      "top": true,
+      "part": "top_library_2"
+    },
+    {
+      "top": true,
+      "part": "top_library_3"
+    },
+    {
+      "top": true,
+      "part": "top_library_4"
+    }
+  ]
+},

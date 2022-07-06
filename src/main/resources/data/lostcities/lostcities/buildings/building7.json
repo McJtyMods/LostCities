@@ -1,0 +1,48 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "palette": {
+    "palette": [
+      {
+        "char": "#",
+        "variant": "blackstone",
+        "damaged": "minecraft:iron_bars"
+      },
+      {
+        "char": "}",
+        "variant": "blackstone_rubble",
+        "damaged": "minecraft:iron_bars"
+      }
+    ]
+  },
+  "parts": [
+    {
+      "top": false,
+      "part": "building4_1"
+    },
+    {
+      "top": false,
+      "part": "building4_2"
+    },
+    {
+      "top": false,
+      "part": "building4_3"
+    },
+    {
+      "top": false,
+      "part": "building4_4"
+    },
+    {
+      "top": true,
+      "part": "top4_1"
+    },
+    {
+      "top": true,
+      "part": "top4_2"
+    },
+    {
+      "top": true,
+      "part": "top4_3"
+    }
+  ]
+}

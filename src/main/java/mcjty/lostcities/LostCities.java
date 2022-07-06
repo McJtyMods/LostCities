@@ -4,6 +4,7 @@ import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.ILostCitiesPre;
 import mcjty.lostcities.setup.ClientSetup;
 import mcjty.lostcities.setup.Config;
+import mcjty.lostcities.setup.CustomRegistries;
 import mcjty.lostcities.setup.ModSetup;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -36,6 +37,8 @@ public class LostCities {
 
     public LostCities() {
         instance = this;
+
+        CustomRegistries.init();
 
         Path configPath = FMLPaths.CONFIGDIR.get();
         File dir = new File(configPath + File.separator + "lostcities");

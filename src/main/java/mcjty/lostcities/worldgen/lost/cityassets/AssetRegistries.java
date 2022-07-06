@@ -64,7 +64,7 @@ public class AssetRegistries {
             Palette localPalette = part.getLocalPalette();
             Map<Character, Object> palette = Collections.emptyMap();
             if (localPalette != null) {
-                palette = localPalette.palette;
+                palette = localPalette.getPalette();
             }
             for (int x = 0 ; x < part.getXSize() ; x++) {
                 for (int z = 0 ; z < part.getZSize() ; z++) {

@@ -1,0 +1,44 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "parts": [
+    {
+      "cellar": true,
+      "part": "town00_c"
+    },
+    {
+      "top": false,
+      "ground": true,
+      "cellar": false,
+      "part": "town00_0"
+    },
+    {
+      "top": false,
+      "ground": false,
+      "cellar": false,
+      "part": "town00_1"
+    },
+    {
+      "top": true,
+      "part": "top_center00_1"
+    },
+    {
+      "top": true,
+      "part": "top_center00_2"
+    }
+  ],
+  "parts2": [
+    {
+      "top": false,
+      "part": "town00_in_1"
+    },
+    {
+      "top": false,
+      "part": "town00_in_2"
+    },
+    {
+      "top": false,
+      "part": "town00_in_3"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "parts": [
+    {
+      "cellar": true,
+      "part": "town10_c"
+    },
+    {
+      "top": false,
+      "ground": true,
+      "cellar": false,
+      "part": "town10_0"
+    },
+    {
+      "top": false,
+      "ground": false,
+      "cellar": false,
+      "part": "town10_1"
+    },
+    {
+      "top": true,
+      "part": "top_center_1"
+    },
+    {
+      "top": true,
+      "part": "top_center_2"
+    },
+    {
+      "top": true,
+      "part": "top_center_3"
+    },
+    {
+      "top": true,
+      "part": "top_center_4"
+    }
+  ],
+  "parts2": [
+    {
+      "top": false,
+      "part": "town_in_1"
+    },
+    {
+      "top": false,
+      "part": "town_in_2"
+    },
+    {
+      "top": false,
+      "part": "town_in_3"
+    },
+    {
+      "top": false,
+      "part": "town_in_4"
+    },
+    {
+      "top": false,
+      "part": "town_in_5"
+    },
+    {
+      "top": false,
+      "part": "town_in_6"
+    }
+  ]
+}

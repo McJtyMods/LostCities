@@ -1,0 +1,42 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "parts": [
+    {
+      "top": false,
+      "part": "building3_1"
+    },
+    {
+      "top": false,
+      "part": "building3_2"
+    },
+    {
+      "top": false,
+      "part": "building3_3"
+    },
+    {
+      "top": false,
+      "part": "building3_4"
+    },
+    {
+      "top": true,
+      "part": "top1x1_1"
+    },
+    {
+      "top": true,
+      "part": "top1x1_2"
+    },
+    {
+      "top": true,
+      "part": "top1x1_3"
+    },
+    {
+      "top": true,
+      "part": "top1x1_4"
+    },
+    {
+      "top": true,
+      "part": "top1x1_5"
+    }
+  ]
+}

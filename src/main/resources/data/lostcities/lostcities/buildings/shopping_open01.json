@@ -1,0 +1,72 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "maxcellars": 0,
+  "minfloors": 4,
+  "maxfloors": 6,
+  "preferslonely": 0.9,
+  "parts": [
+    {
+      "floor": 0,
+      "part": "shopping_open01_0"
+    },
+    {
+      "floor": 1,
+      "part": "shopping_open01_1"
+    },
+    {
+      "floor": 2,
+      "part": "shopping_open01_2"
+    },
+    {
+      "top": false,
+      "range": "3,100",
+      "part": "shopping01_r1"
+    },
+    {
+      "top": true,
+      "part": "top_center_1"
+    },
+    {
+      "top": true,
+      "part": "top_center_2"
+    },
+    {
+      "top": true,
+      "part": "top_center_3"
+    },
+    {
+      "top": true,
+      "part": "top_center_4"
+    }
+  ],
+  "parts2": [
+    {
+      "floor": 0,
+      "part": "shopping01_in_1"
+    },
+    {
+      "floor": 0,
+      "part": "shopping01_in_2"
+    },
+    {
+      "floor": 0,
+      "part": "shopping01_in_3"
+    },
+    {
+      "top": false,
+      "range": "3,100",
+      "part": "shopping01_in_1"
+    },
+    {
+      "top": false,
+      "range": "3,100",
+      "part": "shopping01_in_2"
+    },
+    {
+      "top": false,
+      "range": "3,100",
+      "part": "shopping01_in_3"
+    }
+  ]
+}

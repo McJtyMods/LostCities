@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityBuilding;
 import mcjty.lostcities.setup.ModSetup;
+import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +35,26 @@ public class Building implements ILostCityBuilding {
 
     public Building(JsonObject object) {
         readFromJSon(object);
+    }
+
+    public Building(BuildingRE object) {
+        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        minFloors = object.getMinFloors();
+        minCellars = object.getMinCellars();
+        maxFloors = object.getMaxFloors();
+        maxCellars = object.getMaxCellars();
+        prefersLonely = object.getPrefersLonely();
+        fillerBlock = object.getFillerBlock();
+        rubbleBlock = object.getRubbleBlock();
+        if (object.getLocalPalette() != null) {
+            localPalette = new Palette();
+            localPalette.parsePaletteArray(object.getLocalPalette()); // @todo get the full palette instead
+        } else if (object.getRefPaletteName() != null) {
+            refPaletteName = object.getRefPaletteName();
+        }
+
+        readParts(this.parts, object.getParts());
+        readParts(this.parts2, object.getParts2());
     }
 
     @Override
@@ -93,6 +114,18 @@ public class Building implements ILostCityBuilding {
 
         readParts(object, this.parts, "parts");
         readParts(object, this.parts2, "parts2");
+    }
+
+    public void readParts(List<Pair<Predicate<ConditionContext>, String>> p, List<BuildingRE.PartRef> partRefs) {
+        p.clear();
+        if (partRefs == null) {
+            return;
+        }
+        for (BuildingRE.PartRef partRef : partRefs) {
+            String partName = partRef.getPart();
+            Predicate<ConditionContext> test = ConditionContext.parseTest(partRef);
+            addPart(test, partName, p);
+        }
     }
 
     public void readParts(JsonObject object, List<Pair<Predicate<ConditionContext>, String>> p, String partSection) {

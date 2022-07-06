@@ -1,0 +1,38 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "parts": [
+    {
+      "top": false,
+      "part": "center10_1"
+    },
+    {
+      "top": false,
+      "part": "center10_2"
+    },
+    {
+      "top": false,
+      "part": "center10_3"
+    },
+    {
+      "top": false,
+      "part": "center10_4"
+    },
+    {
+      "top": true,
+      "part": "top_center_1"
+    },
+    {
+      "top": true,
+      "part": "top_center_2"
+    },
+    {
+      "top": true,
+      "part": "top_center_3"
+    },
+    {
+      "top": true,
+      "part": "top_center_4"
+    }
+  ]
+}

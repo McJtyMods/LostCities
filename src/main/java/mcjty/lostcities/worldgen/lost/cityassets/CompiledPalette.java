@@ -45,7 +45,7 @@ public class CompiledPalette {
         // First add the straight palette entries
         for (Palette p : palettes) {
             if (p != null) {
-                for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {
+                for (Map.Entry<Character, Object> entry : p.getPalette().entrySet()) {
                     Object value = entry.getValue();
                     if (value instanceof BlockState) {
                         palette.put(entry.getKey(), value);
@@ -77,7 +77,7 @@ public class CompiledPalette {
             // Now add the palette entries that refer to other palette entries
             for (Palette p : palettes) {
                 if (p != null) {
-                    for (Map.Entry<Character, Object> entry : p.palette.entrySet()) {
+                    for (Map.Entry<Character, Object> entry : p.getPalette().entrySet()) {
                         Object value = entry.getValue();
                         if (value instanceof String) {
                             char c = ((String) value).charAt(0);
