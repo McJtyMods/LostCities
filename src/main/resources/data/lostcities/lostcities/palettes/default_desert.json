@@ -1,0 +1,121 @@
+{
+  "palette": [
+    {
+      "char": "Q",
+      "block": "minecraft:quartz_block",
+      "damaged": "minecraft:iron_bars"
+    },
+    {
+      "char": "R",
+      "block": "minecraft:stained_hardened_clay@9",
+      "damaged": "minecraft:iron_bars"
+    },
+    {
+      "char": "u",
+      "block": "minecraft:double_stone_slab",
+      "damaged": "minecraft:iron_bars"
+    },
+    {
+      "char": "S",
+      "block": "minecraft:double_stone_slab2",
+      "damaged": "minecraft:iron_bars"
+    },
+    {
+      "char": "b",
+      "block": "minecraft:stone"
+    },
+    {
+      "char": "B",
+      "block": "minecraft:red_nether_brick",
+      "damaged": "minecraft:iron_bars"
+    },
+    {
+      "char": "v",
+      "blocks": [
+        {
+          "random": 10,
+          "block": "minecraft:stonebrick@2"
+        },
+        {
+          "random": 9,
+          "block": "minecraft:stonebrick@1"
+        },
+        {
+          "random": 2000,
+          "block": "minecraft:stonebrick"
+        }
+      ],
+      "damaged": "minecraft:iron_bars"
+    },
+    {
+      "char": "y",
+      "blocks": [
+        {
+          "random": 10,
+          "block": "minecraft:stonebrick@2"
+        },
+        {
+          "random": 9,
+          "block": "minecraft:stonebrick@1"
+        },
+        {
+          "random": 2000,
+          "block": "minecraft:stonebrick"
+        }
+      ],
+      "damaged": "minecraft:iron_bars"
+    },
+    {
+      "char": "x",
+      "block": "minecraft:sandstone@2"
+    },
+    {
+      "char": "_",
+      "block": "minecraft:stone_slab@1"
+    },
+    {
+      "char": "=",
+      "block": "minecraft:stone_slab@9"
+    },
+    {
+      "char": "w",
+      "block": "minecraft:cobblestone_wall"
+    },
+    {
+      "char": ":",
+      "block": "minecraft:iron_bars"
+    },
+    {
+      "char": "A",
+      "block": "minecraft:stone_brick_stairs@1"
+    },
+    {
+      "char": "t",
+      "block": "minecraft:stone_brick_stairs@0"
+    },
+    {
+      "char": "z",
+      "block": "minecraft:stone_brick_stairs@3"
+    },
+    {
+      "char": "c",
+      "block": "minecraft:stone_brick_stairs@2"
+    },
+    {
+      "char": "d",
+      "block": "minecraft:stone_brick_stairs@7"
+    },
+    {
+      "char": "(",
+      "block": "minecraft:quartz_stairs@3"
+    },
+    {
+      "char": ")",
+      "block": "minecraft:quartz_stairs@2"
+    },
+    {
+      "char": "/",
+      "block": "minecraft:stone_stairs@1"
+    }
+  ]
+}

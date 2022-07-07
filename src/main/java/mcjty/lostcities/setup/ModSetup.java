@@ -7,7 +7,6 @@ import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
@@ -21,10 +20,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class ModSetup {
-
-    public static boolean chisel = false;
-    public static boolean biomesoplenty = false;
-    public static boolean atg = false;
 
     public static Logger logger = null;
 
@@ -42,13 +37,6 @@ public class ModSetup {
 
         PacketHandler.registerMessages("lostcities");
         LostCityFeature.registerConfiguredFeatures();
-
-        // @todo 1.16
-//        CavernWorldType.init();
-
-        setupModCompat();
-
-//        ModDimensions.init();
 
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         // @todo 1.14
@@ -106,18 +94,5 @@ public class ModSetup {
                 throw new RuntimeException("Invalid path for lostcity resource in 'assets' config!");
             }
         }
-
-        if (Config.DEBUG) {
-            // @todo 1.14
-//            logger.info("Asset parts loaded: " + AssetRegistries.PARTS.getCount());
-            AssetRegistries.showStatistics();
-        }
     }
-
-    private void setupModCompat() {
-        chisel = ModList.get().isLoaded("chisel");
-        biomesoplenty = ModList.get().isLoaded("biomesoplenty");
-//        atg = Loader.isModLoaded("atg"); // @todo
-    }
-
 }

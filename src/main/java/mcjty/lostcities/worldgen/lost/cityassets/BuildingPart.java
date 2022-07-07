@@ -7,6 +7,7 @@ import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
+import net.minecraft.world.level.CommonLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.StringUtils;
 
@@ -111,9 +112,9 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     }
 
     @Override
-    public Palette getLocalPalette() {
+    public Palette getLocalPalette(CommonLevelAccessor level) {
         if (localPalette == null && refPaletteName != null) {
-            localPalette = AssetRegistries.PALETTES.get(null, refPaletteName);  // @todo REG
+            localPalette = AssetRegistries.PALETTES.get(level, refPaletteName);
             if (localPalette == null) {
                 ModSetup.getLogger().error("Could not find palette '" + refPaletteName + "'!");
                 throw new RuntimeException("Could not find palette '" + refPaletteName + "'!");

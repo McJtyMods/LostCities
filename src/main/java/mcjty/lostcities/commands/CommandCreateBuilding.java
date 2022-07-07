@@ -94,8 +94,8 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
     private static void generatePart(Level level, ChunkPos cp, BuildingInfo info, IBuildingPart part, int oy) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
         // Cache the combined palette?
-        Palette partPalette = part.getLocalPalette();
-        Palette buildingPalette = info.getBuilding().getLocalPalette();
+        Palette partPalette = part.getLocalPalette(level);
+        Palette buildingPalette = info.getBuilding().getLocalPalette(level);
         if (partPalette != null || buildingPalette != null) {
             compiledPalette = new CompiledPalette(compiledPalette, partPalette, buildingPalette);
         }

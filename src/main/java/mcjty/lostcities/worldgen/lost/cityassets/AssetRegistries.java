@@ -7,6 +7,7 @@ import mcjty.lostcities.setup.CustomRegistries;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.Counter;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
+import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +23,7 @@ public class AssetRegistries {
     public static final RegistryAssetRegistry<Building, BuildingRE> BUILDINGS = new RegistryAssetRegistry<>(CustomRegistries.BUILDING_REGISTRY_KEY, Building::new);
     public static final AbstractAssetRegistry<MultiBuilding> MULTI_BUILDINGS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Style> STYLES = new AbstractAssetRegistry<>();
-    public static final AbstractAssetRegistry<Palette> PALETTES = new AbstractAssetRegistry<>();
+    public static final RegistryAssetRegistry<Palette, PaletteRE> PALETTES = new RegistryAssetRegistry<>(CustomRegistries.PALETTE_REGISTRY_KEY, Palette::new);
     public static final AbstractAssetRegistry<PredefinedCity> PREDEFINED_CITIES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<PredefinedSphere> PREDEFINED_SPHERES = new AbstractAssetRegistry<>();
 
@@ -57,77 +58,6 @@ public class AssetRegistries {
         map.get(character).add(partName);
     }
 
-    public static void showStatistics() {
-        Counter<Character> counterLocal = new Counter<>();
-        Counter<Character> counterGlobal = new Counter<>();
-        Map<Character, Set<String>> usersPerCharacter = new HashMap<>();
-
-        for (BuildingPart part : PARTS.getIterable()) {
-            Palette localPalette = part.getLocalPalette();
-            Map<Character, Object> palette = Collections.emptyMap();
-            if (localPalette != null) {
-                palette = localPalette.getPalette();
-            }
-            for (int x = 0 ; x < part.getXSize() ; x++) {
-                for (int z = 0 ; z < part.getZSize() ; z++) {
-                    char[] slice = part.getVSlice(x, z);
-                    if (slice != null) {
-                        for (char c : slice) {
-                            if (palette.containsKey(c)) {
-                                counterLocal.add(c);
-                            } else {
-                                counterGlobal.add(c);
-                            }
-                            add(usersPerCharacter, c, part.getName());
-                        }
-                    }
-                }
-            }
-        }
-        List<Map.Entry<Character, Integer>> global = new ArrayList<>(counterGlobal.getMap().entrySet());
-        List<Map.Entry<Character, Integer>> local = new ArrayList<>(counterLocal.getMap().entrySet());
-        global.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
-        local.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
-        ModSetup.getLogger().info("############################################################################");
-        ModSetup.getLogger().info("Global palette entries");
-        printMap(usersPerCharacter, global);
-        ModSetup.getLogger().info("----------------------------------------------------------------------------");
-        ModSetup.getLogger().info("Local palette entries");
-        printMap(usersPerCharacter, local);
-        ModSetup.getLogger().info("----------------------------------------------------------------------------");
-
-        printChars("Global: ", counterGlobal);
-        printChars("Local: ", counterLocal);
-
-        ModSetup.getLogger().info("############################################################################");
-    }
-
-    private static void printChars(String prefix, Counter<Character> counter) {
-        List<Character> chars = new ArrayList<>(counter.getMap().keySet());
-        chars.sort(Character::compareTo);
-        StringBuilder s = new StringBuilder();
-        for (Character character : chars) {
-            s.append(character);
-        }
-        ModSetup.getLogger().info(prefix + s);
-    }
-
-    private static void printMap(Map<Character, Set<String>> usersPerCharacter, List<Map.Entry<Character, Integer>> map) {
-        for (Map.Entry<Character, Integer> entry : map) {
-            Set<String> users = usersPerCharacter.get(entry.getKey());
-            StringBuilder s = new StringBuilder("    " + entry.getKey() + ": " + entry.getValue() + " Uses");
-            if (users.size() < 10) {
-                s.append(", Used by: ");
-                for (String user : users) {
-                    s.append(user).append(",");
-                }
-            } else {
-                s.append(", Used ").append(users.size()).append(" times");
-            }
-            ModSetup.getLogger().info(s.toString());
-        }
-    }
-
     public static void load(InputStream inputstream, String filename) {
         try(BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8))) {
             JsonParser parser = new JsonParser();
@@ -141,8 +71,6 @@ public class AssetRegistries {
                     VARIANTS.register(new Variant(object));
                 } else if ("condition".equals(type)) {
                     CONDITIONS.register(new Condition(object));
-                } else if ("palette".equals(type)) {
-                    PALETTES.register(new Palette(object));
                 } else if ("citystyle".equals(type)) {
                     CITYSTYLES.register(new CityStyle(object));
                 } else if ("part".equals(type)) {

@@ -1,0 +1,52 @@
+{
+  "palette": [
+    {
+      "char": "k",
+      "block": "minecraft:rail"
+    },
+    {
+      "char": "e",
+      "block": "minecraft:rail@1"
+    },
+    {
+      "char": "j",
+      "block": "minecraft:rail@2"
+    },
+    {
+      "char": "q",
+      "block": "minecraft:rail@6"
+    },
+    {
+      "char": "s",
+      "block": "minecraft:rail@7"
+    },
+    {
+      "char": "r",
+      "block": "minecraft:rail@8"
+    },
+    {
+      "char": "n",
+      "block": "minecraft:rail@9"
+    },
+    {
+      "char": "m",
+      "block": "minecraft:golden_rail@8"
+    },
+    {
+      "char": "E",
+      "block": "minecraft:golden_rail@13"
+    },
+    {
+      "char": "H",
+      "block": "minecraft:golden_rail@12"
+    },
+    {
+      "char": "f",
+      "block": "minecraft:golden_rail@9"
+    },
+    {
+      "char": "i",
+      "block": "minecraft:golden_rail@10"
+    }
+  ]
+}

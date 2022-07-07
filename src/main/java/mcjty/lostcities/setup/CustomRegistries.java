@@ -2,6 +2,7 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
+import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -19,9 +20,14 @@ public class CustomRegistries {
     public static final DeferredRegister<BuildingRE> BUILDING_DEFERRED_REGISTER = DeferredRegister.create(BUILDING_REGISTRY_KEY, LostCities.MODID);
     public static final Supplier<IForgeRegistry<BuildingRE>> BUILDING_REGISTRY = BUILDING_DEFERRED_REGISTER.makeRegistry(BuildingRE.class, () -> new RegistryBuilder<BuildingRE>().dataPackRegistry(BuildingRE.CODEC));
 
+    public static final ResourceKey<Registry<PaletteRE>> PALETTE_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "palettes"));
+    public static final DeferredRegister<PaletteRE> PALETTE_DEFERRED_REGISTER = DeferredRegister.create(PALETTE_REGISTRY_KEY, LostCities.MODID);
+    public static final Supplier<IForgeRegistry<PaletteRE>> PALETTE_REGISTRY = PALETTE_DEFERRED_REGISTER.makeRegistry(PaletteRE.class, () -> new RegistryBuilder<PaletteRE>().dataPackRegistry(PaletteRE.CODEC));
+
     public static void init() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         BUILDING_DEFERRED_REGISTER.register(bus);
+        PALETTE_DEFERRED_REGISTER.register(bus);
     }
 
 }

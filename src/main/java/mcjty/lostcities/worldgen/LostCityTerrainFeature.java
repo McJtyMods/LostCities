@@ -1976,8 +1976,9 @@ public class LostCityTerrainFeature {
                              int ox, int oy, int oz, boolean airWaterLevel) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
         // Cache the combined palette?
-        Palette partPalette = part.getLocalPalette();
-        Palette buildingPalette = info.getBuilding().getLocalPalette();
+        WorldGenLevel world = provider.getWorld();
+        Palette partPalette = part.getLocalPalette(world);
+        Palette buildingPalette = info.getBuilding().getLocalPalette(world);
         if (partPalette != null || buildingPalette != null) {
             compiledPalette = new CompiledPalette(compiledPalette, partPalette, buildingPalette);
         }
@@ -2041,7 +2042,6 @@ public class LostCityTerrainFeature {
                                         BlockPos pos = driver.getCurrentCopy();
                                         BlockState finalB = b;
                                         info.addPostTodo(pos, () -> {
-                                            WorldGenLevel world = provider.getWorld();
                                             if (!world.getBlockState(pos).isAir()) {
                                                 world.setBlock(pos, finalB, Block.UPDATE_CLIENTS);
                                                 generateLoot(info, world, pos, new BuildingInfo.ConditionTodo(inf.loot(), part.getName(), info));
@@ -2053,9 +2053,9 @@ public class LostCityTerrainFeature {
                                         String mobid = inf.mobId();
 
                                         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
-                                        ResourceLocation randomValue = getRandomSpawnerMob(provider.getWorld().getLevel(), rand, provider, info,
+                                        ResourceLocation randomValue = getRandomSpawnerMob(world.getLevel(), rand, provider, info,
                                                 new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
-                                        GlobalTodo.getData(provider.getWorld().getLevel()).addSpawnerTodo(pos, b, randomValue);
+                                        GlobalTodo.getData(world.getLevel()).addSpawnerTodo(pos, b, randomValue);
                                     } else {
                                         b = air;
                                     }
@@ -2072,7 +2072,7 @@ public class LostCityTerrainFeature {
                                     } else {
                                         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
                                         if (block instanceof SaplingBlock saplingBlock) {
-                                            GlobalTodo.getData(provider.getWorld().getLevel()).addTodo(pos, (level) -> {
+                                            GlobalTodo.getData(world.getLevel()).addTodo(pos, (level) -> {
                                                 BlockState state = bs.setValue(SaplingBlock.STAGE, 1);
                                                 if (level.isAreaLoaded(pos, 1)) {
                                                     level.setBlock(pos, state, Block.UPDATE_CLIENTS);

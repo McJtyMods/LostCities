@@ -1,0 +1,16 @@
+{
+  "palette": [
+    {
+      "char": "+",
+      "block": "minecraft:stained_glass"
+    },
+    {
+      "char": "`",
+      "block": "minecraft:stained_glass_pane"
+    },
+    {
+      "char": "a",
+      "block": "minecraft:stained_glass"
+    }
+  ]
+}

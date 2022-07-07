@@ -1,0 +1,9 @@
+{
+  "palette": [
+    {
+      "char": "@",
+      "block": "minecraft:quartz_block",
+      "damaged": "minecraft:iron_bars"
+    }
+  ]
+}

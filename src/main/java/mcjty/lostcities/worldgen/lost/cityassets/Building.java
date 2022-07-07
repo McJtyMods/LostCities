@@ -1,12 +1,10 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityBuilding;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
+import net.minecraft.world.level.CommonLevelAccessor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,10 +30,6 @@ public class Building implements ILostCityBuilding {
 
     private final List<Pair<Predicate<ConditionContext>, String>> parts = new ArrayList<>();
     private final List<Pair<Predicate<ConditionContext>, String>> parts2 = new ArrayList<>();
-
-    public Building(JsonObject object) {
-        readFromJSon(object);
-    }
 
     public Building(BuildingRE object) {
         name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
@@ -63,9 +57,9 @@ public class Building implements ILostCityBuilding {
     }
 
     @Override
-    public Palette getLocalPalette() {
+    public Palette getLocalPalette(CommonLevelAccessor level) {
         if (localPalette == null && refPaletteName != null) {
-            localPalette = AssetRegistries.PALETTES.get(null, refPaletteName);  // @todo REG
+            localPalette = AssetRegistries.PALETTES.get(level, refPaletteName);
             if (localPalette == null) {
                 ModSetup.getLogger().error("Could not find palette '" + refPaletteName + "'!");
                 throw new RuntimeException("Could not find palette '" + refPaletteName + "'!");
@@ -76,44 +70,6 @@ public class Building implements ILostCityBuilding {
 
     @Override
     public void readFromJSon(JsonObject object) {
-        name = object.get("name").getAsString();
-
-        if (object.has("minfloors")) {
-            minFloors = object.get("minfloors").getAsInt();
-        }
-        if (object.has("mincellars")) {
-            minCellars = object.get("mincellars").getAsInt();
-        }
-        if (object.has("maxfloors")) {
-            maxFloors = object.get("maxfloors").getAsInt();
-        }
-        if (object.has("maxcellars")) {
-            maxCellars = object.get("maxcellars").getAsInt();
-        }
-        if (object.has("preferslonely")) {
-            prefersLonely = object.get("preferslonely").getAsFloat();
-        }
-        if (object.has("filler")) {
-            fillerBlock = object.get("filler").getAsCharacter();
-        } else {
-            throw new RuntimeException("'filler' is required for building '" + name + "'!");
-        }
-        if (object.has("rubble")) {
-            rubbleBlock = object.get("rubble").getAsCharacter();
-        }
-
-        if (object.has("palette")) {
-            if (object.get("palette").isJsonArray()) {
-                JsonArray palette = object.get("palette").getAsJsonArray();
-                localPalette = new Palette();
-                localPalette.parsePaletteArray(palette);
-            } else {
-                refPaletteName = object.get("palette").getAsString();
-            }
-        }
-
-        readParts(object, this.parts, "parts");
-        readParts(object, this.parts2, "parts2");
     }
 
     public void readParts(List<Pair<Predicate<ConditionContext>, String>> p, List<BuildingRE.PartRef> partRefs) {
@@ -127,35 +83,6 @@ public class Building implements ILostCityBuilding {
             addPart(test, partName, p);
         }
     }
-
-    public void readParts(JsonObject object, List<Pair<Predicate<ConditionContext>, String>> p, String partSection) {
-        p.clear();
-        if (!object.has(partSection)) {
-            return;
-        }
-        JsonArray partArray = object.get(partSection).getAsJsonArray();
-        for (JsonElement element : partArray) {
-            String partName = element.getAsJsonObject().get("part").getAsString();
-            Predicate<ConditionContext> test = ConditionContext.parseTest(element);
-            addPart(test, partName, p);
-        }
-    }
-
-    public JsonObject writeToJSon() {
-        JsonObject object = new JsonObject();
-        object.add("type", new JsonPrimitive("building"));
-        object.add("name", new JsonPrimitive(name));
-        JsonArray partArray = new JsonArray();
-        for (Pair<Predicate<ConditionContext>, String> part : parts) {
-            JsonObject partObject = new JsonObject();
-            partObject.add("test", new JsonPrimitive("@todo"));
-            partObject.add("part", new JsonPrimitive(part.getRight()));
-            partArray.add(partObject);
-        }
-        object.add("parts", partArray);
-        return object;
-    }
-
 
     public Building addPart(Predicate<ConditionContext> test, String partName,
                             List<Pair<Predicate<ConditionContext>, String>> parts) {

@@ -1,5 +1,7 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
+import net.minecraft.world.level.CommonLevelAccessor;
+
 public interface IBuildingPart {
     Character getMetaChar(String key);
 
@@ -17,7 +19,7 @@ public interface IBuildingPart {
 
     char[] getVSlice(int x, int z);
 
-    Palette getLocalPalette();
+    Palette getLocalPalette(CommonLevelAccessor level);
 
     int getSliceCount();
 

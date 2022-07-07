@@ -1,0 +1,227 @@
+{
+  "palette": [
+    {
+      "char": "1",
+      "block": "minecraft:spawner",
+      "mob": "easymobs"
+    },
+    {
+      "char": "4",
+      "block": "minecraft:spawner",
+      "mob": "hardmobs"
+    },
+    {
+      "char": "T",
+      "block": "minecraft:torch",
+      "torch": true
+    },
+    {
+      "char": "h",
+      "block": "minecraft:glowstone"
+    },
+    {
+      "char": "g",
+      "block": "minecraft:redstone_torch@5"
+    },
+    {
+      "char": "9",
+      "blocks": [
+        {
+          "random": 32,
+          "block": "minecraft:stained_hardened_clay@9"
+        },
+        {
+          "random": 32,
+          "block": "minecraft:stained_hardened_clay@7"
+        },
+        {
+          "random": 32,
+          "block": "minecraft:concrete@9"
+        },
+        {
+          "random": 1000,
+          "block": "minecraft:concrete@7"
+        }
+      ]
+    },
+    {
+      "char": "Y",
+      "block": "minecraft:stained_glass"
+    },
+    {
+      "char": "Z",
+      "blocks": [
+        {
+          "random": 32,
+          "block": "minecraft:glass"
+        },
+        {
+          "random": 32,
+          "block": "minecraft:stained_glass@7"
+        },
+        {
+          "random": 32,
+          "block": "minecraft:stained_glass@11"
+        },
+        {
+          "random": 1000,
+          "block": "minecraft:stained_glass@3"
+        }
+      ]
+    },
+    {
+      "char": "p",
+      "blocks": [
+        {
+          "random": 30,
+          "block": "minecraft:red_flower"
+        },
+        {
+          "random": 30,
+          "block": "minecraft:yellow_flower"
+        },
+        {
+          "random": 15,
+          "block": "minecraft:sapling"
+        },
+        {
+          "random": 15,
+          "block": "minecraft:sapling@1"
+        },
+        {
+          "random": 15,
+          "block": "minecraft:sapling@2"
+        },
+        {
+          "random": 1000,
+          "block": "minecraft:sapling@4"
+        }
+      ]
+    },
+    {
+      "char": "K",
+      "blocks": [
+        {
+          "random": 64,
+          "block": "minecraft:red_flower"
+        },
+        {
+          "random": 1000,
+          "block": "minecraft:yellow_flower"
+        }
+      ]
+    },
+    {
+      "char": "!",
+      "blocks": [
+        {
+          "random": 15,
+          "block": "minecraft:diamond_block"
+        },
+        {
+          "random": 20,
+          "block": "minecraft:gold_block"
+        },
+        {
+          "random": 15,
+          "block": "minecraft:emerald_block"
+        },
+        {
+          "random": 1000,
+          "block": "minecraft:iron_block"
+        }
+      ]
+    },
+    {
+      "char": "F",
+      "blocks": [
+        {
+          "random": 25,
+          "block": "minecraft:furnace"
+        },
+        {
+          "random": 20,
+          "block": "minecraft:crafting_table"
+        },
+        {
+          "random": 7,
+          "block": "minecraft:brewing_stand"
+        },
+        {
+          "random": 6,
+          "block": "minecraft:anvil"
+        },
+        {
+          "random": 5,
+          "block": "minecraft:cauldron"
+        },
+        {
+          "random": 2,
+          "block": "minecraft:enchanting_table"
+        },
+        {
+          "random": 1000,
+          "block": "minecraft:web"
+        }
+      ]
+    },
+    {
+      "char": "%",
+      "blocks": [
+        {
+          "random": 40,
+          "block": "minecraft:web"
+        },
+        {
+          "random": 1000,
+          "block": "minecraft:air"
+        }
+      ]
+    },
+    {
+      "char": "*",
+      "block": "minecraft:flower_pot"
+    },
+    {
+      "char": "l",
+      "block": "minecraft:ladder@2"
+    },
+    {
+      "char": "-",
+      "block": "minecraft:wooden_pressure_plate"
+    },
+    {
+      "char": ".",
+      "block": "minecraft:fence"
+    },
+    {
+      "char": "L",
+      "block": "minecraft:bookshelf"
+    },
+    {
+      "char": "W",
+      "block": "minecraft:water"
+    },
+    {
+      "char": "C",
+      "block": "minecraft:chest",
+      "loot": "chestloot"
+    },
+    {
+      "char": "G",
+      "block": "minecraft:grass"
+    },
+    {
+      "char": "D",
+      "block": "minecraft:dirt"
+    },
+    {
+      "char": " ",
+      "block": "minecraft:air"
+    },
+    {
+      "char": "~",
+      "block": "minecraft:command_block"
+    }
+  ]
+}

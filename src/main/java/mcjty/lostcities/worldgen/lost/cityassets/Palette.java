@@ -27,8 +27,9 @@ public class Palette implements ILostCityAsset {
     public Palette() {
     }
 
-    public Palette(JsonObject object) {
-        readFromJSon(object);
+    public Palette(PaletteRE object) {
+        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        parsePaletteArray(object);
     }
 
     public Palette(String name) {
@@ -70,18 +71,23 @@ public class Palette implements ILostCityAsset {
 
     @Override
     public void readFromJSon(JsonObject object) {
-        name = object.get("name").getAsString();
-        JsonArray paletteArray = object.get("palette").getAsJsonArray();
-        parsePaletteArray(paletteArray);
     }
 
-    // @todo parse mob, loot, ...
     public void parsePaletteArray(PaletteRE paletteRE) {
         for (PaletteRE.PaletteEntry entry : paletteRE.getPaletteEntries()) {
             Character c = entry.getChr().charAt(0);
             BlockState dmg = null;
             if (entry.getDamaged() != null) {
                 dmg = Tools.stringToState(entry.getDamaged());
+            }
+            if (entry.getLoot() != null) {
+                lootTables.put(c, entry.getLoot());
+            }
+            if (entry.getMob() != null) {
+                mobIds.put(c, entry.getMob());
+            }
+            if (entry.getTorch() != null && entry.getTorch()) {
+                torches.add(c);
             }
             if (entry.getBlock() != null) {
                 String block = entry.getBlock();
@@ -107,11 +113,11 @@ public class Palette implements ILostCityAsset {
                 String value = entry.getFrompalette();
                 palette.put(c, value);
             } else if (entry.getBlocks() != null) {
-                List<com.mojang.datafixers.util.Pair<Integer, String>> entryBlocks = entry.getBlocks();
+                List<PaletteRE.BlockEntry> entryBlocks = entry.getBlocks();
                 List<Pair<Integer, BlockState>> blocks = new ArrayList<>();
-                for (com.mojang.datafixers.util.Pair<Integer, String> ob : entryBlocks) {
-                    Integer f = ob.getFirst();
-                    String block = ob.getSecond();
+                for (PaletteRE.BlockEntry ob : entryBlocks) {
+                    Integer f = ob.getRandom();
+                    String block = ob.getBlock();
                     BlockState state = Tools.stringToState(block);
                     blocks.add(Pair.of(f, state));
                     if (dmg != null) {
@@ -120,7 +126,7 @@ public class Palette implements ILostCityAsset {
                 }
                 addMappingViaState(c, blocks);
             } else {
-                throw new RuntimeException("Illegal palette!");
+                throw new RuntimeException("Illegal palette " + name + "!");
             }
         }
     }
@@ -130,6 +136,7 @@ public class Palette implements ILostCityAsset {
             JsonObject o = element.getAsJsonObject();
             Character c = o.get("char").getAsCharacter();
             BlockState dmg = null;
+
             if (o.has("damaged")) {
                 dmg = Tools.stringToState(o.get("damaged").getAsString());
             }
@@ -139,7 +146,7 @@ public class Palette implements ILostCityAsset {
             if (o.has("loot")) {
                 lootTables.put(c, o.get("loot").getAsString());
             }
-            if (o.has("facing")) {
+            if (o.has("torch")) {
                 // @todo 1.14
 //                Map<String, Integer> or = new HashMap<>();
 //                JsonObject torchObj = o.get("facing").getAsJsonObject();
