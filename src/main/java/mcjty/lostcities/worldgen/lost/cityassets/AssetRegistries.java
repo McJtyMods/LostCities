@@ -1,12 +1,11 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
 import com.google.gson.*;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
 import mcjty.lostcities.setup.CustomRegistries;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingPartRE;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
 import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
+import mcjty.lostcities.worldgen.lost.regassets.StyleRE;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +22,7 @@ public class AssetRegistries {
     public static final RegistryAssetRegistry<BuildingPart, BuildingPartRE> PARTS = new RegistryAssetRegistry<>(CustomRegistries.PART_REGISTRY_KEY, BuildingPart::new);
     public static final RegistryAssetRegistry<Building, BuildingRE> BUILDINGS = new RegistryAssetRegistry<>(CustomRegistries.BUILDING_REGISTRY_KEY, Building::new);
     public static final AbstractAssetRegistry<MultiBuilding> MULTI_BUILDINGS = new AbstractAssetRegistry<>();
-    public static final AbstractAssetRegistry<Style> STYLES = new AbstractAssetRegistry<>();
+    public static final RegistryAssetRegistry<Style, StyleRE> STYLES = new RegistryAssetRegistry<>(CustomRegistries.STYLE_REGISTRY_KEY, Style::new);
     public static final RegistryAssetRegistry<Palette, PaletteRE> PALETTES = new RegistryAssetRegistry<>(CustomRegistries.PALETTE_REGISTRY_KEY, Palette::new);
     public static final AbstractAssetRegistry<PredefinedCity> PREDEFINED_CITIES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<PredefinedSphere> PREDEFINED_SPHERES = new AbstractAssetRegistry<>();
@@ -68,9 +67,7 @@ public class AssetRegistries {
             for (JsonElement entry : element.getAsJsonArray()) {
                 JsonObject object = entry.getAsJsonObject();
                 String type = object.get("type").getAsString();
-                if ("style".equals(type)) {
-                    STYLES.register(new Style(object));
-                } else if ("variant".equals(type)) {
+                if ("variant".equals(type)) {
                     VARIANTS.register(new Variant(object));
                 } else if ("condition".equals(type)) {
                     CONDITIONS.register(new Condition(object));

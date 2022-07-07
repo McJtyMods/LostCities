@@ -1,11 +1,9 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.lost.regassets.StyleRE;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -18,46 +16,21 @@ public class Style implements ILostCityAsset {
 
     private final List<List<Pair<Float, String>>> randomPaletteChoices = new ArrayList<>();
 
-    public Style(String name) {
-        this.name = name;
-    }
-
-    public Style(JsonObject object) {
-        readFromJSon(object);
-    }
-
-    @Override
-    public void readFromJSon(JsonObject object) {
-        name = object.get("name").getAsString();
-        JsonArray array = object.get("randompalettes").getAsJsonArray();
-        for (JsonElement element : array) {
+    public Style(StyleRE object) {
+        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        for (List<StyleRE.PaletteSelector> array : object.getRandomPaletteChoices()) {
             List<Pair<Float, String>> palettes = new ArrayList<>();
-            for (JsonElement el : element.getAsJsonArray()) {
-                float factor = el.getAsJsonObject().get("factor").getAsFloat();
-                String style = el.getAsJsonObject().get("palette").getAsString();
-                palettes.add(Pair.of(factor, style));
+            for (StyleRE.PaletteSelector selector : array) {
+                float factor = selector.getFactor();
+                String palette = selector.getPalette();
+                palettes.add(Pair.of(factor, palette));
             }
             randomPaletteChoices.add(palettes);
         }
     }
 
-    public JsonObject writeToJSon() {
-        JsonObject object = new JsonObject();
-        object.add("type", new JsonPrimitive("style"));
-        object.add("name", new JsonPrimitive(name));
-        JsonArray array = new JsonArray();
-        for (List<Pair<Float, String>> list : randomPaletteChoices) {
-            JsonArray a = new JsonArray();
-            for (Pair<Float, String> pair : list) {
-                JsonObject o = new JsonObject();
-                o.add("factor", new JsonPrimitive(pair.getKey()));
-                o.add("palette", new JsonPrimitive(pair.getValue()));
-                a.add(o);
-            }
-            array.add(a);
-        }
-        object.add("randompalettes", array);
-        return object;
+    @Override
+    public void readFromJSon(JsonObject object) {
     }
 
     @Override
@@ -89,6 +62,4 @@ public class Style implements ILostCityAsset {
 
         return palette;
     }
-
-
 }

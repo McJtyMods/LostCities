@@ -22,8 +22,6 @@ public class Config {
     public static final String[] DEFAULT_ASSETS = new String[] {
             "/assets/lostcities/citydata/variants.json",
             "/assets/lostcities/citydata/conditions.json",
-            "/assets/lostcities/citydata/palette.json",
-            "/assets/lostcities/citydata/palette_desert.json",
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
     };
