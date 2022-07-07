@@ -40,7 +40,7 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
                     Codec.INT.optionalFieldOf("maxfloors").forGetter(l -> l.maxFloors == -1 ? Optional.<Integer>empty() : Optional.of(l.maxFloors)),
                     Codec.FLOAT.optionalFieldOf("preferslonely").forGetter(l -> l.prefersLonely == 0 ? Optional.<Float>empty() : Optional.of(l.prefersLonely)),
                     Codec.list(CODEC_PARTREF).fieldOf("parts").forGetter(l -> l.parts),
-                    Codec.list(CODEC_PARTREF).fieldOf("parts2").forGetter(l -> l.parts2)
+                    Codec.list(CODEC_PARTREF).optionalFieldOf("parts2").forGetter(l -> Optional.ofNullable(l.parts2))
             ).apply(instance, BuildingRE::new));
 
 
@@ -62,7 +62,7 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
 
     public BuildingRE(Optional<String> refpalette, Optional<PaletteRE> locpalette, String filler, Optional<String> rubble,
                       Optional<Integer> minCellars, Optional<Integer> minFloors, Optional<Integer> maxCellars, Optional<Integer> maxFloors, Optional<Float> prefersLonely,
-                      List<PartRef> partRefs, List<PartRef> partRefs2) {
+                      List<PartRef> partRefs, Optional<List<PartRef>> partRefs2) {
         this.refPaletteName = refpalette.isPresent() ? refpalette.get() : null;
         this.localPalette = locpalette.isPresent() ? locpalette.get() : null;
         this.fillerBlock = filler.charAt(0);
@@ -73,7 +73,7 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
         this.maxFloors = maxFloors.isPresent() ? maxFloors.get() : -1;
         this.prefersLonely = prefersLonely.isPresent() ? prefersLonely.get() : 0.0f;
         this.parts = partRefs;
-        this.parts2 = partRefs2;
+        this.parts2 = partRefs2.isPresent() ? partRefs2.get() : null;
     }
 
     @Override

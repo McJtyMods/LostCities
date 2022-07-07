@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
+import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -74,10 +75,59 @@ public class Palette implements ILostCityAsset {
         parsePaletteArray(paletteArray);
     }
 
+    // @todo parse mob, loot, ...
+    public void parsePaletteArray(PaletteRE paletteRE) {
+        for (PaletteRE.PaletteEntry entry : paletteRE.getPaletteEntries()) {
+            Character c = entry.getChr().charAt(0);
+            BlockState dmg = null;
+            if (entry.getDamaged() != null) {
+                dmg = Tools.stringToState(entry.getDamaged());
+            }
+            if (entry.getBlock() != null) {
+                String block = entry.getBlock();
+                BlockState state = Tools.stringToState(block);
+                palette.put(c, state);
+                if (dmg != null) {
+                    damaged.put(state, dmg);
+                }
+            } else if (entry.getVariant() != null) {
+                String variantName = entry.getVariant();
+                Variant variant = AssetRegistries.VARIANTS.get(null, variantName);  // @todo REG
+                if (variant == null) {
+                    throw new RuntimeException("Variant '" + variantName + "' is missing!");
+                }
+                List<Pair<Integer, BlockState>> blocks = variant.getBlocks();
+                if (dmg != null) {
+                    for (Pair<Integer, BlockState> pair : blocks) {
+                        damaged.put(pair.getRight(), dmg);
+                    }
+                }
+                addMappingViaState(c, blocks);
+            } else if (entry.getFrompalette() != null) {
+                String value = entry.getFrompalette();
+                palette.put(c, value);
+            } else if (entry.getBlocks() != null) {
+                List<com.mojang.datafixers.util.Pair<Integer, String>> entryBlocks = entry.getBlocks();
+                List<Pair<Integer, BlockState>> blocks = new ArrayList<>();
+                for (com.mojang.datafixers.util.Pair<Integer, String> ob : entryBlocks) {
+                    Integer f = ob.getFirst();
+                    String block = ob.getSecond();
+                    BlockState state = Tools.stringToState(block);
+                    blocks.add(Pair.of(f, state));
+                    if (dmg != null) {
+                        damaged.put(state, dmg);
+                    }
+                }
+                addMappingViaState(c, blocks);
+            } else {
+                throw new RuntimeException("Illegal palette!");
+            }
+        }
+    }
+
     public void parsePaletteArray(JsonArray paletteArray) {
         for (JsonElement element : paletteArray) {
             JsonObject o = element.getAsJsonObject();
-            Object value = null;
             Character c = o.get("char").getAsCharacter();
             BlockState dmg = null;
             if (o.has("damaged")) {
@@ -109,7 +159,7 @@ public class Palette implements ILostCityAsset {
                 }
             } else if (o.has("variant")) {
                 String variantName = o.get("variant").getAsString();
-                Variant variant = AssetRegistries.VARIANTS.get(variantName);
+                Variant variant = AssetRegistries.VARIANTS.get(null, variantName);  // @todo REG
                 if (variant == null) {
                     throw new RuntimeException("Variant '" + variantName + "' is missing!");
                 }
@@ -121,7 +171,7 @@ public class Palette implements ILostCityAsset {
                 }
                 addMappingViaState(c, blocks);
             } else if (o.has("frompalette")) {
-                value = o.get("frompalette").getAsString();
+                String value = o.get("frompalette").getAsString();
                 palette.put(c, value);
             } else if (o.has("blocks")) {
                 JsonArray array = o.get("blocks").getAsJsonArray();

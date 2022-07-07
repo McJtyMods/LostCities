@@ -324,7 +324,7 @@ public class LostCityTerrainFeature {
         boolean vert = info.hasVerticalMonorail();
         if (horiz && vert) {
             if (!CitySphere.intersectsWithCitySphere(info.chunkX, info.chunkZ, provider)) {
-                BuildingPart part = AssetRegistries.PARTS.get("monorails_both");
+                BuildingPart part = AssetRegistries.PARTS.get(provider.getWorld(), "monorails_both");
                 generatePart(info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true);
             }
             return;
@@ -340,22 +340,22 @@ public class LostCityTerrainFeature {
         if (CitySphere.fullyInsideCitySpere(info.chunkX, info.chunkZ, provider)) {
             // If there is a non enclosed monorail nearby we generate a station
             if (hasNonStationMonoRail(info.getXmin())) {
-                part = AssetRegistries.PARTS.get("monorails_station");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
                 transform = Transform.MIRROR_90_X; // flip
                 fillToGround(info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
             } else if (hasNonStationMonoRail(info.getXmax())) {
-                part = AssetRegistries.PARTS.get("monorails_station");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
                 transform = Transform.ROTATE_90;
                 fillToGround(info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
             } else if (hasNonStationMonoRail(info.getZmin())) {
-                part = AssetRegistries.PARTS.get("monorails_station");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
                 transform = Transform.ROTATE_NONE;
                 fillToGround(info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
             } else if (hasNonStationMonoRail(info.getZmax())) {
-                part = AssetRegistries.PARTS.get("monorails_station");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "monorails_station");
                 Character borderBlock = info.getCityStyle().getBorderBlock();
                 transform = Transform.MIRROR_Z; // flip
                 fillToGround(info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
@@ -363,7 +363,7 @@ public class LostCityTerrainFeature {
                 return;
             }
         } else {
-            part = AssetRegistries.PARTS.get("monorails_vertical");
+            part = AssetRegistries.PARTS.get(provider.getWorld(), "monorails_vertical");
         }
 
         generatePart(info, part, transform, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true);
@@ -530,11 +530,11 @@ public class LostCityTerrainFeature {
         BuildingPart part;
         if (info.isTunnel(level)) {
             // We know we need a tunnel
-            part = AssetRegistries.PARTS.get("highway_tunnel" + suffix);
+            part = AssetRegistries.PARTS.get(provider.getWorld(), "highway_tunnel" + suffix);
             generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
-            part = AssetRegistries.PARTS.get("highway_open" + suffix);
+            part = AssetRegistries.PARTS.get(provider.getWorld(), "highway_open" + suffix);
             int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
             // Clear a bit more above the highway
             if (!info.profile.isCavern()) {
@@ -547,7 +547,7 @@ public class LostCityTerrainFeature {
                 }
             }
         } else {
-            part = AssetRegistries.PARTS.get("highway_bridge" + suffix);
+            part = AssetRegistries.PARTS.get(provider.getWorld(), "highway_bridge" + suffix);
             int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
             // Clear a bit more above the highway
             if (!info.profile.isCavern()) {
@@ -1066,31 +1066,31 @@ public class LostCityTerrainFeature {
                 if (railInfo.getLevel() < info.cityLevel) {
                     // Even for a surface station extension we switch to underground if we are an extension
                     // that is at a spot where the city is higher then where the station is
-                    part = AssetRegistries.PARTS.get("station_underground");
+                    part = AssetRegistries.PARTS.get(provider.getWorld(), "station_underground");
                 } else {
                     if (railInfo.getPart() != null) {
-                        part = AssetRegistries.PARTS.get(railInfo.getPart());
+                        part = AssetRegistries.PARTS.get(provider.getWorld(), railInfo.getPart());
                     } else {
-                        part = AssetRegistries.PARTS.get("station_open");
+                        part = AssetRegistries.PARTS.get(provider.getWorld(), "station_open");
                     }
                 }
                 clearUpper = true;
                 break;
             case STATION_UNDERGROUND:
-                part = AssetRegistries.PARTS.get("station_underground_stairs");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "station_underground_stairs");
                 needsStaircase = true;
                 break;
             case STATION_EXTENSION_UNDERGROUND:
-                part = AssetRegistries.PARTS.get("station_underground");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "station_underground");
                 break;
             case RAILS_END_HERE:
-                part = AssetRegistries.PARTS.get("rails_horizontal_end");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_horizontal_end");
                 if (railInfo.getDirection() == Railway.RailDirection.EAST) {
                     transform = Transform.MIRROR_X;
                 }
                 break;
             case HORIZONTAL:
-                part = AssetRegistries.PARTS.get("rails_horizontal");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_horizontal");
 
                 // If the adjacent chunks are also horizontal we take a sample of the blocks around us to see if we are in water
                 RailChunkType type1 = info.getXmin().getRailInfo().getType();
@@ -1102,51 +1102,51 @@ public class LostCityTerrainFeature {
                             driver.getBlock(12, height + 2, 12) == liquid &&
                             driver.getBlock(3, height + 4, 7) == liquid &&
                             driver.getBlock(12, height + 4, 8) == liquid) {
-                        part = AssetRegistries.PARTS.get("rails_horizontal_water");
+                        part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_horizontal_water");
                     }
                 }
                 break;
             case VERTICAL:
-                part = AssetRegistries.PARTS.get("rails_vertical");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_vertical");
                 if (driver.getBlock(3, height + 2, 3) == liquid &&
                         driver.getBlock(12, height + 2, 3) == liquid &&
                         driver.getBlock(3, height + 2, 12) == liquid &&
                         driver.getBlock(12, height + 2, 12) == liquid &&
                         driver.getBlock(3, height + 4, 7) == liquid &&
                         driver.getBlock(12, height + 4, 8) == liquid) {
-                    part = AssetRegistries.PARTS.get("rails_vertical_water");
+                    part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_vertical_water");
                 }
                 if (railInfo.getDirection() == Railway.RailDirection.EAST) {
                     transform = Transform.MIRROR_X;
                 }
                 break;
             case THREE_SPLIT:
-                part = AssetRegistries.PARTS.get("rails_3split");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_3split");
                 if (railInfo.getDirection() == Railway.RailDirection.EAST) {
                     transform = Transform.MIRROR_X;
                 }
                 break;
             case GOING_DOWN_TWO_FROM_SURFACE:
             case GOING_DOWN_FURTHER:
-                part = AssetRegistries.PARTS.get("rails_down2");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_down2");
                 if (railInfo.getDirection() == Railway.RailDirection.EAST) {
                     transform = Transform.MIRROR_X;
                 }
                 break;
             case GOING_DOWN_ONE_FROM_SURFACE:
-                part = AssetRegistries.PARTS.get("rails_down1");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_down1");
                 if (railInfo.getDirection() == Railway.RailDirection.EAST) {
                     transform = Transform.MIRROR_X;
                 }
                 break;
             case DOUBLE_BEND:
-                part = AssetRegistries.PARTS.get("rails_bend");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_bend");
                 if (railInfo.getDirection() == Railway.RailDirection.EAST) {
                     transform = Transform.MIRROR_X;
                 }
                 break;
             default:
-                part = AssetRegistries.PARTS.get("rails_flat");
+                part = AssetRegistries.PARTS.get(provider.getWorld(), "rails_flat");
                 break;
         }
         int h = generatePart(info, part, transform, 0, height, 0, false);
@@ -1259,13 +1259,13 @@ public class LostCityTerrainFeature {
         }
 
         if (needsStaircase) {
-            part = AssetRegistries.PARTS.get("station_staircase");
+            part = AssetRegistries.PARTS.get(provider.getWorld(), "station_staircase");
             for (int i = railInfo.getLevel() + 1; i < info.cityLevel; i++) {
                 height = info.groundLevel + i * FLOORHEIGHT;
                 generatePart(info, part, transform, 0, height, 0, false);
             }
             height = info.groundLevel + info.cityLevel * FLOORHEIGHT;
-            part = AssetRegistries.PARTS.get("station_staircase_surface");
+            part = AssetRegistries.PARTS.get(provider.getWorld(), "station_staircase_surface");
             generatePart(info, part, transform, 0, height, 0, false);
         }
     }
@@ -1459,7 +1459,7 @@ public class LostCityTerrainFeature {
                     vl = (int) (info.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesBuffer[x + z * 16] / info.profile.RUBBLE_LEAVE_SCALE);
 //                    vl = (int) (info.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesNoise.getValue(x / 64.0, z / 64.0) / 4.0 * info.profile.RUBBLE_LEAVE_SCALE);
                 }
-                boolean doRubble = rubbleBlock != null;
+                boolean doRubble = palette.isDefined(rubbleBlock);
                 while (height > 0) {
                     BlockState damage = palette.canBeDamagedToIronBars(driver.getBlock());
                     BlockState c = driver.getBlockDown();
@@ -2112,7 +2112,7 @@ public class LostCityTerrainFeature {
 
     public static ResourceLocation getRandomSpawnerMob(Level world, Random random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
         String condition = todo.getCondition();
-        Condition cnd = AssetRegistries.CONDITIONS.get(condition);
+        Condition cnd = AssetRegistries.CONDITIONS.get(world, condition);
         if (cnd == null) {
             throw new RuntimeException("Cannot find condition '" + condition + "'!");
         }
@@ -2171,7 +2171,7 @@ public class LostCityTerrainFeature {
                         return world.getBiome(pos).value().getRegistryName();
                     }
                 };
-                String randomValue = AssetRegistries.CONDITIONS.get(lootTable).getRandomValue(random, conditionContext);
+                String randomValue = AssetRegistries.CONDITIONS.get(world, lootTable).getRandomValue(random, conditionContext);
                 if (randomValue == null) {
                     throw new RuntimeException("Condition '" + lootTable + "' did not return a table under certain conditions!");
                 }
@@ -2199,11 +2199,11 @@ public class LostCityTerrainFeature {
 
     private void generateDebrisFromChunk(Random rand, BuildingInfo info, BuildingInfo adjacentInfo, BiFunction<Integer, Integer, Float> locationFactor) {
         if (adjacentInfo.hasBuilding) {
+            CompiledPalette adjacentPalette = adjacentInfo.getCompiledPalette();
             Character rubbleBlock = adjacentInfo.getBuilding().getRubbleBlock();
-            if (rubbleBlock == null) {
+            if (!adjacentPalette.isDefined(rubbleBlock)) {
                 rubbleBlock = adjacentInfo.getBuilding().getFillerBlock();
             }
-            CompiledPalette adjacentPalette = adjacentInfo.getCompiledPalette();
             float damageFactor = adjacentInfo.getDamageArea().getDamageFactor();
             if (damageFactor > .5f) {
                 // An estimate of the amount of blocks

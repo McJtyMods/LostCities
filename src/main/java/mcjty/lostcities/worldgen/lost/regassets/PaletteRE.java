@@ -13,7 +13,7 @@ import java.util.Optional;
  */
 public class PaletteRE {
 
-    private static class PaletteEntry {
+    public static class PaletteEntry {
         private String chr;
         private String block;
         private String variant;
@@ -48,6 +48,30 @@ public class PaletteRE {
             return entry;
         }
 
+        public String getChr() {
+            return chr;
+        }
+
+        public String getBlock() {
+            return block;
+        }
+
+        public String getVariant() {
+            return variant;
+        }
+
+        public String getFrompalette() {
+            return frompalette;
+        }
+
+        public List<Pair<Integer, String>> getBlocks() {
+            return blocks;
+        }
+
+        public String getDamaged() {
+            return damaged;
+        }
+
         public PaletteEntry(String chr, Optional<String> block, Optional<String> variant, Optional<String> frompalette,
                             Optional<List<Pair<Integer, String>>> blocks, Optional<String> damaged) {
             this.chr = chr;
@@ -79,5 +103,9 @@ public class PaletteRE {
 
     public PaletteRE(List<PaletteEntry> entries) {
         paletteEntries.addAll(entries);
+    }
+
+    public List<PaletteEntry> getPaletteEntries() {
+        return paletteEntries;
     }
 }

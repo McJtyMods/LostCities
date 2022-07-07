@@ -3,8 +3,10 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import mcjty.lostcities.setup.CustomRegistries;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.Counter;
+import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +19,7 @@ public class AssetRegistries {
     public static final AbstractAssetRegistry<WorldStyle> WORLDSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<BuildingPart> PARTS = new AbstractAssetRegistry<>();
-    public static final AbstractAssetRegistry<Building> BUILDINGS = new AbstractAssetRegistry<>();
+    public static final RegistryAssetRegistry<Building, BuildingRE> BUILDINGS = new RegistryAssetRegistry<>(CustomRegistries.BUILDING_REGISTRY_KEY, Building::new);
     public static final AbstractAssetRegistry<MultiBuilding> MULTI_BUILDINGS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Style> STYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Palette> PALETTES = new AbstractAssetRegistry<>();
@@ -145,8 +147,8 @@ public class AssetRegistries {
                     CITYSTYLES.register(new CityStyle(object));
                 } else if ("part".equals(type)) {
                     PARTS.register(new BuildingPart(object));
-                } else if ("building".equals(type)) {
-                    BUILDINGS.register(new Building(object));
+//                } else if ("building".equals(type)) {
+//                    BUILDINGS.register(new Building(object));
                 } else if ("multibuilding".equals(type)) {
                     MULTI_BUILDINGS.register(new MultiBuilding(object));
                 } else if ("worldstyle".equals(type)) {

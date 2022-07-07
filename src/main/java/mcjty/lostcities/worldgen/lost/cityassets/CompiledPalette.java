@@ -118,6 +118,13 @@ public class CompiledPalette {
     }
 
     /**
+     * Return true if this palette entry exists
+     */
+    public boolean isDefined(Character c) {
+        return c != null && palette.containsKey(c);
+    }
+
+    /**
      * Return true if this is a simple character that can have only one value in the palette
      */
     public boolean isSimple(char c) {

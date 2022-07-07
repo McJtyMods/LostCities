@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.api.ILostCityAssetRegistry;
+import net.minecraft.world.level.CommonLevelAccessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class AbstractAssetRegistry<T extends ILostCityAsset> implements ILostCit
     }
 
     @Override
-    public T get(String name) {
+    public T get(CommonLevelAccessor level, String name) {
         if (name == null) {
             return null;
         }

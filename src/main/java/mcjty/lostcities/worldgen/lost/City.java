@@ -197,7 +197,7 @@ public class City {
         } else {
             cityStyleName = Tools.getRandomFromList(rand, styles);
         }
-        return AssetRegistries.CITYSTYLES.get(cityStyleName);
+        return AssetRegistries.CITYSTYLES.get(provider.getWorld(), cityStyleName);
     }
 
     public static float getCityFactor(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {

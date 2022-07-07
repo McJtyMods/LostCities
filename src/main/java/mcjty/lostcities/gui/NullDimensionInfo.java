@@ -95,7 +95,7 @@ public class NullDimensionInfo implements IDimensionInfo {
 
     public NullDimensionInfo(LostCityProfile profile, long seed) {
         this.profile = profile;
-        style = AssetRegistries.WORLDSTYLES.get(profile.getWorldStyle());
+        style = AssetRegistries.WORLDSTYLES.get(null, profile.getWorldStyle()); // @todo REG
         this.seed = seed;
         random = new Random(seed);
         feature = new LostCityTerrainFeature(this, profile, getRandom());

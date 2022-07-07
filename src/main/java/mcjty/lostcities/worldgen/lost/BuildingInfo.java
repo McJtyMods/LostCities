@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -176,7 +177,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public Style getOutsideStyle() {
-        return AssetRegistries.STYLES.get(provider.getWorldStyle().getOutsideStyle());
+        return AssetRegistries.STYLES.get(provider.getWorld(), provider.getWorldStyle().getOutsideStyle());
     }
 
     private void createPalette(Random rand) {
@@ -185,7 +186,7 @@ public class BuildingInfo implements ILostChunkInfo {
             style = getOutsideStyle();
         } else {
             String name = getCityStyle().getStyle();
-            style = AssetRegistries.STYLES.get(name);
+            style = AssetRegistries.STYLES.get(provider.getWorld(), name);
             if (style == null) {
                 throw new RuntimeException("Cannot find style '" + name + "'!");
             }
@@ -337,21 +338,22 @@ public class BuildingInfo implements ILostChunkInfo {
                         }
                     }
                 }
-                cityStyle = AssetRegistries.CITYSTYLES.get(counter.getMostOccuring());
+                cityStyle = AssetRegistries.CITYSTYLES.get(provider.getWorld(), counter.getMostOccuring());
             } else {
                 cityStyle = City.getCityStyle(chunkX, chunkZ, provider, profile);
             }
             characteristics.cityStyle = cityStyle;
 
 
+            WorldGenLevel world = provider.getWorld();
             if (characteristics.section >= 1) {
                 LostChunkCharacteristics topleft = getTopLeftCityInfo(characteristics, chunkX, chunkZ, provider);
                 characteristics.multiBuilding = topleft.multiBuilding;
                 if (characteristics.multiBuilding != null) {
                     switch (characteristics.section) {
-                        case 1 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(1, 0));
-                        case 2 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(0, 1));
-                        case 3 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(1, 1));
+                        case 1 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, characteristics.multiBuilding.getBuilding(1, 0));
+                        case 2 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, characteristics.multiBuilding.getBuilding(0, 1));
+                        case 3 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, characteristics.multiBuilding.getBuilding(1, 1));
                         default -> throw new RuntimeException("What 2!");
                     }
                 } else {
@@ -364,19 +366,19 @@ public class BuildingInfo implements ILostChunkInfo {
                     if (predefinedBuilding != null) {
                         name = predefinedBuilding.building();
                     }
-                    characteristics.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(name);
-                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(characteristics.multiBuilding.getBuilding(0, 0));
+                    characteristics.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(world, name);
+                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, characteristics.multiBuilding.getBuilding(0, 0));
                 } else {
                     characteristics.multiBuilding = null;
                     String name = cityStyle.getRandomBuilding(rand);
                     if (predefinedBuilding != null) {
                         name = predefinedBuilding.building();
                     }
-                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(name);
+                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, name);
                 }
             }
 
-            LostCityEvent.CharacteristicsEvent event = new LostCityEvent.CharacteristicsEvent(provider.getWorld(), LostCities.lostCitiesImp,
+            LostCityEvent.CharacteristicsEvent event = new LostCityEvent.CharacteristicsEvent(world, LostCities.lostCitiesImp,
                     chunkX, chunkZ, characteristics);
             MinecraftForge.EVENT_BUS.post(event);
 
@@ -660,9 +662,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
-            floorTypes[i] = Validate.notNull(AssetRegistries.PARTS.get(randomPart), "Null part for " + randomPart);
+            floorTypes[i] = Validate.notNull(AssetRegistries.PARTS.get(provider.getWorld(), randomPart), "Null part for " + randomPart);
             randomPart = building.getRandomPart2(rand, conditionContext);
-            floorTypes2[i] = AssetRegistries.PARTS.get(randomPart);
+            floorTypes2[i] = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);
         }
     }
 
@@ -743,11 +745,11 @@ public class BuildingInfo implements ILostChunkInfo {
                 streetType = StreetType.NORMAL;
             }
             if (rand.nextFloat() < profile.FOUNTAIN_CHANCE) {
-                fountainType = AssetRegistries.PARTS.get(cs.getRandomFountain(rand));
+                fountainType = AssetRegistries.PARTS.get(provider.getWorld(), cs.getRandomFountain(rand));
             } else {
                 fountainType = null;
             }
-            parkType = AssetRegistries.PARTS.get(cs.getRandomPark(rand));
+            parkType = AssetRegistries.PARTS.get(provider.getWorld(), cs.getRandomPark(rand));
             float cityFactor = City.getCityFactor(chunkX, chunkZ, provider, profile);
 
             int maxfloors = getMaxfloors(cs);
@@ -784,8 +786,8 @@ public class BuildingInfo implements ILostChunkInfo {
             cellars = fb;
 
             doorBlock = getRandomDoor(rand);
-            bridgeType = AssetRegistries.PARTS.get(cs.getRandomBridge(rand));
-            stairType = AssetRegistries.PARTS.get(cs.getRandomStair(rand));
+            bridgeType = AssetRegistries.PARTS.get(provider.getWorld(), cs.getRandomBridge(rand));
+            stairType = AssetRegistries.PARTS.get(provider.getWorld(), cs.getRandomStair(rand));
             stairPriority = rand.nextFloat();
             createPalette(rand);
             float r = rand.nextFloat();
@@ -823,9 +825,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
-            floorTypes[i] = Validate.notNull(AssetRegistries.PARTS.get(randomPart), "Null part for " + randomPart);
+            floorTypes[i] = Validate.notNull(AssetRegistries.PARTS.get(provider.getWorld(), randomPart), "Null part for " + randomPart);
             randomPart = building.getRandomPart2(rand, conditionContext);
-            floorTypes2[i] = AssetRegistries.PARTS.get(randomPart);
+            floorTypes2[i] = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);
             connectionAtX[i] = isCity(chunkX - 1, chunkZ, provider) && (rand.nextFloat() < profile.BUILDING_DOORWAYCHANCE);
             connectionAtZ[i] = isCity(chunkX, chunkZ - 1, provider) && (rand.nextFloat() < profile.BUILDING_DOORWAYCHANCE);
         }
@@ -848,7 +850,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
         if (rand.nextFloat() < profile.RAILWAY_DUNGEON_CHANCE) {
             if (!hasBuilding || (Railway.RAILWAY_LEVEL_OFFSET < (cityLevel - cellars))) {
-                railDungeon = AssetRegistries.PARTS.get(getCityStyle().getRandomRailDungeon(rand));
+                railDungeon = AssetRegistries.PARTS.get(provider.getWorld(), getCityStyle().getRandomRailDungeon(rand));
             } else {
                 railDungeon = null;
             }
@@ -857,7 +859,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         if (rand.nextFloat() < profile.BUILDING_FRONTCHANCE) {
-            frontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand));
+            frontType = AssetRegistries.PARTS.get(provider.getWorld(), getCityStyle().getRandomFront(rand));
         } else {
             frontType = null;
         }

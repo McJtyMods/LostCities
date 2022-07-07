@@ -46,7 +46,7 @@ public abstract class ConditionContext {
                 test = combine(test, levelInfo -> !levelInfo.isTopOfBuilding());
             }
         }
-        if (element.getGround()) {
+        if (element.getGround() != null) {
             boolean ground = element.getGround();
             if (ground) {
                 test = combine(test, ConditionContext::isGroundFloor);
@@ -54,7 +54,7 @@ public abstract class ConditionContext {
                 test = combine(test, levelInfo -> !levelInfo.isGroundFloor());
             }
         }
-        if (element.getIsbuilding()) {
+        if (element.getIsbuilding() != null) {
             boolean ground = element.getIsbuilding();
             if (ground) {
                 test = combine(test, ConditionContext::isBuilding);
@@ -62,48 +62,48 @@ public abstract class ConditionContext {
                 test = combine(test, levelInfo -> !levelInfo.isBuilding());
             }
         }
-        if (obj.has("issphere")) {
-            boolean ground = obj.get("issphere").getAsBoolean();
+        if (element.getIssphere() != null) {
+            boolean ground = element.getIssphere();
             if (ground) {
                 test = combine(test, ConditionContext::isSphere);
             } else {
                 test = combine(test, levelInfo -> !levelInfo.isSphere());
             }
         }
-        if (obj.has("chunkx")) {
-            int chunkX = obj.get("chunkx").getAsInt();
+        if (element.getChunkx() != null) {
+            int chunkX = element.getChunkx();
             test = combine(test, context -> chunkX == context.getChunkX());
         }
-        if (obj.has("chunkz")) {
-            int chunkZ = obj.get("chunkz").getAsInt();
+        if (element.getChunkz() != null) {
+            int chunkZ = element.getChunkz();
             test = combine(test, context -> chunkZ == context.getChunkZ());
         }
-        if (obj.has("inpart")) {
-            String part = obj.get("inpart").getAsString();
+        if (element.getInpart() != null) {
+            String part = element.getInpart();
             test = combine(test, context -> part.equals(context.getPart()));
         }
-        if (obj.has("inbuilding")) {
-            String building = obj.get("inbuilding").getAsString();
+        if (element.getInbuilding() != null) {
+            String building = element.getInbuilding();
             test = combine(test, context -> building.equals(context.getBuilding()));
         }
-        if (obj.has("inbiome")) {
-            String biome = obj.get("inbiome").getAsString();
+        if (element.getInbiome() != null) {
+            String biome = element.getInbiome();
             test = combine(test, context -> biome.equals(context.getBiome().toString()));
         }
-        if (obj.has("cellar")) {
-            boolean cellar = obj.get("cellar").getAsBoolean();
+        if (element.getCellar() != null) {
+            boolean cellar = element.getCellar();
             if (cellar) {
                 test = combine(test, ConditionContext::isCellar);
             } else {
                 test = combine(test, levelInfo -> !levelInfo.isCellar());
             }
         }
-        if (obj.has("floor")) {
-            int level = obj.get("floor").getAsInt();
+        if (element.getFloor() != null) {
+            int level = element.getFloor();
             test = combine(test, levelInfo -> levelInfo.isFloor(level));
         }
-        if (obj.has("range")) {
-            String range = obj.get("range").getAsString();
+        if (element.getRange() != null) {
+            String range = element.getRange();
             String[] split = StringUtils.split(range, ',');
             try {
                 int l1 = Integer.parseInt(split[0]);

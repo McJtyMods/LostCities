@@ -95,7 +95,7 @@ public class ForgeEventHandlers {
                     needsCheck = true;
                 }
             } else if (!profile.SPAWN_CITY.isEmpty()) {
-                final PredefinedCity city = AssetRegistries.PREDEFINED_CITIES.get(profile.SPAWN_CITY);
+                final PredefinedCity city = AssetRegistries.PREDEFINED_CITIES.get(world, profile.SPAWN_CITY);
                 if (city == null) {
                     LostCities.setup.getLogger().error("Cannot find city '" + profile.SPAWN_CITY + "' for the player to spawn in !");
                 } else {
@@ -126,7 +126,7 @@ public class ForgeEventHandlers {
                     };
                     needsCheck = true;
                 } else {
-                    final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(profile.SPAWN_SPHERE);
+                    final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(world, profile.SPAWN_SPHERE);
                     if (sphere == null) {
                         LostCities.setup.getLogger().error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
                     } else {

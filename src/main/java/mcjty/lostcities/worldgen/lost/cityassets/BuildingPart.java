@@ -113,7 +113,7 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     @Override
     public Palette getLocalPalette() {
         if (localPalette == null && refPaletteName != null) {
-            localPalette = AssetRegistries.PALETTES.get(refPaletteName);
+            localPalette = AssetRegistries.PALETTES.get(null, refPaletteName);  // @todo REG
             if (localPalette == null) {
                 ModSetup.getLogger().error("Could not find palette '" + refPaletteName + "'!");
                 throw new RuntimeException("Could not find palette '" + refPaletteName + "'!");

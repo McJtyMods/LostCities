@@ -43,7 +43,7 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
         String name = context.getArgument("name", String.class);
         Integer floors = context.getArgument("floors", Integer.class);
         Integer cellars = context.getArgument("cellars", Integer.class);
-        Building building = AssetRegistries.BUILDINGS.get(name);
+        Building building = AssetRegistries.BUILDINGS.get(context.getSource().getLevel(), name);
         if (building == null) {
             context.getSource().sendFailure(ComponentFactory.literal("Cannot find building: " + name + "!"));
             return 0;
