@@ -41,7 +41,7 @@ public class Building implements ILostCityBuilding {
         fillerBlock = object.getFillerBlock();
         rubbleBlock = object.getRubbleBlock();
         if (object.getLocalPalette() != null) {
-            localPalette = new Palette();
+            localPalette = new Palette("__local__" + object.getRegistryName().getPath());
             localPalette.parsePaletteArray(object.getLocalPalette()); // @todo get the full palette instead
         } else if (object.getRefPaletteName() != null) {
             refPaletteName = object.getRefPaletteName();

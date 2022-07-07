@@ -66,7 +66,7 @@ public class Style implements ILostCityAsset {
     }
 
     public Palette getRandomPalette(IDimensionInfo provider, Random random) {
-        Palette palette = new Palette();
+        Palette palette = new Palette("__random__");
         for (List<Pair<Float, String>> pairs : randomPaletteChoices) {
             float totalweight = 0;
             for (Pair<Float, String> pair : pairs) {

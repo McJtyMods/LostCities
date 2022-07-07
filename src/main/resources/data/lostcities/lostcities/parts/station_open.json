@@ -1,0 +1,43 @@
+{
+  "xsize": 16,
+  "zsize": 16,
+  "refpalette": "rails",
+  "slices": [
+    [
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy",
+      "yyyyyyyyyyyyyyyy"
+    ],
+    [
+      "yyyyyyyyyyyyyyyy",
+      "QQQQQQQQQQQQQQQQ",
+      "QQQQQQQQQQQQQQQQ",
+      "QQQQQQQQQQQQQQQQ",
+      "yyyyyyyyyyyyyyyy",
+      "eeeeeeefeeeeeeee",
+      "yyyyyyygyyyyyyyy",
+      "eeeeeeefeeeeeeee",
+      "yyyyyyygyyyyyyyy",
+      "eeeeeeefeeeeeeee",
+      "yyyyyyyyyyyyyyyy",
+      "QQQQQQQQQQQQQQQQ",
+      "QQQQQQQQQQQQQQQQ",
+      "QQQQQQQQQQQQQQQQ",
+      "QQQQQQQQQQQQQQQQ",
+      "yyyyyyyyyyyyyyyy"
+    ]
+  ]
+}

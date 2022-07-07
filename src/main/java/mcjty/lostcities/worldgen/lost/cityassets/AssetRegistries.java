@@ -1,17 +1,18 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 import mcjty.lostcities.setup.CustomRegistries;
-import mcjty.lostcities.setup.ModSetup;
-import mcjty.lostcities.varia.Counter;
+import mcjty.lostcities.worldgen.lost.regassets.BuildingPartRE;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
 import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class AssetRegistries {
 
@@ -19,7 +20,7 @@ public class AssetRegistries {
     public static final AbstractAssetRegistry<Condition> CONDITIONS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<WorldStyle> WORLDSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
-    public static final AbstractAssetRegistry<BuildingPart> PARTS = new AbstractAssetRegistry<>();
+    public static final RegistryAssetRegistry<BuildingPart, BuildingPartRE> PARTS = new RegistryAssetRegistry<>(CustomRegistries.PART_REGISTRY_KEY, BuildingPart::new);
     public static final RegistryAssetRegistry<Building, BuildingRE> BUILDINGS = new RegistryAssetRegistry<>(CustomRegistries.BUILDING_REGISTRY_KEY, Building::new);
     public static final AbstractAssetRegistry<MultiBuilding> MULTI_BUILDINGS = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<Style> STYLES = new AbstractAssetRegistry<>();
@@ -42,7 +43,7 @@ public class AssetRegistries {
     }
 
     public static void load(File file) {
-        try(FileInputStream in = new FileInputStream(file)) {
+        try (FileInputStream in = new FileInputStream(file)) {
             load(in, file.getName());
         } catch (FileNotFoundException e) {
             // Not an error
@@ -58,8 +59,10 @@ public class AssetRegistries {
         map.get(character).add(partName);
     }
 
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
     public static void load(InputStream inputstream, String filename) {
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8))) {
             JsonParser parser = new JsonParser();
             JsonElement element = parser.parse(br);
             for (JsonElement entry : element.getAsJsonArray()) {
@@ -73,10 +76,6 @@ public class AssetRegistries {
                     CONDITIONS.register(new Condition(object));
                 } else if ("citystyle".equals(type)) {
                     CITYSTYLES.register(new CityStyle(object));
-                } else if ("part".equals(type)) {
-                    PARTS.register(new BuildingPart(object));
-//                } else if ("building".equals(type)) {
-//                    BUILDINGS.register(new Building(object));
                 } else if ("multibuilding".equals(type)) {
                     MULTI_BUILDINGS.register(new MultiBuilding(object));
                 } else if ("worldstyle".equals(type)) {
@@ -92,5 +91,20 @@ public class AssetRegistries {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+
+//        File dir = new File("c:\\personal\\parts");
+//        dir.mkdirs();
+//        for (BuildingPart part : AssetRegistries.PARTS.getIterable()) {
+//            DataResult<JsonElement> result = BuildingPartRE.CODEC.encodeStart(JsonOps.INSTANCE, new BuildingPartRE(part));
+//            String output = result.result().map(element -> GSON.toJson(element)).orElse("XXX");
+//            File f = new File("c:\\personal\\parts\\" + part.getName() + ".json");
+//            try {
+//                BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+//                writer.write(output);
+//                writer.close();
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
     }
 }

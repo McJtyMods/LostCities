@@ -1,15 +1,12 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
+import mcjty.lostcities.worldgen.lost.regassets.BuildingPartRE;
 import net.minecraft.world.level.CommonLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,18 +31,39 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     private Palette localPalette = null;
     String refPaletteName;
 
-
     private final Map<String, Object> metadata = new HashMap<>();
 
-    public BuildingPart(JsonObject object) {
-        readFromJSon(object);
+    public BuildingPart(BuildingPartRE object) {
+        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        xSize = object.getxSize();
+        zSize = object.getzSize();
+        slices = object.getSlices();
+        if (object.getLocalPalette() != null) {
+            localPalette = new Palette("__local__" + name);
+            localPalette.parsePaletteArray(object.getLocalPalette()); // @todo get the full palette instead
+        } else if (object.getRefPaletteName() != null) {
+            refPaletteName = object.getRefPaletteName();
+        }
+        if (object.getMetadata() != null) {
+            for (BuildingPartRE.PartMeta meta : object.getMetadata()) {
+                String key = meta.getKey();
+                if (meta.getI() != null) {
+                    metadata.put(key, meta.getI());
+                } else if (meta.getF() != null) {
+                    metadata.put(key, meta.getF());
+                } else if (meta.getBool() != null) {
+                    metadata.put(key, meta.getBool());
+                } else if (meta.getChr() != null) {
+                    metadata.put(key, meta.getChr().charAt(0));
+                } else if (meta.getBool()) {
+                    metadata.put(key, meta.getBool());
+                }
+            }
+        }
     }
 
-    public BuildingPart(String name, int xSize, int zSize, String[] slices) {
-        this.name = name;
-        this.slices = slices;
-        this.xSize = xSize;
-        this.zSize = zSize;
+    public Map<String, Object> getMetadata() {
+        return metadata;
     }
 
     @Override
@@ -125,89 +143,6 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
 
     @Override
     public void readFromJSon(JsonObject object) {
-        name = object.get("name").getAsString();
-        xSize = object.get("xsize").getAsInt();
-        zSize = object.get("zsize").getAsInt();
-        JsonArray sliceArray = object.get("slices").getAsJsonArray();
-        slices = new String[sliceArray.size()];
-        int i = 0;
-        for (JsonElement element : sliceArray) {
-            JsonArray a = element.getAsJsonArray();
-            StringBuilder slice = new StringBuilder();
-            for (JsonElement el : a) {
-                slice.append(el.getAsString());
-            }
-            slices[i++] = slice.toString();
-        }
-        if (object.has("palette")) {
-            if (object.get("palette").isJsonArray()) {
-                JsonArray palette = object.get("palette").getAsJsonArray();
-                localPalette = new Palette();
-                localPalette.parsePaletteArray(palette);
-            } else {
-                refPaletteName = object.get("palette").getAsString();
-            }
-        }
-        if (object.has("meta")) {
-            JsonArray metaArray = object.get("meta").getAsJsonArray();
-            for (JsonElement element : metaArray) {
-                JsonObject o = element.getAsJsonObject();
-                String key = o.get("key").getAsString();
-                if (o.has("integer")) {
-                    metadata.put(key, o.get("integer").getAsInt());
-                } else if (o.has("float")) {
-                    metadata.put(key, o.get("float").getAsFloat());
-                } else if (o.has("boolean")) {
-                    metadata.put(key, o.get("boolean").getAsBoolean());
-                } else if (o.has("char")) {
-                    metadata.put(key, o.get("char").getAsCharacter());
-                } else if (o.has("character")) {
-                    metadata.put(key, o.get("character").getAsCharacter());
-                } else if (o.has("string")) {
-                    metadata.put(key, o.get("string").getAsString());
-                }
-            }
-        }
-    }
-
-    public JsonObject writeToJSon() {
-        JsonObject object = new JsonObject();
-        object.add("type", new JsonPrimitive("part"));
-        object.add("name", new JsonPrimitive(name));
-        object.add("xsize", new JsonPrimitive(xSize));
-        object.add("zsize", new JsonPrimitive(zSize));
-        JsonArray sliceArray = new JsonArray();
-        for (String slice : slices) {
-            String s = slice;
-            JsonArray a = new JsonArray();
-            while (!s.isEmpty()) {
-                String left = StringUtils.left(s, xSize);
-                a.add(new JsonPrimitive(left));
-                s = s.substring(left.length());
-            }
-            sliceArray.add(a);
-        }
-        object.add("slices", sliceArray);
-
-        JsonArray metaArray = new JsonArray();
-        for (Map.Entry<String, Object> entry : metadata.entrySet()) {
-            JsonObject o = new JsonObject();
-            o.add("key", new JsonPrimitive(entry.getKey()));
-            Object v = entry.getValue();
-            if (v instanceof Integer) {
-                o.add("integer", new JsonPrimitive((Integer) v));
-            } else if (v instanceof Float) {
-                o.add("float", new JsonPrimitive((Float) v));
-            } else if (v instanceof Boolean) {
-                o.add("boolean", new JsonPrimitive((Boolean) v));
-            } else if (v instanceof String) {
-                o.add("string", new JsonPrimitive((String) v));
-            }
-            metaArray.add(o);
-        }
-        object.add("meta", metaArray);
-
-        return object;
     }
 
     @Override

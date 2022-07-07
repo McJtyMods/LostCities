@@ -1,0 +1,67 @@
+{
+  "xsize": 16,
+  "zsize": 16,
+  "palette": {
+    "palette": [
+      {
+        "char": "P",
+        "blocks": [
+          {
+            "random": 32,
+            "block": "minecraft:sapling"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:sapling@1"
+          },
+          {
+            "random": 32,
+            "block": "minecraft:sapling@2"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:sapling@4"
+          }
+        ]
+      }
+    ]
+  },
+  "slices": [
+    [
+      "                ",
+      "                ",
+      "  _____  _____  ",
+      "  _SSS_  _SSS_  ",
+      "  _SDS_  _SDS_  ",
+      "  _SSS_  _SSS_  ",
+      "  _____  _____  ",
+      "                ",
+      "                ",
+      "  _____  _____  ",
+      "  _SSS_  _SSS_  ",
+      "  _SDS_  _SDS_  ",
+      "  _SSS_  _SSS_  ",
+      "  _____  _____  ",
+      "                ",
+      "                "
+    ],
+    [
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "   TP      PT   ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "   TP      PT   ",
+      "                ",
+      "                ",
+      "                ",
+      "                "
+    ]
+  ]
+}

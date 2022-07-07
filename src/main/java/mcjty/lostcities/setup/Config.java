@@ -24,10 +24,6 @@ public class Config {
             "/assets/lostcities/citydata/conditions.json",
             "/assets/lostcities/citydata/palette.json",
             "/assets/lostcities/citydata/palette_desert.json",
-            "/assets/lostcities/citydata/highwayparts.json",
-            "/assets/lostcities/citydata/railparts.json",
-            "/assets/lostcities/citydata/monorailparts.json",
-            "/assets/lostcities/citydata/buildingparts.json",
             "/assets/lostcities/citydata/library.json",
             "$lostcities/userassets.json"
     };
