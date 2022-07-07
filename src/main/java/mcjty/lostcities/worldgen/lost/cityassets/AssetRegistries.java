@@ -2,10 +2,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 
 import com.google.gson.*;
 import mcjty.lostcities.setup.CustomRegistries;
-import mcjty.lostcities.worldgen.lost.regassets.BuildingPartRE;
-import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
-import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
-import mcjty.lostcities.worldgen.lost.regassets.StyleRE;
+import mcjty.lostcities.worldgen.lost.regassets.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -16,7 +13,7 @@ import java.util.Set;
 public class AssetRegistries {
 
     public static final AbstractAssetRegistry<Variant> VARIANTS = new AbstractAssetRegistry<>();
-    public static final AbstractAssetRegistry<Condition> CONDITIONS = new AbstractAssetRegistry<>();
+    public static final RegistryAssetRegistry<Condition, ConditionRE> CONDITIONS = new RegistryAssetRegistry<>(CustomRegistries.CONDITIONS_REGISTRY_KEY, Condition::new);
     public static final AbstractAssetRegistry<WorldStyle> WORLDSTYLES = new AbstractAssetRegistry<>();
     public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
     public static final RegistryAssetRegistry<BuildingPart, BuildingPartRE> PARTS = new RegistryAssetRegistry<>(CustomRegistries.PART_REGISTRY_KEY, BuildingPart::new);
@@ -69,8 +66,6 @@ public class AssetRegistries {
                 String type = object.get("type").getAsString();
                 if ("variant".equals(type)) {
                     VARIANTS.register(new Variant(object));
-                } else if ("condition".equals(type)) {
-                    CONDITIONS.register(new Condition(object));
                 } else if ("citystyle".equals(type)) {
                     CITYSTYLES.register(new CityStyle(object));
                 } else if ("multibuilding".equals(type)) {

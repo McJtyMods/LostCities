@@ -1,0 +1,16 @@
+{
+  "values": [
+    {
+      "factor": 1,
+      "value": "minecraft:zombie"
+    },
+    {
+      "factor": 1,
+      "value": "minecraft:skeleton"
+    },
+    {
+      "factor": 1,
+      "value": "minecraft:spider"
+    }
+  ]
+}

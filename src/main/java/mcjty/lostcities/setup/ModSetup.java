@@ -12,8 +12,9 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,30 +48,6 @@ public class ModSetup {
 //        LootTableList.register(new ResourceLocation(LostCities.MODID, "chests/raildungeonchest"));
 
         readAssets();
-
-        makeExamples();
-    }
-
-    private void makeExamples() {
-        Path configPath = FMLPaths.CONFIGDIR.get();
-        File dir = new File(configPath + File.separator + "lostcities" + File.separator + "examples");
-        dir.mkdirs();
-        File exampleConditions = new File(configPath + File.separator + "lostcities" + File.separator + "examples" + File.separator + "conditions.json");
-        try {
-            FileWriter writer = new FileWriter(exampleConditions);
-            writer.append("// This is an example set of conditions that you can use and modify and put\n");
-            writer.append("// into (for example) config/lostcities/userassets.json\n\n");
-            InputStream inputstream = LostCities.class.getResourceAsStream("/assets/lostcities/citydata/conditions.json");
-            BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8));
-            for (String line = br.readLine(); line != null; line = br.readLine()) {
-                writer.append(line + "\n");
-            }
-
-            br.close();
-            writer.close();
-        } catch (IOException e) {
-            LostCities.logger.warn("Could not write examples!");
-        }
     }
 
     private void readAssets() {

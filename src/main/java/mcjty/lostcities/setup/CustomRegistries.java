@@ -1,10 +1,7 @@
 package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.worldgen.lost.regassets.BuildingPartRE;
-import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
-import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
-import mcjty.lostcities.worldgen.lost.regassets.StyleRE;
+import mcjty.lostcities.worldgen.lost.regassets.*;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -34,12 +31,17 @@ public class CustomRegistries {
     public static final DeferredRegister<StyleRE> STYLE_DEFERRED_REGISTER = DeferredRegister.create(STYLE_REGISTRY_KEY, LostCities.MODID);
     public static final Supplier<IForgeRegistry<StyleRE>> STYLE_REGISTRY = STYLE_DEFERRED_REGISTER.makeRegistry(StyleRE.class, () -> new RegistryBuilder<StyleRE>().dataPackRegistry(StyleRE.CODEC));
 
+    public static final ResourceKey<Registry<ConditionRE>> CONDITIONS_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "conditions"));
+    public static final DeferredRegister<ConditionRE> CONDITIONS_DEFERRED_REGISTER = DeferredRegister.create(CONDITIONS_REGISTRY_KEY, LostCities.MODID);
+    public static final Supplier<IForgeRegistry<ConditionRE>> CONDITIONS_REGISTRY = CONDITIONS_DEFERRED_REGISTER.makeRegistry(ConditionRE.class, () -> new RegistryBuilder<ConditionRE>().dataPackRegistry(ConditionRE.CODEC));
+
     public static void init() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         BUILDING_DEFERRED_REGISTER.register(bus);
         PALETTE_DEFERRED_REGISTER.register(bus);
         PART_DEFERRED_REGISTER.register(bus);
         STYLE_DEFERRED_REGISTER.register(bus);
+        CONDITIONS_DEFERRED_REGISTER.register(bus);
     }
 
 }

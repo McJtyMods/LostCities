@@ -1,11 +1,9 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
+import mcjty.lostcities.worldgen.lost.regassets.ConditionRE;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -19,12 +17,13 @@ public class Condition implements ILostCityAsset {
 
     private final List<Pair<Predicate<ConditionContext>, Pair<Float, String>>> valueSelector = new ArrayList<>();
 
-    public Condition(JsonObject object) {
-        readFromJSon(object);
-    }
-
-    public Condition(String name) {
-        this.name = name;
+    public Condition(ConditionRE object) {
+        for (ConditionRE.ConditionPart cp : object.getValues()) {
+            float factor = cp.getFactor();
+            String value = cp.getValue();
+            Predicate<ConditionContext> test = ConditionContext.parseTest(cp);
+            valueSelector.add(Pair.of(test, Pair.of(factor, value)));
+        }
     }
 
     @Override
@@ -34,24 +33,7 @@ public class Condition implements ILostCityAsset {
 
     @Override
     public void readFromJSon(JsonObject object) {
-        name = object.get("name").getAsString();
-        JsonArray array = object.get("values").getAsJsonArray();
-        for (JsonElement element : array) {
-            JsonObject o = element.getAsJsonObject();
-            float factor = o.get("factor").getAsFloat();
-            String value = o.get("value").getAsString();
-            Predicate<ConditionContext> test = ConditionContext.parseTest(element);
-            valueSelector.add(Pair.of(test, Pair.of(factor, value)));
-        }
     }
-
-    public JsonObject writeToJSon() {
-        JsonObject object = new JsonObject();
-        object.add("type", new JsonPrimitive("condition"));
-        object.add("name", new JsonPrimitive(name));
-        return object;
-    }
-
 
     public String getRandomValue(Random random, ConditionContext info) {
         List<Pair<Float, String>> values = new ArrayList<>();

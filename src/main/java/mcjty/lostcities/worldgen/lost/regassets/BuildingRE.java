@@ -14,18 +14,18 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
     public static final Codec<PartRef> CODEC_PARTREF = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.STRING.fieldOf("part").forGetter(l -> l.part),
-                    Codec.BOOL.optionalFieldOf("top").forGetter(l -> Optional.ofNullable(l.top)),
-                    Codec.BOOL.optionalFieldOf("ground").forGetter(l -> Optional.ofNullable(l.ground)),
-                    Codec.BOOL.optionalFieldOf("cellar").forGetter(l -> Optional.ofNullable(l.cellar)),
-                    Codec.BOOL.optionalFieldOf("isbuilding").forGetter(l -> Optional.ofNullable(l.isbuilding)),
-                    Codec.BOOL.optionalFieldOf("issphere").forGetter(l -> Optional.ofNullable(l.issphere)),
-                    Codec.INT.optionalFieldOf("floor").forGetter(l -> Optional.ofNullable(l.floor)),
-                    Codec.INT.optionalFieldOf("chunkx").forGetter(l -> Optional.ofNullable(l.chunkx)),
-                    Codec.INT.optionalFieldOf("chunkz").forGetter(l -> Optional.ofNullable(l.chunkz)),
-                    Codec.STRING.optionalFieldOf("inpart").forGetter(l -> Optional.ofNullable(l.inpart)),
-                    Codec.STRING.optionalFieldOf("inbuilding").forGetter(l -> Optional.ofNullable(l.inbuilding)),
-                    Codec.STRING.optionalFieldOf("inbiome").forGetter(l -> Optional.ofNullable(l.inbiome)),
-                    Codec.STRING.optionalFieldOf("range").forGetter(l -> Optional.ofNullable(l.range))
+                    Codec.BOOL.optionalFieldOf("top").forGetter(l -> Optional.ofNullable(l.getTop())),
+                    Codec.BOOL.optionalFieldOf("ground").forGetter(l -> Optional.ofNullable(l.getGround())),
+                    Codec.BOOL.optionalFieldOf("cellar").forGetter(l -> Optional.ofNullable(l.getCellar())),
+                    Codec.BOOL.optionalFieldOf("isbuilding").forGetter(l -> Optional.ofNullable(l.getIsbuilding())),
+                    Codec.BOOL.optionalFieldOf("issphere").forGetter(l -> Optional.ofNullable(l.getIssphere())),
+                    Codec.INT.optionalFieldOf("floor").forGetter(l -> Optional.ofNullable(l.getFloor())),
+                    Codec.INT.optionalFieldOf("chunkx").forGetter(l -> Optional.ofNullable(l.getChunkx())),
+                    Codec.INT.optionalFieldOf("chunkz").forGetter(l -> Optional.ofNullable(l.getChunkz())),
+                    Codec.STRING.optionalFieldOf("inpart").forGetter(l -> Optional.ofNullable(l.getInpart())),
+                    Codec.STRING.optionalFieldOf("inbuilding").forGetter(l -> Optional.ofNullable(l.getInbuilding())),
+                    Codec.STRING.optionalFieldOf("inbiome").forGetter(l -> Optional.ofNullable(l.getInbiome())),
+                    Codec.STRING.optionalFieldOf("range").forGetter(l -> Optional.ofNullable(l.getRange()))
             ).apply(instance, PartRef::new));
 
     public static final Codec<BuildingRE> CODEC = RecordCodecBuilder.create(instance ->
@@ -137,71 +137,11 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
         return parts2;
     }
 
-    public static class PartRef {
+    public static class PartRef extends ConditionRE.ConditionTest {
         private String part;
-        private Boolean top;
-        private Boolean ground;
-        private Boolean cellar;
-        private Boolean isbuilding;
-        private Boolean issphere;
-        private Integer floor;
-        private Integer chunkx;
-        private Integer chunkz;
-        private String inpart;
-        private String inbuilding;
-        private String inbiome;
-        private String range;
 
         public String getPart() {
             return part;
-        }
-
-        public Boolean getTop() {
-            return top;
-        }
-
-        public Boolean getGround() {
-            return ground;
-        }
-
-        public Boolean getCellar() {
-            return cellar;
-        }
-
-        public Boolean getIsbuilding() {
-            return isbuilding;
-        }
-
-        public Boolean getIssphere() {
-            return issphere;
-        }
-
-        public Integer getFloor() {
-            return floor;
-        }
-
-        public Integer getChunkx() {
-            return chunkx;
-        }
-
-        public Integer getChunkz() {
-            return chunkz;
-        }
-
-        public String getInpart() {
-            return inpart;
-        }
-
-        public String getInbuilding() {
-            return inbuilding;
-        }
-
-        public String getInbiome() {
-            return inbiome;
-        }
-
-        public String getRange() {
-            return range;
         }
 
         public PartRef(String part,
@@ -217,19 +157,8 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
                        Optional<String> inbuilding,
                        Optional<String> inbiome,
                        Optional<String> range) {
+            super(top, ground, cellar, isbuilding, issphere, floor, chunkx, chunkz, inpart, inbuilding, inbiome, range);
             this.part = part;
-            this.top = top.isPresent() ? top.get() : null;
-            this.ground = ground.isPresent() ? ground.get() : null;
-            this.cellar = cellar.isPresent() ? cellar.get() : null;
-            this.isbuilding = isbuilding.isPresent() ? isbuilding.get() : null;
-            this.issphere = issphere.isPresent() ? issphere.get() : null;
-            this.floor = floor.isPresent() ? floor.get() : null;
-            this.chunkx = chunkx.isPresent() ? chunkx.get() : null;
-            this.chunkz = chunkz.isPresent() ? chunkz.get() : null;
-            this.inpart = inpart.isPresent() ? inpart.get() : null;
-            this.inbuilding = inbuilding.isPresent() ? inbuilding.get() : null;
-            this.inbiome = inbiome.isPresent() ? inbiome.get() : null;
-            this.range = range.isPresent() ? range.get() : null;
         }
     }
 }

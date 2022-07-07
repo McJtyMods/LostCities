@@ -2,7 +2,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
+import mcjty.lostcities.worldgen.lost.regassets.ConditionRE;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,7 +36,7 @@ public abstract class ConditionContext {
         return levelInfo -> orig.test(levelInfo) && newTest.test(levelInfo);
     }
 
-    public static Predicate<ConditionContext> parseTest(BuildingRE.PartRef element) {
+    public static Predicate<ConditionContext> parseTest(ConditionRE.ConditionTest element) {
         Predicate<ConditionContext> test = null;
         if (element.getTop() != null) {
             boolean top = element.getTop();
