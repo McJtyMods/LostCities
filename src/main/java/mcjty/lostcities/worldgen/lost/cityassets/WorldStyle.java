@@ -103,6 +103,11 @@ public class WorldStyle implements ILostCityAsset {
             }
         }
 
-        return Tools.getRandomFromList(random, ct);
+        Pair<Float, String> randomFromList = Tools.getRandomFromList(random, ct, Pair::getLeft);
+        if (randomFromList == null) {
+            return null;
+        } else {
+            return randomFromList.getRight();
+        }
     }
 }

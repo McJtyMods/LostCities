@@ -195,7 +195,12 @@ public class City {
         if (styles.isEmpty()) {
             cityStyleName = provider.getWorldStyle().getRandomCityStyle(provider, chunkX, chunkZ, rand);
         } else {
-            cityStyleName = Tools.getRandomFromList(rand, styles);
+            Pair<Float, String> fromList = Tools.getRandomFromList(rand, styles, Pair::getLeft);
+            if (fromList == null) {
+                cityStyleName = null;
+            } else {
+                cityStyleName = fromList.getRight();
+            }
         }
         return AssetRegistries.CITYSTYLES.get(provider.getWorld(), cityStyleName);
     }

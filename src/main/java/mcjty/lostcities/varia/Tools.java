@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Function;
 
 public class Tools {
 
@@ -167,21 +168,21 @@ public class Tools {
         return state.getBlock().getRegistryName().toString();
     }
 
-    public static String getRandomFromList(Random random, List<Pair<Float, String>> list) {
+    public static <T> T getRandomFromList(Random random, List<T> list, Function<T, Float> weightGetter) {
         if (list.isEmpty()) {
             return null;
         }
-        List<Pair<Float, String>> elements = new ArrayList<>();
+        List<T> elements = new ArrayList<>();
         float totalweight = 0;
-        for (Pair<Float, String> pair : list) {
+        for (T pair : list) {
             elements.add(pair);
-            totalweight += pair.getKey();
+            totalweight += weightGetter.apply(pair);
         }
         float r = random.nextFloat() * totalweight;
-        for (Pair<Float, String> pair : elements) {
-            r -= pair.getKey();
+        for (T pair : elements) {
+            r -= weightGetter.apply(pair);
             if (r <= 0) {
-                return pair.getRight();
+                return pair;
             }
         }
         return null;

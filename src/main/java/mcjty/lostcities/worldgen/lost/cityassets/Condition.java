@@ -45,6 +45,11 @@ public class Condition implements ILostCityAsset {
         if (values.isEmpty()) {
             return null;
         }
-        return Tools.getRandomFromList(random, values);
+        Pair<Float, String> randomFromList = Tools.getRandomFromList(random, values, Pair::getLeft);
+        if (randomFromList == null) {
+            return null;
+        } else {
+            return randomFromList.getRight();
+        }
     }
 }

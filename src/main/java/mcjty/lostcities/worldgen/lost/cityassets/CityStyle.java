@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityCityStyle;
 import mcjty.lostcities.varia.Tools;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,41 +15,70 @@ public class CityStyle implements ILostCityCityStyle {
 
     private String name;
 
-    private final List<Pair<Float, String>> buildingSelector = new ArrayList<>();
-    private final List<Pair<Float, String>> bridgeSelector = new ArrayList<>();
-    private final List<Pair<Float, String>> parkSelector = new ArrayList<>();
-    private final List<Pair<Float, String>> fountainSelector = new ArrayList<>();
-    private final List<Pair<Float, String>> stairSelector = new ArrayList<>();
-    private final List<Pair<Float, String>> frontSelector = new ArrayList<>();
-    private final List<Pair<Float, String>> railDungeonSelector = new ArrayList<>();
-    private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
-    private String style;
+    public static class PartSelector {
+        private float factor;
+        private String value;
 
-    private Integer streetWidth;
+        public float getFactor() {
+            return factor;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public PartSelector(float factor, String value) {
+            this.factor = factor;
+            this.value = value;
+        }
+    }
+
+    private final List<PartSelector> buildingSelector = new ArrayList<>();
+    private final List<PartSelector> bridgeSelector = new ArrayList<>();
+    private final List<PartSelector> parkSelector = new ArrayList<>();
+    private final List<PartSelector> fountainSelector = new ArrayList<>();
+    private final List<PartSelector> stairSelector = new ArrayList<>();
+    private final List<PartSelector> frontSelector = new ArrayList<>();
+    private final List<PartSelector> railDungeonSelector = new ArrayList<>();
+    private final List<PartSelector> multiBuildingSelector = new ArrayList<>();
+
+    // Building settings
     private Integer minFloorCount;
     private Integer minCellarCount;
     private Integer maxFloorCount;
     private Integer maxCellarCount;
     private Float buildingChance;   // Optional build chance override
 
-    private Float explosionChance;
-
+    // Street settings
+    private Integer streetWidth;
     private Character streetBlock;
     private Character streetBaseBlock;
     private Character streetVariantBlock;
-    private Character parkElevationBlock;
-    private Character corridorRoofBlock;
-    private Character corridorGlassBlock;
-    private Character railMainBlock;
     private Character borderBlock;
     private Character wallBlock;
+
+    // Park settings
+    private Character parkElevationBlock;
+    private Character grassBlock;
+
+    // Corridor settings
+    private Character corridorRoofBlock;
+    private Character corridorGlassBlock;
+
+    // Rail settings
+    private Character railMainBlock;
+
+    // Sphere settings
     private Character sphereBlock;          // Used for 'space' landscape type
     private Character sphereSideBlock;      // Used for 'space' landscape type
     private Character sphereGlassBlock;     // Used for 'space' landscape type
-    private Character grassBlock;
+
+    // General settings
     private Character ironbarsBlock;
     private Character glowstoneBlock;
 
+    private Float explosionChance;
+    private String style;
     private String inherit;
     private boolean resolveInherit = false;
 
@@ -367,7 +395,7 @@ public class CityStyle implements ILostCityCityStyle {
         parseArraySafe(object, railDungeonSelector, "raildungeons", "dungeon");
     }
 
-    private void parseArraySafe(JsonObject object, List<Pair<Float, String>> selector, String arrayName, String elName) {
+    private void parseArraySafe(JsonObject object, List<PartSelector> selector, String arrayName, String elName) {
         JsonArray array = getArraySafe(object, arrayName);
         for (JsonElement element : array) {
             if (element.getAsJsonObject().has("clear")) {
@@ -375,7 +403,7 @@ public class CityStyle implements ILostCityCityStyle {
             } else {
                 float factor = element.getAsJsonObject().get("factor").getAsFloat();
                 String el = element.getAsJsonObject().get(elName).getAsString();
-                selector.add(Pair.of(factor, el));
+                selector.add(new PartSelector(factor, el));
             }
         }
     }
@@ -402,72 +430,72 @@ public class CityStyle implements ILostCityCityStyle {
         object.add("streetblocks", s);
 
         JsonArray array = new JsonArray();
-        for (Pair<Float, String> pair : buildingSelector) {
+        for (PartSelector pair : buildingSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("factor", new JsonPrimitive(pair.getFactor()));
             o.add("building", new JsonPrimitive(pair.getValue()));
             array.add(o);
         }
         object.add("buildings", array);
 
         array = new JsonArray();
-        for (Pair<Float, String> pair : multiBuildingSelector) {
+        for (PartSelector pair : multiBuildingSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("factor", new JsonPrimitive(pair.getFactor()));
             o.add("multibuilding", new JsonPrimitive(pair.getValue()));
             array.add(o);
         }
         object.add("multibuildings", array);
 
         array = new JsonArray();
-        for (Pair<Float, String> pair : parkSelector) {
+        for (PartSelector pair : parkSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("factor", new JsonPrimitive(pair.getFactor()));
             o.add("park", new JsonPrimitive(pair.getValue()));
             array.add(o);
         }
         object.add("parks", array);
 
         array = new JsonArray();
-        for (Pair<Float, String> pair : fountainSelector) {
+        for (PartSelector pair : fountainSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("factor", new JsonPrimitive(pair.getFactor()));
             o.add("fountain", new JsonPrimitive(pair.getValue()));
             array.add(o);
         }
         object.add("fountains", array);
 
         array = new JsonArray();
-        for (Pair<Float, String> pair : stairSelector) {
+        for (PartSelector pair : stairSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("factor", new JsonPrimitive(pair.getFactor()));
             o.add("stair", new JsonPrimitive(pair.getValue()));
             array.add(o);
         }
         object.add("stairs", array);
 
         array = new JsonArray();
-        for (Pair<Float, String> pair : frontSelector) {
+        for (PartSelector pair : frontSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("factor", new JsonPrimitive(pair.getFactor()));
             o.add("front", new JsonPrimitive(pair.getValue()));
             array.add(o);
         }
         object.add("fronts", array);
 
         array = new JsonArray();
-        for (Pair<Float, String> pair : bridgeSelector) {
+        for (PartSelector pair : bridgeSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("factor", new JsonPrimitive(pair.getFactor()));
             o.add("bridge", new JsonPrimitive(pair.getValue()));
             array.add(o);
         }
         object.add("bridges", array);
 
         array = new JsonArray();
-        for (Pair<Float, String> pair : railDungeonSelector) {
+        for (PartSelector pair : railDungeonSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getKey()));
+            o.add("factor", new JsonPrimitive(pair.getFactor()));
             o.add("dungeon", new JsonPrimitive(pair.getValue()));
             array.add(o);
         }
@@ -476,36 +504,45 @@ public class CityStyle implements ILostCityCityStyle {
         return object;
     }
 
+    private static String getRandomFromList(Random random, List<PartSelector> list) {
+        PartSelector fromList = Tools.getRandomFromList(random, list, PartSelector::getFactor);
+        if (fromList == null) {
+            return null;
+        } else {
+            return fromList.getValue();
+        }
+    }
+
     public String getRandomStair(Random random) {
-        return Tools.getRandomFromList(random, stairSelector);
+        return getRandomFromList(random, stairSelector);
     }
 
     public String getRandomFront(Random random) {
-        return Tools.getRandomFromList(random, frontSelector);
+        return getRandomFromList(random, frontSelector);
     }
 
     public String getRandomRailDungeon(Random random) {
-        return Tools.getRandomFromList(random, railDungeonSelector);
+        return getRandomFromList(random, railDungeonSelector);
     }
 
     public String getRandomPark(Random random) {
-        return Tools.getRandomFromList(random, parkSelector);
+        return getRandomFromList(random, parkSelector);
     }
 
     public String getRandomBridge(Random random) {
-        return Tools.getRandomFromList(random, bridgeSelector);
+        return getRandomFromList(random, bridgeSelector);
     }
 
     public String getRandomFountain(Random random) {
-        return Tools.getRandomFromList(random, fountainSelector);
+        return getRandomFromList(random, fountainSelector);
     }
 
     public String getRandomBuilding(Random random) {
-        return Tools.getRandomFromList(random, buildingSelector);
+        return getRandomFromList(random, buildingSelector);
     }
 
     public String getRandomMultiBuilding(Random random) {
-        return Tools.getRandomFromList(random, multiBuildingSelector);
+        return getRandomFromList(random, multiBuildingSelector);
     }
 
     public boolean hasMultiBuildings() {
