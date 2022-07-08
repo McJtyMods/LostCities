@@ -1,0 +1,16 @@
+{
+  "blocks": [
+    {
+      "random": 32,
+      "block": "minecraft:polished_blackstone_bricks"
+    },
+    {
+      "random": 32,
+      "block": "minecraft:cracked_polished_blackstone_bricks"
+    },
+    {
+      "random": 1000,
+      "block": "minecraft:polished_blackstone"
+    }
+  ]
+}

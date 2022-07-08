@@ -43,6 +43,10 @@ public class CustomRegistries {
     public static final DeferredRegister<MultiBuildingRE> MULTIBUILDINGS_DEFERRED_REGISTER = DeferredRegister.create(MULTIBUILDINGS_REGISTRY_KEY, LostCities.MODID);
     public static final Supplier<IForgeRegistry<MultiBuildingRE>> MULTIBUILDINGS_REGISTRY = MULTIBUILDINGS_DEFERRED_REGISTER.makeRegistry(MultiBuildingRE.class, () -> new RegistryBuilder<MultiBuildingRE>().dataPackRegistry(MultiBuildingRE.CODEC));
 
+    public static final ResourceKey<Registry<VariantRE>> VARIANTS_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "variants"));
+    public static final DeferredRegister<VariantRE> VARIANTS_DEFERRED_REGISTER = DeferredRegister.create(VARIANTS_REGISTRY_KEY, LostCities.MODID);
+    public static final Supplier<IForgeRegistry<VariantRE>> VARIANTS_REGISTRY = VARIANTS_DEFERRED_REGISTER.makeRegistry(VariantRE.class, () -> new RegistryBuilder<VariantRE>().dataPackRegistry(VariantRE.CODEC));
+
     public static void init() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         BUILDING_DEFERRED_REGISTER.register(bus);
@@ -52,6 +56,7 @@ public class CustomRegistries {
         CONDITIONS_DEFERRED_REGISTER.register(bus);
         CITYSTYLES_DEFERRED_REGISTER.register(bus);
         MULTIBUILDINGS_DEFERRED_REGISTER.register(bus);
+        VARIANTS_DEFERRED_REGISTER.register(bus);
     }
 
 }

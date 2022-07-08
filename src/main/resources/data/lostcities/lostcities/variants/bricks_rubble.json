@@ -1,0 +1,20 @@
+{
+  "blocks": [
+    {
+      "random": 10,
+      "block": "minecraft:bricks"
+    },
+    {
+      "random": 10,
+      "block": "minecraft:brick_stairs"
+    },
+    {
+      "random": 10,
+      "block": "minecraft:brick_slab"
+    },
+    {
+      "random": 1000,
+      "block": "minecraft:red_terracotta"
+    }
+  ]
+}

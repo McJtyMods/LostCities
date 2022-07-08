@@ -1,0 +1,20 @@
+{
+  "blocks": [
+    {
+      "random": 10,
+      "block": "minecraft:quartz_bricks"
+    },
+    {
+      "random": 8,
+      "block": "minecraft:quartz_stairs"
+    },
+    {
+      "random": 10,
+      "block": "minecraft:quartz_slab"
+    },
+    {
+      "random": 1000,
+      "block": "minecraft:smooth_quartz"
+    }
+  ]
+}

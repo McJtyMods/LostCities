@@ -6,7 +6,11 @@ import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.BlockEntry;
 import mcjty.lostcities.worldgen.lost.regassets.data.PaletteEntry;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -94,7 +98,9 @@ public class Palette implements ILostCityAsset {
                 }
             } else if (entry.getVariant() != null) {
                 String variantName = entry.getVariant();
-                Variant variant = AssetRegistries.VARIANTS.get(null, variantName);  // @todo REG
+                MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+                ServerLevel level = server.getLevel(Level.OVERWORLD);
+                Variant variant = AssetRegistries.VARIANTS.get(level, variantName);
                 if (variant == null) {
                     throw new RuntimeException("Variant '" + variantName + "' is missing!");
                 }

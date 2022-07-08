@@ -1,0 +1,20 @@
+{
+  "blocks": [
+    {
+      "random": 32,
+      "block": "minecraft:cracked_deepslate_tiles"
+    },
+    {
+      "random": 32,
+      "block": "minecraft:cobbled_deepslate_slab"
+    },
+    {
+      "random": 32,
+      "block": "minecraft:cobbled_deepslate_stairs"
+    },
+    {
+      "random": 1000,
+      "block": "minecraft:deepslate_tiles"
+    }
+  ]
+}

@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class AssetRegistries {
 
-    public static final AbstractAssetRegistry<Variant> VARIANTS = new AbstractAssetRegistry<>();
+    public static final RegistryAssetRegistry<Variant, VariantRE> VARIANTS = new RegistryAssetRegistry<>(CustomRegistries.VARIANTS_REGISTRY_KEY, Variant::new);
     public static final RegistryAssetRegistry<Condition, ConditionRE> CONDITIONS = new RegistryAssetRegistry<>(CustomRegistries.CONDITIONS_REGISTRY_KEY, Condition::new);
     public static final AbstractAssetRegistry<WorldStyle> WORLDSTYLES = new AbstractAssetRegistry<>();
     public static final RegistryAssetRegistry<CityStyle, CityStyleRE> CITYSTYLES = new RegistryAssetRegistry<>(CustomRegistries.CITYSTYLES_REGISTRY_KEY, CityStyle::new);
@@ -64,9 +64,7 @@ public class AssetRegistries {
             for (JsonElement entry : element.getAsJsonArray()) {
                 JsonObject object = entry.getAsJsonObject();
                 String type = object.get("type").getAsString();
-                if ("variant".equals(type)) {
-                    VARIANTS.register(new Variant(object));
-                } else if ("worldstyle".equals(type)) {
+                if ("worldstyle".equals(type)) {
                     WORLDSTYLES.register(new WorldStyle(object));
                 } else if ("city".equals(type)) {
                     PREDEFINED_CITIES.register(new PredefinedCity(object));
