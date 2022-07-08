@@ -53,9 +53,9 @@ public class BuildingPartRE implements IForgeRegistryEntry<BuildingPartRE> {
         }
         this.xSize = xSize;
         this.zSize = zSize;
-        this.refPaletteName = refpalette.isPresent() ? refpalette.get() : null;
-        this.localPalette = locpalette.isPresent() ? locpalette.get() : null;
-        this.metadata = metadata.isPresent() ? metadata.get() : null;
+        this.refPaletteName = refpalette.orElse(null);
+        this.localPalette = locpalette.orElse(null);
+        this.metadata = metadata.orElse(null);
     }
 
     private List<List<String>> createSlices() {

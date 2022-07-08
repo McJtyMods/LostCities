@@ -10,6 +10,8 @@ import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
+import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
+import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
@@ -360,7 +362,7 @@ public class BuildingInfo implements ILostChunkInfo {
                     characteristics.buildingType = topleft.buildingType;
                 }
             } else {
-                PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
+                PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
                 if (characteristics.section == 0) {
                     String name = cityStyle.getRandomMultiBuilding(rand);
                     if (predefinedBuilding != null) {
@@ -417,11 +419,11 @@ public class BuildingInfo implements ILostChunkInfo {
         float bc = rand.nextFloat();
         ResourceKey<Level> type = provider.getType();
 
-        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
+        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null) {
             return true;    // We don't need other tests
         }
-        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
+        PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
         if (predefinedStreet != null) {
             return false;   // No building here
         }
@@ -500,11 +502,11 @@ public class BuildingInfo implements ILostChunkInfo {
 
     private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, CityStyle cityStyle) {
         ResourceKey<Level> type = provider.getType();
-        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
+        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return true;    // We don't need other tests. This is the top-left of a multibuilding
         }
-        PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
+        PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
         if (predefinedStreet != null) {
             return false;   // There is a street here so no building
         }
@@ -566,7 +568,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
     private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
         ResourceKey<Level> type = provider.getType();
-        PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
+        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             // Regardless of other conditions, this is the top left of a multibuilding
             return true;
@@ -587,7 +589,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, provider, profile, cityStyle) &&
                 !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, provider, profile, cityStyle)
                 ) {
-            PredefinedCity.PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
+            PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
             if (predefinedStreet != null) {
                 return false;   // There is a street here so no building
             }
@@ -735,7 +737,7 @@ public class BuildingInfo implements ILostChunkInfo {
             noLoot = topleft.noLoot;
             ruinHeight = topleft.ruinHeight;
         } else {
-            PredefinedCity.PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
+            PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
             highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider, profile);
             highwayZLevel = Highway.getZHighwayLevel(chunkX, chunkZ, provider, profile);
 

@@ -80,17 +80,17 @@ public class ConditionTest {
             Optional<String> inbuilding,
             Optional<String> inbiome,
             Optional<String> range) {
-        this.top = top.isPresent() ? top.get() : null;
-        this.ground = ground.isPresent() ? ground.get() : null;
-        this.cellar = cellar.isPresent() ? cellar.get() : null;
-        this.isbuilding = isbuilding.isPresent() ? isbuilding.get() : null;
-        this.issphere = issphere.isPresent() ? issphere.get() : null;
-        this.floor = floor.isPresent() ? floor.get() : null;
-        this.chunkx = chunkx.isPresent() ? chunkx.get() : null;
-        this.chunkz = chunkz.isPresent() ? chunkz.get() : null;
-        this.inpart = inpart.isPresent() ? inpart.get() : null;
-        this.inbuilding = inbuilding.isPresent() ? inbuilding.get() : null;
-        this.inbiome = inbiome.isPresent() ? inbiome.get() : null;
-        this.range = range.isPresent() ? range.get() : null;
+        this.top = top.orElse(null);
+        this.ground = ground.orElse(null);
+        this.cellar = cellar.orElse(null);
+        this.isbuilding = isbuilding.orElse(null);
+        this.issphere = issphere.orElse(null);
+        this.floor = floor.orElse(null);
+        this.chunkx = chunkx.orElse(null);
+        this.chunkz = chunkz.orElse(null);
+        this.inpart = inpart.orElse(null);
+        this.inbuilding = inbuilding.orElse(null);
+        this.inbiome = inbiome.orElse(null);
+        this.range = range.orElse(null);
     }
 }

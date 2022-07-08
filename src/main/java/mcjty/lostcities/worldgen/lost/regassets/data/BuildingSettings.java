@@ -49,10 +49,10 @@ public class BuildingSettings {
                             Optional<Integer> maxFloorCount,
                             Optional<Integer> maxCellarCount,
                             Optional<Float> buildingChance) {
-        this.minFloorCount = minFloorCount.isPresent() ? minFloorCount.get() : null;
-        this.minCellarCount = minCellarCount.isPresent() ? minCellarCount.get() : null;
-        this.maxFloorCount = maxFloorCount.isPresent() ? maxFloorCount.get() : null;
-        this.maxCellarCount = maxCellarCount.isPresent() ? maxCellarCount.get() : null;
-        this.buildingChance = buildingChance.isPresent() ? buildingChance.get() : null;
+        this.minFloorCount = minFloorCount.orElse(null);
+        this.minCellarCount = minCellarCount.orElse(null);
+        this.maxFloorCount = maxFloorCount.orElse(null);
+        this.maxCellarCount = maxCellarCount.orElse(null);
+        this.buildingChance = buildingChance.orElse(null);
     }
 }

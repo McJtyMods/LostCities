@@ -47,17 +47,17 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
     public BuildingRE(Optional<String> refpalette, Optional<PaletteRE> locpalette, String filler, Optional<String> rubble,
                       Optional<Integer> minCellars, Optional<Integer> minFloors, Optional<Integer> maxCellars, Optional<Integer> maxFloors, Optional<Float> prefersLonely,
                       List<PartRef> partRefs, Optional<List<PartRef>> partRefs2) {
-        this.refPaletteName = refpalette.isPresent() ? refpalette.get() : null;
-        this.localPalette = locpalette.isPresent() ? locpalette.get() : null;
+        this.refPaletteName = refpalette.orElse(null);
+        this.localPalette = locpalette.orElse(null);
         this.fillerBlock = filler.charAt(0);
-        this.rubbleBlock = rubble.isPresent() ? rubble.get() : null;
-        this.minCellars = minCellars.isPresent() ? minCellars.get() : -1;
-        this.maxCellars = maxCellars.isPresent() ? maxCellars.get() : -1;
-        this.minFloors = minFloors.isPresent() ? minFloors.get() : -1;
-        this.maxFloors = maxFloors.isPresent() ? maxFloors.get() : -1;
-        this.prefersLonely = prefersLonely.isPresent() ? prefersLonely.get() : 0.0f;
+        this.rubbleBlock = rubble.orElse(null);
+        this.minCellars = minCellars.orElse(-1);
+        this.maxCellars = maxCellars.orElse(-1);
+        this.minFloors = minFloors.orElse(-1);
+        this.maxFloors = maxFloors.orElse(-1);
+        this.prefersLonely = prefersLonely.orElse(0.0f);
         this.parts = partRefs;
-        this.parts2 = partRefs2.isPresent() ? partRefs2.get() : null;
+        this.parts2 = partRefs2.orElse(null);
     }
 
     @Override

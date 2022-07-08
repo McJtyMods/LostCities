@@ -19,6 +19,7 @@ public class Condition implements ILostCityAsset {
     private final List<Pair<Predicate<ConditionContext>, Pair<Float, String>>> valueSelector = new ArrayList<>();
 
     public Condition(ConditionRE object) {
+        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
         for (ConditionPart cp : object.getValues()) {
             float factor = cp.getFactor();
             String value = cp.getValue();

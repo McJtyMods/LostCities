@@ -101,13 +101,13 @@ public class PaletteEntry {
                         Optional<List<BlockEntry>> blocks, Optional<String> damaged,
                         Optional<String> mob, Optional<String> loot, Optional<Boolean> torch) {
         this.chr = chr;
-        this.block = block.isPresent() ? block.get() : null;
-        this.variant = variant.isPresent() ? variant.get() : null;
-        this.frompalette = frompalette.isPresent() ? frompalette.get() : null;
-        this.blocks = blocks.isPresent() ? blocks.get() : null;
-        this.damaged = damaged.isPresent() ? damaged.get() : null;
-        this.mob = mob.isPresent() ? mob.get() : null;
-        this.loot = loot.isPresent() ? loot.get() : null;
-        this.torch = torch.isPresent() ? torch.get() : null;
+        this.block = block.orElse(null);
+        this.variant = variant.orElse(null);
+        this.frompalette = frompalette.orElse(null);
+        this.blocks = blocks.orElse(null);
+        this.damaged = damaged.orElse(null);
+        this.mob = mob.orElse(null);
+        this.loot = loot.orElse(null);
+        this.torch = torch.orElse(null);
     }
 }

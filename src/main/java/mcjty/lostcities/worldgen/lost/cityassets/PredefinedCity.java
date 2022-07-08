@@ -1,13 +1,13 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
+import mcjty.lostcities.worldgen.lost.regassets.PredefinedCityRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
+import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
@@ -24,78 +24,19 @@ public class PredefinedCity implements ILostCityAsset {
     private final List<PredefinedBuilding> predefinedBuildings = new ArrayList<>();
     private final List<PredefinedStreet> predefinedStreets = new ArrayList<>();
 
-    public PredefinedCity(JsonObject object) {
-        readFromJSon(object);
-    }
-
-    public PredefinedCity(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void readFromJSon(JsonObject object) {
-        name = object.get("name").getAsString();
-        dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(object.get("dimension").getAsString()));
-        chunkX = object.get("chunkx").getAsInt();
-        chunkZ = object.get("chunkz").getAsInt();
-        radius = object.get("radius").getAsInt();
-        if (object.has("citystyle")) {
-            cityStyle = object.get("citystyle").getAsString();
+    public PredefinedCity(PredefinedCityRE object) {
+        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(object.getDimension()));
+        chunkX = object.getChunkX();
+        chunkZ = object.getChunkZ();
+        radius = object.getRadius();
+        cityStyle = object.getCityStyle();
+        if (object.getPredefinedBuildings() != null) {
+            predefinedBuildings.addAll(object.getPredefinedBuildings());
         }
-        JsonArray buildings = getArraySafe(object, "buildings");
-        for (JsonElement element : buildings) {
-            JsonObject o = element.getAsJsonObject();
-            boolean multi;
-            String building;
-            if (o.has("building")) {
-                building = o.get("building").getAsString();
-                multi = false;
-            } else {
-                building = o.get("multibuilding").getAsString();
-                multi = true;
-            }
-            boolean preventRuins = o.has("preventruins") && o.get("preventruins").getAsBoolean();
-            int relChunkX = o.get("chunkx").getAsInt();
-            int relChunkZ = o.get("chunkz").getAsInt();
-            PredefinedBuilding b = new PredefinedBuilding(building, relChunkX, relChunkZ, multi, preventRuins);
-            predefinedBuildings.add(b);
+        if (object.getPredefinedStreets() != null) {
+            predefinedStreets.addAll(object.getPredefinedStreets());
         }
-        JsonArray streets = getArraySafe(object, "streets");
-        for (JsonElement element : streets) {
-            JsonObject o = element.getAsJsonObject();
-            int relChunkX = o.get("chunkx").getAsInt();
-            int relChunkZ = o.get("chunkz").getAsInt();
-            PredefinedStreet b = new PredefinedStreet(relChunkX, relChunkZ);
-            predefinedStreets.add(b);
-        }
-    }
-
-    private JsonArray getArraySafe(JsonObject object, String key) {
-        if (object.has(key)) {
-            return object.get(key).getAsJsonArray();
-        } else {
-            return new JsonArray(); // Empty array
-        }
-    }
-
-    public JsonObject writeToJSon() {
-        JsonObject object = new JsonObject();
-        object.add("type", new JsonPrimitive("city"));
-        object.add("name", new JsonPrimitive(name));
-        return object;
-    }
-
-    public List<PredefinedBuilding> getPredefinedBuildings() {
-        return predefinedBuildings;
-    }
-
-    public List<PredefinedStreet> getPredefinedStreets() {
-        return predefinedStreets;
     }
 
     public ResourceKey<Level> getDimension() {
@@ -118,10 +59,20 @@ public class PredefinedCity implements ILostCityAsset {
         return cityStyle;
     }
 
-    public record PredefinedStreet(int relChunkX, int relChunkZ) {
+    public List<PredefinedBuilding> getPredefinedBuildings() {
+        return predefinedBuildings;
     }
 
-    public record PredefinedBuilding(String building, int relChunkX, int relChunkZ, boolean multi,
-                                     boolean preventRuins) {
+    public List<PredefinedStreet> getPredefinedStreets() {
+        return predefinedStreets;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void readFromJSon(JsonObject object) {
     }
 }

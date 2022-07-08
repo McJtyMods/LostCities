@@ -25,10 +25,10 @@ public record PartMeta(String key, Boolean bool, String chr, String str,
     public static PartMeta create(String key, Optional<Boolean> bool, Optional<String> chr, Optional<String> str,
                                   Optional<Integer> i, Optional<Float> f) {
         return new PartMeta(key,
-                bool.isPresent() ? bool.get() : null,
-                chr.isPresent() ? chr.get() : null,
-                str.isPresent() ? str.get() : null,
-                i.isPresent() ? i.get() : null,
-                f.isPresent() ? f.get() : null);
+                bool.orElse(null),
+                chr.orElse(null),
+                str.orElse(null),
+                i.orElse(null),
+                f.orElse(null));
     }
 }

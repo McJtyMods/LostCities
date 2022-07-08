@@ -56,7 +56,7 @@ public class StreetSettings {
                           Optional<String> streetVariantBlock,
                           Optional<String> borderBlock,
                           Optional<String> wallBlock) {
-        this.streetWidth = streetWidth.isPresent() ? streetWidth.get() : null;
+        this.streetWidth = streetWidth.orElse(null);
         this.streetBlock = DataTools.getNullableChar(streetBlock);
         this.streetBaseBlock = DataTools.getNullableChar(streetBaseBlock);
         this.streetVariantBlock = DataTools.getNullableChar(streetVariantBlock);

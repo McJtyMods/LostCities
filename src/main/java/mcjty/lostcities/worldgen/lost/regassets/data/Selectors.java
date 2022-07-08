@@ -69,13 +69,13 @@ public class Selectors {
                      Optional<List<ObjectSelector>> frontSelector,
                      Optional<List<ObjectSelector>> railDungeonSelector,
                      Optional<List<ObjectSelector>> multiBuildingSelector) {
-        this.buildingSelector = buildingSelector.isPresent() ? buildingSelector.get() : null;
-        this.bridgeSelector = bridgeSelector.isPresent() ? bridgeSelector.get() : null;
-        this.parkSelector = parkSelector.isPresent() ? parkSelector.get() : null;
-        this.fountainSelector = fountainSelector.isPresent() ? fountainSelector.get() : null;
-        this.stairSelector = stairSelector.isPresent() ? stairSelector.get() : null;
-        this.frontSelector = frontSelector.isPresent() ? frontSelector.get() : null;
-        this.railDungeonSelector = railDungeonSelector.isPresent() ? railDungeonSelector.get() : null;
-        this.multiBuildingSelector = multiBuildingSelector.isPresent() ? multiBuildingSelector.get() : null;
+        this.buildingSelector = buildingSelector.orElse(null);
+        this.bridgeSelector = bridgeSelector.orElse(null);
+        this.parkSelector = parkSelector.orElse(null);
+        this.fountainSelector = fountainSelector.orElse(null);
+        this.stairSelector = stairSelector.orElse(null);
+        this.frontSelector = frontSelector.orElse(null);
+        this.railDungeonSelector = railDungeonSelector.orElse(null);
+        this.multiBuildingSelector = multiBuildingSelector.orElse(null);
     }
 }

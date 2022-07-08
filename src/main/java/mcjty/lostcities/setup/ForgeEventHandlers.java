@@ -12,7 +12,6 @@ import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
-import mcjty.lostcities.worldgen.lost.cityassets.PredefinedSphere;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -125,16 +124,16 @@ public class ForgeEventHandlers {
                         return sphere.getCenterPos().distSqr(new BlockPos(blockPos.getX(), sphere.getCenterPos().getY(), blockPos.getZ())) > sqradius;
                     };
                     needsCheck = true;
-                } else {
-                    final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(world, profile.SPAWN_SPHERE);
-                    if (sphere == null) {
-                        LostCities.setup.getLogger().error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
-                    } else {
-                        float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
-                        isSuitable = blockPos -> sphere.getDimension() == serverLevel.dimension() &&
-                                CitySphere.squaredDistance(sphere.getChunkX() * 16 + 8, sphere.getChunkZ() * 16 + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
-                        needsCheck = true;
-                    }
+//                } else {
+//                    final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(world, profile.SPAWN_SPHERE);
+//                    if (sphere == null) {
+//                        LostCities.setup.getLogger().error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
+//                    } else {
+//                        float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
+//                        isSuitable = blockPos -> sphere.getDimension() == serverLevel.dimension() &&
+//                                CitySphere.squaredDistance(sphere.getChunkX() * 16 + 8, sphere.getChunkZ() * 16 + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
+//                        needsCheck = true;
+//                    }
                 }
             }
 

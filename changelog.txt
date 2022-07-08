@@ -6,9 +6,10 @@ Upcoming:
 - Added forceSpawnInBuilding to force the spawn inside a building (might fail if there is no building near spawn)
 - New feature where you can specify rubble blocks for a building. These will be used instead of the filler block but only for when buildings are damaged and spill over in adjacent chunks
 - New 'variant' asset type where you can define sets of blocks that can then be used in palettes. This makes defining different palettes easier
+- All assets are now converted to datapack objects. This totally changes the way you can reconfigure Lost Cities
 
 @TODO: Fix glass panes not updating state correctly
-@TODO: replace isPresent -> orElse
+@TODO: test large cities, style standard_border is weird?
 
 1.18-5.2.6:
 - New system to control city rarity based on perlin maps. If the cityChance setting is -1 then cityPerlinScale and cityPerlinOffset will be used for a more natural city style
