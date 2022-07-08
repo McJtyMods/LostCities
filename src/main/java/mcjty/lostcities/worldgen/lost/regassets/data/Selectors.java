@@ -27,7 +27,7 @@ public class Selectors {
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("fountains").forGetter(l -> Optional.ofNullable(l.fountainSelector)),
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("stairs").forGetter(l -> Optional.ofNullable(l.stairSelector)),
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("fronts").forGetter(l -> Optional.ofNullable(l.frontSelector)),
-                    Codec.list(ObjectSelector.CODEC).optionalFieldOf("dungeons").forGetter(l -> Optional.ofNullable(l.railDungeonSelector)),
+                    Codec.list(ObjectSelector.CODEC).optionalFieldOf("raildungeons").forGetter(l -> Optional.ofNullable(l.railDungeonSelector)),
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("multibuildings").forGetter(l -> Optional.ofNullable(l.multiBuildingSelector))
             ).apply(instance, Selectors::new));
 

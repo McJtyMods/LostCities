@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityCityStyle;
 import mcjty.lostcities.varia.Tools;
+import mcjty.lostcities.worldgen.lost.regassets.CityStyleRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.ObjectSelector;
 
 import java.util.ArrayList;
@@ -69,8 +70,20 @@ public class CityStyle implements ILostCityCityStyle {
         readFromJSon(object);
     }
 
-    public CityStyle(String name) {
-        this.name = name;
+    public CityStyle(CityStyleRE object) {
+        inherit = object.getInherit();
+        style = object.getStyle();
+        explosionChance = object.getExplosionChance();
+        object.getBuildingSettings().ifPresent(s -> {
+            buildingChance = s.getBuildingChance();
+            maxCellarCount = s.getMaxCellarCount();
+            maxFloorCount = s.getMaxFloorCount();
+            minCellarCount = s.getMinCellarCount();
+            minFloorCount = s.getMinFloorCount();
+        });
+        object.getCorridorSettings().ifPresent(s -> {
+
+        });
     }
 
     @Override
@@ -398,6 +411,7 @@ public class CityStyle implements ILostCityCityStyle {
             return new JsonArray(); // Empty array
         }
     }
+
 
     public JsonObject writeToJSon() {
         JsonObject object = new JsonObject();

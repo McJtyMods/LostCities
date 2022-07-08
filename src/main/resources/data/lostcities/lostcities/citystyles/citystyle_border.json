@@ -29,128 +29,130 @@
     "border": "9",
     "inner": "b"
   },
-  "buildings": [
-    {
-      "factor": 0.3,
-      "value": "building1"
-    },
-    {
-      "factor": 0.4,
-      "value": "building2"
-    },
-    {
-      "factor": 0.2,
-      "value": "building3"
-    },
-    {
-      "factor": 0.2,
-      "value": "building4"
-    },
-    {
-      "factor": 0.3,
-      "value": "building5"
-    }
-  ],
-  "multibuildings": [
-  ],
-  "bridges": [
-    {
-      "factor": 1.0,
-      "value": "bridge_open"
-    },
-    {
-      "factor": 1.0,
-      "value": "bridge_covered"
-    }
-  ],
-  "fronts": [
-    {
-      "factor": 1.0,
-      "value": "building_front1"
-    },
-    {
-      "factor": 1.0,
-      "value": "building_front2"
-    },
-    {
-      "factor": 1.0,
-      "value": "building_front3"
-    }
-  ],
-  "stairs": [
-    {
-      "factor": 1.0,
-      "value": "stairs1"
-    },
-    {
-      "factor": 1.0,
-      "value": "stairs2"
-    },
-    {
-      "factor": 1.0,
-      "value": "stairsnormal"
-    },
-    {
-      "factor": 1.0,
-      "value": "stairsbig"
-    }
-  ],
-  "fountains": [
-    {
-      "factor": 1.0,
-      "value": "fountain1"
-    },
-    {
-      "factor": 1.0,
-      "value": "fountain2"
-    },
-    {
-      "factor": 1.0,
-      "value": "fountain3"
-    }
-  ],
-  "parks": [
-    {
-      "factor": 1.0,
-      "value": "park_pool"
-    },
-    {
-      "factor": 1.0,
-      "value": "park_plants"
-    },
-    {
-      "factor": 1.0,
-      "value": "park_trees"
-    },
-    {
-      "factor": 1.0,
-      "value": "park_plants_pillars"
-    },
-    {
-      "factor": 0.8,
-      "value": "park_fountain1"
-    },
-    {
-      "factor": 0.8,
-      "value": "park_fountain2"
-    },
-    {
-      "factor": 0.3,
-      "value": "park_building"
-    },
-    {
-      "factor": 0.3,
-      "value": "park_building2"
-    }
-  ],
-  "raildungeons": [
-    {
-      "factor": 1.0,
-      "value": "rail_dungeon1"
-    },
-    {
-      "factor": 1.0,
-      "value": "rail_dungeon2"
-    }
-  ]
+  "selectors": {
+    "buildings": [
+      {
+        "factor": 0.3,
+        "value": "building1"
+      },
+      {
+        "factor": 0.4,
+        "value": "building2"
+      },
+      {
+        "factor": 0.2,
+        "value": "building3"
+      },
+      {
+        "factor": 0.2,
+        "value": "building4"
+      },
+      {
+        "factor": 0.3,
+        "value": "building5"
+      }
+    ],
+    "multibuildings": [
+    ],
+    "bridges": [
+      {
+        "factor": 1.0,
+        "value": "bridge_open"
+      },
+      {
+        "factor": 1.0,
+        "value": "bridge_covered"
+      }
+    ],
+    "fronts": [
+      {
+        "factor": 1.0,
+        "value": "building_front1"
+      },
+      {
+        "factor": 1.0,
+        "value": "building_front2"
+      },
+      {
+        "factor": 1.0,
+        "value": "building_front3"
+      }
+    ],
+    "stairs": [
+      {
+        "factor": 1.0,
+        "value": "stairs1"
+      },
+      {
+        "factor": 1.0,
+        "value": "stairs2"
+      },
+      {
+        "factor": 1.0,
+        "value": "stairsnormal"
+      },
+      {
+        "factor": 1.0,
+        "value": "stairsbig"
+      }
+    ],
+    "fountains": [
+      {
+        "factor": 1.0,
+        "value": "fountain1"
+      },
+      {
+        "factor": 1.0,
+        "value": "fountain2"
+      },
+      {
+        "factor": 1.0,
+        "value": "fountain3"
+      }
+    ],
+    "parks": [
+      {
+        "factor": 1.0,
+        "value": "park_pool"
+      },
+      {
+        "factor": 1.0,
+        "value": "park_plants"
+      },
+      {
+        "factor": 1.0,
+        "value": "park_trees"
+      },
+      {
+        "factor": 1.0,
+        "value": "park_plants_pillars"
+      },
+      {
+        "factor": 0.8,
+        "value": "park_fountain1"
+      },
+      {
+        "factor": 0.8,
+        "value": "park_fountain2"
+      },
+      {
+        "factor": 0.3,
+        "value": "park_building"
+      },
+      {
+        "factor": 0.3,
+        "value": "park_building2"
+      }
+    ],
+    "raildungeons": [
+      {
+        "factor": 1.0,
+        "value": "rail_dungeon1"
+      },
+      {
+        "factor": 1.0,
+        "value": "rail_dungeon2"
+      }
+    ]
+  }
 }
