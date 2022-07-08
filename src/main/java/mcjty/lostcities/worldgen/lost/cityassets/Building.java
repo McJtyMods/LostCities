@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityBuilding;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.PartRef;
 import net.minecraft.world.level.CommonLevelAccessor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -72,12 +73,12 @@ public class Building implements ILostCityBuilding {
     public void readFromJSon(JsonObject object) {
     }
 
-    public void readParts(List<Pair<Predicate<ConditionContext>, String>> p, List<BuildingRE.PartRef> partRefs) {
+    public void readParts(List<Pair<Predicate<ConditionContext>, String>> p, List<PartRef> partRefs) {
         p.clear();
         if (partRefs == null) {
             return;
         }
-        for (BuildingRE.PartRef partRef : partRefs) {
+        for (PartRef partRef : partRefs) {
             String partName = partRef.getPart();
             Predicate<ConditionContext> test = ConditionContext.parseTest(partRef);
             addPart(test, partName, p);

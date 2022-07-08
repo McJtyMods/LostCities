@@ -5,6 +5,7 @@ import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingPartRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.PartMeta;
 import net.minecraft.world.level.CommonLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -45,18 +46,18 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
             refPaletteName = object.getRefPaletteName();
         }
         if (object.getMetadata() != null) {
-            for (BuildingPartRE.PartMeta meta : object.getMetadata()) {
-                String key = meta.getKey();
-                if (meta.getI() != null) {
-                    metadata.put(key, meta.getI());
-                } else if (meta.getF() != null) {
-                    metadata.put(key, meta.getF());
-                } else if (meta.getBool() != null) {
-                    metadata.put(key, meta.getBool());
-                } else if (meta.getChr() != null) {
-                    metadata.put(key, meta.getChr().charAt(0));
-                } else if (meta.getBool()) {
-                    metadata.put(key, meta.getBool());
+            for (PartMeta meta : object.getMetadata()) {
+                String key = meta.key();
+                if (meta.i() != null) {
+                    metadata.put(key, meta.i());
+                } else if (meta.f() != null) {
+                    metadata.put(key, meta.f());
+                } else if (meta.bool() != null) {
+                    metadata.put(key, meta.bool());
+                } else if (meta.chr() != null) {
+                    metadata.put(key, meta.chr().charAt(0));
+                } else if (meta.bool()) {
+                    metadata.put(key, meta.bool());
                 }
             }
         }

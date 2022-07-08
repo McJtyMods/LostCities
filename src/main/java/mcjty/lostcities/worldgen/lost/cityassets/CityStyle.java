@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityCityStyle;
 import mcjty.lostcities.varia.Tools;
+import mcjty.lostcities.worldgen.lost.regassets.data.ObjectSelector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,32 +16,14 @@ public class CityStyle implements ILostCityCityStyle {
 
     private String name;
 
-    public static class PartSelector {
-        private float factor;
-        private String value;
-
-        public float getFactor() {
-            return factor;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public PartSelector(float factor, String value) {
-            this.factor = factor;
-            this.value = value;
-        }
-    }
-
-    private final List<PartSelector> buildingSelector = new ArrayList<>();
-    private final List<PartSelector> bridgeSelector = new ArrayList<>();
-    private final List<PartSelector> parkSelector = new ArrayList<>();
-    private final List<PartSelector> fountainSelector = new ArrayList<>();
-    private final List<PartSelector> stairSelector = new ArrayList<>();
-    private final List<PartSelector> frontSelector = new ArrayList<>();
-    private final List<PartSelector> railDungeonSelector = new ArrayList<>();
-    private final List<PartSelector> multiBuildingSelector = new ArrayList<>();
+    private final List<ObjectSelector> buildingSelector = new ArrayList<>();
+    private final List<ObjectSelector> bridgeSelector = new ArrayList<>();
+    private final List<ObjectSelector> parkSelector = new ArrayList<>();
+    private final List<ObjectSelector> fountainSelector = new ArrayList<>();
+    private final List<ObjectSelector> stairSelector = new ArrayList<>();
+    private final List<ObjectSelector> frontSelector = new ArrayList<>();
+    private final List<ObjectSelector> railDungeonSelector = new ArrayList<>();
+    private final List<ObjectSelector> multiBuildingSelector = new ArrayList<>();
 
     // Building settings
     private Integer minFloorCount;
@@ -395,7 +378,7 @@ public class CityStyle implements ILostCityCityStyle {
         parseArraySafe(object, railDungeonSelector, "raildungeons", "dungeon");
     }
 
-    private void parseArraySafe(JsonObject object, List<PartSelector> selector, String arrayName, String elName) {
+    private void parseArraySafe(JsonObject object, List<ObjectSelector> selector, String arrayName, String elName) {
         JsonArray array = getArraySafe(object, arrayName);
         for (JsonElement element : array) {
             if (element.getAsJsonObject().has("clear")) {
@@ -403,7 +386,7 @@ public class CityStyle implements ILostCityCityStyle {
             } else {
                 float factor = element.getAsJsonObject().get("factor").getAsFloat();
                 String el = element.getAsJsonObject().get(elName).getAsString();
-                selector.add(new PartSelector(factor, el));
+                selector.add(new ObjectSelector(factor, el));
             }
         }
     }
@@ -430,73 +413,73 @@ public class CityStyle implements ILostCityCityStyle {
         object.add("streetblocks", s);
 
         JsonArray array = new JsonArray();
-        for (PartSelector pair : buildingSelector) {
+        for (ObjectSelector pair : buildingSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getFactor()));
-            o.add("building", new JsonPrimitive(pair.getValue()));
+            o.add("factor", new JsonPrimitive(pair.factor()));
+            o.add("building", new JsonPrimitive(pair.value()));
             array.add(o);
         }
         object.add("buildings", array);
 
         array = new JsonArray();
-        for (PartSelector pair : multiBuildingSelector) {
+        for (ObjectSelector pair : multiBuildingSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getFactor()));
-            o.add("multibuilding", new JsonPrimitive(pair.getValue()));
+            o.add("factor", new JsonPrimitive(pair.factor()));
+            o.add("multibuilding", new JsonPrimitive(pair.value()));
             array.add(o);
         }
         object.add("multibuildings", array);
 
         array = new JsonArray();
-        for (PartSelector pair : parkSelector) {
+        for (ObjectSelector pair : parkSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getFactor()));
-            o.add("park", new JsonPrimitive(pair.getValue()));
+            o.add("factor", new JsonPrimitive(pair.factor()));
+            o.add("park", new JsonPrimitive(pair.value()));
             array.add(o);
         }
         object.add("parks", array);
 
         array = new JsonArray();
-        for (PartSelector pair : fountainSelector) {
+        for (ObjectSelector pair : fountainSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getFactor()));
-            o.add("fountain", new JsonPrimitive(pair.getValue()));
+            o.add("factor", new JsonPrimitive(pair.factor()));
+            o.add("fountain", new JsonPrimitive(pair.value()));
             array.add(o);
         }
         object.add("fountains", array);
 
         array = new JsonArray();
-        for (PartSelector pair : stairSelector) {
+        for (ObjectSelector pair : stairSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getFactor()));
-            o.add("stair", new JsonPrimitive(pair.getValue()));
+            o.add("factor", new JsonPrimitive(pair.factor()));
+            o.add("stair", new JsonPrimitive(pair.value()));
             array.add(o);
         }
         object.add("stairs", array);
 
         array = new JsonArray();
-        for (PartSelector pair : frontSelector) {
+        for (ObjectSelector pair : frontSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getFactor()));
-            o.add("front", new JsonPrimitive(pair.getValue()));
+            o.add("factor", new JsonPrimitive(pair.factor()));
+            o.add("front", new JsonPrimitive(pair.value()));
             array.add(o);
         }
         object.add("fronts", array);
 
         array = new JsonArray();
-        for (PartSelector pair : bridgeSelector) {
+        for (ObjectSelector pair : bridgeSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getFactor()));
-            o.add("bridge", new JsonPrimitive(pair.getValue()));
+            o.add("factor", new JsonPrimitive(pair.factor()));
+            o.add("bridge", new JsonPrimitive(pair.value()));
             array.add(o);
         }
         object.add("bridges", array);
 
         array = new JsonArray();
-        for (PartSelector pair : railDungeonSelector) {
+        for (ObjectSelector pair : railDungeonSelector) {
             JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.getFactor()));
-            o.add("dungeon", new JsonPrimitive(pair.getValue()));
+            o.add("factor", new JsonPrimitive(pair.factor()));
+            o.add("dungeon", new JsonPrimitive(pair.value()));
             array.add(o);
         }
         object.add("raildungeons", array);
@@ -504,12 +487,12 @@ public class CityStyle implements ILostCityCityStyle {
         return object;
     }
 
-    private static String getRandomFromList(Random random, List<PartSelector> list) {
-        PartSelector fromList = Tools.getRandomFromList(random, list, PartSelector::getFactor);
+    private static String getRandomFromList(Random random, List<ObjectSelector> list) {
+        ObjectSelector fromList = Tools.getRandomFromList(random, list, ObjectSelector::factor);
         if (fromList == null) {
             return null;
         } else {
-            return fromList.getValue();
+            return fromList.value();
         }
     }
 

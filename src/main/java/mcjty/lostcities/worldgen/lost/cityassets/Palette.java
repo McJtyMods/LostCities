@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.BlockEntry;
+import mcjty.lostcities.worldgen.lost.regassets.data.PaletteEntry;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -68,7 +70,7 @@ public class Palette implements ILostCityAsset {
     }
 
     public void parsePaletteArray(PaletteRE paletteRE) {
-        for (PaletteRE.PaletteEntry entry : paletteRE.getPaletteEntries()) {
+        for (PaletteEntry entry : paletteRE.getPaletteEntries()) {
             Character c = entry.getChr().charAt(0);
             BlockState dmg = null;
             if (entry.getDamaged() != null) {
@@ -107,11 +109,11 @@ public class Palette implements ILostCityAsset {
                 String value = entry.getFrompalette();
                 palette.put(c, value);
             } else if (entry.getBlocks() != null) {
-                List<PaletteRE.BlockEntry> entryBlocks = entry.getBlocks();
+                List<BlockEntry> entryBlocks = entry.getBlocks();
                 List<Pair<Integer, BlockState>> blocks = new ArrayList<>();
-                for (PaletteRE.BlockEntry ob : entryBlocks) {
-                    Integer f = ob.getRandom();
-                    String block = ob.getBlock();
+                for (BlockEntry ob : entryBlocks) {
+                    Integer f = ob.random();
+                    String block = ob.block();
                     BlockState state = Tools.stringToState(block);
                     blocks.add(Pair.of(f, state));
                     if (dmg != null) {

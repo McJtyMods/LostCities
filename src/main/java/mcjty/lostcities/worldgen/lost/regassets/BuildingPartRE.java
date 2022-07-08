@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost.regassets;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import mcjty.lostcities.worldgen.lost.regassets.data.PartMeta;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
@@ -15,59 +16,6 @@ import java.util.Optional;
  */
 public class BuildingPartRE implements IForgeRegistryEntry<BuildingPartRE> {
 
-    public static class PartMeta {
-        private String key;
-        private Boolean bool;
-        private String chr;
-        private String str;
-        private Integer i;
-        private Float f;
-
-        public String getKey() {
-            return key;
-        }
-
-        public Boolean getBool() {
-            return bool;
-        }
-
-        public String getChr() {
-            return chr;
-        }
-
-        public String getStr() {
-            return str;
-        }
-
-        public Integer getI() {
-            return i;
-        }
-
-        public Float getF() {
-            return f;
-        }
-
-        public PartMeta(String key, Optional<Boolean> bool, Optional<String> chr, Optional<String> str,
-                        Optional<Integer> i, Optional<Float> f) {
-            this.key = key;
-            this.bool = bool.isPresent() ? bool.get() : null;
-            this.chr = chr.isPresent() ? chr.get() : null;
-            this.str = str.isPresent() ? str.get() : null;
-            this.i = i.isPresent() ? i.get() : null;
-            this.f = f.isPresent() ? f.get() : null;
-        }
-    }
-
-    public static final Codec<PartMeta> CODEC_PARTMETA = RecordCodecBuilder.create(instance ->
-            instance.group(
-                    Codec.STRING.fieldOf("key").forGetter(l -> l.key),
-                    Codec.BOOL.optionalFieldOf("boolean").forGetter(l -> Optional.ofNullable(l.bool)),
-                    Codec.STRING.optionalFieldOf("char").forGetter(l -> Optional.ofNullable(l.chr)),
-                    Codec.STRING.optionalFieldOf("string").forGetter(l -> Optional.ofNullable(l.str)),
-                    Codec.INT.optionalFieldOf("integer").forGetter(l -> Optional.ofNullable(l.i)),
-                    Codec.FLOAT.optionalFieldOf("float").forGetter(l -> Optional.ofNullable(l.f))
-            ).apply(instance, PartMeta::new));
-
     public static final Codec<BuildingPartRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.INT.fieldOf("xsize").forGetter(l -> l.xSize),
@@ -75,22 +23,22 @@ public class BuildingPartRE implements IForgeRegistryEntry<BuildingPartRE> {
                     Codec.list(Codec.list(Codec.STRING)).fieldOf("slices").forGetter(BuildingPartRE::createSlices),
                     Codec.STRING.optionalFieldOf("refpalette").forGetter(l -> Optional.ofNullable(l.refPaletteName)),
                     PaletteRE.CODEC.optionalFieldOf("palette").forGetter(l -> Optional.ofNullable(l.localPalette)),
-                    Codec.list(CODEC_PARTMETA).optionalFieldOf("meta").forGetter(l -> Optional.ofNullable(l.metadata))
+                    Codec.list(PartMeta.CODEC).optionalFieldOf("meta").forGetter(l -> Optional.ofNullable(l.metadata))
             ).apply(instance, BuildingPartRE::new));
 
     private ResourceLocation name;
 
     // Data per height level
-    private String[] slices;
+    private final String[] slices;
 
     // Dimension (should be less then 16x16)
-    private int xSize;
-    private int zSize;
+    private final int xSize;
+    private final int zSize;
 
     private PaletteRE localPalette = null;
-    private String refPaletteName;
+    private final String refPaletteName;
 
-    private List<PartMeta> metadata;
+    private final List<PartMeta> metadata;
 
     public BuildingPartRE(int xSize, int zSize, List<List<String>> slices, Optional<String> refpalette, Optional<PaletteRE> locpalette,
                           Optional<List<PartMeta>> metadata) {

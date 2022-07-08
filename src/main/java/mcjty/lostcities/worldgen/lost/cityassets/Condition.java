@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.regassets.ConditionRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.ConditionPart;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class Condition implements ILostCityAsset {
     private final List<Pair<Predicate<ConditionContext>, Pair<Float, String>>> valueSelector = new ArrayList<>();
 
     public Condition(ConditionRE object) {
-        for (ConditionRE.ConditionPart cp : object.getValues()) {
+        for (ConditionPart cp : object.getValues()) {
             float factor = cp.getFactor();
             String value = cp.getValue();
             Predicate<ConditionContext> test = ConditionContext.parseTest(cp);

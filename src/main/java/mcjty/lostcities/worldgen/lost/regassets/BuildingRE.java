@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost.regassets;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import mcjty.lostcities.worldgen.lost.regassets.data.PartRef;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
@@ -10,23 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
-
-    public static final Codec<PartRef> CODEC_PARTREF = RecordCodecBuilder.create(instance ->
-            instance.group(
-                    Codec.STRING.fieldOf("part").forGetter(l -> l.part),
-                    Codec.BOOL.optionalFieldOf("top").forGetter(l -> Optional.ofNullable(l.getTop())),
-                    Codec.BOOL.optionalFieldOf("ground").forGetter(l -> Optional.ofNullable(l.getGround())),
-                    Codec.BOOL.optionalFieldOf("cellar").forGetter(l -> Optional.ofNullable(l.getCellar())),
-                    Codec.BOOL.optionalFieldOf("isbuilding").forGetter(l -> Optional.ofNullable(l.getIsbuilding())),
-                    Codec.BOOL.optionalFieldOf("issphere").forGetter(l -> Optional.ofNullable(l.getIssphere())),
-                    Codec.INT.optionalFieldOf("floor").forGetter(l -> Optional.ofNullable(l.getFloor())),
-                    Codec.INT.optionalFieldOf("chunkx").forGetter(l -> Optional.ofNullable(l.getChunkx())),
-                    Codec.INT.optionalFieldOf("chunkz").forGetter(l -> Optional.ofNullable(l.getChunkz())),
-                    Codec.STRING.optionalFieldOf("inpart").forGetter(l -> Optional.ofNullable(l.getInpart())),
-                    Codec.STRING.optionalFieldOf("inbuilding").forGetter(l -> Optional.ofNullable(l.getInbuilding())),
-                    Codec.STRING.optionalFieldOf("inbiome").forGetter(l -> Optional.ofNullable(l.getInbiome())),
-                    Codec.STRING.optionalFieldOf("range").forGetter(l -> Optional.ofNullable(l.getRange()))
-            ).apply(instance, PartRef::new));
 
     public static final Codec<BuildingRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -39,8 +23,8 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
                     Codec.INT.optionalFieldOf("maxcellars").forGetter(l -> l.maxCellars == -1 ? Optional.<Integer>empty() : Optional.of(l.maxCellars)),
                     Codec.INT.optionalFieldOf("maxfloors").forGetter(l -> l.maxFloors == -1 ? Optional.<Integer>empty() : Optional.of(l.maxFloors)),
                     Codec.FLOAT.optionalFieldOf("preferslonely").forGetter(l -> l.prefersLonely == 0 ? Optional.<Float>empty() : Optional.of(l.prefersLonely)),
-                    Codec.list(CODEC_PARTREF).fieldOf("parts").forGetter(l -> l.parts),
-                    Codec.list(CODEC_PARTREF).optionalFieldOf("parts2").forGetter(l -> Optional.ofNullable(l.parts2))
+                    Codec.list(PartRef.CODEC).fieldOf("parts").forGetter(l -> l.parts),
+                    Codec.list(PartRef.CODEC).optionalFieldOf("parts2").forGetter(l -> Optional.ofNullable(l.parts2))
             ).apply(instance, BuildingRE::new));
 
 
@@ -137,28 +121,4 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
         return parts2;
     }
 
-    public static class PartRef extends ConditionRE.ConditionTest {
-        private String part;
-
-        public String getPart() {
-            return part;
-        }
-
-        public PartRef(String part,
-                       Optional<Boolean> top,
-                       Optional<Boolean> ground,
-                       Optional<Boolean> cellar,
-                       Optional<Boolean> isbuilding,
-                       Optional<Boolean> issphere,
-                       Optional<Integer> floor,
-                       Optional<Integer> chunkx,
-                       Optional<Integer> chunkz,
-                       Optional<String> inpart,
-                       Optional<String> inbuilding,
-                       Optional<String> inbiome,
-                       Optional<String> range) {
-            super(top, ground, cellar, isbuilding, issphere, floor, chunkx, chunkz, inpart, inbuilding, inbiome, range);
-            this.part = part;
-        }
-    }
 }
