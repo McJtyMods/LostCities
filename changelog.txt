@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.3.0:
 - Various improvements to the configuration GUI. The preview is now larger too
 - Removed several config options that no longer work or are no longer relevant
 - Cleaned up a lot of code
