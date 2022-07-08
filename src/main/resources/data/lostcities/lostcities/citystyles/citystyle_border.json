@@ -1,6 +1,6 @@
 {
   "style": "standard_border",
-  "inherit": "citystyle_config",
+  "inherit": "citystyle_common",
 
   "buildingsettings": {
     "maxfloors": 1,

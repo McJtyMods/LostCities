@@ -8,15 +8,10 @@ import mcjty.lostcities.api.ILostCityProfile;
 import mcjty.lostcities.setup.ModSetup;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LostCityProfile implements ILostCityProfile {
 
@@ -134,10 +129,6 @@ public class LostCityProfile implements ILostCityProfile {
     public int TERRAIN_FIX_LOWER_MAX_OFFSET = -3;
     public int TERRAIN_FIX_UPPER_MIN_OFFSET = -1;
     public int TERRAIN_FIX_UPPER_MAX_OFFSET = 1;
-
-    public Float CITY_DEFAULT_BIOME_FACTOR = 1.0f;
-    public String[] CITY_BIOME_FACTORS = new String[] { "river=0", "frozen_river=0", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.4" };
-    public Map<ResourceLocation, Float> biomeFactorMap = null;
 
     public String[] ALLOWED_BIOME_FACTORS = new String[] { };
     public String[] MANUAL_BIOME_MAPPINGS = new String[] { };
@@ -420,8 +411,6 @@ public class LostCityProfile implements ILostCityProfile {
                 "specified in 'cityStyleAlternative'");
         CITY_STYLE_ALTERNATIVE = cfg.getString("cityStyleAlternative", LostCityProfile.CATEGORY_CITIES, CITY_STYLE_ALTERNATIVE, "Alternative city style. Used with cityStyleThreshold");
         CITY_AVOID_VOID = cfg.getBoolean("cityAvoidVoid", LostCityProfile.CATEGORY_CITIES, CITY_AVOID_VOID, "Only used with floating landscape type: if true an additional detection is done to see if the chunk is void and in that case the city isn't generated there. Otherwise you might get city chunks on the border of islands which sometimes looks weird");
-        CITY_BIOME_FACTORS = cfg.getStringList("cityBiomeFactors", LostCityProfile.CATEGORY_CITIES, CITY_BIOME_FACTORS, "List of biomes with a factor to affect the city factor in that biome. Using the value 0 you can disable city generation in biomes");
-        CITY_DEFAULT_BIOME_FACTOR = cfg.getFloat("cityBiomeFactorDefault", LostCityProfile.CATEGORY_CITIES, CITY_DEFAULT_BIOME_FACTOR, 0.0f, 1.0f, "The default biome factor which is used if your biome is not specified in 'cityBiomeFactors'");
 
         CITY_LEVEL0_HEIGHT = cfg.getInt("cityLevel0Height", LostCityProfile.CATEGORY_CITIES, CITY_LEVEL0_HEIGHT, 1, 255,
                 "Below this chunk height cities will be level 0");
@@ -513,28 +502,6 @@ public class LostCityProfile implements ILostCityProfile {
     @Override
     public void setOceanCorrectionBorder(int border) {
         this.OCEAN_CORRECTION_BORDER = border;
-    }
-
-    public Map<ResourceLocation, Float> getBiomeFactorMap() {
-        if (biomeFactorMap == null) {
-            biomeFactorMap = new HashMap<>();
-            for (String s : CITY_BIOME_FACTORS) {
-                String[] split = StringUtils.split(s, '=');
-                if (split.length < 2) {
-                    ModSetup.getLogger().error("Badly specified biome factor. Must be <biome>=<factor>!");
-                } else {
-                    float f = Float.parseFloat(split[1]);
-                    String biomeId = split[0];
-                    Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(biomeId));
-                    if (biome != null) {
-                        biomeFactorMap.put(new ResourceLocation(biomeId), f);
-                    } else {
-                        ModSetup.getLogger().warn("Can't find biome " + biomeId);
-                    }
-                }
-            }
-        }
-        return biomeFactorMap;
     }
 
     public boolean isDefault() {

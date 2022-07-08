@@ -1,23 +1,5 @@
 {
   "outsidestyle": "outside",
-  "citybiomemultipliers": [
-    {
-      "multiplier": 0.1,
-      "biomes": {
-        "if_any": [
-          "#minecraft:is_ocean"
-        ]
-      }
-    },
-    {
-      "multiplier": 0.3,
-      "biomes": {
-        "if_any": [
-          "#minecraft:is_river"
-        ]
-      }
-    }
-  ],
   "citystyles": [
     {
       "factor": 0.5,

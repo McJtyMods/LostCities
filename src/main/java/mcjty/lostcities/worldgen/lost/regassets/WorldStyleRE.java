@@ -2,29 +2,33 @@ package mcjty.lostcities.worldgen.lost.regassets;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import mcjty.lostcities.worldgen.lost.regassets.data.CityBiomeMultiplier;
 import mcjty.lostcities.worldgen.lost.regassets.data.CityStyleSelector;
-import mcjty.lostcities.worldgen.lost.regassets.data.ConditionPart;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
 
     public static final Codec<WorldStyleRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.STRING.fieldOf("outsidestyle").forGetter(l -> l.outsideStyle),
-                    Codec.list(CityStyleSelector.CODEC).fieldOf("citystyles").forGetter(l -> l.cityStyleSelectors)
+                    Codec.list(CityStyleSelector.CODEC).fieldOf("citystyles").forGetter(l -> l.cityStyleSelectors),
+                    Codec.list(CityBiomeMultiplier.CODEC).optionalFieldOf("citybiomemultipliers").forGetter(l -> Optional.ofNullable(l.cityBiomeMultipliers))
             ).apply(instance, WorldStyleRE::new));
 
     private ResourceLocation name;
-    private String outsideStyle;
-    private List<CityStyleSelector> cityStyleSelectors;
+    private final String outsideStyle;
+    private final List<CityStyleSelector> cityStyleSelectors;
+    private final List<CityBiomeMultiplier> cityBiomeMultipliers;
 
-    public WorldStyleRE(String outsideStyle, List<CityStyleSelector> values) {
+    public WorldStyleRE(String outsideStyle, List<CityStyleSelector> values, Optional<List<CityBiomeMultiplier>> cityBiomeMultipliers) {
         this.outsideStyle = outsideStyle;
         this.cityStyleSelectors = values;
+        this.cityBiomeMultipliers = cityBiomeMultipliers.orElse(null);
     }
 
     public String getOutsideStyle() {
@@ -33,6 +37,10 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
 
     public List<CityStyleSelector> getCityStyleSelectors() {
         return cityStyleSelectors;
+    }
+
+    public List<CityBiomeMultiplier> getCityBiomeMultipliers() {
+        return cityBiomeMultipliers;
     }
 
     @Override

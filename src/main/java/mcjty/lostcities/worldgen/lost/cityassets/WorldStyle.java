@@ -7,6 +7,7 @@ import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BiomeInfo;
 import mcjty.lostcities.worldgen.lost.regassets.WorldStyleRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.CityBiomeMultiplier;
 import mcjty.lostcities.worldgen.lost.regassets.data.CityStyleSelector;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
@@ -23,16 +24,21 @@ public class WorldStyle implements ILostCityAsset {
     private String outsideStyle;
 
     private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
+    private final List<Pair<Predicate<Holder<Biome>>, Float>> cityBiomeMultiplier = new ArrayList<>();
 
     public WorldStyle(WorldStyleRE object) {
         outsideStyle = object.getOutsideStyle();
         for (CityStyleSelector selector : object.getCityStyleSelectors()) {
-            String citystyle = selector.citystyle();
             Predicate<Holder<Biome>> predicate = biomeHolder -> true;
             if (selector.biomeMatcher() != null) {
-                predicate = info -> selector.biomeMatcher().test(info);
+                predicate = selector.biomeMatcher();
             }
             cityStyleSelector.add(Pair.of(predicate, Pair.of(selector.factor(), selector.citystyle())));
+        }
+        if (object.getCityBiomeMultipliers() != null) {
+            for (CityBiomeMultiplier multiplier : object.getCityBiomeMultipliers()) {
+                cityBiomeMultiplier.add(Pair.of(multiplier.biomeMatcher(), multiplier.multiplier()));
+            }
         }
     }
 
@@ -51,6 +57,16 @@ public class WorldStyle implements ILostCityAsset {
 
     public String getOutsideStyle() {
         return outsideStyle;
+    }
+
+    public float getCityChanceMultiplier(IDimensionInfo provider, int chunkX, int chunkZ) {
+        Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
+        for (Pair<Predicate<Holder<Biome>>, Float> pair : cityBiomeMultiplier) {
+            if (pair.getLeft().test(biome)) {
+                return pair.getRight();
+            }
+        }
+        return 1.0f;
     }
 
     public String getRandomCityStyle(IDimensionInfo provider, int chunkX, int chunkZ, Random random) {

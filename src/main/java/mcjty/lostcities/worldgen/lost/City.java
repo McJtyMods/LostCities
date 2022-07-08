@@ -7,14 +7,12 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
+import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -237,7 +235,7 @@ public class City {
         if (profile.CITY_CHANCE < 0) {
             CityRarityMap rarityMap = getCityRarityMap(provider.dimension(), provider.getSeed(),
                     profile.CITY_PERLIN_SCALE, profile.CITY_PERLIN_OFFSET, profile.CITY_PERLIN_INNERSCALE);
-            return rarityMap.getCityFactor(chunkX, chunkZ);
+            factor = rarityMap.getCityFactor(chunkX, chunkZ);
         } else {
             int offset = (profile.CITY_MAXRADIUS + 15) / 16;
             for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
@@ -258,6 +256,12 @@ public class City {
             }
         }
 
+        if (factor > 0.0001 && provider.getWorld() != null) {
+            WorldStyle worldStyle = AssetRegistries.WORLDSTYLES.get(provider.getWorld(), profile.getWorldStyle());
+            float multiplier = worldStyle.getCityChanceMultiplier(provider, chunkX, chunkZ);
+            factor *= multiplier;
+        }
+
         // @todo 1.14: do we need this?
 //        for (int cx = -1 ; cx <= 1 ; cx++) {
 //            for (int cz = -1 ; cz <= 1 ; cz++) {
@@ -268,20 +272,6 @@ public class City {
 //            }
 //        }
 
-        float foundFactor = profile.CITY_DEFAULT_BIOME_FACTOR;
-        Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(type, chunkX, chunkZ)).getMainBiome();
-        Map<ResourceLocation, Float> map = profile.getBiomeFactorMap();
-        ResourceLocation object = Tools.getBiomeId(biome.value());
-        Float f;
-        try {
-            f = map.get(object);
-        } catch(NullPointerException e) {
-            throw new RuntimeException("Biome '" + object.toString() + "' (" + object.getPath() + ") could not be found in the biome registry! This is likely a bug in the mod providing that biome!", e);
-        }
-        if (f != null) {
-            foundFactor = f;
-        }
-
-        return Math.min(Math.max(factor * foundFactor, 0), 1);
+        return Math.min(Math.max(factor, 0), 1);
     }
 }

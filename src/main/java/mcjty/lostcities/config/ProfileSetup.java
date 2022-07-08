@@ -221,7 +221,6 @@ public class ProfileSetup {
         profile.setIconFile("textures/gui/icon_onlycities.png");
         profile.CITY_CHANCE = 0.2;
         profile.CITY_MAXRADIUS = 256;
-        profile.CITY_BIOME_FACTORS = new String[] { "river=.5", "frozen_river=.5", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.6" };
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("tallbuildings", true);

@@ -7,9 +7,9 @@ Upcoming:
 - New feature where you can specify rubble blocks for a building. These will be used instead of the filler block but only for when buildings are damaged and spill over in adjacent chunks
 - New 'variant' asset type where you can define sets of blocks that can then be used in palettes. This makes defining different palettes easier
 - All assets are now converted to datapack objects. This totally changes the way you can reconfigure Lost Cities
-
-@TODO: Fix glass panes not updating state correctly
-@TODO: test large cities, style standard_border is weird?
+- Expanded the worldstyle asset type with a new 'citychancemultipliers' section that allows you to specify biomes where cities should spawn less or more
+- The city biome factors have been removed from the profile. This is now better handled in the asset system (worldstyle)
+- The standard worldstyle avoids rivers slightly and oceans a bit more
 
 1.18-5.2.6:
 - New system to control city rarity based on perlin maps. If the cityChance setting is -1 then cityPerlinScale and cityPerlinOffset will be used for a more natural city style

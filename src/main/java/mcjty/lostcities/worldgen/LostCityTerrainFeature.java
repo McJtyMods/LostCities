@@ -277,11 +277,6 @@ public class LostCityTerrainFeature {
             doCity = !v;
         }
 
-        if (chunkX == 0 && chunkZ == -88) {
-            System.out.println("LostCityTerrainFeature.doCityChunk");
-        }
-
-
         if (doCity) {
             doCityChunk(chunkX, chunkZ, info);
         } else {
