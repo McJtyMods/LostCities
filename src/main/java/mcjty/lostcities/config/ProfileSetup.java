@@ -370,6 +370,7 @@ public class ProfileSetup {
         profile.CITY_THRESHOLD = .1f;
         profile.CITY_STYLE_THRESHOLD = .4f;
         profile.CITY_STYLE_ALTERNATIVE = "citystyle_border";
+        profile.GENERATE_LIGHTING = true;
         profile.BUILDING_MAXFLOORS = 9;
         profile.BUILDING_MAXFLOORS_CHANCE = 7;
         profile.BUILDING_CHANCE = .4f;

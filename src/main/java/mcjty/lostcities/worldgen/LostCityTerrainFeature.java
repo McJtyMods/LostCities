@@ -277,6 +277,10 @@ public class LostCityTerrainFeature {
             doCity = !v;
         }
 
+        if (chunkX == 0 && chunkZ == -88) {
+            System.out.println("LostCityTerrainFeature.doCityChunk");
+        }
+
 
         if (doCity) {
             doCityChunk(chunkX, chunkZ, info);
@@ -2234,9 +2238,6 @@ public class LostCityTerrainFeature {
                             b = ironbars.get();
                         } else {
                             b = adjacentPalette.get(rubbleBlock);     // Filler from adjacent building
-                        }
-                        if (b == null) {
-                            System.out.println("LostCityTerrainFeature.generateDebrisFromChunk");
                         }
                         driver.current(x, h + 1, z).block(b);
                     }
