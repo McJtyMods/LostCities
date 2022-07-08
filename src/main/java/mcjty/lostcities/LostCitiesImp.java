@@ -11,8 +11,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,16 +35,6 @@ public class LostCitiesImp implements ILostCities {
     @Override
     public void registerDimension(ResourceKey<Level> key, String profile) {
         Config.registerLostCityDimension(key, profile);
-    }
-
-    @Override
-    public void loadAsset(File file) {
-        AssetRegistries.load(file);
-    }
-
-    @Override
-    public void loadAsset(InputStream input, String path) {
-        AssetRegistries.load(input, path);
     }
 
     public record LostCityInformation(IDimensionInfo dimensionInfo) implements ILostCityInformation {

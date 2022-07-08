@@ -4,8 +4,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.InputStream;
 
 /**
  * Main interface for this mod. Use this to get city information
@@ -41,14 +39,4 @@ public interface ILostCities {
      * (for example in buildSurface)
      */
     void registerDimension(ResourceKey<Level> key, String profile);
-
-    /**
-     * Load an additional asset file
-     */
-    void loadAsset(File file);
-
-    /**
-     * Load an additional asset file
-     */
-    void loadAsset(InputStream input, String path);
 }

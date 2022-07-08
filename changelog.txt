@@ -8,6 +8,7 @@ Upcoming:
 - New 'variant' asset type where you can define sets of blocks that can then be used in palettes. This makes defining different palettes easier
 
 @TODO: Fix glass panes not updating state correctly
+@TODO: replace isPresent -> orElse
 
 1.18-5.2.6:
 - New system to control city rarity based on perlin maps. If the cityChance setting is -1 then cityPerlinScale and cityPerlinOffset will be used for a more natural city style

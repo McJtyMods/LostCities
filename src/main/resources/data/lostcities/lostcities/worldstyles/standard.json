@@ -1,0 +1,19 @@
+{
+  "outsidestyle": "outside",
+  "citystyles": [
+    {
+      "factor": 0.5,
+      "citystyle": "citystyle_standard"
+    },
+    {
+      "factor": 9.0,
+      "biomes": {
+        "if_any": [
+          "minecraft:desert",
+          "minecraft:badlands"
+        ]
+      },
+      "citystyle": "citystyle_desert"
+    }
+  ]
+}

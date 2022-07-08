@@ -14,7 +14,7 @@ public class AssetRegistries {
 
     public static final RegistryAssetRegistry<Variant, VariantRE> VARIANTS = new RegistryAssetRegistry<>(CustomRegistries.VARIANTS_REGISTRY_KEY, Variant::new);
     public static final RegistryAssetRegistry<Condition, ConditionRE> CONDITIONS = new RegistryAssetRegistry<>(CustomRegistries.CONDITIONS_REGISTRY_KEY, Condition::new);
-    public static final AbstractAssetRegistry<WorldStyle> WORLDSTYLES = new AbstractAssetRegistry<>();
+    public static final RegistryAssetRegistry<WorldStyle, WorldStyleRE> WORLDSTYLES = new RegistryAssetRegistry<>(CustomRegistries.WORLDSTYLES_REGISTRY_KEY, WorldStyle::new);
     public static final RegistryAssetRegistry<CityStyle, CityStyleRE> CITYSTYLES = new RegistryAssetRegistry<>(CustomRegistries.CITYSTYLES_REGISTRY_KEY, CityStyle::new);
     public static final RegistryAssetRegistry<BuildingPart, BuildingPartRE> PARTS = new RegistryAssetRegistry<>(CustomRegistries.PART_REGISTRY_KEY, BuildingPart::new);
     public static final RegistryAssetRegistry<Building, BuildingRE> BUILDINGS = new RegistryAssetRegistry<>(CustomRegistries.BUILDING_REGISTRY_KEY, Building::new);
@@ -38,16 +38,6 @@ public class AssetRegistries {
         PREDEFINED_SPHERES.reset();
     }
 
-    public static void load(File file) {
-        try (FileInputStream in = new FileInputStream(file)) {
-            load(in, file.getName());
-        } catch (FileNotFoundException e) {
-            // Not an error
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     private static void add(Map<Character, Set<String>> map, Character character, String partName) {
         if (!map.containsKey(character)) {
             map.put(character, new HashSet<>());
@@ -64,9 +54,7 @@ public class AssetRegistries {
             for (JsonElement entry : element.getAsJsonArray()) {
                 JsonObject object = entry.getAsJsonObject();
                 String type = object.get("type").getAsString();
-                if ("worldstyle".equals(type)) {
-                    WORLDSTYLES.register(new WorldStyle(object));
-                } else if ("city".equals(type)) {
+                if ("city".equals(type)) {
                     PREDEFINED_CITIES.register(new PredefinedCity(object));
                 } else if ("sphere".equals(type)) {
                     PREDEFINED_SPHERES.register(new PredefinedSphere(object));

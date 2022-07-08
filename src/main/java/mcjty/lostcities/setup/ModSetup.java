@@ -1,6 +1,5 @@
 package mcjty.lostcities.setup;
 
-import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityProfileSetup;
 import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.network.PacketHandler;
@@ -8,14 +7,9 @@ import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -47,29 +41,6 @@ public class ModSetup {
 //        LootTableList.register(new ResourceLocation(LostCities.MODID, "chests/lostcitychest"));
 //        LootTableList.register(new ResourceLocation(LostCities.MODID, "chests/raildungeonchest"));
 
-        readAssets();
-    }
-
-    private void readAssets() {
         AssetRegistries.reset();
-        for (String path : Config.ASSETS.get()) {
-            if (path.startsWith("/")) {
-                try(InputStream inputstream = LostCities.class.getResourceAsStream(path)) {
-                    if (inputstream != null) {
-                        AssetRegistries.load(inputstream, path);
-                    } else {
-                        LostCities.logger.error("Can't load asset file '" + path + "'!");
-                    }
-                } catch (IOException ex) {
-                    LostCities.logger.error("Can't load asset file '" + path + "'!");
-                }
-            } else if (path.startsWith("$")) {
-                Path configPath = FMLPaths.CONFIGDIR.get();
-                File file = new File(configPath + File.separator + path.substring(1));
-                AssetRegistries.load(file);
-            } else {
-                throw new RuntimeException("Invalid path for lostcity resource in 'assets' config!");
-            }
-        }
     }
 }

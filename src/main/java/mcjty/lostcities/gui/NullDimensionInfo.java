@@ -4,7 +4,6 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
-import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -86,7 +85,7 @@ public class NullDimensionInfo implements IDimensionInfo {
     };
 
     private final LostCityProfile profile;
-    private final WorldStyle style;
+    private final WorldStyle style = null;
     private final Random random;
     private final long seed;
 
@@ -95,7 +94,7 @@ public class NullDimensionInfo implements IDimensionInfo {
 
     public NullDimensionInfo(LostCityProfile profile, long seed) {
         this.profile = profile;
-        style = AssetRegistries.WORLDSTYLES.get(null, profile.getWorldStyle()); // @todo REG
+//        style = AssetRegistries.WORLDSTYLES.get(null, profile.getWorldStyle()); // @todo REG
         this.seed = seed;
         random = new Random(seed);
         feature = new LostCityTerrainFeature(this, profile, getRandom());

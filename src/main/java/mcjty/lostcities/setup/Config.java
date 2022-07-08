@@ -2,8 +2,8 @@ package mcjty.lostcities.setup;
 
 import com.google.common.collect.Lists;
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.ProfileSetup;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -18,12 +18,6 @@ public class Config {
 
     public static final String CATEGORY_PROFILES = "profiles";
     public static final String CATEGORY_GENERAL = "general";
-
-    public static final String[] DEFAULT_ASSETS = new String[] {
-            "/assets/lostcities/citydata/library.json",
-            "$lostcities/userassets.json"
-    };
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ASSETS;
 
     public static final String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
             "minecraft:glowstone",
@@ -132,10 +126,6 @@ public class Config {
         SPECIAL_BED_BLOCK = SERVER_BUILDER
                 .comment("Block to put underneath a bed so that it qualifies as a teleporter bed")
                 .define("specialBedBlock", "minecraft:diamond_block");
-
-        ASSETS = COMMON_BUILDER
-                .comment("A list of assets that Lost Cities will use to load city data. Paths starting with '/' are relative to the Lost City resource pack. Paths starting with '$' are relative to the main config directory")
-                .defineList("assets", Lists.newArrayList(DEFAULT_ASSETS), s -> s instanceof String);
 
         SELECTED_PROFILE = SERVER_BUILDER.define("selectedProfile", "<CHECK>"); // Default is dummy value that tells the system to check in profileFromClient
         SELECTED_CUSTOM_JSON = SERVER_BUILDER.define("selectedCustomJson", "");
