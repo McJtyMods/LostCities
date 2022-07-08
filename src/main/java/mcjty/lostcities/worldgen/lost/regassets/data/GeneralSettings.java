@@ -18,9 +18,16 @@ public class GeneralSettings {
                     Codec.STRING.optionalFieldOf("glowstone").forGetter(l -> DataTools.toNullable(l.glowstoneBlock))
             ).apply(instance, GeneralSettings::new));
 
+    public Character getIronbarsBlock() {
+        return ironbarsBlock;
+    }
+
+    public Character getGlowstoneBlock() {
+        return glowstoneBlock;
+    }
 
     public GeneralSettings(Optional<String> ironbarsBlock,
-                        Optional<String> glowstoneBlock) {
+                           Optional<String> glowstoneBlock) {
         this.ironbarsBlock = DataTools.getNullableChar(ironbarsBlock);
         this.glowstoneBlock = DataTools.getNullableChar(glowstoneBlock);
     }

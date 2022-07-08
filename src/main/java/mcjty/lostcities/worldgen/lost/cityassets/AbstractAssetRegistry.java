@@ -30,15 +30,7 @@ public class AbstractAssetRegistry<T extends ILostCityAsset> implements ILostCit
         }
         T t = assets.get(name);
         if (t != null) {
-            t.init();
-        }
-        return t;
-    }
-
-    public T get(int i) {
-        T t = assets.get(assetNames.get(i));
-        if (t != null) {
-            t.init();
+            t.init(level);
         }
         return t;
     }

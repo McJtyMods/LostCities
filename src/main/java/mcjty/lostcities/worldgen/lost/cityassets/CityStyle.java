@@ -1,13 +1,11 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityCityStyle;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.regassets.CityStyleRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.ObjectSelector;
+import net.minecraft.world.level.CommonLevelAccessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,11 +64,8 @@ public class CityStyle implements ILostCityCityStyle {
     private String inherit;
     private boolean resolveInherit = false;
 
-    public CityStyle(JsonObject object) {
-        readFromJSon(object);
-    }
-
     public CityStyle(CityStyleRE object) {
+        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
         inherit = object.getInherit();
         style = object.getStyle();
         explosionChance = object.getExplosionChance();
@@ -82,7 +77,42 @@ public class CityStyle implements ILostCityCityStyle {
             minFloorCount = s.getMinFloorCount();
         });
         object.getCorridorSettings().ifPresent(s -> {
-
+            corridorGlassBlock = s.getCorridorGlassBlock();
+            corridorRoofBlock = s.getCorridorRoofBlock();
+        });
+        object.getRailSettings().ifPresent(s -> {
+            railMainBlock = s.getRailMainBlock();
+        });
+        object.getParkSettings().ifPresent(s -> {
+            grassBlock = s.getGrassBlock();
+            parkElevationBlock = s.getParkElevationBlock();
+        });
+        object.getSphereSettings().ifPresent(s -> {
+            sphereBlock = s.getSphereBlock();
+            sphereGlassBlock = s.getSphereGlassBlock();
+            sphereSideBlock = s.getSphereSideBlock();
+        });
+        object.getStreetSettings().ifPresent(s -> {
+            borderBlock = s.getBorderBlock();
+            streetBaseBlock = s.getStreetBaseBlock();
+            streetBlock = s.getStreetBlock();
+            streetVariantBlock = s.getStreetVariantBlock();
+            wallBlock = s.getWallBlock();
+            streetWidth = s.getStreetWidth();
+        });
+        object.getGeneralSettings().ifPresent(s -> {
+            glowstoneBlock = s.getGlowstoneBlock();
+            ironbarsBlock = s.getIronbarsBlock();
+        });
+        object.getSelectors().ifPresent(s -> {
+            s.getBridgeSelector().ifPresent(bridgeSelector::addAll);
+            s.getBuildingSelector().ifPresent(buildingSelector::addAll);
+            s.getFountainSelector().ifPresent(fountainSelector::addAll);
+            s.getFrontSelector().ifPresent(frontSelector::addAll);
+            s.getParkSelector().ifPresent(parkSelector::addAll);
+            s.getMultiBuildingSelector().ifPresent(multiBuildingSelector::addAll);
+            s.getRailDungeonSelector().ifPresent(railDungeonSelector::addAll);
+            s.getStairSelector().ifPresent(stairSelector::addAll);
         });
     }
 
@@ -204,11 +234,11 @@ public class CityStyle implements ILostCityCityStyle {
     }
 
     @Override
-    public void init() {
+    public void init(CommonLevelAccessor level) {
         if (!resolveInherit) {
             resolveInherit = true;
             if (inherit != null) {
-                CityStyle inheritFrom = AssetRegistries.CITYSTYLES.get(null, inherit);  // @todo REG
+                CityStyle inheritFrom = AssetRegistries.CITYSTYLES.get(level, inherit);
                 if (inheritFrom == null) {
                     throw new RuntimeException("Cannot find citystyle '" + inherit + "' to inherit from!");
                 }
@@ -286,219 +316,6 @@ public class CityStyle implements ILostCityCityStyle {
 
     @Override
     public void readFromJSon(JsonObject object) {
-        name = object.get("name").getAsString();
-
-        if (object.has("inherit")) {
-            inherit = object.get("inherit").getAsString();
-        }
-
-        if (object.has("style")) {
-            style = object.get("style").getAsString();
-        }
-
-        if (object.has("explosionchance")) {
-            explosionChance = object.get("explosionchance").getAsFloat();
-        }
-
-        if (object.has("generalblocks")) {
-            JsonObject s = object.get("generalblocks").getAsJsonObject();
-            if (s.has("ironbars")) {
-                ironbarsBlock = s.get("ironbars").getAsCharacter();
-            }
-            if (s.has("glowstone")) {
-                glowstoneBlock = s.get("glowstone").getAsCharacter();
-            }
-        }
-
-        if (object.has("streetblocks")) {
-            JsonObject s = object.get("streetblocks").getAsJsonObject();
-            if (s.has("border")) {
-                borderBlock = s.get("border").getAsCharacter();
-            }
-            if (s.has("wall")) {
-                wallBlock = s.get("wall").getAsCharacter();
-            }
-            if (s.has("street")) {
-                streetBlock = s.get("street").getAsCharacter();
-            }
-            if (s.has("streetvariant")) {
-                streetVariantBlock = s.get("streetvariant").getAsCharacter();
-            }
-            if (s.has("streetbase")) {
-                streetBaseBlock = s.get("streetbase").getAsCharacter();
-            }
-            if (s.has("width")) {
-                streetWidth = s.get("width").getAsInt();
-            }
-        }
-        if (object.has("buildingsettings")) {
-            JsonObject s = object.get("buildingsettings").getAsJsonObject();
-            if (s.has("maxfloors")) {
-                maxFloorCount = s.get("maxfloors").getAsInt();
-            }
-            if (s.has("maxcellars")) {
-                maxCellarCount = s.get("maxcellars").getAsInt();
-            }
-            if (s.has("minfloors")) {
-                minFloorCount = s.get("minfloors").getAsInt();
-            }
-            if (s.has("mincellars")) {
-                minCellarCount = s.get("mincellars").getAsInt();
-            }
-            if (s.has("buildingchance")) {
-                buildingChance = s.get("buildingchance").getAsFloat();
-            }
-        }
-        if (object.has("railblocks")) {
-            JsonObject s = object.get("railblocks").getAsJsonObject();
-            railMainBlock = s.get("railmain").getAsCharacter();
-        }
-        if (object.has("parkblocks")) {
-            JsonObject s = object.get("parkblocks").getAsJsonObject();
-            parkElevationBlock = s.get("elevation").getAsCharacter();
-            if (s.has("grass")) {
-                grassBlock = s.get("grass").getAsCharacter();
-            }
-        }
-        if (object.has("corridorblocks")) {
-            JsonObject s = object.get("corridorblocks").getAsJsonObject();
-            if (s.has("roof")) {
-                corridorRoofBlock = s.get("roof").getAsCharacter();
-            }
-            if (s.has("glass")) {
-                corridorGlassBlock = s.get("glass").getAsCharacter();
-            }
-        }
-        if (object.has("sphereblocks")) {
-            JsonObject s = object.get("sphereblocks").getAsJsonObject();
-            if (s.has("glass")) {
-                sphereGlassBlock = s.get("glass").getAsCharacter();
-            }
-            if (s.has("border")) {
-                sphereSideBlock = s.get("border").getAsCharacter();
-            }
-            if (s.has("inner")) {
-                sphereBlock = s.get("inner").getAsCharacter();
-            }
-        }
-        parseArraySafe(object, buildingSelector, "buildings", "building");
-        parseArraySafe(object, multiBuildingSelector, "multibuildings", "multibuilding");
-        parseArraySafe(object, parkSelector, "parks", "park");
-        parseArraySafe(object, fountainSelector, "fountains", "fountain");
-        parseArraySafe(object, stairSelector, "stairs", "stair");
-        parseArraySafe(object, frontSelector, "fronts", "front");
-        parseArraySafe(object, bridgeSelector, "bridges", "bridge");
-        parseArraySafe(object, railDungeonSelector, "raildungeons", "dungeon");
-    }
-
-    private void parseArraySafe(JsonObject object, List<ObjectSelector> selector, String arrayName, String elName) {
-        JsonArray array = getArraySafe(object, arrayName);
-        for (JsonElement element : array) {
-            if (element.getAsJsonObject().has("clear")) {
-                selector.clear();
-            } else {
-                float factor = element.getAsJsonObject().get("factor").getAsFloat();
-                String el = element.getAsJsonObject().get(elName).getAsString();
-                selector.add(new ObjectSelector(factor, el));
-            }
-        }
-    }
-
-    private JsonArray getArraySafe(JsonObject object, String key) {
-        if (object.has(key)) {
-            return object.get(key).getAsJsonArray();
-        } else {
-            return new JsonArray(); // Empty array
-        }
-    }
-
-
-    public JsonObject writeToJSon() {
-        JsonObject object = new JsonObject();
-        object.add("type", new JsonPrimitive("citystyle"));
-        object.add("name", new JsonPrimitive(name));
-        object.add("style", new JsonPrimitive(style));
-
-        JsonObject s = new JsonObject();
-        s.add("street", new JsonPrimitive(streetBlock));
-        s.add("streetvariant", new JsonPrimitive(streetVariantBlock));
-        s.add("streetbase", new JsonPrimitive(streetBaseBlock));
-        s.add("width", new JsonPrimitive(streetWidth));
-        object.add("streetblocks", s);
-
-        JsonArray array = new JsonArray();
-        for (ObjectSelector pair : buildingSelector) {
-            JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.factor()));
-            o.add("building", new JsonPrimitive(pair.value()));
-            array.add(o);
-        }
-        object.add("buildings", array);
-
-        array = new JsonArray();
-        for (ObjectSelector pair : multiBuildingSelector) {
-            JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.factor()));
-            o.add("multibuilding", new JsonPrimitive(pair.value()));
-            array.add(o);
-        }
-        object.add("multibuildings", array);
-
-        array = new JsonArray();
-        for (ObjectSelector pair : parkSelector) {
-            JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.factor()));
-            o.add("park", new JsonPrimitive(pair.value()));
-            array.add(o);
-        }
-        object.add("parks", array);
-
-        array = new JsonArray();
-        for (ObjectSelector pair : fountainSelector) {
-            JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.factor()));
-            o.add("fountain", new JsonPrimitive(pair.value()));
-            array.add(o);
-        }
-        object.add("fountains", array);
-
-        array = new JsonArray();
-        for (ObjectSelector pair : stairSelector) {
-            JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.factor()));
-            o.add("stair", new JsonPrimitive(pair.value()));
-            array.add(o);
-        }
-        object.add("stairs", array);
-
-        array = new JsonArray();
-        for (ObjectSelector pair : frontSelector) {
-            JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.factor()));
-            o.add("front", new JsonPrimitive(pair.value()));
-            array.add(o);
-        }
-        object.add("fronts", array);
-
-        array = new JsonArray();
-        for (ObjectSelector pair : bridgeSelector) {
-            JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.factor()));
-            o.add("bridge", new JsonPrimitive(pair.value()));
-            array.add(o);
-        }
-        object.add("bridges", array);
-
-        array = new JsonArray();
-        for (ObjectSelector pair : railDungeonSelector) {
-            JsonObject o = new JsonObject();
-            o.add("factor", new JsonPrimitive(pair.factor()));
-            o.add("dungeon", new JsonPrimitive(pair.value()));
-            array.add(o);
-        }
-        object.add("raildungeons", array);
-
-        return object;
     }
 
     private static String getRandomFromList(Random random, List<ObjectSelector> list) {

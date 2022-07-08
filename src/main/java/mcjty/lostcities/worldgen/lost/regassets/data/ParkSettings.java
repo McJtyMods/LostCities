@@ -18,6 +18,13 @@ public class ParkSettings {
                     Codec.STRING.optionalFieldOf("grass").forGetter(l -> DataTools.toNullable(l.grassBlock))
             ).apply(instance, ParkSettings::new));
 
+    public Character getParkElevationBlock() {
+        return parkElevationBlock;
+    }
+
+    public Character getGrassBlock() {
+        return grassBlock;
+    }
 
     public ParkSettings(Optional<String> parkElevationBlock,
                         Optional<String> grassBlock) {

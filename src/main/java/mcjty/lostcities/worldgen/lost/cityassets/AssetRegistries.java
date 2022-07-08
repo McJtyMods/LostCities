@@ -15,7 +15,7 @@ public class AssetRegistries {
     public static final AbstractAssetRegistry<Variant> VARIANTS = new AbstractAssetRegistry<>();
     public static final RegistryAssetRegistry<Condition, ConditionRE> CONDITIONS = new RegistryAssetRegistry<>(CustomRegistries.CONDITIONS_REGISTRY_KEY, Condition::new);
     public static final AbstractAssetRegistry<WorldStyle> WORLDSTYLES = new AbstractAssetRegistry<>();
-    public static final AbstractAssetRegistry<CityStyle> CITYSTYLES = new AbstractAssetRegistry<>();
+    public static final RegistryAssetRegistry<CityStyle, CityStyleRE> CITYSTYLES = new RegistryAssetRegistry<>(CustomRegistries.CITYSTYLES_REGISTRY_KEY, CityStyle::new);
     public static final RegistryAssetRegistry<BuildingPart, BuildingPartRE> PARTS = new RegistryAssetRegistry<>(CustomRegistries.PART_REGISTRY_KEY, BuildingPart::new);
     public static final RegistryAssetRegistry<Building, BuildingRE> BUILDINGS = new RegistryAssetRegistry<>(CustomRegistries.BUILDING_REGISTRY_KEY, Building::new);
     public static final AbstractAssetRegistry<MultiBuilding> MULTI_BUILDINGS = new AbstractAssetRegistry<>();
@@ -66,8 +66,6 @@ public class AssetRegistries {
                 String type = object.get("type").getAsString();
                 if ("variant".equals(type)) {
                     VARIANTS.register(new Variant(object));
-                } else if ("citystyle".equals(type)) {
-                    CITYSTYLES.register(new CityStyle(object));
                 } else if ("multibuilding".equals(type)) {
                     MULTI_BUILDINGS.register(new MultiBuilding(object));
                 } else if ("worldstyle".equals(type)) {

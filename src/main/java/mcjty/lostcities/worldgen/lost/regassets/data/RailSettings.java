@@ -16,6 +16,9 @@ public class RailSettings {
                     Codec.STRING.optionalFieldOf("railmain").forGetter(l -> DataTools.toNullable(l.railMainBlock))
             ).apply(instance, RailSettings::new));
 
+    public Character getRailMainBlock() {
+        return railMainBlock;
+    }
 
     public RailSettings(Optional<String> railMainBlock) {
         this.railMainBlock = DataTools.getNullableChar(railMainBlock);

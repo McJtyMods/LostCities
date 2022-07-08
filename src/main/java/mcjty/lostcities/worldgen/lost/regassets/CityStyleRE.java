@@ -79,8 +79,8 @@ public class CityStyleRE implements IForgeRegistryEntry<CityStyleRE> {
         return inherit;
     }
 
-    public GeneralSettings getGeneralSettings() {
-        return generalSettings;
+    public Optional<GeneralSettings> getGeneralSettings() {
+        return Optional.ofNullable(generalSettings);
     }
 
     public Optional<BuildingSettings> getBuildingSettings() {
@@ -95,20 +95,20 @@ public class CityStyleRE implements IForgeRegistryEntry<CityStyleRE> {
         return Optional.ofNullable(parkSettings);
     }
 
-    public RailSettings getRailSettings() {
-        return railSettings;
+    public Optional<RailSettings> getRailSettings() {
+        return Optional.ofNullable(railSettings);
     }
 
-    public SphereSettings getSphereSettings() {
-        return sphereSettings;
+    public Optional<SphereSettings> getSphereSettings() {
+        return Optional.ofNullable(sphereSettings);
     }
 
-    public StreetSettings getStreetSettings() {
-        return streetSettings;
+    public Optional<StreetSettings> getStreetSettings() {
+        return Optional.ofNullable(streetSettings);
     }
 
-    public Selectors getSelectors() {
-        return selectors;
+    public Optional<Selectors> getSelectors() {
+        return Optional.ofNullable(selectors);
     }
 
     @Override

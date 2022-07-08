@@ -26,6 +26,29 @@ public class StreetSettings {
                     Codec.STRING.optionalFieldOf("wall").forGetter(l -> DataTools.toNullable(l.wallBlock))
             ).apply(instance, StreetSettings::new));
 
+    public Integer getStreetWidth() {
+        return streetWidth;
+    }
+
+    public Character getStreetBlock() {
+        return streetBlock;
+    }
+
+    public Character getStreetBaseBlock() {
+        return streetBaseBlock;
+    }
+
+    public Character getStreetVariantBlock() {
+        return streetVariantBlock;
+    }
+
+    public Character getBorderBlock() {
+        return borderBlock;
+    }
+
+    public Character getWallBlock() {
+        return wallBlock;
+    }
 
     public StreetSettings(Optional<Integer> streetWidth,
                           Optional<String> streetBlock,

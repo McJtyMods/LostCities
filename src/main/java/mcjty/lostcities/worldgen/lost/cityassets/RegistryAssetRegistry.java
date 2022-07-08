@@ -45,7 +45,7 @@ public class RegistryAssetRegistry<T extends ILostCityAsset, R extends IForgeReg
             assets.put(name, t);
         }
         if (t != null) {
-            t.init();
+            t.init(level);
         }
         return t;
     }

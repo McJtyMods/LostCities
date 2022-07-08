@@ -31,36 +31,34 @@ public class Selectors {
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("multibuildings").forGetter(l -> Optional.ofNullable(l.multiBuildingSelector))
             ).apply(instance, Selectors::new));
 
-    public List<ObjectSelector> getBuildingSelector() {
-        return buildingSelector;
+    public Optional<List<ObjectSelector>> getBuildingSelector() {
+        return Optional.ofNullable(buildingSelector);
     }
 
-    public List<ObjectSelector> getBridgeSelector() {
-        return bridgeSelector;
+    public Optional<List<ObjectSelector>> getBridgeSelector() { return Optional.ofNullable(bridgeSelector); }
+
+    public Optional<List<ObjectSelector>> getParkSelector() {
+        return Optional.ofNullable(parkSelector);
     }
 
-    public List<ObjectSelector> getParkSelector() {
-        return parkSelector;
+    public Optional<List<ObjectSelector>> getFountainSelector() {
+        return Optional.ofNullable(fountainSelector);
     }
 
-    public List<ObjectSelector> getFountainSelector() {
-        return fountainSelector;
+    public Optional<List<ObjectSelector>> getStairSelector() {
+        return Optional.ofNullable(stairSelector);
     }
 
-    public List<ObjectSelector> getStairSelector() {
-        return stairSelector;
+    public Optional<List<ObjectSelector>> getFrontSelector() {
+        return Optional.ofNullable(frontSelector);
     }
 
-    public List<ObjectSelector> getFrontSelector() {
-        return frontSelector;
+    public Optional<List<ObjectSelector>> getRailDungeonSelector() {
+        return Optional.ofNullable(railDungeonSelector);
     }
 
-    public List<ObjectSelector> getRailDungeonSelector() {
-        return railDungeonSelector;
-    }
-
-    public List<ObjectSelector> getMultiBuildingSelector() {
-        return multiBuildingSelector;
+    public Optional<List<ObjectSelector>> getMultiBuildingSelector() {
+        return Optional.ofNullable(multiBuildingSelector);
     }
 
     public Selectors(Optional<List<ObjectSelector>> buildingSelector,

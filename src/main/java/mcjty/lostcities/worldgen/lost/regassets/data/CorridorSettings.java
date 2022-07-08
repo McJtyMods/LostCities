@@ -18,9 +18,16 @@ public class CorridorSettings {
                     Codec.STRING.optionalFieldOf("glass").forGetter(l -> DataTools.toNullable(l.corridorGlassBlock))
             ).apply(instance, CorridorSettings::new));
 
+    public Character getCorridorRoofBlock() {
+        return corridorRoofBlock;
+    }
+
+    public Character getCorridorGlassBlock() {
+        return corridorGlassBlock;
+    }
 
     public CorridorSettings(Optional<String> corridorRoofBlock,
-                        Optional<String> corridorGlassBlock) {
+                            Optional<String> corridorGlassBlock) {
         this.corridorRoofBlock = DataTools.getNullableChar(corridorRoofBlock);
         this.corridorGlassBlock = DataTools.getNullableChar(corridorGlassBlock);
     }

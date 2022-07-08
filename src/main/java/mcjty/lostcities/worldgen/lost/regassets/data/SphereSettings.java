@@ -20,6 +20,17 @@ public class SphereSettings {
                     Codec.STRING.optionalFieldOf("glass").forGetter(l -> DataTools.toNullable(l.sphereGlassBlock))
             ).apply(instance, SphereSettings::new));
 
+    public Character getSphereBlock() {
+        return sphereBlock;
+    }
+
+    public Character getSphereSideBlock() {
+        return sphereSideBlock;
+    }
+
+    public Character getSphereGlassBlock() {
+        return sphereGlassBlock;
+    }
 
     public SphereSettings(Optional<String> sphereBlock,
                           Optional<String> sphereSideBlock,
