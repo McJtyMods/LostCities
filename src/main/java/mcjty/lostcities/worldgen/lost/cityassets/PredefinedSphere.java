@@ -1,17 +1,17 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityAsset;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 
 public class PredefinedSphere implements ILostCityAsset {
 
-    private String name;
+    private ResourceLocation name;
     private ResourceKey<Level> dimension;
     private int chunkX;
     private int chunkZ;
@@ -24,18 +24,18 @@ public class PredefinedSphere implements ILostCityAsset {
         readFromJSon(object);
     }
 
-    public PredefinedSphere(String name) {
-        this.name = name;
+    @Override
+    public String getName() {
+        return DataTools.toName(name);
     }
 
     @Override
-    public String getName() {
+    public ResourceLocation getId() {
         return name;
     }
 
-    @Override
     public void readFromJSon(JsonObject object) {
-        name = object.get("name").getAsString();
+        name = new ResourceLocation(LostCities.MODID, object.get("name").getAsString());    // @todo temporary
         dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(object.get("dimension").getAsString()));
         chunkX = object.get("chunkx").getAsInt();
         chunkZ = object.get("chunkz").getAsInt();
@@ -47,21 +47,6 @@ public class PredefinedSphere implements ILostCityAsset {
         } else {
             biome = null;
         }
-    }
-
-    private JsonArray getArraySafe(JsonObject object, String key) {
-        if (object.has(key)) {
-            return object.get(key).getAsJsonArray();
-        } else {
-            return new JsonArray(); // Empty array
-        }
-    }
-
-    public JsonObject writeToJSon() {
-        JsonObject object = new JsonObject();
-        object.add("type", new JsonPrimitive("sphere"));
-        object.add("name", new JsonPrimitive(name));
-        return object;
     }
 
     public ResourceKey<Level> getDimension() {

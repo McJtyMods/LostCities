@@ -1,10 +1,11 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityCityStyle;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.regassets.CityStyleRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.ObjectSelector;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.CommonLevelAccessor;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.Random;
 
 public class CityStyle implements ILostCityCityStyle {
 
-    private String name;
+    private final ResourceLocation name;
 
     private final List<ObjectSelector> buildingSelector = new ArrayList<>();
     private final List<ObjectSelector> bridgeSelector = new ArrayList<>();
@@ -61,11 +62,11 @@ public class CityStyle implements ILostCityCityStyle {
 
     private Float explosionChance;
     private String style;
-    private String inherit;
+    private final String inherit;
     private boolean resolveInherit = false;
 
     public CityStyle(CityStyleRE object) {
-        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        name = object.getRegistryName();
         inherit = object.getInherit();
         style = object.getStyle();
         explosionChance = object.getExplosionChance();
@@ -118,6 +119,11 @@ public class CityStyle implements ILostCityCityStyle {
 
     @Override
     public String getName() {
+        return DataTools.toName(name);
+    }
+
+    @Override
+    public ResourceLocation getId() {
         return name;
     }
 
@@ -312,10 +318,6 @@ public class CityStyle implements ILostCityCityStyle {
                 }
             }
         }
-    }
-
-    @Override
-    public void readFromJSon(JsonObject object) {
     }
 
     private static String getRandomFromList(Random random, List<ObjectSelector> list) {

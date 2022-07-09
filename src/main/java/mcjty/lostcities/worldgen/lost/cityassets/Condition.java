@@ -1,10 +1,11 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.regassets.ConditionRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.ConditionPart;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -14,12 +15,12 @@ import java.util.function.Predicate;
 
 public class Condition implements ILostCityAsset {
 
-    private String name;
+    private final ResourceLocation name;
 
     private final List<Pair<Predicate<ConditionContext>, Pair<Float, String>>> valueSelector = new ArrayList<>();
 
     public Condition(ConditionRE object) {
-        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        name = object.getRegistryName();
         for (ConditionPart cp : object.getValues()) {
             float factor = cp.getFactor();
             String value = cp.getValue();
@@ -30,11 +31,12 @@ public class Condition implements ILostCityAsset {
 
     @Override
     public String getName() {
-        return name;
+        return DataTools.toName(name);
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
+    public ResourceLocation getId() {
+        return name;
     }
 
     public String getRandomValue(Random random, ConditionContext info) {

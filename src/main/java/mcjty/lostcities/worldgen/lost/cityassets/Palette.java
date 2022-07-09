@@ -1,11 +1,13 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.BlockEntry;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.PaletteEntry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -20,7 +22,7 @@ import java.util.*;
  */
 public class Palette implements ILostCityAsset {
 
-    private String name;
+    private final ResourceLocation name;
     private final Map<Character, Object> palette = new HashMap<>();
     private final Map<BlockState, BlockState> damaged = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
@@ -28,12 +30,12 @@ public class Palette implements ILostCityAsset {
     private final Set<Character> torches = new HashSet<>(); // For torches
 
     public Palette(PaletteRE object) {
-        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        name = object.getRegistryName();
         parsePaletteArray(object);
     }
 
     public Palette(String name) {
-        this.name = name;
+        this.name = new ResourceLocation(LostCities.MODID, name);
     }
 
     public void merge(Palette other) {
@@ -46,6 +48,11 @@ public class Palette implements ILostCityAsset {
 
     @Override
     public String getName() {
+        return DataTools.toName(name);
+    }
+
+    @Override
+    public ResourceLocation getId() {
         return name;
     }
 
@@ -67,10 +74,6 @@ public class Palette implements ILostCityAsset {
 
     public Map<Character, Object> getPalette() {
         return palette;
-    }
-
-    @Override
-    public void readFromJSon(JsonObject object) {
     }
 
     public void parsePaletteArray(PaletteRE paletteRE) {

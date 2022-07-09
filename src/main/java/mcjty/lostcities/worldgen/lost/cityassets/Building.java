@@ -1,10 +1,11 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityBuilding;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.PartRef;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.CommonLevelAccessor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -16,14 +17,14 @@ import java.util.function.Predicate;
 
 public class Building implements ILostCityBuilding {
 
-    private String name;
+    private final ResourceLocation name;
 
     private int minFloors = -1;         // -1 means default from level
     private int minCellars = -1;        // -1 means default frmo level
     private int maxFloors = -1;         // -1 means default from level
     private int maxCellars = -1;        // -1 means default frmo level
-    private char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
-    private Character rubbleBlock;      // Block used for destroyed building rubble
+    private final char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
+    private final Character rubbleBlock;      // Block used for destroyed building rubble
     private float prefersLonely = 0.0f; // The chance this this building is alone. If 1.0f this building wants to be alone all the time
 
     private Palette localPalette = null;
@@ -33,7 +34,7 @@ public class Building implements ILostCityBuilding {
     private final List<Pair<Predicate<ConditionContext>, String>> parts2 = new ArrayList<>();
 
     public Building(BuildingRE object) {
-        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        name = object.getRegistryName();
         minFloors = object.getMinFloors();
         minCellars = object.getMinCellars();
         maxFloors = object.getMaxFloors();
@@ -54,6 +55,11 @@ public class Building implements ILostCityBuilding {
 
     @Override
     public String getName() {
+        return DataTools.toName(name);
+    }
+
+    @Override
+    public ResourceLocation getId() {
         return name;
     }
 
@@ -69,10 +75,6 @@ public class Building implements ILostCityBuilding {
         return localPalette;
     }
 
-    @Override
-    public void readFromJSon(JsonObject object) {
-    }
-
     public void readParts(List<Pair<Predicate<ConditionContext>, String>> p, List<PartRef> partRefs) {
         p.clear();
         if (partRefs == null) {
@@ -81,14 +83,8 @@ public class Building implements ILostCityBuilding {
         for (PartRef partRef : partRefs) {
             String partName = partRef.getPart();
             Predicate<ConditionContext> test = ConditionContext.parseTest(partRef);
-            addPart(test, partName, p);
+            p.add(Pair.of(test, partName));
         }
-    }
-
-    public Building addPart(Predicate<ConditionContext> test, String partName,
-                            List<Pair<Predicate<ConditionContext>, String>> parts) {
-        parts.add(Pair.of(test, partName));
-        return this;
     }
 
     @Override

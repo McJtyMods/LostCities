@@ -1,10 +1,11 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.regassets.StyleRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.PaletteSelector;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -13,12 +14,12 @@ import java.util.Random;
 
 public class Style implements ILostCityAsset {
 
-    private String name;
+    private final ResourceLocation name;
 
     private final List<List<Pair<Float, String>>> randomPaletteChoices = new ArrayList<>();
 
     public Style(StyleRE object) {
-        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        name = object.getRegistryName();
         for (List<PaletteSelector> array : object.getRandomPaletteChoices()) {
             List<Pair<Float, String>> palettes = new ArrayList<>();
             for (PaletteSelector selector : array) {
@@ -31,11 +32,12 @@ public class Style implements ILostCityAsset {
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
+    public String getName() {
+        return DataTools.toName(name);
     }
 
     @Override
-    public String getName() {
+    public ResourceLocation getId() {
         return name;
     }
 

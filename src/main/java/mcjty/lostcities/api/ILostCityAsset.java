@@ -1,6 +1,6 @@
 package mcjty.lostcities.api;
 
-import com.google.gson.JsonObject;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.CommonLevelAccessor;
 
 public interface ILostCityAsset {
@@ -10,5 +10,5 @@ public interface ILostCityAsset {
 
     String getName();
 
-    void readFromJSon(JsonObject object);
+    ResourceLocation getId();
 }

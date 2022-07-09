@@ -1,20 +1,21 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityMultiBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.MultiBuildingRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
 public class MultiBuilding implements ILostCityMultiBuilding {
 
-    private String name;
-    private int dimX;
-    private int dimZ;
-    private List<List<String>> buildings;
+    private final ResourceLocation name;
+    private final int dimX;
+    private final int dimZ;
+    private final List<List<String>> buildings;
 
     public MultiBuilding(MultiBuildingRE object) {
-        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        name = object.getRegistryName();
         this.dimX = object.getDimX();
         this.dimZ = object.getDimZ();
         this.buildings = object.getBuildings();
@@ -22,14 +23,12 @@ public class MultiBuilding implements ILostCityMultiBuilding {
 
     public MultiBuilding set(int x, int z, String building) {
         buildings.get(x).set(z, building);
-//        buildings[x][z] = building;
         return this;
     }
 
     @Override
     public String getBuilding(int x, int z) {
         return buildings.get(x).get(z);
-//        return buildings[x][z];
     }
 
     @Override
@@ -44,10 +43,11 @@ public class MultiBuilding implements ILostCityMultiBuilding {
 
     @Override
     public String getName() {
-        return name;
+        return DataTools.toName(name);
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
+    public ResourceLocation getId() {
+        return name;
     }
 }

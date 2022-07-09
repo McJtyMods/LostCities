@@ -1,8 +1,8 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.worldgen.lost.regassets.PredefinedCityRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
 import net.minecraft.core.Registry;
@@ -15,17 +15,17 @@ import java.util.List;
 
 public class PredefinedCity implements ILostCityAsset {
 
-    private String name;
-    private ResourceKey<Level> dimension;
-    private int chunkX;
-    private int chunkZ;
-    private int radius;
-    private String cityStyle;
+    private final ResourceLocation name;
+    private final ResourceKey<Level> dimension;
+    private final int chunkX;
+    private final int chunkZ;
+    private final int radius;
+    private final String cityStyle;
     private final List<PredefinedBuilding> predefinedBuildings = new ArrayList<>();
     private final List<PredefinedStreet> predefinedStreets = new ArrayList<>();
 
     public PredefinedCity(PredefinedCityRE object) {
-        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        name = object.getRegistryName();
         dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(object.getDimension()));
         chunkX = object.getChunkX();
         chunkZ = object.getChunkZ();
@@ -69,10 +69,11 @@ public class PredefinedCity implements ILostCityAsset {
 
     @Override
     public String getName() {
-        return name;
+        return DataTools.toName(name);
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
+    public ResourceLocation getId() {
+        return name;
     }
 }

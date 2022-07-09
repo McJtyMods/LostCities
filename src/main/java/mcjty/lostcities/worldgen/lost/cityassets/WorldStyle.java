@@ -1,6 +1,5 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;
@@ -9,7 +8,9 @@ import mcjty.lostcities.worldgen.lost.BiomeInfo;
 import mcjty.lostcities.worldgen.lost.regassets.WorldStyleRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.CityBiomeMultiplier;
 import mcjty.lostcities.worldgen.lost.regassets.data.CityStyleSelector;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -20,13 +21,14 @@ import java.util.function.Predicate;
 
 public class WorldStyle implements ILostCityAsset {
 
-    private String name;
-    private String outsideStyle;
+    private final ResourceLocation name;
+    private final String outsideStyle;
 
     private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
     private final List<Pair<Predicate<Holder<Biome>>, Float>> cityBiomeMultiplier = new ArrayList<>();
 
     public WorldStyle(WorldStyleRE object) {
+        name = object.getRegistryName();
         outsideStyle = object.getOutsideStyle();
         for (CityStyleSelector selector : object.getCityStyleSelectors()) {
             Predicate<Holder<Biome>> predicate = biomeHolder -> true;
@@ -42,17 +44,14 @@ public class WorldStyle implements ILostCityAsset {
         }
     }
 
-    public WorldStyle(String name) {
-        this.name = name;
-    }
-
     @Override
     public String getName() {
-        return name;
+        return DataTools.toName(name);
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
+    public ResourceLocation getId() {
+        return name;
     }
 
     public String getOutsideStyle() {

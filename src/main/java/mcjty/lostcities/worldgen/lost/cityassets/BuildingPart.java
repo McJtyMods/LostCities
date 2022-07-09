@@ -1,11 +1,12 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingPartRE;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.PartMeta;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.CommonLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -17,14 +18,14 @@ import java.util.Map;
  */
 public class BuildingPart implements IBuildingPart, ILostCityAsset {
 
-    private String name;
+    private final ResourceLocation name;
 
     // Data per height level
-    private String[] slices;
+    private final String[] slices;
 
     // Dimension (should be less then 16x16)
-    private int xSize;
-    private int zSize;
+    private final int xSize;
+    private final int zSize;
 
     // Optimized version of this part which is organized in xSize*ySize vertical strings
     private char[][] vslices = null;
@@ -35,12 +36,12 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     private final Map<String, Object> metadata = new HashMap<>();
 
     public BuildingPart(BuildingPartRE object) {
-        name = object.getRegistryName().getPath(); // @todo temporary. Needs to be fully qualified
+        name = object.getRegistryName();
         xSize = object.getxSize();
         zSize = object.getzSize();
         slices = object.getSlices();
         if (object.getLocalPalette() != null) {
-            localPalette = new Palette("__local__" + name);
+            localPalette = new Palette("__local__" + name.getPath());
             localPalette.parsePaletteArray(object.getLocalPalette()); // @todo get the full palette instead
         } else if (object.getRefPaletteName() != null) {
             refPaletteName = object.getRefPaletteName();
@@ -56,15 +57,11 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
                     metadata.put(key, meta.bool());
                 } else if (meta.chr() != null) {
                     metadata.put(key, meta.chr().charAt(0));
-                } else if (meta.bool()) {
-                    metadata.put(key, meta.bool());
+                } else if (meta.str() != null) {
+                    metadata.put(key, meta.str());
                 }
             }
         }
-    }
-
-    public Map<String, Object> getMetadata() {
-        return metadata;
     }
 
     @Override
@@ -92,6 +89,11 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
 
     @Override
     public String getName() {
+        return DataTools.toName(name);
+    }
+
+    @Override
+    public ResourceLocation getId() {
         return name;
     }
 
@@ -140,10 +142,6 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
             }
         }
         return localPalette;
-    }
-
-    @Override
-    public void readFromJSon(JsonObject object) {
     }
 
     @Override
