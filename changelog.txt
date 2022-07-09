@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.3.1:
 - Now the registry system properly supports namespaces. Default namespace is 'lostcities'
 
 1.18-5.3.0:
