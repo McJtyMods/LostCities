@@ -19,9 +19,9 @@ public class MultiBuildingRE implements IForgeRegistryEntry<MultiBuildingRE> {
             ).apply(instance, MultiBuildingRE::new));
 
     private ResourceLocation name;
-    private int dimX;
-    private int dimZ;
-    private List<List<String>> buildings;
+    private final int dimX;
+    private final int dimZ;
+    private final List<List<String>> buildings;
 
     public MultiBuildingRE(int dimX, int dimZ, List<List<String>> buildings) {
         this.dimX = dimX;

@@ -352,14 +352,21 @@ public class BuildingInfo implements ILostChunkInfo {
                 LostChunkCharacteristics topleft = getTopLeftCityInfo(characteristics, chunkX, chunkZ, provider);
                 characteristics.multiBuilding = topleft.multiBuilding;
                 if (characteristics.multiBuilding != null) {
-                    switch (characteristics.section) {
-                        case 1 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, characteristics.multiBuilding.getBuilding(1, 0));
-                        case 2 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, characteristics.multiBuilding.getBuilding(0, 1));
-                        case 3 -> characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, characteristics.multiBuilding.getBuilding(1, 1));
+                    String b = switch (characteristics.section) {
+                        case 1 -> characteristics.multiBuilding.getBuilding(1, 0);
+                        case 2 -> characteristics.multiBuilding.getBuilding(0, 1);
+                        case 3 -> characteristics.multiBuilding.getBuilding(1, 1);
                         default -> throw new RuntimeException("What 2!");
+                    };
+                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, b);
+                    if (characteristics.buildingType == null) {
+                        throw new RuntimeException("Error getting building type '" + b + " for multibuilding'!");
                     }
                 } else {
                     characteristics.buildingType = topleft.buildingType;
+                    if (characteristics.buildingType == null) {
+                        throw new RuntimeException("Topleft building type is not set!");
+                    }
                 }
             } else {
                 PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
@@ -369,7 +376,11 @@ public class BuildingInfo implements ILostChunkInfo {
                         name = predefinedBuilding.building();
                     }
                     characteristics.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(world, name);
-                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, characteristics.multiBuilding.getBuilding(0, 0));
+                    String b = characteristics.multiBuilding.getBuilding(0, 0);
+                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, b);
+                    if (characteristics.buildingType == null) {
+                        throw new RuntimeException("Error getting building type '" + b + " for multibuilding'!");
+                    }
                 } else {
                     characteristics.multiBuilding = null;
                     String name = cityStyle.getRandomBuilding(rand);
@@ -377,6 +388,9 @@ public class BuildingInfo implements ILostChunkInfo {
                         name = predefinedBuilding.building();
                     }
                     characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, name);
+                    if (characteristics.buildingType == null) {
+                        throw new RuntimeException("Error getting building type '" + name + "'!");
+                    }
                 }
             }
 

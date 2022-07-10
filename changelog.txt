@@ -1,3 +1,6 @@
+Upcoming:
+- More diagnostics to check a problem with pregenerating chunks
+
 1.18-5.3.1:
 - Now the registry system properly supports namespaces. Default namespace is 'lostcities'
 
