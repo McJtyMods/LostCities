@@ -55,6 +55,10 @@ public class CustomRegistries {
     public static final DeferredRegister<PredefinedCityRE> PREDEFINEDCITITIES_DEFERRED_REGISTER = DeferredRegister.create(PREDEFINEDCITITIES_REGISTRY_KEY, LostCities.MODID);
     public static final Supplier<IForgeRegistry<PredefinedCityRE>> PREDEFINEDCITITIES_REGISTRY = PREDEFINEDCITITIES_DEFERRED_REGISTER.makeRegistry(PredefinedCityRE.class, () -> new RegistryBuilder<PredefinedCityRE>().dataPackRegistry(PredefinedCityRE.CODEC));
 
+    public static final ResourceKey<Registry<ScatteredRE>> SCATTERED_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "scattered"));
+    public static final DeferredRegister<ScatteredRE> SCATTERED_DEFERRED_REGISTER = DeferredRegister.create(SCATTERED_REGISTRY_KEY, LostCities.MODID);
+    public static final Supplier<IForgeRegistry<ScatteredRE>> SCATTERED_REGISTRY = SCATTERED_DEFERRED_REGISTER.makeRegistry(ScatteredRE.class, () -> new RegistryBuilder<ScatteredRE>().dataPackRegistry(ScatteredRE.CODEC));
+
     public static void init() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         BUILDING_DEFERRED_REGISTER.register(bus);
@@ -67,6 +71,7 @@ public class CustomRegistries {
         VARIANTS_DEFERRED_REGISTER.register(bus);
         WORLDSTYLES_DEFERRED_REGISTER.register(bus);
         PREDEFINEDCITITIES_DEFERRED_REGISTER.register(bus);
+        SCATTERED_DEFERRED_REGISTER.register(bus);
     }
 
 }

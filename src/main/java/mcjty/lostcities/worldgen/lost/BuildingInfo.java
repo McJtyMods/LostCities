@@ -748,10 +748,6 @@ public class BuildingInfo implements ILostChunkInfo {
         buildingType = characteristics.buildingType;
         multiBuilding = characteristics.multiBuilding;
         multiBuildingPos = characteristics.multiPos;
-        if (multiBuilding != null) {
-            System.out.println("Multi = " + chunkX*16 + "," + chunkZ*16 + " -> " + multiBuilding.getName()
-                    + " (" + multiBuildingPos.x()+","+multiBuildingPos.z()+") (building=" + buildingType.getName() + ")");
-        }
 
         Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
         rand.nextFloat();       // Compatibility?
@@ -1212,6 +1208,16 @@ public class BuildingInfo implements ILostChunkInfo {
             case X -> hasXBridge(provider);
             case Z -> hasZBridge(provider);
         };
+    }
+
+    public boolean hasBridge(IDimensionInfo provider) {
+        if (hasXBridge(provider) != null) {
+            return true;
+        }
+        if (hasZBridge(provider) != null) {
+            return true;
+        }
+        return false;
     }
 
     // To prevent adjacent bridges of the same direction we give the bridges at even chunk Z coordinates higher priority

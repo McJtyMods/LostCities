@@ -21,11 +21,6 @@ public class MultiBuilding implements ILostCityMultiBuilding {
         this.buildings = object.getBuildings();
     }
 
-    public MultiBuilding set(int x, int z, String building) {
-        buildings.get(x).set(z, building);
-        return this;
-    }
-
     @Override
     public String getBuilding(int x, int z) {
         return buildings.get(x).get(z);

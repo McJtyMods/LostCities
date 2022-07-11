@@ -10,8 +10,10 @@ import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.NoiseGeneratorPerlin;
+import mcjty.lostcities.varia.QualityRandom;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
+import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
@@ -44,6 +46,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -401,7 +404,7 @@ public class LostCityTerrainFeature {
 
     private void doNormalChunk(int chunkX, int chunkZ, BuildingInfo info) {
 //        debugClearChunk(chunkX, chunkZ, primer);
-        if (info.profile.isDefault()) {
+        if (profile.isDefault()) {
             correctTerrainShape(chunkX, chunkZ);
 //            flattenChunkToCityBorder(chunkX, chunkZ);
         }
@@ -411,6 +414,109 @@ public class LostCityTerrainFeature {
 
         generateBridges(info);
         generateHighways(chunkX, chunkZ, info);
+
+        if (!provider.getWorldStyle().getScatteredReferences().isEmpty()) {
+            if (!info.hasBridge(provider) && !Highway.hasHighway(chunkX, chunkZ, provider, profile)) {
+                generateScattered(info);
+            }
+        }
+    }
+
+    private void generateScattered(BuildingInfo info) {
+        for (ScatteredReference reference : provider.getWorldStyle().getScatteredReferences()) {
+            Random rand = getScatteredRandom(info.chunkX, info.chunkZ, provider.getSeed());
+            if (rand.nextFloat() < reference.getChance()) {
+                boolean ok = true;
+                if (reference.getBiomeMatcher() != null) {
+                    BiomeInfo biome = BiomeInfo.getBiomeInfo(provider, info.coord);
+                    if (!reference.getBiomeMatcher().test(biome.getMainBiome())) {
+                        ok = false;
+                    }
+                }
+                if (ok) {
+                    Scattered scattered = AssetRegistries.SCATTERED.get(provider.getWorld(), reference.getName());
+                    if (scattered == null) {
+                        throw new RuntimeException("Cannot find scattered '" + reference.getName() + "'!");
+                    }
+                    String buildingName;
+                    List<String> buildings = scattered.getBuildings();
+                    if (buildings.size() == 1) {
+                        buildingName = buildings.get(0);
+                    } else {
+                        buildingName = buildings.get(rand.nextInt(buildings.size()));
+                    }
+                    Building building = AssetRegistries.BUILDINGS.get(provider.getWorld(), buildingName);
+                    if (building == null) {
+                        throw new RuntimeException("Cannot find building '" + buildingName + "' for scattered '" + reference.getName() + "'!");
+                    }
+                    generateScatteredBuilding(info, building, rand);
+                    return;
+                }
+            }
+        }
+    }
+
+    private static Random getScatteredRandom(int chunkX, int chunkZ, long seed) {
+        Random rand = new QualityRandom(seed + chunkZ * 5564338337L + chunkX * 25564337621L);
+        rand.nextFloat();
+        rand.nextFloat();
+        return rand;
+    }
+
+    private void generateScatteredBuilding(BuildingInfo info, Building building, Random rand) {
+        int chunkX = info.chunkX;
+        int chunkZ = info.chunkZ;
+        ChunkHeightmap heightmap = getHeightmap(chunkX, chunkZ, provider.getWorld());
+        // @todo better fitting to terrain
+        int lowestLevel = heightmap.getHeight(8, 8);
+
+        CompiledPalette palette = info.getCompiledPalette();
+
+        char fillerBlock = info.getBuilding().getFillerBlock();
+
+        int height = lowestLevel;
+        int floors;
+        int minfloors = building.getMinFloors();
+        if (minfloors <= 0) {
+            minfloors = 1;
+        }
+        int maxfloors = building.getMaxFloors();
+        if (maxfloors <= 0) {
+            maxfloors = 1;
+        }
+        if (minfloors >= maxfloors) {
+            floors = minfloors;
+        } else {
+            floors = minfloors + rand.nextInt(maxfloors-minfloors+1);
+        }
+        for (int f = 0 ; f < floors ;  f++) {
+            ConditionContext conditionContext = new ConditionContext(lowestLevel, f, 0, floors, "<none>", building.getName(),
+                    chunkX, chunkZ) {
+                @Override
+                public boolean isBuilding() {
+                    return true;
+                }
+
+                @Override
+                public boolean isSphere() {
+                    return CitySphere.isInSphere(chunkX, chunkZ, new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8), provider);
+                }
+
+                @Override
+                public ResourceLocation getBiome() {
+                    return provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value().getRegistryName();
+                }
+            };
+            String randomPart = building.getRandomPart(rand, conditionContext);
+            BuildingPart part = Validate.notNull(AssetRegistries.PARTS.get(provider.getWorld(), randomPart), "Null part for " + randomPart);
+            randomPart = building.getRandomPart2(rand, conditionContext);
+            BuildingPart part2 = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);
+
+            height += generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+            if (part2 != null) {
+                generatePart(info, part2, Transform.ROTATE_NONE, 0, height, 0, false);
+            }
+        }
     }
 
     private void breakBlocksForDamageNew(int chunkX, int chunkZ, BuildingInfo info) {

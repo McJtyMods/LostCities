@@ -33,6 +33,16 @@ public class Highway {
         zHighwayLevelCache.clear();
     }
 
+    public static boolean hasHighway(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
+        if (getXHighwayLevel(chunkX, chunkZ, provider, profile) >= 0) {
+            return true;
+        }
+        if (getZHighwayLevel(chunkX, chunkZ, provider, profile) >= 0) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Returns -1 if there is no highway in X direction that goes through this chunk.
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.

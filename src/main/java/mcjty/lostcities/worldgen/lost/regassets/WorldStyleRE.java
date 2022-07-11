@@ -2,8 +2,10 @@ package mcjty.lostcities.worldgen.lost.regassets;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import mcjty.lostcities.worldgen.lost.cityassets.Scattered;
 import mcjty.lostcities.worldgen.lost.regassets.data.CityBiomeMultiplier;
 import mcjty.lostcities.worldgen.lost.regassets.data.CityStyleSelector;
+import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredReference;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
@@ -17,18 +19,23 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
             instance.group(
                     Codec.STRING.fieldOf("outsidestyle").forGetter(l -> l.outsideStyle),
                     Codec.list(CityStyleSelector.CODEC).fieldOf("citystyles").forGetter(l -> l.cityStyleSelectors),
-                    Codec.list(CityBiomeMultiplier.CODEC).optionalFieldOf("citybiomemultipliers").forGetter(l -> Optional.ofNullable(l.cityBiomeMultipliers))
+                    Codec.list(CityBiomeMultiplier.CODEC).optionalFieldOf("citybiomemultipliers").forGetter(l -> Optional.ofNullable(l.cityBiomeMultipliers)),
+                    Codec.list(ScatteredReference.CODEC).optionalFieldOf("scattered").forGetter(l -> Optional.ofNullable(l.scatteredReferences))
             ).apply(instance, WorldStyleRE::new));
 
     private ResourceLocation name;
     private final String outsideStyle;
     private final List<CityStyleSelector> cityStyleSelectors;
     private final List<CityBiomeMultiplier> cityBiomeMultipliers;
+    private final List<ScatteredReference> scatteredReferences;
 
-    public WorldStyleRE(String outsideStyle, List<CityStyleSelector> values, Optional<List<CityBiomeMultiplier>> cityBiomeMultipliers) {
+    public WorldStyleRE(String outsideStyle, List<CityStyleSelector> values,
+                        Optional<List<CityBiomeMultiplier>> cityBiomeMultipliers,
+                        Optional<List<ScatteredReference>> scatteredReferences) {
         this.outsideStyle = outsideStyle;
         this.cityStyleSelectors = values;
         this.cityBiomeMultipliers = cityBiomeMultipliers.orElse(null);
+        this.scatteredReferences = scatteredReferences.orElse(null);
     }
 
     public String getOutsideStyle() {
@@ -41,6 +48,10 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
 
     public List<CityBiomeMultiplier> getCityBiomeMultipliers() {
         return cityBiomeMultipliers;
+    }
+
+    public List<ScatteredReference> getScatteredReferences() {
+        return scatteredReferences;
     }
 
     @Override

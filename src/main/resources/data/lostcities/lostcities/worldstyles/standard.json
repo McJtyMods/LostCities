@@ -1,5 +1,18 @@
 {
   "outsidestyle": "outside",
+  "scattered": [
+    {
+      "name": "radiotower",
+      "chance": 0.01,
+      "biomes": {
+        "excluding": [
+          "#minecraft:is_ocean",
+          "#minecraft:is_river",
+          "#minecraft:is_beach"
+        ]
+      }
+    }
+  ],
   "citybiomemultipliers": [
     {
       "multiplier": 0.1,
