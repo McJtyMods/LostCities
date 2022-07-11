@@ -2,7 +2,6 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.*;
-import mcjty.lostcities.api.MultiPos;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
@@ -45,9 +44,9 @@ public class BuildingInfo implements ILostChunkInfo {
     public final boolean isCity;
     public boolean hasBuilding;
     public final MultiPos multiBuildingPos;
-
     public final ILostCityMultiBuilding multiBuilding;
     public ILostCityBuilding buildingType;
+
     public final BuildingPart fountainType;
     public final BuildingPart parkType;
     public final BuildingPart bridgeType;
@@ -309,11 +308,11 @@ public class BuildingInfo implements ILostChunkInfo {
             LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
 
             characteristics.isCity = isCityRaw(chunkX, chunkZ, provider, profile);
-            characteristics.multiPos = getMultiBuildingSection(chunkX, chunkZ, provider, profile);
+            initMultiBuildingSection(characteristics, chunkX, chunkZ, provider, profile);
             if (characteristics.multiPos.isSingle()) {
                 characteristics.cityLevel = getCityLevel(chunkX, chunkZ, provider);
             } else {
-                characteristics.cityLevel = getTopLeftCityInfo(characteristics, chunkX, chunkZ, provider).cityLevel;
+                characteristics.cityLevel = getAverageCityLevel(characteristics, chunkX, chunkZ, provider);
             }
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
             characteristics.couldHaveBuilding = characteristics.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, profile, characteristics.multiPos, characteristics.cityLevel, rand);
@@ -351,7 +350,7 @@ public class BuildingInfo implements ILostChunkInfo {
             WorldGenLevel world = provider.getWorld();
             if (characteristics.multiPos.isMulti() && !characteristics.multiPos.isTopLeft()) {
                 LostChunkCharacteristics topleft = getTopLeftCityInfo(characteristics, chunkX, chunkZ, provider);
-                characteristics.multiBuilding = topleft.multiBuilding;
+//                characteristics.multiBuilding = topleft.multiBuilding;
                 if (characteristics.multiBuilding != null) {
                     String b = characteristics.multiBuilding.getBuilding(characteristics.multiPos.x(), characteristics.multiPos.z());
                     characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, b);
@@ -359,6 +358,7 @@ public class BuildingInfo implements ILostChunkInfo {
                         throw new RuntimeException("Error getting building type '" + b + " for multibuilding'!");
                     }
                 } else {
+                    // @todo is this even possible?
                     characteristics.buildingType = topleft.buildingType;
                     if (characteristics.buildingType == null) {
                         throw new RuntimeException("Topleft building type is not set!");
@@ -367,18 +367,18 @@ public class BuildingInfo implements ILostChunkInfo {
             } else {
                 PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
                 if (characteristics.multiPos.isTopLeft()) {
-                    String name = cityStyle.getRandomMultiBuilding(rand);
-                    if (predefinedBuilding != null) {
-                        name = predefinedBuilding.building();
-                    }
-                    characteristics.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(world, name);
+//                    String name = cityStyle.getRandomMultiBuilding(rand);
+//                    if (predefinedBuilding != null) {
+//                        name = predefinedBuilding.building();
+//                    }
+//                    characteristics.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(world, name);
                     String b = characteristics.multiBuilding.getBuilding(0, 0);
                     characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, b);
                     if (characteristics.buildingType == null) {
                         throw new RuntimeException("Error getting building type '" + b + " for multibuilding'!");
                     }
                 } else {
-                    characteristics.multiBuilding = null;
+//                    characteristics.multiBuilding = null;
                     String name = cityStyle.getRandomBuilding(rand);
                     if (predefinedBuilding != null) {
                         name = predefinedBuilding.building();
@@ -474,18 +474,24 @@ public class BuildingInfo implements ILostChunkInfo {
         return b;
     }
 
-    private static MultiPos getMultiBuildingSection(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        if (isTopLeftOf2x2Building(chunkX, chunkZ, provider, profile)) {
-            return MultiPos.C00;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ, provider, profile)) {
-            return MultiPos.C10;
-        } else if (isTopLeftOf2x2Building(chunkX, chunkZ - 1, provider, profile)) {
-            return MultiPos.C01;
-        } else if (isTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider, profile)) {
-            return MultiPos.C11;
-        } else {
-            return MultiPos.SINGLE;
+    /**
+     * Initialize the chunk characteristics with the multi building information
+     */
+    private static void initMultiBuildingSection(LostChunkCharacteristics characteristics, int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
+        for (int x = -2 ; x <= 0 ; x++) {
+            for (int z = -2 ; z <= 0 ; z++) {
+                MultiBuilding building = isTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile);
+                if (building != null) {
+                    if (building.getDimX() > -x && building.getDimZ() > -z) {
+                        characteristics.multiPos = new MultiPos(-x, -z, building.getDimX(), building.getDimZ());
+                        characteristics.multiBuilding = building;
+                        return;
+                    }
+                }
+            }
         }
+        characteristics.multiPos = MultiPos.SINGLE;
+        characteristics.multiBuilding = null;
     }
 
     private BuildingInfo calculateTopLeft() {
@@ -495,6 +501,20 @@ public class BuildingInfo implements ILostChunkInfo {
         return getBuildingInfo(chunkX - multiBuildingPos.x(), chunkZ - multiBuildingPos.z(), provider);
     }
 
+    private static int getAverageCityLevel(LostChunkCharacteristics thisone, int chunkX, int chunkZ, IDimensionInfo provider) {
+        LostChunkCharacteristics topleft = getTopLeftCityInfo(thisone, chunkX, chunkZ, provider);
+        int level = 0;
+        MultiPos mp = topleft.multiPos;
+        int topX = chunkX - mp.x();
+        int topZ = chunkZ - mp.z();
+        for (int x = 0 ; x < mp.w() ; x++) {
+            for (int z = 0 ; z < mp.h() ; z++) {
+                level += getCityLevel(topX+x, topZ+z, provider);
+            }
+        }
+        return level / (mp.w() * mp.h());
+    }
+
     private static LostChunkCharacteristics getTopLeftCityInfo(LostChunkCharacteristics thisone, int chunkX, int chunkZ, IDimensionInfo provider) {
         if (thisone.multiPos.isTopLeft()) {
             return thisone;
@@ -502,7 +522,11 @@ public class BuildingInfo implements ILostChunkInfo {
         return getChunkCharacteristics(chunkX - thisone.multiPos.x(), chunkZ - thisone.multiPos.z(), provider);
     }
 
-    private static boolean isCandidateForTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, CityStyle cityStyle) {
+    /**
+     * Check if this chunk is a candidate for the top left of a multibuilding.
+     * This function does not use the cached building info or characteristics
+     */
+    private static boolean isCandidateForTopLeftOfMultiBuilding(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, CityStyle cityStyle) {
         ResourceKey<Level> type = provider.getType();
         PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
@@ -520,15 +544,19 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
+    /**
+     * Check if this chunk is suitable for a multibuilding.
+     * This function does not use the cached building info or characteristics
+     */
     private static boolean isMultiBuildingCandidate(int chunkX, int chunkZ, IDimensionInfo provider,
                                                     LostCityProfile profile, CityStyle cityStyle) {
         boolean result = isCityRaw(chunkX, chunkZ, provider, profile) && !hasHighway(chunkX, chunkZ, provider, profile) && !hasRailway(chunkX, chunkZ, provider, profile);
         if (result) {
             CityStyle style = City.getCityStyle(chunkX, chunkZ, provider, profile);
+            if (!cityStyle.hasMultiBuildings()) {
+                return false;
+            }
             return style.getName().equals(cityStyle.getName());
-        }
-        if (!cityStyle.hasMultiBuildings()) {
-            return false;
         }
         return result;
     }
@@ -568,39 +596,70 @@ public class BuildingInfo implements ILostChunkInfo {
         return cnt > 12;    // We make a tunnel if more then half of the chunk is above the highway
     }
 
-    private static boolean isTopLeftOf2x2Building(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
+    /**
+     * If possible get the multibuilding that would fit here. Returns null if not suitable
+     * This function does not use cached building info or characteristics
+     */
+    @Nullable
+    private static MultiBuilding isTopLeftOfMultiBuilding(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
         ResourceKey<Level> type = provider.getType();
         PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             // Regardless of other conditions, this is the top left of a multibuilding
-            return true;
+            return AssetRegistries.MULTI_BUILDINGS.get(provider.getWorld(), predefinedBuilding.building());
         }
 
         CityStyle cityStyle = City.getCityStyle(chunkX, chunkZ, provider, profile);
         if (!cityStyle.hasMultiBuildings()) {
-            return false;
+            return null;
         }
-        if (isCandidateForTopLeftOf2x2Building(chunkX, chunkZ, provider, profile, cityStyle) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ, provider, profile, cityStyle) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ - 1, provider, profile, cityStyle) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ - 1, provider, profile, cityStyle) &&
 
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ - 1, provider, profile, cityStyle) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ, provider, profile, cityStyle) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX + 1, chunkZ + 1, provider, profile, cityStyle) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX, chunkZ + 1, provider, profile, cityStyle) &&
-                !isCandidateForTopLeftOf2x2Building(chunkX - 1, chunkZ + 1, provider, profile, cityStyle)
-                ) {
-            PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
-            if (predefinedStreet != null) {
-                return false;   // There is a street here so no building
-            }
-            return isMultiBuildingCandidate(chunkX + 1, chunkZ, provider, profile, cityStyle) &&
-                    isMultiBuildingCandidate(chunkX + 1, chunkZ + 1, provider, profile, cityStyle) &&
-                    isMultiBuildingCandidate(chunkX, chunkZ + 1, provider, profile, cityStyle);
-        } else {
-            return false;
+        Random rand = getMultiBuildingRandom(chunkX, chunkZ, provider.getSeed());
+        String name = cityStyle.getRandomMultiBuilding(rand);
+        if (name == null) {
+            return null;
         }
+        MultiBuilding building = AssetRegistries.MULTI_BUILDINGS.get(provider.getWorld(), name);
+        if (building == null) {
+            throw new RuntimeException("Multibuilding '" + name + "' is missing!");
+        }
+
+        // First make sure that there is no other candidate for a multibuilding top-left of us
+        // Area to check (x) with O the current chunk:
+        //      xxxx
+        //      xxxx
+        //      xxO.
+        //      xx..
+        for (int x = -2 ; x <= 1 ; x++) {
+            for (int z = -2 ; z <= 1 ; z++) {
+                if (x == 0 && z == 0) {
+                    if (!isCandidateForTopLeftOfMultiBuilding(chunkX, chunkZ, provider, profile, cityStyle)) {
+                        return null;
+                    }
+                } if (x < 0 || z < 0) {
+                    CityStyle otherStyle = City.getCityStyle(chunkX + x, chunkZ + z, provider, profile);
+                    if (isCandidateForTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile, otherStyle)) {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        // There is no other multibuilding candidate topleft of this one. So we test further
+        PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
+        if (predefinedStreet != null) {
+            return null;   // There is a street here so no building
+        }
+
+        // Check if all chunks for the size of the multibuilding are candidates
+        for (int x = 0 ; x < building.getDimX() ; x++) {
+            for (int z = 0 ; z < building.getDimZ() ; z++) {
+                if ((x != 0 || z != 0) && !isMultiBuildingCandidate(chunkX+x, chunkZ+z, provider, profile, cityStyle)) {
+                    return null;
+                }
+            }
+        }
+        return building;
     }
 
     public static void cleanCache() {
@@ -685,10 +744,14 @@ public class BuildingInfo implements ILostChunkInfo {
         LostChunkCharacteristics characteristics = getChunkCharacteristics(chunkX, chunkZ, provider);
 
         isCity = characteristics.isCity;
-        multiBuildingPos = characteristics.multiPos;
         cityLevel = characteristics.cityLevel;
         buildingType = characteristics.buildingType;
         multiBuilding = characteristics.multiBuilding;
+        multiBuildingPos = characteristics.multiPos;
+        if (multiBuilding != null) {
+            System.out.println("Multi = " + chunkX*16 + "," + chunkZ*16 + " -> " + multiBuilding.getName()
+                    + " (" + multiBuildingPos.x()+","+multiBuildingPos.z()+") (building=" + buildingType.getName() + ")");
+        }
 
         Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
         rand.nextFloat();       // Compatibility?
@@ -720,7 +783,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
         CityStyle cs = (CityStyle) characteristics.cityStyle;
 
-        // In a 2x2 building we copy all information from the top-left chunk
+        // In a multi building we copy all information from the top-left chunk
         if (multiBuildingPos.isMulti() && !multiBuildingPos.isTopLeft()) {
             BuildingInfo topleft = calculateTopLeft();
             highwayXLevel = topleft.highwayXLevel;
@@ -1383,6 +1446,13 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public static Random getBuildingRandom(int chunkX, int chunkZ, long seed) {
         Random rand = new QualityRandom(seed + chunkZ * 341873128712L + chunkX * 132897987541L);
+        rand.nextFloat();
+        rand.nextFloat();
+        return rand;
+    }
+
+    public static Random getMultiBuildingRandom(int chunkX, int chunkZ, long seed) {
+        Random rand = new QualityRandom(seed + chunkZ * 8987899751L + chunkX * 189878980451L);
         rand.nextFloat();
         rand.nextFloat();
         return rand;

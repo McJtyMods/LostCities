@@ -1,3 +1,6 @@
+Upcoming:
+- Multibuildings can now be any size with a maximum of 3x3. So 1x2, 2x3, 2x2, ...
+
 1.18-5.3.2:
 - More diagnostics to check a problem with pregenerating chunks
 
