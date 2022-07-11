@@ -2,7 +2,7 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.*;
-import mcjty.lostcities.api.LostChunkCharacteristics.MultiPos;
+import mcjty.lostcities.api.MultiPos;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
