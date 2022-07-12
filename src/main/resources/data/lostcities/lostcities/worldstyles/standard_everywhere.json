@@ -1,5 +1,32 @@
 {
   "outsidestyle": "outside",
+  "scatterchance": 0.01,
+  "scattered": [
+    {
+      "name": "radiotower",
+      "weight": 10,
+      "maxheightdiff": 3,
+      "biomes": {
+        "excluding": [
+          "#minecraft:is_ocean",
+          "#minecraft:is_river",
+          "#minecraft:is_beach"
+        ]
+      }
+    },
+    {
+      "name": "cabin",
+      "weight": 10,
+      "maxheightdiff": 2,
+      "biomes": {
+        "excluding": [
+          "#minecraft:is_ocean",
+          "#minecraft:is_river",
+          "#minecraft:is_beach"
+        ]
+      }
+    }
+  ],
   "citystyles": [
     {
       "factor": 0.5,

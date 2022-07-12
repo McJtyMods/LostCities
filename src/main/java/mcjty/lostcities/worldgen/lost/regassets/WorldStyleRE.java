@@ -18,6 +18,7 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
     public static final Codec<WorldStyleRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.STRING.fieldOf("outsidestyle").forGetter(l -> l.outsideStyle),
+                    Codec.FLOAT.optionalFieldOf("scatterchance", 0.01f).forGetter(l -> l.scatterChance),
                     Codec.list(CityStyleSelector.CODEC).fieldOf("citystyles").forGetter(l -> l.cityStyleSelectors),
                     Codec.list(CityBiomeMultiplier.CODEC).optionalFieldOf("citybiomemultipliers").forGetter(l -> Optional.ofNullable(l.cityBiomeMultipliers)),
                     Codec.list(ScatteredReference.CODEC).optionalFieldOf("scattered").forGetter(l -> Optional.ofNullable(l.scatteredReferences))
@@ -25,14 +26,17 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
 
     private ResourceLocation name;
     private final String outsideStyle;
+    private final float scatterChance;
     private final List<CityStyleSelector> cityStyleSelectors;
     private final List<CityBiomeMultiplier> cityBiomeMultipliers;
     private final List<ScatteredReference> scatteredReferences;
 
-    public WorldStyleRE(String outsideStyle, List<CityStyleSelector> values,
+    public WorldStyleRE(String outsideStyle, float scatterChance,
+                        List<CityStyleSelector> values,
                         Optional<List<CityBiomeMultiplier>> cityBiomeMultipliers,
                         Optional<List<ScatteredReference>> scatteredReferences) {
         this.outsideStyle = outsideStyle;
+        this.scatterChance = scatterChance;
         this.cityStyleSelectors = values;
         this.cityBiomeMultipliers = cityBiomeMultipliers.orElse(null);
         this.scatteredReferences = scatteredReferences.orElse(null);
@@ -40,6 +44,10 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
 
     public String getOutsideStyle() {
         return outsideStyle;
+    }
+
+    public float getScatterChance() {
+        return scatterChance;
     }
 
     public List<CityStyleSelector> getCityStyleSelectors() {

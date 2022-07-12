@@ -25,12 +25,14 @@ public class WorldStyle implements ILostCityAsset {
     private final ResourceLocation name;
     private final String outsideStyle;
 
+    private final float scatterChance;
     private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
     private final List<Pair<Predicate<Holder<Biome>>, Float>> cityBiomeMultiplier = new ArrayList<>();
     private final List<ScatteredReference> scatteredReferences = new ArrayList<>();
 
     public WorldStyle(WorldStyleRE object) {
         name = object.getRegistryName();
+        scatterChance = object.getScatterChance();
         outsideStyle = object.getOutsideStyle();
         for (CityStyleSelector selector : object.getCityStyleSelectors()) {
             Predicate<Holder<Biome>> predicate = biomeHolder -> true;
@@ -94,5 +96,9 @@ public class WorldStyle implements ILostCityAsset {
 
     public List<ScatteredReference> getScatteredReferences() {
         return scatteredReferences;
+    }
+
+    public float getScatterChance() {
+        return scatterChance;
     }
 }
