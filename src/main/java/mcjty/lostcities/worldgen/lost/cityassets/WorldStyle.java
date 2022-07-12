@@ -6,14 +6,12 @@ import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BiomeInfo;
 import mcjty.lostcities.worldgen.lost.regassets.WorldStyleRE;
-import mcjty.lostcities.worldgen.lost.regassets.data.CityBiomeMultiplier;
-import mcjty.lostcities.worldgen.lost.regassets.data.CityStyleSelector;
-import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
-import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredReference;
+import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,14 +23,13 @@ public class WorldStyle implements ILostCityAsset {
     private final ResourceLocation name;
     private final String outsideStyle;
 
-    private final float scatterChance;
+    private final ScatteredSettings scatteredSettings;
     private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
     private final List<Pair<Predicate<Holder<Biome>>, Float>> cityBiomeMultiplier = new ArrayList<>();
-    private final List<ScatteredReference> scatteredReferences = new ArrayList<>();
 
     public WorldStyle(WorldStyleRE object) {
         name = object.getRegistryName();
-        scatterChance = object.getScatterChance();
+        this.scatteredSettings = object.getScatteredSettings();
         outsideStyle = object.getOutsideStyle();
         for (CityStyleSelector selector : object.getCityStyleSelectors()) {
             Predicate<Holder<Biome>> predicate = biomeHolder -> true;
@@ -44,11 +41,6 @@ public class WorldStyle implements ILostCityAsset {
         if (object.getCityBiomeMultipliers() != null) {
             for (CityBiomeMultiplier multiplier : object.getCityBiomeMultipliers()) {
                 cityBiomeMultiplier.add(Pair.of(multiplier.biomeMatcher(), multiplier.multiplier()));
-            }
-        }
-        if (object.getScatteredReferences() != null) {
-            for (ScatteredReference reference : object.getScatteredReferences()) {
-                scatteredReferences.add(reference);
             }
         }
     }
@@ -65,6 +57,11 @@ public class WorldStyle implements ILostCityAsset {
 
     public String getOutsideStyle() {
         return outsideStyle;
+    }
+
+    @Nullable
+    public ScatteredSettings getScatteredSettings() {
+        return scatteredSettings;
     }
 
     public float getCityChanceMultiplier(IDimensionInfo provider, int chunkX, int chunkZ) {
@@ -92,13 +89,5 @@ public class WorldStyle implements ILostCityAsset {
         } else {
             return randomFromList.getRight();
         }
-    }
-
-    public List<ScatteredReference> getScatteredReferences() {
-        return scatteredReferences;
-    }
-
-    public float getScatterChance() {
-        return scatterChance;
     }
 }
