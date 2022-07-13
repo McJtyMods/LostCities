@@ -2,7 +2,7 @@
   "palette": [
     {
       "char": "R",
-      "block": "minecraft:stained_hardened_clay@9",
+      "block": "minecraft:cyan_terracotta",
       "damaged": "minecraft:iron_bars"
     },
     {
@@ -12,12 +12,12 @@
     },
     {
       "char": "u",
-      "block": "minecraft:double_stone_slab",
+      "block": "minecraft:smooth_stone_slab[type=double]",
       "damaged": "minecraft:iron_bars"
     },
     {
       "char": "S",
-      "block": "minecraft:double_stone_slab",
+      "block": "minecraft:smooth_stone_slab[type=double]",
       "damaged": "minecraft:iron_bars"
     },
     {
@@ -26,7 +26,7 @@
     },
     {
       "char": "B",
-      "block": "minecraft:brick_block",
+      "block": "minecraft:bricks",
       "damaged": "minecraft:iron_bars"
     },
     {
@@ -46,11 +46,11 @@
     },
     {
       "char": "_",
-      "block": "minecraft:stone_slab"
+      "block": "minecraft:smooth_stone_slab[type=bottom]"
     },
     {
       "char": "=",
-      "block": "minecraft:stone_slab@8"
+      "block": "minecraft:smooth_stone_slab[type=bottom]"
     },
     {
       "char": "w",
@@ -62,35 +62,35 @@
     },
     {
       "char": "A",
-      "block": "minecraft:stone_brick_stairs@1"
+      "block": "minecraft:stone_brick_stairs[facing=west,half=bottom,shape=straight]"
     },
     {
       "char": "t",
-      "block": "minecraft:stone_brick_stairs@0"
+      "block": "minecraft:stone_brick_stairs[facing=east,half=bottom,shape=straight]"
     },
     {
       "char": "z",
-      "block": "minecraft:stone_brick_stairs@3"
+      "block": "minecraft:stone_brick_stairs[facing=north,half=bottom,shape=straight]"
     },
     {
       "char": "c",
-      "block": "minecraft:stone_brick_stairs@2"
+      "block": "minecraft:stone_brick_stairs[facing=south,half=bottom,shape=straight]"
     },
     {
       "char": "d",
-      "block": "minecraft:stone_brick_stairs@7"
+      "block": "minecraft:stone_brick_stairs[facing=north,half=top,shape=straight]"
     },
     {
       "char": "(",
-      "block": "minecraft:quartz_stairs@3"
+      "block": "minecraft:quartz_stairs[facing=north,half=bottom,shape=straight]"
     },
     {
       "char": ")",
-      "block": "minecraft:quartz_stairs@2"
+      "block": "minecraft:quartz_stairs[facing=south,half=bottom,shape=straight]"
     },
     {
       "char": "/",
-      "block": "minecraft:stone_stairs@1"
+      "block": "minecraft:stone_stairs[facing=west,half=bottom,shape=straight]"
     }
   ]
 }

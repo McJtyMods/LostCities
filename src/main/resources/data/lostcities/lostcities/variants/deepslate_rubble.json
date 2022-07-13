@@ -6,11 +6,11 @@
     },
     {
       "random": 32,
-      "block": "minecraft:cobbled_deepslate_slab"
+      "block": "minecraft:cobbled_deepslate_slab[type=bottom]"
     },
     {
       "random": 32,
-      "block": "minecraft:cobbled_deepslate_stairs"
+      "block": "minecraft:cobbled_deepslate_stairs[facing=north,half=bottom]"
     },
     {
       "random": 1000,

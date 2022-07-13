@@ -2,15 +2,15 @@
   "palette": [
     {
       "char": "+",
-      "block": "minecraft:stained_glass@11"
+      "block": "minecraft:blue_stained_glass"
     },
     {
       "char": "`",
-      "block": "minecraft:stained_glass_pane@11"
+      "block": "minecraft:blue_stained_glass_pane"
     },
     {
       "char": "a",
-      "block": "minecraft:stained_glass@11"
+      "block": "minecraft:blue_stained_glass"
     }
   ]
 }

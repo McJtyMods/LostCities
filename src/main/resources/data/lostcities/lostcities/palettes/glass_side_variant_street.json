@@ -2,7 +2,7 @@
   "palette": [
     {
       "char": "@",
-      "block": "minecraft:double_stone_slab",
+      "block": "minecraft:smooth_stone_slab[type=double]",
       "damaged": "minecraft:iron_bars"
     }
   ]

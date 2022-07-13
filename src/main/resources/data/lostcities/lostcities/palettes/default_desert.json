@@ -7,17 +7,17 @@
     },
     {
       "char": "R",
-      "block": "minecraft:stained_hardened_clay@9",
+      "block": "minecraft:cyan_terracotta",
       "damaged": "minecraft:iron_bars"
     },
     {
       "char": "u",
-      "block": "minecraft:double_stone_slab",
+      "block": "minecraft:smooth_stone_slab[type=double]",
       "damaged": "minecraft:iron_bars"
     },
     {
       "char": "S",
-      "block": "minecraft:double_stone_slab2",
+      "block": "minecraft:red_sandstone_slab[type=double]",
       "damaged": "minecraft:iron_bars"
     },
     {
@@ -26,7 +26,7 @@
     },
     {
       "char": "B",
-      "block": "minecraft:red_nether_brick",
+      "block": "minecraft:red_nether_bricks",
       "damaged": "minecraft:iron_bars"
     },
     {
@@ -34,15 +34,15 @@
       "blocks": [
         {
           "random": 10,
-          "block": "minecraft:stonebrick@2"
+          "block": "minecraft:cracked_stone_bricks"
         },
         {
           "random": 9,
-          "block": "minecraft:stonebrick@1"
+          "block": "minecraft:mossy_stone_bricks"
         },
         {
           "random": 2000,
-          "block": "minecraft:stonebrick"
+          "block": "minecraft:stone_bricks"
         }
       ],
       "damaged": "minecraft:iron_bars"
@@ -52,30 +52,30 @@
       "blocks": [
         {
           "random": 10,
-          "block": "minecraft:stonebrick@2"
+          "block": "minecraft:cracked_stone_bricks"
         },
         {
           "random": 9,
-          "block": "minecraft:stonebrick@1"
+          "block": "minecraft:mossy_stone_bricks"
         },
         {
           "random": 2000,
-          "block": "minecraft:stonebrick"
+          "block": "minecraft:stone_bricks"
         }
       ],
       "damaged": "minecraft:iron_bars"
     },
     {
       "char": "x",
-      "block": "minecraft:sandstone@2"
+      "block": "minecraft:cut_sandstone"
     },
     {
       "char": "_",
-      "block": "minecraft:stone_slab@1"
+      "block": "minecraft:smooth_stone_slab[type=bottom]"
     },
     {
       "char": "=",
-      "block": "minecraft:stone_slab@9"
+      "block": "minecraft:smooth_stone_slab[type=bottom]"
     },
     {
       "char": "w",
@@ -87,35 +87,35 @@
     },
     {
       "char": "A",
-      "block": "minecraft:stone_brick_stairs@1"
+      "block": "minecraft:stone_brick_stairs[facing=west,half=bottom,shape=straight]"
     },
     {
       "char": "t",
-      "block": "minecraft:stone_brick_stairs@0"
+      "block": "minecraft:stone_brick_stairs[facing=east,half=bottom,shape=straight]"
     },
     {
       "char": "z",
-      "block": "minecraft:stone_brick_stairs@3"
+      "block": "minecraft:stone_brick_stairs[facing=north,half=bottom,shape=straight]"
     },
     {
       "char": "c",
-      "block": "minecraft:stone_brick_stairs@2"
+      "block": "minecraft:stone_brick_stairs[facing=south,half=bottom,shape=straight]"
     },
     {
       "char": "d",
-      "block": "minecraft:stone_brick_stairs@7"
+      "block": "minecraft:stone_brick_stairs[facing=north,half=top,shape=straight]"
     },
     {
       "char": "(",
-      "block": "minecraft:quartz_stairs@3"
+      "block": "minecraft:quartz_stairs[facing=north,half=bottom,shape=straight]"
     },
     {
       "char": ")",
-      "block": "minecraft:quartz_stairs@2"
+      "block": "minecraft:quartz_stairs[facing=south,half=bottom,shape=straight]"
     },
     {
       "char": "/",
-      "block": "minecraft:stone_stairs@1"
+      "block": "minecraft:stone_stairs[facing=west,half=bottom,shape=straight]"
     }
   ]
 }

@@ -12,7 +12,7 @@
     },
     {
       "char": "T",
-      "block": "minecraft:torch",
+      "block": "minecraft:wall_torch[facing=north]",
       "torch": true
     },
     {
@@ -21,32 +21,32 @@
     },
     {
       "char": "g",
-      "block": "minecraft:redstone_torch@5"
+      "block": "minecraft:redstone_torch[lit=true]"
     },
     {
       "char": "9",
       "blocks": [
         {
           "random": 32,
-          "block": "minecraft:stained_hardened_clay@9"
+          "block": "minecraft:cyan_terracotta"
         },
         {
           "random": 32,
-          "block": "minecraft:stained_hardened_clay@7"
+          "block": "minecraft:gray_terracotta"
         },
         {
           "random": 32,
-          "block": "minecraft:concrete@9"
+          "block": "minecraft:cyan_concrete"
         },
         {
           "random": 1000,
-          "block": "minecraft:concrete@7"
+          "block": "minecraft:gray_concrete"
         }
       ]
     },
     {
       "char": "Y",
-      "block": "minecraft:stained_glass"
+      "block": "minecraft:white_stained_glass"
     },
     {
       "char": "Z",
@@ -57,15 +57,15 @@
         },
         {
           "random": 32,
-          "block": "minecraft:stained_glass@7"
+          "block": "minecraft:gray_stained_glass"
         },
         {
           "random": 32,
-          "block": "minecraft:stained_glass@11"
+          "block": "minecraft:blue_stained_glass"
         },
         {
           "random": 1000,
-          "block": "minecraft:stained_glass@3"
+          "block": "minecraft:light_blue_stained_glass"
         }
       ]
     },
@@ -74,27 +74,27 @@
       "blocks": [
         {
           "random": 30,
-          "block": "minecraft:red_flower"
+          "block": "minecraft:poppy"
         },
         {
           "random": 30,
-          "block": "minecraft:yellow_flower"
+          "block": "minecraft:dandelion"
         },
         {
           "random": 15,
-          "block": "minecraft:sapling"
+          "block": "minecraft:oak_sapling[stage=1]"
         },
         {
           "random": 15,
-          "block": "minecraft:sapling@1"
+          "block": "minecraft:spruce_sapling[stage=1]"
         },
         {
           "random": 15,
-          "block": "minecraft:sapling@2"
+          "block": "minecraft:birch_sapling[stage=1]"
         },
         {
           "random": 1000,
-          "block": "minecraft:sapling@4"
+          "block": "minecraft:acacia_sapling[stage=1]"
         }
       ]
     },
@@ -103,11 +103,11 @@
       "blocks": [
         {
           "random": 64,
-          "block": "minecraft:red_flower"
+          "block": "minecraft:poppy"
         },
         {
           "random": 1000,
-          "block": "minecraft:yellow_flower"
+          "block": "minecraft:dandelion"
         }
       ]
     },
@@ -137,7 +137,7 @@
       "blocks": [
         {
           "random": 25,
-          "block": "minecraft:furnace"
+          "block": "minecraft:furnace[facing=north]"
         },
         {
           "random": 20,
@@ -149,7 +149,7 @@
         },
         {
           "random": 6,
-          "block": "minecraft:anvil"
+          "block": "minecraft:anvil[facing=north]"
         },
         {
           "random": 5,
@@ -161,7 +161,7 @@
         },
         {
           "random": 1000,
-          "block": "minecraft:web"
+          "block": "minecraft:cobweb"
         }
       ]
     },
@@ -170,7 +170,7 @@
       "blocks": [
         {
           "random": 40,
-          "block": "minecraft:web"
+          "block": "minecraft:cobweb"
         },
         {
           "random": 1000,
@@ -180,19 +180,19 @@
     },
     {
       "char": "*",
-      "block": "minecraft:flower_pot"
+      "block": "minecraft:potted_cactus"
     },
     {
       "char": "l",
-      "block": "minecraft:ladder@2"
+      "block": "minecraft:ladder[facing=north]"
     },
     {
       "char": "-",
-      "block": "minecraft:wooden_pressure_plate"
+      "block": "minecraft:oak_pressure_plate"
     },
     {
       "char": ".",
-      "block": "minecraft:fence"
+      "block": "minecraft:oak_fence"
     },
     {
       "char": "L",
@@ -204,12 +204,12 @@
     },
     {
       "char": "C",
-      "block": "minecraft:chest",
+      "block": "minecraft:chest[facing=north]",
       "loot": "chestloot"
     },
     {
       "char": "G",
-      "block": "minecraft:grass"
+      "block": "minecraft:grass_block"
     },
     {
       "char": "D",

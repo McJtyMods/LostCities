@@ -2,11 +2,11 @@
   "blocks": [
     {
       "random": 9,
-      "block": "minecraft:stonebrick@2"
+      "block": "minecraft:cracked_stone_bricks"
     },
     {
       "random": 8,
-      "block": "minecraft:stonebrick@1"
+      "block": "minecraft:mossy_stone_bricks"
     },
     {
       "random": 5,
@@ -18,7 +18,7 @@
     },
     {
       "random": 1000,
-      "block": "minecraft:stonebrick"
+      "block": "minecraft:stone_bricks"
     }
   ]
 }

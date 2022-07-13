@@ -2,51 +2,51 @@
   "palette": [
     {
       "char": "k",
-      "block": "minecraft:rail"
+      "block": "minecraft:rail[shape=north_south]"
     },
     {
       "char": "e",
-      "block": "minecraft:rail@1"
+      "block": "minecraft:rail[shape=east_west]"
     },
     {
       "char": "j",
-      "block": "minecraft:rail@2"
+      "block": "minecraft:rail[shape=ascending_east]"
     },
     {
       "char": "q",
-      "block": "minecraft:rail@6"
+      "block": "minecraft:rail[shape=south_east]"
     },
     {
       "char": "s",
-      "block": "minecraft:rail@7"
+      "block": "minecraft:rail[shape=south_west]"
     },
     {
       "char": "r",
-      "block": "minecraft:rail@8"
+      "block": "minecraft:rail[shape=north_west]"
     },
     {
       "char": "n",
-      "block": "minecraft:rail@9"
+      "block": "minecraft:rail[shape=north_east]"
     },
     {
       "char": "m",
-      "block": "minecraft:golden_rail@8"
+      "block": "minecraft:powered_rail[powered=true,shape=north_south]"
     },
     {
       "char": "E",
-      "block": "minecraft:golden_rail@13"
+      "block": "minecraft:powered_rail[powered=true,shape=ascending_south]"
     },
     {
       "char": "H",
-      "block": "minecraft:golden_rail@12"
+      "block": "minecraft:powered_rail[powered=true,shape=ascending_north]"
     },
     {
       "char": "f",
-      "block": "minecraft:golden_rail@9"
+      "block": "minecraft:powered_rail[powered=true,shape=east_west]"
     },
     {
       "char": "i",
-      "block": "minecraft:golden_rail@10"
+      "block": "minecraft:powered_rail[powered=true,shape=ascending_east]"
     }
   ]
 }

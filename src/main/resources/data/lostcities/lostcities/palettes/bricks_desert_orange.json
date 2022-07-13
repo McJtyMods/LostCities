@@ -2,17 +2,17 @@
   "palette": [
     {
       "char": "X",
-      "block": "minecraft:stained_hardened_clay@1",
+      "block": "minecraft:orange_terracotta",
       "damaged": "minecraft:iron_bars"
     },
     {
       "char": "$",
-      "block": "minecraft:double_stone_slab2",
+      "block": "minecraft:red_sandstone_slab[type=double]",
       "damaged": "minecraft:iron_bars"
     },
     {
       "char": "#",
-      "block": "minecraft:stained_hardened_clay@1",
+      "block": "minecraft:orange_terracotta",
       "damaged": "minecraft:iron_bars"
     }
   ]

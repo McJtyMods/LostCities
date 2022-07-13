@@ -2,22 +2,22 @@
   "palette": [
     {
       "char": "X",
-      "block": "minecraft:stained_hardened_clay@9",
+      "block": "minecraft:cyan_terracotta",
       "damaged": "minecraft:iron_bars"
     },
     {
       "char": "$",
-      "block": "minecraft:stained_hardened_clay@15",
+      "block": "minecraft:black_terracotta",
       "damaged": "minecraft:iron_bars"
     },
     {
       "char": "#",
-      "block": "minecraft:stained_hardened_clay@9",
+      "block": "minecraft:cyan_terracotta",
       "damaged": "minecraft:iron_bars"
     },
     {
       "char": "}",
-      "block": "minecraft:stained_hardened_clay@9",
+      "block": "minecraft:cyan_terracotta",
       "damaged": "minecraft:iron_bars"
     }
   ]

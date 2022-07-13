@@ -8,19 +8,19 @@
         "blocks": [
           {
             "random": 32,
-            "block": "minecraft:sapling"
+            "block": "minecraft:oak_sapling[stage=1]"
           },
           {
             "random": 32,
-            "block": "minecraft:sapling@1"
+            "block": "minecraft:spruce_sapling[stage=1]"
           },
           {
             "random": 32,
-            "block": "minecraft:sapling@2"
+            "block": "minecraft:birch_sapling[stage=1]"
           },
           {
             "random": 1000,
-            "block": "minecraft:sapling@4"
+            "block": "minecraft:acacia_sapling[stage=1]"
           }
         ]
       }

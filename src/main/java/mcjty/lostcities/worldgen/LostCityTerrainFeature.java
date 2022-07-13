@@ -462,10 +462,8 @@ public class LostCityTerrainFeature {
         }
 
         // Find the position of the building in the world
-        int relx = rand.nextInt(scatteredSettings.getAreasize() - w + 1);
-        int relz = rand.nextInt(scatteredSettings.getAreasize() - h + 1);
-        int tlChunkX = (ax * scatteredSettings.getAreasize() - 2000000) + relx;
-        int tlChunkZ = (az * scatteredSettings.getAreasize() - 2000000) + relz;
+        int tlChunkX = (ax * scatteredSettings.getAreasize() - 2000000) + rand.nextInt(scatteredSettings.getAreasize() - w + 1);
+        int tlChunkZ = (az * scatteredSettings.getAreasize() - 2000000) + rand.nextInt(scatteredSettings.getAreasize() - h + 1);
 
         if (chunkX < tlChunkX || chunkZ < tlChunkZ || chunkX >= (tlChunkX+w) || chunkZ >= (tlChunkZ+h)) {
             return;
@@ -518,6 +516,8 @@ public class LostCityTerrainFeature {
             generateScatteredBuilding(info, building, rand, lowestLevel);
         } else {
             int lowestLevel = handleScatteredTerrainMulti(info, scattered, multiBuilding, minheight, maxheight, avgheight);
+            int relx = chunkX - tlChunkX;
+            int relz = chunkZ - tlChunkZ;
             String buildingName = multiBuilding.getBuilding(relx, relz);
             Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
             generateScatteredBuilding(info, building, rand, lowestLevel);

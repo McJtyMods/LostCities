@@ -17,7 +17,7 @@
       },
       {
         "char": "B",
-        "block": "minecraft:barrel"
+        "block": "minecraft:barrel[facing=north]"
       },
       {
         "char": "c",

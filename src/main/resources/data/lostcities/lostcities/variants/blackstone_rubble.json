@@ -10,11 +10,11 @@
     },
     {
       "random": 20,
-      "block": "minecraft:polished_blackstone_slab"
+      "block": "minecraft:polished_blackstone_slab[type=bottom]"
     },
     {
       "random": 20,
-      "block": "minecraft:polished_blackstone_stairs"
+      "block": "minecraft:polished_blackstone_stairs[facing=north,half=bottom]"
     },
     {
       "random": 1000,

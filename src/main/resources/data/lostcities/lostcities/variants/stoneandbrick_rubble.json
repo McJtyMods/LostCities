@@ -10,11 +10,11 @@
     },
     {
       "random": 20,
-      "block": "minecraft:stone_slab"
+      "block": "minecraft:smooth_stone_slab[type=bottom]"
     },
     {
       "random": 20,
-      "block": "minecraft:stone_stairs"
+      "block": "minecraft:stone_stairs[facing=east,half=bottom]"
     },
     {
       "random": 1000,
