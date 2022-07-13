@@ -103,10 +103,7 @@ public class Palette implements ILostCityAsset {
                 String variantName = entry.getVariant();
                 MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
                 ServerLevel level = server.getLevel(Level.OVERWORLD);
-                Variant variant = AssetRegistries.VARIANTS.get(level, variantName);
-                if (variant == null) {
-                    throw new RuntimeException("Variant '" + variantName + "' is missing!");
-                }
+                Variant variant = AssetRegistries.VARIANTS.getOrThrow(level, variantName);
                 List<Pair<Integer, BlockState>> blocks = variant.getBlocks();
                 if (dmg != null) {
                     for (Pair<Integer, BlockState> pair : blocks) {

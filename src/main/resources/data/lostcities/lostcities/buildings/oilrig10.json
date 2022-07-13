@@ -1,0 +1,11 @@
+{
+  "filler": "#",
+  "rubble": "}",
+  "minfloors": 1,
+  "maxfloors": 1,
+  "parts": [
+    {
+      "part": "oilrig10"
+    }
+  ]
+}

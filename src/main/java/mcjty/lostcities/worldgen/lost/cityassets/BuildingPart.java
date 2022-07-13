@@ -1,7 +1,6 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
 import mcjty.lostcities.api.ILostCityAsset;
-import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingPartRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
@@ -135,11 +134,7 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     @Override
     public Palette getLocalPalette(CommonLevelAccessor level) {
         if (localPalette == null && refPaletteName != null) {
-            localPalette = AssetRegistries.PALETTES.get(level, refPaletteName);
-            if (localPalette == null) {
-                ModSetup.getLogger().error("Could not find palette '" + refPaletteName + "'!");
-                throw new RuntimeException("Could not find palette '" + refPaletteName + "'!");
-            }
+            localPalette = AssetRegistries.PALETTES.getOrThrow(level, refPaletteName);
         }
         return localPalette;
     }

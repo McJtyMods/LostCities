@@ -1,0 +1,14 @@
+{
+  "dimx": 2,
+  "dimz": 2,
+  "buildings": [
+    [
+      "oilrig00",
+      "oilrig01"
+    ],
+    [
+      "oilrig10",
+      "oilrig11"
+    ]
+  ]
+}

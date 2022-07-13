@@ -188,10 +188,7 @@ public class BuildingInfo implements ILostChunkInfo {
             style = getOutsideStyle();
         } else {
             String name = getCityStyle().getStyle();
-            style = AssetRegistries.STYLES.get(provider.getWorld(), name);
-            if (style == null) {
-                throw new RuntimeException("Cannot find style '" + name + "'!");
-            }
+            style = AssetRegistries.STYLES.getOrThrow(provider.getWorld(), name);
         }
         palette = style.getRandomPalette(provider, rand);
     }
@@ -353,10 +350,7 @@ public class BuildingInfo implements ILostChunkInfo {
 //                characteristics.multiBuilding = topleft.multiBuilding;
                 if (characteristics.multiBuilding != null) {
                     String b = characteristics.multiBuilding.getBuilding(characteristics.multiPos.x(), characteristics.multiPos.z());
-                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, b);
-                    if (characteristics.buildingType == null) {
-                        throw new RuntimeException("Error getting building type '" + b + " for multibuilding'!");
-                    }
+                    characteristics.buildingType = AssetRegistries.BUILDINGS.getOrThrow(world, b);
                 } else {
                     // @todo is this even possible?
                     characteristics.buildingType = topleft.buildingType;
@@ -373,20 +367,14 @@ public class BuildingInfo implements ILostChunkInfo {
 //                    }
 //                    characteristics.multiBuilding = AssetRegistries.MULTI_BUILDINGS.get(world, name);
                     String b = characteristics.multiBuilding.getBuilding(0, 0);
-                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, b);
-                    if (characteristics.buildingType == null) {
-                        throw new RuntimeException("Error getting building type '" + b + " for multibuilding'!");
-                    }
+                    characteristics.buildingType = AssetRegistries.BUILDINGS.getOrThrow(world, b);
                 } else {
 //                    characteristics.multiBuilding = null;
                     String name = cityStyle.getRandomBuilding(rand);
                     if (predefinedBuilding != null) {
                         name = predefinedBuilding.building();
                     }
-                    characteristics.buildingType = AssetRegistries.BUILDINGS.get(world, name);
-                    if (characteristics.buildingType == null) {
-                        throw new RuntimeException("Error getting building type '" + name + "'!");
-                    }
+                    characteristics.buildingType = AssetRegistries.BUILDINGS.getOrThrow(world, name);
                 }
             }
 
@@ -606,7 +594,7 @@ public class BuildingInfo implements ILostChunkInfo {
         PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             // Regardless of other conditions, this is the top left of a multibuilding
-            return AssetRegistries.MULTI_BUILDINGS.get(provider.getWorld(), predefinedBuilding.building());
+            return AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), predefinedBuilding.building());
         }
 
         CityStyle cityStyle = City.getCityStyle(chunkX, chunkZ, provider, profile);
@@ -619,10 +607,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (name == null) {
             return null;
         }
-        MultiBuilding building = AssetRegistries.MULTI_BUILDINGS.get(provider.getWorld(), name);
-        if (building == null) {
-            throw new RuntimeException("Multibuilding '" + name + "' is missing!");
-        }
+        MultiBuilding building = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), name);
 
         // First make sure that there is no other candidate for a multibuilding top-left of us
         // Area to check (x) with O the current chunk:
@@ -725,9 +710,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
-            floorTypes[i] = Validate.notNull(AssetRegistries.PARTS.get(provider.getWorld(), randomPart), "Null part for " + randomPart);
+            floorTypes[i] = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), randomPart);
             randomPart = building.getRandomPart2(rand, conditionContext);
-            floorTypes2[i] = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);
+            floorTypes2[i] = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);    // null is legal
         }
     }
 
@@ -808,11 +793,11 @@ public class BuildingInfo implements ILostChunkInfo {
                 streetType = StreetType.NORMAL;
             }
             if (rand.nextFloat() < profile.FOUNTAIN_CHANCE) {
-                fountainType = AssetRegistries.PARTS.get(provider.getWorld(), cs.getRandomFountain(rand));
+                fountainType = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), cs.getRandomFountain(rand));
             } else {
                 fountainType = null;
             }
-            parkType = AssetRegistries.PARTS.get(provider.getWorld(), cs.getRandomPark(rand));
+            parkType = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), cs.getRandomPark(rand));
             float cityFactor = City.getCityFactor(chunkX, chunkZ, provider, profile);
 
             int maxfloors = getMaxfloors(cs);
@@ -849,8 +834,8 @@ public class BuildingInfo implements ILostChunkInfo {
             cellars = fb;
 
             doorBlock = getRandomDoor(rand);
-            bridgeType = AssetRegistries.PARTS.get(provider.getWorld(), cs.getRandomBridge(rand));
-            stairType = AssetRegistries.PARTS.get(provider.getWorld(), cs.getRandomStair(rand));
+            bridgeType = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), cs.getRandomBridge(rand));
+            stairType = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), cs.getRandomStair(rand));
             stairPriority = rand.nextFloat();
             createPalette(rand);
             float r = rand.nextFloat();
@@ -888,9 +873,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
-            floorTypes[i] = Validate.notNull(AssetRegistries.PARTS.get(provider.getWorld(), randomPart), "Null part for " + randomPart);
+            floorTypes[i] = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), randomPart);
             randomPart = building.getRandomPart2(rand, conditionContext);
-            floorTypes2[i] = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);
+            floorTypes2[i] = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);    // null is legal
             connectionAtX[i] = isCity(chunkX - 1, chunkZ, provider) && (rand.nextFloat() < profile.BUILDING_DOORWAYCHANCE);
             connectionAtZ[i] = isCity(chunkX, chunkZ - 1, provider) && (rand.nextFloat() < profile.BUILDING_DOORWAYCHANCE);
         }
@@ -913,7 +898,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
         if (rand.nextFloat() < profile.RAILWAY_DUNGEON_CHANCE) {
             if (!hasBuilding || (Railway.RAILWAY_LEVEL_OFFSET < (cityLevel - cellars))) {
-                railDungeon = AssetRegistries.PARTS.get(provider.getWorld(), getCityStyle().getRandomRailDungeon(rand));
+                railDungeon = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getCityStyle().getRandomRailDungeon(rand));
             } else {
                 railDungeon = null;
             }
@@ -922,7 +907,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         if (rand.nextFloat() < profile.BUILDING_FRONTCHANCE) {
-            frontType = AssetRegistries.PARTS.get(provider.getWorld(), getCityStyle().getRandomFront(rand));
+            frontType = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getCityStyle().getRandomFront(rand));
         } else {
             frontType = null;
         }

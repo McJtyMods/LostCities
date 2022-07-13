@@ -66,11 +66,7 @@ public class Building implements ILostCityBuilding {
     @Override
     public Palette getLocalPalette(CommonLevelAccessor level) {
         if (localPalette == null && refPaletteName != null) {
-            localPalette = AssetRegistries.PALETTES.get(level, refPaletteName);
-            if (localPalette == null) {
-                ModSetup.getLogger().error("Could not find palette '" + refPaletteName + "'!");
-                throw new RuntimeException("Could not find palette '" + refPaletteName + "'!");
-            }
+            localPalette = AssetRegistries.PALETTES.getOrThrow(level, refPaletteName);
         }
         return localPalette;
     }

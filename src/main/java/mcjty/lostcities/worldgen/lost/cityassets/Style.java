@@ -53,10 +53,7 @@ public class Style implements ILostCityAsset {
             for (Pair<Float, String> pair : pairs) {
                 r -= pair.getKey();
                 if (r <= 0) {
-                    tomerge = AssetRegistries.PALETTES.get(provider.getWorld(), pair.getRight());
-                    if (tomerge == null) {
-                        throw new RuntimeException("Palette '" + pair.getRight() + "' is missing!");
-                    }
+                    tomerge = AssetRegistries.PALETTES.getOrThrow(provider.getWorld(), pair.getRight());
                     break;
                 }
             }

@@ -15,7 +15,7 @@ public class ScatteredRE implements IForgeRegistryEntry<ScatteredRE> {
 
     public static final Codec<ScatteredRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.list(Codec.STRING).optionalFieldOf("buildings", null).forGetter(l -> l.buildings),
+                    Codec.list(Codec.STRING).optionalFieldOf("buildings").forGetter(l -> Optional.ofNullable(l.buildings)),
                     Codec.STRING.optionalFieldOf("multibuilding").forGetter(l -> Optional.ofNullable(l.multibuilding)),
                     StringRepresentable.fromEnum(Scattered.TerrainHeight::values, Scattered.TerrainHeight::byName).fieldOf("terrainheight").forGetter(l -> l.terrainheight),
                     StringRepresentable.fromEnum(Scattered.TerrainFix::values, Scattered.TerrainFix::byName).fieldOf("terrainfix").forGetter(l -> l.terrainfix),
@@ -29,9 +29,9 @@ public class ScatteredRE implements IForgeRegistryEntry<ScatteredRE> {
     private final List<String> buildings;
     private final String multibuilding;
 
-    public ScatteredRE(List<String> buildings, Optional<String> multibuilding, Scattered.TerrainHeight terrainheight, Scattered.TerrainFix terrainfix,
+    public ScatteredRE(Optional<List<String>> buildings, Optional<String> multibuilding, Scattered.TerrainHeight terrainheight, Scattered.TerrainFix terrainfix,
                        int heightoffset) {
-        this.buildings = buildings;
+        this.buildings = buildings.orElse(null);
         this.multibuilding = multibuilding.orElse(null);
         this.terrainheight = terrainheight;
         this.terrainfix = terrainfix;

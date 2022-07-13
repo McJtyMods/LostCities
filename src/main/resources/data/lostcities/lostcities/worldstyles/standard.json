@@ -17,6 +17,16 @@
         }
       },
       {
+        "name": "oilrig",
+        "weight": 10,
+        "maxheightdiff": 1,
+        "biomes": {
+          "if_any": [
+            "#minecraft:is_ocean"
+          ]
+        }
+      },
+      {
         "name": "cabin",
         "weight": 10,
         "maxheightdiff": 2,

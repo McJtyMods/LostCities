@@ -244,10 +244,7 @@ public class CityStyle implements ILostCityCityStyle {
         if (!resolveInherit) {
             resolveInherit = true;
             if (inherit != null) {
-                CityStyle inheritFrom = AssetRegistries.CITYSTYLES.get(level, inherit);
-                if (inheritFrom == null) {
-                    throw new RuntimeException("Cannot find citystyle '" + inherit + "' to inherit from!");
-                }
+                CityStyle inheritFrom = AssetRegistries.CITYSTYLES.getOrThrow(level, inherit);
                 if (style == null) {
                     style = inheritFrom.getStyle();
                 }
