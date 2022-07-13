@@ -23,7 +23,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
-import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -266,7 +265,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public CityStyle getCityStyle() {
-        return (CityStyle) getChunkCharacteristics(chunkX, chunkZ, provider).cityStyle;
+        return (CityStyle) getChunkCharacteristics(coord, chunkX, chunkZ, provider).cityStyle;
     }
 
     // Version for usage inside the gui
@@ -295,9 +294,12 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
-    public static synchronized LostChunkCharacteristics getChunkCharacteristics(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static LostChunkCharacteristics getChunkCharacteristics(int chunkX, int chunkZ, IDimensionInfo provider) {
+        return getChunkCharacteristics(new ChunkCoord(provider.dimension(), chunkX, chunkZ), chunkX, chunkZ, provider);
+    }
+
+    public static synchronized LostChunkCharacteristics getChunkCharacteristics(ChunkCoord key, int chunkX, int chunkZ, IDimensionInfo provider) {
         ResourceKey<Level> type = provider.getType();
-        ChunkCoord key = new ChunkCoord(type, chunkX, chunkZ);
         if (cityInfoMap.containsKey(key)) {
             return cityInfoMap.get(key);
         } else {
@@ -321,7 +323,6 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             }
 
-            ChunkCoord coord = new ChunkCoord(type, chunkX, chunkZ);
             CityStyle cityStyle;
             // If this is a street we find other chunks connected to this and pick the cityStyle
             // that represents the majority. This is to prevent streets from switching style randomly if two
@@ -330,7 +331,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 Counter<String> counter = new Counter<>();
                 for (int cx = -1 ; cx <= 1 ; cx++) {
                     for (int cz = -1 ; cz <= 1 ; cz++) {
-                        cityStyle = City.getCityStyle(coord.chunkX()+cx, coord.chunkZ()+cz, provider, profile);
+                        cityStyle = City.getCityStyle(key.chunkX()+cx, key.chunkZ()+cz, provider, profile);
                         counter.add(cityStyle.getName());
                         if (cx == 0 && cz == 0) {
                             counter.add(cityStyle.getName());   // Add this chunk again for a bias
@@ -381,8 +382,6 @@ public class BuildingInfo implements ILostChunkInfo {
             LostCityEvent.CharacteristicsEvent event = new LostCityEvent.CharacteristicsEvent(world, LostCities.lostCitiesImp,
                     chunkX, chunkZ, characteristics);
             MinecraftForge.EVENT_BUS.post(event);
-
-            cityInfoMap.put(key, characteristics);
             return characteristics;
         }
     }
@@ -409,7 +408,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static boolean isCity(int chunkX, int chunkZ, IDimensionInfo provider) {
-        return getChunkCharacteristics(chunkX, chunkZ, provider).isCity;
+        return getChunkCharacteristics(new ChunkCoord(provider.dimension(), chunkX, chunkZ), chunkX, chunkZ, provider).isCity;  // @todo avoid this new?
     }
 
     private static boolean checkBuildingPossibility(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, MultiPos section, int cityLevel, Random rand) {
@@ -507,7 +506,9 @@ public class BuildingInfo implements ILostChunkInfo {
         if (thisone.multiPos.isTopLeft()) {
             return thisone;
         }
-        return getChunkCharacteristics(chunkX - thisone.multiPos.x(), chunkZ - thisone.multiPos.z(), provider);
+        int cx = chunkX - thisone.multiPos.x();
+        int cz = chunkZ - thisone.multiPos.z();
+        return getChunkCharacteristics(cx, cz, provider);
     }
 
     /**
@@ -657,7 +658,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (buildingInfoMap.containsKey(key)) {
             return buildingInfoMap.get(key);
         }
-        BuildingInfo info = new BuildingInfo(chunkX, chunkZ, provider);
+        BuildingInfo info = new BuildingInfo(key, chunkX, chunkZ, provider);
         buildingInfoMap.put(key, info);
         return info;
     }
@@ -716,17 +717,17 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
-    private BuildingInfo(int chunkX, int chunkZ, IDimensionInfo provider) {
+    private BuildingInfo(ChunkCoord key, int chunkX, int chunkZ, IDimensionInfo provider) {
         this.provider = provider;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         ResourceKey<Level> type = provider.getType();
-        this.coord = new ChunkCoord(type, chunkX, chunkZ);
+        this.coord = key;
 
         outsideChunk = provider.getProfile().isSpace() && !CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider);
         profile = getProfile(chunkX, chunkZ, provider);
 
-        LostChunkCharacteristics characteristics = getChunkCharacteristics(chunkX, chunkZ, provider);
+        LostChunkCharacteristics characteristics = getChunkCharacteristics(key, chunkX, chunkZ, provider);
 
         isCity = characteristics.isCity;
         cityLevel = characteristics.cityLevel;
@@ -1333,7 +1334,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isOcean != null) {
             return isOcean;
         }
-        Holder<Biome> mainBiome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
+        Holder<Biome> mainBiome = BiomeInfo.getBiomeInfo(provider, coord).getMainBiome();
         isOcean = mainBiome.is(BiomeTags.IS_OCEAN) || mainBiome.is(BiomeTags.IS_DEEP_OCEAN);
         return isOcean;
     }

@@ -44,7 +44,7 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("isCity = " + info.isCity);
             System.out.println("chunkX = " + info.chunkX);
             System.out.println("chunkZ = " + info.chunkZ);
-            System.out.println("getCityStyle() = " + BuildingInfo.getChunkCharacteristics(info.chunkX, info.chunkZ, info.provider).cityStyle.getName());
+            System.out.println("getCityStyle() = " + BuildingInfo.getChunkCharacteristics(info.coord, info.chunkX, info.chunkZ, info.provider).cityStyle.getName());
             System.out.println("streetType = " + info.streetType);
             System.out.println("ruinHeight = " + info.ruinHeight);
             System.out.println("tunnel0 = " + info.isTunnel(0));
@@ -69,7 +69,7 @@ public class CommandDebug implements Command<CommandSourceStack> {
             int explosions = info.getExplosions().size();
             System.out.println("explosions = " + explosions);
 
-            ChunkHeightmap heightmap = dimInfo.getFeature().getHeightmap(info.chunkX, info.chunkZ, player.getLevel());
+            ChunkHeightmap heightmap = dimInfo.getFeature().getHeightmap(info.coord, player.getLevel());
             int avg = 0;
             for (int x = 0 ; x < 16 ; x++) {
                 for (int z = 0 ; z < 16 ; z++) {

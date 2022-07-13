@@ -4,8 +4,7 @@ import mcjty.lostcities.worldgen.lost.Orientation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
-public record ChunkCoord(ResourceKey<Level> dimension, int chunkX,
-                         int chunkZ) {
+public record ChunkCoord(ResourceKey<Level> dimension, int chunkX, int chunkZ) {
 
     public ChunkCoord lower(Orientation o) {
         return switch (o) {

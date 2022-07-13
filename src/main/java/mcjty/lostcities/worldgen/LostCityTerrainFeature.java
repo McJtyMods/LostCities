@@ -47,11 +47,13 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -622,7 +624,7 @@ public class LostCityTerrainFeature {
     }
 
     private int handleScatteredTerrain(BuildingInfo info, Scattered scattered) {
-        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, provider.getWorld());
+        ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
 
         int lowestLevel = switch (scattered.getTerrainheight()) {
             case LOWEST -> heightmap.getMinimumHeight();
@@ -1014,7 +1016,7 @@ public class LostCityTerrainFeature {
         if (max00 < 256 || max10 < 256 || max01 < 256 || max11 < 256 ||
                 min00 < 256 || min10 < 256 || min01 < 256 || min11 < 256) {
             // We need to fit the terrain between the upper and lower mesh here
-            ChunkHeightmap heightmap = getHeightmap(chunkX, chunkZ, provider.getWorld());
+            ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
             int maxHeightP = heightmap.getMaximumHeight() + 10;
             int minHeightP = heightmap.getMinimumHeight() - 10;
             if (max00 >= 256) {
@@ -1163,7 +1165,7 @@ public class LostCityTerrainFeature {
      * @return
      */
     public int getMinHeightAt(BuildingInfo info, int x, int z) {
-        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, info.provider.getWorld());
+        ChunkHeightmap heightmap = getHeightmap(info.coord, info.provider.getWorld());
         int height = heightmap.getHeight(x, z);
         ChunkHeightmap adjacentHeightmap;
         WorldGenLevel world = info.provider.getWorld();
@@ -1196,12 +1198,16 @@ public class LostCityTerrainFeature {
 
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ, @Nonnull WorldGenLevel world) {
         ChunkCoord key = new ChunkCoord(world.getLevel().dimension(), chunkX, chunkZ);
+        return getHeightmap(key, world);
+    }
+
+    public ChunkHeightmap getHeightmap(ChunkCoord key, @Nonnull WorldGenLevel world) {
         synchronized (this) {
             if (cachedHeightmaps.containsKey(key)) {
                 return cachedHeightmaps.get(key);
             } else {
                 ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL);
-                generateHeightmap(chunkX, chunkZ, world, heightmap);
+                generateHeightmap(key.chunkX(), key.chunkZ(), world, heightmap);
                 cachedHeightmaps.put(key, heightmap);
                 return heightmap;
             }
@@ -1237,7 +1243,7 @@ public class LostCityTerrainFeature {
     private void doCityChunk(int chunkX, int chunkZ, BuildingInfo info) {
         boolean building = info.hasBuilding;
 
-        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, provider.getWorld());
+        ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
 
         Random rand = new Random(provider.getSeed() * 377 + chunkZ * 341873128712L + chunkX * 132897987541L);
         rand.nextFloat();
@@ -1406,7 +1412,7 @@ public class LostCityTerrainFeature {
         }
         int h = generatePart(info, part, transform, 0, height, 0, false);
         if (clearUpper) {
-            ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, provider.getWorld());
+            ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
             int maxh = heightmap.getMaximumHeight() + 4;
             if (h < maxh) {
                 for (int x = 0; x < 16; x++) {
@@ -1900,7 +1906,7 @@ public class LostCityTerrainFeature {
 
         switch (info.profile.LANDSCAPE_TYPE) {
             case DEFAULT -> {
-                ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, info.provider.getWorld());
+                ChunkHeightmap heightmap = getHeightmap(info.coord, info.provider.getWorld());
                 int y = getMinHeightAt(info, x, z);
                 if (y < info.getCityGroundLevel()+1) {
                     // We are above heightmap level. Generated a border from that level to our ground level
@@ -1915,7 +1921,7 @@ public class LostCityTerrainFeature {
                 if (adjacent.isCity) {
                     adjacentY = Math.min(adjacentY, adjacent.getCityGroundLevel());
                 } else {
-                    ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.chunkX, adjacent.chunkZ, provider.getWorld());
+                    ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.coord, provider.getWorld());
                     int minimumHeight = adjacentHeightmap.getMinimumHeight();
                     adjacentY = Math.min(adjacentY, minimumHeight - 2);
                 }
@@ -1950,7 +1956,7 @@ public class LostCityTerrainFeature {
      * Generate a column of wall blocks (and stone below that in water)
      */
     private void generateBorderSupport(BuildingInfo info, BlockState wall, int x, int z, int offset) {
-        ChunkHeightmap heightmap = getHeightmap(info.chunkX, info.chunkZ, provider.getWorld());
+        ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
         int height = heightmap.getHeight(x, z);
         if (height > 1) {
             // None void
@@ -2237,8 +2243,12 @@ public class LostCityTerrainFeature {
         if (partPalette != null || buildingPalette != null) {
             compiledPalette = new CompiledPalette(compiledPalette, partPalette, buildingPalette);
         }
+        final CompiledPalette finalCompiledPalette = compiledPalette;
 
         boolean nowater = part.getMetaBoolean(ILostCities.META_NOWATER);
+
+        // Optimization: cache the actions to do per character
+        Map<Character, Supplier<BlockState>> stateSuppliers = new HashMap<>();
 
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
@@ -2250,29 +2260,17 @@ public class LostCityTerrainFeature {
                     int len = vs.length;
                     for (int y = 0; y < len; y++) {
                         char c = vs[y];
-                        BlockState b = compiledPalette.get(c);
-                        if (b == null) {
-                            throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
-                        }
-
+                        Supplier<BlockState> stateSupplier = stateSuppliers.computeIfAbsent(c, chr -> {
+                            if (finalCompiledPalette.isSimple(chr)) {
+                                final BlockState state = getBlockStateForPart(part, transform, finalCompiledPalette, c);
+                                return () -> state;
+                            } else {
+                                return () -> getBlockStateForPart(part, transform, finalCompiledPalette, c);
+                            }
+                        });
+                        BlockState b = stateSupplier.get();
                         Palette.Info inf = compiledPalette.getInfo(c);
 
-                        if (transform != Transform.ROTATE_NONE) {
-                            if (getRotatableStates().contains(b)) {
-                                b = b.rotate(transform.getMcRotation());
-                            } else if (getRailStates().contains(b)) {
-                                EnumProperty<RailShape> shapeProperty;
-                                if (b.getBlock() == Blocks.RAIL) {
-                                    shapeProperty = RailBlock.SHAPE;
-                                } else if (b.getBlock() == Blocks.POWERED_RAIL) {
-                                    shapeProperty = PoweredRailBlock.SHAPE;
-                                } else {
-                                    throw new RuntimeException("Error with rail!");
-                                }
-                                RailShape shape = b.getValue(shapeProperty);
-                                b = b.setValue(shapeProperty, transform.transform(shape));
-                            }
-                        }
                         // We don't replace the world where the part is empty (air)
                         if (b != air) {
                             if (b == liquid) {
@@ -2347,6 +2345,31 @@ public class LostCityTerrainFeature {
             }
         }
         return oy + part.getSliceCount();
+    }
+
+    @NotNull
+    private BlockState getBlockStateForPart(IBuildingPart part, Transform transform, CompiledPalette finalCompiledPalette, char c) {
+        BlockState b = finalCompiledPalette.get(c);
+        if (b == null) {
+            throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
+        }
+        if (transform != Transform.ROTATE_NONE) {
+            if (getRotatableStates().contains(b)) {
+                b = b.rotate(transform.getMcRotation());
+            } else if (getRailStates().contains(b)) {
+                EnumProperty<RailShape> shapeProperty;
+                if (b.getBlock() == Blocks.RAIL) {
+                    shapeProperty = RailBlock.SHAPE;
+                } else if (b.getBlock() == Blocks.POWERED_RAIL) {
+                    shapeProperty = PoweredRailBlock.SHAPE;
+                } else {
+                    throw new RuntimeException("Error with rail!");
+                }
+                RailShape shape = b.getValue(shapeProperty);
+                b = b.setValue(shapeProperty, transform.transform(shape));
+            }
+        }
+        return b;
     }
 
     public static void createSpawner(Level world, BlockPos pos, ResourceLocation randomEntity) {
@@ -2501,7 +2524,7 @@ public class LostCityTerrainFeature {
             }
             if (info.profile.isSpace()) {
                 // Base it on ground level
-                ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.chunkX, adjacent.chunkZ, provider.getWorld());
+                ChunkHeightmap adjacentHeightmap = getHeightmap(adjacent.coord, provider.getWorld());
                 int adjacentHeight = adjacentHeightmap.getAverageHeight();
                 if (adjacentHeight > 5) {
                     if ((adjacentHeight - 4) < info.getCityGroundLevel()) {
