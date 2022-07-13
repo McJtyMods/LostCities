@@ -888,7 +888,7 @@ public class LostCityTerrainFeature {
                 while (l < bt.getSliceCount()) {
                     Character c = orientation == Orientation.X ? bt.getPaletteChar(x, l, z) : bt.getPaletteChar(z, l, x); // @todo general rotation system?
                     BlockState b = info.getCompiledPalette().get(c);
-                    CompiledPalette.Info inf = compiledPalette.getInfo(c);
+                    Palette.Info inf = compiledPalette.getInfo(c);
                     if (inf != null) {
                         if (inf.isTorch()) {
                             if (info.profile.GENERATE_LIGHTING) {
@@ -2252,7 +2252,7 @@ public class LostCityTerrainFeature {
                             throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
                         }
 
-                        CompiledPalette.Info inf = compiledPalette.getInfo(c);
+                        Palette.Info inf = compiledPalette.getInfo(c);
 
                         if (transform != Transform.ROTATE_NONE) {
                             if (getRotatableStates().contains(b)) {

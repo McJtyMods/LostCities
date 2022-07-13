@@ -15,7 +15,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A palette of materials as used by building parts
@@ -23,11 +26,12 @@ import java.util.*;
 public class Palette implements ILostCityAsset {
 
     private final ResourceLocation name;
-    private final Map<Character, Object> palette = new HashMap<>();
+    private final Map<Character, PE> palette = new HashMap<>();
+//    private final Map<Character, Object> palette = new HashMap<>();
     private final Map<BlockState, BlockState> damaged = new HashMap<>();
-    private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
-    private final Map<Character, String> lootTables = new HashMap<>(); // For chests
-    private final Set<Character> torches = new HashSet<>(); // For torches
+//    private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
+//    private final Map<Character, String> lootTables = new HashMap<>(); // For chests
+//    private final Set<Character> torches = new HashSet<>(); // For torches
 
     public Palette(PaletteRE object) {
         name = object.getRegistryName();
@@ -41,9 +45,9 @@ public class Palette implements ILostCityAsset {
     public void merge(Palette other) {
         palette.putAll(other.palette);
         damaged.putAll(other.damaged);
-        mobIds.putAll(other.mobIds);
-        lootTables.putAll(other.lootTables);
-        torches.addAll(other.torches);
+//        mobIds.putAll(other.mobIds);
+//        lootTables.putAll(other.lootTables);
+//        torches.addAll(other.torches);
     }
 
     @Override
@@ -60,21 +64,25 @@ public class Palette implements ILostCityAsset {
         return damaged;
     }
 
-    public Map<Character, String> getMobIds() {
-        return mobIds;
-    }
-
-    public Map<Character, String> getLootTables() {
-        return lootTables;
-    }
-
-    public Set<Character> getTorches() {
-        return torches;
-    }
-
-    public Map<Character, Object> getPalette() {
+    public Map<Character, PE> getPalette() {
         return palette;
     }
+
+    //    public Map<Character, String> getMobIds() {
+//        return mobIds;
+//    }
+
+//    public Map<Character, String> getLootTables() {
+//        return lootTables;
+//    }
+
+//    public Set<Character> getTorches() {
+//        return torches;
+//    }
+
+//    public Map<Character, Object> getPalette() {
+//        return palette;
+//    }
 
     public void parsePaletteArray(PaletteRE paletteRE) {
         for (PaletteEntry entry : paletteRE.getPaletteEntries()) {
@@ -83,19 +91,12 @@ public class Palette implements ILostCityAsset {
             if (entry.getDamaged() != null) {
                 dmg = Tools.stringToState(entry.getDamaged());
             }
-            if (entry.getLoot() != null) {
-                lootTables.put(c, entry.getLoot());
-            }
-            if (entry.getMob() != null) {
-                mobIds.put(c, entry.getMob());
-            }
-            if (entry.getTorch() != null && entry.getTorch()) {
-                torches.add(c);
-            }
+            Info info = new Info(entry.getMob(), entry.getLoot(), entry.getTorch() == null ? false : entry.getTorch());
+
             if (entry.getBlock() != null) {
                 String block = entry.getBlock();
                 BlockState state = Tools.stringToState(block);
-                palette.put(c, state);
+                palette.put(c, new PE(state, info));
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }
@@ -110,10 +111,10 @@ public class Palette implements ILostCityAsset {
                         damaged.put(pair.getRight(), dmg);
                     }
                 }
-                addMappingViaState(c, blocks);
+                addMappingViaState(c, blocks, info);
             } else if (entry.getFrompalette() != null) {
                 String value = entry.getFrompalette();
-                palette.put(c, value);
+                palette.put(c, new PE(value, info));
             } else if (entry.getBlocks() != null) {
                 List<BlockEntry> entryBlocks = entry.getBlocks();
                 List<Pair<Integer, BlockState>> blocks = new ArrayList<>();
@@ -126,15 +127,25 @@ public class Palette implements ILostCityAsset {
                         damaged.put(state, dmg);
                     }
                 }
-                addMappingViaState(c, blocks);
+                addMappingViaState(c, blocks, info);
             } else {
                 throw new RuntimeException("Illegal palette " + name + "!");
             }
         }
     }
 
-    private Palette addMappingViaState(char c, List<Pair<Integer, BlockState>> randomBlocks) {
-        palette.put(c, randomBlocks.toArray(new Pair[randomBlocks.size()]));
+    private Palette addMappingViaState(char c, List<Pair<Integer, BlockState>> randomBlocks, Info info) {
+        palette.put(c, new PE(randomBlocks.toArray(new Pair[randomBlocks.size()]), info));
         return this;
     }
+
+    public record Info(String mobId, String loot, boolean isTorch) {
+        public boolean isSpecial() {
+            return mobId != null || loot != null || isTorch;
+        }
+    }
+
+    public record PE(Object blocks, Info info) {
+    }
+
 }
