@@ -78,13 +78,12 @@ public class CompiledPalette {
                 if (p != null) {
                     for (Map.Entry<Character, Palette.PE> entry : p.getPalette().entrySet()) {
                         Palette.PE pe = entry.getValue();
-                        if (pe.blocks() instanceof String) {
-                            char c = ((String) pe.blocks()).charAt(0);
+                        if (pe.blocks() instanceof String blocks) {
+                            char c = blocks.charAt(0);
                             if (palette.containsKey(c) && !palette.containsKey(entry.getKey())) {
-                                Object s = palette.get(c);
-                                palette.put(entry.getKey(), s);
-                                dirty = true;
+                                palette.put(entry.getKey(), palette.get(c));
                                 information.remove(entry.getKey());
+                                dirty = true;
                             }
                         }
                     }
@@ -131,8 +130,8 @@ public class CompiledPalette {
     public BlockState get(char c, Random rand) {
         try {
             Object o = palette.get(c);
-            if (o instanceof BlockState) {
-                return (BlockState) o;
+            if (o instanceof BlockState state) {
+                return state;
             } else if (o == null) {
                 return null;
             } else {
@@ -149,8 +148,8 @@ public class CompiledPalette {
     public Set<BlockState> getAll(char c) {
         try {
             Object o = palette.get(c);
-            if (o instanceof BlockState) {
-                return Collections.singleton((BlockState) o);
+            if (o instanceof BlockState state) {
+                return Collections.singleton(state);
             } else if (o == null) {
                 return Collections.emptySet();
             } else {
@@ -165,8 +164,8 @@ public class CompiledPalette {
     public BlockState get(char c) {
         try {
             Object o = palette.get(c);
-            if (o instanceof BlockState) {
-                return (BlockState) o;
+            if (o instanceof BlockState state) {
+                return state;
             } else if (o == null) {
                 return null;
             } else {

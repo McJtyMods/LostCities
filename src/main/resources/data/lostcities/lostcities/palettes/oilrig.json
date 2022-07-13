@@ -1,0 +1,44 @@
+{
+  "palette": [
+    {
+      "char": "D",
+      "block": "minecraft:polished_diorite"
+    },
+    {
+      "char": "5",
+      "block": "minecraft:polished_diorite_stairs[facing=north,half=top,shape=straight]"
+    },
+    {
+      "char": "6",
+      "block": "minecraft:polished_diorite_stairs[facing=east,half=top,shape=straight]"
+    },
+    {
+      "char": "7",
+      "block": "minecraft:polished_diorite_stairs[facing=south,half=top,shape=straight]"
+    },
+    {
+      "char": "8",
+      "block": "minecraft:polished_diorite_stairs[facing=west,half=top,shape=straight]"
+    },
+    {
+      "char": "l",
+      "block": "minecraft:polished_diorite_stairs[facing=north,half=bottom,shape=straight]"
+    },
+    {
+      "char": "i",
+      "block": "minecraft:polished_diorite_stairs[facing=east,half=bottom,shape=straight]"
+    },
+    {
+      "char": "o",
+      "block": "minecraft:polished_diorite_stairs[facing=south,half=bottom,shape=straight]"
+    },
+    {
+      "char": "p",
+      "block": "minecraft:polished_diorite_stairs[facing=west,half=bottom,shape=straight]"
+    },
+    {
+      "char": "w",
+      "block": "minecraft:diorite_wall"
+    }
+  ]
+}

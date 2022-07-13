@@ -27,11 +27,7 @@ public class Palette implements ILostCityAsset {
 
     private final ResourceLocation name;
     private final Map<Character, PE> palette = new HashMap<>();
-//    private final Map<Character, Object> palette = new HashMap<>();
     private final Map<BlockState, BlockState> damaged = new HashMap<>();
-//    private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
-//    private final Map<Character, String> lootTables = new HashMap<>(); // For chests
-//    private final Set<Character> torches = new HashSet<>(); // For torches
 
     public Palette(PaletteRE object) {
         name = object.getRegistryName();
@@ -45,9 +41,6 @@ public class Palette implements ILostCityAsset {
     public void merge(Palette other) {
         palette.putAll(other.palette);
         damaged.putAll(other.damaged);
-//        mobIds.putAll(other.mobIds);
-//        lootTables.putAll(other.lootTables);
-//        torches.addAll(other.torches);
     }
 
     @Override
@@ -67,22 +60,6 @@ public class Palette implements ILostCityAsset {
     public Map<Character, PE> getPalette() {
         return palette;
     }
-
-    //    public Map<Character, String> getMobIds() {
-//        return mobIds;
-//    }
-
-//    public Map<Character, String> getLootTables() {
-//        return lootTables;
-//    }
-
-//    public Set<Character> getTorches() {
-//        return torches;
-//    }
-
-//    public Map<Character, Object> getPalette() {
-//        return palette;
-//    }
 
     public void parsePaletteArray(PaletteRE paletteRE) {
         for (PaletteEntry entry : paletteRE.getPaletteEntries()) {

@@ -475,13 +475,14 @@ public class LostCityTerrainFeature {
         int avgheight = 0;
         for (int x = tlChunkX ; x < tlChunkX + w ; x++) {
             for (int z = tlChunkZ; z < tlChunkZ + h; z++) {
-                if (!isValidScatterBiome(info, reference, x, z)) {
+                BuildingInfo tinfo = BuildingInfo.getBuildingInfo(x, z, provider);
+                if (!isValidScatterBiome(reference, x, z)) {
                     return;
                 }
-                if (!avoidScattered(BuildingInfo.getBuildingInfo(tlChunkX, tlChunkZ, provider))) {
+                if (!avoidScattered(tinfo)) {
                     return;
                 }
-                ChunkHeightmap heightmap = getHeightmap(tlChunkX, tlChunkZ, provider.getWorld());
+                ChunkHeightmap heightmap = getHeightmap(x, z, provider.getWorld());
                 minheight = Math.min(minheight, heightmap.getMinimumHeight());
                 maxheight = Math.max(maxheight, heightmap.getMaximumHeight());
                 avgheight += heightmap.getAverageHeight();
@@ -534,7 +535,7 @@ public class LostCityTerrainFeature {
         int totalweight = 0;
         List<ScatteredReference> filteredList = new ArrayList<>();
         for (ScatteredReference reference : list) {
-            if (isValidScatterBiome(info, reference, 0, 0)) {
+            if (isValidScatterBiome(reference, info.chunkX, info.chunkZ)) {
                 totalweight += reference.getWeight();
                 filteredList.add(reference);
             }
@@ -556,9 +557,9 @@ public class LostCityTerrainFeature {
         return reference;
     }
 
-    private boolean isValidScatterBiome(BuildingInfo info, ScatteredReference reference, int x, int z) {
+    private boolean isValidScatterBiome(ScatteredReference reference, int x, int z) {
         if (reference.getBiomeMatcher() != null) {
-            BiomeInfo biome = BiomeInfo.getBiomeInfo(provider, info.coord.chunkX() + x, info.coord.chunkZ() + z);
+            BiomeInfo biome = BiomeInfo.getBiomeInfo(provider, x, z);
             return reference.getBiomeMatcher().test(biome.getMainBiome());
         }
         return true;
@@ -627,6 +628,7 @@ public class LostCityTerrainFeature {
             case LOWEST -> heightmap.getMinimumHeight();
             case AVERAGE -> heightmap.getAverageHeight();
             case HIGHEST -> heightmap.getMaximumHeight();
+            case OCEAN -> ((ServerChunkCache)provider.getWorld().getChunkSource()).getGenerator().getSeaLevel();
         };
         lowestLevel += scattered.getHeightoffset();
 
@@ -649,6 +651,7 @@ public class LostCityTerrainFeature {
             case LOWEST -> minimum;
             case AVERAGE -> maximum;
             case HIGHEST -> average;
+            case OCEAN -> ((ServerChunkCache)provider.getWorld().getChunkSource()).getGenerator().getSeaLevel();
         };
         lowestLevel += scattered.getHeightoffset();
 

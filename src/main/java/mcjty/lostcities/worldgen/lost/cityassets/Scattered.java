@@ -66,7 +66,8 @@ public class Scattered implements ILostCityAsset {
     public static enum TerrainHeight implements StringRepresentable {
         LOWEST("lowest"),
         AVERAGE("average"),
-        HIGHEST("highest")
+        HIGHEST("highest"),
+        OCEAN("ocean")
         ;
 
         private static final Map<String, TerrainHeight> BY_NAME = Arrays.stream(values()).collect(Collectors.toMap(TerrainHeight::getSerializedName, (v) -> v));

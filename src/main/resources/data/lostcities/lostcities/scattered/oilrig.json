@@ -1,6 +1,6 @@
 {
   "multibuilding": "oilrig",
-  "terrainheight": "highest",
+  "terrainheight": "ocean",
   "terrainfix": "none",
-  "heightoffset": 0
+  "heightoffset": -12
 }
