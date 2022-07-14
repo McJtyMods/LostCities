@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
@@ -182,4 +183,45 @@ public class CompiledPalette {
     }
 
     public Palette.Info getInfo(Character c) { return information.get(c); }
+
+    /**
+     * For editor. Return the palette entry given a state
+     */
+    @Nullable
+    public Character find(BlockState state) {
+        for (Map.Entry<Character, Object> entry : palette.entrySet()) {
+            Object o = entry.getValue();
+            if (o instanceof BlockState s) {
+                if (s == state) {
+                    return entry.getKey();
+                }
+            } else {
+                BlockState[] randomBlocks = (BlockState[]) o;
+                for (BlockState randomBlock : randomBlocks) {
+                    if (randomBlock == state) {
+                        return entry.getKey();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * For editor. See if a state matches with a character
+     */
+    public boolean isMatch(char c, BlockState state) {
+        Object o = palette.get(c);
+        if (o instanceof BlockState s) {
+            return s.getBlock() == state.getBlock();
+        } else {
+            BlockState[] randomBlocks = (BlockState[]) o;
+            for (BlockState randomBlock : randomBlocks) {
+                if (randomBlock.getBlock() == state.getBlock()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

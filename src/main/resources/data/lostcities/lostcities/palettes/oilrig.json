@@ -1,6 +1,18 @@
 {
   "palette": [
     {
+      "char": "_",
+      "block": "minecraft:iron_door[facing=north,half=lower,hinge=right]"
+    },
+    {
+      "char": "-",
+      "block": "minecraft:iron_door[facing=north,half=upper,hinge=right]"
+    },
+    {
+      "char": "L",
+      "block": "minecraft:lever[face=wall,facing=south]"
+    },
+    {
       "char": "D",
       "block": "minecraft:polished_diorite"
     },

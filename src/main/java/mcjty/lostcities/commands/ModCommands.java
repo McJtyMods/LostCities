@@ -15,6 +15,8 @@ public class ModCommands {
                         .then(CommandDebug.register(dispatcher))
                         .then(CommandMap.register(dispatcher))
                         .then(CommandSaveProfile.register(dispatcher))
+                        .then(CommandCreatePart.register(dispatcher))
+                        .then(CommandExportPart.register(dispatcher))
         );
 
         dispatcher.register(Commands.literal("lost").redirect(commands));

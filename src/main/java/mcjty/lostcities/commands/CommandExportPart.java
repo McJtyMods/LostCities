@@ -1,22 +1,108 @@
 package mcjty.lostcities.commands;
 
-public class CommandExportPart {} /* @todo 1.14 implements ICommand {
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import mcjty.lostcities.setup.Registration;
+import mcjty.lostcities.varia.ComponentFactory;
+import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.lost.BuildingInfo;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
+import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
+import mcjty.lostcities.worldgen.lost.cityassets.Palette;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
-    @Override
-    public String getName() {
-        return "lc_exportpart";
+import java.util.HashSet;
+import java.util.Set;
+
+public class CommandExportPart implements Command<CommandSourceStack> {
+
+    private static final CommandExportPart CMD = new CommandExportPart();
+
+    public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        return Commands.literal("exportpart")
+                .requires(cs -> cs.hasPermission(1))
+                .then(Commands.argument("name", StringArgumentType.word()).executes(CMD));
     }
 
-    @Override
-    public String getUsage(ICommandSender sender) {
-        return getName() + " <file> <slices>";
-    }
 
     @Override
-    public List<String> getAliases() {
-        return Collections.emptyList();
-    }
+    public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        String name = context.getArgument("name", String.class);
+        BuildingPart part = AssetRegistries.PARTS.get(context.getSource().getLevel(), name);
+        if (part == null) {
+            context.getSource().sendFailure(new TextComponent("Error finding part '" + name + "'!").withStyle(ChatFormatting.RED));
+            return 0;
+        }
 
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        BlockPos start = player.blockPosition();
+
+        ServerLevel level = player.getLevel();
+        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(level);
+        if (dimInfo == null) {
+            context.getSource().sendFailure(ComponentFactory.literal("This dimension doesn't support Lost Cities!"));
+            return 0;
+        }
+
+        BuildingInfo info = BuildingInfo.getBuildingInfo(start.getX() >> 4, start.getZ() >> 4, dimInfo);
+        CompiledPalette palette = info.getCompiledPalette();
+        Palette partPalette = part.getLocalPalette(level);
+        Palette buildingPalette = info.getBuilding().getLocalPalette(level);
+        if (partPalette != null || buildingPalette != null) {
+            palette = new CompiledPalette(palette, partPalette, buildingPalette);
+        }
+
+        Set<BlockState> unknowns = new HashSet<>();
+
+        for (int y = 0 ; y < part.getSliceCount() ; y++) {
+            System.out.println("    [");
+            for (int z = 0; z < part.getZSize(); z++) {
+                StringBuilder b = new StringBuilder("      \"");
+                for (int x = 0; x < part.getXSize(); x++) {
+                    BlockPos pos = new BlockPos(info.chunkX*16+x, start.getY()+y, info.chunkZ*16+z);
+                    BlockState state = level.getBlockState(pos);
+                    Character c = palette.find(state);
+                    if (c == null) {
+                        Character character = part.getC(x, y, z);
+                        if (palette.isMatch(character, state)) {
+                            c = character;
+                        } else {
+                            c = '?';
+                            unknowns.add(state);
+                        }
+                    }
+                    b.append(c);
+                }
+                b.append('"');
+                if (z < part.getZSize()-1) {
+                    b.append(',');
+                }
+                System.out.println(b);
+            }
+            System.out.println("    ],");
+        }
+
+        for (BlockState unknown : unknowns) {
+            System.out.println("unknown = " + unknown);
+        }
+
+        return 0;
+    }
+}
+    /*
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         try {

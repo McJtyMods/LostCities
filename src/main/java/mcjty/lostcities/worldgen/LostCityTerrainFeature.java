@@ -47,13 +47,11 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -240,7 +238,16 @@ public class LostCityTerrainFeature {
         return driver.getY() == minHeight;
     }
 
+//    public static long startTime = -1;
+//    public static long chunksDone = 0;
+
     public void generate(WorldGenRegion region, ChunkAccess chunk) {
+//        if (chunksDone == 0) {
+//            startTime = System.currentTimeMillis();
+//        } else if (chunksDone % 100 == 0) {
+//            System.out.println("At " + chunksDone + " elapsed = " + (System.currentTimeMillis()-startTime));
+//        }
+//        chunksDone++;
         LevelAccessor oldRegion = driver.getRegion();
         ChunkAccess oldChunk = driver.getPrimer();
         driver.setPrimer(region, chunk);
@@ -2247,9 +2254,6 @@ public class LostCityTerrainFeature {
 
         boolean nowater = part.getMetaBoolean(ILostCities.META_NOWATER);
 
-        // Optimization: cache the actions to do per character
-        Map<Character, Supplier<BlockState>> stateSuppliers = new HashMap<>();
-
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
                 char[] vs = part.getVSlice(x, z);
@@ -2260,16 +2264,16 @@ public class LostCityTerrainFeature {
                     int len = vs.length;
                     for (int y = 0; y < len; y++) {
                         char c = vs[y];
-                        Supplier<BlockState> stateSupplier = stateSuppliers.computeIfAbsent(c, chr -> {
-                            if (finalCompiledPalette.isSimple(chr)) {
-                                final BlockState state = getBlockStateForPart(part, transform, finalCompiledPalette, c);
-                                return () -> state;
-                            } else {
-                                return () -> getBlockStateForPart(part, transform, finalCompiledPalette, c);
-                            }
-                        });
-                        BlockState b = stateSupplier.get();
+                        BlockState b = compiledPalette.get(c);
+                        if (b == null) {
+                            throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
+                        }
+
                         Palette.Info inf = compiledPalette.getInfo(c);
+
+                        if (transform != Transform.ROTATE_NONE) {
+                            b = transformBlockState(transform, b);
+                        }
 
                         // We don't replace the world where the part is empty (air)
                         if (b != air) {
@@ -2291,50 +2295,15 @@ public class LostCityTerrainFeature {
                                         b = air;        // No torches
                                     }
                                 } else if (inf.loot() != null && !inf.loot().isEmpty()) {
-                                    if (!info.noLoot) {
-                                        BlockPos pos = driver.getCurrentCopy();
-                                        BlockState finalB = b;
-                                        info.addPostTodo(pos, () -> {
-                                            if (!world.getBlockState(pos).isAir()) {
-                                                world.setBlock(pos, finalB, Block.UPDATE_CLIENTS);
-                                                generateLoot(info, world, pos, new BuildingInfo.ConditionTodo(inf.loot(), part.getName(), info));
-                                            }
-                                        });
-                                    }
+                                    handleLoot(info, part, world, b, inf);
                                 } else if (inf.mobId() != null && !inf.mobId().isEmpty()) {
-                                    if (info.profile.GENERATE_SPAWNERS && !info.noLoot) {
-                                        String mobid = inf.mobId();
-
-                                        BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
-                                        ResourceLocation randomValue = getRandomSpawnerMob(world.getLevel(), rand, provider, info,
-                                                new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
-                                        GlobalTodo.getData(world.getLevel()).addSpawnerTodo(pos, b, randomValue);
-                                    } else {
-                                        b = air;
-                                    }
+                                    b = handleSpawner(info, part, oy, world, rx, rz, y, b, inf);
                                 }
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
                                 BlockPos pos = driver.getCurrentCopy();
                                 updateNeeded(info, pos);
                             } else if (getStatesNeedingTodo().contains(b)) {
-                                BlockState bs = b;
-                                Block block = bs.getBlock();
-                                if (block instanceof SaplingBlock || block instanceof FlowerBlock) {
-                                    if (info.profile.AVOID_FOLIAGE) {
-                                        b = air;
-                                    } else {
-                                        BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
-                                        if (block instanceof SaplingBlock saplingBlock) {
-                                            GlobalTodo.getData(world.getLevel()).addTodo(pos, (level) -> {
-                                                BlockState state = bs.setValue(SaplingBlock.STAGE, 1);
-                                                if (level.isAreaLoaded(pos, 1)) {
-                                                    level.setBlock(pos, state, Block.UPDATE_CLIENTS);
-                                                    saplingBlock.advanceTree(level, pos, state, rand);
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
+                                b = handleTodo(info, oy, world, rx, rz, y, b);
                             }
                             driver.add(b);
                         } else {
@@ -2347,27 +2316,69 @@ public class LostCityTerrainFeature {
         return oy + part.getSliceCount();
     }
 
-    @NotNull
-    private BlockState getBlockStateForPart(IBuildingPart part, Transform transform, CompiledPalette finalCompiledPalette, char c) {
-        BlockState b = finalCompiledPalette.get(c);
-        if (b == null) {
-            throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
+    private BlockState handleSpawner(BuildingInfo info, IBuildingPart part, int oy, WorldGenLevel world, int rx, int rz, int y, BlockState b, Palette.Info inf) {
+        if (info.profile.GENERATE_SPAWNERS && !info.noLoot) {
+            String mobid = inf.mobId();
+
+            BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
+            ResourceLocation randomValue = getRandomSpawnerMob(world.getLevel(), rand, provider, info,
+                    new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
+            GlobalTodo.getData(world.getLevel()).addSpawnerTodo(pos, b, randomValue);
+        } else {
+            b = air;
         }
-        if (transform != Transform.ROTATE_NONE) {
-            if (getRotatableStates().contains(b)) {
-                b = b.rotate(transform.getMcRotation());
-            } else if (getRailStates().contains(b)) {
-                EnumProperty<RailShape> shapeProperty;
-                if (b.getBlock() == Blocks.RAIL) {
-                    shapeProperty = RailBlock.SHAPE;
-                } else if (b.getBlock() == Blocks.POWERED_RAIL) {
-                    shapeProperty = PoweredRailBlock.SHAPE;
-                } else {
-                    throw new RuntimeException("Error with rail!");
+        return b;
+    }
+
+    private void handleLoot(BuildingInfo info, IBuildingPart part, WorldGenLevel world, BlockState b, Palette.Info inf) {
+        if (!info.noLoot) {
+            BlockPos pos = driver.getCurrentCopy();
+            BlockState finalB = b;
+            info.addPostTodo(pos, () -> {
+                if (!world.getBlockState(pos).isAir()) {
+                    world.setBlock(pos, finalB, Block.UPDATE_CLIENTS);
+                    generateLoot(info, world, pos, new BuildingInfo.ConditionTodo(inf.loot(), part.getName(), info));
                 }
-                RailShape shape = b.getValue(shapeProperty);
-                b = b.setValue(shapeProperty, transform.transform(shape));
+            });
+        }
+    }
+
+    private BlockState handleTodo(BuildingInfo info, int oy, WorldGenLevel world, int rx, int rz, int y, BlockState b) {
+        Block block = b.getBlock();
+        if (block instanceof SaplingBlock || block instanceof FlowerBlock) {
+            if (info.profile.AVOID_FOLIAGE) {
+                b = air;
+            } else {
+                BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
+                if (block instanceof SaplingBlock saplingBlock) {
+                    BlockState finalB = b;
+                    GlobalTodo.getData(world.getLevel()).addTodo(pos, (level) -> {
+                        BlockState state = finalB.setValue(SaplingBlock.STAGE, 1);
+                        if (level.isAreaLoaded(pos, 1)) {
+                            level.setBlock(pos, state, Block.UPDATE_CLIENTS);
+                            saplingBlock.advanceTree(level, pos, state, rand);
+                        }
+                    });
+                }
             }
+        }
+        return b;
+    }
+
+    private BlockState transformBlockState(Transform transform, BlockState b) {
+        if (getRotatableStates().contains(b)) {
+            b = b.rotate(transform.getMcRotation());
+        } else if (getRailStates().contains(b)) {
+            EnumProperty<RailShape> shapeProperty;
+            if (b.getBlock() == Blocks.RAIL) {
+                shapeProperty = RailBlock.SHAPE;
+            } else if (b.getBlock() == Blocks.POWERED_RAIL) {
+                shapeProperty = PoweredRailBlock.SHAPE;
+            } else {
+                throw new RuntimeException("Error with rail!");
+            }
+            RailShape shape = b.getValue(shapeProperty);
+            b = b.setValue(shapeProperty, transform.transform(shape));
         }
         return b;
     }
