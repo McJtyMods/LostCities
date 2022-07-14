@@ -94,8 +94,9 @@ public class Scattered implements ILostCityAsset {
     }
 
     public static enum TerrainFix implements StringRepresentable {
-        NONE("none"),           // Do nothing with the terrain
-        CLEAR("clear")          // Clear from generation point upwards
+        NONE("none"),               // Do nothing with the terrain
+        CLEAR("clear"),             // Clear from generation point upwards
+        REPEATSLICE("repeatslice")  // Repeat the bottom slice downwards until it hits a solid block
         ;
 
         private static final Map<String, TerrainFix> BY_NAME = Arrays.stream(values()).collect(Collectors.toMap(TerrainFix::getSerializedName, (v) -> v));

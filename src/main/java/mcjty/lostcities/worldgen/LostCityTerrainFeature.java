@@ -527,14 +527,14 @@ public class LostCityTerrainFeature {
             }
             Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
             int lowestLevel = handleScatteredTerrain(info, scattered);
-            generateScatteredBuilding(info, building, scatteredRandom, lowestLevel);
+            generateScatteredBuilding(info, building, scatteredRandom, lowestLevel, scattered.getTerrainfix());
         } else {
             int lowestLevel = handleScatteredTerrainMulti(info, scattered, multiBuilding, minheight, maxheight, avgheight);
             int relx = chunkX - tlChunkX;
             int relz = chunkZ - tlChunkZ;
             String buildingName = multiBuilding.getBuilding(relx, relz);
             Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
-            generateScatteredBuilding(info, building, scatteredRandom, lowestLevel);
+            generateScatteredBuilding(info, building, scatteredRandom, lowestLevel, scattered.getTerrainfix());
         }
     }
 
@@ -578,7 +578,7 @@ public class LostCityTerrainFeature {
         return true;
     }
 
-    private void generateScatteredBuilding(BuildingInfo info, Building building, Random rand, int lowestLevel) {
+    private void generateScatteredBuilding(BuildingInfo info, Building building, Random rand, int lowestLevel, Scattered.TerrainFix terrainFix) {
         int chunkX = info.chunkX;
         int chunkZ = info.chunkZ;
 
@@ -620,6 +620,38 @@ public class LostCityTerrainFeature {
             randomPart = building.getRandomPart2(rand, conditionContext);
             BuildingPart part2 = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);    // Null is legal
 
+            if (f == 0) {
+                switch (terrainFix) {
+                    case NONE -> {
+                    }
+                    case CLEAR -> {
+                        for (int x = 0; x < 16; x++) {
+                            for (int z = 0; z < 16; z++) {
+                                clearRange(info, x, z, lowestLevel, lowestLevel + 50, false);
+                            }
+                        }
+                    }
+                    case REPEATSLICE -> {
+                        CompiledPalette compiledPalette = computePalette(info, part);
+                        for (int x = 0; x < 16; x++) {
+                            for (int z = 0; z < 16; z++) {
+                                char c = part.getPaletteChar(x, 0, z);
+                                if (c != ' ') {
+                                    int y = lowestLevel - 1;
+                                    driver.current(x, y, z);
+                                    BlockState b = driver.getBlock();
+                                    while (b == air || b == liquid) {
+                                        driver.block(compiledPalette.get(c));
+                                        driver.decY();
+                                        b = driver.getBlock();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             height += generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
             if (part2 != null) {
                 generatePart(info, part2, Transform.ROTATE_NONE, 0, height, 0, false);
@@ -637,18 +669,6 @@ public class LostCityTerrainFeature {
             case OCEAN -> ((ServerChunkCache)provider.getWorld().getChunkSource()).getGenerator().getSeaLevel();
         };
         lowestLevel += scattered.getHeightoffset();
-
-        switch (scattered.getTerrainfix()) {
-            case NONE -> {
-            }
-            case CLEAR -> {
-                for (int x = 0 ; x < 16 ; x++) {
-                    for (int z = 0 ; z < 16 ; z++) {
-                        clearRange(info, x, z, lowestLevel, lowestLevel + 50, false);
-                    }
-                }
-            }
-        }
         return lowestLevel;
     }
 
@@ -660,18 +680,6 @@ public class LostCityTerrainFeature {
             case OCEAN -> ((ServerChunkCache)provider.getWorld().getChunkSource()).getGenerator().getSeaLevel();
         };
         lowestLevel += scattered.getHeightoffset();
-
-        switch (scattered.getTerrainfix()) {
-            case NONE -> {
-            }
-            case CLEAR -> {
-                for (int x = 0 ; x < 16 ; x++) {
-                    for (int z = 0 ; z < 16 ; z++) {
-                        clearRange(info, x, z, lowestLevel, lowestLevel + 50, false);
-                    }
-                }
-            }
-        }
         return lowestLevel;
     }
 
@@ -2243,15 +2251,7 @@ public class LostCityTerrainFeature {
     private int generatePart(BuildingInfo info, IBuildingPart part,
                              Transform transform,
                              int ox, int oy, int oz, boolean airWaterLevel) {
-        CompiledPalette compiledPalette = info.getCompiledPalette();
-        // Cache the combined palette?
-        WorldGenLevel world = provider.getWorld();
-        Palette partPalette = part.getLocalPalette(world);
-        Palette buildingPalette = info.getBuilding().getLocalPalette(world);
-        if (partPalette != null || buildingPalette != null) {
-            compiledPalette = new CompiledPalette(compiledPalette, partPalette, buildingPalette);
-        }
-        final CompiledPalette finalCompiledPalette = compiledPalette;
+        CompiledPalette compiledPalette = computePalette(info, part);
 
         boolean nowater = part.getMetaBoolean(ILostCities.META_NOWATER);
 
@@ -2296,15 +2296,15 @@ public class LostCityTerrainFeature {
                                         b = air;        // No torches
                                     }
                                 } else if (inf.loot() != null && !inf.loot().isEmpty()) {
-                                    handleLoot(info, part, world, b, inf);
+                                    handleLoot(info, part, provider.getWorld(), b, inf);
                                 } else if (inf.mobId() != null && !inf.mobId().isEmpty()) {
-                                    b = handleSpawner(info, part, oy, world, rx, rz, y, b, inf);
+                                    b = handleSpawner(info, part, oy, provider.getWorld(), rx, rz, y, b, inf);
                                 }
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
                                 BlockPos pos = driver.getCurrentCopy();
                                 updateNeeded(info, pos);
                             } else if (getStatesNeedingTodo().contains(b)) {
-                                b = handleTodo(info, oy, world, rx, rz, y, b);
+                                b = handleTodo(info, oy, provider.getWorld(), rx, rz, y, b);
                             }
                             driver.add(b);
                         } else {
@@ -2315,6 +2315,17 @@ public class LostCityTerrainFeature {
             }
         }
         return oy + part.getSliceCount();
+    }
+
+    private CompiledPalette computePalette(BuildingInfo info, IBuildingPart part) {
+        CompiledPalette compiledPalette = info.getCompiledPalette();
+        // Cache the combined palette?
+        Palette partPalette = part.getLocalPalette(provider.getWorld());
+        Palette buildingPalette = info.getBuilding().getLocalPalette(provider.getWorld());
+        if (partPalette != null || buildingPalette != null) {
+            compiledPalette = new CompiledPalette(compiledPalette, partPalette, buildingPalette);
+        }
+        return compiledPalette;
     }
 
     private BlockState handleSpawner(BuildingInfo info, IBuildingPart part, int oy, WorldGenLevel world, int rx, int rz, int y, BlockState b, Palette.Info inf) {

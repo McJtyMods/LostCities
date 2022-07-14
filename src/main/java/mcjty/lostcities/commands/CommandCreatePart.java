@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import mcjty.lostcities.editor.EditorInfo;
 import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.IDimensionInfo;
@@ -62,6 +63,8 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
             palette = new CompiledPalette(palette, partPalette, buildingPalette);
         }
 
+        EditorInfo editorInfo = EditorInfo.createEditorInfo(player.getUUID(), name, start);
+
         for (int y = 0 ; y < part.getSliceCount() ; y++) {
             for (int x = 0; x < part.getXSize(); x++) {
                 for (int z = 0; z < part.getZSize(); z++) {
@@ -70,6 +73,18 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
                     BlockState state = palette.get(character);
                     if (state != null) {
                         level.setBlock(pos, state, Block.UPDATE_ALL);
+                    }
+                }
+            }
+        }
+        for (int y = 0 ; y < part.getSliceCount() ; y++) {
+            for (int x = 0; x < part.getXSize(); x++) {
+                for (int z = 0; z < part.getZSize(); z++) {
+                    BlockPos pos = new BlockPos(info.chunkX*16+x, start.getY()+y, info.chunkZ*16+z);
+                    Character character = part.getC(x, y, z);
+                    if (palette.get(character) != null) {
+                        BlockState state = level.getBlockState(pos);
+                        editorInfo.addPaletteEntry(character, state);
                     }
                 }
             }

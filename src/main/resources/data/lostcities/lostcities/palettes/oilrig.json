@@ -51,6 +51,22 @@
     {
       "char": "w",
       "block": "minecraft:diorite_wall"
+    },
+    {
+      "char": "e",
+      "block": "minecraft:stone_stairs[facing=east,half=bottom,shape=straight]"
+    },
+    {
+      "char": "k",
+      "block": "minecraft:rail[shape=north_south]"
+    },
+    {
+      "char": "f",
+      "block": "minecraft:mossy_stone_brick_stairs[facing=east,half=bottom,shape=straight]"
+    },
+    {
+      "char": "r",
+      "block": "minecraft:lever[face=wall,facing=north,powered=false]"
     }
   ]
 }

@@ -30,7 +30,7 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     private char[][] vslices = null;
 
     private Palette localPalette = null;
-    String refPaletteName;
+    private String refPaletteName;
 
     private final Map<String, Object> metadata = new HashMap<>();
 
@@ -84,6 +84,10 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     @Override
     public String getMetaString(String key) {
         return (String) metadata.get(key);
+    }
+
+    public String getRefPaletteName() {
+        return refPaletteName;
     }
 
     @Override
