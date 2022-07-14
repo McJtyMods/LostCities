@@ -444,7 +444,7 @@ public class LostCityTerrainFeature {
         int ax = (chunkX + 2000000) / scatteredSettings.getAreasize();
         int az = (chunkZ + 2000000) / scatteredSettings.getAreasize();
 
-        QualityRandom scatteredRandom = new QualityRandom(provider.getSeed() + chunkZ * 5564338337L + chunkX * 25564337621L);
+        QualityRandom scatteredRandom = new QualityRandom(provider.getSeed() + ax * 5564338337L + az * 25564337621L);
         scatteredRandom.nextFloat();
         scatteredRandom.nextFloat();
 
