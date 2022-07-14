@@ -317,9 +317,9 @@ public class LostCityTerrainFeature {
         if (!MinecraftForge.EVENT_BUS.post(event)) {
             if (info.getDamageArea().hasExplosions()) {
                 breakBlocksForDamageNew(chunkX, chunkZ, info);
-                fixAfterExplosion(info, rand);
+                fixAfterExplosion(info);
             }
-            generateDebris(rand, info);
+            generateDebris(info);
         }
 
         driver.actuallyGenerate();
@@ -443,14 +443,18 @@ public class LostCityTerrainFeature {
         // First normalize the coordinates to scatter area sized coordinates. Add a large amount to make sure the coordinates are positive
         int ax = (chunkX + 2000000) / scatteredSettings.getAreasize();
         int az = (chunkZ + 2000000) / scatteredSettings.getAreasize();
-        Random rand = getScatteredRandom(ax, az, provider.getSeed());
-        if (rand.nextFloat() < scatteredSettings.getChance()) {
+
+        QualityRandom scatteredRandom = new QualityRandom(provider.getSeed() + chunkZ * 5564338337L + chunkX * 25564337621L);
+        scatteredRandom.nextFloat();
+        scatteredRandom.nextFloat();
+
+        if (scatteredRandom.nextFloat() < scatteredSettings.getChance()) {
             // No scattered structure in this area
             return;
         }
 
         // Find the right type of scattered asset for this area
-        ScatteredReference reference = selectRandomScattered(info, scatteredSettings, rand);
+        ScatteredReference reference = selectRandomScattered(info, scatteredSettings, scatteredRandom);
         if (reference == null) {
             // Nothing matches
             return;
@@ -471,8 +475,8 @@ public class LostCityTerrainFeature {
         }
 
         // Find the position of the building in the world
-        int tlChunkX = (ax * scatteredSettings.getAreasize() - 2000000) + rand.nextInt(scatteredSettings.getAreasize() - w + 1);
-        int tlChunkZ = (az * scatteredSettings.getAreasize() - 2000000) + rand.nextInt(scatteredSettings.getAreasize() - h + 1);
+        int tlChunkX = (ax * scatteredSettings.getAreasize() - 2000000) + scatteredRandom.nextInt(scatteredSettings.getAreasize() - w + 1);
+        int tlChunkZ = (az * scatteredSettings.getAreasize() - 2000000) + scatteredRandom.nextInt(scatteredSettings.getAreasize() - h + 1);
 
         if (chunkX < tlChunkX || chunkZ < tlChunkZ || chunkX >= (tlChunkX+w) || chunkZ >= (tlChunkZ+h)) {
             return;
@@ -519,18 +523,18 @@ public class LostCityTerrainFeature {
             if (buildings.size() == 1) {
                 buildingName = buildings.get(0);
             } else {
-                buildingName = buildings.get(rand.nextInt(buildings.size()));
+                buildingName = buildings.get(scatteredRandom.nextInt(buildings.size()));
             }
             Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
             int lowestLevel = handleScatteredTerrain(info, scattered);
-            generateScatteredBuilding(info, building, rand, lowestLevel);
+            generateScatteredBuilding(info, building, scatteredRandom, lowestLevel);
         } else {
             int lowestLevel = handleScatteredTerrainMulti(info, scattered, multiBuilding, minheight, maxheight, avgheight);
             int relx = chunkX - tlChunkX;
             int relz = chunkZ - tlChunkZ;
             String buildingName = multiBuilding.getBuilding(relx, relz);
             Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
-            generateScatteredBuilding(info, building, rand, lowestLevel);
+            generateScatteredBuilding(info, building, scatteredRandom, lowestLevel);
         }
     }
 
@@ -572,13 +576,6 @@ public class LostCityTerrainFeature {
             return reference.getBiomeMatcher().test(biome.getMainBiome());
         }
         return true;
-    }
-
-    private static Random getScatteredRandom(int chunkX, int chunkZ, long seed) {
-        Random rand = new QualityRandom(seed + chunkZ * 5564338337L + chunkX * 25564337621L);
-        rand.nextFloat();
-        rand.nextFloat();
-        return rand;
     }
 
     private void generateScatteredBuilding(BuildingInfo info, Building building, Random rand, int lowestLevel) {
@@ -965,22 +962,25 @@ public class LostCityTerrainFeature {
         }
     }
 
+    private static final Random RANDOMIZED_OFFSET = new Random();
     public static int getRandomizedOffset(int chunkX, int chunkZ, int min, int max) {
-        Random rand = new Random(chunkZ * 256203221L + chunkX * 899809363L);
-        rand.nextFloat();
-        return rand.nextInt(max - min + 1) + min;
+        RANDOMIZED_OFFSET.setSeed(chunkZ * 256203221L + chunkX * 899809363L);
+        RANDOMIZED_OFFSET.nextFloat();
+        return RANDOMIZED_OFFSET.nextInt(max - min + 1) + min;
     }
 
+    private static final Random RANDOMIZED_OFFSET_L1 = new Random();
     public static int getHeightOffsetL1(int chunkX, int chunkZ) {
-        Random rand = new Random(chunkZ * 341873128712L + chunkX * 132897987541L);
-        rand.nextFloat();
-        return rand.nextInt(5);
+        RANDOMIZED_OFFSET_L1.setSeed(chunkZ * 341873128712L + chunkX * 132897987541L);
+        RANDOMIZED_OFFSET_L1.nextFloat();
+        return RANDOMIZED_OFFSET_L1.nextInt(5);
     }
 
+    private static final Random RANDOMIZED_OFFSET_L2 = new Random();
     public static int getHeightOffsetL2(int chunkX, int chunkZ) {
-        Random rand = new Random(chunkX * 341873128712L + chunkZ * 132897987541L);
-        rand.nextFloat();
-        return rand.nextInt(5);
+        RANDOMIZED_OFFSET_L2.setSeed(chunkZ * 132897987541L + chunkX * 341873128712L);
+        RANDOMIZED_OFFSET_L2.nextFloat();
+        return RANDOMIZED_OFFSET_L2.nextInt(5);
     }
 
     /*
@@ -1252,10 +1252,6 @@ public class LostCityTerrainFeature {
 
         ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
 
-        Random rand = new Random(provider.getSeed() * 377 + chunkZ * 341873128712L + chunkX * 132897987541L);
-        rand.nextFloat();
-        rand.nextFloat();
-
         if (info.profile.isDefault()) {
             int minHeight = provider.getWorld().getMinBuildHeight();
             for (int x = 0; x < 16; ++x) {
@@ -1279,7 +1275,7 @@ public class LostCityTerrainFeature {
             if (building) {
                 generateBuilding(info, heightmap);
             } else {
-                generateStreet(info, heightmap, rand);
+                generateStreet(info, heightmap);
             }
         }
         LostCityEvent.PostGenCityChunkEvent postevent = new LostCityEvent.PostGenCityChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
@@ -1571,7 +1567,7 @@ public class LostCityTerrainFeature {
     }
 
     /// Fix floating blocks after an explosion
-    private void fixAfterExplosion(BuildingInfo info, Random rand) {
+    private void fixAfterExplosion(BuildingInfo info) {
         if (info.profile.isCavern() && !info.hasBuilding) {
             // In a cavern we only do this correction when there is a building
             return;
@@ -1757,7 +1753,7 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void generateStreet(BuildingInfo info, ChunkHeightmap heightmap, Random rand) {
+    private void generateStreet(BuildingInfo info, ChunkHeightmap heightmap) {
         boolean xRail = info.hasXCorridor();
         boolean zRail = info.hasZCorridor();
         if (xRail || zRail) {
@@ -1808,7 +1804,7 @@ public class LostCityTerrainFeature {
                 generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
             }
 
-            generateRandomVegetation(info, rand, height);
+            generateRandomVegetation(info, height);
 
             generateFrontPart(info, height, info.getXmin(), Transform.ROTATE_NONE);
             generateFrontPart(info, height, info.getZmin(), Transform.ROTATE_90);
@@ -2027,7 +2023,12 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void generateRandomVegetation(BuildingInfo info, Random rand, int height) {
+    private static final Random VEGETATION_RAND = new Random();
+    private void generateRandomVegetation(BuildingInfo info, int height) {
+        VEGETATION_RAND.setSeed(provider.getSeed() * 377 + info.chunkZ * 341873128712L + info.chunkX * 132897987541L);
+        VEGETATION_RAND.nextFloat();
+        VEGETATION_RAND.nextFloat();
+
         if (info.getXmin().hasBuilding) {
             for (int x = 0; x < info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -2039,7 +2040,7 @@ public class LostCityTerrainFeature {
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - x));
                     int cnt = 0;
-                    while (rand.nextFloat() < v && cnt < 30) {
+                    while (VEGETATION_RAND.nextFloat() < v && cnt < 30) {
                         driver.add(getRandomLeaf());
                         cnt++;
                     }
@@ -2057,7 +2058,7 @@ public class LostCityTerrainFeature {
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS));
                     int cnt = 0;
-                    while (rand.nextFloat() < v && cnt < 30) {
+                    while (VEGETATION_RAND.nextFloat() < v && cnt < 30) {
                         driver.add(getRandomLeaf());
                         cnt++;
                     }
@@ -2075,7 +2076,7 @@ public class LostCityTerrainFeature {
                     }
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - z));
                     int cnt = 0;
-                    while (rand.nextFloat() < v && cnt < 30) {
+                    while (VEGETATION_RAND.nextFloat() < v && cnt < 30) {
                         driver.add(getRandomLeaf());
                         cnt++;
                     }
@@ -2093,7 +2094,7 @@ public class LostCityTerrainFeature {
                     }
                     float v = info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS);
                     int cnt = 0;
-                    while (rand.nextFloat() < v && cnt < 30) {
+                    while (VEGETATION_RAND.nextFloat() < v && cnt < 30) {
                         driver.add(getRandomLeaf());
                         cnt++;
                     }
@@ -2469,18 +2470,18 @@ public class LostCityTerrainFeature {
     }
 
 
-    private void generateDebris(Random rand, BuildingInfo info) {
-        generateDebrisFromChunk(rand, info, info.getXmin(), (xx, zz) -> (15.0f - xx) / 16.0f);
-        generateDebrisFromChunk(rand, info, info.getXmax(), (xx, zz) -> xx / 16.0f);
-        generateDebrisFromChunk(rand, info, info.getZmin(), (xx, zz) -> (15.0f - zz) / 16.0f);
-        generateDebrisFromChunk(rand, info, info.getZmax(), (xx, zz) -> zz / 16.0f);
-        generateDebrisFromChunk(rand, info, info.getXmin().getZmin(), (xx, zz) -> ((15.0f - xx) * (15.0f - zz)) / 256.0f);
-        generateDebrisFromChunk(rand, info, info.getXmax().getZmax(), (xx, zz) -> (xx * zz) / 256.0f);
-        generateDebrisFromChunk(rand, info, info.getXmin().getZmax(), (xx, zz) -> ((15.0f - xx) * zz) / 256.0f);
-        generateDebrisFromChunk(rand, info, info.getXmax().getZmin(), (xx, zz) -> (xx * (15.0f - zz)) / 256.0f);
+    private void generateDebris(BuildingInfo info) {
+        generateDebrisFromChunk(info, info.getXmin(), (xx, zz) -> (15.0f - xx) / 16.0f);
+        generateDebrisFromChunk(info, info.getXmax(), (xx, zz) -> xx / 16.0f);
+        generateDebrisFromChunk(info, info.getZmin(), (xx, zz) -> (15.0f - zz) / 16.0f);
+        generateDebrisFromChunk(info, info.getZmax(), (xx, zz) -> zz / 16.0f);
+        generateDebrisFromChunk(info, info.getXmin().getZmin(), (xx, zz) -> ((15.0f - xx) * (15.0f - zz)) / 256.0f);
+        generateDebrisFromChunk(info, info.getXmax().getZmax(), (xx, zz) -> (xx * zz) / 256.0f);
+        generateDebrisFromChunk(info, info.getXmin().getZmax(), (xx, zz) -> ((15.0f - xx) * zz) / 256.0f);
+        generateDebrisFromChunk(info, info.getXmax().getZmin(), (xx, zz) -> (xx * (15.0f - zz)) / 256.0f);
     }
 
-    private void generateDebrisFromChunk(Random rand, BuildingInfo info, BuildingInfo adjacentInfo, BiFunction<Integer, Integer, Float> locationFactor) {
+    private void generateDebrisFromChunk(BuildingInfo info, BuildingInfo adjacentInfo, BiFunction<Integer, Integer, Float> locationFactor) {
         if (adjacentInfo.hasBuilding) {
             CompiledPalette adjacentPalette = adjacentInfo.getCompiledPalette();
             Character rubbleBlock = adjacentInfo.getBuilding().getRubbleBlock();

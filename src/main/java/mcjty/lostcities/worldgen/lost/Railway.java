@@ -8,7 +8,6 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import static mcjty.lostcities.api.RailChunkType.*;
 import static mcjty.lostcities.worldgen.lost.Railway.RailDirection.*;
@@ -96,14 +95,14 @@ public class Railway {
      * The station grid repeats every 9 chunks. There is never a station at every 18/18 multiple chunk
      */
     private static RailChunkInfo getRailChunkTypeInternal(int chunkX, int chunkZ, IDimensionInfo provider) {
-        Random rand = new QualityRandom(provider.getSeed() + chunkZ * 2600003897L + chunkX * 43600002517L);
-        rand.nextFloat();
-        rand.nextFloat();
+        QualityRandom randomRailChunkType = new QualityRandom(provider.getSeed() + chunkZ * 2600003897L + chunkX * 43600002517L);
+        randomRailChunkType.nextFloat();
+        randomRailChunkType.nextFloat();
 
         LostCityProfile profile = BuildingInfo.getProfile(chunkX, chunkZ, provider);
 
         // @todo make all settings based on rand below configurable
-        float r = rand.nextFloat();
+        float r = randomRailChunkType.nextFloat();
 
         int mx = Math.floorMod(chunkX + 1, 20);       // The +1 to avoid having them on highways
         int mz = Math.floorMod(chunkZ + 1, 20);
@@ -127,7 +126,7 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 3);
             }
-            return getStationType(chunkX, chunkZ, provider, profile, r, 3, rand.nextFloat() < .5f ? "station_open" : "station_openroof");
+            return getStationType(chunkX, chunkZ, provider, profile, r, 3, randomRailChunkType.nextFloat() < .5f ? "station_open" : "station_openroof");
         }
         if (mx == 10 && mz == 0) {
             if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider, profile)) {
@@ -149,7 +148,7 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 2);
             }
-            return getStationType(chunkX, chunkZ, provider, profile, r, 2, rand.nextFloat() < .5f ? "station_open" : "station_openroof");
+            return getStationType(chunkX, chunkZ, provider, profile, r, 2, randomRailChunkType.nextFloat() < .5f ? "station_open" : "station_openroof");
         }
         if (mx == 10 && mz == 10) {
             if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider, profile)) {
@@ -171,7 +170,7 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 1);
             }
-            return getStationType(chunkX, chunkZ, provider, profile, r, 1, rand.nextFloat() < .5f ? "station_open" : "station_openroof");
+            return getStationType(chunkX, chunkZ, provider, profile, r, 1, randomRailChunkType.nextFloat() < .5f ? "station_open" : "station_openroof");
         }
         if (mx == 0 && mz == 0) {
             return RailChunkInfo.NOTHING;

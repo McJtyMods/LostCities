@@ -1439,17 +1439,17 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static Random getBuildingRandom(int chunkX, int chunkZ, long seed) {
-        Random rand = new QualityRandom(seed + chunkZ * 341873128712L + chunkX * 132897987541L);
-        rand.nextFloat();
-        rand.nextFloat();
-        return rand;
+        QualityRandom random = new QualityRandom(seed + chunkZ * 341873128712L + chunkX * 132897987541L);
+        random.nextFloat();
+        random.nextFloat();
+        return random;
     }
 
     public static Random getMultiBuildingRandom(int chunkX, int chunkZ, long seed) {
-        Random rand = new QualityRandom(seed + chunkZ * 8987899751L + chunkX * 189878980451L);
-        rand.nextFloat();
-        rand.nextFloat();
-        return rand;
+        QualityRandom random = new QualityRandom(seed + chunkZ * 8987899751L + chunkX * 189878980451L);
+        random.nextFloat();
+        random.nextFloat();
+        return random;
     }
 
     // Convert a local building level to a global one (where cityLevel == 0)

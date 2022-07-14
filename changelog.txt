@@ -5,6 +5,7 @@ Upcoming:
 - Slightly optimized/cleaned up palette code and also fixed a bug where overriding palette entries would not get rid of the original palette data
 - Bugfixes on multibuilding scattered features
 - Worked on the oilrig
+- Small optimization avoid object creation for too many randoms
 
 1.18-5.3.2:
 - More diagnostics to check a problem with pregenerating chunks
