@@ -47,6 +47,10 @@ public class Config {
         dimensionProfileCache = null;
     }
 
+    public static void resetProfileCache() {
+        dimensionProfileCache = null;
+    }
+
     // @todo BAD
     public static void registerLostCityDimension(ResourceKey<Level> type, String profile) {
         String profileForDimension = getProfileForDimension(type);

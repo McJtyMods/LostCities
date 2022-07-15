@@ -8,6 +8,7 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.gui.elements.*;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.varia.ComponentFactory;
+import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.City;
 import mcjty.lostcities.worldgen.lost.Highway;
@@ -60,6 +61,10 @@ public class GuiLCConfig extends Screen {
 
     private static void selectProfile(String profileName, @Nullable LostCityProfile profile) {
         Config.profileFromClient = profileName;
+
+        LostCityFeature.globalDimensionInfoDirtyCounter++;
+        Config.resetProfileCache();
+
         if (profile != null) {
             ProfileSetup.standardProfiles.get("customized").copyFrom(profile);
             Config.jsonFromClient = profile.toJson(false).toString();
