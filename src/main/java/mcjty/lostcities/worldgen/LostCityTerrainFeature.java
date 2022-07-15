@@ -6,6 +6,7 @@ import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.editor.EditModeData;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -2251,6 +2252,9 @@ public class LostCityTerrainFeature {
     private int generatePart(BuildingInfo info, IBuildingPart part,
                              Transform transform,
                              int ox, int oy, int oz, boolean airWaterLevel) {
+        if (profile.EDITMODE) {
+            EditModeData.getData().addPartData(info.coord, oy, part.getName());
+        }
         CompiledPalette compiledPalette = computePalette(info, part);
 
         boolean nowater = part.getMetaBoolean(ILostCities.META_NOWATER);

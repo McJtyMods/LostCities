@@ -1,6 +1,30 @@
 {
   "palette": [
     {
+      "char": "M",
+      "block": "minecraft:diamond_block"
+    },
+    {
+      "char": "q",
+      "block": "minecraft:obsidian"
+    },
+    {
+      "char": "I",
+      "block": "minecraft:black_stained_glass"
+    },
+    {
+      "char": "0",
+      "block": "minecraft:polished_blackstone_bricks"
+    },
+    {
+      "char": "[",
+      "block": "minecraft:cracked_polished_blackstone_bricks"
+    },
+    {
+      "char": "J",
+      "block": "minecraft:sea_lantern"
+    },
+    {
       "char": "P",
       "block": "minecraft:spruce_pressure_plate[powered=false]"
     },

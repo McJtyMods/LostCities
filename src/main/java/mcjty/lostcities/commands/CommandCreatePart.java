@@ -6,25 +6,19 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import mcjty.lostcities.editor.EditorInfo;
+import mcjty.lostcities.editor.Editor;
 import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.IDimensionInfo;
-import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
-import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
-import mcjty.lostcities.worldgen.lost.cityassets.Palette;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class CommandCreatePart implements Command<CommandSourceStack> {
 
@@ -56,47 +50,9 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
             return 0;
         }
 
-        BuildingInfo info = BuildingInfo.getBuildingInfo(start.getX() >> 4, start.getZ() >> 4, dimInfo);
-        CompiledPalette palette = info.getCompiledPalette();
-        Palette partPalette = part.getLocalPalette(level);
-        Palette buildingPalette = info.getBuilding().getLocalPalette(level);
-        if (partPalette != null || buildingPalette != null) {
-            palette = new CompiledPalette(palette, partPalette, buildingPalette);
-        }
-
-        EditorInfo editorInfo = EditorInfo.createEditorInfo(player.getUUID(), name, start);
-
-        CompiledPalette finalPalette = palette;
-
-        player.level.getServer().doRunTask(new TickTask(3, () -> {
-            System.out.println("CommandCreatePart.run");
-
-            for (int y = 0; y < part.getSliceCount(); y++) {
-                for (int x = 0; x < part.getXSize(); x++) {
-                    for (int z = 0; z < part.getZSize(); z++) {
-                        BlockPos pos = new BlockPos(info.chunkX * 16 + x, start.getY() + y, info.chunkZ * 16 + z);
-                        Character character = part.getC(x, y, z);
-                        BlockState state = finalPalette.get(character);
-                        if (state != null) {
-                            level.setBlock(pos, state, Block.UPDATE_ALL);
-                        }
-                    }
-                }
-            }
-            for (int y = 0; y < part.getSliceCount(); y++) {
-                for (int x = 0; x < part.getXSize(); x++) {
-                    for (int z = 0; z < part.getZSize(); z++) {
-                        BlockPos pos = new BlockPos(info.chunkX * 16 + x, start.getY() + y, info.chunkZ * 16 + z);
-                        Character character = part.getC(x, y, z);
-                        if (finalPalette.get(character) != null) {
-                            BlockState state = level.getBlockState(pos);
-                            editorInfo.addPaletteEntry(character, state);
-                        }
-                    }
-                }
-            }
-        }));
+        Editor.startEditing( part, player, start, level, dimInfo);
 
         return 0;
     }
+
 }

@@ -5,6 +5,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import mcjty.lostcities.LostCities;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.server.commands.ResetChunksCommand;
 
 public class ModCommands {
 
@@ -16,10 +17,12 @@ public class ModCommands {
                         .then(CommandMap.register(dispatcher))
                         .then(CommandSaveProfile.register(dispatcher))
                         .then(CommandCreatePart.register(dispatcher))
+                        .then(CommandEditPart.register(dispatcher))
                         .then(CommandExportPart.register(dispatcher))
         );
 
         dispatcher.register(Commands.literal("lost").redirect(commands));
+        ResetChunksCommand.register(dispatcher);
     }
 
 }

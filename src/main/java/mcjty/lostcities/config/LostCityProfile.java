@@ -69,6 +69,8 @@ public class LostCityProfile implements ILostCityProfile {
 
     public boolean EXPLOSIONS_IN_CITIES_ONLY = true;
 
+    public boolean EDITMODE = false;
+
     public boolean GENERATE_NETHER = false;
     public boolean GENERATE_SPAWNERS = true;
     public boolean GENERATE_LOOT = true;
@@ -367,6 +369,9 @@ public class LostCityProfile implements ILostCityProfile {
 
         BEDROCK_LAYER = cfg.getInt("bedrockLayer", LostCityProfile.CATEGORY_LOSTCITY, BEDROCK_LAYER, 0, 10,
                 "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");
+
+        EDITMODE = cfg.getBoolean("editMode", LostCityProfile.CATEGORY_LOSTCITY, EDITMODE,
+                "If true then this world is in edit mode");
 
         GENERATE_NETHER = cfg.getBoolean("generateNether", LostCityProfile.CATEGORY_LOSTCITY, GENERATE_NETHER,
                 "If true then generate a cavern type world in the Nether");

@@ -157,7 +157,8 @@ public class GuiLCConfig extends Screen {
         addFloat(left, "lostcity.vineChance").label("Vines:"); nl();
         addFloat(left, "lostcity.randomLeafBlockChance").label("Leafs:"); nl();
         nl();
-        addBool(left, "lostcity.generateNether").label("Nether:");
+        addBool(left, "lostcity.generateNether").label("Nether:"); nl();
+        addBool(left, "lostcity.editMode").label("Edit mode:");
     }
 
     private void initDamage(int left) {
