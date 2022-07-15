@@ -557,7 +557,7 @@ public class LostCityTerrainFeature {
             return null;
         }
 
-        int rndweight = rand.nextInt(totalweight);
+        int rndweight = rand.nextInt(totalweight + scatteredSettings.getWeightnone());
         ScatteredReference reference = null;
         for (ScatteredReference scatteredReference : filteredList) {
             int weight = scatteredReference.getWeight();

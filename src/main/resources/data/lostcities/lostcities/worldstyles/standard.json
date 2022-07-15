@@ -3,10 +3,11 @@
   "scattered": {
     "areasize": 8,
     "chance": 0.1,
+    "weightnone": 20,
     "list": [
       {
         "name": "radiotower",
-        "weight": 10,
+        "weight": 15,
         "maxheightdiff": 3,
         "biomes": {
           "excluding": [
@@ -18,7 +19,7 @@
       },
       {
         "name": "oilrig",
-        "weight": 30,
+        "weight": 1,
         "maxheightdiff": 100,
         "biomes": {
           "if_any": [

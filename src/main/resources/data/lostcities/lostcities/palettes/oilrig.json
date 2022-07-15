@@ -1,6 +1,58 @@
 {
   "palette": [
     {
+      "char": "P",
+      "block": "minecraft:spruce_pressure_plate[powered=false]"
+    },
+    {
+      "char": "E",
+      "block": "minecraft:oak_fence[east=false,north=true,south=true,west=true]"
+    },
+    {
+      "char": "2",
+      "block": "minecraft:smooth_stone"
+    },
+    {
+      "char": "s",
+      "block": "minecraft:barrel[facing=east,open=false]"
+    },
+    {
+      "char": "N",
+      "block": "minecraft:barrel[facing=west,open=false]"
+    },
+    {
+      "char": "U",
+      "block": "minecraft:barrel[facing=south,open=false]"
+    },
+    {
+      "char": "&",
+      "block": "minecraft:red_concrete"
+    },
+    {
+      "char": "m",
+      "block": "minecraft:stone_pressure_plate[powered=false]"
+    },
+    {
+      "char": "V",
+      "block": "minecraft:iron_trapdoor[facing=east,half=bottom,open=false,powered=false]"
+    },
+    {
+      "char": "^",
+      "block": "minecraft:smooth_stone_slab[type=top,waterlogged=false]"
+    },
+    {
+      "char": "j",
+      "block": "minecraft:ladder[facing=east]"
+    },
+    {
+      "char": "O",
+      "block": "minecraft:iron_door[facing=south,half=upper,hinge=left,open=false,powered=false]"
+    },
+    {
+      "char": "n",
+      "block": "minecraft:iron_door[facing=south,half=lower,hinge=left,open=false,powered=false]"
+    },
+    {
       "char": "_",
       "block": "minecraft:iron_door[facing=north,half=lower,hinge=right]"
     },
@@ -47,6 +99,14 @@
     {
       "char": "p",
       "block": "minecraft:polished_diorite_stairs[facing=west,half=bottom,shape=straight]"
+    },
+    {
+      "char": "3",
+      "block": "minecraft:yellow_concrete"
+    },
+    {
+      "char": "|",
+      "block": "minecraft:redstone_wall_torch[facing=east,lit=true]"
     },
     {
       "char": "w",

@@ -20,6 +20,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
@@ -65,30 +66,36 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
 
         EditorInfo editorInfo = EditorInfo.createEditorInfo(player.getUUID(), name, start);
 
-        for (int y = 0 ; y < part.getSliceCount() ; y++) {
-            for (int x = 0; x < part.getXSize(); x++) {
-                for (int z = 0; z < part.getZSize(); z++) {
-                    BlockPos pos = new BlockPos(info.chunkX*16+x, start.getY()+y, info.chunkZ*16+z);
-                    Character character = part.getC(x, y, z);
-                    BlockState state = palette.get(character);
-                    if (state != null) {
-                        level.setBlock(pos, state, Block.UPDATE_ALL);
+        CompiledPalette finalPalette = palette;
+
+        player.level.getServer().doRunTask(new TickTask(3, () -> {
+            System.out.println("CommandCreatePart.run");
+
+            for (int y = 0; y < part.getSliceCount(); y++) {
+                for (int x = 0; x < part.getXSize(); x++) {
+                    for (int z = 0; z < part.getZSize(); z++) {
+                        BlockPos pos = new BlockPos(info.chunkX * 16 + x, start.getY() + y, info.chunkZ * 16 + z);
+                        Character character = part.getC(x, y, z);
+                        BlockState state = finalPalette.get(character);
+                        if (state != null) {
+                            level.setBlock(pos, state, Block.UPDATE_ALL);
+                        }
                     }
                 }
             }
-        }
-        for (int y = 0 ; y < part.getSliceCount() ; y++) {
-            for (int x = 0; x < part.getXSize(); x++) {
-                for (int z = 0; z < part.getZSize(); z++) {
-                    BlockPos pos = new BlockPos(info.chunkX*16+x, start.getY()+y, info.chunkZ*16+z);
-                    Character character = part.getC(x, y, z);
-                    if (palette.get(character) != null) {
-                        BlockState state = level.getBlockState(pos);
-                        editorInfo.addPaletteEntry(character, state);
+            for (int y = 0; y < part.getSliceCount(); y++) {
+                for (int x = 0; x < part.getXSize(); x++) {
+                    for (int z = 0; z < part.getZSize(); z++) {
+                        BlockPos pos = new BlockPos(info.chunkX * 16 + x, start.getY() + y, info.chunkZ * 16 + z);
+                        Character character = part.getC(x, y, z);
+                        if (finalPalette.get(character) != null) {
+                            BlockState state = level.getBlockState(pos);
+                            editorInfo.addPaletteEntry(character, state);
+                        }
                     }
                 }
             }
-        }
+        }));
 
         return 0;
     }
