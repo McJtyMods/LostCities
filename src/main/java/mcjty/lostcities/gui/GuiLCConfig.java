@@ -471,6 +471,8 @@ public class GuiLCConfig extends Screen {
         }
 
         Minecraft.getInstance().setScreen(parent);
+        LostCityFeature.globalDimensionInfoDirtyCounter++;
+        Config.resetProfileCache();
     }
 
     @Override
