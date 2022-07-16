@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.3.3:
 - Multibuildings can now be any size with a maximum of 3x3. So 1x2, 2x3, 2x2, ...
 - New type of 'scattered' buildings. These are 1x1 or multi buildings that will generate randomly outside cities
 - Cleaned up the palettes and got rid of all legacy names and blockstates using metadata. These are no longer supported. Use the <modid>:<blockid>[<properties>...] format instead
