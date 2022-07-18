@@ -1,3 +1,8 @@
+Upcoming:
+- 'exportpart' now expects a filename where it will export the part and optional palette
+- New 'listparts' to list all parts in the current chunk. Only works in edit mode
+- New 'locatepart' to find a named part
+
 1.18-5.3.4:
 - It's now possible to toggle between different worldstyles in the Lost Cities world creation screen
 

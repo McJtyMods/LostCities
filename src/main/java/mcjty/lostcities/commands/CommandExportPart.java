@@ -1,10 +1,9 @@
 package mcjty.lostcities.commands;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
+import com.google.gson.*;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -32,6 +31,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class CommandExportPart implements Command<CommandSourceStack> {
@@ -40,12 +42,14 @@ public class CommandExportPart implements Command<CommandSourceStack> {
 
     public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         return Commands.literal("exportpart")
-                .requires(cs -> cs.hasPermission(1)).executes(CMD);
+                .requires(cs -> cs.hasPermission(1))
+                .then(Commands.argument("name", StringArgumentType.word()).executes(CMD));
     }
 
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        String name = context.getArgument("name", String.class);
         ServerPlayer player = context.getSource().getPlayerOrException();
         EditorInfo editorInfo = EditorInfo.getEditorInfo(player.getUUID());
         if (editorInfo == null) {
@@ -107,9 +111,9 @@ public class CommandExportPart implements Command<CommandSourceStack> {
         }
 
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        JsonObject root = new JsonObject();
 
         if (!unknowns.isEmpty()) {
-            System.out.println("#######################################################################################");
             List<PaletteEntry> entries = new ArrayList<>();
             for (Map.Entry<BlockState, Character> entry : unknowns.entrySet()) {
                 entries.add(new PaletteEntry(Character.toString(entry.getValue()), Optional.of(Tools.stateToString(entry.getKey())),
@@ -117,16 +121,29 @@ public class CommandExportPart implements Command<CommandSourceStack> {
             }
             PaletteRE paletteRE = new PaletteRE(entries);
             DataResult<JsonElement> result = PaletteRE.CODEC.encodeStart(JsonOps.INSTANCE, paletteRE);
-            String json = gson.toJson(result.result().get());
-            System.out.println(json);
+            root.add("__comment__", new JsonPrimitive("'missingpalette' represents all blockstates that it couldn't find in the palette. These have to be put in a palette. " +
+                    "'exportedpart' is the actual exported part"));
+            root.add("missingpalette", result.result().get());
+        } else {
+            root.add("__comment__", new JsonPrimitive("'exportedpart' is the actual exported part"));
         }
 
-        System.out.println("#######################################################################################");
         BuildingPartRE buildingPartRE = new BuildingPartRE(part.getXSize(), part.getZSize(), slices,
                 Optional.ofNullable(part.getRefPaletteName()), Optional.empty(), Optional.empty());
         DataResult<JsonElement> result = BuildingPartRE.CODEC.encodeStart(JsonOps.INSTANCE, buildingPartRE);
-        String json = gson.toJson(result.result().get());
-        System.out.println(json);
+        root.add("exportedpart", result.result().get());
+
+        String json = gson.toJson(root);
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(name));
+            writer.write(json);
+            writer.close();
+            context.getSource().sendSuccess(ComponentFactory.literal("Exported part to '" + name + "'!"), false);
+        } catch (IOException e) {
+            context.getSource().sendFailure(new TextComponent("Error writing file '" + name + "'!").withStyle(ChatFormatting.RED));
+        }
+
         return 0;
     }
 }
