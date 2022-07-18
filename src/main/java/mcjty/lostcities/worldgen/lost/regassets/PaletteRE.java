@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lostcities.worldgen.lost.regassets.data.PaletteEntry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.List;
 /**
  * A palette of materials as used by building parts
  */
-public class PaletteRE implements IForgeRegistryEntry<PaletteRE> {
+public class PaletteRE {
 
     public static final Codec<PaletteRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -31,20 +30,13 @@ public class PaletteRE implements IForgeRegistryEntry<PaletteRE> {
         return paletteEntries;
     }
 
-    @Override
     public PaletteRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;
     }
 
     @Nullable
-    @Override
     public ResourceLocation getRegistryName() {
         return name;
-    }
-
-    @Override
-    public Class<PaletteRE> getRegistryType() {
-        return PaletteRE.class;
     }
 }

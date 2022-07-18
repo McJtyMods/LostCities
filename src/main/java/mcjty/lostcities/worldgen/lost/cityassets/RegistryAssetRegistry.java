@@ -7,14 +7,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.CommonLevelAccessor;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public class RegistryAssetRegistry<T extends ILostCityAsset, R extends IForgeRegistryEntry<R>> implements ILostCityAssetRegistry<T>  {
+public class RegistryAssetRegistry<T extends ILostCityAsset, R> implements ILostCityAssetRegistry<T>  {
 
     private final Map<ResourceLocation, T> assets = new HashMap<>();
     private final ResourceKey<Registry<R>> registryKey;
@@ -40,11 +39,11 @@ public class RegistryAssetRegistry<T extends ILostCityAsset, R extends IForgeReg
     @Nonnull
     public T getOrThrow(CommonLevelAccessor level, String name) {
         if (name == null) {
-            throw new RuntimeException("Invalid name given to " + registryKey.getRegistryName() + " getOrThrow!");
+            throw new RuntimeException("Invalid name given to " + registryKey.registry() + " getOrThrow!");
         }
         T result = get(level, DataTools.fromName(name));
         if (result == null) {
-            throw new RuntimeException("Can't find '" + name + "' in " + registryKey.getRegistryName() + "!");
+            throw new RuntimeException("Can't find '" + name + "' in " + registryKey.registry() + "!");
         }
         return result;
     }
@@ -58,7 +57,7 @@ public class RegistryAssetRegistry<T extends ILostCityAsset, R extends IForgeReg
         if (t == null) {
             Registry<R> registry = level.registryAccess().registryOrThrow(registryKey);
             R value = registry.get(ResourceKey.create(registryKey, name));
-            value.setRegistryName(name);
+//            value.setRegistryName(name);  // @todo 1.19
             t = assetConstructor.apply(value);
             assets.put(name, t);
         }

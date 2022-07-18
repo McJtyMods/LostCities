@@ -4,12 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class CityStyleRE implements IForgeRegistryEntry<CityStyleRE> {
+public class CityStyleRE {
 
     public static final Codec<CityStyleRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -111,20 +110,13 @@ public class CityStyleRE implements IForgeRegistryEntry<CityStyleRE> {
         return Optional.ofNullable(selectors);
     }
 
-    @Override
     public CityStyleRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;
     }
 
     @Nullable
-    @Override
     public ResourceLocation getRegistryName() {
         return name;
-    }
-
-    @Override
-    public Class<CityStyleRE> getRegistryType() {
-        return CityStyleRE.class;
     }
 }

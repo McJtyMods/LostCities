@@ -4,12 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lostcities.worldgen.lost.regassets.data.ConditionPart;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ConditionRE implements IForgeRegistryEntry<ConditionRE> {
+public class ConditionRE {
 
     public static final Codec<ConditionRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -27,21 +26,13 @@ public class ConditionRE implements IForgeRegistryEntry<ConditionRE> {
         return values;
     }
 
-    @Override
     public ConditionRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;
     }
 
     @Nullable
-    @Override
     public ResourceLocation getRegistryName() {
         return name;
     }
-
-    @Override
-    public Class<ConditionRE> getRegistryType() {
-        return ConditionRE.class;
-    }
-
 }

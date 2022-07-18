@@ -14,6 +14,7 @@ import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
@@ -709,7 +710,9 @@ public class BuildingInfo implements ILostChunkInfo {
 
                 @Override
                 public ResourceLocation getBiome() {
-                    return provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value().getRegistryName();
+                    Biome biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value();
+                    return provider.getWorld().registryAccess().registry(Registry.BIOME_REGISTRY).orElseThrow().getKey(biome);
+//                    return ForgeRegistries.BIOMESxxxx.getKey(biome);
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
@@ -872,7 +875,9 @@ public class BuildingInfo implements ILostChunkInfo {
 
                 @Override
                 public ResourceLocation getBiome() {
-                    return provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value().getRegistryName();
+                    Biome biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value();
+                    return provider.getWorld().registryAccess().registry(Registry.BIOME_REGISTRY).orElseThrow().getKey(biome);
+//                    return ForgeRegistries.BIOMES.biome.getRegistryName();
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);

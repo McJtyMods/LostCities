@@ -16,9 +16,11 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+
+import java.awt.*;
 
 public class CommandCreatePart implements Command<CommandSourceStack> {
 
@@ -36,7 +38,7 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
         String name = context.getArgument("name", String.class);
         BuildingPart part = AssetRegistries.PARTS.get(context.getSource().getLevel(), name);
         if (part == null) {
-            context.getSource().sendFailure(new TextComponent("Error finding part '" + name + "'!").withStyle(ChatFormatting.RED));
+            context.getSource().sendFailure(Component.literal("Error finding part '" + name + "'!").withStyle(ChatFormatting.RED));
             return 0;
         }
 

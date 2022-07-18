@@ -4,13 +4,12 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lostcities.worldgen.lost.regassets.data.PartRef;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
-public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
+public class BuildingRE {
 
     public static final Codec<BuildingRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -60,21 +59,14 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
         this.parts2 = partRefs2.orElse(null);
     }
 
-    @Override
     public BuildingRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;
     }
 
     @Nullable
-    @Override
     public ResourceLocation getRegistryName() {
         return name;
-    }
-
-    @Override
-    public Class<BuildingRE> getRegistryType() {
-        return BuildingRE.class;
     }
 
     public int getMinFloors() {

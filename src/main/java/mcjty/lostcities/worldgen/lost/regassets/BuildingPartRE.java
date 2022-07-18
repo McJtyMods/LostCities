@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lostcities.worldgen.lost.regassets.data.PartMeta;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import java.util.Optional;
 /**
  * A structure part
  */
-public class BuildingPartRE implements IForgeRegistryEntry<BuildingPartRE> {
+public class BuildingPartRE {
 
     public static final Codec<BuildingPartRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -62,7 +61,7 @@ public class BuildingPartRE implements IForgeRegistryEntry<BuildingPartRE> {
         List<List<String>> result = new ArrayList<>();
         for (String slice : slices) {
             List<String> s = new ArrayList<>();
-            for (int z = 0 ; z < zSize ; z++) {
+            for (int z = 0; z < zSize; z++) {
                 String sub = slice.substring(z * xSize, z * xSize + xSize);
                 s.add(sub);
             }
@@ -95,20 +94,13 @@ public class BuildingPartRE implements IForgeRegistryEntry<BuildingPartRE> {
         return refPaletteName;
     }
 
-    @Override
     public BuildingPartRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;
     }
 
     @Nullable
-    @Override
     public ResourceLocation getRegistryName() {
         return name;
-    }
-
-    @Override
-    public Class<BuildingPartRE> getRegistryType() {
-        return BuildingPartRE.class;
     }
 }

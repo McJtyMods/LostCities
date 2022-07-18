@@ -2,19 +2,17 @@ package mcjty.lostcities.worldgen.lost.regassets;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import mcjty.lostcities.worldgen.lost.cityassets.Scattered;
 import mcjty.lostcities.worldgen.lost.regassets.data.CityBiomeMultiplier;
 import mcjty.lostcities.worldgen.lost.regassets.data.CityStyleSelector;
 import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredReference;
 import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredSettings;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
-public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
+public class WorldStyleRE {
 
     public static final Codec<WorldStyleRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -64,21 +62,13 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
         return scatteredReferences;
     }
 
-    @Override
     public WorldStyleRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;
     }
 
     @Nullable
-    @Override
     public ResourceLocation getRegistryName() {
         return name;
     }
-
-    @Override
-    public Class<WorldStyleRE> getRegistryType() {
-        return WorldStyleRE.class;
-    }
-
 }

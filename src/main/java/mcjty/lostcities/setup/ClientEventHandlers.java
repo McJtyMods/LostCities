@@ -48,7 +48,7 @@ public class ClientEventHandlers {
     private Button lostCitiesButton = null;
 
     @SubscribeEvent
-    public void onGuiDraw(ScreenEvent.DrawScreenEvent event) {
+    public void onGuiDraw(ScreenEvent.Render event) {
         if (event.getScreen() instanceof CreateWorldScreen screen && lostCitiesButton != null) {
             lostCitiesButton.visible = screen.worldGenSettingsVisible;
             if (lostCitiesButton.visible) {
@@ -59,7 +59,7 @@ public class ClientEventHandlers {
     }
 
     @SubscribeEvent
-    public void onGuiPost(ScreenEvent.InitScreenEvent.Post event) {
+    public void onGuiPost(ScreenEvent.Init.Post event) {
         if (event.getScreen() instanceof CreateWorldScreen screen) {
             lostCitiesButton = new Button(screen.width - 100, 10, 70, 20, ComponentFactory.literal("Cities"), p_onPress_1_ -> {
 //                WorldType worldType = WorldType.WORLD_TYPES[screen.selectedIndex];

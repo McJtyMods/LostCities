@@ -1,13 +1,14 @@
 package mcjty.lostcities.varia;
 
+import net.minecraft.util.RandomSource;
+
 import java.util.Arrays;
-import java.util.Random;
 
 public class NoiseGeneratorPerlin {
     private final NoiseGeneratorSimplex[] noiseLevels;
     private final int levels;
 
-    public NoiseGeneratorPerlin(Random seed, int levelsIn) {
+    public NoiseGeneratorPerlin(RandomSource seed, int levelsIn) {
         this.levels = levelsIn;
         this.noiseLevels = new NoiseGeneratorSimplex[levelsIn];
 

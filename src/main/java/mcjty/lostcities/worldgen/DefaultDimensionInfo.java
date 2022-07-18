@@ -9,16 +9,17 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkSource;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 public class DefaultDimensionInfo implements IDimensionInfo {
 
@@ -74,7 +75,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     }
 
     @Override
-    public Random getRandom() {
+    public RandomSource getRandom() {
         return world.getRandom();
     }
 
@@ -103,7 +104,8 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         if (chunkProvider instanceof ServerChunkCache) {
             ChunkGenerator generator = ((ServerChunkCache) chunkProvider).getGenerator();
             BiomeSource biomeProvider = generator.getBiomeSource();
-            return biomeProvider.getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2, generator.climateSampler());
+            Climate.Sampler sampler = ((ServerChunkCache) chunkProvider).randomState().sampler();
+            return biomeProvider.getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2, sampler);
         }
         return biomeRegistry.getHolderOrThrow(Biomes.PLAINS);
     }

@@ -5,6 +5,7 @@ import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -27,7 +28,7 @@ public interface IDimensionInfo {
 
     WorldStyle getWorldStyle();
 
-    Random getRandom();
+    RandomSource getRandom();
 
     LostCityTerrainFeature getFeature();
 

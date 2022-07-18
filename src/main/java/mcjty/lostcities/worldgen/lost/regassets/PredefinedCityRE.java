@@ -5,14 +5,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class PredefinedCityRE implements IForgeRegistryEntry<PredefinedCityRE> {
+public class PredefinedCityRE {
 
     public static final Codec<PredefinedCityRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -78,20 +76,13 @@ public class PredefinedCityRE implements IForgeRegistryEntry<PredefinedCityRE> {
         return predefinedStreets;
     }
 
-    @Override
     public PredefinedCityRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;
     }
 
     @Nullable
-    @Override
     public ResourceLocation getRegistryName() {
         return name;
-    }
-
-    @Override
-    public Class<PredefinedCityRE> getRegistryType() {
-        return PredefinedCityRE.class;
     }
 }

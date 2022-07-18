@@ -20,11 +20,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.StructureTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -42,8 +45,8 @@ import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
@@ -93,11 +96,11 @@ public class LostCityTerrainFeature {
 
     private final IDimensionInfo provider;
     private final LostCityProfile profile;
-    private final Random rand;
+    private final RandomSource rand;
 
     private final Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
 
-    public LostCityTerrainFeature(IDimensionInfo provider, LostCityProfile profile, Random rand) {
+    public LostCityTerrainFeature(IDimensionInfo provider, LostCityProfile profile, RandomSource rand) {
         this.provider = provider;
         this.profile = profile;
         this.rand = rand;
@@ -270,14 +273,21 @@ public class LostCityTerrainFeature {
 
         // Check if there is no village here
         ChunkAccess ch = region.getChunk(chunkX, chunkZ);
-        if (ch.hasAnyStructureReferences()) {
-            Map<ConfiguredStructureFeature<?, ?>, LongSet> references = ch.getAllReferences();
+        if (doCity && ch.hasAnyStructureReferences()) {
+            var references = ch.getAllReferences();
 //            BuiltinRegistries.CONFIGURED_FEATURE.get(StructureFeature.VILLAGE)
             // @todo we can do this more optimally if we first find all configured structures for village
-            for (Map.Entry<ConfiguredStructureFeature<?, ?>, LongSet> entry : references.entrySet()) {
-                if (entry.getKey().feature == StructureFeature.VILLAGE && !entry.getValue().isEmpty()) {
-                    doCity = false;
-                    break;
+            for (Map.Entry<Structure, LongSet> entry : references.entrySet()) {
+                if (!entry.getValue().isEmpty()) {
+                    Structure structure = entry.getKey();
+                    Optional<ResourceKey<Structure>> key = provider.getWorld().registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY).getResourceKey(structure);
+                    doCity = key.map(k -> {
+                        Holder<Structure> holder = provider.getWorld().registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY).getHolderOrThrow(k);
+                        return !holder.is(StructureTags.VILLAGE);
+                    }).orElse(true);
+                    if (!doCity) {
+                        break;
+                    }
                 }
             }
         }
@@ -613,7 +623,8 @@ public class LostCityTerrainFeature {
 
                 @Override
                 public ResourceLocation getBiome() {
-                    return provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value().getRegistryName();
+                    Biome biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value();
+                    return provider.getWorld().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
@@ -1235,10 +1246,11 @@ public class LostCityTerrainFeature {
         ChunkGenerator generator = chunkProvider.getGenerator();
         int cx = chunkX << 4;
         int cz = chunkZ << 4;
-        int height00 = generator.getBaseHeight(cx + 3, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region);
-        int height10 = generator.getBaseHeight(cx + 12, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region);
-        int height01 = generator.getBaseHeight(cx + 3, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region);
-        int height11 = generator.getBaseHeight(cx + 12, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region);
+        RandomState randomState = chunkProvider.randomState();
+        int height00 = generator.getBaseHeight(cx + 3, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
+        int height10 = generator.getBaseHeight(cx + 12, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
+        int height01 = generator.getBaseHeight(cx + 3, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
+        int height11 = generator.getBaseHeight(cx + 12, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 int y;
@@ -2403,7 +2415,7 @@ public class LostCityTerrainFeature {
         BlockEntity tileentity = world.getBlockEntity(pos);
         if (tileentity instanceof SpawnerBlockEntity spawner) {
             BaseSpawner logic = spawner.getSpawner();
-            logic.setEntityId(ForgeRegistries.ENTITIES.getValue(randomEntity));
+            logic.setEntityId(ForgeRegistries.ENTITY_TYPES.getValue(randomEntity));
             spawner.setChanged();
             if (Config.DEBUG) {
                 ModSetup.getLogger().debug("generateLootSpawners: mob=" + randomEntity.toString() + " pos=" + pos);
@@ -2415,7 +2427,7 @@ public class LostCityTerrainFeature {
         }
     }
 
-    public static ResourceLocation getRandomSpawnerMob(Level world, Random random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
+    public static ResourceLocation getRandomSpawnerMob(Level world, RandomSource random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
         String condition = todo.getCondition();
         Condition cnd = AssetRegistries.CONDITIONS.getOrThrow(world, condition);
         int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / FLOORHEIGHT;
@@ -2429,7 +2441,8 @@ public class LostCityTerrainFeature {
 
             @Override
             public ResourceLocation getBiome() {
-                return world.getBiome(pos).value().getRegistryName();
+                Biome biome = world.getBiome(pos).value();
+                return world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
             }
         };
         String randomValue = cnd.getRandomValue(random, conditionContext);
@@ -2451,7 +2464,7 @@ public class LostCityTerrainFeature {
         }
     }
 
-    public static void createLoot(BuildingInfo info, Random random, LevelAccessor world, BlockPos pos, BuildingInfo.ConditionTodo todo, IDimensionInfo diminfo) {
+    public static void createLoot(BuildingInfo info, RandomSource random, LevelAccessor world, BlockPos pos, BuildingInfo.ConditionTodo todo, IDimensionInfo diminfo) {
         if (random.nextFloat() < diminfo.getProfile().CHEST_WITHOUT_LOOT_CHANCE) {
             return;
         }

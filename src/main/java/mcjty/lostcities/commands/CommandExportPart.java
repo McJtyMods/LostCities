@@ -26,7 +26,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.state.BlockState;
@@ -53,13 +53,13 @@ public class CommandExportPart implements Command<CommandSourceStack> {
         ServerPlayer player = context.getSource().getPlayerOrException();
         EditorInfo editorInfo = EditorInfo.getEditorInfo(player.getUUID());
         if (editorInfo == null) {
-            context.getSource().sendFailure(new TextComponent("You are not editing anything!").withStyle(ChatFormatting.RED));
+            context.getSource().sendFailure(Component.literal("You are not editing anything!").withStyle(ChatFormatting.RED));
             return 0;
         }
 
         BuildingPart part = AssetRegistries.PARTS.get(context.getSource().getLevel(), editorInfo.getPartName());
         if (part == null) {
-            context.getSource().sendFailure(new TextComponent("Error finding part '" + editorInfo.getPartName() + "'!").withStyle(ChatFormatting.RED));
+            context.getSource().sendFailure(Component.literal("Error finding part '" + editorInfo.getPartName() + "'!").withStyle(ChatFormatting.RED));
             return 0;
         }
 
@@ -141,7 +141,7 @@ public class CommandExportPart implements Command<CommandSourceStack> {
             writer.close();
             context.getSource().sendSuccess(ComponentFactory.literal("Exported part to '" + name + "'!"), false);
         } catch (IOException e) {
-            context.getSource().sendFailure(new TextComponent("Error writing file '" + name + "'!").withStyle(ChatFormatting.RED));
+            context.getSource().sendFailure(Component.literal("Error writing file '" + name + "'!").withStyle(ChatFormatting.RED));
         }
 
         return 0;
