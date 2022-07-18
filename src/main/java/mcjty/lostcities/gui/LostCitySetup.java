@@ -1,11 +1,21 @@
 package mcjty.lostcities.gui;
 
-import mcjty.lostcities.config.ProfileSetup;
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.ProfileSetup;
+import mcjty.lostcities.varia.Tools;
+import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.resources.CloseableResourceManager;
+import net.minecraft.server.packs.resources.MultiPackResourceManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class LostCitySetup {
 
@@ -50,6 +60,10 @@ public class LostCitySetup {
         return profile == null ? "Disabled" : profile;
     }
 
+    public String getWorldStyleLabel() {
+        return get().isEmpty() ? "n.a." : get().get().getWorldStyle();
+    }
+
     public void setProfile(String profile) {
         this.profile = profile;
         refreshPreview.run();
@@ -92,6 +106,43 @@ public class LostCitySetup {
 //
 //        }
 //    }
+
+
+    private static String worldStyleToName(ResourceLocation rl) {
+        String path = rl.getPath();
+        int idx = path.lastIndexOf('/');
+        if (idx != -1) {
+            path = path.substring(idx+1);
+        }
+        idx = path.lastIndexOf('.');
+        if (idx != -1) {
+            path = path.substring(0, idx);
+        }
+        if (!LostCities.MODID.equals(rl.getNamespace())) {
+            path = rl.getNamespace() + ":" + path;
+        }
+        return path;
+    }
+
+    public void toggleWorldStyle() {
+        PackRepository repository = Minecraft.getInstance().getResourcePackRepository();
+        CloseableResourceManager resourceManager = new MultiPackResourceManager(PackType.SERVER_DATA, repository.openAllSelected());
+        List<String> styles = resourceManager.listResources("lostcities/worldstyles", s -> s.endsWith(".json")).stream().map(LostCitySetup::worldStyleToName).collect(Collectors.toList());
+        String current = get().map(LostCityProfile::getWorldStyle).orElse("<none>");
+        int idx = styles.indexOf(current);
+        if (idx == -1) {
+            idx = 0;
+        } else {
+            idx++;
+            if (idx >= styles.size()) {
+                idx = 0;
+            }
+        }
+        if (get().isPresent()) {
+            get().get().setWorldStyle(styles.get(idx));
+        }
+        refreshPreview.run();
+    }
 
     public void toggleProfile(/* @todo 1.16 WorldType worldType */) {
         if (profiles == null) {

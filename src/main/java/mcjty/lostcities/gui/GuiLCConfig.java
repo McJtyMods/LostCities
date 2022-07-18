@@ -32,6 +32,7 @@ public class GuiLCConfig extends Screen {
 //    private final WorldType worldType;
 
     private Button profileButton;
+    private Button worldstyleButton;
     private Button customizeButton;
     private Button modeButton;
 
@@ -89,15 +90,21 @@ public class GuiLCConfig extends Screen {
         super.init();
         this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
-        profileButton = addRenderableWidget(new ButtonExt(this, 70, 10, 100, 20, ComponentFactory.literal(localSetup.getProfileLabel()), p -> {
+        profileButton = addRenderableWidget(new ButtonExt(this, 55, 10, 80, 20, ComponentFactory.literal(localSetup.getProfileLabel()), p -> {
             localSetup.toggleProfile(/* @todo 1.16 worldType*/);
             updateValues();
         }).tooltip(ComponentFactory.literal("Select a standard profile for your Lost City worldgen")));
-        customizeButton = addRenderableWidget(new ButtonExt(this, 180, 10, 100, 20, ComponentFactory.literal("Customize"), p -> {
+
+        worldstyleButton = addRenderableWidget(new ButtonExt(this, 145, 10, 120, 20, ComponentFactory.literal(localSetup.getWorldStyleLabel()), p -> {
+            localSetup.toggleWorldStyle();
+            updateValues();
+        }).tooltip(ComponentFactory.literal("Select the worldstyle to use for this profile")));
+
+        customizeButton = addRenderableWidget(new ButtonExt(this, 275, 10, 70, 20, ComponentFactory.literal("Customize"), p -> {
             localSetup.customize();
             updateValues();
         }).tooltip(ComponentFactory.literal("Create a customized version of the currently selected profile")));
-        modeButton = addRenderableWidget(new ButtonExt(this, 290, 10, 100, 20, ComponentFactory.literal(mode), p -> toggleMode())
+        modeButton = addRenderableWidget(new ButtonExt(this, 355, 10, 70, 20, ComponentFactory.literal(mode), p -> toggleMode())
             .tooltip(ComponentFactory.literal("Switch between different configuration pages")));
 
         addRenderableWidget(new Button(10, this.height - 30, 120, 20,
@@ -437,9 +444,11 @@ public class GuiLCConfig extends Screen {
 
     private void refreshButtons() {
         profileButton.setMessage(ComponentFactory.literal(localSetup.getProfileLabel()));
+        worldstyleButton.setMessage(ComponentFactory.literal(localSetup.getWorldStyleLabel()));
         customizeButton.active = localSetup.isCustomizable();
 
         boolean isCustomized = "customized".equals(localSetup.getProfileLabel());
+        worldstyleButton.active = isCustomized;
         modeButton.active = localSetup.isCustomizable() || isCustomized;
         elements.forEach(s -> {
             s.setEnabled(isCustomized);
