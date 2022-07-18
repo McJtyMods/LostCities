@@ -1,4 +1,4 @@
-Upcoming:
+1.18-5.3.4:
 - It's now possible to toggle between different worldstyles in the Lost Cities world creation screen
 
 1.18-5.3.3:
