@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem where rubble wouldn't be the correct block in case a building has an overridden palette
+
 1.18-5.3.5:
 - 'exportpart' now expects a filename where it will export the part and optional palette
 - New 'listparts' to list all parts in the current chunk. Only works in edit mode

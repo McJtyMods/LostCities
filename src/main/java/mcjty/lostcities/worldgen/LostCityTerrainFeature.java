@@ -2325,9 +2325,8 @@ public class LostCityTerrainFeature {
         CompiledPalette compiledPalette = info.getCompiledPalette();
         // Cache the combined palette?
         Palette partPalette = part.getLocalPalette(provider.getWorld());
-        Palette buildingPalette = info.getBuilding().getLocalPalette(provider.getWorld());
-        if (partPalette != null || buildingPalette != null) {
-            compiledPalette = new CompiledPalette(compiledPalette, partPalette, buildingPalette);
+        if (partPalette != null) {
+            compiledPalette = new CompiledPalette(compiledPalette, partPalette);
         }
         return compiledPalette;
     }
