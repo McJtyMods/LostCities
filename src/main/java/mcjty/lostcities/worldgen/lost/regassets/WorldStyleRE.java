@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class WorldStyleRE {
+public class WorldStyleRE implements IAsset<WorldStyleRE> {
 
     public static final Codec<WorldStyleRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -62,6 +62,7 @@ public class WorldStyleRE {
         return scatteredReferences;
     }
 
+    @Override
     public WorldStyleRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

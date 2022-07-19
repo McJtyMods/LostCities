@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class BuildingRE {
+public class BuildingRE implements IAsset<BuildingRE> {
 
     public static final Codec<BuildingRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -59,6 +59,7 @@ public class BuildingRE {
         this.parts2 = partRefs2.orElse(null);
     }
 
+    @Override
     public BuildingRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

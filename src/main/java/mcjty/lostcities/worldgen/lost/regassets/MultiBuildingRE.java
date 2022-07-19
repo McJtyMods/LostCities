@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MultiBuildingRE {
+public class MultiBuildingRE implements IAsset<MultiBuildingRE> {
 
     public static final Codec<MultiBuildingRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -39,6 +39,7 @@ public class MultiBuildingRE {
         return buildings;
     }
 
+    @Override
     public MultiBuildingRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

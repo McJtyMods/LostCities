@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VariantRE {
+public class VariantRE implements IAsset<VariantRE> {
 
     public static final Codec<VariantRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -27,6 +27,7 @@ public class VariantRE {
         return blocks;
     }
 
+    @Override
     public VariantRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

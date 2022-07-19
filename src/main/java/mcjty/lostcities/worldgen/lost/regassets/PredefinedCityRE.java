@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class PredefinedCityRE {
+public class PredefinedCityRE implements IAsset<PredefinedCityRE> {
 
     public static final Codec<PredefinedCityRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -76,6 +76,7 @@ public class PredefinedCityRE {
         return predefinedStreets;
     }
 
+    @Override
     public PredefinedCityRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

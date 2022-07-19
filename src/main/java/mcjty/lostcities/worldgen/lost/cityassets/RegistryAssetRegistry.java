@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.api.ILostCityAssetRegistry;
+import mcjty.lostcities.worldgen.lost.regassets.IAsset;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -57,7 +58,9 @@ public class RegistryAssetRegistry<T extends ILostCityAsset, R> implements ILost
         if (t == null) {
             Registry<R> registry = level.registryAccess().registryOrThrow(registryKey);
             R value = registry.get(ResourceKey.create(registryKey, name));
-//            value.setRegistryName(name);  // @todo 1.19
+            if (value instanceof IAsset asset) {
+                asset.setRegistryName(name);
+            }
             t = assetConstructor.apply(value);
             assets.put(name, t);
         }

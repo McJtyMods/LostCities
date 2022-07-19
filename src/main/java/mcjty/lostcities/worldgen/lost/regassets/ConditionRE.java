@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ConditionRE {
+public class ConditionRE implements IAsset<ConditionRE> {
 
     public static final Codec<ConditionRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -26,6 +26,7 @@ public class ConditionRE {
         return values;
     }
 
+    @Override
     public ConditionRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

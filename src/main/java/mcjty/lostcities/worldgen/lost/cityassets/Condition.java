@@ -6,6 +6,7 @@ import mcjty.lostcities.worldgen.lost.regassets.ConditionRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.ConditionPart;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class Condition implements ILostCityAsset {
         return name;
     }
 
-    public String getRandomValue(Random random, ConditionContext info) {
+    public String getRandomValue(RandomSource random, ConditionContext info) {
         List<Pair<Float, String>> values = new ArrayList<>();
         for (Pair<Predicate<ConditionContext>, Pair<Float, String>> pair : valueSelector) {
             if (pair.getLeft().test(info)) {

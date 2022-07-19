@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * A structure part
  */
-public class BuildingPartRE {
+public class BuildingPartRE implements IAsset<BuildingPartRE> {
 
     public static final Codec<BuildingPartRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -94,6 +94,7 @@ public class BuildingPartRE {
         return refPaletteName;
     }
 
+    @Override
     public BuildingPartRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

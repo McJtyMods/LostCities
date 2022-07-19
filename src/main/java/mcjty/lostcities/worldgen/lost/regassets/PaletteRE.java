@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * A palette of materials as used by building parts
  */
-public class PaletteRE {
+public class PaletteRE implements IAsset<PaletteRE> {
 
     public static final Codec<PaletteRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -30,6 +30,7 @@ public class PaletteRE {
         return paletteEntries;
     }
 
+    @Override
     public PaletteRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

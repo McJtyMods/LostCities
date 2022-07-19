@@ -74,7 +74,7 @@ public class ForgeEventHandlers {
     public void onCreateSpawnPoint(LevelEvent.CreateSpawnPosition event) {
         LevelAccessor world = event.getLevel();
         if (world instanceof ServerLevel serverLevel) {
-            IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(serverLevel);
+            IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(serverLevel);
             if (dimensionInfo == null) {
                 return;
             }

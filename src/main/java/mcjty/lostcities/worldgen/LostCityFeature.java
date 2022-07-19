@@ -50,8 +50,8 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     }
 
     private static <C extends FeatureConfiguration, F extends Feature<C>> Holder<PlacedFeature> registerPlacedFeature(PlacementModifier... placementModifiers) {
-        Holder<ConfiguredFeature<NoneFeatureConfiguration, ?>> configuredFeatureHolder = Holder.direct(new ConfiguredFeature<>(Registration.LOSTCITY_FEATURE, FeatureConfiguration.NONE));
-        return PlacementUtils.register("lc_configured", configuredFeatureHolder, placementModifiers);
+        Holder<ConfiguredFeature<NoneFeatureConfiguration, ?>> configuredFeatureHolder = Holder.direct(new ConfiguredFeature<>(Registration.LOSTCITY_FEATURE.get(), FeatureConfiguration.NONE));
+        return PlacementUtils.register("lostcities:lostcities", configuredFeatureHolder, placementModifiers);
     }
 
 

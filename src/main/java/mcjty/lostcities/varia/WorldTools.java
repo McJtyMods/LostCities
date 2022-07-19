@@ -1,13 +1,10 @@
 package mcjty.lostcities.varia;
 
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class WorldTools {
@@ -48,23 +45,5 @@ public class WorldTools {
         MinecraftServer server = world.getServer();
         return server.getLevel(type);
     }
-
-    /**
-     * Find a biome based on ID or registry name
-     */
-    public static Biome findBiome(String biomeId) {
-        Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(biomeId));
-        if (biome == null) {
-            for (Biome b : ForgeRegistries.BIOMES) {
-                ResourceLocation registryName = b.getRegistryName();
-                if (registryName != null && biomeId.equals(registryName.getPath())) {
-                    biome = b;
-                    break;
-                }
-            }
-        }
-        return biome;
-    }
-
 
 }

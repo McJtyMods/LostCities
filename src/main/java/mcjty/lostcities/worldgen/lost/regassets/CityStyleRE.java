@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class CityStyleRE {
+public class CityStyleRE implements IAsset<CityStyleRE> {
 
     public static final Codec<CityStyleRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -110,6 +110,7 @@ public class CityStyleRE {
         return Optional.ofNullable(selectors);
     }
 
+    @Override
     public CityStyleRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

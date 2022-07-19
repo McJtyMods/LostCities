@@ -29,7 +29,7 @@ public class CommandMap implements Command<CommandSourceStack> {
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         BlockPos position = player.blockPosition();
-        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(player.getLevel());
+        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(player.getLevel());
         if (dimInfo != null) {
             ChunkPos pos = new ChunkPos(position);
             for (int z = pos.z - 20 ; z <= pos.z + 20 ; z++) {

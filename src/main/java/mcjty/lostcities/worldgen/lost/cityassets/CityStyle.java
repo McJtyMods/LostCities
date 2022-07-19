@@ -6,6 +6,7 @@ import mcjty.lostcities.worldgen.lost.regassets.CityStyleRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.ObjectSelector;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.CommonLevelAccessor;
 
 import java.util.ArrayList;
@@ -314,6 +315,15 @@ public class CityStyle implements ILostCityCityStyle {
                     sphereGlassBlock = inheritFrom.sphereGlassBlock;
                 }
             }
+        }
+    }
+
+    private static String getRandomFromList(RandomSource random, List<ObjectSelector> list) {
+        ObjectSelector fromList = Tools.getRandomFromList(random, list, ObjectSelector::factor);
+        if (fromList == null) {
+            return null;
+        } else {
+            return fromList.value();
         }
     }
 

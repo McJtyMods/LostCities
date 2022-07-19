@@ -3,17 +3,17 @@ package mcjty.lostcities.gui;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.ProfileSetup;
-import mcjty.lostcities.varia.Tools;
-import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.server.packs.resources.MultiPackResourceManager;
+import net.minecraft.server.packs.resources.Resource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -127,7 +127,8 @@ public class LostCitySetup {
     public void toggleWorldStyle() {
         PackRepository repository = Minecraft.getInstance().getResourcePackRepository();
         CloseableResourceManager resourceManager = new MultiPackResourceManager(PackType.SERVER_DATA, repository.openAllSelected());
-        List<String> styles = resourceManager.listResources("lostcities/worldstyles", s -> s.endsWith(".json")).stream().map(LostCitySetup::worldStyleToName).collect(Collectors.toList());
+        Map<ResourceLocation, Resource> map = resourceManager.listResources("lostcities/worldstyles", s -> s.toString().endsWith(".json"));
+        List<String> styles = map.keySet().stream().map(LostCitySetup::worldStyleToName).collect(Collectors.toList());
         String current = get().map(LostCityProfile::getWorldStyle).orElse("<none>");
         int idx = styles.indexOf(current);
         if (idx == -1) {

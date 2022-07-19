@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class StyleRE {
+public class StyleRE implements IAsset<StyleRE> {
 
     public static final Codec<StyleRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -27,6 +27,7 @@ public class StyleRE {
         return randomPaletteChoices;
     }
 
+    @Override
     public StyleRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

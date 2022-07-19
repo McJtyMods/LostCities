@@ -21,11 +21,15 @@ import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+
 public class DefaultDimensionInfo implements IDimensionInfo {
 
     private WorldGenLevel world;
     private final LostCityProfile profile;
     private final WorldStyle style;
+
+    private final Random random;
 
     private final Registry<Biome> biomeRegistry;
     private final LostCityTerrainFeature feature;
@@ -34,7 +38,8 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         this.world = world;
         this.profile = profile;
         style = AssetRegistries.WORLDSTYLES.get(world, profile.getWorldStyle());
-        feature = new LostCityTerrainFeature(this, profile, getRandom());
+        random = new Random(world.getSeed());
+        feature = new LostCityTerrainFeature(this, profile, world.getRandom());
         feature.setupStates(profile);
         biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();
     }
@@ -75,8 +80,8 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     }
 
     @Override
-    public RandomSource getRandom() {
-        return world.getRandom();
+    public Random getRandom() {
+        return random;
     }
 
     @Override

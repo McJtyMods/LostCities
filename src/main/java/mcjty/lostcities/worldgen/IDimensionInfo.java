@@ -28,7 +28,7 @@ public interface IDimensionInfo {
 
     WorldStyle getWorldStyle();
 
-    RandomSource getRandom();
+    Random getRandom();
 
     LostCityTerrainFeature getFeature();
 

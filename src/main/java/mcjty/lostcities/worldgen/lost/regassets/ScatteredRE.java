@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class ScatteredRE {
+public class ScatteredRE implements IAsset<ScatteredRE> {
 
     public static final Codec<ScatteredRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -59,6 +59,7 @@ public class ScatteredRE {
         return heightoffset;
     }
 
+    @Override
     public ScatteredRE setRegistryName(ResourceLocation name) {
         this.name = name;
         return this;

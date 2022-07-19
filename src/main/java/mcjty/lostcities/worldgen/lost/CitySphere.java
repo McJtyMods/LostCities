@@ -4,9 +4,7 @@ import mcjty.lostcities.api.ILostSphere;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
-import mcjty.lostcities.worldgen.BiomeTranslator;
 import mcjty.lostcities.worldgen.IDimensionInfo;
-import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedSphere;
@@ -395,7 +393,7 @@ public class CitySphere implements ILostSphere {
                     biomeKeys.sort(ResourceLocation::compareTo);
                     citySphere.biome = ForgeRegistries.BIOMES.getValue(biomeKeys.get(rand.nextInt(biomeKeys.size())));
                 } else {
-                    List<Pair<Float, Biome>> pairs = BiomeTranslator.parseBiomes(profile.ALLOWED_BIOME_FACTORS);
+                    List<Pair<Float, Biome>> pairs = Collections.emptyList(); // @todo broken BiomeTranslator.parseBiomes(profile.ALLOWED_BIOME_FACTORS);
                     float total = 0.0f;
                     for (Pair<Float, Biome> pair : pairs) {
                         total += 3.0f / pair.getKey();

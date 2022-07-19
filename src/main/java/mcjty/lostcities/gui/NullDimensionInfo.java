@@ -10,11 +10,13 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 
 import java.util.Random;
 
@@ -87,6 +89,7 @@ public class NullDimensionInfo implements IDimensionInfo {
     private final LostCityProfile profile;
     private final WorldStyle style = null;
     private final Random random;
+    private final RandomSource randomSource;
     private final long seed;
 
     private final Registry<Biome> biomeRegistry;
@@ -97,7 +100,8 @@ public class NullDimensionInfo implements IDimensionInfo {
 //        style = AssetRegistries.WORLDSTYLES.get(null, profile.getWorldStyle()); // @todo REG
         this.seed = seed;
         random = new Random(seed);
-        feature = new LostCityTerrainFeature(this, profile, getRandom());
+        randomSource = new LegacyRandomSource(seed);
+        feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
         biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();
     }
