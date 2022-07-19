@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a concurrency issue with random source from the world
+
 1.19-6.0.0:
 - Port to 1.19!
 - 'exportpart' now expects a filename where it will export the part and optional palette

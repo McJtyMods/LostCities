@@ -18,6 +18,7 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkSource;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +31,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     private final WorldStyle style;
 
     private final Random random;
+    private final RandomSource randomSource;
 
     private final Registry<Biome> biomeRegistry;
     private final LostCityTerrainFeature feature;
@@ -39,7 +41,8 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         this.profile = profile;
         style = AssetRegistries.WORLDSTYLES.get(world, profile.getWorldStyle());
         random = new Random(world.getSeed());
-        feature = new LostCityTerrainFeature(this, profile, world.getRandom());
+        randomSource = new LegacyRandomSource(world.getSeed());
+        feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
         biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();
     }
