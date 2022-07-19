@@ -28,7 +28,7 @@ public class Building implements ILostCityBuilding {
     private float prefersLonely = 0.0f; // The chance this this building is alone. If 1.0f this building wants to be alone all the time
 
     private Palette localPalette = null;
-    String refPaletteName;
+    private String refPaletteName;
 
     private final List<Pair<Predicate<ConditionContext>, String>> parts = new ArrayList<>();
     private final List<Pair<Predicate<ConditionContext>, String>> parts2 = new ArrayList<>();

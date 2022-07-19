@@ -168,6 +168,12 @@ public class BuildingInfo implements ILostChunkInfo {
     public CompiledPalette getCompiledPalette() {
         if (compiledPalette == null) {
             compiledPalette = new CompiledPalette(palette);
+            if (hasBuilding) {
+                Palette buildingPalette = buildingType.getLocalPalette(provider.getWorld());
+                if (buildingPalette != null) {
+                    compiledPalette = new CompiledPalette(compiledPalette, buildingPalette);
+                }
+            }
         }
         return compiledPalette;
     }

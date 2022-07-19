@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem where rubble wouldn't be the correct block in case a building has an overridden palette
+
 1.19-6.0.1:
 - Fixed a concurrency issue with random source from the world
 
