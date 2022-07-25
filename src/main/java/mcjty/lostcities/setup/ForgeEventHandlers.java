@@ -54,12 +54,6 @@ public class ForgeEventHandlers {
         }
     }
 
-    // @todo 1.19 BiomeDecorator
-//    @SubscribeEvent(priority = EventPriority.HIGH)
-//    public void onBiomeLoad(BiomeLoadingEvent event) {
-//        event.getGeneration().getFeatures(GenerationStep.Decoration.RAW_GENERATION).add(LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
-//    }
-
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         BuildingInfo.cleanCache();
