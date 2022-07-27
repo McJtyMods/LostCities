@@ -1,1 +1,3 @@
 - Make explosions go upwards more for a more realistic shape
+- Fix the leaky roofs (rain going through roofs after worldgen)
+- Make partnames like 'highway.json' configurable (in worldstyle)
