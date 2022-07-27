@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.0.3:
 - Fixed a problem with leaky roofs. When it was raining the rain got through. This was because the chunk heightmap wasn't correctly updated
 - It's now also possible to specify the parts to use for highways, railways, and stations in the worldstyle using a new optional 'parts' section
 
