@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem with leaky roofs. When it was raining the rain got through. This was because the chunk heightmap wasn't correctly updated
+
 1.18-5.3.6:
 - Fixed a problem where rubble wouldn't be the correct block in case a building has an overridden palette
 

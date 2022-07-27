@@ -11,6 +11,7 @@ import net.minecraft.world.level.chunk.BulkSectionAccess;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 import javax.annotation.Nullable;
 import java.util.function.Predicate;
@@ -38,11 +39,25 @@ public class ChunkDriver {
         }
     }
 
-    public void actuallyGenerate() {
+    public void actuallyGenerate(ChunkAccess chunk) {
         BulkSectionAccess bulk = new BulkSectionAccess(region);
         cache.generate(bulk);
-        cache.clear();
         bulk.close();
+
+        BlockState bedrock = LostCityTerrainFeature.bedrock;
+        for (int x = 0 ; x < 16 ; x++) {
+            for (int z = 0 ; z < 16 ; z++) {
+                int y = cache.heightmap[x][z];
+                if (y > Integer.MIN_VALUE) {
+                    chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.MOTION_BLOCKING).update(x, y, z, bedrock);
+                    chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES).update(x, y, z, bedrock);
+                    chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.OCEAN_FLOOR).update(x, y, z, bedrock);
+                    chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.WORLD_SURFACE).update(x, y, z, bedrock);
+                }
+            }
+        }
+
+        cache.clear();
     }
 
     private void setBlock(BlockPos p, BlockState state) {
@@ -344,6 +359,7 @@ public class ChunkDriver {
         private final int cx;
         private final int cz;
         private final S[] cache;
+        private final int[][] heightmap = new int[16][16];
 
         private SectionCache(LevelAccessor level, int cx, int cz) {
             minY = level.getMinBuildHeight();
@@ -356,9 +372,16 @@ public class ChunkDriver {
 
         private void put(BlockPos pos, BlockState state) {
             int sectionIdx = (pos.getY() - minY) / SECTION_HEIGHT;
-            int idx = ((pos.getX() & 0xf) << 8) + ((pos.getY() & 0xf) << 4) + ((pos.getZ() & 0xf));
+            int px = pos.getX() & 0xf;
+            int pz = pos.getZ() & 0xf;
+            int idx = (px << 8) + ((pos.getY() & 0xf) << 4) + pz;
             cache[sectionIdx].section[idx] = state;
             cache[sectionIdx].isEmpty = false;
+            if (state != LostCityTerrainFeature.air) {
+                if (heightmap[px][pz] < pos.getY()) {
+                    heightmap[px][pz] = pos.getY();
+                }
+            }
         }
 
         @Nullable
@@ -395,6 +418,11 @@ public class ChunkDriver {
         private void clear() {
             for (int si = 0 ; si < (maxY - minY) / SECTION_HEIGHT ; si++) {
                 cache[si] = new S();
+            }
+            for (int x = 0 ; x < 16 ; x++) {
+                for (int z = 0 ; z < 16 ; z++) {
+                    heightmap[x][z] = Integer.MIN_VALUE;
+                }
             }
         }
     }

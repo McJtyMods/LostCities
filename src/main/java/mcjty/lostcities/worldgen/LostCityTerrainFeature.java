@@ -323,7 +323,8 @@ public class LostCityTerrainFeature {
             generateDebris(info);
         }
 
-        driver.actuallyGenerate();
+        driver.actuallyGenerate(chunk);
+
         driver.setPrimer(oldRegion, oldChunk);
 
         ChunkFixer.fix(provider, chunkX, chunkZ);
