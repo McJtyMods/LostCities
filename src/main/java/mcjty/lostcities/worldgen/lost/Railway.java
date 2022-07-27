@@ -5,6 +5,7 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.QualityRandom;
 import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.lost.regassets.data.RailwayParts;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -100,6 +101,7 @@ public class Railway {
         randomRailChunkType.nextFloat();
 
         LostCityProfile profile = BuildingInfo.getProfile(chunkX, chunkZ, provider);
+        RailwayParts railwayParts = provider.getWorldStyle().getPartSelector().railwayParts();
 
         // @todo make all settings based on rand below configurable
         float r = randomRailChunkType.nextFloat();
@@ -126,7 +128,8 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 3);
             }
-            return getStationType(chunkX, chunkZ, provider, profile, r, 3, randomRailChunkType.nextFloat() < .5f ? "station_open" : "station_openroof");
+            return getStationType(chunkX, chunkZ, provider, profile, r, 3,
+                    randomRailChunkType.nextFloat() < .5f ? railwayParts.stationOpen() : railwayParts.stationOpenRoof());
         }
         if (mx == 10 && mz == 0) {
             if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider, profile)) {
@@ -148,7 +151,8 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 2);
             }
-            return getStationType(chunkX, chunkZ, provider, profile, r, 2, randomRailChunkType.nextFloat() < .5f ? "station_open" : "station_openroof");
+            return getStationType(chunkX, chunkZ, provider, profile, r, 2,
+                    randomRailChunkType.nextFloat() < .5f ? railwayParts.stationOpen() : railwayParts.stationOpenRoof());
         }
         if (mx == 10 && mz == 10) {
             if (!BuildingInfo.isCityRaw(chunkX, chunkZ, provider, profile)) {
@@ -170,7 +174,8 @@ public class Railway {
                 }
                 return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 1);
             }
-            return getStationType(chunkX, chunkZ, provider, profile, r, 1, randomRailChunkType.nextFloat() < .5f ? "station_open" : "station_openroof");
+            return getStationType(chunkX, chunkZ, provider, profile, r, 1,
+                    randomRailChunkType.nextFloat() < .5f ? railwayParts.stationOpen() : railwayParts.stationOpenRoof());
         }
         if (mx == 0 && mz == 0) {
             return RailChunkInfo.NOTHING;

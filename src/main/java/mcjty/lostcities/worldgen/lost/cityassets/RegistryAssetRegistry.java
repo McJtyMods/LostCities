@@ -56,11 +56,15 @@ public class RegistryAssetRegistry<T extends ILostCityAsset, R extends IForgeReg
         }
         T t = assets.get(name);
         if (t == null) {
-            Registry<R> registry = level.registryAccess().registryOrThrow(registryKey);
-            R value = registry.get(ResourceKey.create(registryKey, name));
-            value.setRegistryName(name);
-            t = assetConstructor.apply(value);
-            assets.put(name, t);
+            try {
+                Registry<R> registry = level.registryAccess().registryOrThrow(registryKey);
+                R value = registry.get(ResourceKey.create(registryKey, name));
+                value.setRegistryName(name);
+                t = assetConstructor.apply(value);
+                assets.put(name, t);
+            } catch (Exception e) {
+                throw new RuntimeException("Error trying to get resource " + name + "!", e);
+            }
         }
         if (t != null) {
             t.init(level);

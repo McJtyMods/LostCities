@@ -13,6 +13,7 @@ import net.minecraft.world.level.biome.Biome;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,12 +25,14 @@ public class WorldStyle implements ILostCityAsset {
     private final String outsideStyle;
 
     private final ScatteredSettings scatteredSettings;
+    @Nonnull final PartSelector partSelector;
     private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
     private final List<Pair<Predicate<Holder<Biome>>, Float>> cityBiomeMultiplier = new ArrayList<>();
 
     public WorldStyle(WorldStyleRE object) {
         name = object.getRegistryName();
         this.scatteredSettings = object.getScatteredSettings();
+        this.partSelector = object.getPartSelector();
         outsideStyle = object.getOutsideStyle();
         for (CityStyleSelector selector : object.getCityStyleSelectors()) {
             Predicate<Holder<Biome>> predicate = biomeHolder -> true;
@@ -57,6 +60,11 @@ public class WorldStyle implements ILostCityAsset {
 
     public String getOutsideStyle() {
         return outsideStyle;
+    }
+
+    @Nonnull
+    public PartSelector getPartSelector() {
+        return partSelector;
     }
 
     @Nullable
