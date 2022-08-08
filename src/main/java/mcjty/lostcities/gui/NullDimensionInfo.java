@@ -5,6 +5,7 @@ import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import mcjty.lostcities.worldgen.lost.regassets.WorldStyleRE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -16,6 +17,8 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 
+import java.util.Collections;
+import java.util.Optional;
 import java.util.Random;
 
 public class NullDimensionInfo implements IDimensionInfo {
@@ -85,7 +88,7 @@ public class NullDimensionInfo implements IDimensionInfo {
     };
 
     private final LostCityProfile profile;
-    private final WorldStyle style = null;
+    private final WorldStyle style;
     private final Random random;
     private final long seed;
 
@@ -94,7 +97,14 @@ public class NullDimensionInfo implements IDimensionInfo {
 
     public NullDimensionInfo(LostCityProfile profile, long seed) {
         this.profile = profile;
-//        style = AssetRegistries.WORLDSTYLES.get(null, profile.getWorldStyle()); // @todo REG
+        style = new WorldStyle(new WorldStyleRE(
+                "standard",
+                Optional.empty(),
+                Optional.empty(),
+                Collections.emptyList(),
+                Optional.empty(),
+                Optional.empty()
+        ));
         this.seed = seed;
         random = new Random(seed);
         feature = new LostCityTerrainFeature(this, profile, getRandom());
