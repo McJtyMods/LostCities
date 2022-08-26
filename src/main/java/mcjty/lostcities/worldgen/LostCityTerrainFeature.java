@@ -2815,10 +2815,12 @@ public class LostCityTerrainFeature {
                 if (isSide(x, z)) {
                     while (y > 1 && driver.getBlock() == air) {
                         driver.block(info.getCompiledPalette().get(borderBlock)).decY();
+                        y--;
                     }
                 } else {
                     while (y > 1 && driver.getBlock() == air) {
                         driver.block(base).decY();
+                        y--;
                     }
                 }
             }
