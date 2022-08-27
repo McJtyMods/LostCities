@@ -1,5 +1,6 @@
 Upcoming:
 - SandTechnology fixed a bug on space type worlds (void worlds) with a potential crash
+- Henkelmax fixed an issue with sleeping bags
 
 1.16-4.0.11-beta:
 - Properly fixed the problem on single player where exiting the world would not reset everything and keep settings for the next created world
