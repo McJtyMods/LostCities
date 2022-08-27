@@ -1,3 +1,6 @@
+Upcoming:
+- SandTechnology fixed a bug on space type worlds (void worlds) with a potential crash
+
 1.18-5.3.8:
 - Fixed a bug with the customize screen crashing
 
