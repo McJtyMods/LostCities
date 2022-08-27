@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.0.5:
 - SandTechnology fixed a bug on space type worlds (void worlds) with a potential crash
 - Henkelmax fixed an issue with sleeping bags
 
