@@ -88,6 +88,10 @@ public class LostCityTerrainFeature {
 
     private static BlockState[] randomLeafs = null;
 
+    private static BlockState[] randomDirt = null;
+
+    static Material[] plantMaterials = new Material[]{Material.PLANT, Material.WATER_PLANT, Material.REPLACEABLE_WATER_PLANT, Material.REPLACEABLE_PLANT, Material.REPLACEABLE_FIREPROOF_PLANT, Material.BAMBOO_SAPLING, Material.BAMBOO, Material.WOOD, Material.LEAVES};
+
     private final ChunkDriver driver;
 
     private final IDimensionInfo provider;
@@ -134,6 +138,31 @@ public class LostCityTerrainFeature {
             }
         }
         return randomLeafs[fastrand128()];
+    }
+
+    //Gets rubble block - regenerates list if empty
+    public static BlockState getRandomDirt() {
+        if (randomDirt == null) {
+            BlockState mBricks = Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
+            BlockState mCobble = Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+            BlockState moss = Blocks.MOSS_BLOCK.defaultBlockState();
+
+            randomDirt = new BlockState[128];
+            int i = 0;
+            while (i < 20) {
+                randomDirt[i] = mBricks;
+                i++;
+            }
+            while (i < 60) {
+                randomDirt[i] = mCobble;
+                i++;
+            }
+            while (i < randomDirt.length) {
+                randomDirt[i] = moss;
+                i++;
+            }
+        }
+        return randomDirt[fastrand128()];
     }
 
     public static Set<BlockState> getRailStates() {
@@ -1096,13 +1125,21 @@ public class LostCityTerrainFeature {
         }
         return false;
     }
+    // Return true if state is Empty or Plant based - stops (most) funny tree/mushroom action on chunk borders
+    private static boolean isFoliageOrEmpty(BlockState state) {
+        Material material = state.getMaterial();
+        if(isEmpty(state)){
+            return true;
+        }
+        return Arrays.stream(plantMaterials).anyMatch((material1 -> material1 == material));
+    }
 
     private void moveUp(int x, int z, int height, boolean dowater) {
         // Find the first non-empty block starting at the given height
         driver.current(x, height, z);
         int minHeight = provider.getWorld().getMinBuildHeight();
         // We assume here we are not in a void chunk
-        while (isEmpty(driver.getBlock()) && driver.getY() > minHeight) {
+        while (isFoliageOrEmpty(driver.getBlock()) && driver.getY() > minHeight) {
             driver.decY();
         }
 
@@ -1129,7 +1166,7 @@ public class LostCityTerrainFeature {
         int y = 255;
         driver.current(x, y, z);
         // We assume here we are not in a void chunk
-        while (driver.getBlock() == air && driver.getY() > height) {
+        while (isFoliageOrEmpty(driver.getBlock()) && driver.getY() > height) {
             driver.decY();
         }
 
@@ -1277,6 +1314,19 @@ public class LostCityTerrainFeature {
                     for (int z = 0; z < 16; ++z) {
                         driver.setBlockRange(x, info.groundLevel, z, info.waterLevel, liquid);
                     }
+                }
+            }
+        }
+
+        //city surface leveling - for prettier cities
+        //note: Better results may be achieved with terrain noise adjustment (like how newer structures do it)
+        int ground = info.getCityGroundLevel();
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                boolean moved = moveDown(x, z, ground + 1, info.waterLevel > info.groundLevel);
+
+                if (!moved) {
+                    moveUp(x, z, ground, info.waterLevel > info.groundLevel);
                 }
             }
         }
@@ -1635,13 +1685,18 @@ public class LostCityTerrainFeature {
                     if (c != air && c != liquid) {
                         for (int i = 0; i < vr; i++) {
                             if (isEmpty(driver.getBlock())) {
-                                driver.add(base);
+                                driver.add(getRandomDirt());
                             } else {
                                 driver.incY();
                             }
                         }
                     }
-                    if (driver.getBlockDown() == base) {
+                    //first round may not have generated this - stops crash on create world
+                    if(randomDirt == null) {
+                        getRandomDirt();
+                    }
+                    BlockState leafBaseState = driver.getBlockDown();
+                    if (leafBaseState == base || Arrays.stream(randomDirt).anyMatch((b) -> b == leafBaseState)) {
                         for (int i = 0; i < vl; i++) {
                             if (isEmpty(driver.getBlock())) {
                                 driver.add(getRandomLeaf());
@@ -1780,9 +1835,9 @@ public class LostCityTerrainFeature {
         if (canDoParks) {
             int height = info.getCityGroundLevel();
             // In default landscape type we clear the landscape on top of the building
-            if (profile.isDefault()) {
-                clearToMax(info, heightmap, height);
-            }
+            //if (profile.isDefault()) {
+                //clearToMax(info, heightmap, height);
+            //}
 
             BuildingInfo.StreetType streetType = info.streetType;
             boolean elevated = info.isElevatedParkSection();

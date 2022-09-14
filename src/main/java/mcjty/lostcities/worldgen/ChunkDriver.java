@@ -61,7 +61,7 @@ public class ChunkDriver {
     }
 
     private void setBlock(BlockPos p, BlockState state) {
-        cache.put(p, state);
+        if(state != null) cache.put(p, state);
     }
 
     // This version of getBlock() is less optimal but it will work for different chunks
@@ -288,6 +288,9 @@ public class ChunkDriver {
             state = state.setValue(WallBlock.SOUTH_WALL, canAttachWall(southState));
         } else if (state.getBlock() instanceof StairBlock) {
             state = state.setValue(StairBlock.SHAPE, getShapeProperty(state, pos.set(cx, cy, cz)));
+        } else if (state.getBlock() instanceof StructureVoidBlock){
+            //like an alpha channel - but for parts! Uses whatever block was previously there instead of changing it!
+            return null;
         }
         return state;
     }
