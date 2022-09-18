@@ -93,7 +93,17 @@ public class LostCityTerrainFeature {
 
     private static BlockState[] randomDirt = null;
 
-    static Material[] plantMaterials = new Material[]{Material.PLANT, Material.WATER_PLANT, Material.REPLACEABLE_WATER_PLANT, Material.REPLACEABLE_PLANT, Material.REPLACEABLE_FIREPROOF_PLANT, Material.BAMBOO_SAPLING, Material.BAMBOO, Material.WOOD, Material.LEAVES};
+    static Material[] plantMaterials = new Material[] {
+            Material.PLANT,
+            Material.WATER_PLANT,
+            Material.REPLACEABLE_WATER_PLANT,
+            Material.REPLACEABLE_PLANT,
+            Material.REPLACEABLE_FIREPROOF_PLANT,
+            Material.BAMBOO_SAPLING,
+            Material.BAMBOO,
+            Material.WOOD,
+            Material.LEAVES
+    };
 
     private final ChunkDriver driver;
 
@@ -1177,7 +1187,7 @@ public class LostCityTerrainFeature {
         int y = 255;
         driver.current(x, y, z);
         // We assume here we are not in a void chunk
-        while (isFoliageOrEmpty(driver.getBlock()) && driver.getY() > height) {
+        while (isEmpty(driver.getBlock()) && driver.getY() > height) {
             driver.decY();
         }
 
@@ -1332,13 +1342,15 @@ public class LostCityTerrainFeature {
 
         //city surface leveling - for prettier cities
         //note: Better results may be achieved with terrain noise adjustment (like how newer structures do it)
-        int ground = info.getCityGroundLevel();
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                boolean moved = moveDown(x, z, ground + 1, info.waterLevel > info.groundLevel);
+        if (profile.isDefault()) {
+            int ground = info.getCityGroundLevel();
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    boolean moved = moveDown(x, z, ground + 1, info.waterLevel > info.groundLevel);
 
-                if (!moved) {
-                    moveUp(x, z, ground, info.waterLevel > info.groundLevel);
+                    if (!moved) {
+                        moveUp(x, z, ground, info.waterLevel > info.groundLevel);
+                    }
                 }
             }
         }
@@ -1847,9 +1859,9 @@ public class LostCityTerrainFeature {
         if (canDoParks) {
             int height = info.getCityGroundLevel();
             // In default landscape type we clear the landscape on top of the building
-            //if (profile.isDefault()) {
-                //clearToMax(info, heightmap, height);
-            //}
+//            if (profile.isDefault()) {
+//                clearToMax(info, heightmap, height);
+//            }
 
             BuildingInfo.StreetType streetType = info.streetType;
             boolean elevated = info.isElevatedParkSection();
