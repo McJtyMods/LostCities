@@ -12,11 +12,11 @@ import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.NoiseGeneratorPerlin;
 import mcjty.lostcities.varia.QualityRandom;
+import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -45,7 +45,6 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,9 +70,7 @@ public class LostCityTerrainFeature {
     public BlockState liquid;
     public BlockState base;
 
-    private static Set<BlockState> rotatableStates = null;
     private static Set<BlockState> railStates = null;
-    private static Set<BlockState> glassStates = null;
     private static Set<BlockState> statesNeedingTodo = null;
     private static Set<BlockState> statesNeedingLightingUpdate = null;
 
@@ -87,10 +84,9 @@ public class LostCityTerrainFeature {
     private final NoiseGeneratorPerlin ruinNoise;
 
     private static BlockState[] randomLeafs = null;
-
     private static BlockState[] randomDirt = null;
 
-    static Material[] plantMaterials = new Material[]{Material.PLANT, Material.WATER_PLANT, Material.REPLACEABLE_WATER_PLANT, Material.REPLACEABLE_PLANT, Material.REPLACEABLE_FIREPROOF_PLANT, Material.BAMBOO_SAPLING, Material.BAMBOO, Material.WOOD, Material.LEAVES};
+    private static Set<BlockState> randomDirtSet = null;
 
     private final ChunkDriver driver;
 
@@ -143,9 +139,13 @@ public class LostCityTerrainFeature {
     //Gets rubble block - regenerates list if empty
     public static BlockState getRandomDirt() {
         if (randomDirt == null) {
+            randomDirtSet = new HashSet<>();
             BlockState mBricks = Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
             BlockState mCobble = Blocks.MOSSY_COBBLESTONE.defaultBlockState();
             BlockState moss = Blocks.MOSS_BLOCK.defaultBlockState();
+            randomDirtSet.add(mBricks);
+            randomDirtSet.add(mCobble);
+            randomDirtSet.add(moss);
 
             randomDirt = new BlockState[128];
             int i = 0;
@@ -174,25 +174,6 @@ public class LostCityTerrainFeature {
         return railStates;
     }
 
-    public static Set<BlockState> getGlassStates() {
-        if (glassStates == null) {
-            glassStates = new HashSet<>();
-            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(Tags.Blocks.GLASS)) {
-                addStates(bh.value(), glassStates);
-            }
-            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(Tags.Blocks.STAINED_GLASS)) {
-                addStates(bh.value(), glassStates);
-            }
-            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(Tags.Blocks.GLASS_PANES)) {
-                addStates(bh.value(), glassStates);
-            }
-            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(Tags.Blocks.STAINED_GLASS_PANES)) {
-                addStates(bh.value(), glassStates);
-            }
-        }
-        return glassStates;
-    }
-
     public static Set<BlockState> getStatesNeedingTodo() {
         if (statesNeedingTodo == null) {
             statesNeedingTodo = new HashSet<>();
@@ -217,16 +198,6 @@ public class LostCityTerrainFeature {
             }
         }
         return statesNeedingLightingUpdate;
-    }
-
-    public static Set<BlockState> getRotatableStates() {
-        if (rotatableStates == null) {
-            rotatableStates = new HashSet<>();
-            DefaultedRegistry<Block> registry = Registry.BLOCK;
-            registry.getTagOrEmpty(BlockTags.STAIRS).forEach(holder -> addStates(holder.value(), rotatableStates));
-            addStates(Blocks.LADDER, rotatableStates);
-        }
-        return rotatableStates;
     }
 
     private static void addStates(Block block, Set<BlockState> set) {
@@ -1127,11 +1098,10 @@ public class LostCityTerrainFeature {
     }
     // Return true if state is Empty or Plant based - stops (most) funny tree/mushroom action on chunk borders
     private static boolean isFoliageOrEmpty(BlockState state) {
-        Material material = state.getMaterial();
-        if(isEmpty(state)){
+        if (isEmpty(state)){
             return true;
         }
-        return Arrays.stream(plantMaterials).anyMatch((material1 -> material1 == material));
+        return Tools.hasTag(state.getBlock(), LostTags.FOLIAGE_TAG);
     }
 
     private void moveUp(int x, int z, int height, boolean dowater) {
@@ -1696,7 +1666,7 @@ public class LostCityTerrainFeature {
                         getRandomDirt();
                     }
                     BlockState leafBaseState = driver.getBlockDown();
-                    if (leafBaseState == base || Arrays.stream(randomDirt).anyMatch((b) -> b == leafBaseState)) {
+                    if (leafBaseState == base || randomDirtSet.contains(leafBaseState)) {
                         for (int i = 0; i < vl; i++) {
                             if (isEmpty(driver.getBlock())) {
                                 driver.add(getRandomLeaf());
@@ -2439,7 +2409,7 @@ public class LostCityTerrainFeature {
     }
 
     private BlockState transformBlockState(Transform transform, BlockState b) {
-        if (getRotatableStates().contains(b)) {
+        if (Tools.hasTag(b.getBlock(), LostTags.ROTATABLE_TAG)) {
             b = b.rotate(transform.getMcRotation());
         } else if (getRailStates().contains(b)) {
             EnumProperty<RailShape> shapeProperty;
