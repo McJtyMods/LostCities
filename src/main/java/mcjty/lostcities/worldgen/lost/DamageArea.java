@@ -2,8 +2,10 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.GeometryTools;
+import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
+import mcjty.lostcities.worldgen.LostTags;
 import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
@@ -69,7 +71,7 @@ public class DamageArea {
             return b;
         }
 
-        if (LostCityTerrainFeature.getGlassStates().contains(b)) {
+        if (Tools.hasTag(b.getBlock(), LostTags.EASY_BREAKABLE_TAG)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }
         if (provider.getRandom().nextFloat() <= damage) {

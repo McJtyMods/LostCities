@@ -3,8 +3,11 @@ package mcjty.lostcities.varia;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
+import net.minecraft.core.DefaultedRegistry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.datafix.fixes.BlockStateData;
 import net.minecraft.world.level.block.Block;
@@ -19,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class Tools {
 
-    private static Set<String> done = new HashSet<>();
+    private static final Set<String> done = new HashSet<>();
 
     private static final Function<Map.Entry<Property<?>, Comparable<?>>, String> PROPERTY_MAPPER = new Function<Map.Entry<Property<?>, Comparable<?>>, String>() {
         @Override
@@ -105,5 +108,14 @@ public class Tools {
             }
         }
         return null;
+    }
+
+    public static Iterable<Holder<Block>> getBlocksForTag(TagKey<Block> rl) {
+        DefaultedRegistry<Block> registry = Registry.BLOCK;
+        return registry.getTagOrEmpty(rl);
+    }
+
+    public static boolean hasTag(Block block, TagKey<Block> tag) {
+        return Registry.BLOCK.getHolderOrThrow(block.builtInRegistryHolder().key()).is(tag);
     }
 }
