@@ -11,23 +11,23 @@ import java.util.Map;
 
 public class BiomeInfo {
 
-    private static final Map<ChunkCoord, BiomeInfo> biomeInfoMap = new HashMap<>();
+    private static final Map<ChunkCoord, BiomeInfo> BIOME_INFO_MAP = new HashMap<>();
 
     private Holder<Biome> mainBiome;
 
     public static void cleanCache() {
-        biomeInfoMap.clear();
+        BIOME_INFO_MAP.clear();
     }
 
     public static BiomeInfo getBiomeInfo(IDimensionInfo provider, ChunkCoord coord) {
-        if (!biomeInfoMap.containsKey(coord)) {
+        if (!BIOME_INFO_MAP.containsKey(coord)) {
             BiomeInfo info = new BiomeInfo();
             int chunkX = coord.chunkX();
             int chunkZ = coord.chunkZ();
             info.mainBiome = provider.getBiome(new BlockPos((chunkX << 4) + 8, 65, (chunkZ << 4) + 8));
-            biomeInfoMap.put(coord, info);
+            BIOME_INFO_MAP.put(coord, info);
         }
-        return biomeInfoMap.get(coord);
+        return BIOME_INFO_MAP.get(coord);
     }
 
     public static BiomeInfo getBiomeInfo(IDimensionInfo provider, int chunkX, int chunkZ) {

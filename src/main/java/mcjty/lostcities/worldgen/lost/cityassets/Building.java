@@ -1,7 +1,6 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
 import mcjty.lostcities.api.ILostCityBuilding;
-import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.worldgen.lost.regassets.BuildingRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.PartRef;

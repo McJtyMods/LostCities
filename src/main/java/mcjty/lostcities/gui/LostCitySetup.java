@@ -79,8 +79,8 @@ public class LostCitySetup {
             throw new IllegalStateException("Cannot happen!");
         }
         customizedProfile = new LostCityProfile("customized", false);
-        LostCityProfile original = ProfileSetup.standardProfiles.get(profile);
-        ProfileSetup.standardProfiles.put("customized", customizedProfile);
+        LostCityProfile original = ProfileSetup.STANDARD_PROFILES.get(profile);
+        ProfileSetup.STANDARD_PROFILES.put("customized", customizedProfile);
         profiles.add("customized");
         customizedProfile.copyFrom(original);
         profile = "customized";
@@ -93,7 +93,7 @@ public class LostCitySetup {
         } else if ("customized".equals(profile)) {
             return Optional.ofNullable(customizedProfile);
         } else {
-            return Optional.of(ProfileSetup.standardProfiles.get(profile));
+            return Optional.of(ProfileSetup.STANDARD_PROFILES.get(profile));
         }
     }
 
@@ -151,7 +151,7 @@ public class LostCitySetup {
 //            if ("lc_cavern".equals(worldType.getName())) {
 //                preferedProfile = "cavern";
 //            }
-            profiles = new ArrayList<>(ProfileSetup.standardProfiles.keySet());
+            profiles = new ArrayList<>(ProfileSetup.STANDARD_PROFILES.keySet());
             profiles.sort((o1, o2) -> {
                 if (preferedProfile.equals(o1)) {
                     return -1;

@@ -9,9 +9,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.datafix.fixes.BlockStateData;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class Tools {
 
-    private static final Set<String> done = new HashSet<>();
+    private static final Set<String> DONE = new HashSet<>();
 
     private static final Function<Map.Entry<Property<?>, Comparable<?>>, String> PROPERTY_MAPPER = new Function<Map.Entry<Property<?>, Comparable<?>>, String>() {
         @Override
@@ -106,11 +108,22 @@ public class Tools {
     }
 
     public static Iterable<Holder<Block>> getBlocksForTag(TagKey<Block> rl) {
-        DefaultedRegistry<Block> registry = Registry.BLOCK;
+        @SuppressWarnings("deprecation") DefaultedRegistry<Block> registry = Registry.BLOCK;
         return registry.getTagOrEmpty(rl);
     }
 
     public static boolean hasTag(Block block, TagKey<Block> tag) {
+        //noinspection deprecation
         return Registry.BLOCK.getHolderOrThrow(block.builtInRegistryHolder().key()).is(tag);
+    }
+
+    public static int getSeaLevel(LevelReader level) {
+        if (level instanceof WorldGenLevel wgLevel) {
+            if (wgLevel.getChunkSource() instanceof ServerChunkCache scc) {
+                return scc.getGenerator().getSeaLevel();
+            }
+        }
+        //noinspection deprecation
+        return level.getSeaLevel();
     }
 }

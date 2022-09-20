@@ -13,8 +13,8 @@ public class Highway {
 
     private static PerlinNoiseGenerator14 perlinX = null;
     private static PerlinNoiseGenerator14 perlinZ = null;
-    private static final Map<ChunkCoord, Integer> xHighwayLevelCache = new HashMap<>();
-    private static final Map<ChunkCoord, Integer> zHighwayLevelCache = new HashMap<>();
+    private static final Map<ChunkCoord, Integer> X_HIGHWAY_LEVEL_CACHE = new HashMap<>();
+    private static final Map<ChunkCoord, Integer> Z_HIGHWAY_LEVEL_CACHE = new HashMap<>();
 
 
     private static void makePerlin(long seed) {
@@ -29,8 +29,8 @@ public class Highway {
     public static void cleanCache() {
         perlinX = null;
         perlinZ = null;
-        xHighwayLevelCache.clear();
-        zHighwayLevelCache.clear();
+        X_HIGHWAY_LEVEL_CACHE.clear();
+        Z_HIGHWAY_LEVEL_CACHE.clear();
     }
 
     public static boolean hasHighway(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
@@ -48,7 +48,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getXHighwayLevel(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        return getHighwayLevel(provider, profile, Highway.xHighwayLevelCache, cp -> hasXHighway(cp, profile), Orientation.X, new ChunkCoord(provider.getType(), chunkX, chunkZ));
+        return getHighwayLevel(provider, profile, Highway.X_HIGHWAY_LEVEL_CACHE, cp -> hasXHighway(cp, profile), Orientation.X, new ChunkCoord(provider.getType(), chunkX, chunkZ));
     }
 
     /**
@@ -56,7 +56,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getZHighwayLevel(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        return getHighwayLevel(provider, profile, Highway.zHighwayLevelCache, cp -> hasZHighway(cp, profile), Orientation.Z, new ChunkCoord(provider.getType(), chunkX, chunkZ));
+        return getHighwayLevel(provider, profile, Highway.Z_HIGHWAY_LEVEL_CACHE, cp -> hasZHighway(cp, profile), Orientation.Z, new ChunkCoord(provider.getType(), chunkX, chunkZ));
     }
 
     private static int getHighwayLevel(IDimensionInfo provider, LostCityProfile profile, Map<ChunkCoord, Integer> cache, Function<ChunkCoord, Boolean> hasHighway, Orientation orientation, ChunkCoord cp) {

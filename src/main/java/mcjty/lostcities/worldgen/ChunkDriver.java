@@ -61,7 +61,9 @@ public class ChunkDriver {
     }
 
     private void setBlock(BlockPos p, BlockState state) {
-        if(state != null) cache.put(p, state);
+        if (state != null) {
+            cache.put(p, state);
+        }
     }
 
     // This version of getBlock() is less optimal but it will work for different chunks

@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 public class LostCities {
     public static final String MODID = "lostcities";
 
-    public static final Logger logger = LogManager.getLogger(LostCities.MODID);
+    public static final Logger LOGGER = LogManager.getLogger(LostCities.MODID);
 
     public static final ModSetup setup = new ModSetup();
     public static LostCities instance;
@@ -59,7 +59,7 @@ public class LostCities {
     }
 
     public static Logger getLogger() {
-        return logger;
+        return LOGGER;
     }
 
     private void onConstructModEvent(FMLConstructModEvent event) {

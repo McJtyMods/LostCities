@@ -9,7 +9,7 @@ import java.util.Optional;
  * For a city style this object represents settings for rails
  */
 public class RailSettings {
-    private Character railMainBlock;
+    private final Character railMainBlock;
 
     public static final Codec<RailSettings> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(

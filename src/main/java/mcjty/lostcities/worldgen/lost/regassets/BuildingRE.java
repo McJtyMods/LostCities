@@ -34,12 +34,12 @@ public class BuildingRE implements IForgeRegistryEntry<BuildingRE> {
     private int minCellars = -1;        // -1 means default frmo level
     private int maxFloors = -1;         // -1 means default from level
     private int maxCellars = -1;        // -1 means default frmo level
-    private char fillerBlock;           // Block used to fill/close areas. Usually the block of the building itself
-    private String rubbleBlock;         // Block used for destroyed building rubble
+    private final char fillerBlock;     // Block used to fill/close areas. Usually the block of the building itself
+    private final String rubbleBlock;   // Block used for destroyed building rubble
     private float prefersLonely = 0.0f; // The chance this this building is alone. If 1.0f this building wants to be alone all the time
 
     private PaletteRE localPalette = null;
-    private String refPaletteName;
+    private final String refPaletteName;
 
     private final List<PartRef> parts;
     private final List<PartRef> parts2;

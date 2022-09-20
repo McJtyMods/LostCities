@@ -3,7 +3,7 @@ package mcjty.lostcities.varia;
 import java.util.Random;
 
 public class NoiseGeneratorSimplex {
-    private static final int[][] grad3 = new int[][]{{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}, {1, 0, 1}, {-1, 0, 1}, {1, 0, -1}, {-1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
+    private static final int[][] GRAD_3 = new int[][]{{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}, {1, 0, 1}, {-1, 0, 1}, {1, 0, -1}, {-1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
     public static final double SQRT_3 = Math.sqrt(3.0D);
     private final int[] p;
     public final double xo;
@@ -76,7 +76,7 @@ public class NoiseGeneratorSimplex {
             d0 = 0.0D;
         } else {
             d15 = d15 * d15;
-            d0 = d15 * d15 * dot(grad3[k1], d9, d10);
+            d0 = d15 * d15 * dot(GRAD_3[k1], d9, d10);
         }
 
         double d16 = 0.5D - d11 * d11 - d12 * d12;
@@ -86,7 +86,7 @@ public class NoiseGeneratorSimplex {
             d1 = 0.0D;
         } else {
             d16 = d16 * d16;
-            d1 = d16 * d16 * dot(grad3[l1], d11, d12);
+            d1 = d16 * d16 * dot(GRAD_3[l1], d11, d12);
         }
 
         double d17 = 0.5D - d13 * d13 - d14 * d14;
@@ -96,20 +96,20 @@ public class NoiseGeneratorSimplex {
             d2 = 0.0D;
         } else {
             d17 = d17 * d17;
-            d2 = d17 * d17 * dot(grad3[i2], d13, d14);
+            d2 = d17 * d17 * dot(GRAD_3[i2], d13, d14);
         }
 
         return 70.0D * (d0 + d1 + d2);
     }
 
-    public void add(double[] buffer, double p_151606_2_, double p_151606_4_, int p_151606_6_, int p_151606_7_, double p_151606_8_, double p_151606_10_, double p_151606_12_) {
+    public void add(double[] buffer, double x, double z, int xWidth, int zWidth, double xScale, double zScale, double factor) {
         int i = 0;
 
-        for (int j = 0; j < p_151606_7_; ++j) {
-            double d0 = (p_151606_4_ + j) * p_151606_10_ + this.yo;
+        for (int zz = 0; zz < zWidth; ++zz) {
+            double d0 = (z + zz) * zScale + this.yo;
 
-            for (int k = 0; k < p_151606_6_; ++k) {
-                double d1 = (p_151606_2_ + k) * p_151606_8_ + this.xo;
+            for (int xx = 0; xx < xWidth; ++xx) {
+                double d1 = (x + xx) * xScale + this.xo;
                 double d5 = (d1 + d0) * F2;
                 int l = fastFloor(d1 + d5);
                 int i1 = fastFloor(d0 + d5);
@@ -145,7 +145,7 @@ public class NoiseGeneratorSimplex {
                     d2 = 0.0D;
                 } else {
                     d15 = d15 * d15;
-                    d2 = d15 * d15 * dot(grad3[j2], d9, d10);
+                    d2 = d15 * d15 * dot(GRAD_3[j2], d9, d10);
                 }
 
                 double d16 = 0.5D - d11 * d11 - d12 * d12;
@@ -155,7 +155,7 @@ public class NoiseGeneratorSimplex {
                     d3 = 0.0D;
                 } else {
                     d16 = d16 * d16;
-                    d3 = d16 * d16 * dot(grad3[k2], d11, d12);
+                    d3 = d16 * d16 * dot(GRAD_3[k2], d11, d12);
                 }
 
                 double d17 = 0.5D - d13 * d13 - d14 * d14;
@@ -165,11 +165,11 @@ public class NoiseGeneratorSimplex {
                     d4 = 0.0D;
                 } else {
                     d17 = d17 * d17;
-                    d4 = d17 * d17 * dot(grad3[l2], d13, d14);
+                    d4 = d17 * d17 * dot(GRAD_3[l2], d13, d14);
                 }
 
                 int i3 = i++;
-                buffer[i3] += 70.0D * (d2 + d3 + d4) * p_151606_12_;
+                buffer[i3] += 70.0D * (d2 + d3 + d4) * factor;
             }
         }
     }

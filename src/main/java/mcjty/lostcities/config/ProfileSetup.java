@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class ProfileSetup {
 
-    public static final Map<String, LostCityProfile> standardProfiles = new HashMap<>();
+    public static final Map<String, LostCityProfile> STANDARD_PROFILES = new HashMap<>();
 
     private static void initStandardProfiles() {
         LostCityProfile profile;
@@ -29,7 +29,7 @@ public class ProfileSetup {
 
         profile = new LostCityProfile("default", true);
         profile.setIconFile("textures/gui/icon_default.png");
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("cavern", true);
         profile.setDescription("This is a cavern type world (like the nether)");
@@ -52,7 +52,7 @@ public class ProfileSetup {
         profile.CITY_LEVEL2_HEIGHT = 40+20;
         profile.CITY_LEVEL3_HEIGHT = 40+28;
 //        profile.setIconFile("textures/gui/icon_default.png");
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("nodamage", true);
         profile.setDescription("Like default but no explosion damage");
@@ -62,7 +62,7 @@ public class ProfileSetup {
         profile.MINI_EXPLOSION_CHANCE = 0;
         profile.RUIN_CHANCE = 0;
         profile.RUBBLELAYER = false;
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
 
 //        profile = new LostCityProfile("floating", true);
 //        profile.setDescription("Cities on floating islands");
@@ -214,14 +214,14 @@ public class ProfileSetup {
         profile.RUIN_CHANCE = 0;
         profile.HIGHWAY_REQUIRES_TWO_CITIES = false;
         profile.RAILWAYS_CAN_END = true;
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("onlycities", true);
         profile.setDescription("The entire world is a city");
         profile.setIconFile("textures/gui/icon_onlycities.png");
         profile.CITY_CHANCE = 0.2;
         profile.CITY_MAXRADIUS = 256;
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("tallbuildings", true);
         profile.setDescription("Very tall buildings (performance heavy)");
@@ -240,7 +240,7 @@ public class ProfileSetup {
         profile.MINI_EXPLOSION_MAXRADIUS = 14;
         profile.MINI_EXPLOSION_MINRADIUS = 3;
         profile.RUIN_CHANCE = 0.01f;
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("safe", true);
         profile.setDescription("Safe mode: no spawners, lighting but no loot");
@@ -248,7 +248,7 @@ public class ProfileSetup {
         profile.GENERATE_SPAWNERS = false;
         profile.GENERATE_LIGHTING = true;
         profile.GENERATE_LOOT = false;
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("ancient", true);
         profile.setDescription("Ancient jungle city, vines and leafs, ruined buildings");
@@ -267,7 +267,7 @@ public class ProfileSetup {
         profile.RUIN_MINLEVEL_PERCENT = 0.0f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.9f;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2", "ocean=8", "beaches=20", "river=5" };
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("wasteland", true);
         profile.setDescription("Wasteland, no water, bare land");
@@ -285,7 +285,7 @@ public class ProfileSetup {
         profile.AVOID_WATER = true;
         profile.AVOID_FOLIAGE = true;
         profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
 
 //        profile = new LostCityProfile("atlantis", true);
 //        profile.setDescription("Drowned cities, raised waterlevel");
@@ -373,7 +373,7 @@ public class ProfileSetup {
         profile.BUILDING_MAXFLOORS = 9;
         profile.BUILDING_MAXFLOORS_CHANCE = 7;
         profile.BUILDING_CHANCE = .4f;
-        standardProfiles.put(profile.getName(), profile);
+        STANDARD_PROFILES.put(profile.getName(), profile);
     }
 
     public static void setupProfiles() {
@@ -389,7 +389,7 @@ public class ProfileSetup {
         });
 
         new File(profileDir.toString()).mkdirs();
-        for (Map.Entry<String, LostCityProfile> entry : standardProfiles.entrySet()) {
+        for (Map.Entry<String, LostCityProfile> entry : STANDARD_PROFILES.entrySet()) {
             String name = entry.getKey();
             if (!"customized".equals(name)) {
                 LostCityProfile profile = entry.getValue();
@@ -401,7 +401,7 @@ public class ProfileSetup {
                         writer.flush();
                     }
                 } catch (FileNotFoundException e) {
-                    LostCities.getLogger().error("Couldn't save profile '" + name + "'!");
+                    LostCities.getLogger().error("Couldn't save profile '{}'!", name);
                 }
             }
         }
@@ -418,9 +418,9 @@ public class ProfileSetup {
                 String json = FileUtils.readFileToString(file, "UTF-8");
                 String[] split = name.split("\\.");
                 LostCityProfile profile = new LostCityProfile(split[0], json);
-                standardProfiles.put(split[0], profile);
+                STANDARD_PROFILES.put(split[0], profile);
             } catch (IOException e) {
-                LostCities.getLogger().error("Couldn't read profile '" + name + "'!");
+                LostCities.getLogger().error("Couldn't read profile '{}'!", name);
                 return;
             }
         }

@@ -186,8 +186,7 @@ public class LostCityProfile implements ILostCityProfile {
         this.name = name;
         isPublic = false;
         Configuration config = new Configuration();
-        JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(json);
+        JsonElement element = JsonParser.parseString(json);
         config.fromJson(element.getAsJsonObject());
         init(config);
     }
@@ -527,7 +526,7 @@ public class LostCityProfile implements ILostCityProfile {
         if (liquidBlock == null) {
             Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LIQUID_BLOCK));
             if (b == null) {
-                ModSetup.getLogger().error("Bad liquid block: " + LIQUID_BLOCK + "!");
+                ModSetup.getLogger().error("Bad liquid block: {}!", LIQUID_BLOCK);
                 liquidBlock = Blocks.WATER.defaultBlockState();
             } else {
                 liquidBlock = b.defaultBlockState();
@@ -540,7 +539,7 @@ public class LostCityProfile implements ILostCityProfile {
         if (baseBlock == null) {
             Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(BASE_BLOCK));
             if (b == null) {
-                ModSetup.getLogger().error("Bad base block: " + BASE_BLOCK + "!");
+                ModSetup.getLogger().error("Bad base block: {}!", BASE_BLOCK);
                 baseBlock = Blocks.STONE.defaultBlockState();
             } else {
                 baseBlock = b.defaultBlockState();

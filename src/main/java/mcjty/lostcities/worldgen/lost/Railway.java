@@ -86,10 +86,10 @@ public class Railway {
         }
     }
 
-    private static final Map<ChunkCoord, RailChunkInfo> railInfo = new HashMap<>();
+    private static final Map<ChunkCoord, RailChunkInfo> RAIL_INFO = new HashMap<>();
 
     public static void cleanCache() {
-        railInfo.clear();
+        RAIL_INFO.clear();
     }
 
     /**
@@ -309,8 +309,8 @@ public class Railway {
 
     public static RailChunkInfo getRailChunkType(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
         ChunkCoord key = new ChunkCoord(provider.getType(), chunkX, chunkZ);
-        if (railInfo.containsKey(key)) {
-            return railInfo.get(key);
+        if (RAIL_INFO.containsKey(key)) {
+            return RAIL_INFO.get(key);
         }
         RailChunkInfo info = getRailChunkTypeInternal(chunkX, chunkZ, provider);
         if (provider.getProfile().isSpace() && CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
@@ -324,7 +324,7 @@ public class Railway {
                 info = RailChunkInfo.NOTHING;
             }
         }
-        railInfo.put(key, info);
+        RAIL_INFO.put(key, info);
         return info;
     }
 
@@ -367,6 +367,12 @@ public class Railway {
                 } else {
                     return new RailChunkInfo(GOING_DOWN_FURTHER, direction, adjacent.getLevel() - 2, adjacent.getRails());
                 }
+            case THREE_SPLIT:
+                break;
+            case VERTICAL:
+                break;
+            case DOUBLE_BEND:
+                break;
             case RAILS_END_HERE:
                 if (direction == adjacent.getDirection()) {
                     return new RailChunkInfo(HORIZONTAL, direction, adjacent.getLevel(), adjacent.getRails());
@@ -379,17 +385,17 @@ public class Railway {
         throw new RuntimeException("This is really impossible!");
     }
 
-    public static void main(String[] args) {
-        int chunkX = -16;
-        int chunkZ = -1;
-        int mx = Math.floorMod(chunkX + 1, 20);       // The +1 to avoid having them on highways
-        int mz = Math.floorMod(chunkZ + 1, 20);
-        System.out.println("mx = " + mx);
-        System.out.println("mz = " + mz);
-
-        for (int i = -40 ; i < 40 ; i++) {
-            System.out.println("Math.floorMod(" + i + ", 20) = " + Math.floorMod(i, 20));
-        }
+//    public static void main(String[] args) {
+//        int chunkX = -16;
+//        int chunkZ = -1;
+//        int mx = Math.floorMod(chunkX + 1, 20);       // The +1 to avoid having them on highways
+//        int mz = Math.floorMod(chunkZ + 1, 20);
+//        System.out.println("mx = " + mx);
+//        System.out.println("mz = " + mz);
+//
+//        for (int i = -40 ; i < 40 ; i++) {
+//            System.out.println("Math.floorMod(" + i + ", 20) = " + Math.floorMod(i, 20));
+//        }
 
 //
 //
@@ -456,5 +462,4 @@ public class Railway {
 //            System.out.println("" + s);
 //        }
 //    }
-    }
 }

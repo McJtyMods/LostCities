@@ -27,17 +27,17 @@ public class City {
     private static Map<ChunkCoord, PredefinedStreet> predefinedStreetMap = null;
 
     // If cityChance == -1 then this is used to control where cities are
-    private static final Map<ResourceKey<Level>, CityRarityMap> cityRarityMap = new HashMap<>();
+    private static final Map<ResourceKey<Level>, CityRarityMap> CITY_RARITY_MAP = new HashMap<>();
 
     public static void cleanCache() {
         predefinedCityMap = null;
         predefinedBuildingMap = null;
         predefinedStreetMap = null;
-        cityRarityMap.clear();
+        CITY_RARITY_MAP.clear();
     }
 
     public static CityRarityMap getCityRarityMap(ResourceKey<Level> level, long seed, double scale, double offset, double innerScale) {
-        return cityRarityMap.computeIfAbsent(level, k -> new CityRarityMap(seed, scale, offset, innerScale));
+        return CITY_RARITY_MAP.computeIfAbsent(level, k -> new CityRarityMap(seed, scale, offset, innerScale));
     }
 
     public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, ResourceKey<Level> type) {

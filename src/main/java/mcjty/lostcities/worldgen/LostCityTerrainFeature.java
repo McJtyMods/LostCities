@@ -102,7 +102,7 @@ public class LostCityTerrainFeature {
         this.rand = rand;
         driver = new ChunkDriver();
         this.mainGroundLevel = profile.GROUNDLEVEL;
-        int waterLevel = provider.getWorld() == null ? 65 : provider.getWorld().getSeaLevel();// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
+        int waterLevel = provider.getWorld() == null ? 65 : Tools.getSeaLevel(provider.getWorld());// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
         this.rubbleNoise = new NoiseGeneratorPerlin(rand, 4);
         this.leavesNoise = new NoiseGeneratorPerlin(rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);
@@ -177,10 +177,10 @@ public class LostCityTerrainFeature {
     public static Set<BlockState> getStatesNeedingTodo() {
         if (statesNeedingTodo == null) {
             statesNeedingTodo = new HashSet<>();
-            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(BlockTags.SAPLINGS)) {
+            for (Holder<Block> bh : Tools.getBlocksForTag(BlockTags.SAPLINGS)) {
                 addStates(bh.value(), statesNeedingTodo);
             }
-            for (Holder<Block> bh : Registry.BLOCK.getTagOrEmpty(BlockTags.SMALL_FLOWERS)) {
+            for (Holder<Block> bh : Tools.getBlocksForTag(BlockTags.SMALL_FLOWERS)) {
                 addStates(bh.value(), statesNeedingTodo);
             }
         }
@@ -1288,15 +1288,16 @@ public class LostCityTerrainFeature {
             }
         }
 
-        //city surface leveling - for prettier cities
-        //note: Better results may be achieved with terrain noise adjustment (like how newer structures do it)
-        int ground = info.getCityGroundLevel();
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                boolean moved = moveDown(x, z, ground + 1, info.waterLevel > info.groundLevel);
-
-                if (!moved) {
-                    moveUp(x, z, ground, info.waterLevel > info.groundLevel);
+        // City surface leveling - for prettier cities
+        // Note: Better results may be achieved with terrain noise adjustment (like how newer structures do it)
+        if (profile.isDefault()) {
+            int ground = info.getCityGroundLevel();
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    boolean moved = moveDown(x, z, ground + 1, info.waterLevel > info.groundLevel);
+                    if (!moved) {
+                        moveUp(x, z, ground, info.waterLevel > info.groundLevel);
+                    }
                 }
             }
         }
@@ -1546,10 +1547,9 @@ public class LostCityTerrainFeature {
                     }
                     break;
                 case THREE_SPLIT:
-                    break;
                 case VERTICAL:
-                    break;
                 case DOUBLE_BEND:
+                case RAILS_END_HERE:
                     break;
             }
         }
@@ -1737,7 +1737,7 @@ public class LostCityTerrainFeature {
             this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
         }
 
-        int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * (float) FLOORHEIGHT));
+        int baseheight = (int) (info.getCityGroundLevel() + 1 + (info.ruinHeight * info.getNumFloors() * FLOORHEIGHT));
 
         CompiledPalette palette = info.getCompiledPalette();
 
@@ -2376,10 +2376,9 @@ public class LostCityTerrainFeature {
     private void handleLoot(BuildingInfo info, IBuildingPart part, WorldGenLevel world, BlockState b, Palette.Info inf) {
         if (!info.noLoot) {
             BlockPos pos = driver.getCurrentCopy();
-            BlockState finalB = b;
             info.addPostTodo(pos, () -> {
                 if (!world.getBlockState(pos).isAir()) {
-                    world.setBlock(pos, finalB, Block.UPDATE_CLIENTS);
+                    world.setBlock(pos, b, Block.UPDATE_CLIENTS);
                     generateLoot(info, world, pos, new BuildingInfo.ConditionTodo(inf.loot(), part.getName(), info));
                 }
             });
@@ -2433,12 +2432,12 @@ public class LostCityTerrainFeature {
             logic.setEntityId(ForgeRegistries.ENTITIES.getValue(randomEntity));
             spawner.setChanged();
             if (Config.DEBUG) {
-                ModSetup.getLogger().debug("generateLootSpawners: mob=" + randomEntity.toString() + " pos=" + pos);
+                ModSetup.getLogger().debug("generateLootSpawners: mob={} pos={}", randomEntity.toString(), pos);
             }
         } else if (tileentity != null) {
-            ModSetup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") has a TileEntity of incorrect type " + tileentity.getClass().getName() + "!");
+            ModSetup.getLogger().error("The mob spawner at ({}, {}, {}) has a TileEntity of incorrect type {}!", pos.getX(), pos.getY(), pos.getZ(), tileentity.getClass().getName());
         } else {
-            ModSetup.getLogger().error("The mob spawner at (" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ") is missing its TileEntity!");
+            ModSetup.getLogger().error("The mob spawner at ({}, {}, {}) is missing its TileEntity!", pos.getX(), pos.getY(), pos.getZ());
         }
     }
 
@@ -2474,7 +2473,7 @@ public class LostCityTerrainFeature {
                 createLoot(info, rand, world, pos, condition, this.provider);
             }
         } else if (te == null) {
-            ModSetup.getLogger().error("Error setting loot at " + pos.getX() + "," + pos.getY() + "," + pos.getZ());
+            ModSetup.getLogger().error("Error setting loot at {},{},{}", pos.getX(), pos.getY(), pos.getZ());
         }
     }
 
