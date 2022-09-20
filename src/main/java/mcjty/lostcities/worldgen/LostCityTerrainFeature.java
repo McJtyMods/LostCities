@@ -59,16 +59,15 @@ public class LostCityTerrainFeature {
 
     private static int gSeed = 123456789;
     private final int mainGroundLevel;
-    private boolean statesSetup = false;
-    private static BlockState air;
-    private static BlockState hardAir;
+    private final BlockState air;
+    private final BlockState hardAir;
 
+    private BlockState base = null;
     private BlockState liquid;
-    private BlockState base;
 
-    private static Set<BlockState> railStates = null;
-    private static Set<BlockState> statesNeedingTodo = null;
-    private static Set<BlockState> statesNeedingLightingUpdate = null;
+    private Set<BlockState> railStates = null;
+    private Set<BlockState> statesNeedingTodo = null;
+    private Set<BlockState> statesNeedingLightingUpdate = null;
 
     private char street;
     private char streetBase;
@@ -103,12 +102,19 @@ public class LostCityTerrainFeature {
         this.leavesNoise = new NoiseGeneratorPerlin(rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);
 
+        air = Blocks.AIR.defaultBlockState();
+        hardAir = Blocks.COMMAND_BLOCK.defaultBlockState();
+
 //        islandTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
 //        cavernTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
 //        spaceTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
     }
 
-    private BlockState getRandomLeaf() {
+    private BlockState getRandomLeaf(BuildingInfo info, CompiledPalette compiledPalette) {
+        Character leavesBlock = info.getCityStyle().getLeavesBlock();
+        if (leavesBlock != null) {
+            return compiledPalette.get(leavesBlock);
+        }
         if (randomLeafs == null) {
             BlockState leaves = Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
             BlockState leaves2 = Blocks.JUNGLE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
@@ -132,8 +138,22 @@ public class LostCityTerrainFeature {
         return randomLeafs[fastrand128()];
     }
 
-    //Gets rubble block - regenerates list if empty
-    private BlockState getRandomDirt() {
+    private Set<BlockState> getPossibleRandomDirts(BuildingInfo info, CompiledPalette compiledPalette) {
+        Character rubbleDirtBlock = info.getCityStyle().getRubbleDirtBlock();
+        if (rubbleDirtBlock != null) {
+            return compiledPalette.getAll(rubbleDirtBlock);
+        } else {
+            getRandomDirt(info, compiledPalette);
+            return randomDirtSet;
+        }
+    }
+
+    // Gets rubble block - regenerates list if empty
+    private BlockState getRandomDirt(BuildingInfo info, CompiledPalette compiledPalette) {
+        Character rubbleDirtBlock = info.getCityStyle().getRubbleDirtBlock();
+        if (rubbleDirtBlock != null) {
+            return compiledPalette.get(rubbleDirtBlock);
+        }
         if (randomDirt == null) {
             randomDirtSet = new HashSet<>();
             BlockState mBricks = Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
@@ -161,7 +181,7 @@ public class LostCityTerrainFeature {
         return randomDirt[fastrand128()];
     }
 
-    public static Set<BlockState> getRailStates() {
+    private Set<BlockState> getRailStates() {
         if (railStates == null) {
             railStates = new HashSet<>();
             addStates(Blocks.RAIL, railStates);
@@ -170,7 +190,7 @@ public class LostCityTerrainFeature {
         return railStates;
     }
 
-    public static Set<BlockState> getStatesNeedingTodo() {
+    private Set<BlockState> getStatesNeedingTodo() {
         if (statesNeedingTodo == null) {
             statesNeedingTodo = new HashSet<>();
             for (Holder<Block> bh : Tools.getBlocksForTag(BlockTags.SAPLINGS)) {
@@ -183,7 +203,7 @@ public class LostCityTerrainFeature {
         return statesNeedingTodo;
     }
 
-    public static Set<BlockState> getStatesNeedingLightingUpdate() {
+    private Set<BlockState> getStatesNeedingLightingUpdate() {
         if (statesNeedingLightingUpdate == null) {
             statesNeedingLightingUpdate = new HashSet<>();
             for (String s : Config.BLOCKS_REQUIRING_LIGHTING_UPDATES) {
@@ -201,14 +221,9 @@ public class LostCityTerrainFeature {
     }
 
     public void setupStates(LostCityProfile profile) {
-        if (!statesSetup) {
-            air = Blocks.AIR.defaultBlockState();
-            hardAir = Blocks.COMMAND_BLOCK.defaultBlockState();
-
+        if (base == null) {
             base = profile.getBaseBlock();
             liquid = profile.getLiquidBlock();
-
-            statesSetup = true;
         }
     }
 
@@ -1649,21 +1664,18 @@ public class LostCityTerrainFeature {
                     if (c != air && c != liquid) {
                         for (int i = 0; i < vr; i++) {
                             if (isEmpty(driver.getBlock())) {
-                                driver.add(getRandomDirt());
+                                driver.add(getRandomDirt(info, info.getCompiledPalette()));
                             } else {
                                 driver.incY();
                             }
                         }
                     }
                     //first round may not have generated this - stops crash on create world
-                    if(randomDirt == null) {
-                        getRandomDirt();
-                    }
                     BlockState leafBaseState = driver.getBlockDown();
-                    if (leafBaseState == base || randomDirtSet.contains(leafBaseState)) {
+                    if (leafBaseState == base || getPossibleRandomDirts(info, info.getCompiledPalette()).contains(leafBaseState)) {
                         for (int i = 0; i < vl; i++) {
                             if (isEmpty(driver.getBlock())) {
-                                driver.add(getRandomLeaf());
+                                driver.add(getRandomLeaf(info, info.getCompiledPalette()));
                             } else {
                                 driver.incY();
                             }
@@ -1772,7 +1784,7 @@ public class LostCityTerrainFeature {
                                 height++;   // Make sure we keep on filling with air a bit longer because we are lowering here
                                 c = driver.getBlockDown();
                             }
-                            driver.add(getRandomLeaf());
+                            driver.add(getRandomLeaf(info, palette));
                             vl--;
                         } else {
                             driver.add(air);
@@ -2072,7 +2084,7 @@ public class LostCityTerrainFeature {
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - x));
                     int cnt = 0;
                     while (VEGETATION_RAND.nextFloat() < v && cnt < 30) {
-                        driver.add(getRandomLeaf());
+                        driver.add(getRandomLeaf(info, info.getCompiledPalette()));
                         cnt++;
                     }
                 }
@@ -2090,7 +2102,7 @@ public class LostCityTerrainFeature {
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (x - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS));
                     int cnt = 0;
                     while (VEGETATION_RAND.nextFloat() < v && cnt < 30) {
-                        driver.add(getRandomLeaf());
+                        driver.add(getRandomLeaf(info, info.getCompiledPalette()));
                         cnt++;
                     }
                 }
@@ -2108,7 +2120,7 @@ public class LostCityTerrainFeature {
                     float v = Math.min(.8f, info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS + 1 - z));
                     int cnt = 0;
                     while (VEGETATION_RAND.nextFloat() < v && cnt < 30) {
-                        driver.add(getRandomLeaf());
+                        driver.add(getRandomLeaf(info, info.getCompiledPalette()));
                         cnt++;
                     }
                 }
@@ -2126,7 +2138,7 @@ public class LostCityTerrainFeature {
                     float v = info.profile.CHANCE_OF_RANDOM_LEAFBLOCKS * (z - 14 + info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS);
                     int cnt = 0;
                     while (VEGETATION_RAND.nextFloat() < v && cnt < 30) {
-                        driver.add(getRandomLeaf());
+                        driver.add(getRandomLeaf(info, info.getCompiledPalette()));
                         cnt++;
                     }
                 }

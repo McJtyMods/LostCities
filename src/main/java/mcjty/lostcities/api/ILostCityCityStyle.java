@@ -50,4 +50,9 @@ public interface ILostCityCityStyle extends ILostCityAsset {
      * If this returns null it will be the default minecraft:glowstone
      */
     Character getGlowstoneBlock();
+
+    /**
+     * If this returns null it will be the default random leaves
+     */
+    Character getLeavesBlock();
 }
