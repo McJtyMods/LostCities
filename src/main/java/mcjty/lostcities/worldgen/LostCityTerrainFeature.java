@@ -62,9 +62,6 @@ public class LostCityTerrainFeature {
     private boolean statesSetup = false;
     private static BlockState air;
     private static BlockState hardAir;
-    public static BlockState bedrock;
-    public static BlockState endportal;
-    public static BlockState endportalFrame;
 
     private BlockState liquid;
     private BlockState base;
@@ -211,9 +208,6 @@ public class LostCityTerrainFeature {
             base = profile.getBaseBlock();
             liquid = profile.getLiquidBlock();
 
-            bedrock = Blocks.BEDROCK.defaultBlockState();
-            endportal = Blocks.END_PORTAL.defaultBlockState();
-            endportalFrame = Blocks.END_PORTAL_FRAME.defaultBlockState();
             statesSetup = true;
         }
     }
