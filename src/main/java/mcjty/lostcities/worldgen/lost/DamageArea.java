@@ -8,6 +8,7 @@ import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.LostTags;
 import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
@@ -26,11 +27,14 @@ public class DamageArea {
     private final AABB chunkBox;
     private final LostCityProfile profile;
 
+    private final BlockState air;
+
     public DamageArea(int chunkX, int chunkZ, IDimensionInfo provider, BuildingInfo info) {
         this.seed = provider.getSeed();
         this.profile = info.profile;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
+        this.air = Blocks.AIR.defaultBlockState();
         chunkBox = new AABB(chunkX * 16, 0, chunkZ * 16, chunkX * 16 + 15, 256, chunkZ * 16 + 15);
 
         Random damageRandom = new Random(seed + chunkZ * 295075153L + chunkX * 899826547L);
@@ -81,10 +85,10 @@ public class DamageArea {
                 if (provider.getRandom().nextFloat() < .7f) {
                     b = damaged;
                 } else {
-                    b = y <= waterlevel ? liquidChar : LostCityTerrainFeature.air;
+                    b = y <= waterlevel ? liquidChar : air;
                 }
             } else {
-                b = y <= waterlevel ? liquidChar : LostCityTerrainFeature.air;
+                b = y <= waterlevel ? liquidChar : air;
             }
         }
         return b;

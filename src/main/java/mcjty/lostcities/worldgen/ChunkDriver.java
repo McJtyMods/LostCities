@@ -44,7 +44,7 @@ public class ChunkDriver {
         cache.generate(bulk);
         bulk.close();
 
-        BlockState bedrock = LostCityTerrainFeature.bedrock;
+        BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
         for (int x = 0 ; x < 16 ; x++) {
             for (int z = 0 ; z < 16 ; z++) {
                 int y = cache.heightmap[x][z];
@@ -382,7 +382,7 @@ public class ChunkDriver {
             int idx = (px << 8) + ((pos.getY() & 0xf) << 4) + pz;
             cache[sectionIdx].section[idx] = state;
             cache[sectionIdx].isEmpty = false;
-            if (state != LostCityTerrainFeature.air) {
+            if (!state.isAir()) {
                 if (heightmap[px][pz] < pos.getY()) {
                     heightmap[px][pz] = pos.getY();
                 }
