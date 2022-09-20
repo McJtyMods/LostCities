@@ -4,7 +4,6 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.GeometryTools;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
-import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.LostTags;
 import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
 import net.minecraft.core.BlockPos;
@@ -71,7 +70,7 @@ public class DamageArea {
     }
 
     public BlockState damageBlock(BlockState b, IDimensionInfo provider, int y, float damage, CompiledPalette palette, BlockState liquidChar) {
-        if (b == LostCityTerrainFeature.bedrock || b == LostCityTerrainFeature.endportal || b == LostCityTerrainFeature.endportalFrame) {
+        if (Tools.hasTag(b.getBlock(), LostTags.NOT_BREAKABLE_TAG)) {
             return b;
         }
 
