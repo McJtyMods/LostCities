@@ -64,14 +64,14 @@ public class LostCityTerrainFeature {
     private static int gSeed = 123456789;
     private final int mainGroundLevel;
     private boolean statesSetup = false;
-    public static BlockState air;
-    public static BlockState hardAir;
+    private static BlockState air;
+    private static BlockState hardAir;
     public static BlockState bedrock;
     public static BlockState endportal;
     public static BlockState endportalFrame;
 
-    public BlockState liquid;
-    public BlockState base;
+    private BlockState liquid;
+    private BlockState base;
 
     private static Set<BlockState> railStates = null;
     private static Set<BlockState> statesNeedingTodo = null;
@@ -86,9 +86,9 @@ public class LostCityTerrainFeature {
     private final NoiseGeneratorPerlin leavesNoise;
     private final NoiseGeneratorPerlin ruinNoise;
 
-    private static BlockState[] randomLeafs = null;
-    private static BlockState[] randomDirt = null;
-    private static Set<BlockState> randomDirtSet = null;
+    private BlockState[] randomLeafs = null;
+    private BlockState[] randomDirt = null;
+    private Set<BlockState> randomDirtSet = null;
 
     private final ChunkDriver driver;
 
@@ -114,7 +114,7 @@ public class LostCityTerrainFeature {
 //        spaceTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
     }
 
-    public static BlockState getRandomLeaf() {
+    private BlockState getRandomLeaf() {
         if (randomLeafs == null) {
             BlockState leaves = Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
             BlockState leaves2 = Blocks.JUNGLE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
@@ -139,7 +139,7 @@ public class LostCityTerrainFeature {
     }
 
     //Gets rubble block - regenerates list if empty
-    public static BlockState getRandomDirt() {
+    private BlockState getRandomDirt() {
         if (randomDirt == null) {
             randomDirtSet = new HashSet<>();
             BlockState mBricks = Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
@@ -1283,6 +1283,7 @@ public class LostCityTerrainFeature {
 
         if (info.profile.isDefault()) {
             int minHeight = provider.getWorld().getMinBuildHeight();
+            BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     driver.setBlockRange(x, minHeight, z, minHeight + info.profile.BEDROCK_LAYER, bedrock);
