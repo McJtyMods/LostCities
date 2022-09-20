@@ -65,15 +65,15 @@ public class Config {
             for (String dp : DIMENSION_PROFILES.get()) {
                 String[] split = dp.split("=");
                 if (split.length != 2) {
-                    LostCities.getLogger().error("Bad format for config value: '" + dp +"'!");
+                    LostCities.getLogger().error("Bad format for config value: '{}'!", dp);
                 } else {
                     ResourceKey<Level> dimensionType = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(split[0]));
                     String profileName = split[1];
-                    LostCityProfile profile = ProfileSetup.standardProfiles.get(profileName);
+                    LostCityProfile profile = ProfileSetup.STANDARD_PROFILES.get(profileName);
                     if (profile != null) {
                         dimensionProfileCache.put(dimensionType, profileName);
                     } else {
-                        LostCities.getLogger().error("Cannot find profile: " + profileName + " for dimension " + split[0] + "!");
+                        LostCities.getLogger().error("Cannot find profile: {} for dimension {}!", profileName, split[0]);
                     }
                 }
             }
@@ -97,16 +97,16 @@ public class Config {
                 String json = Config.SELECTED_CUSTOM_JSON.get();
                 if (json != null && !json.isEmpty()) {
                     LostCityProfile profile = new LostCityProfile("customized", json);
-                    if (!ProfileSetup.standardProfiles.containsKey("customized")) {
-                        ProfileSetup.standardProfiles.put("customized", new LostCityProfile("customized", false));
+                    if (!ProfileSetup.STANDARD_PROFILES.containsKey("customized")) {
+                        ProfileSetup.STANDARD_PROFILES.put("customized", new LostCityProfile("customized", false));
                     }
-                    ProfileSetup.standardProfiles.get("customized").copyFrom(profile);
+                    ProfileSetup.STANDARD_PROFILES.get("customized").copyFrom(profile);
                 }
             }
 
             String profile = getProfileForDimension(Level.OVERWORLD);
             if (profile != null && !profile.isEmpty()) {
-                if (ProfileSetup.standardProfiles.get(profile).GENERATE_NETHER) {
+                if (ProfileSetup.STANDARD_PROFILES.get(profile).GENERATE_NETHER) {
                     dimensionProfileCache.put(Level.NETHER, "cavern");
                 }
             }

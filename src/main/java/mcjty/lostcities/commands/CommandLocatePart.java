@@ -63,8 +63,8 @@ public class CommandLocatePart implements Command<CommandSourceStack> {
                         break;
                     }
                 }
-            };
-        };
+            }
+        }
         return 0;
     }
 }

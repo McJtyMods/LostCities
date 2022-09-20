@@ -27,6 +27,7 @@ public class CommandDebug implements Command<CommandSourceStack> {
     }
 
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();

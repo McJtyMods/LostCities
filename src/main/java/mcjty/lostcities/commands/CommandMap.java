@@ -46,6 +46,7 @@ public class CommandMap implements Command<CommandSourceStack> {
                         buf.append(" ");
                     }
                 }
+                //noinspection UseOfSystemOutOrSystemErr
                 System.out.println(buf);
             }
         }

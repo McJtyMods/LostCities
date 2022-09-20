@@ -2,11 +2,6 @@ package mcjty.lostcities.worldgen.lost.regassets;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import mcjty.lostcities.worldgen.lost.regassets.data.CityBiomeMultiplier;
-import mcjty.lostcities.worldgen.lost.regassets.data.CityStyleSelector;
-import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredReference;
-import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredSettings;
-import mcjty.lostcities.worldgen.lost.cityassets.Scattered;
 import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;

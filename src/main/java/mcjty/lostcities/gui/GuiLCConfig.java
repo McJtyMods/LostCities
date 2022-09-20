@@ -67,7 +67,7 @@ public class GuiLCConfig extends Screen {
         Config.resetProfileCache();
 
         if (profile != null) {
-            ProfileSetup.standardProfiles.get("customized").copyFrom(profile);
+            ProfileSetup.STANDARD_PROFILES.get("customized").copyFrom(profile);
             Config.jsonFromClient = profile.toJson(false).toString();
         }
     }
@@ -459,6 +459,7 @@ public class GuiLCConfig extends Screen {
             boolean perlin = profile.CITY_CHANCE < 0;
             perlinScaleElement.setEnabled(perlin && isCustomized);
             perlinOffsetElement.setEnabled(perlin && isCustomized);
+            perlinInnerScaleElement.setEnabled(perlin && isCustomized);
         });
     }
 
@@ -473,7 +474,7 @@ public class GuiLCConfig extends Screen {
         LostCitySetup.CLIENT_SETUP.copyFrom(localSetup);
         LostCityProfile customizedProfile = localSetup.getCustomizedProfile();
         if ("customized".equals(localSetup.getProfile()) && customizedProfile != null) {
-            ProfileSetup.standardProfiles.get("customized").copyFrom(customizedProfile);
+            ProfileSetup.STANDARD_PROFILES.get("customized").copyFrom(customizedProfile);
             selectProfile(localSetup.getProfile(), customizedProfile);
         } else {
             selectProfile(localSetup.getProfile(), null);
@@ -494,7 +495,7 @@ public class GuiLCConfig extends Screen {
             if (listener instanceof AbstractWidget widget) {
                 if (widget.isMouseOver(mouseX, mouseY) && widget.visible) {
 //            if (widget.isHovered() && widget.visible) {
-                    widget.renderToolTip(stack, mouseX - 0, mouseY - 0);
+                    widget.renderToolTip(stack, mouseX, mouseY);
                     break;
                 }
             }

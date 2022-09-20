@@ -1,11 +1,9 @@
 package mcjty.lostcities.gui.elements;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import net.minecraft.client.gui.components.Button.OnPress;
 
 public class ButtonExt extends Button {
 

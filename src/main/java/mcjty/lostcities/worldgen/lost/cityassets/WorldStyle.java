@@ -25,7 +25,7 @@ public class WorldStyle implements ILostCityAsset {
     private final String outsideStyle;
 
     private final ScatteredSettings scatteredSettings;
-    @Nonnull final PartSelector partSelector;
+    @Nonnull private final PartSelector partSelector;
     private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
     private final List<Pair<Predicate<Holder<Biome>>, Float>> cityBiomeMultiplier = new ArrayList<>();
 

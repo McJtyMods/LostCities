@@ -6,6 +6,7 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
 import mcjty.lostcities.varia.QualityRandom;
+import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
@@ -18,7 +19,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
@@ -138,8 +138,8 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     // BuildingInfo cache
-    private static final Map<ChunkCoord, BuildingInfo> buildingInfoMap = new HashMap<>();
-    private static final Map<ChunkCoord, LostChunkCharacteristics> cityInfoMap = new HashMap<>();
+    private static final Map<ChunkCoord, BuildingInfo> BUILDING_INFO_MAP = new HashMap<>();
+    private static final Map<ChunkCoord, LostChunkCharacteristics> CITY_INFO_MAP = new HashMap<>();
 
     public void addTorchTodo(BlockPos index) {
         torchTodo.add(index);
@@ -287,8 +287,8 @@ public class BuildingInfo implements ILostChunkInfo {
     public static synchronized LostChunkCharacteristics getChunkCharacteristicsGui(int chunkX, int chunkZ, IDimensionInfo provider) {
         ResourceKey<Level> type = provider.getType();
         ChunkCoord key = new ChunkCoord(type, chunkX, chunkZ);
-        if (cityInfoMap.containsKey(key)) {
-            return cityInfoMap.get(key);
+        if (CITY_INFO_MAP.containsKey(key)) {
+            return CITY_INFO_MAP.get(key);
         } else {
             LostCityProfile profile = getProfile(chunkX, chunkZ, provider);
             LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
@@ -297,7 +297,7 @@ public class BuildingInfo implements ILostChunkInfo {
             characteristics.cityLevel = getCityLevel(chunkX, chunkZ, provider);
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
             characteristics.couldHaveBuilding = characteristics.isCity && rand.nextFloat() < profile.BUILDING_CHANCE;
-            cityInfoMap.put(key, characteristics);
+            CITY_INFO_MAP.put(key, characteristics);
             return characteristics;
         }
     }
@@ -308,8 +308,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public static synchronized LostChunkCharacteristics getChunkCharacteristics(ChunkCoord key, int chunkX, int chunkZ, IDimensionInfo provider) {
         ResourceKey<Level> type = provider.getType();
-        if (cityInfoMap.containsKey(key)) {
-            return cityInfoMap.get(key);
+        if (CITY_INFO_MAP.containsKey(key)) {
+            return CITY_INFO_MAP.get(key);
         } else {
             LostCityProfile profile = getProfile(chunkX, chunkZ, provider);
             LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
@@ -391,7 +391,7 @@ public class BuildingInfo implements ILostChunkInfo {
                     chunkX, chunkZ, characteristics);
             MinecraftForge.EVENT_BUS.post(event);
 
-            cityInfoMap.put(key, characteristics);
+            CITY_INFO_MAP.put(key, characteristics);
             return characteristics;
         }
     }
@@ -557,7 +557,7 @@ public class BuildingInfo implements ILostChunkInfo {
             }
             return style.getName().equals(cityStyle.getName());
         }
-        return result;
+        return false;
     }
 
     private static boolean hasHighway(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
@@ -659,17 +659,17 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static void cleanCache() {
-        buildingInfoMap.clear();
-        cityInfoMap.clear();
+        BUILDING_INFO_MAP.clear();
+        CITY_INFO_MAP.clear();
     }
 
     public static synchronized BuildingInfo getBuildingInfo(int chunkX, int chunkZ, IDimensionInfo provider) {
         ChunkCoord key = new ChunkCoord(provider.getType(), chunkX, chunkZ);
-        if (buildingInfoMap.containsKey(key)) {
-            return buildingInfoMap.get(key);
+        if (BUILDING_INFO_MAP.containsKey(key)) {
+            return BUILDING_INFO_MAP.get(key);
         }
         BuildingInfo info = new BuildingInfo(key, chunkX, chunkZ, provider);
-        buildingInfoMap.put(key, info);
+        BUILDING_INFO_MAP.put(key, info);
         return info;
     }
 
@@ -773,7 +773,7 @@ public class BuildingInfo implements ILostChunkInfo {
             groundLevel = provider.getProfile().GROUNDLEVEL;
             wl = provider.getProfile().SEALEVEL;
         }
-        waterLevel = wl == -1 ? provider.getWorld().getSeaLevel() : wl;
+        waterLevel = wl == -1 ? Tools.getSeaLevel(provider.getWorld()) : wl;
 
         CityStyle cs = (CityStyle) characteristics.cityStyle;
 

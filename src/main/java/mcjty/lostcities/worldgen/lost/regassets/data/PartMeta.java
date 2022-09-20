@@ -2,7 +2,6 @@ package mcjty.lostcities.worldgen.lost.regassets.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import mcjty.lostcities.worldgen.lost.regassets.BuildingPartRE;
 
 import java.util.Optional;
 

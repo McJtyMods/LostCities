@@ -20,8 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.awt.*;
-
 public class CommandCreatePart implements Command<CommandSourceStack> {
 
     private static final CommandCreatePart CMD = new CommandCreatePart();

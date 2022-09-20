@@ -27,19 +27,19 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
 
     private ResourceLocation name;
 
-    private Float explosionChance;
-    private String style;
-    private String inherit;
+    private final Float explosionChance;
+    private final String style;
+    private final String inherit;
 
-    private GeneralSettings generalSettings;
-    private BuildingSettings buildingSettings;
-    private CorridorSettings corridorSettings;
-    private ParkSettings parkSettings;
-    private RailSettings railSettings;
-    private SphereSettings sphereSettings;
-    private StreetSettings streetSettings;
+    private final GeneralSettings generalSettings;
+    private final BuildingSettings buildingSettings;
+    private final CorridorSettings corridorSettings;
+    private final ParkSettings parkSettings;
+    private final RailSettings railSettings;
+    private final SphereSettings sphereSettings;
+    private final StreetSettings streetSettings;
 
-    private Selectors selectors;
+    private final Selectors selectors;
 
     public CityStyleRE(
             Optional<Float> explosionChance,

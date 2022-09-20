@@ -35,7 +35,7 @@ public class CommandSaveProfile implements Command<CommandSourceStack> {
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         String name = context.getArgument("profile", String.class);
-        LostCityProfile profile = ProfileSetup.standardProfiles.get(name);
+        LostCityProfile profile = ProfileSetup.STANDARD_PROFILES.get(name);
         if (profile == null) {
             context.getSource().sendSuccess(ComponentFactory.literal(ChatFormatting.RED + "Could not find profile '" + name + "'!"), true);
             return 0;

@@ -76,7 +76,7 @@ public class DamageArea {
         }
         if (provider.getRandom().nextFloat() <= damage) {
             BlockState damaged = palette.canBeDamagedToIronBars(b);
-            int waterlevel = provider.getWorld().getSeaLevel();//profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
+            int waterlevel = Tools.getSeaLevel(provider.getWorld());//profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
             if (damage < BLOCK_DAMAGE_CHANCE && damaged != null) {
                 if (provider.getRandom().nextFloat() < .7f) {
                     b = damaged;

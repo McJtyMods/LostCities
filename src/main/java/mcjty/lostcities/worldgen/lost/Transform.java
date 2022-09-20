@@ -194,10 +194,10 @@ public enum Transform {
         throw new IllegalStateException("Cannot happen!");
     }
 
-    public static void main(String[] args) {
-        int x;
-        int z;
-        x = 4; z = 4;
-        System.out.println("x,z = " + x +","+z + " -> " +ROTATE_90.rotateX(x, z) +","+ROTATE_90.rotateZ(x,z));
-    }
+//    public static void main(String[] args) {
+//        int x;
+//        int z;
+//        x = 4; z = 4;
+//        System.out.println("x,z = " + x +","+z + " -> " +ROTATE_90.rotateX(x, z) +","+ROTATE_90.rotateZ(x,z));
+//    }
 }

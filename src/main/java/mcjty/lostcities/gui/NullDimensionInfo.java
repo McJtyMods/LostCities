@@ -92,7 +92,6 @@ public class NullDimensionInfo implements IDimensionInfo {
     private final LostCityProfile profile;
     private final WorldStyle style;
     private final Random random;
-    private final RandomSource randomSource;
     private final long seed;
 
     private final Registry<Biome> biomeRegistry;
@@ -110,7 +109,7 @@ public class NullDimensionInfo implements IDimensionInfo {
         ));
         this.seed = seed;
         random = new Random(seed);
-        randomSource = new LegacyRandomSource(seed);
+        RandomSource randomSource = new LegacyRandomSource(seed);
         feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
         biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();

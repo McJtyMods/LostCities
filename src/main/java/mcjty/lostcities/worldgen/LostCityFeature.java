@@ -91,7 +91,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
         String profileName = Config.getProfileForDimension(type);
         if (profileName != null) {
             if (!dimensionInfo.containsKey(type)) {
-                LostCityProfile profile = ProfileSetup.standardProfiles.get(profileName);
+                LostCityProfile profile = ProfileSetup.STANDARD_PROFILES.get(profileName);
                 IDimensionInfo diminfo = new DefaultDimensionInfo(world, profile);
                 dimensionInfo.put(type, diminfo);
             }

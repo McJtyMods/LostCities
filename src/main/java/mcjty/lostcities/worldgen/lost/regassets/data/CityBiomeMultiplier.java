@@ -3,8 +3,6 @@ package mcjty.lostcities.worldgen.lost.regassets.data;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import java.util.Optional;
-
 public record CityBiomeMultiplier(float multiplier, BiomeMatcher biomeMatcher) {
 
     public static final Codec<CityBiomeMultiplier> CODEC = RecordCodecBuilder.create(instance ->

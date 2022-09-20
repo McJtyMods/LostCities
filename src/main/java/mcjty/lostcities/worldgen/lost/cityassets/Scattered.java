@@ -5,7 +5,6 @@ import mcjty.lostcities.worldgen.lost.regassets.ScatteredRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.level.levelgen.DensityFunctions;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;

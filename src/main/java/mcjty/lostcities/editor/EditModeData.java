@@ -24,7 +24,7 @@ public class EditModeData extends SavedData {
     public static final String NAME = "LostCityEditData";
 
     public static record PartData(String partName, int y) { }
-    private Map<ChunkCoord, List<PartData>> partData = new HashMap<>();
+    private final Map<ChunkCoord, List<PartData>> partData = new HashMap<>();
 
     @Nonnull
     public static EditModeData getData() {

@@ -11,7 +11,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Predicate;
 
 public class Condition implements ILostCityAsset {

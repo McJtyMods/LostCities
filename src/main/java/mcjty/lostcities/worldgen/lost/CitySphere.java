@@ -23,7 +23,7 @@ import java.util.*;
 
 public class CitySphere implements ILostSphere {
 
-    private static final Map<ChunkCoord, CitySphere> citySphereCache = new HashMap<>();
+    private static final Map<ChunkCoord, CitySphere> CITY_SPHERE_CACHE = new HashMap<>();
 
     public static final CitySphere EMPTY = new CitySphere(new ChunkCoord(Level.OVERWORLD, 0, 0), 0.0f, new BlockPos(0, 0, 0), false);
 
@@ -157,7 +157,7 @@ public class CitySphere implements ILostSphere {
     }
 
     public static void cleanCache() {
-        citySphereCache.clear();
+        CITY_SPHERE_CACHE.clear();
     }
 
     /**
@@ -384,7 +384,7 @@ public class CitySphere implements ILostSphere {
             if (predef != null && predef.getBiome() != null) {
                 citySphere.biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(predef.getBiome()));
                 if (citySphere.biome == null) {
-                    ModSetup.getLogger().warn("Could not find biome '" + predef.getBiome() + "'!");
+                    ModSetup.getLogger().warn("Could not find biome '{}'!", predef.getBiome());
                 }
             } else if (profile.CITYSPHERE_SINGLE_BIOME) {
                 if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
@@ -421,7 +421,7 @@ public class CitySphere implements ILostSphere {
     @Nonnull
     public static CitySphere getCitySphere(int chunkX, int chunkZ, IDimensionInfo provider) {
         ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
-        if (!citySphereCache.containsKey(coord)) {
+        if (!CITY_SPHERE_CACHE.containsKey(coord)) {
 //            for (PredefinedSphere predef : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
 //                if (predef.getDimension() == provider.getType()) {
 //                    if (intersectChunkWithSphere(chunkX, chunkZ, predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
@@ -445,23 +445,23 @@ public class CitySphere implements ILostSphere {
             updateCache(coord, sphere);
             return sphere;
         } else {
-            return citySphereCache.get(coord);
+            return CITY_SPHERE_CACHE.get(coord);
         }
     }
 
     private static void updateCache(ChunkCoord coord, CitySphere sphere) {
-        citySphereCache.put(coord, sphere);
+        CITY_SPHERE_CACHE.put(coord, sphere);
         BlockPos centerPos = sphere.getCenterPos();
         int radius = (int) sphere.getRadius();
         if (radius < 0.0001f) {
-            citySphereCache.put(sphere.center, sphere);
+            CITY_SPHERE_CACHE.put(sphere.center, sphere);
             return;
         }
         for (int cx = centerPos.getX() - radius-16 ; cx <= centerPos.getX() + radius+16 ; cx += 16) {
             for (int cz = centerPos.getZ() - radius-16 ; cz <= centerPos.getZ()+radius+16 ; cz += 16) {
                 ChunkCoord cc = new ChunkCoord(sphere.getCenter().dimension(), cx >> 4, cz >> 4);
                 if (intersectChunkWithSphere(cc.chunkX(), cc.chunkZ(), radius, centerPos)) {
-                    citySphereCache.put(cc, sphere);
+                    CITY_SPHERE_CACHE.put(cc, sphere);
                 }
             }
         }

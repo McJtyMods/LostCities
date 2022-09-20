@@ -29,19 +29,19 @@ public class NoiseGeneratorPerlin {
         return d0;
     }
 
-    public double[] getRegion(double[] buffer, double p_151599_2_, double p_151599_4_, int p_151599_6_, int p_151599_7_, double p_151599_8_, double p_151599_10_, double p_151599_12_) {
-        if (buffer != null && buffer.length >= p_151599_6_ * p_151599_7_) {
+    public double[] getRegion(double[] buffer, double x, double z, int xWidth, int zWidth, double xScale, double zScale, double factor) {
+        if (buffer != null && buffer.length >= xWidth * zWidth) {
             Arrays.fill(buffer, 0.0D);
         } else {
-            buffer = new double[p_151599_6_ * p_151599_7_];
+            buffer = new double[xWidth * zWidth];
         }
 
         double d1 = 1.0D;
         double d0 = 1.0D;
 
         for (int j = 0; j < this.levels; ++j) {
-            this.noiseLevels[j].add(buffer, p_151599_2_, p_151599_4_, p_151599_6_, p_151599_7_, p_151599_8_ * d0 * d1, p_151599_10_ * d0 * d1, 0.55D / d1);
-            d0 *= p_151599_12_;
+            this.noiseLevels[j].add(buffer, x, z, xWidth, zWidth, xScale * d0 * d1, zScale * d0 * d1, 0.55D / d1);
+            d0 *= factor;
             d1 *= 0.5D;
         }
 
