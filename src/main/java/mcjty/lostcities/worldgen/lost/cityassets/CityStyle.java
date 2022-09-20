@@ -60,6 +60,8 @@ public class CityStyle implements ILostCityCityStyle {
     // General settings
     private Character ironbarsBlock;
     private Character glowstoneBlock;
+    private Character leavesBlock;
+    private Character rubbleDirtBlock;
 
     private Float explosionChance;
     private String style;
@@ -105,6 +107,8 @@ public class CityStyle implements ILostCityCityStyle {
         object.getGeneralSettings().ifPresent(s -> {
             glowstoneBlock = s.getGlowstoneBlock();
             ironbarsBlock = s.getIronbarsBlock();
+            leavesBlock = s.getLeavesBlock();
+            rubbleDirtBlock = s.getRubbleDirtBlock();
         });
         object.getSelectors().ifPresent(s -> {
             s.getBridgeSelector().ifPresent(bridgeSelector::addAll);
@@ -181,6 +185,15 @@ public class CityStyle implements ILostCityCityStyle {
     @Override
     public Character getGlowstoneBlock() {
         return glowstoneBlock;
+    }
+
+    @Override
+    public Character getLeavesBlock() {
+        return leavesBlock;
+    }
+
+    public Character getRubbleDirtBlock() {
+        return rubbleDirtBlock;
     }
 
     @Override
