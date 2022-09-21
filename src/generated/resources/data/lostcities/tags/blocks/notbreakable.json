@@ -1,4 +1,5 @@
 {
+  "replace": false,
   "values": [
     "minecraft:bedrock",
     "minecraft:end_portal",
