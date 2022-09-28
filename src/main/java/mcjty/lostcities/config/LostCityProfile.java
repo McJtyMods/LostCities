@@ -522,6 +522,11 @@ public class LostCityProfile implements ILostCityProfile {
 
     public boolean isCavern() { return LANDSCAPE_TYPE == LandscapeType.CAVERN; }
 
+    public boolean isSpheres() {
+        return LANDSCAPE_TYPE == LandscapeType.SPHERES;
+    }
+
+
     public BlockState getLiquidBlock() {
         if (liquidBlock == null) {
             Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LIQUID_BLOCK));

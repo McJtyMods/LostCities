@@ -138,7 +138,7 @@ public class NullDimensionInfo implements IDimensionInfo {
 
     @Override
     public LostCityProfile getOutsideProfile() {
-        return null;
+        return  profile;
     }
 
     @Override

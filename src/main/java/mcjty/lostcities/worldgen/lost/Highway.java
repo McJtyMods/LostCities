@@ -77,7 +77,7 @@ public class Highway {
         }
 
         // Disable highways that intersect with cityspheres
-        if (provider.getProfile().isSpace() && CitySphere.intersectsWithCitySphere(cp.chunkX(), cp.chunkZ(), provider)) {
+        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.intersectsWithCitySphere(cp.chunkX(), cp.chunkZ(), provider)) {
             cache.put(cp, -1);
             return -1;
         }

@@ -316,6 +316,22 @@ public class LostCityTerrainFeature {
 
         fixTorches(info);
 
+        // Do the city spheres
+        if (profile.isSpace() || profile.isSpheres()) {
+            CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+            CitySphere.initSphere(sphere, provider);   // Make sure city sphere information is complete
+            if (sphere.isEnabled()) {
+                boolean outsideLandscape = profile.CITYSPHERE_LANDSCAPE_OUTSIDE;
+
+                float radius = sphere.getRadius();
+                BlockPos cc = sphere.getCenterPos();
+                int cx = cc.getX() - chunkX * 16;
+                int cz = cc.getZ() - chunkZ * 16;
+                fillSphere(cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), liquid, base, outsideLandscape);
+            }
+        }
+
+
         // We make a new random here because the primer for a normal chunk may have
         // been cached and we want to be able to do the same when returning from a cached
         // primer vs generating it here
@@ -335,6 +351,62 @@ public class LostCityTerrainFeature {
         driver.setPrimer(oldRegion, oldChunk);
 
         ChunkFixer.fix(provider, chunkX, chunkZ);
+    }
+
+    private void fillSphere(int centerx, int centery, int centerz, int radius,
+                            BlockState glass, BlockState block, BlockState sideBlock, BlockState liquidChar, BlockState baseChar, boolean outsideLandscape) {
+        double sqradius = radius * radius;
+        double sqradiusOffset = (radius-2) * (radius-2);
+        LostCityProfile profile = provider.getProfile();
+        LostCityProfile profileOut = provider.getOutsideProfile();
+        int waterLevelOut = profileOut.GROUNDLEVEL - 0;// @todo profileOut.WATERLEVEL_OFFSET;
+//        int waterLevel = profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
+        int waterLevel = provider.getWorld() == null ? 65 : Tools.getSeaLevel(provider.getWorld());// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
+
+        for (int x = 0 ; x < 16 ; x++) {
+            double dxdx = (x-centerx) * (x-centerx);
+            for (int z = 0 ; z < 16 ; z++) {
+                double dzdz = (z-centerz) * (z-centerz);
+//                double vo = profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION;
+//                double vr = profile.CITYSPHERE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_SURFACE_VARIATION;
+                if (outsideLandscape) {
+                    driver.current(x, 0, z);
+                    for (int y = 0 ; y <= Math.max(Math.min(centery+radius, 255), waterLevel) ; y++) {
+                        double dydy = (y-centery) * (y-centery);
+                        double sqdist = dxdx + dydy + dzdz;
+                        if (y == 0) {
+                            driver.block(Blocks.BEDROCK.defaultBlockState());
+                        } else if (sqdist <= sqradius) {
+                            if (sqdist >= sqradiusOffset) {
+                                if (y > centery) {
+                                    driver.block(glass);
+                                } else {
+                                    driver.block(sideBlock);
+                                }
+                            }
+                        }
+                        driver.incY();
+                    }
+                } else {
+                    int starty = Math.max(centery - radius, 0);
+                    driver.current(x, starty, z);
+                    for (int y = starty; y <= Math.min(centery+radius, 255) ; y++) {
+                        double dydy = (y-centery) * (y-centery);
+                        double sqdist = dxdx + dydy + dzdz;
+                        if (sqdist <= sqradius) {
+                            if (sqdist >= sqradiusOffset) {
+                                if (y > centery) {
+                                    driver.block(glass);
+                                } else {
+                                    driver.block(sideBlock);
+                                }
+                            }
+                        }
+                        driver.incY();
+                    }
+                }
+            }
+        }
     }
 
 
@@ -423,7 +495,7 @@ public class LostCityTerrainFeature {
 
     private void doNormalChunk(int chunkX, int chunkZ, BuildingInfo info) {
 //        debugClearChunk(chunkX, chunkZ, primer);
-        if (profile.isDefault()) {
+        if (profile.isDefault() || profile.isSpheres()) {
             correctTerrainShape(chunkX, chunkZ);
 //            flattenChunkToCityBorder(chunkX, chunkZ);
         }
@@ -1278,7 +1350,7 @@ public class LostCityTerrainFeature {
 
         ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
 
-        if (info.profile.isDefault()) {
+        if (info.profile.isDefault() || info.profile.isSpheres()) {
             int minHeight = provider.getWorld().getMinBuildHeight();
             BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
             for (int x = 0; x < 16; ++x) {
@@ -1299,7 +1371,7 @@ public class LostCityTerrainFeature {
 
         // City surface leveling - for prettier cities
         // Note: Better results may be achieved with terrain noise adjustment (like how newer structures do it)
-        if (profile.isDefault()) {
+        if (profile.isDefault() || profile.isSpheres()) {
             int ground = info.getCityGroundLevel();
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
@@ -1866,6 +1938,7 @@ public class LostCityTerrainFeature {
             case FLOATING -> fillMainStreetBlock(info, borderBlock, 3);
             case CAVERN -> fillMainStreetBlock(info, borderBlock, 2);
             case SPACE -> fillToGroundStreetBlock(info, info.getCityGroundLevel());
+            case SPHERES -> fillToBedrockStreetBlock(info);
         }
 
         if (doBorder(info, Direction.XMIN)) {
@@ -1951,7 +2024,7 @@ public class LostCityTerrainFeature {
         BlockState wall = info.getCompiledPalette().get(wallBlock);
 
         switch (info.profile.LANDSCAPE_TYPE) {
-            case DEFAULT -> {
+            case DEFAULT, SPHERES -> {
                 ChunkHeightmap heightmap = getHeightmap(info.coord, info.provider.getWorld());
                 int y = getMinHeightAt(info, x, z);
                 if (y < info.getCityGroundLevel()+1) {
@@ -2631,7 +2704,7 @@ public class LostCityTerrainFeature {
         for (int f = -info.cellars; f <= info.getNumFloors(); f++) {
             // In default landscape type we clear the landscape on top of the building when we are at the top floor
             if (f == info.getNumFloors()) {
-                if (profile.isDefault()) {
+                if (profile.isDefault() || profile.isSpheres()) {
                     clearToMax(info, heightmap, height);
                 }
             }
@@ -2722,7 +2795,7 @@ public class LostCityTerrainFeature {
                     clearRange(info, x, z, lowestLevel, info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT, info.waterLevel > info.groundLevel);
                 }
             }
-        } else {
+        } else { // (also for spheres)
             // For normal worldgen we have a thin layer of 'border' blocks because that looks nicer
             // We try to avoid this layer in big caves though
             for (int x = 0; x < 16; ++x) {
