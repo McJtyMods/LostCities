@@ -7,7 +7,9 @@ public enum LandscapeType {
     DEFAULT("default"),
     FLOATING("floating"),
     SPACE("space"),
-    CAVERN("cavern");
+    CAVERN("cavern"),
+    SPHERES("spheres");
+
 
     private final String name;
 

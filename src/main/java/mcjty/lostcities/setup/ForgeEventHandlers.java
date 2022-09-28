@@ -140,6 +140,7 @@ public class ForgeEventHandlers {
             // Potentially set the spawn point
             switch (profile.LANDSCAPE_TYPE) {
                 case DEFAULT:
+                case SPHERES:
                 case CAVERN:
                     if (needsCheck) {
                         findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());

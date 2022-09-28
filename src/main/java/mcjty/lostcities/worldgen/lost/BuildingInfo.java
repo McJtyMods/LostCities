@@ -323,7 +323,7 @@ public class BuildingInfo implements ILostChunkInfo {
             }
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
             characteristics.couldHaveBuilding = characteristics.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, profile, characteristics.multiPos, characteristics.cityLevel, rand);
-            if (profile.isSpace() && characteristics.multiPos.isSingle()) {
+            if ((profile.isSpace() || profile.isSpheres()) && characteristics.multiPos.isSingle()) {
                 // Minimize cities at the edge of the city in an orb
                 float dist = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
                 if (dist > .7f) {
@@ -403,7 +403,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isVoidChunk(chunkX, chunkZ, provider)) {
             // If we have a void chunk then no city here
             return false;
-        } else if (provider.getProfile().isSpace()) {
+        } else if (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) {
             if (CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
                 return false;
             } else if (!provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE && !CitySphere.fullyInsideCitySpere(chunkX, chunkZ, provider)) {
@@ -677,7 +677,7 @@ public class BuildingInfo implements ILostChunkInfo {
      * Find the correct profile for this chunk. This takes space sphere worlds into account
      */
     public static LostCityProfile getProfile(int chunkX, int chunkZ, IDimensionInfo provider) {
-        if (provider.getProfile().isSpace()) {
+        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres())) {
             if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
                 return provider.getProfile();
             } else {
@@ -736,7 +736,7 @@ public class BuildingInfo implements ILostChunkInfo {
         ResourceKey<Level> type = provider.getType();
         this.coord = key;
 
-        outsideChunk = provider.getProfile().isSpace() && !CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider);
+        outsideChunk = (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && !CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider);
         profile = getProfile(chunkX, chunkZ, provider);
 
         LostChunkCharacteristics characteristics = getChunkCharacteristics(key, chunkX, chunkZ, provider);
@@ -824,7 +824,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 f = minfloors;
             }
 
-            if (provider.getProfile().isSpace() && CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
+            if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
                 float reldest = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
                 if (reldest > .6f) {
                     f = Math.max(minfloors, f-2);
@@ -1023,7 +1023,7 @@ public class BuildingInfo implements ILostChunkInfo {
      * This function does not use the cache. So safe to use when the cache is building
      */
     public static int getCityLevel(int chunkX, int chunkZ, IDimensionInfo provider) {
-        if (provider.getProfile().isSpace()) {
+        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres())) {
             return getCityLevelSpace(chunkX, chunkZ, provider);
         } else if (provider.getProfile().isFloating()) {
             return getCityLevelFloating(chunkX, chunkZ, provider);

@@ -94,7 +94,7 @@ public class City {
         Random cityCenterRandom = new Random(chunkZ * 797003437L + chunkX * 295075153L);
         cityCenterRandom.nextFloat();
         cityCenterRandom.nextFloat();
-        if (provider.getProfile().isSpace()) {
+        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres())) {
             // @todo config
             CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
             if (!sphere.isEnabled()) {
@@ -127,7 +127,7 @@ public class City {
         if (cityRange < 1) {
             cityRange = 1;
         }
-        if (profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) {
+        if ((profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) || profile.isSpheres()) {
             if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
                 return profile.CITY_MINRADIUS + cityRadiusRandom.nextInt(cityRange);
             } else {

@@ -27,6 +27,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 
     private WorldGenLevel world;
     private final LostCityProfile profile;
+    private final LostCityProfile profileOutside;
     private final WorldStyle style;
 
     private final Random random;
@@ -34,9 +35,10 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     private final Registry<Biome> biomeRegistry;
     private final LostCityTerrainFeature feature;
 
-    public DefaultDimensionInfo(WorldGenLevel world, LostCityProfile profile) {
+    public DefaultDimensionInfo(WorldGenLevel world, LostCityProfile profile, LostCityProfile profileOutside) {
         this.world = world;
         this.profile = profile;
+        this.profileOutside = profileOutside;
         style = AssetRegistries.WORLDSTYLES.get(world, profile.getWorldStyle());
         random = new Random(world.getSeed());
         RandomSource randomSource = new LegacyRandomSource(world.getSeed());
@@ -72,7 +74,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 
     @Override
     public LostCityProfile getOutsideProfile() {
-        return null;
+        return profileOutside;
     }
 
     @Override

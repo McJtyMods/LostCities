@@ -71,7 +71,7 @@ public class CitySphere implements ILostSphere {
 
     public static boolean isInSphere(int chunkX, int chunkZ, BlockPos pos, IDimensionInfo provider) {
         boolean sphere = false;
-        if (provider.getProfile().isSpace()) {
+        if (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) {
             CitySphere citySphere = getCitySphere(chunkX, chunkZ, provider);
             if (citySphere.isEnabled()) {
                 double sqdist = squaredDistance(citySphere.getCenterPos().getX(), citySphere.getCenterPos().getZ(), pos.getX(), pos.getZ());
