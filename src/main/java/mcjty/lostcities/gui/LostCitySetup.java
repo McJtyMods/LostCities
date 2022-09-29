@@ -11,7 +11,6 @@ import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.server.packs.resources.Resource;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -152,7 +151,11 @@ public class LostCitySetup {
 //            if ("lc_cavern".equals(worldType.getName())) {
 //                preferedProfile = "cavern";
 //            }
-            profiles = new ArrayList<>(ProfileSetup.STANDARD_PROFILES.keySet());
+
+            profiles = ProfileSetup.STANDARD_PROFILES.entrySet().stream()
+                    .filter(entry -> entry.getValue().isPublic())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
             profiles.sort((o1, o2) -> {
                 if (preferedProfile.equals(o1)) {
                     return -1;
