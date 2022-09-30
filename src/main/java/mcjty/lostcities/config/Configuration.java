@@ -132,22 +132,24 @@ public class Configuration {
         for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
             String category = entry.getKey();
             addCustomCategoryComment(category, "<none>");
-            for (Map.Entry<String, JsonElement> elementEntry : entry.getValue().getAsJsonObject().entrySet()) {
-                JsonElement valueEl = elementEntry.getValue();
-                if (valueEl.isJsonPrimitive()) {
-                    if (valueEl.getAsJsonPrimitive().isNumber()) {
-                        getDouble(elementEntry.getKey(), category, valueEl.getAsDouble(), 0.0, 0.0, "");
-                    } else if (valueEl.getAsJsonPrimitive().isString()) {
-                        getString(elementEntry.getKey(), category, valueEl.getAsString(), "");
-                    } else if (valueEl.getAsJsonPrimitive().isBoolean()) {
-                        getBoolean(elementEntry.getKey(), category, valueEl.getAsBoolean(), "");
+            if (entry.getValue().isJsonObject()) { // Ignore things like 'public' : true
+                for (Map.Entry<String, JsonElement> elementEntry : entry.getValue().getAsJsonObject().entrySet()) {
+                    JsonElement valueEl = elementEntry.getValue();
+                    if (valueEl.isJsonPrimitive()) {
+                        if (valueEl.getAsJsonPrimitive().isNumber()) {
+                            getDouble(elementEntry.getKey(), category, valueEl.getAsDouble(), 0.0, 0.0, "");
+                        } else if (valueEl.getAsJsonPrimitive().isString()) {
+                            getString(elementEntry.getKey(), category, valueEl.getAsString(), "");
+                        } else if (valueEl.getAsJsonPrimitive().isBoolean()) {
+                            getBoolean(elementEntry.getKey(), category, valueEl.getAsBoolean(), "");
+                        }
+                    } else if (valueEl.isJsonArray()) {
+                        List<String> list = new ArrayList<>();
+                        for (JsonElement element : valueEl.getAsJsonArray()) {
+                            list.add(element.getAsString());
+                        }
+                        getStringList(elementEntry.getKey(), category, list.toArray(new String[list.size()]), "");
                     }
-                } else if (valueEl.isJsonArray()) {
-                    List<String> list = new ArrayList<>();
-                    for (JsonElement element : valueEl.getAsJsonArray()) {
-                        list.add(element.getAsString());
-                    }
-                    getStringList(elementEntry.getKey(), category, list.toArray(new String[list.size()]), "");
                 }
             }
         }

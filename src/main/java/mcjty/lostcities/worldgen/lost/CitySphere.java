@@ -5,6 +5,7 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedSphere;
@@ -422,16 +423,16 @@ public class CitySphere implements ILostSphere {
     public static CitySphere getCitySphere(int chunkX, int chunkZ, IDimensionInfo provider) {
         ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
         if (!CITY_SPHERE_CACHE.containsKey(coord)) {
-//            for (PredefinedSphere predef : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
-//                if (predef.getDimension() == provider.getType()) {
-//                    if (intersectChunkWithSphere(chunkX, chunkZ, predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
-//                        ChunkCoord center = new ChunkCoord(provider.getType(), predef.getChunkX(), predef.getChunkZ());
-//                        CitySphere sphere = getSphereAtCenter(center, provider, predef);
-//                        updateCache(coord, sphere);
-//                        return sphere;
-//                    }
-//                }
-//            }
+            for (PredefinedSphere predef : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
+                if (predef.getDimension() == provider.getType()) {
+                    if (intersectChunkWithSphere(chunkX, chunkZ, predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
+                        ChunkCoord center = new ChunkCoord(provider.getType(), predef.getChunkX(), predef.getChunkZ());
+                        CitySphere sphere = getSphereAtCenter(center, provider, predef);
+                        updateCache(coord, sphere);
+                        return sphere;
+                    }
+                }
+            }
 
             CitySphere sphere;
             if (provider.getProfile().CITYSPHERE_ONLY_PREDEFINED) {

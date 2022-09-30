@@ -51,9 +51,14 @@ public class CustomRegistries {
     public static final DeferredRegister<WorldStyleRE> WORLDSTYLES_DEFERRED_REGISTER = DeferredRegister.create(WORLDSTYLES_REGISTRY_KEY, LostCities.MODID);
     public static final Supplier<IForgeRegistry<WorldStyleRE>> WORLDSTYLES_REGISTRY = WORLDSTYLES_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<WorldStyleRE>().dataPackRegistry(WorldStyleRE.CODEC));
 
-    public static final ResourceKey<Registry<PredefinedCityRE>> PREDEFINEDCITITIES_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "predefinedcitites"));
-    public static final DeferredRegister<PredefinedCityRE> PREDEFINEDCITITIES_DEFERRED_REGISTER = DeferredRegister.create(PREDEFINEDCITITIES_REGISTRY_KEY, LostCities.MODID);
-    public static final Supplier<IForgeRegistry<PredefinedCityRE>> PREDEFINEDCITITIES_REGISTRY = PREDEFINEDCITITIES_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<PredefinedCityRE>().dataPackRegistry(PredefinedCityRE.CODEC));
+    public static final ResourceKey<Registry<PredefinedCityRE>> PREDEFINEDCITIES_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "predefinedcites"));
+    public static final DeferredRegister<PredefinedCityRE> PREDEFINEDCITIES_DEFERRED_REGISTER = DeferredRegister.create(PREDEFINEDCITIES_REGISTRY_KEY, LostCities.MODID);
+    public static final Supplier<IForgeRegistry<PredefinedCityRE>> PREDEFINEDCITIES_REGISTRY = PREDEFINEDCITIES_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<PredefinedCityRE>().dataPackRegistry(PredefinedCityRE.CODEC));
+
+    public static final ResourceKey<Registry<PredefinedSphereRE>> PREDEFINEDSPHERES_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "predefinedspheres"));
+    public static final DeferredRegister<PredefinedSphereRE> PREDEFINEDSPHERES_DEFERRED_REGISTER = DeferredRegister.create(PREDEFINEDSPHERES_REGISTRY_KEY, LostCities.MODID);
+    public static final Supplier<IForgeRegistry<PredefinedSphereRE>> PREDEFINEDSPHERES_REGISTRY = PREDEFINEDSPHERES_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<PredefinedSphereRE>().dataPackRegistry(PredefinedSphereRE.CODEC));
+
 
     public static final ResourceKey<Registry<ScatteredRE>> SCATTERED_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "scattered"));
     public static final DeferredRegister<ScatteredRE> SCATTERED_DEFERRED_REGISTER = DeferredRegister.create(SCATTERED_REGISTRY_KEY, LostCities.MODID);
@@ -70,7 +75,8 @@ public class CustomRegistries {
         MULTIBUILDINGS_DEFERRED_REGISTER.register(bus);
         VARIANTS_DEFERRED_REGISTER.register(bus);
         WORLDSTYLES_DEFERRED_REGISTER.register(bus);
-        PREDEFINEDCITITIES_DEFERRED_REGISTER.register(bus);
+        PREDEFINEDCITIES_DEFERRED_REGISTER.register(bus);
+        PREDEFINEDSPHERES_DEFERRED_REGISTER.register(bus);
         SCATTERED_DEFERRED_REGISTER.register(bus);
     }
 

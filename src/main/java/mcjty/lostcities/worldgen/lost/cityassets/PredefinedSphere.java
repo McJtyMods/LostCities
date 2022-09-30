@@ -1,8 +1,7 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
-import com.google.gson.JsonObject;
-import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityAsset;
+import mcjty.lostcities.worldgen.lost.regassets.PredefinedSphereRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -20,8 +19,15 @@ public class PredefinedSphere implements ILostCityAsset {
     private int radius;
     private String biome;
 
-    public PredefinedSphere(JsonObject object) {
-        readFromJSon(object);
+    public PredefinedSphere(PredefinedSphereRE object) {
+        name = object.getRegistryName();
+        dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(object.getDimension()));
+        chunkX = object.getChunkX();
+        chunkZ = object.getChunkZ();
+        centerX = object.getCenterX();
+        centerZ = object.getCenterZ();
+        radius = object.getRadius();
+        biome = object.getBiome();
     }
 
     @Override
@@ -32,21 +38,6 @@ public class PredefinedSphere implements ILostCityAsset {
     @Override
     public ResourceLocation getId() {
         return name;
-    }
-
-    public void readFromJSon(JsonObject object) {
-        name = new ResourceLocation(LostCities.MODID, object.get("name").getAsString());    // @todo temporary
-        dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(object.get("dimension").getAsString()));
-        chunkX = object.get("chunkx").getAsInt();
-        chunkZ = object.get("chunkz").getAsInt();
-        centerX = object.get("centerx").getAsInt();
-        centerZ = object.get("centerz").getAsInt();
-        radius = object.get("radius").getAsInt();
-        if (object.has("biome")) {
-            biome = object.get("biome").getAsString();
-        } else {
-            biome = null;
-        }
     }
 
     public ResourceKey<Level> getDimension() {
