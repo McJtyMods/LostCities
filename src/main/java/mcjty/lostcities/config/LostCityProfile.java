@@ -178,16 +178,13 @@ public class LostCityProfile implements ILostCityProfile {
         this.isPublic = isPublic;
     }
 
-    public LostCityProfile(String name, FriendlyByteBuf buf) {
-        this(name, buf.readUtf(32767));
-    }
-
     public LostCityProfile(String name, String json) {
         this.name = name;
-        isPublic = false;
         Configuration config = new Configuration();
         JsonElement element = JsonParser.parseString(json);
-        config.fromJson(element.getAsJsonObject());
+        JsonObject root = element.getAsJsonObject();
+        config.fromJson(root);
+        this.isPublic = !root.has("public") || root.getAsJsonPrimitive("public").getAsBoolean();
         init(config);
     }
 
@@ -562,7 +559,9 @@ public class LostCityProfile implements ILostCityProfile {
     public JsonObject toJson(boolean readonly) {
         Configuration config = new Configuration();
         init(config);
-        return config.toJson(readonly);
+        JsonObject root = config.toJson(readonly);
+        root.addProperty("public", isPublic);
+        return root;
     }
 
     public void toBytes(FriendlyByteBuf buf) {

@@ -166,7 +166,7 @@ public class ProfileSetup {
         profile.LANDSCAPE_TYPE = LandscapeType.SPHERES;
         profile.HORIZON = 30;
         profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
-        profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2" };
+//        profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2" };
         profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "bio_wasteland";
         profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 0.5f;
@@ -322,8 +322,7 @@ public class ProfileSetup {
 
         profile = new LostCityProfile("bio_wasteland", false);
         profile.setDescription("Private wasteland for biospheres");
-        profile.GROUNDLEVEL = 40;
-//        profile.WATERLEVEL_OFFSET = 70;
+        profile.GROUNDLEVEL = 71;
         profile.AVOID_WATER = true;
         profile.CITY_CHANCE = 0.008f;
         profile.CITY_MINRADIUS = 30;
@@ -338,7 +337,7 @@ public class ProfileSetup {
         profile.RUIN_MINLEVEL_PERCENT = 0.1f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.4f;
         profile.AVOID_FOLIAGE = true;
-        profile.ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
+//        profile.ALLOWED_BIOME_FACTORS = new String[] { "stone_beach=1", "dead_forest=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("largecities", true);
