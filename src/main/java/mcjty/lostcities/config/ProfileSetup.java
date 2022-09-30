@@ -165,7 +165,6 @@ public class ProfileSetup {
         profile.setIconFile("textures/gui/icon_biosphere.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPHERES;
         profile.HORIZON = 30;
-        profile.CITYSPHERE_LANDSCAPE_OUTSIDE = true;
 //        profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2" };
         profile.CITYSPHERE_MONORAIL_CHANCE = 0.0f;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "bio_wasteland";

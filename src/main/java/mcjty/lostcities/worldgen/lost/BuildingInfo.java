@@ -405,8 +405,6 @@ public class BuildingInfo implements ILostChunkInfo {
         } else if (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) {
             if (CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
                 return false;
-            } else if (!provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE && !CitySphere.fullyInsideCitySpere(chunkX, chunkZ, provider)) {
-                return false;
             } else if (CitySphere.hasMonorailStation(chunkX, chunkZ, provider)) {
                 return false;
             }
@@ -763,7 +761,7 @@ public class BuildingInfo implements ILostChunkInfo {
         hasBuilding = b;
 
         int wl;
-        if (outsideChunk && provider.getProfile().CITYSPHERE_LANDSCAPE_OUTSIDE) {
+        if (outsideChunk) {
             groundLevel = provider.getOutsideProfile().GROUNDLEVEL;
             wl = provider.getOutsideProfile().SEALEVEL;
         } else {
