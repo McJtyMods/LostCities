@@ -1,6 +1,5 @@
 package mcjty.lostcities.worldgen;
 
-import it.unimi.dsi.fastutil.longs.LongSet;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.LostCityEvent;
@@ -280,24 +279,7 @@ public class LostCityTerrainFeature {
 
         // Check if there is no village here
         ChunkAccess ch = region.getChunk(chunkX, chunkZ);
-        if (doCity && ch.hasAnyStructureReferences()) {
-            var references = ch.getAllReferences();
-//            BuiltinRegistries.CONFIGURED_FEATURE.get(StructureFeature.VILLAGE)
-            // @todo we can do this more optimally if we first find all configured structures for village
-            for (Map.Entry<Structure, LongSet> entry : references.entrySet()) {
-                if (!entry.getValue().isEmpty()) {
-                    Structure structure = entry.getKey();
-                    Optional<ResourceKey<Structure>> key = provider.getWorld().registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY).getResourceKey(structure);
-                    doCity = key.map(k -> {
-                        Holder<Structure> holder = provider.getWorld().registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY).getHolderOrThrow(k);
-                        return !holder.is(StructureTags.VILLAGE);
-                    }).orElse(true);
-                    if (!doCity) {
-                        break;
-                    }
-                }
-            }
-        }
+        doCity = doCity && !hasVillage(ch);
 
         // If this chunk has a building or street but we're in a floating profile and
         // we happen to have a void chunk we detect that here and go back to normal chunk generation
@@ -359,6 +341,23 @@ public class LostCityTerrainFeature {
         driver.setPrimer(oldRegion, oldChunk);
 
         ChunkFixer.fix(provider, chunkX, chunkZ);
+    }
+
+    private boolean hasVillage(ChunkAccess ch) {
+        if (ch.hasAnyStructureReferences()) {
+            var structures = provider.getWorld().registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY);
+            var references = ch.getAllReferences();
+            // @todo we can do this more optimally if we first find all configured structures for village
+            for (var entry : references.entrySet()) {
+                if (!entry.getValue().isEmpty()) {
+                    Optional<ResourceKey<Structure>> key = structures.getResourceKey(entry.getKey());
+                    if (key.map(k -> structures.getHolderOrThrow(k).is(StructureTags.VILLAGE)).orElse(false)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private void fillSphere(int centerx, int centery, int centerz, int radius,

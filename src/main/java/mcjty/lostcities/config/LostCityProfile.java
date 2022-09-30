@@ -117,7 +117,6 @@ public class LostCityProfile implements ILostCityProfile {
     public String CITYSPHERE_OUTSIDE_PROFILE = "";
     public boolean CITYSPHERE_ONLY_PREDEFINED = false;
     public int CITYSPHERE_MONORAIL_HEIGHT_OFFSET = -2;
-    public boolean CITYSPHERE_SINGLE_BIOME = false;
 
     public int CITY_LEVEL0_HEIGHT = 75;
     public int CITY_LEVEL1_HEIGHT = 83;
@@ -130,10 +129,6 @@ public class LostCityProfile implements ILostCityProfile {
     public int TERRAIN_FIX_LOWER_MAX_OFFSET = -3;
     public int TERRAIN_FIX_UPPER_MIN_OFFSET = -1;
     public int TERRAIN_FIX_UPPER_MAX_OFFSET = 1;
-
-    public String[] ALLOWED_BIOME_FACTORS = new String[] { };
-    public String[] MANUAL_BIOME_MAPPINGS = new String[] { };
-    public BiomeSelectionStrategy BIOME_SELECTION_STRATEGY = BiomeSelectionStrategy.ORIGINAL;
 
     public float CHEST_WITHOUT_LOOT_CHANCE = .2f;
     public float BUILDING_WITHOUT_LOOT_CHANCE = .2f;
@@ -247,8 +242,6 @@ public class LostCityProfile implements ILostCityProfile {
         CITYSPHERE_OUTSIDE_GROUNDLEVEL = cfg.getInt("outsideGroundLevel", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_OUTSIDE_GROUNDLEVEL, -1, 256, "Ground level for outside city spheres (DEPRECATED, USE GROUNDLEVEL OF OTHER PROFILE)");
         CITYSPHERE_OUTSIDE_PROFILE = cfg.getString("outsideProfile", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_OUTSIDE_PROFILE, "An optional profile to use for the outside world");
         CITYSPHERE_MONORAIL_HEIGHT_OFFSET = cfg.getInt("monorailOffset", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_MONORAIL_HEIGHT_OFFSET, -100, 100, "Offset compared to main height");
-        CITYSPHERE_SINGLE_BIOME = cfg.getBoolean("singleBiome", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_SINGLE_BIOME,
-                "If this is true then every city sphere will be limited to one (random) biome");
     }
 
     private void initLostcity(Configuration cfg) {
@@ -376,23 +369,6 @@ public class LostCityProfile implements ILostCityProfile {
                 "If true then there will be minimal lighting in the buildings");
         AVOID_WATER = cfg.getBoolean("avoidWater", LostCityProfile.CATEGORY_LOSTCITY, AVOID_WATER,
                 "If true then all water will be avoided (replaced with air)");
-
-        ALLOWED_BIOME_FACTORS = cfg.getStringList("allowedBiomeFactors", LostCityProfile.CATEGORY_LOSTCITY, ALLOWED_BIOME_FACTORS,
-                "List of biomes that are allowed in the world. Empty list is default all biomes. The factor controls how much that biome is favored over the others (higher means less favored!)");
-        MANUAL_BIOME_MAPPINGS = cfg.getStringList("manualBiomeMappings", LostCityProfile.CATEGORY_LOSTCITY, MANUAL_BIOME_MAPPINGS,
-                "Use in combination with 'allowedBiomeFactors' to manually map some biomes to others. This is a list of the format oldbiome=newbiome");
-
-        String biomeSelectionStrategy = cfg.getString("biomeSelectionStrategy", LostCityProfile.CATEGORY_LOSTCITY, BIOME_SELECTION_STRATEGY.getName(),
-                "This is used in combination with allowedBiomeFactors. 'original' is the old strategy. 'randomized' is a new strategy that tries to randomize the biomes better. 'varied' is similar but has a more relaxed biome distance function",
-                new String[] {
-                        BiomeSelectionStrategy.ORIGINAL.getName(),
-                        BiomeSelectionStrategy.RANDOMIZED.getName(),
-                        BiomeSelectionStrategy.VARIED.getName()
-                });
-        BIOME_SELECTION_STRATEGY = BiomeSelectionStrategy.getTypeByName(biomeSelectionStrategy);
-        if (BIOME_SELECTION_STRATEGY == null) {
-            throw new RuntimeException("Bad biome selection strategy: " + biomeSelectionStrategy + "!");
-        }
     }
 
     private void initCities(Configuration cfg) {

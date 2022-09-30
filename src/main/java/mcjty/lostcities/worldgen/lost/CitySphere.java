@@ -2,7 +2,6 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.api.ILostSphere;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
@@ -10,17 +9,15 @@ import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedSphere;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class CitySphere implements ILostSphere {
 
@@ -32,8 +29,6 @@ public class CitySphere implements ILostSphere {
     private final BlockPos centerPos;
     private final float radius;
     private final boolean enabled;
-
-    private Biome biome;
 
     private boolean monorailNorthCandidate;
     private boolean monorailSouthCandidate;
@@ -126,12 +121,6 @@ public class CitySphere implements ILostSphere {
     @Override
     public float getRadius() {
         return radius;
-    }
-
-    @Override
-    @Nullable
-    public Biome getBiome() {
-        return biome;
     }
 
     public void setBlocks(BlockState glassBlock, BlockState baseBlock, BlockState sideBlock) {
@@ -382,35 +371,6 @@ public class CitySphere implements ILostSphere {
             citySphere.monorailSouthCandidate = rand.nextFloat() < profile.CITYSPHERE_MONORAIL_CHANCE;
             citySphere.monorailWestCandidate = rand.nextFloat() < profile.CITYSPHERE_MONORAIL_CHANCE;
             citySphere.monorailEastCandidate = rand.nextFloat() < profile.CITYSPHERE_MONORAIL_CHANCE;
-            if (predef != null && predef.getBiome() != null) {
-                citySphere.biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(predef.getBiome()));
-                if (citySphere.biome == null) {
-                    ModSetup.getLogger().warn("Could not find biome '{}'!", predef.getBiome());
-                }
-            } else if (profile.CITYSPHERE_SINGLE_BIOME) {
-                if (profile.ALLOWED_BIOME_FACTORS.length == 0) {
-                    // Just pick a random biome
-                    List<ResourceLocation> biomeKeys = new ArrayList<>(ForgeRegistries.BIOMES.getKeys());
-                    biomeKeys.sort(ResourceLocation::compareTo);
-                    citySphere.biome = ForgeRegistries.BIOMES.getValue(biomeKeys.get(rand.nextInt(biomeKeys.size())));
-                } else {
-                    List<Pair<Float, Biome>> pairs = Collections.emptyList(); // @todo broken BiomeTranslator.parseBiomes(profile.ALLOWED_BIOME_FACTORS);
-                    float total = 0.0f;
-                    for (Pair<Float, Biome> pair : pairs) {
-                        total += 3.0f / pair.getKey();
-                    }
-                    if (total > 0.001) {
-                        float f = rand.nextFloat() * total;
-                        for (Pair<Float, Biome> pair : pairs) {
-                            f -= 3.0f / pair.getKey();
-                            if (f <= 0) {
-                                citySphere.biome = pair.getRight();
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
         }
         return citySphere;
     }

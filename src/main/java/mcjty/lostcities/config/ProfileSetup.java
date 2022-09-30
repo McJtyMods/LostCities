@@ -186,9 +186,9 @@ public class ProfileSetup {
         profile.RUIN_MAXLEVEL_PERCENT = 0.8f;
         profile.RUBBLELAYER = false;
         profile.GROUNDLEVEL = 60;
-        profile.CITYSPHERE_CHANCE = 0.4f;
+        profile.CITYSPHERE_CHANCE = 0.5f;
 //        profile.CITY_CHANCE = 0.3f;       // @EXP
-        profile.CITY_CHANCE = 0.6f;
+        profile.CITY_CHANCE = 0.9f;
 
         profile.CITY_MAXRADIUS = 90;
         profile.CITY_THRESHOLD = .05f;
@@ -259,7 +259,6 @@ public class ProfileSetup {
         profile.RUIN_CHANCE = 0.9f;
         profile.RUIN_MINLEVEL_PERCENT = 0.0f;
         profile.RUIN_MAXLEVEL_PERCENT = 0.9f;
-        profile.ALLOWED_BIOME_FACTORS = new String[] { "jungle=1", "jungle_hills=1", "jungle_edge=2", "ocean=8", "beaches=20", "river=5" };
         STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("wasteland", true);
@@ -277,7 +276,6 @@ public class ProfileSetup {
         profile.RUIN_MAXLEVEL_PERCENT = 0.9f;
         profile.AVOID_WATER = true;
         profile.AVOID_FOLIAGE = true;
-        profile.ALLOWED_BIOME_FACTORS = new String[] { "desert=1", "desert_hills=1", "stone_beach=1", "dead_forest=1", "gravel_beach=1", "outback=1", "volcanic_island=1", "wasteland=.3" };
         STANDARD_PROFILES.put(profile.getName(), profile);
 
 //        profile = new LostCityProfile("atlantis", true);
