@@ -331,13 +331,11 @@ public class LostCityTerrainFeature {
             CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
             CitySphere.initSphere(sphere, provider);   // Make sure city sphere information is complete
             if (sphere.isEnabled()) {
-                boolean outsideLandscape = profile.CITYSPHERE_LANDSCAPE_OUTSIDE;
-
                 float radius = sphere.getRadius();
                 BlockPos cc = sphere.getCenterPos();
                 int cx = cc.getX() - chunkX * 16;
                 int cz = cc.getZ() - chunkZ * 16;
-                fillSphere(cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getBaseBlock(), sphere.getSideBlock(), liquid, base, outsideLandscape);
+                fillSphere(cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getSideBlock());
             }
         }
 
@@ -364,56 +362,33 @@ public class LostCityTerrainFeature {
     }
 
     private void fillSphere(int centerx, int centery, int centerz, int radius,
-                            BlockState glass, BlockState block, BlockState sideBlock, BlockState liquidChar, BlockState baseChar, boolean outsideLandscape) {
+                            BlockState glass, BlockState sideBlock) {
         double sqradius = radius * radius;
         double sqradiusOffset = (radius-2) * (radius-2);
-        LostCityProfile profile = provider.getProfile();
-        LostCityProfile profileOut = provider.getOutsideProfile();
-        int waterLevelOut = profileOut.GROUNDLEVEL - 0;// @todo profileOut.WATERLEVEL_OFFSET;
-//        int waterLevel = profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
-        int waterLevel = provider.getWorld() == null ? 65 : Tools.getSeaLevel(provider.getWorld());// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
+
+        int minY = Math.max(provider.getWorld().getMinBuildHeight(), centery-radius-1);
+        int maxY = Math.min(provider.getWorld().getMaxBuildHeight(), centery+radius+1);
 
         for (int x = 0 ; x < 16 ; x++) {
             double dxdx = (x-centerx) * (x-centerx);
             for (int z = 0 ; z < 16 ; z++) {
                 double dzdz = (z-centerz) * (z-centerz);
-//                double vo = profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION;
-//                double vr = profile.CITYSPHERE_SURFACE_VARIATION < 0.01f ? 0 : surfaceBuffer[x + z * 16] / profile.CITYSPHERE_SURFACE_VARIATION;
-                if (outsideLandscape) {
-                    driver.current(x, 0, z);
-                    for (int y = 0 ; y <= Math.max(Math.min(centery+radius, 255), waterLevel) ; y++) {
-                        double dydy = (y-centery) * (y-centery);
-                        double sqdist = dxdx + dydy + dzdz;
-                        if (y == 0) {
-                            driver.block(Blocks.BEDROCK.defaultBlockState());
-                        } else if (sqdist <= sqradius) {
-                            if (sqdist >= sqradiusOffset) {
-                                if (y > centery) {
-                                    driver.block(glass);
-                                } else {
-                                    driver.block(sideBlock);
-                                }
-                            }
-                        }
-                        driver.incY();
+                driver.current(x, minY, z);
+                for (int y = minY; y <= centery ; y++) {
+                    double dydy = (y-centery) * (y-centery);
+                    double sqdist = dxdx + dydy + dzdz;
+                    if (sqdist <= sqradius && sqdist >= sqradiusOffset) {
+                        driver.block(sideBlock);
                     }
-                } else {
-                    int starty = Math.max(centery - radius, 0);
-                    driver.current(x, starty, z);
-                    for (int y = starty; y <= Math.min(centery+radius, 255) ; y++) {
-                        double dydy = (y-centery) * (y-centery);
-                        double sqdist = dxdx + dydy + dzdz;
-                        if (sqdist <= sqradius) {
-                            if (sqdist >= sqradiusOffset) {
-                                if (y > centery) {
-                                    driver.block(glass);
-                                } else {
-                                    driver.block(sideBlock);
-                                }
-                            }
-                        }
-                        driver.incY();
+                    driver.incY();
+                }
+                for (int y = centery+1; y < maxY ; y++) {
+                    double dydy = (y-centery) * (y-centery);
+                    double sqdist = dxdx + dydy + dzdz;
+                    if (sqdist <= sqradius && sqdist >= sqradiusOffset) {
+                        driver.block(glass);
                     }
+                    driver.incY();
                 }
             }
         }

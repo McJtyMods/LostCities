@@ -127,7 +127,7 @@ public class City {
         if (cityRange < 1) {
             cityRange = 1;
         }
-        if ((profile.isSpace() && profile.CITYSPHERE_LANDSCAPE_OUTSIDE) || profile.isSpheres()) {
+        if (profile.isSpace() || profile.isSpheres()) {
             if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
                 return profile.CITY_MINRADIUS + cityRadiusRandom.nextInt(cityRange);
             } else {
