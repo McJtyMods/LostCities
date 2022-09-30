@@ -2,6 +2,8 @@ Upcoming:
 - Dadobug1111 improved worldgen in several (sometimes subtle, sometimes less subtle) ways
 - Four new tags that allow you to customize worldgen: lostcities/notbreakable (blocks that can't break with explosions), lostcities/easybreakable (blocks that explosions will break more easily), lostcities/foliage (foliage block test), lostcities/rotatable (rotatable blocks, like stairs)
 - It is now possible to configure the leaves rubble and the random dirt/stone rubble you get in the city style (generalsettings)
+- Cleaned up some biome settings that aren't implemented. If they have to be redone it will be with another mod
+- City spheres are back!
 
 1.18-5.3.9:
 - SandTechnology fixed a bug on space type worlds (void worlds) with a potential crash

@@ -15,8 +15,7 @@ public class PredefinedSphereRE implements IForgeRegistryEntry<PredefinedSphereR
                     Codec.INT.fieldOf("chunkz").forGetter(l -> l.chunkZ),
                     Codec.INT.fieldOf("centerx").forGetter(l -> l.centerX),
                     Codec.INT.fieldOf("centerz").forGetter(l -> l.centerZ),
-                    Codec.INT.fieldOf("radius").forGetter(l -> l.radius),
-                    Codec.STRING.fieldOf("biome").forGetter(l -> l.biome)
+                    Codec.INT.fieldOf("radius").forGetter(l -> l.radius)
             ).apply(instance, PredefinedSphereRE::new));
 
     private ResourceLocation name;
@@ -27,19 +26,16 @@ public class PredefinedSphereRE implements IForgeRegistryEntry<PredefinedSphereR
     private final int centerX;
     private final int centerZ;
     private final int radius;
-    private String biome;
 
     public PredefinedSphereRE(
             String dimension,
-            int chunkX, int chunkZ, int centerX, int centerZ, int radius,
-            String biome) {
+            int chunkX, int chunkZ, int centerX, int centerZ, int radius) {
         this.dimension = dimension;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         this.centerX = centerX;
         this.centerZ = centerZ;
         this.radius = radius;
-        this.biome = biome;
     }
 
     public String getDimension() {
@@ -64,10 +60,6 @@ public class PredefinedSphereRE implements IForgeRegistryEntry<PredefinedSphereR
 
     public int getRadius() {
         return radius;
-    }
-
-    public String getBiome() {
-        return biome;
     }
 
     @Override

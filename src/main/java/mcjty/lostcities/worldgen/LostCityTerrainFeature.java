@@ -1,6 +1,5 @@
 package mcjty.lostcities.worldgen;
 
-import it.unimi.dsi.fastutil.longs.LongSet;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.LostCityEvent;
@@ -40,7 +39,6 @@ import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
@@ -277,17 +275,7 @@ public class LostCityTerrainFeature {
 
         // Check if there is no village here
         ChunkAccess ch = region.getChunk(chunkX, chunkZ);
-        if (ch.hasAnyStructureReferences()) {
-            Map<ConfiguredStructureFeature<?, ?>, LongSet> references = ch.getAllReferences();
-//            BuiltinRegistries.CONFIGURED_FEATURE.get(StructureFeature.VILLAGE)
-            // @todo we can do this more optimally if we first find all configured structures for village
-            for (Map.Entry<ConfiguredStructureFeature<?, ?>, LongSet> entry : references.entrySet()) {
-                if (entry.getKey().feature == StructureFeature.VILLAGE && !entry.getValue().isEmpty()) {
-                    doCity = false;
-                    break;
-                }
-            }
-        }
+        doCity = doCity && !hasVillage(ch);
 
         // If this chunk has a building or street but we're in a floating profile and
         // we happen to have a void chunk we detect that here and go back to normal chunk generation
@@ -349,6 +337,19 @@ public class LostCityTerrainFeature {
         driver.setPrimer(oldRegion, oldChunk);
 
         ChunkFixer.fix(provider, chunkX, chunkZ);
+    }
+
+    private boolean hasVillage(ChunkAccess ch) {
+        if (ch.hasAnyStructureReferences()) {
+            var references = ch.getAllReferences();
+            // @todo we can do this more optimally if we first find all configured structures for village
+            for (var entry : references.entrySet()) {
+                if (entry.getKey().feature == StructureFeature.VILLAGE && !entry.getValue().isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void fillSphere(int centerx, int centery, int centerz, int radius,

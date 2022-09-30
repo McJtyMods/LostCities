@@ -17,7 +17,6 @@ public class PredefinedSphere implements ILostCityAsset {
     private int centerX;
     private int centerZ;
     private int radius;
-    private String biome;
 
     public PredefinedSphere(PredefinedSphereRE object) {
         name = object.getRegistryName();
@@ -27,7 +26,6 @@ public class PredefinedSphere implements ILostCityAsset {
         centerX = object.getCenterX();
         centerZ = object.getCenterZ();
         radius = object.getRadius();
-        biome = object.getBiome();
     }
 
     @Override
@@ -62,9 +60,5 @@ public class PredefinedSphere implements ILostCityAsset {
 
     public int getRadius() {
         return radius;
-    }
-
-    public String getBiome() {
-        return biome;
     }
 }

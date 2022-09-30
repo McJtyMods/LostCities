@@ -2,9 +2,6 @@ package mcjty.lostcities.api;
 
 import mcjty.lostcities.varia.ChunkCoord;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.biome.Biome;
-
-import javax.annotation.Nullable;
 
 public interface ILostSphere {
 
@@ -16,10 +13,6 @@ public interface ILostSphere {
 
     // The radius
     float getRadius();
-
-    // If this biome is tied to a fixed biome
-    @Nullable
-    Biome getBiome();
 
     // Return true if this sphere is enabled. Always test for this
     boolean isEnabled();
