@@ -1,9 +1,7 @@
 package mcjty.lostcities.dimensions.world.terraingen;
 
-import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
-import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -100,7 +98,7 @@ public class IslandTerrainGenerator {
         this.noiseGen5 = ctx.getScale();
         this.islandNoise = ctx.getIsland();
 
-        driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
+        driver = /*LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() :*/ new SafeDriver();
     }
 
     /**

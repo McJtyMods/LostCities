@@ -24,6 +24,7 @@ public class Palette implements ILostCityAsset {
     private final Map<IBlockState, IBlockState> damaged = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
     private final Map<Character, String> lootTables = new HashMap<>(); // For chests
+    private final Map<Character, Boolean> tileEntities = new HashMap<>();
     private final Map<Character, Map<String, Integer>> torchOrientations = new HashMap<>(); // For torches
 
     public Palette() {
@@ -41,6 +42,7 @@ public class Palette implements ILostCityAsset {
         palette.putAll(other.palette);
         damaged.putAll(other.damaged);
         mobIds.putAll(other.mobIds);
+        tileEntities.putAll(other.tileEntities);
         lootTables.putAll(other.lootTables);
         torchOrientations.putAll(other.torchOrientations);
     }
@@ -56,6 +58,10 @@ public class Palette implements ILostCityAsset {
 
     public Map<Character, String> getMobIds() {
         return mobIds;
+    }
+
+    public Map<Character, Boolean> getTileEntities() {
+        return this.tileEntities;
     }
 
     public Map<Character, String> getLootTables() {
@@ -92,6 +98,10 @@ public class Palette implements ILostCityAsset {
             if (o.has("loot")) {
                 lootTables.put(c, o.get("loot").getAsString());
             }
+            if (o.has("tile_entity")) {
+                System.out.println("Added new tile_entity to palette! " + c);
+                tileEntities.put(c, o.get("tile_entity").getAsBoolean());
+            }
             if (o.has("facing")) {
                 Map<String, Integer> or = new HashMap<>();
                 JsonObject torchObj = o.get("facing").getAsJsonObject();
@@ -119,6 +129,10 @@ public class Palette implements ILostCityAsset {
                     JsonObject ob = el.getAsJsonObject();
                     Integer f = ob.get("random").getAsInt();
                     String block = ob.get("block").getAsString();
+                    if (ob.has("tile_entity")) {
+                        System.out.println("Block in BlockList was detected as a TileEntity; adding to todo!");
+                        tileEntities.put(c, ob.get("tile_entity").getAsBoolean());
+                    }
                     IBlockState state = Tools.stringToState(block);
                     blocks.add(Pair.of(f, state));
                     if (dmg != null) {

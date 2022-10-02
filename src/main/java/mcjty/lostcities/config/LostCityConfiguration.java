@@ -65,7 +65,7 @@ public class LostCityConfiguration {
     public static boolean DIMENSION_BOP = true;
 
     public static boolean DEBUG = false;
-    public static boolean OPTIMIZED_CHUNKGEN = true;
+    public static boolean OPTIMIZED_CHUNKGEN = false;
 
     public static String SPECIAL_BED_BLOCK = Blocks.DIAMOND_BLOCK.getRegistryName().toString();
 
@@ -137,6 +137,7 @@ public class LostCityConfiguration {
 
         DEBUG = cfg.getBoolean("debug", CATEGORY_GENERAL, DEBUG, "Enable debugging/logging");
         OPTIMIZED_CHUNKGEN = cfg.getBoolean("optimizedChunkgen", CATEGORY_GENERAL, OPTIMIZED_CHUNKGEN, "Disable this if you have mods like NEID or JEID installed. Note that when NEID or JEID is present this is disabled by default");
+        OPTIMIZED_CHUNKGEN = false; // Permanently keep optimized chunk gen OFF
         if (ModSetup.neid || ModSetup.jeid) {
             LostCities.setup.getLogger().log(Level.INFO, "NEID or JEID detected: disabling optimized chunkgeneration!");
             OPTIMIZED_CHUNKGEN = false;

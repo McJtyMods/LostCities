@@ -24,10 +24,13 @@ public class CompiledPalette {
         private final String loot;
         private final Map<String, Integer> torchOrientations;
 
-        public Info(String mobId, String loot, Map<String, Integer> torchOrientations) {
+        private final boolean isTileEntity;
+
+        public Info(String mobId, String loot, Map<String, Integer> torchOrientations, boolean isTileEntity) {
             this.mobId = mobId;
             this.loot = loot;
             this.torchOrientations = torchOrientations;
+            this.isTileEntity = isTileEntity;
         }
 
         public String getMobId() {
@@ -36,6 +39,10 @@ public class CompiledPalette {
 
         public String getLoot() {
             return loot;
+        }
+
+        public boolean isTileEntity() {
+            return this.isTileEntity;
         }
 
         public Map<String, Integer> getTorchOrientations() {
@@ -122,15 +129,21 @@ public class CompiledPalette {
             }
             for (Map.Entry<Character, String> entry : p.getMobIds().entrySet()) {
                 Character c = entry.getKey();
-                information.put(c, new Info(entry.getValue(), null, null));
+                information.put(c, new Info(entry.getValue(), null, null, false));
             }
             for (Map.Entry<Character, String> entry : p.getLootTables().entrySet()) {
                 Character c = entry.getKey();
-                information.put(c, new Info(null, entry.getValue(), null));
+                information.put(c, new Info(null, entry.getValue(), null, false));
             }
             for (Map.Entry<Character, Map<String, Integer>> entry : p.getTorchOrientations().entrySet()) {
                 Character c = entry.getKey();
-                information.put(c, new Info(null, null, entry.getValue()));
+                information.put(c, new Info(null, null, entry.getValue(), false));
+            }
+
+            for (Map.Entry<Character, Boolean> entry : p.getTileEntities().entrySet()) {
+                System.out.println("Checking Tile ENtities in for loop. . .");
+                Character c = entry.getKey();
+                information.put(c, new Info(null, null, null, true));
             }
         }
     }
