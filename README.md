@@ -1,6 +1,6 @@
 # LostCities
 
-This LostCities Fork is VERY fucky. I have 0 modding experience but I know my java so i did the absolutely best I could to get this working!
+This LostCities Fork is VERY fucky, im not responsible if this corrupts your world. You have been warned. I have 0 modding experience but I know my java so i did the absolutely best I could to get this working!
 
 The original reason for this forks creation stems from this issue: https://github.com/McJtyMods/LostCities/issues/155
 
