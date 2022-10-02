@@ -4,7 +4,7 @@ This LostCities Fork is VERY fucky, im not responsible if this corrupts your wor
 
 The original reason for this forks creation stems from this issue: https://github.com/McJtyMods/LostCities/issues/155
 
-For some reason in 1.12.2 TileEntitys do NOT get any special treatment and are placed as normal blocks without any type of special treatment (Chests and Spawners do, but simply because they are hard coded)
+For some reason in 1.12.2 TileEntitys do NOT get any special treatment and are placed as normal blocks without any type of special treatment (Chests and Spawners do, but simply because they are hard coded in the mod as TileEntities and they receive a dirty mark to update)
 
 This fix aims to combat this render glitch by adding in a config option to palettes. Here is an example palette:
 
