@@ -7,9 +7,9 @@ import net.minecraft.world.chunk.ChunkPrimer;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class OptimizedDriver /*implements IPrimerDriver*/ {
+public class OptimizedDriver implements IPrimerDriver {
 
-    /*private ChunkPrimer primer;
+    private ChunkPrimer primer;
     private int current;
 
     @Override
@@ -185,5 +185,5 @@ public class OptimizedDriver /*implements IPrimerDriver*/ {
         driver.current = current;
         driver.primer = primer;
         return driver;
-    }*/
+    }
 }

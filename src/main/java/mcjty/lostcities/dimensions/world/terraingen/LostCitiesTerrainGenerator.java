@@ -8,6 +8,7 @@ import mcjty.lostcities.dimensions.world.ChunkHeightmap;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IIndex;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
+import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import mcjty.lostcities.dimensions.world.lost.*;
 import mcjty.lostcities.dimensions.world.lost.cityassets.*;
@@ -81,7 +82,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     public LostCitiesTerrainGenerator(LostCityChunkGenerator provider) {
         super(provider);
-        driver = /*LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() :*/ new SafeDriver();
+        driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
         this.mainGroundLevel = provider.getProfile().GROUNDLEVEL;
         this.waterLevel = provider.getProfile().GROUNDLEVEL - provider.getProfile().WATERLEVEL_OFFSET;
         this.rubbleNoise = new NoiseGeneratorPerlin(provider.rand, 4);
@@ -405,7 +406,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     }
 
     private void defaultGenerate(int chunkX, int chunkZ, ChunkPrimer primer) {
-        IPrimerDriver driver = /*LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() :*/ new SafeDriver();
+        IPrimerDriver driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
         driver.setPrimer(primer);
         generateHeightmap(chunkX, chunkZ);
         for (int x4 = 0; x4 < 4; ++x4) {

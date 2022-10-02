@@ -5,6 +5,7 @@ import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
+import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import mcjty.lostcities.dimensions.world.lost.BuildingInfo;
 import mcjty.lostcities.dimensions.world.lost.CitySphere;
@@ -191,7 +192,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         } else if (cachedPrimers.containsKey(key)) {
             char baseChar = (char) Block.BLOCK_STATE_IDS.get(profile.getBaseBlock());
             ChunkPrimer primer = cachedPrimers.get(key);
-            IPrimerDriver driver = /*LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() :*/ new SafeDriver();
+            IPrimerDriver driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
             driver.setPrimer(primer);
             ChunkHeightmap heightmap = new ChunkHeightmap(driver, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, baseChar);
             cachedHeightmaps.put(key, heightmap);
@@ -200,7 +201,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
             ChunkPrimer primer = generatePrimer(chunkX, chunkZ);
             cachedPrimers.put(key, primer);
             char baseChar = (char) Block.BLOCK_STATE_IDS.get(profile.getBaseBlock());
-            IPrimerDriver driver = /*LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() :*/ new SafeDriver();
+            IPrimerDriver driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
             driver.setPrimer(primer);
             ChunkHeightmap heightmap = new ChunkHeightmap(driver, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, baseChar);
             cachedHeightmaps.put(key, heightmap);
@@ -306,7 +307,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
             if (!cachedHeightmaps.containsKey(key)) {
                 // We might need this later
                 char baseChar = (char) Block.BLOCK_STATE_IDS.get(profile.getBaseBlock());
-                IPrimerDriver driver = /*LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() :*/ new SafeDriver();
+                IPrimerDriver driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
                 driver.setPrimer(chunkprimer);
                 cachedHeightmaps.put(key, new ChunkHeightmap(driver, profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL, baseChar));
             }

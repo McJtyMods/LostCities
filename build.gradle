@@ -72,6 +72,8 @@ minecraft {
     // Simply re-run your setup task after changing the mappings to update your workspace.
     mappings channel: 'stable', version: '39-1.12'
 
+    accessTransformer = file('src/main/resources/META-INF/lostcities_at.cfg')
+
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.

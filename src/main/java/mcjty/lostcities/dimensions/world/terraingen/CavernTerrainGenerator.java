@@ -1,8 +1,10 @@
 package mcjty.lostcities.dimensions.world.terraingen;
 
+import mcjty.lostcities.config.LostCityConfiguration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import mcjty.lostcities.dimensions.world.driver.IPrimerDriver;
+import mcjty.lostcities.dimensions.world.driver.OptimizedDriver;
 import mcjty.lostcities.dimensions.world.driver.SafeDriver;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -59,7 +61,7 @@ public class CavernTerrainGenerator {
         this.netherrackExculsivityNoiseGen = ctx.getPerlin3();
         this.netherNoiseGen6 = ctx.getScale();
         this.netherNoiseGen7 = ctx.getDepth();
-        driver = /*LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() :*/ new SafeDriver();
+        driver = LostCityConfiguration.OPTIMIZED_CHUNKGEN ? new OptimizedDriver() : new SafeDriver();
     }
 
     /**
