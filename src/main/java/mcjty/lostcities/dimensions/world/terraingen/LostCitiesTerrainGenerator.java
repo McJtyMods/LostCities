@@ -667,11 +667,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 driver.decY();
             }
         }
-
-        boolean isXRunning = Highway.getXHighwayLevel(info.chunkX, info.chunkZ, provider, info.profile) >= 0;
-        LostCityEvent.PostGenHighwayChunkEvent postEvent =
-                new LostCityEvent.PostGenHighwayChunkEvent(provider.worldObj, provider, info.chunkX, info.chunkZ, isXRunning, highwayGroundLevel);
-        MinecraftForge.EVENT_BUS.post(postEvent);
     }
 
     private void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater) {

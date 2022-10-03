@@ -45,45 +45,6 @@ public class LostCityEvent extends Event {
     }
 
     /**
-     * PostGenHighwayChunkEvent is fired after a Highway Part generates in a Chunk
-     * This event is fired after all the blocks in the part have been generated and placed in
-     * the world. This event is an informational event, relatively only used to get the ground
-     * level of the highway (The road) when it generates, useful for other mods to use {@link #isXRunning()}
-     * and look through blocks on this level to re-orientate road directions if they're blocks are directionals.
-     * This event is non-modifiable and non-cancellable. This event gets fired on the forge EVENT_BUS
-     * <br>
-     * // TODO finish javadoc
-     */
-    public static class PostGenHighwayChunkEvent extends LostCityEvent {
-
-        protected final boolean isXRunning;
-        protected final int highwayGroundLevel;
-
-        public PostGenHighwayChunkEvent(World world,
-                                        ILostChunkGenerator generator,
-                                        int chunkX,
-                                        int chunkZ,
-                                        boolean isXRunning,
-                                        int highwayGroundLevel) {
-            super(world, generator, chunkX, chunkZ);
-            this.isXRunning = isXRunning;
-            this.highwayGroundLevel = highwayGroundLevel;
-        }
-
-        public boolean isXRunning() {
-            return this.isXRunning;
-        }
-
-        public boolean isZRunning() {
-            return !this.isXRunning;
-        }
-
-        public int getHighwayLevel() {
-            return this.highwayGroundLevel;
-        }
-    }
-
-    /**
      * CharacteristicsEvent is fired when Lost Cities tries to determine chunk chracteristics.<br>
      * This event is fired right when The Lost Cities tries to decide if a chunk should contain
      * a building and what type of building. All fields in the given characteristic object can be modified.
