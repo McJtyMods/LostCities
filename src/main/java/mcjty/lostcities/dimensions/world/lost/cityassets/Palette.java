@@ -51,6 +51,8 @@ public class Palette implements ILostCityAsset {
         damaged.putAll(other.damaged);
         mobIds.putAll(other.mobIds);
         tileEntities.putAll(other.tileEntities);
+        highwayXPalette.putAll(other.highwayXPalette);
+        highwayZPalette.putAll(other.highwayZPalette);
         lootTables.putAll(other.lootTables);
         torchOrientations.putAll(other.torchOrientations);
     }

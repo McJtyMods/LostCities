@@ -2158,7 +2158,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
                                 // Patches added by Dalton
                                 if (inf.isTileEntity()) {
-                                    System.out.println("Re-Processing Tile-Entity");
                                     info.getTodoChunk(rx, rz).addTileEntityTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                 }
 
@@ -2197,16 +2196,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 }
                             } else if (isHighway && !isHighwayIntersecting && isHighwayRunningX) {
                                 Character charr = compiledPalette.getHighwayX(c);
-                                if (charr == null)
-                                    throw new RuntimeException("Could not find entry for character: " + c + " in highway X running palette");
-                                b = charr;
-                                System.out.println("Successfully changed block for highway running X Part");
+                                // Not all characters may be a highway character
+                                if (charr != null) {
+                                    b = charr;
+                                    System.out.println("Successfully changed block for highway running X Part");
+                                }
                             } else if (isHighway && !isHighwayIntersecting) {
                                 Character charr = compiledPalette.getHighwayZ(c);
-                                if (charr == null)
-                                    throw new RuntimeException("Could not find entry for character: " + c + " in highway Z running palette");
-                                b = charr;
-                                System.out.println("Successfully changed block for highway running Z Part");
+                                // Not all characters may be a highway character
+                                if (charr != null) {
+                                    b = charr;
+                                    System.out.println("Successfully changed block for highway running Z Part");
+                                }
                             }
                             driver.add(b);
                         } else {

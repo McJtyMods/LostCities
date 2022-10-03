@@ -107,7 +107,10 @@ public class CompiledPalette {
                 Object value = entry.getValue();
                 if (!(value instanceof IBlockState)) {
                     throw new RuntimeException("Invalid highway-x-palette entry for '" + entry.getKey() + "'!");
-                } else this.highwayXPalette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+                } else {
+
+                    this.highwayXPalette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+                }
 
             }
 
@@ -161,7 +164,6 @@ public class CompiledPalette {
             }
 
             for (Map.Entry<Character, Boolean> entry : p.getTileEntities().entrySet()) {
-                System.out.println("Checking Tile ENtities in for loop. . .");
                 Character c = entry.getKey();
                 information.put(c, new Info(null, null, null, true));
             }
