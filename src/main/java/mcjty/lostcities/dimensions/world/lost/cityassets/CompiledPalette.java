@@ -4,7 +4,7 @@ import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import org.apache.commons.lang3.tuple.Pair;
-import scala.Char;
+
 
 import java.util.HashMap;
 import java.util.Map;

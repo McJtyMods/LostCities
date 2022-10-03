@@ -6,13 +6,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
-import org.apache.commons.lang3.tuple.Pair;
-import scala.Char;
 
-import javax.annotation.Nullable;
+import net.minecraft.block.state.IBlockState;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

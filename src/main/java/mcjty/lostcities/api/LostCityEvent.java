@@ -1,6 +1,5 @@
 package mcjty.lostcities.api;
 
-import mcjty.lostcities.dimensions.world.LostCityChunkGenerator;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraftforge.common.MinecraftForge;
