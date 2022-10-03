@@ -26,6 +26,11 @@ public class Palette implements ILostCityAsset {
     final Map<Character, Object> highwayXPalette = new HashMap<>();
 
     final Map<Character, Object> highwayZPalette = new HashMap<>();
+
+    final Map<Character, Object> paletteEast = new HashMap<>();
+    final Map<Character, Object> paletteWest = new HashMap<>();
+    final Map<Character, Object> paletteNorth = new HashMap<>();
+    final Map<Character, Object> paletteSouth = new HashMap<>();
     private final Map<IBlockState, IBlockState> damaged = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
     private final Map<Character, String> lootTables = new HashMap<>(); // For chests
@@ -45,6 +50,10 @@ public class Palette implements ILostCityAsset {
 
     public void merge(Palette other) {
         palette.putAll(other.palette);
+        paletteEast.putAll(other.paletteEast);
+        paletteNorth.putAll(other.paletteNorth);
+        paletteWest.putAll(other.paletteWest);
+        paletteSouth.putAll(other.paletteSouth);
         damaged.putAll(other.damaged);
         mobIds.putAll(other.mobIds);
         tileEntities.putAll(other.tileEntities);
@@ -134,6 +143,36 @@ public class Palette implements ILostCityAsset {
                 String block = o.get("highwayX").getAsString();
                 IBlockState state = Tools.stringToState(block);
                 this.highwayXPalette.put(c, state);
+                if (dmg != null) {
+                    damaged.put(state, dmg);
+                }
+            }
+
+            if (o.has("block_east")) {
+                String block = o.get("block_east").getAsString();
+                IBlockState state = Tools.stringToState(block);
+                paletteEast.put(c, state);
+                if (dmg != null) {
+                    damaged.put(state, dmg);
+                }
+            } else if (o.has("block_west")) {
+                String block = o.get("block_west").getAsString();
+                IBlockState state = Tools.stringToState(block);
+                paletteWest.put(c, state);
+                if (dmg != null) {
+                    damaged.put(state, dmg);
+                }
+            } else if (o.has("block_north")) {
+                String block = o.get("block_north").getAsString();
+                IBlockState state = Tools.stringToState(block);
+                paletteNorth.put(c, state);
+                if (dmg != null) {
+                    damaged.put(state, dmg);
+                }
+            } else if (o.has("block_south")) {
+                String block = o.get("block_south").getAsString();
+                IBlockState state = Tools.stringToState(block);
+                paletteSouth.put(c, state);
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }

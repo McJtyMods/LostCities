@@ -1,5 +1,7 @@
 package mcjty.lostcities.dimensions.world.lost.cityassets;
 
+import gnu.trove.map.hash.THashMap;
+import mcjty.lostcities.dimensions.world.lost.Direction;
 import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -17,6 +19,11 @@ import java.util.Set;
 public class CompiledPalette {
 
     private final Map<Character, Object> palette = new HashMap<>();
+
+    private final Map<Character, Character> paletteEast = new HashMap<>();
+    private final Map<Character, Character> paletteWest = new HashMap<>();
+    private final Map<Character, Character> paletteNorth = new HashMap<>();
+    private final Map<Character, Character> paletteSouth = new HashMap<>();
 
     private final Map<Character, Character> highwayXPalette = new HashMap<>(); // only support singular blocks
 
@@ -58,6 +65,12 @@ public class CompiledPalette {
 
     public CompiledPalette(CompiledPalette other, Palette... palettes) {
         this.palette.putAll(other.palette);
+        this.paletteWest.putAll(other.paletteWest);
+        this.paletteEast.putAll(other.paletteEast);
+        this.paletteNorth.putAll(other.paletteNorth);
+        this.paletteSouth.putAll(other.paletteSouth);
+        this.highwayXPalette.putAll(other.highwayXPalette);
+        this.highwayZPalette.putAll(other.highwayZPalette);
         this.damagedToBlock.putAll(other.damagedToBlock);
         this.information.putAll(other.information);
         addPalettes(palettes);
@@ -103,15 +116,39 @@ public class CompiledPalette {
                 }
             }
 
+            for (Map.Entry<Character, Object> entry : p.paletteEast.entrySet()) {
+                Object value = entry.getValue();
+                if (!(value instanceof IBlockState)) {
+                    throw new RuntimeException("Invalid block_east entry for: '" + entry.getKey() + "'!");
+                } else this.paletteEast.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+            }
+
+            for (Map.Entry<Character, Object> entry : p.paletteWest.entrySet()) {
+                Object value = entry.getValue();
+                if (!(value instanceof IBlockState)) {
+                    throw new RuntimeException("Invalid block_west entry for: '" + entry.getKey() + "'!");
+                } else this.paletteWest.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+            }
+
+            for (Map.Entry<Character, Object> entry : p.paletteNorth.entrySet()) {
+                Object value = entry.getValue();
+                if (!(value instanceof IBlockState)) {
+                    throw new RuntimeException("Invalid block_north entry for: '" + entry.getKey() + "'!");
+                } else this.paletteNorth.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+            }
+
+            for (Map.Entry<Character, Object> entry : p.paletteSouth.entrySet()) {
+                Object value = entry.getValue();
+                if (!(value instanceof IBlockState)) {
+                    throw new RuntimeException("Invalid block_south entry for: '" + entry.getKey() + "'!");
+                } else this.paletteSouth.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+            }
+
             for (Map.Entry<Character, Object> entry : p.highwayXPalette.entrySet()) {
                 Object value = entry.getValue();
                 if (!(value instanceof IBlockState)) {
                     throw new RuntimeException("Invalid highway-x-palette entry for '" + entry.getKey() + "'!");
-                } else {
-
-                    this.highwayXPalette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
-                }
-
+                } else this.highwayXPalette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
             }
 
             for (Map.Entry<Character, Object> entry : p.highwayZPalette.entrySet()) {
@@ -224,6 +261,18 @@ public class CompiledPalette {
 
     public Character getHighwayZ(char c) {
         return this.highwayZPalette.get(c);
+    }
+
+    public Character getDirectionalBlock(char c, Direction direction) {
+        if (direction == Direction.XMIN) {
+            return  this.paletteEast.get(c);
+        } else if (direction == Direction.XMAX) {
+            return this.paletteWest.get(c);
+        } else if (direction == Direction.ZMIN) {
+            return this.paletteSouth.get(c);
+        } else {
+            return this.paletteNorth.get(c);
+        }
     }
 
     public Character get(char c) {

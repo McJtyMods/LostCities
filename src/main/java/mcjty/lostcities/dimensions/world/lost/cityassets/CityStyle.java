@@ -5,9 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityCityStyle;
+import mcjty.lostcities.dimensions.world.lost.Direction;
 import mcjty.lostcities.varia.Tools;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -22,6 +24,10 @@ public class CityStyle implements ILostCityCityStyle {
     private final List<Pair<Float, String>> fountainSelector = new ArrayList<>();
     private final List<Pair<Float, String>> stairSelector = new ArrayList<>();
     private final List<Pair<Float, String>> frontSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> eastFrontSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> westFrontSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> northFrontSelector = new ArrayList<>();
+    private final List<Pair<Float, String>> southFrontSelector = new ArrayList<>();
     private final List<Pair<Float, String>> railDungeonSelector = new ArrayList<>();
     private final List<Pair<Float, String>> multiBuildingSelector = new ArrayList<>();
     private String style;
@@ -319,9 +325,22 @@ public class CityStyle implements ILostCityCityStyle {
         parseArraySafe(object, parkSelector, "parks", "park");
         parseArraySafe(object, fountainSelector, "fountains", "fountain");
         parseArraySafe(object, stairSelector, "stairs", "stair");
+        parseArraySafe(object, eastFrontSelector, "fronts", "front_east");
+        parseArraySafe(object, westFrontSelector, "fronts", "front_west");
+        parseArraySafe(object, northFrontSelector, "fronts", "front_north");
+        parseArraySafe(object, southFrontSelector, "fronts", "front_south");
         parseArraySafe(object, frontSelector, "fronts", "front");
         parseArraySafe(object, bridgeSelector, "bridges", "bridge");
         parseArraySafe(object, railDungeonSelector, "raildungeons", "dungeon");
+    }
+
+    /**
+     * Quick util method for checking if there is any configured directional fronts
+     * @return
+     */
+    protected boolean noDirectionalFrontExists() {
+        return eastFrontSelector.isEmpty() && westFrontSelector.isEmpty()
+                && northFrontSelector.isEmpty() && southFrontSelector.isEmpty();
     }
 
     private void parseArraySafe(JsonObject object, List<Pair<Float, String>> selector, String arrayName, String elName) {
@@ -437,8 +456,17 @@ public class CityStyle implements ILostCityCityStyle {
         return Tools.getRandomFromList(random, stairSelector);
     }
 
-    public String getRandomFront(Random random) {
-        return Tools.getRandomFromList(random, frontSelector);
+    public String getRandomFront(Random random, @Nullable Direction direction) {
+
+        if (direction == Direction.XMIN) { // Front facing east
+            return Tools.getRandomFromList(random, eastFrontSelector);
+        } else if (direction == Direction.XMAX) { // Front facing west
+            return Tools.getRandomFromList(random, westFrontSelector);
+        } else if (direction == Direction.ZMIN) { // Front facing south
+            return Tools.getRandomFromList(random, southFrontSelector);
+        } else if (direction == Direction.ZMAX) { // Front facing north
+            return Tools.getRandomFromList(random, northFrontSelector);
+        } else return Tools.getRandomFromList(random, frontSelector); // fallback to default front selector if no directionals were provided
     }
 
     public String getRandomRailDungeon(Random random) {

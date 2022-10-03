@@ -45,6 +45,10 @@ public class BuildingInfo implements ILostChunkInfo {
     public final BuildingPart bridgeType;
     public final BuildingPart stairType;
     public final BuildingPart frontType;
+    public final BuildingPart northFrontType;
+    public final BuildingPart southFrontType;
+    public final BuildingPart westFrontType;
+    public final BuildingPart eastFrontType;
     private final float stairPriority;      // A random number that indicates if this chunk should get a stair if there are competing stairs around it. The highest wins
     public final BuildingPart railDungeon;    // Dungeon next to rails. Will only generate if there are actually rails next to it
     public final StreetType streetType;
@@ -859,9 +863,17 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         if (rand.nextFloat() < profile.BUILDING_FRONTCHANCE) {
-            frontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand));
+            frontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand, null));
+            northFrontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand, Direction.ZMAX));
+            southFrontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand, Direction.ZMIN));
+            westFrontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand, Direction.XMAX));
+            eastFrontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand, Direction.XMIN));
         } else {
             frontType = null;
+            northFrontType = null;
+            southFrontType = null;
+            eastFrontType = null;
+            westFrontType = null;
         }
     }
 
@@ -1471,6 +1483,28 @@ public class BuildingInfo implements ILostChunkInfo {
         throw new IllegalStateException("Cannot happen!");
     }
 
+    /**
+     * Quick helper method for checking all of an adjacent BuildingInfo's Front Types
+     * @param adj {@link BuildingInfo} part
+     * @return true if one was not null
+     */
+    public boolean hasAdjacentFrontType(BuildingInfo adj) {
+        return adj.frontType != null
+                || this.hasAdjacentFrontDirectionalType(adj);
+    }
+
+    /**
+     * Quick helper method to tell if an adjacent has a direction front type set
+     * @param adj
+     * @return
+     */
+    public boolean hasAdjacentFrontDirectionalType(BuildingInfo adj) {
+        return adj.northFrontType != null
+                || adj.southFrontType != null
+                || adj.westFrontType != null
+                || adj.eastFrontType != null;
+    }
+
     // Call this from the street reference with the (potential building) as 'adj'
     // 'streetLevel' is the cityLevel at the position of the street
     public boolean hasFrontPartFrom(BuildingInfo adj) {
@@ -1480,7 +1514,7 @@ public class BuildingInfo implements ILostChunkInfo {
             st = BuildingInfo.StreetType.PARK;
         }
 
-        if (adj.hasBuilding && adj.frontType != null && st == BuildingInfo.StreetType.NORMAL && cityLevel < adj.cityLevel + adj.getNumFloors()) {
+        if (adj.hasBuilding && this.hasAdjacentFrontType(adj) && st == BuildingInfo.StreetType.NORMAL && cityLevel < adj.cityLevel + adj.getNumFloors()) {
             RailChunkType type = getRailInfo().getType();
             if (type == RailChunkType.STATION_UNDERGROUND) {
                 return false;
