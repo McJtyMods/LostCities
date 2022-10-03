@@ -290,7 +290,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (horiz && vert) {
             if (!CitySphere.intersectsWithCitySphere(info.chunkX, info.chunkZ, provider)) {
                 BuildingPart part = AssetRegistries.PARTS.get("monorails_both");
-                generatePart(info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true);
+                generatePart(info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true,
+                        false, false, false);
             }
             return;
         } else if (horiz) {
@@ -331,7 +332,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             part = AssetRegistries.PARTS.get("monorails_vertical");
         }
 
-        generatePart(info, part, transform, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true);
+        generatePart(info, part, transform, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true,
+                false, false, false);
     }
 
     private boolean hasNonStationMonoRail(BuildingInfo info) {
@@ -566,38 +568,54 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int levelZ = Highway.getZHighwayLevel(chunkX, chunkZ, provider, info.profile);
         if (levelX == levelZ && levelX >= 0) {
             // Crossing
-            generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getXmax(), info.getZmax(), "_bi");
+            generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getXmax(), info.getZmax(), "_bi",
+                    false, true);
         } else if (levelX >= 0 && levelZ >= 0) {
             // There are two highways on different level. Make sure the lowest one is done first because it
             // will clear out what is above it
             if (levelX == 0) {
-                generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "");
-                generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "");
+                generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "",
+                        true, false);
+                generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "",
+                        false, false);
             } else {
-                generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "");
-                generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "");
+                generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "",
+                        false, true);
+                generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "",
+                        true, false);
             }
         } else {
             if (levelX >= 0) {
-                generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "");
+                generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), "",
+                        true, false);
             } else if (levelZ >= 0) {
-                generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "");
+                generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "",
+                        false, true);
             }
         }
     }
 
-    private void generateHighwayPart(BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, String suffix) {
+    private void generateHighwayPart(BuildingInfo info,
+                                     int level,
+                                     Transform transform,
+                                     BuildingInfo adjacent1,
+                                     BuildingInfo adjacent2,
+                                     String suffix,
+                                     boolean runningX,
+                                     boolean intersects) {
         int highwayGroundLevel = info.groundLevel + level * 6;
 
         BuildingPart part;
         if (info.isTunnel(level)) {
             // We know we need a tunnel
             part = AssetRegistries.PARTS.get("highway_tunnel" + suffix);
-            generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
+            generatePart(info, part, transform, 0, highwayGroundLevel, 0, true,
+                    true, runningX, intersects);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
             part = AssetRegistries.PARTS.get("highway_open" + suffix);
-            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
+            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true,
+                    true, runningX, intersects);
             // Clear a bit more above the highway
             if (!info.profile.isCavern()) {
                 int clearheight = 15;
@@ -609,7 +627,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             }
         } else {
             part = AssetRegistries.PARTS.get("highway_bridge" + suffix);
-            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
+            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true,
+                    true, runningX, intersects);
             // Clear a bit more above the highway
             if (!info.profile.isCavern()) {
                 int clearheight = 15;
@@ -648,6 +667,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 driver.decY();
             }
         }
+
+        boolean isXRunning = Highway.getXHighwayLevel(info.chunkX, info.chunkZ, provider, info.profile) >= 0;
+        LostCityEvent.PostGenHighwayChunkEvent postEvent =
+                new LostCityEvent.PostGenHighwayChunkEvent(provider.worldObj, provider, info.chunkX, info.chunkZ, isXRunning, highwayGroundLevel);
+        MinecraftForge.EVENT_BUS.post(postEvent);
     }
 
     private void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater) {
@@ -946,7 +970,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         if (info.getZmin().getRailInfo().getType() == RailChunkType.HORIZONTAL ||
                 info.getZmax().getRailInfo().getType() == RailChunkType.HORIZONTAL) {
             int height = info.groundLevel + Railway.RAILWAY_LEVEL_OFFSET * 6;
-            generatePart(info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0, false);
+            generatePart(info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0, false,
+                    false, false, false);
         }
     }
 
@@ -1046,7 +1071,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 part = AssetRegistries.PARTS.get("rails_flat");
                 break;
         }
-        generatePart(info, part, transform, 0, height, 0, false);
+        generatePart(info, part, transform, 0, height, 0, false,
+                 false, false, false);
 
         Character railMainBlock = info.getCityStyle().getRailMainBlock();
         char rail = info.getCompiledPalette().get(railMainBlock);
@@ -1153,11 +1179,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             part = AssetRegistries.PARTS.get("station_staircase");
             for (int i = railInfo.getLevel() + 1; i < info.cityLevel; i++) {
                 height = info.groundLevel + i * 6;
-                generatePart(info, part, transform, 0, height, 0, false);
+                generatePart(info, part, transform, 0, height, 0, false, false, false, false);
             }
             height = info.groundLevel + info.cityLevel * 6;
             part = AssetRegistries.PARTS.get("station_staircase_surface");
-            generatePart(info, part, transform, 0, height, 0, false);
+            generatePart(info, part, transform, 0, height, 0, false,
+                    false, false, false);
         }
     }
 
@@ -1184,7 +1211,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                     throw new RuntimeException("Cannot happen!");
             }
 
-            generatePart(info, stairs, transform, 0, oy, 0, false);
+            generatePart(info, stairs, transform, 0, oy, 0, false,
+                    false, false, false);
         }
     }
 
@@ -1624,7 +1652,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                 } else {
                     part = info.fountainType;
                 }
-                generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+                generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false,
+                        false, false, false);
             }
 
             generateRandomVegetation(info, rand, height);
@@ -1796,7 +1825,8 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
     private void generateFrontPart(BuildingInfo info, int height, BuildingInfo adj, Transform rot) {
         if (info.hasFrontPartFrom(adj)) {
-            generatePart(adj, adj.frontType, rot, 0, height, 0, false);
+            generatePart(adj, adj.frontType, rot, 0, height, 0, false,
+                    false, false, false);
         }
     }
 
@@ -2055,10 +2085,15 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
     /**
      * Generate a part. If 'airWaterLevel' is true then 'hard air' blocks are replaced with water below the waterLevel.
      * Otherwise they are replaced with air.
+     *
+     * Highway booleans is for support direction block states in highways (Useful in roads)
+     *
+     * //TODO: If 1.12 support is continued; refactor this to a Builder class
      */
     private int generatePart(BuildingInfo info, IBuildingPart part,
                              Transform transform,
-                             int ox, int oy, int oz, boolean airWaterLevel) {
+                             int ox, int oy, int oz, boolean airWaterLevel,
+                             boolean isHighway, boolean isHighwayRunningX, boolean isHighwayIntersecting) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
         // Cache the combined palette?
         Palette localPalette = part.getLocalPalette();
@@ -2082,6 +2117,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         if (b == null) {
                             throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
                         }
+
 
                         CompiledPalette.Info inf = compiledPalette.getInfo(c);
 
@@ -2120,7 +2156,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                 }
                             } else if (inf != null) {
 
-                                System.out.println("Attempting to add tile_entity. . .");
+                                // Patches added by Dalton
                                 if (inf.isTileEntity()) {
                                     System.out.println("Re-Processing Tile-Entity");
                                     info.getTodoChunk(rx, rz).addTileEntityTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
@@ -2159,6 +2195,18 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                         info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                     }
                                 }
+                            } else if (isHighway && !isHighwayIntersecting && isHighwayRunningX) {
+                                Character charr = compiledPalette.getHighwayX(c);
+                                if (charr == null)
+                                    throw new RuntimeException("Could not find entry for character: " + c + " in highway X running palette");
+                                b = charr;
+                                System.out.println("Successfully changed block for highway running X Part");
+                            } else if (isHighway && !isHighwayIntersecting) {
+                                Character charr = compiledPalette.getHighwayZ(c);
+                                if (charr == null)
+                                    throw new RuntimeException("Could not find entry for character: " + c + " in highway Z running palette");
+                                b = charr;
+                                System.out.println("Successfully changed block for highway running Z Part");
                             }
                             driver.add(b);
                         } else {
@@ -2328,10 +2376,12 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
         int height = lowestLevel;
         for (int f = -info.floorsBelowGround; f <= info.getNumFloors(); f++) {
             BuildingPart part = info.getFloor(f);
-            generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+            generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false,
+                    false, false, false);
             part = info.getFloorPart2(f);
             if (part != null) {
-                generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+                generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false,
+                        false, false, false);
             }
 
             // Check for doors

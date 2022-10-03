@@ -6,9 +6,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.varia.Tools;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.TileEntity;
 import org.apache.commons.lang3.tuple.Pair;
+import scala.Char;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +25,10 @@ public class Palette implements ILostCityAsset {
 
     private String name;
     final Map<Character, Object> palette = new HashMap<>();
+
+    final Map<Character, Object> highwayXPalette = new HashMap<>();
+
+    final Map<Character, Object> highwayZPalette = new HashMap<>();
     private final Map<IBlockState, IBlockState> damaged = new HashMap<>();
     private final Map<Character, String> mobIds = new HashMap<>(); // For spawners
     private final Map<Character, String> lootTables = new HashMap<>(); // For chests
@@ -98,6 +106,7 @@ public class Palette implements ILostCityAsset {
             if (o.has("loot")) {
                 lootTables.put(c, o.get("loot").getAsString());
             }
+            // Patch added by Dalton - allows user to mark a pallet entry as having/being a TileEntity
             if (o.has("tile_entity")) {
                 System.out.println("Added new tile_entity to palette! " + c);
                 tileEntities.put(c, o.get("tile_entity").getAsBoolean());
@@ -112,6 +121,26 @@ public class Palette implements ILostCityAsset {
                 getOrientation(or, torchObj, "up");
                 torchOrientations.put(c, or);
             }
+
+            if (o.has("highwayZ")) {
+                String block = o.get("highwayZ").getAsString();
+                IBlockState state = Tools.stringToState(block);
+                this.highwayZPalette.put(c, state);
+                if (dmg != null) {
+                    damaged.put(state, dmg);
+                }
+            }
+
+            if (o.has("highwayX")) {
+                String block = o.get("highwayX").getAsString();
+                IBlockState state = Tools.stringToState(block);
+                this.highwayXPalette.put(c, state);
+                if (dmg != null) {
+                    damaged.put(state, dmg);
+                }
+            }
+
+            // For HighwayX/Z If no X/Z block is set; it falls back to using this block instead
             if (o.has("block")) {
                 String block = o.get("block").getAsString();
                 IBlockState state = Tools.stringToState(block);

@@ -4,6 +4,7 @@ import mcjty.lostcities.dimensions.world.terraingen.LostCitiesTerrainGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import org.apache.commons.lang3.tuple.Pair;
+import scala.Char;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,10 @@ import java.util.Set;
 public class CompiledPalette {
 
     private final Map<Character, Object> palette = new HashMap<>();
+
+    private final Map<Character, Character> highwayXPalette = new HashMap<>(); // only support singular blocks
+
+    private final Map<Character, Character> highwayZPalette = new HashMap<>(); // only support singular blocks
     private final Map<Character, Character> damagedToBlock = new HashMap<>();
     private final Map<Character, Info> information = new HashMap<>();
 
@@ -96,6 +101,21 @@ public class CompiledPalette {
                     }
                     palette.put(entry.getKey(), value);
                 }
+            }
+
+            for (Map.Entry<Character, Object> entry : p.highwayXPalette.entrySet()) {
+                Object value = entry.getValue();
+                if (!(value instanceof IBlockState)) {
+                    throw new RuntimeException("Invalid highway-x-palette entry for '" + entry.getKey() + "'!");
+                } else this.highwayXPalette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+
+            }
+
+            for (Map.Entry<Character, Object> entry : p.highwayZPalette.entrySet()) {
+                Object value = entry.getValue();
+                if (!(value instanceof IBlockState)) {
+                    throw new RuntimeException("Invalid highway-z-palette entry for '" + entry.getKey() + "'!");
+                } else this.highwayZPalette.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
             }
         }
 
@@ -194,6 +214,14 @@ public class CompiledPalette {
             return null;
         }
 
+    }
+
+    public Character getHighwayX(char c) {
+        return this.highwayXPalette.get(c);
+    }
+
+    public Character getHighwayZ(char c) {
+        return this.highwayZPalette.get(c);
     }
 
     public Character get(char c) {

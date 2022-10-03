@@ -475,10 +475,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         }
         info.clearLootTodo();
 
-        System.out.println("Processing TileEntity Todos!");
         for (BlockPos pos : info.getTileEntityTodo()) {
             TileEntity te = world.getTileEntity(pos);
             if (te == null) {
+                /* Attempt to get the Block Name to log it to console*/
                 IBlockState state = world.getBlockState(pos);
                 ResourceLocation loc = state.getBlock().getRegistryName();
                 String name = null;
@@ -486,12 +486,10 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
                     name = loc.getPath();
                 }
                 System.out.println("WARNING - TileEntity in configuration was set to update; however the provided block is not a TileEntity! Block name (I tried my best to get it): " + name);
-            } else {
-                te.markDirty();
-                System.out.println("Successfully forced an update upon TileEntity");
-            }
+            } else te.markDirty(); // This is the most important line of code in my entire commit - Dalton
+
         }
-        info.clearTileEntityTodo();
+        info.clearTileEntityTodo(); // remember to clear this list
 
 
         for (BlockPos pos : info.getLightingUpdateTodo()) {
