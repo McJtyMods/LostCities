@@ -590,7 +590,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         true, false);
             } else if (levelZ >= 0) {
                 generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), "",
-                        false, true);
+                        false, false);
             }
         }
     }
@@ -2113,6 +2113,30 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                             throw new RuntimeException("Could not find entry '" + c + "' in the palette for part '" + part.getName() + "'!");
                         }
 
+                        if (isHighway && !isHighwayIntersecting) {
+                            Character charX = compiledPalette.getHighwayX(c);
+                            Character charZ = compiledPalette.getHighwayZ(c);
+
+                            if (charX != null && isHighwayRunningX) {
+                                driver.add(charX);
+                                System.out.println("Successfully changed block for highway running X Part");
+                                continue;
+                            } else if (charZ != null && !isHighwayRunningX) {
+                                b = charZ;
+                                driver.add(charZ);
+                                IBlockState stateZ = Block.BLOCK_STATE_IDS.getByValue(b);
+                                String debug;
+                                if (stateZ != null) {
+                                    ResourceLocation loc = stateZ.getBlock().getRegistryName();
+                                    if (loc != null) {
+                                        debug = loc.getPath();
+                                    } else debug = "nullOnResourceLocation";
+                                } else debug = "nullState";
+                                System.out.println("Successfully changed block for highway running Z Part " + debug);
+                                continue;
+                            }
+                        }
+
 
                         CompiledPalette.Info inf = compiledPalette.getInfo(c);
 
@@ -2188,20 +2212,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                     } else {
                                         info.getTodoChunk(rx, rz).addSaplingTodo(new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz));
                                     }
-                                }
-                            } else if (isHighway && !isHighwayIntersecting && isHighwayRunningX) {
-                                Character charr = compiledPalette.getHighwayX(c);
-                                // Not all characters may be a highway character
-                                if (charr != null) {
-                                    b = charr;
-                                    System.out.println("Successfully changed block for highway running X Part");
-                                }
-                            } else if (isHighway && !isHighwayIntersecting) {
-                                Character charr = compiledPalette.getHighwayZ(c);
-                                // Not all characters may be a highway character
-                                if (charr != null) {
-                                    b = charr;
-                                    System.out.println("Successfully changed block for highway running Z Part");
                                 }
                             }
                             driver.add(b);

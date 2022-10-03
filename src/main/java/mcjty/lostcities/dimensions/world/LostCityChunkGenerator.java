@@ -477,16 +477,7 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
 
         for (BlockPos pos : info.getTileEntityTodo()) {
             TileEntity te = world.getTileEntity(pos);
-            if (te == null) {
-                /* Attempt to get the Block Name to log it to console*/
-                IBlockState state = world.getBlockState(pos);
-                ResourceLocation loc = state.getBlock().getRegistryName();
-                String name = null;
-                if (loc != null) {
-                    name = loc.getPath();
-                }
-                System.out.println("WARNING - TileEntity in configuration was set to update; however the provided block is not a TileEntity! Block name (I tried my best to get it): " + name);
-            } else te.markDirty(); // This is the most important line of code in my entire commit - Dalton
+            if (te != null)  te.markDirty(); // This is the most important line of code in my entire commit - Dalton
 
         }
         info.clearTileEntityTodo(); // remember to clear this list
