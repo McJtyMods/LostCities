@@ -45,6 +45,11 @@ public class LostCitiesImp implements ILostCities {
         }
 
         @Override
+        public ILostSphere getSphere(int chunkX, int chunkZ) {
+            return BuildingInfo.getSphereInt(chunkX, chunkZ, dimensionInfo);
+        }
+
+        @Override
         public int getRealHeight(int level) {
             return dimensionInfo.getProfile().GROUNDLEVEL + level * 6;
         }

@@ -1829,6 +1829,11 @@ public class BuildingInfo implements ILostChunkInfo {
     @Nullable
     @Override
     public ILostSphere getSphere() {
+        return getSphereInt(chunkX, chunkZ, provider);
+    }
+
+    @Nullable
+    public static CitySphere getSphereInt(int chunkX, int chunkZ, IDimensionInfo provider) {
         CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
         if (sphere.isEnabled()) {
             return sphere;
