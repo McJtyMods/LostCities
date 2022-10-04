@@ -325,10 +325,6 @@ public class CityStyle implements ILostCityCityStyle {
         parseArraySafe(object, parkSelector, "parks", "park");
         parseArraySafe(object, fountainSelector, "fountains", "fountain");
         parseArraySafe(object, stairSelector, "stairs", "stair");
-        parseArraySafe(object, eastFrontSelector, "fronts", "front_east");
-        parseArraySafe(object, westFrontSelector, "fronts", "front_west");
-        parseArraySafe(object, northFrontSelector, "fronts", "front_north");
-        parseArraySafe(object, southFrontSelector, "fronts", "front_south");
         parseArraySafe(object, frontSelector, "fronts", "front");
         parseArraySafe(object, bridgeSelector, "bridges", "bridge");
         parseArraySafe(object, railDungeonSelector, "raildungeons", "dungeon");

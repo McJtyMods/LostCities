@@ -116,7 +116,6 @@ public class Palette implements ILostCityAsset {
             }
             // Patch added by Dalton - allows user to mark a pallet entry as having/being a TileEntity
             if (o.has("tile_entity")) {
-                System.out.println("Added new tile_entity to palette! " + c);
                 tileEntities.put(c, o.get("tile_entity").getAsBoolean());
             }
             if (o.has("facing")) {
@@ -155,21 +154,27 @@ public class Palette implements ILostCityAsset {
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }
-            } else if (o.has("block_west")) {
+            }
+
+            if (o.has("block_west")) {
                 String block = o.get("block_west").getAsString();
                 IBlockState state = Tools.stringToState(block);
                 paletteWest.put(c, state);
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }
-            } else if (o.has("block_north")) {
+            }
+
+            if (o.has("block_north")) {
                 String block = o.get("block_north").getAsString();
                 IBlockState state = Tools.stringToState(block);
                 paletteNorth.put(c, state);
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }
-            } else if (o.has("block_south")) {
+            }
+
+            if (o.has("block_south")) {
                 String block = o.get("block_south").getAsString();
                 IBlockState state = Tools.stringToState(block);
                 paletteSouth.put(c, state);
@@ -179,7 +184,8 @@ public class Palette implements ILostCityAsset {
             }
 
             // For HighwayX/Z If no X/Z block is set; it falls back to using this block instead
-            if (o.has("block")) {
+            // And with
+            if (o.has("block") && this.noDirectionPalettes()) {
                 String block = o.get("block").getAsString();
                 IBlockState state = Tools.stringToState(block);
                 palette.put(c, state);
@@ -197,7 +203,6 @@ public class Palette implements ILostCityAsset {
                     Integer f = ob.get("random").getAsInt();
                     String block = ob.get("block").getAsString();
                     if (ob.has("tile_entity")) {
-                        System.out.println("Block in BlockList was detected as a TileEntity; adding to todo!");
                         tileEntities.put(c, ob.get("tile_entity").getAsBoolean());
                     }
                     IBlockState state = Tools.stringToState(block);
@@ -207,10 +212,25 @@ public class Palette implements ILostCityAsset {
                     }
                 }
                 addMappingViaState(c, blocks.toArray(new Pair[blocks.size()]));
-            } else {
-                throw new RuntimeException("Illegal palette!");
+            } else if (this.noHighwayPalettes() && this.noDirectionPalettes() && this.paletteIsEmpty()) {
+                    throw new RuntimeException("Illegal palette! (no highway/direction blocks & no block entry?)");
+                }
             }
-        }
+
+    }
+
+    protected boolean paletteIsEmpty() {
+        return this.palette.isEmpty();
+    }
+
+    // Quick helper method - Dalton
+    protected boolean noDirectionPalettes() {
+        return this.paletteNorth.isEmpty() && this.paletteSouth.isEmpty()
+                && this.paletteEast.isEmpty() && this.paletteWest.isEmpty();
+    }
+
+    protected boolean noHighwayPalettes() {
+        return this.highwayZPalette.isEmpty() && this.highwayXPalette.isEmpty();
     }
 
     private void getOrientation(Map<String, Integer> or, JsonObject torchObj, String orientation) {

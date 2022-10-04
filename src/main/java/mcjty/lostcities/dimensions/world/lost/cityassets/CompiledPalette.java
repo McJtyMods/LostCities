@@ -120,7 +120,9 @@ public class CompiledPalette {
                 Object value = entry.getValue();
                 if (!(value instanceof IBlockState)) {
                     throw new RuntimeException("Invalid block_east entry for: '" + entry.getKey() + "'!");
-                } else this.paletteEast.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+                } else {
+                    this.paletteEast.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
+                }
             }
 
             for (Map.Entry<Character, Object> entry : p.paletteWest.entrySet()) {
@@ -270,8 +272,10 @@ public class CompiledPalette {
             return this.paletteWest.get(c);
         } else if (direction == Direction.ZMIN) {
             return this.paletteSouth.get(c);
-        } else {
+        } else if (direction == Direction.ZMAX){
             return this.paletteNorth.get(c);
+        } else {
+            return null;
         }
     }
 

@@ -1667,12 +1667,9 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
 
             generateFrontPart(info, height, info.getXmin(), Transform.ROTATE_NONE, Direction.XMIN);
-            generateFrontPart(info, height, info.getZmin(), Transform.ROTATE_NONE, Direction.ZMIN);
-            generateFrontPart(info, height, info.getXmax(), Transform.ROTATE_NONE, Direction.XMAX);
-            generateFrontPart(info, height, info.getZmax(), Transform.ROTATE_NONE, Direction.ZMAX);
-            //generateFrontPart(info, height, info.getZmin(), Transform.ROTATE_90);
-            //generateFrontPart(info, height, info.getXmax(), Transform.ROTATE_180);
-            //generateFrontPart(info, height, info.getZmax(), Transform.ROTATE_270);
+            generateFrontPart(info, height, info.getZmin(), Transform.ROTATE_90, Direction.ZMIN);
+            generateFrontPart(info, height, info.getXmax(), Transform.ROTATE_180, Direction.XMAX);
+            generateFrontPart(info, height, info.getZmax(), Transform.ROTATE_270, Direction.ZMAX);
         }
 
         generateBorders(info, canDoParks);
@@ -1839,7 +1836,11 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
         if (!info.hasFrontPartFrom(adj)) return;
 
-        if (!info.hasAdjacentFrontDirectionalType(adj)) { // If not directional front parts exist; use the default one
+        generatePart(adj, adj.frontType, rot, 0, height, 0, false,
+                false, false, false,
+                true, direction);
+
+        /*if (!info.hasAdjacentFrontDirectionalType(adj)) { // If not directional front parts exist; use the default one
             System.out.println("Generating basic front type without directional support.");
             generatePart(adj, adj.frontType, rot, 0, height, 0, false,
                     false, false, false,
@@ -1863,7 +1864,7 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
             generatePart(adj, adj.northFrontType, rot, 0, height, 0, false,
                     false, false, false,
                     true, direction);
-        }
+        }*/
     }
 
     private void generateCorridors(BuildingInfo info, boolean xRail, boolean zRail) {
@@ -2154,7 +2155,13 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                         Character b = compiledPalette.get(c);
 
                         if (isBuildingFront && buildingFrontDirection != null) {
-                            b = compiledPalette.getDirectionalBlock(c, buildingFrontDirection);
+                            Character test = compiledPalette.getDirectionalBlock(c, buildingFrontDirection);
+                            if (test != null) {
+                                b = test;
+                            } else {
+                                b = compiledPalette.get(c); // this allows non-directional blocks in buildings fronts
+                            }
+
                         }
 
                         if (b == null) {
@@ -2167,7 +2174,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
 
                             if (charX != null && isHighwayRunningX) {
                                 driver.add(charX);
-                                System.out.println("Successfully changed block for highway running X Part");
                                 continue;
                             } else if (charZ != null && !isHighwayRunningX) {
                                 b = charZ;
@@ -2180,7 +2186,6 @@ public class LostCitiesTerrainGenerator extends NormalTerrainGenerator {
                                         debug = loc.getPath();
                                     } else debug = "nullOnResourceLocation";
                                 } else debug = "nullState";
-                                System.out.println("Successfully changed block for highway running Z Part " + debug);
                                 continue;
                             }
                         }
