@@ -1,6 +1,6 @@
 modLoader="javafml"
 license="MIT License https://github.com/McJtyMods/LostCities/blob/1.16/LICENCE"
-loaderVersion="[31,)"
+loaderVersion="[43,)"
 issueTrackerURL="http://github.com/McJtyMods/LostCities/issues"
 displayURL="http://github.com/McJtyMods/LostCities/"
 #logoFile="examplemod.png" #optional
@@ -18,6 +18,6 @@ Generate cities all over the world
 [[dependencies.lostcities]]
     modId="forge"
     mandatory=true
-    versionRange="[31,)"
+    versionRange="[43,)"
     ordering="NONE"
     side="BOTH"
