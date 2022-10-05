@@ -44,7 +44,7 @@ public class BiomeTranslator {
             Biome biome = findBiome(biomeId);
             Biome destBiome = findBiome(destBiomeId);
             if (biome != null && destBiome != null) {
-                mapping.add(Pair.of(biome.biomeName, destBiome));
+                mapping.add(Pair.of(biome.getBiomeName(), destBiome));
             } else if (biome == null) {
                 LostCities.setup.getLogger().warn("Could not find biome '" + biomeId + "'!");
             } else if (destBiome == null) {
@@ -77,7 +77,7 @@ public class BiomeTranslator {
         if (biome == null) {
             for (Biome b : Biome.REGISTRY) {
                 ResourceLocation registryName = b.getRegistryName();
-                if (registryName != null && biomeId.equals(registryName.getResourcePath())) {
+                if (registryName != null && biomeId.equals(registryName.getPath())) {
                     biome = b;
                     break;
                 }
@@ -90,7 +90,7 @@ public class BiomeTranslator {
         LostCities.setup.getLogger().info("Dumping biome mapping");
         for (Map.Entry<String, Biome> entry : translationMap.entrySet()) {
             ResourceLocation biomeKey = ForgeRegistries.BIOMES.getKey(entry.getValue());
-            LostCities.setup.getLogger().info("biome: " + entry.getKey() + " -> " + entry.getValue().biomeName + " (" + biomeKey.toString() + ")");
+            LostCities.setup.getLogger().info("biome: " + entry.getKey() + " -> " + entry.getValue().getBiomeName() + " (" + biomeKey.toString() + ")");
         }
     }
 
@@ -109,7 +109,7 @@ public class BiomeTranslator {
             if (bestFit == null) {
                 bestFit = Biomes.PLAINS;
             }
-            translationMap.put(biome.biomeName, bestFit);
+            translationMap.put(biome.getBiomeName(), bestFit);
         }
     }
 
@@ -135,14 +135,14 @@ public class BiomeTranslator {
             }
 
             if (bestFit.size() == 1) {
-                translationMap.put(biome.biomeName, bestFit.get(0));
+                translationMap.put(biome.getBiomeName(), bestFit.get(0));
             } else {
                 // Fixed seed based on biome name so that we have a good chance of getting the same back in case of new biomes
-                long seed = biome.biomeName.hashCode();
+                long seed = biome.getBiomeName().hashCode();
                 Random random = new Random(seed);
                 random.nextFloat();
                 random.nextFloat();
-                translationMap.put(biome.biomeName, bestFit.get(random.nextInt(bestFit.size())));
+                translationMap.put(biome.getBiomeName(), bestFit.get(random.nextInt(bestFit.size())));
             }
         }
     }
@@ -169,7 +169,7 @@ public class BiomeTranslator {
                 dumpTranslationMap();
             }
         }
-        return translationMap.get(biome.biomeName);
+        return translationMap.get(biome.getBiomeName());
     }
 
     private static double calculateBiomeDistance(Biome a, Biome b) {
