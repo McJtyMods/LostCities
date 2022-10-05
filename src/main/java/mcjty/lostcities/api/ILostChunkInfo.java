@@ -90,7 +90,8 @@ public interface ILostChunkInfo {
     int getMaxHighwayLevel();
 
     /**
-     * Get a sphere that contains this chunk (if there is one)
+     * Get the closest sphere for this chunk (if there is one). This doesn't mean this chunk
+     * has to be in that sphere
      */
     @Nullable
     ILostSphere getSphere();
