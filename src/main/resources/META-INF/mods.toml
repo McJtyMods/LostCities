@@ -18,6 +18,6 @@ Generate cities all over the world
 [[dependencies.lostcities]]
     modId="forge"
     mandatory=true
-    versionRange="[43,)"
+    versionRange="[43.1.30,)"
     ordering="NONE"
     side="BOTH"

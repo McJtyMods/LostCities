@@ -4,6 +4,7 @@ import mcjty.lostcities.api.ILostCityProfileSetup;
 import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.worldgen.LostCityFeature;
+import mcjty.lostcities.worldgen.LostCitySphereFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -32,6 +33,7 @@ public class ModSetup {
 
         PacketHandler.registerMessages("lostcities");
         LostCityFeature.registerConfiguredFeatures();
+        LostCitySphereFeature.registerConfiguredFeatures();
 
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandlers());
         // @todo 1.14

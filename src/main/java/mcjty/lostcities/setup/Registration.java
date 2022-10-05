@@ -3,6 +3,7 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.LostCityFeature;
+import mcjty.lostcities.worldgen.LostCitySphereFeature;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +25,7 @@ public class Registration {
     }
 
     public static final RegistryObject<LostCityFeature> LOSTCITY_FEATURE = FEATURE_REGISTRY.register("lostcity", LostCityFeature::new);
+    public static final RegistryObject<LostCitySphereFeature> LOSTCITY_SPHERE_FEATURE = FEATURE_REGISTRY.register("spheres", LostCitySphereFeature::new);
 
     public static final ResourceLocation LOSTCITY = new ResourceLocation(LostCities.MODID, "lostcity");
 

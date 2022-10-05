@@ -71,8 +71,6 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
                 int chunkX = center.x;
                 int chunkZ = center.z;
                 diminfo.setWorld(level);
-//                generator.getBiomeProvider() ->OverworldBiomeProvider
-//                diminfo.getFeature().generateDummy(region, region.getChunk(chunkX, chunkZ));
                 diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
                 return true;
             }
