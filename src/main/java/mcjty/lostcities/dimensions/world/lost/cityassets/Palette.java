@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mcjty.lostcities.api.ILostCityAsset;
+import mcjty.lostcities.dimensions.world.lost.Direction;
 import mcjty.lostcities.varia.Tools;
 
 import net.minecraft.block.state.IBlockState;
@@ -99,6 +100,7 @@ public class Palette implements ILostCityAsset {
         parsePaletteArray(paletteArray);
     }
 
+    //TODO: Better error handling; you can't tell if its a mod or user error
     public void parsePaletteArray(JsonArray paletteArray) {
         for (JsonElement element : paletteArray) {
             JsonObject o = element.getAsJsonObject();
@@ -151,36 +153,127 @@ public class Palette implements ILostCityAsset {
                 String block = o.get("block_east").getAsString();
                 IBlockState state = Tools.stringToState(block);
                 paletteEast.put(c, state);
+                System.out.println("inserting" + state.getBlock().getRegistryName().getPath() + " into block_east");
+
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }
             }
 
-            if (o.has("block_west")) {
+            if (o.has("blocks_east")) {
+                JsonArray array = o.get("blocks_east").getAsJsonArray();
+                System.out.println("Size of blocks_east: " + array.size());
+
+                List<Pair<Integer, IBlockState>> blocks = new ArrayList<>();
+                for (JsonElement el : array) {
+                    JsonObject object = el.getAsJsonObject();
+                    Integer chance = object.get("random").getAsInt();
+                    IBlockState blockState = Tools.stringToState(object.get("block").getAsString());
+                    System.out.println("Adding new east state: " + blockState.getBlock().getRegistryName().getPath());
+                    blocks.add(Pair.of(chance, blockState));
+                }
+                System.out.println("Size of east blocks: " + blocks.size());
+
+                this.addMappingViaDirectionalState(c, Direction.XMAX, blocks);
+            }
+
+            if (o.get("block_west") != null) {
                 String block = o.get("block_west").getAsString();
                 IBlockState state = Tools.stringToState(block);
+                System.out.println("inserting" + state.getBlock().getRegistryName().getPath() + " into block_west");
+
                 paletteWest.put(c, state);
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }
             }
 
-            if (o.has("block_north")) {
+            if (o.get("block_north") != null) {
                 String block = o.get("block_north").getAsString();
                 IBlockState state = Tools.stringToState(block);
+                System.out.println("inserting" + state.getBlock().getRegistryName().getPath() + " into block_north");
+
                 paletteNorth.put(c, state);
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }
             }
 
-            if (o.has("block_south")) {
+            if (o.get("block_south") != null) {
                 String block = o.get("block_south").getAsString();
                 IBlockState state = Tools.stringToState(block);
+                System.out.println("inserting" + state.getBlock().getRegistryName().getPath() + " into block_south");
                 paletteSouth.put(c, state);
                 if (dmg != null) {
                     damaged.put(state, dmg);
                 }
+            }
+
+            if (o.get("blocks_west") != null) {
+                JsonArray array = o.get("blocks_west").getAsJsonArray();
+                System.out.println("Size of blocks_west " + array.size());
+
+                List<Pair<Integer, IBlockState>> blocks = new ArrayList<>();
+                for (JsonElement el : array) {
+                    JsonObject object = el.getAsJsonObject();
+                    Integer chance = object.get("random").getAsInt();
+                    IBlockState blockState = Tools.stringToState(object.get("block").getAsString());
+                    System.out.println("Adding new west state: " + blockState.getBlock().getRegistryName().getPath());
+                    blocks.add(Pair.of(chance, blockState));
+                }
+                System.out.println("Size of west blocks: " + blocks.size());
+
+                this.addMappingViaDirectionalState(c, Direction.XMIN, blocks);
+            }
+
+            if (o.has("blocks_north")) {
+                JsonArray array = o.get("blocks_north").getAsJsonArray();
+                System.out.println("Size of blocks_north: " + array.size());
+                List<Pair<Integer, IBlockState>> blocks = new ArrayList<>();
+                for (JsonElement el : array) {
+                    JsonObject object = el.getAsJsonObject();
+                    Integer chance = object.get("random").getAsInt();
+                    IBlockState blockState = Tools.stringToState(object.get("block").getAsString());
+                    System.out.println("Adding new north state: " + blockState.getBlock().getRegistryName().getPath());
+                    blocks.add(Pair.of(chance, blockState));
+                }
+
+                System.out.println("Size of north blocks: " + blocks.size());
+                this.addMappingViaDirectionalState(c, Direction.ZMAX, blocks);
+            }
+
+            if (o.has("blocks_south")) {
+                JsonArray array = o.get("blocks_south").getAsJsonArray();
+                System.out.println("Size of blocks_south: " + array.size());
+
+                List<Pair<Integer, IBlockState>> blocks = new ArrayList<>();
+                for (JsonElement el : array) {
+                    JsonObject object = el.getAsJsonObject();
+                    Integer chance = object.get("random").getAsInt();
+                    IBlockState blockState = Tools.stringToState(object.get("block").getAsString());
+                    System.out.println("Adding new south state: " + blockState.getBlock().getRegistryName().getPath());
+                    blocks.add(Pair.of(chance, blockState));
+                }
+                System.out.println("Size of south blocks: " + blocks.size());
+
+                this.addMappingViaDirectionalState(c, Direction.ZMIN, blocks);
+            }
+
+            if (o.has("blocks_east")) {
+                JsonArray array = o.get("blocks_east").getAsJsonArray();
+                System.out.println("Size of blocks_east: " + array.size());
+
+                List<Pair<Integer, IBlockState>> blocks = new ArrayList<>();
+                for (JsonElement el : array) {
+                    JsonObject object = el.getAsJsonObject();
+                    Integer chance = object.get("random").getAsInt();
+                    IBlockState blockState = Tools.stringToState(object.get("block").getAsString());
+                    System.out.println("Adding new east state: " + blockState.getBlock().getRegistryName().getPath());
+                    blocks.add(Pair.of(chance, blockState));
+                }
+                System.out.println("Size of east blocks: " + blocks.size());
+
+                this.addMappingViaDirectionalState(c, Direction.XMAX, blocks);
             }
 
             // For HighwayX/Z If no X/Z block is set; it falls back to using this block instead
@@ -281,5 +374,25 @@ public class Palette implements ILostCityAsset {
     private final Palette addMappingViaState(char c, Pair<Integer, IBlockState>... randomBlocks) {
         palette.put(c, randomBlocks);
         return this;
+    }
+
+    private final void addMappingViaDirectionalState(char c,
+                                                     Direction direction, List<Pair<Integer, IBlockState>> randoms) {
+            if (direction == Direction.XMAX) { // east
+                System.out.println("Adding " + randoms.size() + " to east palette");
+                paletteEast.put(c, randoms);
+            } else if (direction == Direction.XMIN) { // west
+                System.out.println("Adding " + randoms.size() + " to west palette");
+
+                paletteWest.put(c, randoms);
+            } else if (direction == Direction.ZMAX) { // north
+                System.out.println("Adding " + randoms.size() + " to north palette");
+
+                paletteNorth.put(c, randoms);
+            } else if (direction == Direction.ZMIN) { // south
+                System.out.println("Adding " + randoms.size() + " to south palette");
+
+                paletteSouth.put(c, randoms);
+            }
     }
 }

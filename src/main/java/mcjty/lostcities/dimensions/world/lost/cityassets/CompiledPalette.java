@@ -8,10 +8,7 @@ import net.minecraft.block.state.IBlockState;
 import org.apache.commons.lang3.tuple.Pair;
 
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * More efficient representation of a palette useful for a single chunk
@@ -20,10 +17,10 @@ public class CompiledPalette {
 
     private final Map<Character, Object> palette = new HashMap<>();
 
-    private final Map<Character, Character> paletteEast = new HashMap<>();
-    private final Map<Character, Character> paletteWest = new HashMap<>();
-    private final Map<Character, Character> paletteNorth = new HashMap<>();
-    private final Map<Character, Character> paletteSouth = new HashMap<>();
+    private final Map<Character, Object> paletteEast = new HashMap<>();
+    private final Map<Character, Object> paletteWest = new HashMap<>();
+    private final Map<Character, Object> paletteNorth = new HashMap<>();
+    private final Map<Character, Object> paletteSouth = new HashMap<>();
 
     private final Map<Character, Character> highwayXPalette = new HashMap<>(); // only support singular blocks
 
@@ -118,31 +115,72 @@ public class CompiledPalette {
 
             for (Map.Entry<Character, Object> entry : p.paletteEast.entrySet()) {
                 Object value = entry.getValue();
-                if (!(value instanceof IBlockState)) {
-                    throw new RuntimeException("Invalid block_east entry for: '" + entry.getKey() + "'!");
+                System.out.println("East is a: " + value.toString() + " or " + value.getClass() + " or " + value);
+                if (value instanceof List) {
+                    System.out.println("east was a List!");
+                    List<Pair<Integer, IBlockState>> r = (List<Pair<Integer, IBlockState>>) value;
+                    char[] randomBlocks = new char[128];
+                    int idx = 0;
+                    for (Pair<Integer, IBlockState> pair : r) {
+                        System.out.println("Process east block: " + pair.getValue().getBlock().getRegistryName().getPath());
+                        idx = addEntries(randomBlocks, idx, (char) Block.BLOCK_STATE_IDS.get(pair.getRight()), pair.getLeft());
+                        System.out.println("east index size: " + idx + ">=" + randomBlocks.length);
+                        if (idx >= randomBlocks.length) {
+                            break;
+                        }
+                    }
+                    this.paletteEast.put(entry.getKey(), randomBlocks);
                 } else {
+                    System.out.println("east was not a Pair for: " + ((IBlockState) value).getBlock().getRegistryName().getPath());
                     this.paletteEast.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
                 }
             }
 
             for (Map.Entry<Character, Object> entry : p.paletteWest.entrySet()) {
                 Object value = entry.getValue();
-                if (!(value instanceof IBlockState)) {
-                    throw new RuntimeException("Invalid block_west entry for: '" + entry.getKey() + "'!");
+                if (value instanceof List) {
+                    List<Pair<Integer, IBlockState>> r = (List<Pair<Integer, IBlockState>>) value;
+                    char[] randomBlocks = new char[128];
+                    int idx = 0;
+                    for (Pair<Integer, IBlockState> pair : r) {
+                        idx = addEntries(randomBlocks, idx, (char) Block.BLOCK_STATE_IDS.get(pair.getRight()), pair.getLeft());
+                        if (idx >= randomBlocks.length) {
+                            break;
+                        }
+                    }
+                    this.paletteWest.put(entry.getKey(), randomBlocks);
                 } else this.paletteWest.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
             }
 
             for (Map.Entry<Character, Object> entry : p.paletteNorth.entrySet()) {
                 Object value = entry.getValue();
-                if (!(value instanceof IBlockState)) {
-                    throw new RuntimeException("Invalid block_north entry for: '" + entry.getKey() + "'!");
+                if (value instanceof List) {
+                    List<Pair<Integer, IBlockState>> r = (List<Pair<Integer, IBlockState>>) value;
+                    char[] randomBlocks = new char[128];
+                    int idx = 0;
+                    for (Pair<Integer, IBlockState> pair : r) {
+                        idx = addEntries(randomBlocks, idx, (char) Block.BLOCK_STATE_IDS.get(pair.getRight()), pair.getLeft());
+                        if (idx >= randomBlocks.length) {
+                            break;
+                        }
+                    }
+                    this.paletteNorth.put(entry.getKey(), randomBlocks);
                 } else this.paletteNorth.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
             }
 
             for (Map.Entry<Character, Object> entry : p.paletteSouth.entrySet()) {
                 Object value = entry.getValue();
-                if (!(value instanceof IBlockState)) {
-                    throw new RuntimeException("Invalid block_south entry for: '" + entry.getKey() + "'!");
+                if (value instanceof List) {
+                    List<Pair<Integer, IBlockState>> r = (List<Pair<Integer, IBlockState>>) value;
+                    char[] randomBlocks = new char[128];
+                    int idx = 0;
+                    for (Pair<Integer, IBlockState> pair : r) {
+                        idx = addEntries(randomBlocks, idx, (char) Block.BLOCK_STATE_IDS.get(pair.getRight()), pair.getLeft());
+                        if (idx >= randomBlocks.length) {
+                            break;
+                        }
+                    }
+                    this.paletteSouth.put(entry.getKey(), randomBlocks);
                 } else this.paletteSouth.put(entry.getKey(), (char) Block.BLOCK_STATE_IDS.get((IBlockState) value));
             }
 
@@ -266,14 +304,35 @@ public class CompiledPalette {
     }
 
     public Character getDirectionalBlock(char c, Direction direction) {
+        int rand = LostCitiesTerrainGenerator.fastrand128();
         if (direction == Direction.XMIN) {
-            return  this.paletteEast.get(c);
+            Object obj = this.paletteEast.get(c);
+            if (obj instanceof Character) return (Character) obj;
+
+            char[] randomBlocks = (char[]) obj;
+            if (randomBlocks == null) return null; // The block is not directional; return null
+            return randomBlocks[rand];
         } else if (direction == Direction.XMAX) {
-            return this.paletteWest.get(c);
+            Object obj = this.paletteWest.get(c);
+            if (obj instanceof Character) return (Character) obj;
+
+            char[] randomBlocks = (char[]) obj;
+            if (randomBlocks == null) return null; // The block is not directional; return null
+            return randomBlocks[rand];
         } else if (direction == Direction.ZMIN) {
-            return this.paletteSouth.get(c);
-        } else if (direction == Direction.ZMAX){
-            return this.paletteNorth.get(c);
+            Object obj = this.paletteSouth.get(c);
+            if (obj instanceof Character) return (Character) obj;
+
+            char[] randomBlocks = (char[]) obj;
+            if (randomBlocks == null) return null; // The block is not directional; return null
+            return randomBlocks[rand];
+        } else if (direction == Direction.ZMAX) {
+            Object obj = this.paletteNorth.get(c);
+            if (obj instanceof Character) return (Character) obj;
+
+            char[] randomBlocks = (char[]) obj;
+            if (randomBlocks == null) return null; // The block is not directional; return null
+            return randomBlocks[rand];
         } else {
             return null;
         }
