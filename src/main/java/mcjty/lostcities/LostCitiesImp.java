@@ -45,8 +45,13 @@ public class LostCitiesImp implements ILostCities {
         }
 
         @Override
-        public ILostSphere getSphere(int chunkX, int chunkZ) {
-            return BuildingInfo.getSphereInt(chunkX, chunkZ, dimensionInfo);
+        public ILostSphere getSphere(int x, int y, int z) {
+            return BuildingInfo.getSphereInt(x, y, z, dimensionInfo);
+        }
+
+        @Override
+        public ILostSphere getSphere(int x, int z) {
+            return BuildingInfo.getSphereInt(x, z, dimensionInfo);
         }
 
         @Override

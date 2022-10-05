@@ -187,9 +187,10 @@ public class ProfileSetup {
         profile.RUBBLELAYER = false;
         profile.CITYSPHERE_CHANCE = 0.5f;
 //        profile.CITY_CHANCE = 0.3f;       // @EXP
-        profile.CITY_CHANCE = 0.9f;
+        profile.CITY_CHANCE = 0.6f;
 
-        profile.CITY_MAXRADIUS = 90;
+        profile.CITY_MINRADIUS = 50;
+        profile.CITY_MAXRADIUS = 65;
         profile.CITY_THRESHOLD = .05f;
         profile.CITY_LEVEL0_HEIGHT = 60;
         profile.CITY_LEVEL1_HEIGHT = 66;

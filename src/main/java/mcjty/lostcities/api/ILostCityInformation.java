@@ -8,15 +8,21 @@ public interface ILostCityInformation {
 
     /**
      * Get information about a chunk. This is an efficient function as it is cached and
-     * only created once every session
+     * only created once every session. Don't call this during worldgen!
      */
     ILostChunkInfo getChunkInfo(int chunkX, int chunkZ);
 
     /**
-     * Safer shortcut to calculate sphere information. Doesn't depend on biomes so you can
+     * Get the sphere that contains the given location. Doesn't depend on biomes so you can
      * use this during biome generation
      */
-    ILostSphere getSphere(int chunkX, int chunkZ);
+    ILostSphere getSphere(int x, int y, int z);
+
+    /**
+     * Get the sphere that contains the given location. Doesn't depend on biomes so you can
+     * use this during biome generation. This version ignores y
+     */
+    ILostSphere getSphere(int x, int z);
 
     /**
      * Convert a 'level' (like a city level) to a real height. This is basically
