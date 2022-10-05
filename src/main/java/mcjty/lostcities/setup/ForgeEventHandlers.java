@@ -9,6 +9,7 @@ import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.GlobalTodo;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityFeature;
+import mcjty.lostcities.worldgen.LostCitySphereFeature;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
@@ -60,6 +61,7 @@ public class ForgeEventHandlers {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void onBiomeLoad(BiomeLoadingEvent event) {
         event.getGeneration().getFeatures(GenerationStep.Decoration.RAW_GENERATION).add(LostCityFeature.LOSTCITY_CONFIGURED_FEATURE);
+        event.getGeneration().getFeatures(GenerationStep.Decoration.VEGETAL_DECORATION).add(LostCitySphereFeature.SPHERE_CONFIGURED_FEATURE);
     }
 
     @SubscribeEvent
@@ -76,7 +78,7 @@ public class ForgeEventHandlers {
     public void onCreateSpawnPoint(WorldEvent.CreateSpawnPosition event) {
         LevelAccessor world = event.getWorld();
         if (world instanceof ServerLevel serverLevel) {
-            IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(serverLevel);
+            IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(serverLevel);
             if (dimensionInfo == null) {
                 return;
             }

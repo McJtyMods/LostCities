@@ -53,7 +53,7 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
         ServerLevel level = player.getLevel();
         BlockPos bottom = player.blockPosition().below();
 
-        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(level);
+        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
         if (dimInfo == null) {
             context.getSource().sendFailure(ComponentFactory.literal("This dimension doesn't support Lost Cities!"));
             return 0;

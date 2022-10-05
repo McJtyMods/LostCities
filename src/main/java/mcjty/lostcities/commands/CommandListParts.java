@@ -35,7 +35,7 @@ public class CommandListParts implements Command<CommandSourceStack> {
         BlockPos start = player.blockPosition();
 
         ServerLevel level = player.getLevel();
-        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo(level);
+        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
         if (dimInfo == null) {
             context.getSource().sendFailure(ComponentFactory.literal("This dimension doesn't support Lost Cities!"));
             return 0;

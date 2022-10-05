@@ -50,7 +50,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     }
 
     private static <C extends FeatureConfiguration, F extends Feature<C>> Holder<PlacedFeature> registerPlacedFeature(PlacementModifier... placementModifiers) {
-        Holder<ConfiguredFeature<NoneFeatureConfiguration, ?>> configuredFeatureHolder = Holder.direct(new ConfiguredFeature<>(Registration.LOSTCITY_FEATURE, FeatureConfiguration.NONE));
+        Holder<ConfiguredFeature<NoneFeatureConfiguration, ?>> configuredFeatureHolder = Holder.direct(new ConfiguredFeature<>(Registration.LOSTCITY_FEATURE.get(), FeatureConfiguration.NONE));
         return PlacementUtils.register("lc_configured", configuredFeatureHolder, placementModifiers);
     }
 
@@ -71,8 +71,6 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
                 int chunkX = center.x;
                 int chunkZ = center.z;
                 diminfo.setWorld(level);
-//                generator.getBiomeProvider() ->OverworldBiomeProvider
-//                diminfo.getFeature().generateDummy(region, region.getChunk(chunkX, chunkZ));
                 diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
                 return true;
             }

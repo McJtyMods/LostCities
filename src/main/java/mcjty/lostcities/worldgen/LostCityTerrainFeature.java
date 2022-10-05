@@ -304,20 +304,6 @@ public class LostCityTerrainFeature {
 
         fixTorches(info);
 
-        // Do the city spheres
-        if (profile.isSpace() || profile.isSpheres()) {
-            CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
-            CitySphere.initSphere(sphere, provider);   // Make sure city sphere information is complete
-            if (sphere.isEnabled()) {
-                float radius = sphere.getRadius();
-                BlockPos cc = sphere.getCenterPos();
-                int cx = cc.getX() - chunkX * 16;
-                int cz = cc.getZ() - chunkZ * 16;
-                fillSphere(cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getSideBlock());
-            }
-        }
-
-
         // We make a new random here because the primer for a normal chunk may have
         // been cached and we want to be able to do the same when returning from a cached
         // primer vs generating it here
@@ -333,10 +319,34 @@ public class LostCityTerrainFeature {
         }
 
         driver.actuallyGenerate(chunk);
-
         driver.setPrimer(oldRegion, oldChunk);
-
         ChunkFixer.fix(provider, chunkX, chunkZ);
+    }
+
+    public void generateSpheres(WorldGenRegion region, ChunkAccess chunk) {
+        // Do the city spheres
+        if (profile.isSpace() || profile.isSpheres()) {
+            LevelAccessor oldRegion = driver.getRegion();
+            ChunkAccess oldChunk = driver.getPrimer();
+            driver.setPrimer(region, chunk);
+
+            int chunkX = chunk.getPos().x;
+            int chunkZ = chunk.getPos().z;
+
+            CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+            CitySphere.initSphere(sphere, provider);   // Make sure city sphere information is complete
+            if (sphere.isEnabled()) {
+                float radius = sphere.getRadius();
+                BlockPos cc = sphere.getCenterPos();
+                int cx = cc.getX() - chunkX * 16;
+                int cz = cc.getZ() - chunkZ * 16;
+                fillSphere(cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getSideBlock());
+            }
+
+            driver.actuallyGenerate(chunk);
+            driver.setPrimer(oldRegion, oldChunk);
+            ChunkFixer.fix(provider, chunkX, chunkZ);
+        }
     }
 
     private boolean hasVillage(ChunkAccess ch) {

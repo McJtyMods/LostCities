@@ -21,7 +21,7 @@ public class LostCitiesImp implements ILostCities {
     @Nullable
     @Override
     public ILostCityInformation getLostInfo(Level world) {
-        IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.getDimensionInfo((WorldGenLevel) world);
+        IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo((WorldGenLevel) world);
         if (dimensionInfo != null) {
             if (!info.containsKey(world.dimension())) {
                 LostCityInformation gen = new LostCityInformation(dimensionInfo);

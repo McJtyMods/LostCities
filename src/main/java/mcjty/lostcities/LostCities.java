@@ -2,10 +2,7 @@ package mcjty.lostcities;
 
 import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.ILostCitiesPre;
-import mcjty.lostcities.setup.ClientSetup;
-import mcjty.lostcities.setup.Config;
-import mcjty.lostcities.setup.CustomRegistries;
-import mcjty.lostcities.setup.ModSetup;
+import mcjty.lostcities.setup.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -38,6 +35,7 @@ public class LostCities {
     public LostCities() {
         instance = this;
 
+        Registration.init();
         CustomRegistries.init();
 
         Path configPath = FMLPaths.CONFIGDIR.get();
