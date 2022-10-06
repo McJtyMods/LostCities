@@ -186,6 +186,7 @@ public class ProfileSetup {
         profile.RUIN_MAXLEVEL_PERCENT = 0.8f;
         profile.RUBBLELAYER = false;
         profile.CITYSPHERE_CHANCE = 0.5f;
+        profile.CITYSPHERE_CLEARABOVE = 15;
 //        profile.CITY_CHANCE = 0.3f;       // @EXP
         profile.CITY_CHANCE = 0.6f;
 
