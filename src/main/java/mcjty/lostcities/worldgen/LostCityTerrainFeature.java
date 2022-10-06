@@ -386,8 +386,22 @@ public class LostCityTerrainFeature {
                 for (int y = centery+1; y < maxY ; y++) {
                     double dydy = (y-centery) * (y-centery);
                     double sqdist = dxdx + dydy + dzdz;
-                    if (sqdist <= sqradius && sqdist >= sqradiusOffset) {
-                        driver.block(glass);
+                    if (sqdist <= sqradius) {
+                        if (sqdist >= sqradiusOffset) {
+                            driver.block(glass);
+                        }
+                    } else {
+                        // Optionally clear above the sphere
+                        if (profile.CITYSPHERE_CLEARABOVE > 0) {
+                            maxY = Math.min(provider.getWorld().getMaxBuildHeight(), y + profile.CITYSPHERE_CLEARABOVE);
+                            int yy = y;
+                            while (yy <= maxY) {
+                                driver.block(air);
+                                driver.incY();
+                                yy++;
+                            }
+                        }
+                        break;
                     }
                     driver.incY();
                 }
