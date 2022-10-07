@@ -9,10 +9,7 @@ import mcjty.lostcities.gui.elements.*;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.LostCityFeature;
-import mcjty.lostcities.worldgen.lost.BuildingInfo;
-import mcjty.lostcities.worldgen.lost.City;
-import mcjty.lostcities.worldgen.lost.Highway;
-import mcjty.lostcities.worldgen.lost.Railway;
+import mcjty.lostcities.worldgen.lost.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -266,6 +263,7 @@ public class GuiLCConfig extends Screen {
         Highway.cleanCache();
         Railway.cleanCache();
         City.cleanCache();
+        CitySphere.cleanCache();
     }
 
     private void renderExtra(PoseStack stack) {
