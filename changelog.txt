@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.0.6:
 - Dadobug1111 improved worldgen in several (sometimes subtle, sometimes less subtle) ways
 - Four new tags that allow you to customize worldgen: lostcities/notbreakable (blocks that can't break with explosions), lostcities/easybreakable (blocks that explosions will break more easily), lostcities/foliage (foliage block test), lostcities/rotatable (rotatable blocks, like stairs)
 - It is now possible to configure the leaves rubble and the random dirt/stone rubble you get in the city style (generalsettings)
