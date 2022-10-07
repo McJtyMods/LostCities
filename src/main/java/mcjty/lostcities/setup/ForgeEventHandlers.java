@@ -82,19 +82,17 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (mcjty.theoneprobe.config.Config.spawnNote.get()) {
-            event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(note -> {
-                if (!note.isPlayerSpawnSet()) {
-                    note.setPlayerSpawnSet(true);
-                    for (Map.Entry<ResourceKey<Level>, BlockPos> entry : spawnPositions.entrySet()) {
-                        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-                            serverPlayer.setRespawnPosition(entry.getKey(), entry.getValue(), 0.0f, true, true);
-                            serverPlayer.teleportTo(entry.getValue().getX(), entry.getValue().getY(), entry.getValue().getZ());
-                        }
+        event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(note -> {
+            if (!note.isPlayerSpawnSet()) {
+                note.setPlayerSpawnSet(true);
+                for (Map.Entry<ResourceKey<Level>, BlockPos> entry : spawnPositions.entrySet()) {
+                    if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                        serverPlayer.setRespawnPosition(entry.getKey(), entry.getValue(), 0.0f, true, true);
+                        serverPlayer.teleportTo(entry.getValue().getX(), entry.getValue().getY(), entry.getValue().getZ());
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
 
