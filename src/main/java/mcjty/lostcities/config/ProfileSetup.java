@@ -170,6 +170,7 @@ public class ProfileSetup {
         profile.CITYSPHERE_OUTSIDE_PROFILE = "bio_wasteland";
         profile.CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 0.5f;
 //        profile.SPAWN_BIOME = "jungle";   // @todo
+        profile.SPAWN_SPHERE = "<in>";
         profile.EXPLOSION_CHANCE = 0.0f;
         profile.MINI_EXPLOSION_CHANCE = 0.01f;
         profile.MINI_EXPLOSION_MINHEIGHT = 60;
@@ -186,9 +187,9 @@ public class ProfileSetup {
         profile.RUIN_MAXLEVEL_PERCENT = 0.8f;
         profile.RUBBLELAYER = false;
         profile.CITYSPHERE_CHANCE = 0.5f;
-        profile.CITYSPHERE_CLEARABOVE = 15;
+        profile.CITYSPHERE_CLEARABOVE = 30;
 //        profile.CITY_CHANCE = 0.3f;       // @EXP
-        profile.CITY_CHANCE = 0.6f;
+        profile.CITY_CHANCE = 0.8f;
 
         profile.CITY_MINRADIUS = 50;
         profile.CITY_MAXRADIUS = 65;
