@@ -3,6 +3,8 @@ package mcjty.lostcities.setup;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.commands.ModCommands;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.playerdata.PlayerProperties;
+import mcjty.lostcities.playerdata.PropertiesDispatcher;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
@@ -11,11 +13,15 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
+import mcjty.lostcities.worldgen.lost.cityassets.PredefinedSphere;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -26,8 +32,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -35,6 +43,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
 
@@ -42,10 +52,52 @@ import static mcjty.lostcities.setup.Registration.LOSTCITY;
 
 public class ForgeEventHandlers {
 
+    private final Map<ResourceKey<Level>, BlockPos> spawnPositions = new HashMap<>();
+
     @SubscribeEvent
     public void commandRegister(RegisterCommandsEvent event) {
         ModCommands.register(event.getDispatcher());
     }
+
+    @SubscribeEvent
+    public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
+        if (event.getObject() instanceof Player) {
+            if (!event.getObject().getCapability(PlayerProperties.PLAYER_SPAWN_SET).isPresent()) {
+                event.addCapability(new ResourceLocation(LostCities.MODID, "spawnset"), new PropertiesDispatcher());
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerCloned(PlayerEvent.Clone event) {
+        if (event.isWasDeath()) {
+            // We need to copyFrom the capabilities
+            event.getOriginal().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(oldStore -> {
+                event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(newStore -> {
+                    newStore.copyFrom(oldStore);
+                });
+            });
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (mcjty.theoneprobe.config.Config.spawnNote.get()) {
+            event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(note -> {
+                if (!note.isPlayerSpawnSet()) {
+                    note.setPlayerSpawnSet(true);
+                    for (Map.Entry<ResourceKey<Level>, BlockPos> entry : spawnPositions.entrySet()) {
+                        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                            serverPlayer.setRespawnPosition(entry.getKey(), entry.getValue(), 0.0f, true, true);
+                            serverPlayer.teleportTo(entry.getValue().getX(), entry.getValue().getY(), entry.getValue().getZ());
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+
 
     @SubscribeEvent
     public void onWorldTick(TickEvent.LevelTickEvent event) {
@@ -103,7 +155,7 @@ public class ForgeEventHandlers {
                             return false;
                         }
                         float sqradius = getSqRadius((int) sphere.getRadius(), 0.8f);
-                        return sphere.getCenterPos().distSqr(blockPos) < sqradius;
+                        return sphere.getCenterPos().distSqr(blockPos.atY(sphere.getCenterPos().getY())) < sqradius;
                     };
                     needsCheck = true;
                 } else if ("<out>".equals(profile.SPAWN_SPHERE)) {
@@ -113,19 +165,19 @@ public class ForgeEventHandlers {
                             return true;
                         }
                         float sqradius = sphere.getRadius() * sphere.getRadius();
-                        return sphere.getCenterPos().distSqr(new BlockPos(blockPos.getX(), sphere.getCenterPos().getY(), blockPos.getZ())) > sqradius;
+                        return sphere.getCenterPos().distSqr(blockPos.atY(sphere.getCenterPos().getY())) > sqradius;
                     };
                     needsCheck = true;
-//                } else {
-//                    final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(world, profile.SPAWN_SPHERE);
-//                    if (sphere == null) {
-//                        LostCities.setup.getLogger().error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
-//                    } else {
-//                        float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
-//                        isSuitable = blockPos -> sphere.getDimension() == serverLevel.dimension() &&
-//                                CitySphere.squaredDistance(sphere.getChunkX() * 16 + 8, sphere.getChunkZ() * 16 + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
-//                        needsCheck = true;
-//                    }
+                } else {
+                    final PredefinedSphere sphere = AssetRegistries.PREDEFINED_SPHERES.get(world, profile.SPAWN_SPHERE);
+                    if (sphere == null) {
+                        LostCities.setup.getLogger().error("Cannot find sphere '" + profile.SPAWN_SPHERE + "' for the player to spawn in !");
+                    } else {
+                        float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
+                        isSuitable = blockPos -> sphere.getDimension() == serverLevel.dimension() &&
+                                CitySphere.squaredDistance(sphere.getChunkX() * 16 + 8, sphere.getChunkZ() * 16 + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
+                        needsCheck = true;
+                    }
                 }
             }
 
@@ -143,13 +195,17 @@ public class ForgeEventHandlers {
                 case SPHERES:
                 case CAVERN:
                     if (needsCheck) {
-                        findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                        BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                        event.getSettings().setSpawn(pos, 0.0f);
+                        spawnPositions.put(serverLevel.dimension(), pos);
                         event.setCanceled(true);
                     }
                     break;
                 case FLOATING:
                 case SPACE:
-                    findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                    BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                    event.getSettings().setSpawn(pos, 0.0f);
+                    spawnPositions.put(serverLevel.dimension(), pos);
                     event.setCanceled(true);
                     break;
             }
@@ -165,7 +221,7 @@ public class ForgeEventHandlers {
         return (int) ((radius * pct) * (radius * pct));
     }
 
-    private void findSafeSpawnPoint(Level world, IDimensionInfo provider, @Nonnull Predicate<BlockPos> isSuitable,
+    private BlockPos findSafeSpawnPoint(Level world, IDimensionInfo provider, @Nonnull Predicate<BlockPos> isSuitable,
                                     @Nonnull ServerLevelData serverLevelData) {
         Random rand = new Random(provider.getSeed());
         rand.nextFloat();
@@ -188,14 +244,13 @@ public class ForgeEventHandlers {
                 for (int y = profile.GROUNDLEVEL-5 ; y < 125 ; y++) {
                     BlockPos pos = new BlockPos(x, y, z);
                     if (isValidStandingPosition(world, pos)) {
-                        serverLevelData.setSpawn(pos.above(), 0.0f);
-//                        ((ServerLevel)world).setDefaultSpawnPos(pos.above(), 0.0f);
-                        return;
+//                        serverLevelData.setSpawn(pos.above(), 0.0f);
+                        return pos.above();
                     }
                 }
             }
             radius += 100;
-            if (attempts > 10000) {
+            if (attempts > 20000) {
                 LostCities.setup.getLogger().error("Can't find a valid spawn position!");
                 throw new RuntimeException("Can't find a valid spawn position!");
             }
