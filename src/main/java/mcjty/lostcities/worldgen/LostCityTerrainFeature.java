@@ -371,39 +371,41 @@ public class LostCityTerrainFeature {
         int maxY = Math.min(provider.getWorld().getMaxBuildHeight(), centery+radius+1);
 
         for (int x = 0 ; x < 16 ; x++) {
-            double dxdx = (x-centerx) * (x-centerx);
-            for (int z = 0 ; z < 16 ; z++) {
-                double dzdz = (z-centerz) * (z-centerz);
-                driver.current(x, minY, z);
-                for (int y = minY; y <= centery ; y++) {
-                    double dydy = (y-centery) * (y-centery);
-                    double sqdist = dxdx + dydy + dzdz;
-                    if (sqdist <= sqradius && sqdist >= sqradiusOffset) {
-                        driver.block(sideBlock);
-                    }
-                    driver.incY();
-                }
-                for (int y = centery+1; y < maxY ; y++) {
-                    double dydy = (y-centery) * (y-centery);
-                    double sqdist = dxdx + dydy + dzdz;
-                    if (sqdist <= sqradius) {
-                        if (sqdist >= sqradiusOffset) {
-                            driver.block(glass);
+            double dxdx = (x - centerx) * (x - centerx);
+            for (int z = 0; z < 16; z++) {
+                double dzdz = (z - centerz) * (z - centerz);
+                if (dxdx + dzdz <= sqradius) {
+                    driver.current(x, minY, z);
+                    for (int y = minY; y <= centery; y++) {
+                        double dydy = (y - centery) * (y - centery);
+                        double sqdist = dxdx + dydy + dzdz;
+                        if (sqdist <= sqradius && sqdist >= sqradiusOffset) {
+                            driver.block(sideBlock);
                         }
-                    } else {
-                        // Optionally clear above the sphere
-                        if (profile.CITYSPHERE_CLEARABOVE > 0) {
-                            maxY = Math.min(provider.getWorld().getMaxBuildHeight(), y + profile.CITYSPHERE_CLEARABOVE);
-                            int yy = y;
-                            while (yy <= maxY) {
-                                driver.block(air);
-                                driver.incY();
-                                yy++;
+                        driver.incY();
+                    }
+                    for (int y = centery + 1; y < maxY; y++) {
+                        double dydy = (y - centery) * (y - centery);
+                        double sqdist = dxdx + dydy + dzdz;
+                        if (sqdist <= sqradius) {
+                            if (sqdist >= sqradiusOffset) {
+                                driver.block(glass);
                             }
+                        } else {
+                            // Optionally clear above the sphere
+                            if (profile.CITYSPHERE_CLEARABOVE > 0) {
+                                maxY = Math.min(provider.getWorld().getMaxBuildHeight(), y + profile.CITYSPHERE_CLEARABOVE);
+                                int yy = y;
+                                while (yy <= maxY) {
+                                    driver.block(air);
+                                    driver.incY();
+                                    yy++;
+                                }
+                            }
+                            break;
                         }
-                        break;
+                        driver.incY();
                     }
-                    driver.incY();
                 }
             }
         }
