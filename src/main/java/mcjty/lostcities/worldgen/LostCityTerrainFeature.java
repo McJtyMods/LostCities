@@ -2423,6 +2423,8 @@ public class LostCityTerrainFeature {
                                     handleLoot(info, part, provider.getWorld(), b, inf);
                                 } else if (inf.mobId() != null && !inf.mobId().isEmpty()) {
                                     b = handleSpawner(info, part, oy, provider.getWorld(), rx, rz, y, b, inf);
+                                } else if (inf.tag() != null) {
+                                    b = handleBlockEntity(info, part, oy, provider.getWorld(), rx, rz, y, b, inf);
                                 }
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
                                 BlockPos pos = driver.getCurrentCopy();
@@ -2449,6 +2451,12 @@ public class LostCityTerrainFeature {
             compiledPalette = new CompiledPalette(compiledPalette, partPalette);
         }
         return compiledPalette;
+    }
+
+    private BlockState handleBlockEntity(BuildingInfo info, IBuildingPart part, int oy, WorldGenLevel world, int rx, int rz, int y, BlockState b, Palette.Info inf) {
+        BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
+        GlobalTodo.getData(world.getLevel()).addBlockEntityTodo(pos, b, inf.tag());
+        return b;
     }
 
     private BlockState handleSpawner(BuildingInfo info, IBuildingPart part, int oy, WorldGenLevel world, int rx, int rz, int y, BlockState b, Palette.Info inf) {

@@ -6,6 +6,20 @@
       "damaged": "minecraft:iron_bars"
     },
     {
+      "char": ";",
+      "block": "minecraft:furnace",
+      "damaged": "minecraft:iron_bars",
+      "tag": {
+        "Items": [
+          {
+            "Slot": 0,
+            "id": "minecraft:coal",
+            "Count": 10
+          }
+        ]
+      }
+    },
+    {
       "char": "Q",
       "block": "minecraft:quartz_block",
       "damaged": "minecraft:iron_bars"
