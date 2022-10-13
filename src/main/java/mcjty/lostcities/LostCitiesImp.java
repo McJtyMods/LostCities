@@ -46,12 +46,20 @@ public class LostCitiesImp implements ILostCities {
 
         @Override
         public ILostSphere getSphere(int x, int y, int z) {
-            return BuildingInfo.getSphereInt(x, y, z, dimensionInfo);
+            if (dimensionInfo.getProfile().isSpheres() || dimensionInfo.getProfile().isSpace()) {
+                return BuildingInfo.getSphereInt(x, y, z, dimensionInfo);
+            } else {
+                return null;
+            }
         }
 
         @Override
         public ILostSphere getSphere(int x, int z) {
-            return BuildingInfo.getSphereInt(x, z, dimensionInfo);
+            if (dimensionInfo.getProfile().isSpheres() || dimensionInfo.getProfile().isSpace()) {
+                return BuildingInfo.getSphereInt(x, z, dimensionInfo);
+            } else {
+                return null;
+            }
         }
 
         @Override

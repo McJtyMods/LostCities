@@ -1,5 +1,7 @@
 Upcoming:
 - Fixed problem with floating grass
+- Fixed a bug where spawners were not actually being set in all cases
+- Fixed the api sphere test returning true in worlds that don't support spheres
 
 1.18-5.3.11:
 - Accidental hard dependency on TOP
