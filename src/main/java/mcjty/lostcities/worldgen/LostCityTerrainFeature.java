@@ -1218,7 +1218,7 @@ public class LostCityTerrainFeature {
         int y = 255;
         driver.current(x, y, z);
         // We assume here we are not in a void chunk
-        while (isFoliageOrEmpty(driver.getBlock()) && driver.getY() > height) {
+        while (isEmpty(driver.getBlock()) && driver.getY() > height) {
             driver.decY();
         }
 
