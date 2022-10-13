@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.0.8:
 - Better and faster way to get the biome for the condition context
 - Fixed a bug where spawners were not actually being set in all cases
 - Fixed the api sphere test returning true in worlds that don't support spheres
