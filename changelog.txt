@@ -1,3 +1,6 @@
+Upcoming:
+- Better and faster way to get the biome for the condition context
+
 1.19-6.0.7:
 - Accidental hard dependency on TOP
 

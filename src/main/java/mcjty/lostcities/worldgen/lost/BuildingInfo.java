@@ -715,9 +715,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
                 @Override
                 public ResourceLocation getBiome() {
-                    Biome biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value();
-                    return provider.getWorld().registryAccess().registry(Registry.BIOME_REGISTRY).orElseThrow().getKey(biome);
-//                    return ForgeRegistries.BIOMESxxxx.getKey(biome);
+                    Holder<Biome> biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8));
+                    return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().registry(Registry.BIOME_REGISTRY).orElseThrow().getKey(b));
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
@@ -880,9 +879,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
                 @Override
                 public ResourceLocation getBiome() {
-                    Biome biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value();
-                    return provider.getWorld().registryAccess().registry(Registry.BIOME_REGISTRY).orElseThrow().getKey(biome);
-//                    return ForgeRegistries.BIOMES.biome.getRegistryName();
+                    Holder<Biome> biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8));
+                    return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().registry(Registry.BIOME_REGISTRY).orElseThrow().getKey(b));
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);

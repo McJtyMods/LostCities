@@ -704,8 +704,8 @@ public class LostCityTerrainFeature {
 
                 @Override
                 public ResourceLocation getBiome() {
-                    Biome biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8)).value();
-                    return provider.getWorld().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
+                    Holder<Biome> biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8));
+                    return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(b));
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
@@ -2547,8 +2547,7 @@ public class LostCityTerrainFeature {
 
             @Override
             public ResourceLocation getBiome() {
-                Biome biome = world.getBiome(pos).value();
-                return world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
+                return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome));
             }
         };
         String randomValue = cnd.getRandomValue(random, conditionContext);
@@ -2589,7 +2588,7 @@ public class LostCityTerrainFeature {
 
                     @Override
                     public ResourceLocation getBiome() {
-                        return world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(world.getBiome(pos).value());
+                        return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome));
                     }
                 };
                 String randomValue = AssetRegistries.CONDITIONS.getOrThrow(world, lootTable).getRandomValue(random, conditionContext);
