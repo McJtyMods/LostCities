@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost.regassets.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,8 @@ public class PaletteEntry {
                     Codec.STRING.optionalFieldOf("damaged").forGetter(l -> Optional.ofNullable(l.getDamaged())),
                     Codec.STRING.optionalFieldOf("mob").forGetter(l -> Optional.ofNullable(l.getMob())),
                     Codec.STRING.optionalFieldOf("loot").forGetter(l -> Optional.ofNullable(l.getLoot())),
-                    Codec.BOOL.optionalFieldOf("torch").forGetter(l -> Optional.ofNullable(l.getTorch()))
+                    Codec.BOOL.optionalFieldOf("torch").forGetter(l -> Optional.ofNullable(l.getTorch())),
+                    CompoundTag.CODEC.optionalFieldOf("tag").forGetter(l -> Optional.ofNullable(l.getTag()))
             ).apply(instance, PaletteEntry::new));
 
     private String chr;
@@ -33,6 +35,7 @@ public class PaletteEntry {
     private String mob;
     private String loot;
     private Boolean torch;
+    private CompoundTag tag;
 
     public PaletteEntry() {
     }
@@ -97,9 +100,14 @@ public class PaletteEntry {
         return torch;
     }
 
+    public CompoundTag getTag() {
+        return tag;
+    }
+
     public PaletteEntry(String chr, Optional<String> block, Optional<String> variant, Optional<String> frompalette,
                         Optional<List<BlockEntry>> blocks, Optional<String> damaged,
-                        Optional<String> mob, Optional<String> loot, Optional<Boolean> torch) {
+                        Optional<String> mob, Optional<String> loot, Optional<Boolean> torch,
+                        Optional<CompoundTag> tag) {
         this.chr = chr;
         this.block = block.orElse(null);
         this.variant = variant.orElse(null);
@@ -109,5 +117,6 @@ public class PaletteEntry {
         this.mob = mob.orElse(null);
         this.loot = loot.orElse(null);
         this.torch = torch.orElse(null);
+        this.tag = tag.orElse(null);
     }
 }

@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
@@ -25,8 +26,10 @@ public class GlobalTodo extends SavedData {
     public static final String NAME = "LostCityTodo";
     // Todo is not persisted. It's currently only for saplings
     private Map<BlockPos, Consumer<ServerLevel>> todo = new HashMap<>();
-    // This is for spawners and is more important
+    // This is for spawners and is more important (and persisted)
     private Map<BlockPos, Pair<BlockState, ResourceLocation>> todoSpawners = new HashMap<>();
+    // This is generic block entity data that still has to be placed in the world
+    private Map<BlockPos, Pair<BlockState, CompoundTag>> todoBlockEntities = new HashMap<>();
 
     @Nonnull
     public static GlobalTodo getData(Level world) {
@@ -49,6 +52,14 @@ public class GlobalTodo extends SavedData {
             ResourceLocation entity = new ResourceLocation(spawnerTag.getString("entity"));
             addSpawnerTodo(pos, state, entity);
         }
+        ListTag blockEntities = nbt.getList("blockentities", Tag.TAG_COMPOUND);
+        for (Tag blockEntity : blockEntities) {
+            CompoundTag blockEntityTag = (CompoundTag) blockEntity;
+            BlockPos pos = NbtUtils.readBlockPos(blockEntityTag.getCompound("pos"));
+            BlockState state = NbtUtils.readBlockState(blockEntityTag.getCompound("state"));
+            CompoundTag tag = blockEntityTag.getCompound("tag");
+            addBlockEntityTodo(pos, state, tag);
+        }
     }
 
     @Override
@@ -62,6 +73,15 @@ public class GlobalTodo extends SavedData {
             spawners.add(spawnerTag);
         });
         tag.put("spawners", spawners);
+        ListTag blockEntities = new ListTag();
+        todoBlockEntities.forEach((pos, pair) -> {
+            CompoundTag blockEntityTag = new CompoundTag();
+            blockEntityTag.put("pos", NbtUtils.writeBlockPos(pos));
+            blockEntityTag.put("state", NbtUtils.writeBlockState(pair.getLeft()));
+            blockEntityTag.put("tag", pair.getRight());
+            blockEntities.add(blockEntityTag);
+        });
+        tag.put("blockentities", blockEntities);
         return tag;
     }
 
@@ -70,13 +90,28 @@ public class GlobalTodo extends SavedData {
     }
 
     public void addSpawnerTodo(BlockPos pos, BlockState spawnerState, ResourceLocation randomEntity) {
-        todo.put(pos, level -> {
-            if (level.getBlockState(pos).getBlock() == spawnerState.getBlock()) {
-                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-                level.setBlock(pos, spawnerState, Block.UPDATE_CLIENTS);
-                LostCityTerrainFeature.createSpawner(level, pos, randomEntity);
-            }
-        });
+        todoSpawners.put(pos, Pair.of(spawnerState, randomEntity));
+//        todo.put(pos, level -> {
+//            if (level.getBlockState(pos).getBlock() == spawnerState.getBlock()) {
+//                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+//                level.setBlock(pos, spawnerState, Block.UPDATE_CLIENTS);
+//                LostCityTerrainFeature.createSpawner(level, pos, randomEntity);
+//            }
+//        });
+    }
+
+    public void addBlockEntityTodo(BlockPos pos, BlockState state, CompoundTag tag) {
+        todoBlockEntities.put(pos, Pair.of(state, tag));
+//        todo.put(pos, level -> {
+//            if (level.getBlockState(pos).getBlock() == state.getBlock()) {
+//                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+//                level.setBlock(pos, state, Block.UPDATE_CLIENTS);
+//                BlockEntity be = level.getBlockEntity(pos);
+//                if (be != null) {
+//                    be.load(tag);
+//                }
+//            }
+//        });
     }
 
     public void executeAndClearTodo(ServerLevel level) {
@@ -84,7 +119,7 @@ public class GlobalTodo extends SavedData {
         this.todo = new HashMap<>();
         copy.forEach((pos, code) -> code.accept(level));
 
-        Map<BlockPos, Pair<BlockState, ResourceLocation>> copySpawners = this.todoSpawners;
+        var copySpawners = this.todoSpawners;
         this.todoSpawners = new HashMap<>();
         copySpawners.forEach((pos, pair) -> {
             BlockState spawnerState = pair.getLeft();
@@ -93,6 +128,17 @@ public class GlobalTodo extends SavedData {
                 level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
                 level.setBlock(pos, spawnerState, Block.UPDATE_CLIENTS);
                 LostCityTerrainFeature.createSpawner(level, pos, randomEntity);
+            }
+        });
+
+        var copyBlockEntities = this.todoBlockEntities;
+        this.todoBlockEntities = new HashMap<>();
+        copyBlockEntities.forEach((pos, pair) -> {
+            BlockState state = pair.getLeft();
+            CompoundTag tag = pair.getRight();
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be != null) {
+                be.load(tag);
             }
         });
     }

@@ -7,6 +7,7 @@ import mcjty.lostcities.worldgen.lost.regassets.PaletteRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.BlockEntry;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.PaletteEntry;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -68,7 +69,8 @@ public class Palette implements ILostCityAsset {
             if (entry.getDamaged() != null) {
                 dmg = Tools.stringToState(entry.getDamaged());
             }
-            Info info = new Info(entry.getMob(), entry.getLoot(), entry.getTorch() == null ? false : entry.getTorch());
+            Info info = new Info(entry.getMob(), entry.getLoot(), entry.getTorch() == null ? false : entry.getTorch(),
+                    entry.getTag());
 
             if (entry.getBlock() != null) {
                 String block = entry.getBlock();
@@ -116,9 +118,9 @@ public class Palette implements ILostCityAsset {
         return this;
     }
 
-    public record Info(String mobId, String loot, boolean isTorch) {
+    public record Info(String mobId, String loot, boolean isTorch, CompoundTag tag) {
         public boolean isSpecial() {
-            return mobId != null || loot != null || isTorch;
+            return mobId != null || loot != null || isTorch || tag != null;
         }
     }
 
