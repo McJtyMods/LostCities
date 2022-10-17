@@ -1,3 +1,6 @@
+Upcoming:
+- In worldstyles it is now possible to specify settings for city spheres. Including the possibility to predefine how the center of a sphere looks and possibly a part that is generated there
+
 1.19-6.0.8:
 - Better and faster way to get the biome for the condition context
 - Fixed a bug where spawners were not actually being set in all cases

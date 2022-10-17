@@ -11,6 +11,7 @@ import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
+import mcjty.lostcities.worldgen.lost.regassets.data.CitySphereSettings;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
 import net.minecraft.core.BlockPos;
@@ -738,7 +739,6 @@ public class BuildingInfo implements ILostChunkInfo {
 
         LostChunkCharacteristics characteristics = getChunkCharacteristics(key, chunkX, chunkZ, provider);
 
-        isCity = characteristics.isCity;
         cityLevel = characteristics.cityLevel;
         buildingType = characteristics.buildingType;
         multiBuilding = characteristics.multiBuilding;
@@ -760,6 +760,30 @@ public class BuildingInfo implements ILostChunkInfo {
             }
         }
 
+        boolean c = characteristics.isCity;
+        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.isCitySphereCenter(chunkX, chunkZ, provider)) {
+            CitySphereSettings settings = provider.getWorldStyle().getCitysphereSettings();
+            if (settings != null) {
+                CitySphereSettings.CitySphereCenterType centertype = settings.getCenterType();
+                switch (centertype) {
+                    case DEFAULT -> {
+                    }
+                    case STREET -> {
+                        c = true;
+                        b = false;
+                    }
+                    case BUILDING -> {
+                        c = true;
+                        b = true;
+                    }
+                    case NORMAL -> {
+                        c = false;
+                    }
+                }
+            }
+        }
+
+        isCity = c;
         hasBuilding = b;
 
         int wl;

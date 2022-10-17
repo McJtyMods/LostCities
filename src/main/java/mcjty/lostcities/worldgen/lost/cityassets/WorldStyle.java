@@ -24,6 +24,7 @@ public class WorldStyle implements ILostCityAsset {
     private final ResourceLocation name;
     private final String outsideStyle;
 
+    private final CitySphereSettings citysphereSettings;
     private final ScatteredSettings scatteredSettings;
     @Nonnull private final PartSelector partSelector;
     private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
@@ -31,6 +32,7 @@ public class WorldStyle implements ILostCityAsset {
 
     public WorldStyle(WorldStyleRE object) {
         name = object.getRegistryName();
+        this.citysphereSettings = object.getCitysphereSettings();
         this.scatteredSettings = object.getScatteredSettings();
         this.partSelector = object.getPartSelector();
         outsideStyle = object.getOutsideStyle();
@@ -65,6 +67,10 @@ public class WorldStyle implements ILostCityAsset {
     @Nonnull
     public PartSelector getPartSelector() {
         return partSelector;
+    }
+
+    public CitySphereSettings getCitysphereSettings() {
+        return citysphereSettings;
     }
 
     @Nullable
