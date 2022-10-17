@@ -376,6 +376,11 @@ public class CitySphere implements ILostSphere {
         return citySphere;
     }
 
+    public static boolean isCitySphereCenter(int chunkX, int chunkZ, IDimensionInfo provider) {
+        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
+        return sphere.isEnabled() && sphere.getCenter().chunkX() == chunkX && sphere.getCenter().chunkZ() == chunkZ;
+    }
+
     /**
      * Given a chunk coordinate return the nearest city sphere that affects this chunk. This can return city
      * spheres that are disabled so always test for that! If this returns EMPTY there is no sphere at all

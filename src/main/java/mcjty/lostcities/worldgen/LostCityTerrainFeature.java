@@ -292,6 +292,25 @@ public class LostCityTerrainFeature {
             doNormalChunk(chunkX, chunkZ, info);
         }
 
+        if (profile.isSpace() || profile.isSpheres()) {
+            if (CitySphere.isCitySphereCenter(chunkX, chunkZ, provider)) {
+                CitySphereSettings settings = provider.getWorldStyle().getCitysphereSettings();
+                if (settings != null && settings.getCenterpart() != null) {
+                    BuildingPart part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), settings.getCenterpart());
+                    int offset = settings.getCenterPartOffset();
+                    int partY = switch (settings.getCenterPartOrigin()) {
+                        case FIXED -> 0;
+                        case CENTER -> CitySphere.getCitySphere(chunkX, chunkZ, provider).getCenterPos().getY();
+                        case FIRSTFLOOR -> info.getCityGroundLevel();
+                        case GROUND -> info.groundLevel;
+                        case TOP -> getTopLevel(info);
+                    };
+                    partY += offset;
+                    generatePart(info, part, Transform.ROTATE_NONE, 0, partY, 0, true);
+                }
+            }
+        }
+
         Railway.RailChunkInfo railInfo = info.getRailInfo();
         if (railInfo.getType() != RailChunkType.NONE) {
             generateRailways(info, railInfo);
@@ -321,6 +340,14 @@ public class LostCityTerrainFeature {
         driver.actuallyGenerate(chunk);
         driver.setPrimer(oldRegion, oldChunk);
         ChunkFixer.fix(provider, chunkX, chunkZ);
+    }
+
+    private int getTopLevel(BuildingInfo info) {
+        if (info.hasBuilding) {
+            return info.getCityGroundLevel() + info.getNumFloors() * 6;
+        } else {
+            return info.getCityGroundLevel();
+        }
     }
 
     public void generateSpheres(WorldGenRegion region, ChunkAccess chunk) {

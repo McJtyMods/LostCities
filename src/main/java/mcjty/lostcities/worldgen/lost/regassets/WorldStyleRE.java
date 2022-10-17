@@ -17,6 +17,7 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
     public static final Codec<WorldStyleRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.STRING.fieldOf("outsidestyle").forGetter(l -> l.outsideStyle),
+                    CitySphereSettings.CODEC.optionalFieldOf("cityspheres").forGetter(l -> Optional.ofNullable(l.citysphereSettings)),
                     ScatteredSettings.CODEC.optionalFieldOf("scattered").forGetter(l -> Optional.ofNullable(l.scatteredSettings)),
                     PartSelector.CODEC.optionalFieldOf("parts").forGetter(l -> l.partSelector.get()),
                     Codec.list(CityStyleSelector.CODEC).fieldOf("citystyles").forGetter(l -> l.cityStyleSelectors),
@@ -27,20 +28,24 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
     private ResourceLocation name;
     private final String outsideStyle;
     private final ScatteredSettings scatteredSettings;
+    private final CitySphereSettings citysphereSettings;
     @Nonnull private final PartSelector partSelector;
     private final List<CityStyleSelector> cityStyleSelectors;
     private final List<CityBiomeMultiplier> cityBiomeMultipliers;
     private final List<ScatteredReference> scatteredReferences;
 
-    public WorldStyleRE(String outsideStyle, Optional<ScatteredSettings> scatteredSettings,
+    public WorldStyleRE(String outsideStyle,
+                        Optional<CitySphereSettings> citysphereSettings,
+                        Optional<ScatteredSettings> scatteredSettings,
                         Optional<PartSelector> partSelector,
-                        List<CityStyleSelector> values,
+                        List<CityStyleSelector> cityStyleSelector,
                         Optional<List<CityBiomeMultiplier>> cityBiomeMultipliers,
                         Optional<List<ScatteredReference>> scatteredReferences) {
         this.outsideStyle = outsideStyle;
+        this.citysphereSettings = citysphereSettings.orElse(null);
         this.scatteredSettings = scatteredSettings.orElse(null);
         this.partSelector = partSelector.orElse(PartSelector.DEFAULT);
-        this.cityStyleSelectors = values;
+        this.cityStyleSelectors = cityStyleSelector;
         this.cityBiomeMultipliers = cityBiomeMultipliers.orElse(null);
         this.scatteredReferences = scatteredReferences.orElse(null);
     }
@@ -52,6 +57,10 @@ public class WorldStyleRE implements IForgeRegistryEntry<WorldStyleRE> {
     @Nonnull
     public PartSelector getPartSelector() {
         return partSelector;
+    }
+
+    public CitySphereSettings getCitysphereSettings() {
+        return citysphereSettings;
     }
 
     @Nullable
