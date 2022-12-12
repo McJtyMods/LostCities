@@ -348,7 +348,7 @@ public class LostCityTerrainFeature {
 
     private int getTopLevel(BuildingInfo info) {
         if (info.hasBuilding) {
-            return info.getCityGroundLevel() + info.getNumFloors() * 6;
+            return info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT;
         } else {
             return info.getCityGroundLevel();
         }
@@ -1390,7 +1390,7 @@ public class LostCityTerrainFeature {
         ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
 
         if (info.profile.isDefault() || info.profile.isSpheres()) {
-            int minHeight = provider.getWorld().getMinBuildHeight();
+            int minHeight = info.minBuildHeight;
             BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
@@ -1873,6 +1873,9 @@ public class LostCityTerrainFeature {
                 int height = baseheight + (int) v;
                 driver.current(x, height, z);
                 height = info.getMaxHeight() + 10 - height;
+                if (height > info.maxBuildHeight - 2) {
+                    height = info.maxBuildHeight - 2;
+                }
                 int vl = 0;
                 if (doLeaves) {
                     vl = (int) (info.profile.RUBBLE_LEAVE_SCALE < 0.01f ? 0 : leavesBuffer[x + z * 16] / info.profile.RUBBLE_LEAVE_SCALE);
@@ -2012,7 +2015,7 @@ public class LostCityTerrainFeature {
      */
     private void fillToBedrockStreetBlock(BuildingInfo info) {
         // Base blocks below streets
-        int minHeight = provider.getWorld().getMinBuildHeight();
+        int minHeight = info.minBuildHeight;
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int y = info.getCityGroundLevel() - 1;
@@ -2665,6 +2668,9 @@ public class LostCityTerrainFeature {
                 // How many go this direction (approx, based on cardinal directions from building as well as number that simply fall down)
                 destroyedBlocks /= info.profile.DEBRIS_TO_NEARBYCHUNK_FACTOR;
                 int h = adjacentInfo.getMaxHeight() + 10;
+                if (h > info.maxBuildHeight-1) {
+                    h = info.minBuildHeight-1;
+                }
 
                 CompiledPalette palette = info.getCompiledPalette();
                 BlockState ironbarsState = Blocks.IRON_BARS.defaultBlockState();
@@ -2741,7 +2747,30 @@ public class LostCityTerrainFeature {
     }
 
     private void generateBuilding(BuildingInfo info, ChunkHeightmap heightmap) {
-        int lowestLevel = info.getCityGroundLevel() - info.cellars * FLOORHEIGHT;
+        int min = info.minBuildHeight + 2;
+        int max = info.maxBuildHeight - 2 - FLOORHEIGHT;
+
+        int cellars = info.cellars;
+        int floors = info.getNumFloors();
+        int lowestLevel = info.getCityGroundLevel() - cellars * FLOORHEIGHT;
+
+        // Fix lowest level so it goes above minimum build height
+        while (lowestLevel <= min) {
+            System.out.println("------------------------------ " + lowestLevel);
+            lowestLevel += FLOORHEIGHT;
+            cellars--;
+            if (cellars < 0) {
+                return;     // Bail out, this is a degenerate case
+            }
+        }
+
+        while (info.getCityGroundLevel() + floors * FLOORHEIGHT >= max) {
+            System.out.println("++++++++++++++++++++++++++++++ " + floors);
+            floors--;
+            if (floors < 0) {
+                return;     // Bail out, this is a degenerate case
+            }
+        }
 
         CompiledPalette palette = info.getCompiledPalette();
         makeRoomForBuilding(info, lowestLevel, heightmap, palette);
@@ -2749,11 +2778,11 @@ public class LostCityTerrainFeature {
         char fillerBlock = info.getBuilding().getFillerBlock();
 
         int height = lowestLevel;
-        for (int f = -info.cellars; f <= info.getNumFloors(); f++) {
+        for (int f = -cellars; f <= floors; f++) {
             // In default landscape type we clear the landscape on top of the building when we are at the top floor
-            if (f == info.getNumFloors()) {
+            if (f == floors) {
                 if (profile.isDefault() || profile.isSpheres()) {
-                    clearToMax(info, heightmap, height);
+                    clearToMax(info, heightmap, height, max);
                 }
             }
 
@@ -2765,7 +2794,7 @@ public class LostCityTerrainFeature {
             }
 
             // Check for doors
-            boolean isTop = f == info.getNumFloors();   // The top does not need generated doors
+            boolean isTop = f == floors;   // The top does not need generated doors
             if (!isTop) {
                 generateDoors(info, height + 1, f);
             }
@@ -2773,7 +2802,7 @@ public class LostCityTerrainFeature {
             height += FLOORHEIGHT;    // We currently only support 6 here
         }
 
-        if (info.cellars > 0) {
+        if (cellars > 0) {
             // Underground we replace the glass with the filler
             for (int x = 0; x < 16; x++) {
                 // Use safe version because this may end up being lower
@@ -2786,7 +2815,7 @@ public class LostCityTerrainFeature {
             }
         }
 
-        if (info.cellars >= 1) {
+        if (cellars >= 1) {
             // We have to potentially connect to corridors
             generateCorridorConnections(info);
         }
@@ -2805,8 +2834,8 @@ public class LostCityTerrainFeature {
             // generated chunks as opposed to blank chunks with non-floating worlds
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
-                    driver.current(x, provider.getWorld().getMaxBuildHeight() - 1, z);
-                    int minHeight = provider.getWorld().getMinBuildHeight();
+                    driver.current(x, info.maxBuildHeight - 1, z);
+                    int minHeight = info.minBuildHeight;
                     while (driver.getBlock() == air && driver.getY() > minHeight) {
                         driver.decY();
                     }
@@ -2868,9 +2897,8 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void clearToMax(BuildingInfo info, ChunkHeightmap heightmap, int height) {
-        // @todo 255 max height!
-        int maximumHeight = Math.min(255, heightmap.getMaximumHeight() + 10);
+    private void clearToMax(BuildingInfo info, ChunkHeightmap heightmap, int height, int max) {
+        int maximumHeight = Math.min(max, heightmap.getMaximumHeight() + 10);
         if (height < maximumHeight) {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
