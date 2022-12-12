@@ -1,5 +1,7 @@
 Upcoming:
 - In worldstyles it is now possible to specify settings for city spheres. Including the possibility to predefine how the center of a sphere looks and possibly a part that is generated there
+- The maximum numbers of floors and cellars has been raised significantly
+- Made floor and cellar generation much more robust. It will now check if the generation goes beyond build limits and adjust accordingly
 
 1.18-5.3.12:
 - Fixed problem with floating grass

@@ -305,15 +305,15 @@ public class LostCityProfile implements ILostCityProfile {
         CHEST_WITHOUT_LOOT_CHANCE = cfg.getFloat("chestWithoutLootChance", LostCityProfile.CATEGORY_LOSTCITY, CHEST_WITHOUT_LOOT_CHANCE, 0.0f, 1.0f, "The chance that a chest will have no loot");
         BUILDING_WITHOUT_LOOT_CHANCE = cfg.getFloat("buildingWithoutLootChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_WITHOUT_LOOT_CHANCE, 0.0f, 1.0f, "The chance that a building will have no loot and no spawners");
         BUILDING_CHANCE = cfg.getFloat("buildingChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_CHANCE, 0.0f, 1.0f, "The chance that a chunk in a city will have a building. Otherwise it will be a street");
-        BUILDING_MINFLOORS = cfg.getInt("buildingMinFloors", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MINFLOORS, 0, 30, "The minimum number of floors (above ground) for a building (0 means the first floor only)");
-        BUILDING_MAXFLOORS = cfg.getInt("buildingMaxFloors", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MAXFLOORS, 0, 30, "A cap for the amount of floors a city can have (above ground)");
-        BUILDING_MINFLOORS_CHANCE = cfg.getInt("buildingMinFloorsChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MINFLOORS_CHANCE, 1, 30, "The amount of floors of a building is equal to: " +
+        BUILDING_MINFLOORS = cfg.getInt("buildingMinFloors", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MINFLOORS, 0, 60, "The minimum number of floors (above ground) for a building (0 means the first floor only)");
+        BUILDING_MAXFLOORS = cfg.getInt("buildingMaxFloors", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MAXFLOORS, 0, 60, "A cap for the amount of floors a city can have (above ground)");
+        BUILDING_MINFLOORS_CHANCE = cfg.getInt("buildingMinFloorsChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MINFLOORS_CHANCE, 1, 60, "The amount of floors of a building is equal to: " +
                 "MINFLOORS + random(MINFLOORS_CHANCE + (cityFactor + .1f) * (MAXFLOORS_CHANCE - MINFLOORS_CHANCE))");
-        BUILDING_MAXFLOORS_CHANCE = cfg.getInt("buildingMaxFloorsChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MAXFLOORS_CHANCE, 1, 30, "The amount of floors of a building is equal to: " +
+        BUILDING_MAXFLOORS_CHANCE = cfg.getInt("buildingMaxFloorsChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MAXFLOORS_CHANCE, 1, 60, "The amount of floors of a building is equal to: " +
                 "MINFLOORS + random(MINFLOORS_CHANCE + (cityFactor + .1f) * (MAXFLOORS_CHANCE - MINFLOORS_CHANCE))");
 
-        BUILDING_MINCELLARS = cfg.getInt("buildingMinCellars", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MINCELLARS, 0, 7, "The minimum number of cellars (below ground). 0 means no cellar");
-        BUILDING_MAXCELLARS = cfg.getInt("buildingMaxCellars", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MAXCELLARS, 0, 7, "The maximum number of cellars (below ground). 0 means no cellar");
+        BUILDING_MINCELLARS = cfg.getInt("buildingMinCellars", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MINCELLARS, 0, 20, "The minimum number of cellars (below ground). 0 means no cellar");
+        BUILDING_MAXCELLARS = cfg.getInt("buildingMaxCellars", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_MAXCELLARS, 0, 20, "The maximum number of cellars (below ground). 0 means no cellar");
         BUILDING_DOORWAYCHANCE = cfg.getFloat("buildingDoorwayChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_DOORWAYCHANCE, 0.0f, 1.0f, "The chance that a doorway will be generated at a side of a building (on any level). Only when possible");
         BUILDING_FRONTCHANCE = cfg.getFloat("buildingFrontChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_FRONTCHANCE, 0.0f, 1.0f, "The chance that a building will have a 'front' part if this is possible (i.e. adjacent street)");
         LIBRARY_CHANCE = cfg.getFloat("libraryChance", LostCityProfile.CATEGORY_LOSTCITY, LIBRARY_CHANCE, 0.0f, 1.0f, "The chance that a 2x2 building will be a library");

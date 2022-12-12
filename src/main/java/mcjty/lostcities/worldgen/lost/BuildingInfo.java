@@ -30,6 +30,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static mcjty.lostcities.worldgen.LostCityTerrainFeature.FLOORHEIGHT;
+
 public class BuildingInfo implements ILostChunkInfo {
 
     public final int chunkX;
@@ -37,6 +39,8 @@ public class BuildingInfo implements ILostChunkInfo {
     public final ChunkCoord coord;
     public final IDimensionInfo provider;
     public final LostCityProfile profile;       // Profile cactive for this chunk: can be different in city sphere worlds
+    public final int minBuildHeight;
+    public final int maxBuildHeight;
 
     public final boolean outsideChunk;  // Only used for citysphere worlds and when this chunk is outside
     public int groundLevel;
@@ -230,11 +234,11 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public int getMaxHeight() {
         if (hasBuilding) {
-            return getCityGroundLevel() + floors * 6;
+            return getCityGroundLevel() + floors * FLOORHEIGHT;
         } else {
             int m = getMaxHighwayLevel();
             if (m >= 0) {
-                return groundLevel + m * 6;
+                return groundLevel + m * FLOORHEIGHT;
             } else {
                 return getCityGroundLevel();
             }
@@ -242,7 +246,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public int getCityGroundLevel() {
-        return groundLevel + cityLevel * 6;
+        return groundLevel + cityLevel * FLOORHEIGHT;
     }
 
     /**
@@ -250,9 +254,9 @@ public class BuildingInfo implements ILostChunkInfo {
      */
     public int getCityGroundLevelOutsideLower() {
         if (isCity) {
-            return groundLevel + cityLevel * 6;
+            return groundLevel + cityLevel * FLOORHEIGHT;
         } else {
-            return groundLevel + cityLevel * 6 -1;
+            return groundLevel + cityLevel * FLOORHEIGHT -1;
         }
     }
 
@@ -580,7 +584,7 @@ public class BuildingInfo implements ILostChunkInfo {
         // Get the (possbily cached) heightmap for this chunk
         ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
         // The height at which the highway would be + a threshold of 3
-        int highwayHeight = groundLevel + level * 6 + 3;
+        int highwayHeight = groundLevel + level * FLOORHEIGHT + 3;
         // If there are many places in the chunk above this height we will need a tunnel
         int cnt = 0;
         for (int x = 2 ; x < 16 ; x += 3) {
@@ -727,6 +731,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
     private BuildingInfo(ChunkCoord key, int chunkX, int chunkZ, IDimensionInfo provider) {
         this.provider = provider;
+        this.minBuildHeight = provider.getWorld().getMinBuildHeight();
+        this.maxBuildHeight = provider.getWorld().getMaxBuildHeight();
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         ResourceKey<Level> type = provider.getType();
@@ -852,6 +858,10 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             }
 
+            int max = maxBuildHeight - 2 - FLOORHEIGHT;
+            while (getCityGroundLevel() + f * FLOORHEIGHT >= max) {
+                f--;
+            }
             floors = f;
 
             int maxcellars = getMaxcellars(cs);
@@ -862,6 +872,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 if (fb < 0) {
                     fb = 0;
                 }
+            }
+            if (fb > maxcellars) {
+                fb = maxcellars;
             }
             cellars = fb;
 
@@ -905,6 +918,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
+            if (randomPart == null) {
+                throw new RuntimeException("Misconfiguration! Floor were generated for a building where no part condition matches!");
+            }
             floorTypes[i] = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), randomPart);
             randomPart = building.getRandomPart2(rand, conditionContext);
             floorTypes2[i] = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);    // null is legal
@@ -1847,7 +1863,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (ruinHeight < 0) {
             return -1;
         }
-        return (int) (getCityGroundLevel() + 1 + (ruinHeight * getNumFloors() * 6.0f));
+        return (int) (getCityGroundLevel() + 1 + (ruinHeight * getNumFloors() * FLOORHEIGHT));
     }
 
     @Nullable
