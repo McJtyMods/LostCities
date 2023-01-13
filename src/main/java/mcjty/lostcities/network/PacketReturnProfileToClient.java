@@ -1,8 +1,8 @@
 package mcjty.lostcities.network;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -14,7 +14,7 @@ public class PacketReturnProfileToClient {
     private final String profile;
 
     public PacketReturnProfileToClient(FriendlyByteBuf buf) {
-        dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
+        dimension = ResourceKey.create(Registries.DIMENSION, buf.readResourceLocation());
         profile = buf.readUtf(32767);
     }
 

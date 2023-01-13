@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
@@ -113,7 +114,9 @@ public class NullDimensionInfo implements IDimensionInfo {
         RandomSource randomSource = new LegacyRandomSource(seed);
         feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
-        biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();
+        // @todo 1.19.3
+        biomeRegistry = RegistryAccess.EMPTY.registryOrThrow(Registries.BIOME);
+//        biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();
     }
 
     @Override

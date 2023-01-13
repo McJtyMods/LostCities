@@ -33,12 +33,13 @@ public class BooleanElement extends GuiElement {
                 gui.refreshPreview();
             });
         }) {
-            @Override
-            public void renderToolTip(PoseStack stack, int x, int y) {
-                gui.getLocalSetup().get().ifPresent(h -> {
-                    gui.renderTooltip(stack, h.toConfiguration().getValue(attribute).getComment(), x, y);
-                });
-            }
+            // @todo 1.19.3
+//            @Override
+//            public void renderToolTip(PoseStack stack, int x, int y) {
+//                gui.getLocalSetup().get().ifPresent(h -> {
+//                    gui.renderTooltip(stack, h.toConfiguration().getValue(attribute).getComment(), x, y);
+//                });
+//            }
         };
         gui.addWidget(field);
     }

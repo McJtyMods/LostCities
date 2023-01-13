@@ -61,10 +61,10 @@ public class ClientEventHandlers {
     @SubscribeEvent
     public void onGuiPost(ScreenEvent.Init.Post event) {
         if (event.getScreen() instanceof CreateWorldScreen screen) {
-            lostCitiesButton = new Button(screen.width - 100, 10, 70, 20, ComponentFactory.literal("Cities"), p_onPress_1_ -> {
+            lostCitiesButton = Button.builder(ComponentFactory.literal("Cities"), p_onPress_1_ -> {
 //                WorldType worldType = WorldType.WORLD_TYPES[screen.selectedIndex];
                 Minecraft.getInstance().setScreen(new GuiLCConfig(screen /* @todo 1.16, worldType*/));
-            });
+            }).bounds(screen.width - 100, 10, 70, 20).build();
             event.addListener(lostCitiesButton);
         }
     }

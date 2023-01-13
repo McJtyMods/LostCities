@@ -6,6 +6,7 @@ import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -26,7 +27,7 @@ public class PredefinedCity implements ILostCityAsset {
 
     public PredefinedCity(PredefinedCityRE object) {
         name = object.getRegistryName();
-        dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(object.getDimension()));
+        dimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(object.getDimension()));
         chunkX = object.getChunkX();
         chunkZ = object.getChunkZ();
         radius = object.getRadius();

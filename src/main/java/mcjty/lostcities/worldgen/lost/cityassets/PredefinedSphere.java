@@ -4,6 +4,7 @@ import mcjty.lostcities.api.ILostCityAsset;
 import mcjty.lostcities.worldgen.lost.regassets.PredefinedSphereRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -20,7 +21,7 @@ public class PredefinedSphere implements ILostCityAsset {
 
     public PredefinedSphere(PredefinedSphereRE object) {
         name = object.getRegistryName();
-        dimension = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(object.getDimension()));
+        dimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(object.getDimension()));
         chunkX = object.getChunkX();
         chunkZ = object.getChunkZ();
         centerX = object.getCenterX();

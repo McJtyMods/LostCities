@@ -6,6 +6,8 @@ import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.tags.TagKey;
@@ -58,7 +60,7 @@ public class Tools {
     public static BlockState stringToState(String s) {
         if (s.contains("[")) {
             try {
-                BlockStateParser.BlockResult parser = BlockStateParser.parseForBlock(WorldTools.getOverworld().registryAccess().registryOrThrow(Registry.BLOCK_REGISTRY), new StringReader(s), false);
+                BlockStateParser.BlockResult parser = BlockStateParser.parseForBlock(WorldTools.getOverworld().holderLookup(Registries.BLOCK), new StringReader(s), false);
                 return parser.blockState();
             } catch (CommandSyntaxException e) {
                 throw new RuntimeException(e);
@@ -114,13 +116,13 @@ public class Tools {
     }
 
     public static Iterable<Holder<Block>> getBlocksForTag(TagKey<Block> rl) {
-        @SuppressWarnings("deprecation") DefaultedRegistry<Block> registry = Registry.BLOCK;
+        @SuppressWarnings("deprecation") DefaultedRegistry<Block> registry = BuiltInRegistries.BLOCK;
         return registry.getTagOrEmpty(rl);
     }
 
     public static boolean hasTag(Block block, TagKey<Block> tag) {
         //noinspection deprecation
-        return Registry.BLOCK.getHolderOrThrow(block.builtInRegistryHolder().key()).is(tag);
+        return BuiltInRegistries.BLOCK.getHolderOrThrow(block.builtInRegistryHolder().key()).is(tag);
     }
 
     public static int getSeaLevel(LevelReader level) {

@@ -2,21 +2,23 @@ package mcjty.lostcities.datagen;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.LostTags;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class BlockTags extends BlockTagsProvider {
 
-    public BlockTags(DataGenerator generator, ExistingFileHelper helper) {
-        super(generator, LostCities.MODID, helper);
+    public BlockTags(DataGenerator generator, CompletableFuture<HolderLookup.Provider> lookupProvider ,ExistingFileHelper helper) {
+        super(generator.getPackOutput(), lookupProvider, LostCities.MODID, helper);
     }
 
     private static final Set<Material> PLANT_MATERIALS = Set.of(
@@ -31,7 +33,7 @@ public class BlockTags extends BlockTagsProvider {
             Material.LEAVES);
 
     @Override
-    protected void addTags() {
+    protected void addTags(HolderLookup.Provider provider) {
         for (Block block : ForgeRegistries.BLOCKS.getValues()) {
             if (PLANT_MATERIALS.contains(block.defaultBlockState().getMaterial())) {
                 tag(LostTags.FOLIAGE_TAG).add(block);

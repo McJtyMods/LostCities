@@ -1,11 +1,13 @@
 package mcjty.lostcities.worldgen;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -14,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
@@ -43,12 +46,17 @@ public class GlobalTodo extends SavedData {
     public GlobalTodo() {
     }
 
+    private static ServerLevel getOverworld() {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        return server.getLevel(Level.OVERWORLD);
+    }
+
     public GlobalTodo(CompoundTag nbt) {
         ListTag spawners = nbt.getList("spawners", Tag.TAG_COMPOUND);
         for (Tag spawner : spawners) {
             CompoundTag spawnerTag = (CompoundTag) spawner;
             BlockPos pos = NbtUtils.readBlockPos(spawnerTag.getCompound("pos"));
-            BlockState state = NbtUtils.readBlockState(spawnerTag.getCompound("state"));
+            BlockState state = NbtUtils.readBlockState(getOverworld().holderLookup(Registries.BLOCK), spawnerTag.getCompound("state"));
             ResourceLocation entity = new ResourceLocation(spawnerTag.getString("entity"));
             addSpawnerTodo(pos, state, entity);
         }
@@ -56,7 +64,7 @@ public class GlobalTodo extends SavedData {
         for (Tag blockEntity : blockEntities) {
             CompoundTag blockEntityTag = (CompoundTag) blockEntity;
             BlockPos pos = NbtUtils.readBlockPos(blockEntityTag.getCompound("pos"));
-            BlockState state = NbtUtils.readBlockState(blockEntityTag.getCompound("state"));
+            BlockState state = NbtUtils.readBlockState(getOverworld().holderLookup(Registries.BLOCK), blockEntityTag.getCompound("state"));
             CompoundTag tag = blockEntityTag.getCompound("tag");
             addBlockEntityTodo(pos, state, tag);
         }

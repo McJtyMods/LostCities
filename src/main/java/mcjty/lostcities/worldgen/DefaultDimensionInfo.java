@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.util.RandomSource;
@@ -44,7 +45,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         RandomSource randomSource = new LegacyRandomSource(world.getSeed());
         feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
-        biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();
+        biomeRegistry = RegistryAccess.EMPTY.registryOrThrow(Registries.BIOME);
     }
 
     @Override

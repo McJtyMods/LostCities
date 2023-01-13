@@ -18,6 +18,7 @@ import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
@@ -382,7 +383,7 @@ public class LostCityTerrainFeature {
 
     private boolean hasVillage(ChunkAccess ch) {
         if (ch.hasAnyStructureReferences()) {
-            var structures = provider.getWorld().registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY);
+            var structures = provider.getWorld().registryAccess().registryOrThrow(Registries.STRUCTURE);
             var references = ch.getAllReferences();
             // @todo we can do this more optimally if we first find all configured structures for village
             for (var entry : references.entrySet()) {
@@ -732,7 +733,7 @@ public class LostCityTerrainFeature {
                 @Override
                 public ResourceLocation getBiome() {
                     Holder<Biome> biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8));
-                    return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(b));
+                    return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().registryOrThrow(Registries.BIOME).getKey(b));
                 }
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
@@ -2559,7 +2560,7 @@ public class LostCityTerrainFeature {
         BlockEntity tileentity = world.getBlockEntity(pos);
         if (tileentity instanceof SpawnerBlockEntity spawner) {
             BaseSpawner logic = spawner.getSpawner();
-            logic.setEntityId(ForgeRegistries.ENTITY_TYPES.getValue(randomEntity));
+            logic.setEntityId(ForgeRegistries.ENTITY_TYPES.getValue(randomEntity), world, world.random, pos);
             spawner.setChanged();
             if (Config.DEBUG) {
                 ModSetup.getLogger().debug("generateLootSpawners: mob={} pos={}", randomEntity.toString(), pos);
@@ -2585,7 +2586,7 @@ public class LostCityTerrainFeature {
 
             @Override
             public ResourceLocation getBiome() {
-                return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome));
+                return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome));
             }
         };
         String randomValue = cnd.getRandomValue(random, conditionContext);
@@ -2626,7 +2627,7 @@ public class LostCityTerrainFeature {
 
                     @Override
                     public ResourceLocation getBiome() {
-                        return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome));
+                        return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome));
                     }
                 };
                 String randomValue = AssetRegistries.CONDITIONS.getOrThrow(world, lootTable).getRandomValue(random, conditionContext);

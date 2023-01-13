@@ -21,12 +21,13 @@ public class IntElement extends GuiElement {
         this.attribute = attribute;
         Integer c = gui.getLocalSetup().get().map(h -> (Integer) h.toConfiguration().get(attribute)).orElse(0);
         field = new EditBox(gui.getFont(), x, y, 45, 16, ComponentFactory.literal(Integer.toString(c))) {
-            @Override
-            public void renderToolTip(PoseStack stack, int x, int y) {
-                gui.getLocalSetup().get().ifPresent(h -> {
-                    gui.renderTooltip(stack, h.toConfiguration().getValue(attribute).getComment(), x, y);
-                });
-            }
+            // @todo 1.19.3
+//            @Override
+//            public void renderToolTip(PoseStack stack, int x, int y) {
+//                gui.getLocalSetup().get().ifPresent(h -> {
+//                    gui.renderTooltip(stack, h.toConfiguration().getValue(attribute).getComment(), x, y);
+//                });
+//            }
         };
         field.setResponder(s -> {
             gui.getLocalSetup().get().ifPresent(profile -> {

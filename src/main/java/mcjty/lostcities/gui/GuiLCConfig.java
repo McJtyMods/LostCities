@@ -3,8 +3,8 @@ package mcjty.lostcities.gui;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.api.RailChunkType;
-import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.gui.elements.*;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.varia.ComponentFactory;
@@ -85,7 +85,8 @@ public class GuiLCConfig extends Screen {
     @Override
     protected void init() {
         super.init();
-        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
+        // @todo 1.19.3
+//        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
         profileButton = addRenderableWidget(new ButtonExt(this, 55, 10, 80, 20, ComponentFactory.literal(localSetup.getProfileLabel()), p -> {
             localSetup.toggleProfile(/* @todo 1.16 worldType*/);
@@ -104,10 +105,9 @@ public class GuiLCConfig extends Screen {
         modeButton = addRenderableWidget(new ButtonExt(this, 355, 10, 70, 20, ComponentFactory.literal(mode), p -> toggleMode())
             .tooltip(ComponentFactory.literal("Switch between different configuration pages")));
 
-        addRenderableWidget(new Button(10, this.height - 30, 120, 20,
-                ComponentFactory.literal("Done"), p -> done()));
-        addRenderableWidget(new Button(this.width - 130, this.height - 30, 120, 20,
-                ComponentFactory.literal("Cancel"), p -> cancel()));
+
+        addRenderableWidget(Button.builder(ComponentFactory.literal("Done"), p -> done()).bounds(10, this.height - 30, 120, 20).build());
+        addRenderableWidget(Button.builder(ComponentFactory.literal("Cancel"), p -> cancel()).bounds(this.width - 130, this.height - 30, 120, 20).build());
         addRenderableWidget(new ButtonExt(this, this.width - 35, 35, 30, 20, ComponentFactory.literal("Rnd"), p -> randomizePreview())
                 .tooltip(ComponentFactory.literal("Randomize the seed for the preview (does not affect the generated world)")));
 
@@ -492,8 +492,8 @@ public class GuiLCConfig extends Screen {
         for(GuiEventListener listener : this.children()) {
             if (listener instanceof AbstractWidget widget) {
                 if (widget.isMouseOver(mouseX, mouseY) && widget.visible) {
-//            if (widget.isHovered() && widget.visible) {
-                    widget.renderToolTip(stack, mouseX, mouseY);
+                    // @todo 1.19.3
+//                    widget.renderToolTip(stack, mouseX, mouseY);
                     break;
                 }
             }
