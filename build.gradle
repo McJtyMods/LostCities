@@ -100,7 +100,7 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:${jei_version}")
     compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:${jei_version}")
     // at runtime, use the full JEI jar for Forge
-    runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
+    // runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
 
     if (findProject(':TheOneProbe') != null) {
         implementation project(':TheOneProbe')

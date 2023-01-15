@@ -50,6 +50,7 @@ public class LostCities {
         bus.addListener(setup::init);
         bus.addListener(this::processIMC);
         bus.addListener(this::onConstructModEvent);
+        bus.addListener(CustomRegistries::onDataPackRegistry);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::init);

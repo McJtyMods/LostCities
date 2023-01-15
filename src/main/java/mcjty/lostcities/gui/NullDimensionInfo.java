@@ -19,6 +19,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -115,8 +116,9 @@ public class NullDimensionInfo implements IDimensionInfo {
         feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
         // @todo 1.19.3
-        biomeRegistry = RegistryAccess.EMPTY.registryOrThrow(Registries.BIOME);
+//        biomeRegistry = ServerLifecycleHooks.getCurrentServer().registryAccess().registryOrThrow(Registries.BIOME);
 //        biomeRegistry = RegistryAccess.builtinCopy().registry(Registry.BIOME_REGISTRY).get();
+        biomeRegistry = null;
     }
 
     @Override

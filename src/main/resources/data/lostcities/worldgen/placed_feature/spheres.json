@@ -1,0 +1,9 @@
+{
+  "feature": "lostcities:spheres",
+  "placement": [
+    {
+      "count": 1,
+      "type": "minecraft:count"
+    }
+  ]
+}

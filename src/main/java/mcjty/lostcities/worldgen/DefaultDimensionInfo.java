@@ -45,7 +45,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         RandomSource randomSource = new LegacyRandomSource(world.getSeed());
         feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
-        biomeRegistry = RegistryAccess.EMPTY.registryOrThrow(Registries.BIOME);
+        biomeRegistry = world.registryAccess().registryOrThrow(Registries.BIOME);
     }
 
     @Override

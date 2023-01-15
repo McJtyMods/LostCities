@@ -64,7 +64,7 @@ public class CustomRegistries {
         SCATTERED_DEFERRED_REGISTER.register(bus);
     }
 
-    public void onDataPackRegistry(DataPackRegistryEvent.NewRegistry event) {
+    public static void onDataPackRegistry(DataPackRegistryEvent.NewRegistry event) {
         event.dataPackRegistry(BUILDING_REGISTRY_KEY, BuildingRE.CODEC);
         event.dataPackRegistry(PALETTE_REGISTRY_KEY, PaletteRE.CODEC);
         event.dataPackRegistry(PART_REGISTRY_KEY, BuildingPartRE.CODEC);
