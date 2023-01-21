@@ -17,8 +17,8 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'eclipse'
 apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'maven-publish'
-//apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/1.19_tech/changelog.gradle'
-apply from: '../changelog.gradle'
+apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/1.19_tech/changelog.gradle'
+//apply from: '../changelog.gradle'
 
 repositories {
     maven { url "https://dvs1.progwml6.com/files/maven" } // JEI
