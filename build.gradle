@@ -50,7 +50,7 @@ dependencies {
 }
 
 tasks.curseforge.enabled = project.hasProperty('curseforge_key')
-cfdeps([], [], [])
+cfdeps(['the-one-probe'], [], [])
 
 task apiJar(type: Jar) {
     classifier = "api"
