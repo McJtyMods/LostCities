@@ -1009,7 +1009,7 @@ public class LostCityTerrainFeature {
     }
 
     private void generateBridge(BuildingInfo info, BuildingPart bt, Orientation orientation) {
-        CompiledPalette compiledPalette = info.getCompiledPalette();
+    	CompiledPalette compiledPalette = computePalette(info, bt);
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 driver.current(x, mainGroundLevel + 1, z);
