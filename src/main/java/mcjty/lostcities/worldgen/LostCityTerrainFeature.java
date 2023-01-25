@@ -2784,7 +2784,7 @@ public class LostCityTerrainFeature {
 
             // Check for doors
             boolean isTop = f == floors;   // The top does not need generated doors
-            if (!isTop) {
+            if (!isTop && info.getAllowDoors()) {
                 generateDoors(info, height + 1, f);
             }
 
