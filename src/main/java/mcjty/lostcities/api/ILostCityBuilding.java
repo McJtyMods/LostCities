@@ -28,6 +28,11 @@ public interface ILostCityBuilding extends ILostCityAsset {
     int getMinFloors();
 
     int getMinCellars();
+    
+    /*
+     * Get the permission to generate the door for the building
+     */
+    Boolean getAllowDoors();
 
     /**
      * The filler block (from the palette) used to do procedural generation of extra
