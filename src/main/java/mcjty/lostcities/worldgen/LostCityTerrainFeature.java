@@ -1019,14 +1019,14 @@ public class LostCityTerrainFeature {
     }
 
     private void generateBridge(BuildingInfo info, BuildingPart bt, Orientation orientation) {
-        CompiledPalette compiledPalette = info.getCompiledPalette();
+        CompiledPalette compiledPalette = computePalette(info, bt);
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 driver.current(x, mainGroundLevel + 1, z);
                 int l = 0;
                 while (l < bt.getSliceCount()) {
                     Character c = orientation == Orientation.X ? bt.getPaletteChar(x, l, z) : bt.getPaletteChar(z, l, x); // @todo general rotation system?
-                    BlockState b = info.getCompiledPalette().get(c);
+                    BlockState b = compiledPalette.get(c);
                     Palette.Info inf = compiledPalette.getInfo(c);
                     if (inf != null) {
                         if (inf.isTorch()) {
