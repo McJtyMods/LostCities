@@ -21,6 +21,8 @@ public class BuildingRE implements IAsset<BuildingRE> {
                     Codec.INT.optionalFieldOf("minfloors").forGetter(l -> l.minFloors == -1 ? Optional.<Integer>empty() : Optional.of(l.minFloors)),
                     Codec.INT.optionalFieldOf("maxcellars").forGetter(l -> l.maxCellars == -1 ? Optional.<Integer>empty() : Optional.of(l.maxCellars)),
                     Codec.INT.optionalFieldOf("maxfloors").forGetter(l -> l.maxFloors == -1 ? Optional.<Integer>empty() : Optional.of(l.maxFloors)),
+                    Codec.BOOL.optionalFieldOf("allowDoors").forGetter(l -> Optional.ofNullable(l.getAllowDoors())),
+                    Codec.BOOL.optionalFieldOf("allowFillers").forGetter(l -> Optional.ofNullable(l.getAllowFillers())),
                     Codec.FLOAT.optionalFieldOf("preferslonely").forGetter(l -> l.prefersLonely == 0 ? Optional.<Float>empty() : Optional.of(l.prefersLonely)),
                     Codec.list(PartRef.CODEC).fieldOf("parts").forGetter(l -> l.parts),
                     Codec.list(PartRef.CODEC).optionalFieldOf("parts2").forGetter(l -> Optional.ofNullable(l.parts2))
@@ -33,6 +35,8 @@ public class BuildingRE implements IAsset<BuildingRE> {
     private int minCellars = -1;        // -1 means default frmo level
     private int maxFloors = -1;         // -1 means default from level
     private int maxCellars = -1;        // -1 means default frmo level
+    private Boolean allowDoors = true;	// true means generation for the door is allowed, adjacent to street and building
+    private Boolean allowFillers = true;// true means generation for the filler is allowed, for cellars
     private final char fillerBlock;     // Block used to fill/close areas. Usually the block of the building itself
     private final String rubbleBlock;   // Block used for destroyed building rubble
     private float prefersLonely = 0.0f; // The chance this this building is alone. If 1.0f this building wants to be alone all the time
@@ -44,8 +48,9 @@ public class BuildingRE implements IAsset<BuildingRE> {
     private final List<PartRef> parts2;
 
     public BuildingRE(Optional<String> refpalette, Optional<PaletteRE> locpalette, String filler, Optional<String> rubble,
-                      Optional<Integer> minCellars, Optional<Integer> minFloors, Optional<Integer> maxCellars, Optional<Integer> maxFloors, Optional<Float> prefersLonely,
-                      List<PartRef> partRefs, Optional<List<PartRef>> partRefs2) {
+                      Optional<Integer> minCellars, Optional<Integer> minFloors, Optional<Integer> maxCellars, Optional<Integer> maxFloors,
+                      Optional<Boolean> allowDoors, Optional<Boolean> allowFillers,
+                      Optional<Float> prefersLonely, List<PartRef> partRefs, Optional<List<PartRef>> partRefs2) {
         this.refPaletteName = refpalette.orElse(null);
         this.localPalette = locpalette.orElse(null);
         this.fillerBlock = filler.charAt(0);
@@ -54,6 +59,8 @@ public class BuildingRE implements IAsset<BuildingRE> {
         this.maxCellars = maxCellars.orElse(-1);
         this.minFloors = minFloors.orElse(-1);
         this.maxFloors = maxFloors.orElse(-1);
+        this.allowDoors = allowDoors.orElse(true);
+        this.allowFillers = allowFillers.orElse(true);
         this.prefersLonely = prefersLonely.orElse(0.0f);
         this.parts = partRefs;
         this.parts2 = partRefs2.orElse(null);
@@ -84,6 +91,14 @@ public class BuildingRE implements IAsset<BuildingRE> {
 
     public int getMaxCellars() {
         return maxCellars;
+    }
+
+    public Boolean getAllowDoors() {
+        return allowDoors;
+    }
+
+    public Boolean getAllowFillers() {
+        return allowFillers;
     }
 
     public char getFillerBlock() {
