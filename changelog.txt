@@ -1,5 +1,6 @@
 Upcoming:
 - TqLxQuanZ fixed a problem where bridges wouldn't use the computed palette
+- TqLxQuanZ implemented optional door generation and cellar filler generation for buildings
 
 1.19.3-6.1.0:
 - Ported to 1.19.3
