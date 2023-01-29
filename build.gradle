@@ -22,7 +22,7 @@ apply plugin: 'maven-publish'
 if (project.file('../gradletools.gradle').exists()) {
     apply from: '../gradletools.gradle'
 } else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/1.19_tech/gradletools.gradle'
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/1.19.3_tech/gradletools.gradle'
 }
 
 repositories {
