@@ -501,9 +501,8 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private static int getAverageCityLevel(LostChunkCharacteristics thisone, int chunkX, int chunkZ, IDimensionInfo provider) {
-        LostChunkCharacteristics topleft = getTopLeftCityInfo(thisone, chunkX, chunkZ, provider);
         int level = 0;
-        MultiPos mp = topleft.multiPos;
+        MultiPos mp = thisone.multiPos;
         int topX = chunkX - mp.x();
         int topZ = chunkZ - mp.z();
         for (int x = 0 ; x < mp.w() ; x++) {
