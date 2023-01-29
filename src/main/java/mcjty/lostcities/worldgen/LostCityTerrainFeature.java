@@ -2784,14 +2784,14 @@ public class LostCityTerrainFeature {
 
             // Check for doors
             boolean isTop = f == floors;   // The top does not need generated doors
-            if (!isTop) {
+            if (!isTop && info.getAllowDoors()) {
                 generateDoors(info, height + 1, f);
             }
 
             height += FLOORHEIGHT;    // We currently only support 6 here
         }
 
-        if (cellars > 0) {
+        if (cellars > 0 && info.getAllowFillers()) {
             // Underground we replace the glass with the filler
             for (int x = 0; x < 16; x++) {
                 // Use safe version because this may end up being lower
