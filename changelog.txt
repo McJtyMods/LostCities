@@ -1,5 +1,6 @@
 Upcoming:
 - TqLxQuanZ fixed a problem where bridges wouldn't use the computed palette
+- TqLxQuanZ implemented optional door generation and cellar filler generation for buildings
 
 1.18-5.3.13:
 - In worldstyles it is now possible to specify settings for city spheres. Including the possibility to predefine how the center of a sphere looks and possibly a part that is generated there
