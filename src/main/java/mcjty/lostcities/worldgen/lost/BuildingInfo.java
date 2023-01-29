@@ -1020,6 +1020,14 @@ public class BuildingInfo implements ILostChunkInfo {
         }
         return maxfloors;
     }
+    
+    public Boolean getAllowDoors() {
+    	return buildingType.getAllowDoors();
+    }
+
+    public Boolean getAllowFillers() {
+    	return buildingType.getAllowFillers();
+    }
 
     public int getHighwayXLevel() {
         return Highway.getXHighwayLevel(chunkX, chunkZ, provider, profile);
