@@ -29,6 +29,16 @@ public interface ILostCityBuilding extends ILostCityAsset {
 
     int getMinCellars();
 
+    /*
+     * Allow the generation of doors.
+     */
+    public Boolean getAllowDoors();
+
+    /*
+     * Allow the generation of filler.
+     */
+    public Boolean getAllowFillers();
+  
     /**
      * The filler block (from the palette) used to do procedural generation of extra
      * features (like the blocks around a door)
