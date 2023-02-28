@@ -1,3 +1,6 @@
+Upcoming:
+- Better error reporting and avoidance of crashing in case of a chunk generation error
+
 1.18-5.3.14:
 - TqLxQuanZ fixed a problem where bridges wouldn't use the computed palette
 - TqLxQuanZ implemented optional door generation and cellar filler generation for buildings

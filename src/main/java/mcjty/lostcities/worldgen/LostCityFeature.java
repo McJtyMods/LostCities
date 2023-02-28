@@ -1,5 +1,6 @@
 package mcjty.lostcities.worldgen;
 
+import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.setup.Config;
@@ -71,7 +72,13 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
                 int chunkX = center.x;
                 int chunkZ = center.z;
                 diminfo.setWorld(level);
-                diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
+                try {
+                    diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
+                } catch (Exception e) {
+                    LostCities.getLogger().error("Error generating chunk {},{}: {}", chunkX, chunkZ, e.getMessage(), e);
+                    ErrorLogger.logChunkInfo(chunkX, chunkZ, diminfo);
+                    ErrorLogger.report("There was an error generating a chunk. See log for details!");
+                }
                 return true;
             }
         }

@@ -387,6 +387,9 @@ public class BuildingInfo implements ILostChunkInfo {
                     if (predefinedBuilding != null) {
                         name = predefinedBuilding.building();
                     }
+                    if (name == null) {
+                        throw new RuntimeException("Invalid building for multibuilding!");
+                    }
                     characteristics.buildingType = AssetRegistries.BUILDINGS.getOrThrow(world, name);
                 }
             }
