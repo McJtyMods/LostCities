@@ -2,7 +2,6 @@ package mcjty.lostcities.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -15,6 +14,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
@@ -28,13 +28,13 @@ public class CommandLocatePart implements Command<CommandSourceStack> {
     public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         return Commands.literal("locatepart")
                 .requires(cs -> cs.hasPermission(1))
-                .then(Commands.argument("name", StringArgumentType.word()).executes(CMD));
+                .then(Commands.argument("name", PartArgumentType.part()).executes(CMD));
     }
 
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        String name = context.getArgument("name", String.class);
+        ResourceLocation name = context.getArgument("name", ResourceLocation.class);
 
         ServerPlayer player = context.getSource().getPlayerOrException();
         BlockPos start = player.blockPosition();
@@ -56,7 +56,7 @@ public class CommandLocatePart implements Command<CommandSourceStack> {
         for (BlockPos.MutableBlockPos mpos : BlockPos.spiralAround(new BlockPos(cp.x, 0, cp.z), 15, Direction.EAST, Direction.SOUTH)) {
             List<EditModeData.PartData> data = EditModeData.getData().getPartData(new ChunkCoord(level.dimension(), mpos.getX(), mpos.getZ()));
             for (EditModeData.PartData pd : data) {
-                if (pd.partName().equals(name)) {
+                if (pd.partName().equals(name.toString())) {
                     context.getSource().sendSuccess(ComponentFactory.literal("Found at " + (mpos.getX() * 16 + 8) + "," + pd.y() + "," + (mpos.getZ() * 16 + 8)), false);
                     cnt++;
                     if (cnt > 6) {

@@ -2,7 +2,6 @@ package mcjty.lostcities.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -17,6 +16,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -27,13 +27,13 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
     public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         return Commands.literal("createpart")
                 .requires(cs -> cs.hasPermission(1))
-                .then(Commands.argument("name", StringArgumentType.word()).executes(CMD));
+                .then(Commands.argument("name", PartArgumentType.part()).executes(CMD));
     }
 
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        String name = context.getArgument("name", String.class);
+        ResourceLocation name = context.getArgument("name", ResourceLocation.class);
         BuildingPart part = AssetRegistries.PARTS.get(context.getSource().getLevel(), name);
         if (part == null) {
             context.getSource().sendFailure(Component.literal("Error finding part '" + name + "'!").withStyle(ChatFormatting.RED));
