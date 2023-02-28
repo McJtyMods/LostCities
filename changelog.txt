@@ -1,5 +1,6 @@
 Upcoming:
 - Better error reporting and avoidance of crashing in case of a chunk generation error
+- The createbuilding, createpart, and locatepart commands will now correctly use resource locations as arguments. They also support completion
 
 1.18-5.3.14:
 - TqLxQuanZ fixed a problem where bridges wouldn't use the computed palette

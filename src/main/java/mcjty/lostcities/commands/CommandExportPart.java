@@ -49,7 +49,7 @@ public class CommandExportPart implements Command<CommandSourceStack> {
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        String name = context.getArgument("name", String.class);
+        String filename = context.getArgument("name", String.class);
         ServerPlayer player = context.getSource().getPlayerOrException();
         EditorInfo editorInfo = EditorInfo.getEditorInfo(player.getUUID());
         if (editorInfo == null) {
@@ -137,12 +137,12 @@ public class CommandExportPart implements Command<CommandSourceStack> {
         String json = gson.toJson(root);
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(name));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
             writer.write(json);
             writer.close();
-            context.getSource().sendSuccess(ComponentFactory.literal("Exported part to '" + name + "'!"), false);
+            context.getSource().sendSuccess(ComponentFactory.literal("Exported part to '" + filename + "'!"), false);
         } catch (IOException e) {
-            context.getSource().sendFailure(new TextComponent("Error writing file '" + name + "'!").withStyle(ChatFormatting.RED));
+            context.getSource().sendFailure(new TextComponent("Error writing file '" + filename + "'!").withStyle(ChatFormatting.RED));
         }
 
         return 0;
