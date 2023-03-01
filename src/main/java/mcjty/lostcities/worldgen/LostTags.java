@@ -20,4 +20,6 @@ public class LostTags {
     public static final ResourceLocation NOT_BREAKABLE = new ResourceLocation(LostCities.MODID, "notbreakable");
     public static final TagKey<Block> NOT_BREAKABLE_TAG = TagKey.create(Registry.BLOCK_REGISTRY, NOT_BREAKABLE);
 
+    public static final ResourceLocation LIGHTS = new ResourceLocation(LostCities.MODID, "lights");
+    public static final TagKey<Block> LIGHTS_TAG = TagKey.create(Registries.BLOCK, LIGHTS);
 }

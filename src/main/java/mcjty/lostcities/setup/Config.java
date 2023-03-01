@@ -18,13 +18,6 @@ public class Config {
 
     public static final String CATEGORY_PROFILES = "profiles";
     public static final String CATEGORY_GENERAL = "general";
-
-    public static final String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
-            "minecraft:glowstone",
-            "minecraft:redstone_torch",
-            "minecraft:lit_pumpkin",
-            "minecraft:magma"
-    };
     public static final boolean DEBUG = false;
 
     public static ForgeConfigSpec.ConfigValue<String> SPECIAL_BED_BLOCK;// = "minecraft:diamond_block";
