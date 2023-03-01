@@ -1,3 +1,6 @@
+Upcoming:
+- New lostcities:lights tag from TqLxQuanZ that Lost Cities will use to check if a block can emit light
+
 1.18-5.3.15:
 - Better error reporting and avoidance of crashing in case of a chunk generation error
 - The createbuilding, createpart, and locatepart commands will now correctly use resource locations as arguments. They also support completion
