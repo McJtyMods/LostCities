@@ -39,6 +39,9 @@ public class BlockTags extends BlockTagsProvider {
             if (block.defaultBlockState().getMaterial() == Material.GLASS) {
                 tag(LostTags.EASY_BREAKABLE_TAG).add(block);
             }
+            if (block.defaultBlockState().getLightEmission() > 0) {
+                tag(LostTags.LIGHTS_TAG).add(block);
+            }
         }
 
         tag(LostTags.ROTATABLE_TAG).addTag(net.minecraft.tags.BlockTags.STAIRS);

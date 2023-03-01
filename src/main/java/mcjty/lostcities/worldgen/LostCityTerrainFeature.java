@@ -204,11 +204,8 @@ public class LostCityTerrainFeature {
     private Set<BlockState> getStatesNeedingLightingUpdate() {
         if (statesNeedingLightingUpdate == null) {
             statesNeedingLightingUpdate = new HashSet<>();
-            for (String s : Config.BLOCKS_REQUIRING_LIGHTING_UPDATES) {
-                Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(s));
-                if (block != null) {
-                    addStates(block, statesNeedingLightingUpdate);
-                }
+            for (Holder<Block> bh : Tools.getBlocksForTag(LostTags.LIGHTS_TAG)) {
+                addStates(bh.value(), statesNeedingLightingUpdate);
             }
         }
         return statesNeedingLightingUpdate;
