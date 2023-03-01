@@ -4,7 +4,9 @@ import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +28,7 @@ public class ErrorLogger {
             lastReportTime = time;
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.RED));
+                player.sendMessage(new TextComponent(message).withStyle(ChatFormatting.RED), Util.NIL_UUID);
             }
         }
     }
