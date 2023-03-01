@@ -38,6 +38,27 @@
     "minecraft:black_stained_glass_pane",
     "minecraft:sea_lantern",
     "minecraft:conduit",
-    "minecraft:tinted_glass"
+    "minecraft:tinted_glass",
+    "rftoolsbuilder:blue_shield_template_block",
+    "rftoolsbuilder:red_shield_template_block",
+    "rftoolsbuilder:green_shield_template_block",
+    "rftoolsbuilder:yellow_shield_template_block",
+    "rftoolsbuilder:shielding_solid",
+    "rftoolsbuilder:shielding_translucent",
+    "rftoolsbuilder:shielding_cutout",
+    "rftoolsstorage:crafting_manager",
+    "deepresonance:dense_glass",
+    "restrictions:oneway",
+    "restrictions:oneway_wall",
+    "lostruins:glassgray3x2_complete",
+    "lostruins:glassgray3x2_pane_complete",
+    "lostruins:glassgray3x2_mossy",
+    "lostruins:glassgray3x2_pane_mossy",
+    "lostruins:glassgray3x2_broken",
+    "lostruins:glassgray3x2_pane_broken",
+    "lostruins:glassgray3x2_broken_mossy",
+    "lostruins:glassgray3x2_pane_broken_mossy",
+    "lostruins:glassgray3x2_vines",
+    "lostruins:glassgray3x2_pane_vines"
   ]
 }
