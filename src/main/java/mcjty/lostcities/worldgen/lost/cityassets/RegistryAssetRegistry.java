@@ -79,6 +79,10 @@ public class RegistryAssetRegistry<T extends ILostCityAsset, R> implements ILost
         return assets.values();
     }
 
+    public int getNumAssets() {
+        return assets.size();
+    }
+
     public void reset() {
         assets.clear();
     }
