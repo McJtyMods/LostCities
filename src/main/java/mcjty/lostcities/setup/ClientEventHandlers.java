@@ -50,7 +50,7 @@ public class ClientEventHandlers {
     @SubscribeEvent
     public void onGuiDraw(ScreenEvent.Render event) {
         if (event.getScreen() instanceof CreateWorldScreen screen && lostCitiesButton != null) {
-            lostCitiesButton.visible = screen.worldGenSettingsVisible;
+            lostCitiesButton.visible = true;    // @todo 1.19.4 screen.worldGenSettingsVisible;
             if (lostCitiesButton.visible) {
                 RenderSystem.setShaderTexture(0, new ResourceLocation(LostCities.MODID, "textures/gui/configicon.png"));
                 GuiComponent.blit(event.getPoseStack(), screen.width - 100, 30, 70, 70, 256, 256, 256, 256, 256, 256);
