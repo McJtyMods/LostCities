@@ -1,4 +1,4 @@
-Upcoming:
+1.19.3-6.1.3:
 - New lostcities:lights tag from TqLxQuanZ that Lost Cities will use to check if a block can emit light
 
 1.19.3-6.1.2:
