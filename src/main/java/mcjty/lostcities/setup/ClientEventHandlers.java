@@ -50,10 +50,10 @@ public class ClientEventHandlers {
     @SubscribeEvent
     public void onGuiDraw(ScreenEvent.Render event) {
         if (event.getScreen() instanceof CreateWorldScreen screen && lostCitiesButton != null) {
-            lostCitiesButton.visible = true;    // @todo 1.19.4 screen.worldGenSettingsVisible;
+            lostCitiesButton.visible = screen.tabManager.getCurrentTab() instanceof CreateWorldScreen.MoreTab;
             if (lostCitiesButton.visible) {
                 RenderSystem.setShaderTexture(0, new ResourceLocation(LostCities.MODID, "textures/gui/configicon.png"));
-                GuiComponent.blit(event.getPoseStack(), screen.width - 100, 30, 70, 70, 256, 256, 256, 256, 256, 256);
+                GuiComponent.blit(event.getPoseStack(), screen.width - 100, 60, 70, 70, 256, 256, 256, 256, 256, 256);
             }
         }
     }
@@ -64,7 +64,8 @@ public class ClientEventHandlers {
             lostCitiesButton = Button.builder(ComponentFactory.literal("Cities"), p_onPress_1_ -> {
 //                WorldType worldType = WorldType.WORLD_TYPES[screen.selectedIndex];
                 Minecraft.getInstance().setScreen(new GuiLCConfig(screen /* @todo 1.16, worldType*/));
-            }).bounds(screen.width - 100, 10, 70, 20).build();
+            }).bounds(screen.width - 100, 40, 70, 20).build();
+            lostCitiesButton.visible = false;
             event.addListener(lostCitiesButton);
         }
     }
