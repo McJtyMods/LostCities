@@ -346,6 +346,9 @@ public class LostCityConfiguration {
         profile.setIconFile("textures/gui/icon_onlycities.png");
         profile.CITY_CHANCE = 0.2f;
         profile.CITY_MAXRADIUS = 256;
+        profile.RAILWAYS_CAN_END = true;
+        profile.RAILWAYS_ENABLED = true;
+        profile.RAILWAY_STATIONS_ENABLED = true;
         profile.CITY_BIOME_FACTORS = new String[] { "river=.5", "frozen_river=.5", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.6" };
         standardProfiles.put(profile.getName(), profile);
 
