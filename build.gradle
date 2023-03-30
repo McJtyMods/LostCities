@@ -25,11 +25,6 @@ if (project.file('../gradletools.gradle').exists()) {
     apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/1.19.4_tech/gradletools.gradle'
 }
 
-repositories {
-    maven { url "https://dvs1.progwml6.com/files/maven" } // JEI
-    maven { url "https://maven.k-4u.nl" } // McJtyLib, TOP
-}
-
 group = "com.github.mcjty"
 archivesBaseName = "lostcities"
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -38,6 +33,7 @@ if (System.getenv('BUILD_NUMBER') != null) {
     version += "-${System.getenv('BUILD_NUMBER')}"
 }
 
+repos()
 runs('lostcities')
 jars('lostcities')
 
