@@ -1,3 +1,6 @@
+Upcoming:
+- Kasualix fixed the day/night cycle in the Lost Cities dimension
+
 1.18-5.3.16:
 - New lostcities:lights tag from TqLxQuanZ that Lost Cities will use to check if a block can emit light
 
