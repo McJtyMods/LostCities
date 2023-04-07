@@ -1,4 +1,4 @@
-Upcoming:
+1.19.4-6.2.1:
 - Kasualix fixed the day/night cycle in the Lost Cities dimension
 - It should now again be possible to use Lost Cities server side only
 
