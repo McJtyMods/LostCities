@@ -12,6 +12,7 @@ import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -28,7 +29,9 @@ public class CommandLocatePart implements Command<CommandSourceStack> {
     public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         return Commands.literal("locatepart")
                 .requires(cs -> cs.hasPermission(1))
-                .then(Commands.argument("name", PartArgumentType.part()).executes(CMD));
+                .then(Commands.argument("name", ResourceLocationArgument.id()).suggests(
+                        ModCommands.getPartSuggestionProvider()
+                ).executes(CMD));
     }
 
 

@@ -1,5 +1,6 @@
 Upcoming:
 - Kasualix fixed the day/night cycle in the Lost Cities dimension
+- It should now again be possible to use Lost Cities server side only
 
 1.19.3-6.1.3:
 - New lostcities:lights tag from TqLxQuanZ that Lost Cities will use to check if a block can emit light
