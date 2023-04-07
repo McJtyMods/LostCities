@@ -34,7 +34,8 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
     public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         return Commands.literal("createbuilding")
                 .requires(cs -> cs.hasPermission(1))
-                .then(Commands.argument("name", BuildingArgumentType.building())
+                .then(Commands.argument("name", ResourceLocationArgument.id())
+                        .suggests(ModCommands.getBuildingSuggestionProvider())
                         .then(Commands.argument("floors", IntegerArgumentType.integer(1, 20))
                                 .then(Commands.argument("cellars", IntegerArgumentType.integer(0, 10)).executes(CMD))));
     }

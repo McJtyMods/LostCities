@@ -14,6 +14,7 @@ import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.Component;
@@ -28,9 +29,10 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
     public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         return Commands.literal("createpart")
                 .requires(cs -> cs.hasPermission(1))
-                .then(Commands.argument("name", PartArgumentType.part()).executes(CMD));
+                .then(Commands.argument("name", ResourceLocationArgument.id())
+                        .suggests(ModCommands.getPartSuggestionProvider())
+                        .executes(CMD));
     }
-
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
