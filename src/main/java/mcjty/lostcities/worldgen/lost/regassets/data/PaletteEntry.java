@@ -119,4 +119,20 @@ public class PaletteEntry {
         this.torch = torch.orElse(null);
         this.tag = tag.orElse(null);
     }
+
+    @Override
+    public String toString() {
+        return "PaletteEntry{" +
+                "chr='" + chr + '\'' +
+                ", block='" + block + '\'' +
+                ", variant='" + variant + '\'' +
+                ", frompalette='" + frompalette + '\'' +
+                ", blocks=" + blocks +
+                ", damaged='" + damaged + '\'' +
+                ", mob='" + mob + '\'' +
+                ", loot='" + loot + '\'' +
+                ", torch=" + torch +
+                ", tag=" + tag +
+                '}';
+    }
 }
