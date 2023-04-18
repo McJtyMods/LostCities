@@ -25,7 +25,7 @@ public class LostCityConfiguration {
     public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
     public static final String PRIVATE_PROFILES_COMMENT = "List of privatep profiles that cannot be selected by the player but are only used as a child profile of another one";
 
-    public static final String[] DEFAULT_PROFILES = new String[]{"default", "cavern", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
+    public static final String[] DEFAULT_PROFILES = new String[]{"default", "cavern", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "nospawner", "ancient", "wasteland", "chisel", "atlantis", "realistic"};
     public static final String[] PRIVATE_PROFILES = new String[]{"bio_wasteland", "water_empty"};
 
     public static String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
@@ -378,6 +378,15 @@ public class LostCityConfiguration {
         profile.GENERATE_LOOT = false;
         standardProfiles.put(profile.getName(), profile);
 
+        profile = new LostCityProfile("nospawner", true);
+        profile.setDescription("No spawners, no lights. Contains loot.");
+        profile.setExtraDescription("Works best with other mods");
+        profile.setIconFile("textures/gui/icon_safe.png");
+        profile.GENERATE_SPAWNERS = false;
+        profile.GENERATE_LIGHTING = false;
+        profile.GENERATE_LOOT = true;
+        standardProfiles.put(profile.getName(), profile);
+        
         profile = new LostCityProfile("ancient", true);
         profile.setDescription("Ancient jungle city, vines and leafs, ruined buildings");
         profile.setExtraDescription("Note! This disables many biomes like deserts, plains, extreme hills, ...");
@@ -387,7 +396,7 @@ public class LostCityConfiguration {
         profile.VINE_CHANCE = 0.1f;
         profile.EXPLOSION_CHANCE = 0;
         profile.MINI_EXPLOSION_CHANCE = 0;
-//        profile.MINI_EXPLOSION_MAXRADIUS = 10;
+//        profile.MINI_EXPLOSION_MAXRADIUS = 10; <--- why is this here?
         profile.RUBBLELAYER = true;
         profile.RUBBLE_DIRT_SCALE = 2.0f;
         profile.RUBBLE_LEAVE_SCALE = 2.0f;
