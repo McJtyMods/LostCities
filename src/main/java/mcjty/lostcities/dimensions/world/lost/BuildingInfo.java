@@ -95,6 +95,8 @@ public class BuildingInfo implements ILostChunkInfo {
     // A list of todo's for mob spawners and other things
     private final List<Pair<BlockPos, ConditionTodo>> mobSpawnerTodo = new ArrayList<>();
     private final List<Pair<BlockPos, ConditionTodo>> lootTodo = new ArrayList<>();
+
+    private final List<BlockPos> tileEntityTodo = new ArrayList<>();
     private final List<BlockPos> lightingUpdateTodo = new ArrayList<>();
     private final List<Pair<IIndex, Map<String, Integer>>> torchTodo = new ArrayList<>();
     private final List<BlockPos> saplingTodo = new ArrayList<>();
@@ -171,6 +173,10 @@ public class BuildingInfo implements ILostChunkInfo {
         mobSpawnerTodo.add(Pair.of(pos, mobId));
     }
 
+    public void addTileEntityTodo(BlockPos pos) {
+        this.tileEntityTodo.add(pos);
+    }
+
     public void addLootTodo(BlockPos pos, @Nullable ConditionTodo lootTable) {
         lootTodo.add(Pair.of(pos, lootTable));
     }
@@ -183,12 +189,20 @@ public class BuildingInfo implements ILostChunkInfo {
         return lootTodo;
     }
 
+    public List<BlockPos> getTileEntityTodo() {
+        return this.tileEntityTodo;
+    }
+
     public void clearMobSpawnerTodo() {
         mobSpawnerTodo.clear();
     }
 
     public void clearLootTodo() {
         lootTodo.clear();
+    }
+
+    public void clearTileEntityTodo() {
+        this.tileEntityTodo.clear();
     }
 
     public CompiledPalette getCompiledPalette() {
@@ -845,7 +859,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         if (rand.nextFloat() < profile.BUILDING_FRONTCHANCE) {
-            frontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand));
+            frontType = AssetRegistries.PARTS.get(getCityStyle().getRandomFront(rand, null));
         } else {
             frontType = null;
         }

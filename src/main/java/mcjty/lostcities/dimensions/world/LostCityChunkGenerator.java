@@ -475,6 +475,13 @@ public class LostCityChunkGenerator implements IChunkGenerator, ILostChunkGenera
         }
         info.clearLootTodo();
 
+        for (BlockPos pos : info.getTileEntityTodo()) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te != null)  te.markDirty(); // This is the most important line of code in my entire commit - Dalton
+
+        }
+        info.clearTileEntityTodo(); // remember to clear this list
+
 
         for (BlockPos pos : info.getLightingUpdateTodo()) {
             IBlockState state = world.getBlockState(pos);
