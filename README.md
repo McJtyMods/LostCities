@@ -1,12 +1,14 @@
-# LostCities
+# The Lost Cities (1.12.2)
 
-The original reason for this forks creation stems from this issue: https://github.com/McJtyMods/LostCities/issues/155
+Hello and welcome to Strubium steals code from people to make a old mod slightly better 
 
-For some reason in 1.12.2 TileEntitys do NOT get any special treatment and are placed as normal blocks without any type of special treatment (Chests and Spawners do, but simply because they are hard coded in the mod as TileEntities and they receive a dirty mark to update)
+(90% of code from here: https://github.com/Burchard36/LostCities-RenderFix)
 
-This fix aims to combat this render glitch by adding in a config option to palettes. Here is an example palette:
+Bugs Fixed:
 
-(For some reason, it took me 20 minutes to parse this json lmfao)
+* In 1.12.2 TileEntitys not gettting special treatment and being placed as normal blocks. (Not at all my work, this is the power of Burchard36) 
+
+Example of what is now possible. (Code again from Burchard36)
 ```json
 {
    "type":"palette",
@@ -34,8 +36,6 @@ This fix aims to combat this render glitch by adding in a config option to palet
 }
 ```
 
-Notice that even though not all entries of `blocks` are TileEntities. Thats fine the mod will just ignore them and not update the blocks that are not TileEntities. This also works for single `block` entries as well!
-
-"Why cant you automatically update TileEntities" - This bug is rather unique & im not going into full detail, it took a lot of time to get this working so this will be an end goal soon & the config option removed
-
-This mod also will add in directional highways for X and Z that way you can line up your blocks properly for very detailed roads!
+## Changes
+* Everything is Bugs Fixed, duh
+* New "nospawner" profile. Generates buildings with loot but without mod spawners.  
