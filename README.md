@@ -6,7 +6,7 @@ Hello and welcome to Strubium steals code from people to make a old mod slightly
 
 Bugs Fixed:
 
-* In 1.12.2 TileEntitys not gettting special treatment and being placed as normal blocks. (Not at all my work, this is the power of Burchard36) 
+* TileEntitys not gettting special treatment and being placed as normal blocks. (Not at all my work, this is the power of Burchard36) 
 
 Example of what is now possible. (Code again from Burchard36)
 ```json
@@ -37,5 +37,6 @@ Example of what is now possible. (Code again from Burchard36)
 ```
 
 ## Changes
-* Everything is Bugs Fixed, duh
-* New "nospawner" profile. Generates buildings with loot but without mod spawners.  
+* Everything is Bugs Fixed, duh.
+* New "nospawner" profile. Generates buildings with loot, but without mod spawners. 
+* Tweeks to the "onlycity" profile. Railways + Highways. 
