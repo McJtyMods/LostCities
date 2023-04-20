@@ -299,9 +299,7 @@ public class LostCityConfiguration {
         profile.MINI_EXPLOSION_MAXHEIGHT = 75;
         profile.MINI_EXPLOSION_MINRADIUS = 5;
         profile.MINI_EXPLOSION_MAXRADIUS = 10;
-//        profile.WATERLEVEL_OFFSET = -3;           // @EXP
         profile.WATERLEVEL_OFFSET = 70;
-
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
@@ -313,9 +311,7 @@ public class LostCityConfiguration {
         profile.RUBBLELAYER = false;
         profile.GROUNDLEVEL = 60;
         profile.CITYSPHERE_CHANCE = 0.4f;
-//        profile.CITY_CHANCE = 0.3f;       // @EXP
         profile.CITY_CHANCE = 0.7f;
-
         profile.CITY_MAXRADIUS = 90;
         profile.CITY_THRESSHOLD = .05f;
         profile.CITY_LEVEL0_HEIGHT = 60;
@@ -346,10 +342,13 @@ public class LostCityConfiguration {
         profile.setIconFile("textures/gui/icon_onlycities.png");
         profile.CITY_CHANCE = 0.2f;
         profile.CITY_MAXRADIUS = 256;
+        profile.HIGHWAY_REQUIRES_TWO_CITIES = false;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = true;
         profile.RAILWAY_STATIONS_ENABLED = true;
-        profile.CITY_BIOME_FACTORS = new String[] { "river=.5", "frozen_river=.5", "ocean=.7", "frozen_ocean=.7", "deep_ocean=.6" };
+        profile.GENERATE_LAKES = false;
+        profile.GENERATE_OCEANMONUMENTS = false;
+        profile.CITY_BIOME_FACTORS = new String[] { "river=1.2", "frozen_river=.3", "ocean=.9", "frozen_ocean=.6", "deep_ocean=.6" };
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("tallbuildings", true);
@@ -453,12 +452,6 @@ public class LostCityConfiguration {
         profile.setIconFile("textures/gui/icon_realistic.png");
         profile.GENERATOR_OPTIONS = "{\"coordinateScale\":175.0,\"heightScale\":75.0,\"lowerLimitScale\":512.0,\"upperLimitScale\":512.0,\"depthNoiseScaleX\":200.0,\"depthNoiseScaleZ\":200.0,\"depthNoiseScaleExponent\":0.5,\"mainNoiseScaleX\":165.0,\"mainNoiseScaleY\":106.61267,\"mainNoiseScaleZ\":165.0,\"baseSize\":8.267606,\"stretchY\":13.387607,\"biomeDepthWeight\":1.2,\"biomeDepthOffset\":0.2,\"biomeScaleWeight\":3.4084506,\"biomeScaleOffset\":0.0,\"seaLevel\":63,\"useCaves\":true,\"useDungeons\":true,\"dungeonChance\":7,\"useStrongholds\":true,\"useVillages\":true,\"useMineShafts\":true,\"useTemples\":true,\"useMonuments\":true,\"useRavines\":true,\"useWaterLakes\":true,\"waterLakeChance\":49,\"useLavaLakes\":true,\"lavaLakeChance\":80,\"useLavaOceans\":false,\"fixedBiome\":-1,\"biomeSize\":4,\"riverSize\":5,\"dirtSize\":33,\"dirtCount\":10,\"dirtMinHeight\":0,\"dirtMaxHeight\":256,\"gravelSize\":33,\"gravelCount\":8,\"gravelMinHeight\":0,\"gravelMaxHeight\":256,\"graniteSize\":33,\"graniteCount\":10,\"graniteMinHeight\":0,\"graniteMaxHeight\":80,\"dioriteSize\":33,\"dioriteCount\":10,\"dioriteMinHeight\":0,\"dioriteMaxHeight\":80,\"andesiteSize\":33,\"andesiteCount\":10,\"andesiteMinHeight\":0,\"andesiteMaxHeight\":80,\"coalSize\":17,\"coalCount\":20,\"coalMinHeight\":0,\"coalMaxHeight\":128,\"ironSize\":9,\"ironCount\":20,\"ironMinHeight\":0,\"ironMaxHeight\":64,\"goldSize\":9,\"goldCount\":2,\"goldMinHeight\":0,\"goldMaxHeight\":32,\"redstoneSize\":8,\"redstoneCount\":8,\"redstoneMinHeight\":0,\"redstoneMaxHeight\":16,\"diamondSize\":8,\"diamondCount\":1,\"diamondMinHeight\":0,\"diamondMaxHeight\":16,\"lapisSize\":7,\"lapisCount\":1,\"lapisCenterHeight\":16,\"lapisSpread\":16}";
         standardProfiles.put(profile.getName(), profile);
-
-//        profile = new LostCityProfile("islands");
-//        profile.setDescription("Floating islands!");
-//        profile.GENERATOR_OPTIONS = "{\"coordinateScale\":375.0,\"heightScale\":6000.0,\"lowerLimitScale\":1025.0,\"upperLimitScale\":200.0,\"depthNoiseScaleX\":200.0,\"depthNoiseScaleZ\":200.0,\"depthNoiseScaleExponent\":0.5,\"mainNoiseScaleX\":80.0,\"mainNoiseScaleY\":160.0,\"mainNoiseScaleZ\":80.0,\"baseSize\":1.0,\"stretchY\":5.65,\"biomeDepthWeight\":1.0,\"biomeDepthOffset\":0.0,\"biomeScaleWeight\":1.0,\"biomeScaleOffset\":0.0,\"seaLevel\":47,\"useCaves\":true,\"useDungeons\":true,\"dungeonChance\":100,\"useStrongholds\":true,\"useVillages\":true,\"useMineShafts\":true,\"useTemples\":true,\"useMonuments\":true,\"useRavines\":true,\"useWaterLakes\":true,\"waterLakeChance\":1,\"useLavaLakes\":true,\"lavaLakeChance\":80,\"useLavaOceans\":false,\"fixedBiome\":-1,\"biomeSize\":1,\"riverSize\":5,\"dirtSize\":18,\"dirtCount\":8,\"dirtMinHeight\":0,\"dirtMaxHeight\":256,\"gravelSize\":22,\"gravelCount\":8,\"gravelMinHeight\":0,\"gravelMaxHeight\":256,\"graniteSize\":22,\"graniteCount\":8,\"graniteMinHeight\":95,\"graniteMaxHeight\":255,\"dioriteSize\":22,\"dioriteCount\":8,\"dioriteMinHeight\":95,\"dioriteMaxHeight\":255,\"andesiteSize\":22,\"andesiteCount\":8,\"andesiteMinHeight\":95,\"andesiteMaxHeight\":255,\"coalSize\":17,\"coalCount\":20,\"coalMinHeight\":125,\"coalMaxHeight\":255,\"ironSize\":9,\"ironCount\":23,\"ironMinHeight\":134,\"ironMaxHeight\":255,\"goldSize\":9,\"goldCount\":4,\"goldMinHeight\":175,\"goldMaxHeight\":255,\"redstoneSize\":8,\"redstoneCount\":8,\"redstoneMinHeight\":175,\"redstoneMaxHeight\":255,\"diamondSize\":8,\"diamondCount\":3,\"diamondMinHeight\":175,\"diamondMaxHeight\":255,\"lapisSize\":7,\"lapisCount\":2,\"lapisCenterHeight\":150,\"lapisSpread\":16}";
-//        standardProfiles.put(profile.getName(), profile);
-
 
         profile = new LostCityProfile("water_empty", false);
         profile.setDescription("Private empty terrain for waterbubbles");
