@@ -15,11 +15,6 @@ apply plugin: 'net.minecraftforge.gradle'
 
 repositories {
 
-    /*maven { // The repo from which to get waila
-        name "Mobius Repo"
-        url "https://tehnut.info/maven"
-        //url "http://mobiusstrip.eu/maven"
-    }*/
     maven { // JEI
         url "https://dvs1.progwml6.com/files/maven"
     }
@@ -74,8 +69,6 @@ minecraft {
 
     accessTransformer = file('src/main/resources/META-INF/lostcities_at.cfg')
 
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
     runs {
@@ -129,19 +122,11 @@ task deobfJar(type: Jar) {
 
 
 dependencies {
-    //implementation 'com.github.MinecraftForge:ForgeGradle:5.1'
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2859'
     implementation "mezz.jei:jei_${jei_version}"
-    //implementation "mcp.mobius.waila:Hwyla:${waila_version}"
     implementation "mcjty.theoneprobe:TheOneProbe-${top_version}"
     implementation "cofh:RedstoneFlux:${redstoneflux_version}"
-    //deobfCompile "mcp.mobius.waila:Hwyla:1.8.10-B23_1.11:api"
-    //deobfCompile "mcjty.theoneprobe:TheOneProbe:1.1x-1.4.7-57"
-    //deobfCompile "team.chisel:Chisel:MC1.11.2-0.0.10.14"
-    //deobfCompile "com.github.mcjty:compatlayer:1.11.2-0.2.6"
-    //deobfCompile "com.github.mcjty:intwheel:1.1x-1.2.6"
 
-    //compile "li.cil.oc:OpenComputers:MC1.7.10-1.5.+:api"
 }
 
 jar {
