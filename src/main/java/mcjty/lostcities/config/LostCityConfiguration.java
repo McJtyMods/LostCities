@@ -456,8 +456,9 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("geopol", true);
         profile.setDescription("GeoPol's Lostcites profile");
         profile.setIconFile("textures/gui/icon_cavern.png");
-        profile.RUINS = true;
-        profile.RUBBLELAYER = true;
+        profile.GENERATE_SPAWNERS = false;
+        profile.GENERATE_LIGHTING = false;
+        profile.GENERATE_LOOT = true;
         profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
         profile.MAX_CAVE_HEIGHT = 64;
         profile.DIMENSION_BOP = true;
