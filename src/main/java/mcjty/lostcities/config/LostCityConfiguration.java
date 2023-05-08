@@ -461,7 +461,6 @@ public class LostCityConfiguration {
         profile.GENERATE_LOOT = true;
         profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
         profile.MAX_CAVE_HEIGHT = 64;
-        profile.DIMENSION_BOP = true;
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("water_empty", false);
