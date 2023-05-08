@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   build:
-
+  
     runs-on: ubuntu-latest
 
     steps:
@@ -37,4 +37,13 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: Package
+        path: build/libs
+    
+  download:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/download-artifact@v3
+      with:
+        name: my-artifact
         path: build/libs
