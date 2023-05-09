@@ -459,6 +459,11 @@ public class LostCityConfiguration {
         profile.GENERATE_SPAWNERS = false;
         profile.GENERATE_LIGHTING = false;
         profile.GENERATE_LOOT = true;
+        profile.CITY_CHANCE = 0.009f;
+        profile.RUINS = false;
+        profile.CITY_MAXRADIUS = 90;
+        profile.HIGHWAY_REQUIRES_TWO_CITIES = false;
+        profile.RAILWAYS_CAN_END = true;
         profile.PREVENT_LAKES_RAVINES_IN_CITIES = true;
         profile.MAX_CAVE_HEIGHT = 64;
         standardProfiles.put(profile.getName(), profile);

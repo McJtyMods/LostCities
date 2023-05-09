@@ -6,9 +6,11 @@ Hello and welcome to Strubium steals code from people to make a old mod slightly
 
 (Original Mod: https://github.com/McJtyMods/LostCities)
 
-Bugs Fixed:
-
-* TileEntitys not gettting special treatment and being placed as normal blocks. (Not at all my work, this is the power of Burchard36) 
+## Changes
+* TileEntitys now get special treatment and arent placed as normal blocks. (Not my work, this is the power of Burchard36) 
+* New "nospawner" profile. Generates buildings with loot, but without mod spawners.
+* New "geopol" profile. Generate cities with the power of [GeoPol!](https://github.com/markgyoni/geopol)
+* Tweeks to the "onlycity" profile. Railways + Highways. 
 
 Example of what is now possible. (Code again from Burchard36)
 ```json
@@ -39,7 +41,6 @@ Example of what is now possible. (Code again from Burchard36)
 ```
 Note that even if <code>tile_entity</code> is <code>true</code>, not all <code>block</code>'s need to tile_entitys, they will be placed "normally" without calculations on their direction.  
 
-## Changes
-* Everything is Bugs Fixed, duh.
-* New "nospawner" profile. Generates buildings with loot, but without mod spawners. 
-* Tweeks to the "onlycity" profile. Railways + Highways. 
+## Future Plans
+* A palette that uses MWC Props 
+* Remastered Chisel profile (It will look nicer)
