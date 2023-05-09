@@ -40,3 +40,7 @@ Example of what is now possible. (Code again from Burchard36)
 }
 ```
 Note that even if <code>tile_entity</code> is <code>true</code>, not all <code>block</code>'s need to tile_entitys, they will be placed "normally" without calculations on their direction.  
+
+## Future Plans
+* A palette that uses MWC Props 
+* Remastered Chisel profile (It will look nicer)
