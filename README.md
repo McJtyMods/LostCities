@@ -1,5 +1,4 @@
-# The Lost Cities (1.12.2)  <img src="https://tokei.rs/b1/github/strubium/LostCities-1.12.2-?category=code" alt="Lines of Code"/> <img src="https://img.shields.io/github/languages/code-size/strubium/
-LostCities-1.12.2-.svg" alt="Code size"/>
+# The Lost Cities (1.12.2)  <img src="https://tokei.rs/b1/github/strubium/LostCities-1.12.2-?category=code" alt="Lines of Code"/> <img src="https://img.shields.io/github/languages/code-size/strubium/LostCities-1.12.2-.svg" alt="Code size"/>
 
 Hello and welcome to Strubium steals code from people to make a old mod slightly better 
 
