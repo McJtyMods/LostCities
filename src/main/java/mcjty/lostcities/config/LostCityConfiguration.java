@@ -347,7 +347,7 @@ public class LostCityConfiguration {
         profile.RAILWAY_STATIONS_ENABLED = true;
         profile.GENERATE_LAKES = false;
         profile.GENERATE_OCEANMONUMENTS = false;
-        profile.CITY_BIOME_FACTORS = new String[] { "river=1.2", "frozen_river=.3", "ocean=.9", "frozen_ocean=.6", "deep_ocean=.6" };
+        profile.CITY_BIOME_FACTORS = new String[] { "river=1.2", "frozen_river=.3", "ocean=.9", "frozen_ocean=.6", "deep_ocean=.6", "plains=.6" , "forest=.6" };
         standardProfiles.put(profile.getName(), profile);
 
         profile = new LostCityProfile("tallbuildings", true);
