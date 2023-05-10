@@ -455,7 +455,7 @@ public class LostCityConfiguration {
         
         profile = new LostCityProfile("geopol", true);
         profile.setDescription("GeoPol's Lostcites profile");
-        profile.setIconFile("textures/gui/icon_cavern.png");
+        profile.setIconFile("textures/gui/transparentlogo.png");
         profile.GENERATE_SPAWNERS = false;
         profile.GENERATE_LIGHTING = false;
         profile.GENERATE_LOOT = true;
