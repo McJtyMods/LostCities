@@ -1,10 +1,10 @@
 [
 {
-  "modid": "lostcitiessquared",
+  "modid": "lostcities",
   "name": "The Lost Cities",
   "description": "The Lost Cities World Generator",
-  "version": ".5.1",
-  "mcversion": "1.12.2",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
   "authorList": ["McJty, strubium"],
