@@ -459,7 +459,7 @@ public class LostCityConfiguration {
         profile.GENERATE_SPAWNERS = false;
         profile.GENERATE_LIGHTING = false;
         profile.GENERATE_LOOT = true;
-        profile.CITY_CHANCE = 0.001f;
+        profile.CITY_CHANCE = 0.009f;
         profile.RUINS = false;
         profile.CITY_MAXRADIUS = 90;
         profile.HIGHWAY_REQUIRES_TWO_CITIES = false;
