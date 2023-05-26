@@ -5,6 +5,7 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
@@ -89,6 +90,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     public IDimensionInfo getDimensionInfo(WorldGenLevel world) {
         if (globalDimensionInfoDirtyCounter != dimensionInfoDirtyCounter) {
             // Force clear of cache
+            AssetRegistries.reset();
             dimensionInfo.clear();
             dimensionInfoDirtyCounter = globalDimensionInfoDirtyCounter;
         }
