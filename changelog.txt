@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.0.16:
 - TqLxQuanZ fixed a problem with the asset registry cache not being cleaned if you (in single player) exit from a world and load a new one
 
 1.19-6.0.15:
