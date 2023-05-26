@@ -1,3 +1,6 @@
+Upcoming:
+- TqLxQuanZ fixed a problem with the asset registry cache not being cleaned if you (in single player) exit from a world and load a new one
+
 1.19-6.0.15:
 - Kasualix fixed the day/night cycle in the Lost Cities dimension
 - It should now again be possible to use Lost Cities server side only
