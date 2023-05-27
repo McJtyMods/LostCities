@@ -867,7 +867,8 @@ public class BuildingInfo implements ILostChunkInfo {
             floors = f;
 
             int maxcellars = getMaxcellars(cs);
-            int fb = profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars+1));
+            int mincellars = Math.max(profile.BUILDING_MINCELLARS, buildingType.getMinCellars());
+            int fb = mincellars + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars+1));
             if (getMaxHighwayLevel() >= 0) {
                 // If we are above a highway we make sure we can't have too many cellars
                 fb = Math.min(cityLevel-getMaxHighwayLevel()-1, fb);
