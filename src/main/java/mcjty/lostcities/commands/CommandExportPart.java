@@ -65,7 +65,7 @@ public class CommandExportPart implements Command<CommandSourceStack> {
 
         BlockPos start = editorInfo.getBottomLocation();
 
-        ServerLevel level = player.getLevel();
+        ServerLevel level = (ServerLevel) player.level();
         IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
         if (dimInfo == null) {
             context.getSource().sendFailure(ComponentFactory.literal("This dimension doesn't support Lost Cities!"));
@@ -140,7 +140,7 @@ public class CommandExportPart implements Command<CommandSourceStack> {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
             writer.write(json);
             writer.close();
-            context.getSource().sendSuccess(ComponentFactory.literal("Exported part to '" + filename + "'!"), false);
+            context.getSource().sendSuccess(() -> ComponentFactory.literal("Exported part to '" + filename + "'!"), false);
         } catch (IOException e) {
             context.getSource().sendFailure(Component.literal("Error writing file '" + filename + "'!").withStyle(ChatFormatting.RED));
         }

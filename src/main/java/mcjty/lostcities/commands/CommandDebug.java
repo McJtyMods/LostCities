@@ -15,6 +15,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.WorldGenLevel;
 
 public class CommandDebug implements Command<CommandSourceStack> {
 
@@ -32,7 +33,7 @@ public class CommandDebug implements Command<CommandSourceStack> {
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         BlockPos position = player.blockPosition();
-        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(player.getLevel());
+        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo((WorldGenLevel) player.level());
         if (dimInfo != null) {
             BuildingInfo info = BuildingInfo.getBuildingInfo(position.getX() >> 4, position.getZ() >> 4, dimInfo);
             System.out.println("profile = " + info.profile.getName());
@@ -70,7 +71,7 @@ public class CommandDebug implements Command<CommandSourceStack> {
             int explosions = info.getExplosions().size();
             System.out.println("explosions = " + explosions);
 
-            ChunkHeightmap heightmap = dimInfo.getFeature().getHeightmap(info.coord, player.getLevel());
+            ChunkHeightmap heightmap = dimInfo.getFeature().getHeightmap(info.coord, (WorldGenLevel) player.level());
             int avg = 0;
             for (int x = 0 ; x < 16 ; x++) {
                 for (int z = 0 ; z < 16 ; z++) {

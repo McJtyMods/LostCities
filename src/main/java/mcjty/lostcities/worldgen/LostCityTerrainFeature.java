@@ -17,7 +17,6 @@ import mcjty.lostcities.worldgen.lost.cityassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -46,7 +45,6 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
@@ -1200,14 +1198,13 @@ public class LostCityTerrainFeature {
 
     // Return true if state is air or liquid
     private static boolean isEmpty(BlockState state) {
-        Material material = state.getMaterial();
-        if (material == Material.AIR) {
+        if (state.isAir()) {
             return true;
         }
-        if (material == Material.WATER) {
+        if (state.is(Blocks.WATER)) {
             return true;
         }
-        if (material == Material.LAVA) {
+        if (state.is(Blocks.LAVA)) {
             return true;
         }
         return false;
@@ -1237,7 +1234,7 @@ public class LostCityTerrainFeature {
         driver.current(x, height, z);
         while (idx > 0) {
             BlockState blockToMove = driver.getBlock(x, idx, z);
-            if (blockToMove.getMaterial() == Material.AIR || blockToMove.getBlock() == Blocks.BEDROCK) {
+            if (blockToMove.isAir() || blockToMove.getBlock() == Blocks.BEDROCK) {
                 break;
             }
             driver.block(blockToMove);

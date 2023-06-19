@@ -1,10 +1,9 @@
 package mcjty.lostcities.gui.elements;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
 import mcjty.lostcities.varia.ComponentFactory;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 
 public class DoubleElement extends GuiElement {
@@ -68,13 +67,13 @@ public class DoubleElement extends GuiElement {
     }
 
     @Override
-    public void render(PoseStack stack) {
+    public void render(GuiGraphics graphics) {
         if (field.visible) {
             if (label != null) {
-                GuiComponent.drawString(stack, gui.getFont(), label, 10, y + 5, 0xffffffff);
+                graphics.drawString(gui.getFont(), label, 10, y + 5, 0xffffffff);
             }
             if (prefix != null) {
-                GuiComponent.drawString(stack, gui.getFont(), prefix, x - 8, y + 5, 0xffffffff);
+                graphics.drawString(gui.getFont(), prefix, x - 8, y + 5, 0xffffffff);
             }
         }
     }

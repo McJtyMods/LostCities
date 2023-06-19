@@ -12,6 +12,7 @@ import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -266,25 +267,25 @@ public class GuiLCConfig extends Screen {
         CitySphere.cleanCache();
     }
 
-    private void renderExtra(PoseStack stack) {
-        drawString(stack, font, "Profile:", 10, 16, 0xffffffff);
-        elements.forEach(el -> el.render(stack));
+    private void renderExtra(GuiGraphics graphics) {
+        graphics.drawString(font, "Profile:", 10, 16, 0xffffffff);
+        elements.forEach(el -> el.render(graphics));
 
         localSetup.get().ifPresent(profile -> {
             if ("Cities".equals(mode)) {
-                renderPreviewMap(stack, profile, false);
+                renderPreviewMap(graphics, profile, false);
             } else if ("Buildings".equals(mode)) {
-                renderPreviewCity(stack, profile, false);
+                renderPreviewCity(graphics, profile, false);
             } else if ("Damage".equals(mode)) {
-                renderPreviewCity(stack, profile, true);
+                renderPreviewCity(graphics, profile, true);
             } else if ("Transport".equals(mode)) {
-                renderPreviewTransports(stack, profile);
+                renderPreviewTransports(graphics, profile);
             }
         });
     }
 
-    private void renderPreviewTransports(PoseStack stack, LostCityProfile profile) {
-        renderPreviewMap(stack, profile, true);
+    private void renderPreviewTransports(GuiGraphics graphics, LostCityProfile profile) {
+        renderPreviewMap(graphics, profile, true);
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
         for (int z = 0; z < NullDimensionInfo.PREVIEW_HEIGHT; z++) {
             for (int x = 0; x < NullDimensionInfo.PREVIEW_WIDTH; x++) {
@@ -305,17 +306,17 @@ public class GuiLCConfig extends Screen {
                     }
                 }
                 if (color != 0) {
-                    fill(stack, sx, sz, sx + 3, sz + 3, color);
+                    graphics.fill(sx, sz, sx + 3, sz + 3, color);
                 }
             }
         }
     }
 
-    private void renderPreviewCity(PoseStack stack, LostCityProfile profile, boolean showDamage) {
+    private void renderPreviewCity(GuiGraphics graphics, LostCityProfile profile, boolean showDamage) {
         int base = 50 + 120;
         int leftRender = this.width - 157;
-        fill(stack, leftRender, 50, leftRender + 150, base, 0xff0099bb);
-        fill(stack, leftRender, base, leftRender + 150, 50 + 150, 0xff996633);
+        graphics.fill(leftRender, 50, leftRender + 150, base, 0xff0099bb);
+        graphics.fill(leftRender, base, leftRender + 150, 50 + 150, 0xff996633);
 
         float radius = 190;
         int dimHor = 10;
@@ -346,13 +347,13 @@ public class GuiLCConfig extends Screen {
                     f = minfloors;
                 }
                 for (int i = 0; i < f; i++) {
-                    fill(stack, leftRender + dimHor * x, base - i * dimVer - dimVer, leftRender + dimHor * x + dimHor - 1, base - i * dimVer + dimVer - 1 - dimVer, 0xffffffff);
+                    graphics.fill(leftRender + dimHor * x, base - i * dimVer - dimVer, leftRender + dimHor * x + dimHor - 1, base - i * dimVer + dimVer - 1 - dimVer, 0xffffffff);
                 }
 
                 int maxcellars = profile.BUILDING_MAXCELLARS;
                 int fb = profile.BUILDING_MINCELLARS + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars + 1));
                 for (int i = 0; i < fb; i++) {
-                    fill(stack, leftRender + dimHor * x, base + i * dimVer, leftRender + dimHor * x + dimHor - 1, base + i * dimVer + dimVer - 1, 0xff333333);
+                    graphics.fill(leftRender + dimHor * x, base + i * dimVer, leftRender + dimHor * x + dimHor - 1, base + i * dimVer + dimVer - 1, 0xff333333);
                 }
             }
         }
@@ -372,7 +373,7 @@ public class GuiLCConfig extends Screen {
                     if (dist < explosionRadius - 3) {
                         double damage = 3.0f * (explosionRadius - dist) / explosionRadius;
                         if (rnd.nextFloat() < damage) {
-                            fill(stack, x, z, x + 1, z + 1, 0x66ff0000);
+                            graphics.fill(x, z, x + 1, z + 1, 0x66ff0000);
                         }
                     }
                 }
@@ -387,7 +388,7 @@ public class GuiLCConfig extends Screen {
                     if (dist < explosionRadius - 3) {
                         double damage = 3.0f * (explosionRadius - dist) / explosionRadius;
                         if (rnd.nextFloat() < damage) {
-                            fill(stack, x, z, x + 1, z + 1, 0x66ff0000);
+                            graphics.fill(x, z, x + 1, z + 1, 0x66ff0000);
                         }
                     }
                 }
@@ -405,7 +406,7 @@ public class GuiLCConfig extends Screen {
         return color;
     }
 
-    private void renderPreviewMap(PoseStack stack, LostCityProfile profile, boolean soft) {
+    private void renderPreviewMap(GuiGraphics graphics, LostCityProfile profile, boolean soft) {
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
         for (int z = 0; z < NullDimensionInfo.PREVIEW_HEIGHT; z++) {
             for (int x = 0; x < NullDimensionInfo.PREVIEW_WIDTH; x++) {
@@ -422,14 +423,14 @@ public class GuiLCConfig extends Screen {
                     case 'd' -> 0xcccc55;
                     default -> 0x005500;
                 };
-                fill(stack, sx, sz, sx + 3, sz + 3, 0xff000000 + soften(color, soft));
+                graphics.fill(sx, sz, sx + 3, sz + 3, 0xff000000 + soften(color, soft));
                 LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristicsGui(x, z, diminfo);
                 if (characteristics.isCity) {
                     color = 0x995555;
                     if (BuildingInfo.hasBuildingGui(x, z, diminfo, characteristics)) {
                         color = 0xffffff;
                     }
-                    fill(stack, sx, sz, sx + 2, sz + 2, 0xff000000 + soften(color, soft));
+                    graphics.fill(sx, sz, sx + 2, sz + 2, 0xff000000 + soften(color, soft));
                 }
             }
         }
@@ -484,11 +485,11 @@ public class GuiLCConfig extends Screen {
     }
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(stack);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(graphics);
         refreshButtons();
-        renderExtra(stack);
-        super.render(stack, mouseX, mouseY, partialTicks);
+        renderExtra(graphics);
+        super.render(graphics, mouseX, mouseY, partialTicks);
         for(GuiEventListener listener : this.children()) {
             if (listener instanceof AbstractWidget widget) {
                 if (widget.isMouseOver(mouseX, mouseY) && widget.visible) {

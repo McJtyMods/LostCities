@@ -7,7 +7,6 @@ import mcjty.lostcities.gui.LostCitySetup;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.LostCityFeature;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.resources.ResourceLocation;
@@ -47,13 +46,14 @@ public class ClientEventHandlers {
 
     private Button lostCitiesButton = null;
 
+    private final static ResourceLocation txt = new ResourceLocation(LostCities.MODID, "textures/gui/configicon.png");
+
     @SubscribeEvent
     public void onGuiDraw(ScreenEvent.Render event) {
         if (event.getScreen() instanceof CreateWorldScreen screen && lostCitiesButton != null) {
             lostCitiesButton.visible = screen.tabManager.getCurrentTab() instanceof CreateWorldScreen.MoreTab;
             if (lostCitiesButton.visible) {
-                RenderSystem.setShaderTexture(0, new ResourceLocation(LostCities.MODID, "textures/gui/configicon.png"));
-                GuiComponent.blit(event.getPoseStack(), screen.width - 100, 60, 70, 70, 256, 256, 256, 256, 256, 256);
+                event.getGuiGraphics().blit(txt, screen.width - 100, 60, 70, 70, 256, 256, 256, 256, 256, 256);
             }
         }
     }

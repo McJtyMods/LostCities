@@ -34,7 +34,7 @@ public class CommandListParts implements Command<CommandSourceStack> {
         ServerPlayer player = context.getSource().getPlayerOrException();
         BlockPos start = player.blockPosition();
 
-        ServerLevel level = player.getLevel();
+        ServerLevel level = (ServerLevel) player.level();
         IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
         if (dimInfo == null) {
             context.getSource().sendFailure(ComponentFactory.literal("This dimension doesn't support Lost Cities!"));
@@ -48,7 +48,7 @@ public class CommandListParts implements Command<CommandSourceStack> {
         ChunkPos cp = new ChunkPos(start);
         List<EditModeData.PartData> data = EditModeData.getData().getPartData(new ChunkCoord(level.dimension(), cp.x, cp.z));
         for (EditModeData.PartData pd : data) {
-            context.getSource().sendSuccess(ComponentFactory.literal("Found '" + pd.partName() + "' at " + pd.y()), false);
+            context.getSource().sendSuccess(() -> ComponentFactory.literal("Found '" + pd.partName() + "' at " + pd.y()), false);
         }
         return 0;
     }

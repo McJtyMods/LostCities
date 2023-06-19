@@ -1,6 +1,6 @@
 package mcjty.lostcities.gui.elements;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 public class GuiElement {
 
@@ -19,7 +19,7 @@ public class GuiElement {
 
     }
 
-    public void render(PoseStack stack) {
+    public void render(GuiGraphics graphics) {
 
     }
 

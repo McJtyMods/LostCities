@@ -37,7 +37,7 @@ public class CommandSaveProfile implements Command<CommandSourceStack> {
         String name = context.getArgument("profile", String.class);
         LostCityProfile profile = ProfileSetup.STANDARD_PROFILES.get(name);
         if (profile == null) {
-            context.getSource().sendSuccess(ComponentFactory.literal(ChatFormatting.RED + "Could not find profile '" + name + "'!"), true);
+            context.getSource().sendSuccess(() -> ComponentFactory.literal(ChatFormatting.RED + "Could not find profile '" + name + "'!"), true);
             return 0;
         }
         JsonObject jsonObject = profile.toJson(false);
@@ -48,10 +48,10 @@ public class CommandSaveProfile implements Command<CommandSourceStack> {
                 writer.flush();
             }
         } catch (FileNotFoundException e) {
-            context.getSource().sendSuccess(ComponentFactory.literal(ChatFormatting.RED + "Error saving profile '" + name + "'!"), true);
+            context.getSource().sendSuccess(() -> ComponentFactory.literal(ChatFormatting.RED + "Error saving profile '" + name + "'!"), true);
             return 0;
         }
-        context.getSource().sendSuccess(ComponentFactory.literal(ChatFormatting.GREEN + "Saved profile '" + name + "'!"), true);
+        context.getSource().sendSuccess(() -> ComponentFactory.literal(ChatFormatting.GREEN + "Saved profile '" + name + "'!"), true);
         return 0;
     }
 }

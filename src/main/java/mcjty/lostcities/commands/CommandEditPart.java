@@ -35,7 +35,7 @@ public class CommandEditPart implements Command<CommandSourceStack> {
         ServerPlayer player = context.getSource().getPlayerOrException();
         BlockPos start = player.blockPosition();
 
-        ServerLevel level = player.getLevel();
+        ServerLevel level = (ServerLevel) player.level();
         IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
         if (dimInfo == null) {
             context.getSource().sendFailure(ComponentFactory.literal("This dimension doesn't support Lost Cities!"));
@@ -54,7 +54,7 @@ public class CommandEditPart implements Command<CommandSourceStack> {
                 return 0;
             }
             if (data.y() <= start.getY() && start.getY() < data.y() + part.getSliceCount()) {
-                context.getSource().sendSuccess(ComponentFactory.literal("Start editing part '" + data.partName() + "'!"), false);
+                context.getSource().sendSuccess(() -> ComponentFactory.literal("Start editing part '" + data.partName() + "'!"), false);
                 Editor.startEditing(part, player, new BlockPos(start.getX(), data.y(), start.getZ()), level, dimInfo);
                 return 0;
             }

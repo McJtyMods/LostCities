@@ -28,7 +28,7 @@ public class Editor {
 
         CompiledPalette finalPalette = palette;
 
-        player.level.getServer().doRunTask(new TickTask(3, () -> {
+        player.level().getServer().doRunTask(new TickTask(3, () -> {
             for (int y = 0; y < part.getSliceCount(); y++) {
                 for (int x = 0; x < part.getXSize(); x++) {
                     for (int z = 0; z < part.getZSize(); z++) {

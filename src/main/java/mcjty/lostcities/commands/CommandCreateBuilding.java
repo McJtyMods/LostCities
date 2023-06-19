@@ -53,7 +53,7 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
         }
 
         ServerPlayer player = context.getSource().getPlayerOrException();
-        ServerLevel level = player.getLevel();
+        ServerLevel level = (ServerLevel) player.level();
         BlockPos bottom = player.blockPosition().below();
 
         IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
