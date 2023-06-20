@@ -1,6 +1,6 @@
 modLoader="javafml"
 license="MIT License https://github.com/McJtyMods/LostCities/blob/1.16/LICENCE"
-loaderVersion="[43,)"
+loaderVersion="[47,)"
 issueTrackerURL="http://github.com/McJtyMods/LostCities/issues"
 displayURL="http://github.com/McJtyMods/LostCities/"
 #logoFile="examplemod.png" #optional
