@@ -101,7 +101,7 @@ public class LostCityTerrainFeature {
         this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);
 
         air = Blocks.AIR.defaultBlockState();
-        hardAir = Blocks.COMMAND_BLOCK.defaultBlockState();
+        hardAir = Blocks.STRUCTURE_VOID.defaultBlockState();
 
 //        islandTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
 //        cavernTerrainGenerator.setup(provider.getWorld().getWorld(), provider);
