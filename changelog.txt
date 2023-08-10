@@ -1,3 +1,6 @@
+Upcoming:
+- TqLxQuanZ changed hardAir to structure_void so that the commandblock can be used again
+
 1.18-5.3.19:
 - TqLxQuanZ fixed mincellars config is not being accounted for buildings
 
