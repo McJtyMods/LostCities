@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.0.18:
 - TqLxQuanZ changed hardAir to structure_void so that the commandblock can be used again
 
 1.19-6.0.17:
