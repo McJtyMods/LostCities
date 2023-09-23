@@ -1,3 +1,6 @@
+1.20-7.0.1:
+- TqLxQuanZ changed hardAir to structure_void so that the commandblock can be used again
+
 1.20-7.0.0:
 - Port to 1.20
 
