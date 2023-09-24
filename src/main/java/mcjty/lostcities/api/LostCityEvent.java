@@ -82,7 +82,7 @@ public class LostCityEvent extends Event {
      * but keep in mind that the street or building will be generated after this and might overwrite what you did.<br>
      * NOTE! This will only be called for city chunks (buildings or street). <br>
      * <br>
-     * {@link #primer} contains the {@link ChunkPrimer} for this chunk. This primer will already be filled with stone up to city level. <br>
+     * {@link #primer} contains the {@link ChunkAccess} for this chunk. This primer will already be filled with stone up to city level. <br>
      * <br>
      * This event is {@link Cancelable}.<br>
      * <br>
@@ -110,7 +110,7 @@ public class LostCityEvent extends Event {
      * This is mostly useful in case you want to modify the standard Lost City building/street after it has been generated.<br>
      * NOTE! This will only be called for city chunks (buildings or street). <br>
      * <br>
-     * {@link #primer} contains the {@link ChunkPrimer} for this chunk. This primer will already have the building and street stuff in it. <br>
+     * {@link #primer} contains the {@link ChunkAccess} for this chunk. This primer will already have the building and street stuff in it. <br>
      * <br>
      * This event is not {@link Cancelable}.<br>
      * <br>
@@ -136,7 +136,7 @@ public class LostCityEvent extends Event {
      * This is fired right after generation of the chunk but before highways, subways and other stuff like that.
      * NOTE! This will NOT be called for city chunks (buildings or street). <br>
      * <br>
-     * {@link #primer} contains the {@link ChunkPrimer} for this chunk. <br>
+     * {@link #primer} contains the {@link ChunkAccess} for this chunk. <br>
      * <br>
      * This event is not {@link Cancelable}.<br>
      * <br>
@@ -163,7 +163,7 @@ public class LostCityEvent extends Event {
      * to modify the chunk before explosion damage is calculated.
      * NOTE! This will be called for every chunk (city or normal). <br>
      * <br>
-     * {@link #primer} contains the {@link ChunkPrimer} for this chunk. <br>
+     * {@link #primer} contains the {@link ChunkAccess} for this chunk. <br>
      * <br>
      * This event is {@link Cancelable}.<br>
      * <br>
@@ -176,6 +176,31 @@ public class LostCityEvent extends Event {
         private final ChunkAccess primer;
 
         public PreExplosionEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
+            super(world, lostCities, chunkX, chunkZ);
+            this.primer = primer;
+        }
+
+        public ChunkAccess getChunkAccess() {
+            return primer;
+        }
+    }
+
+    /**
+     * PostGenHighwayChunkEvent is fired right after generation of a chunk containing a highway.<br>
+     * NOTE! This will be called for both city and outside chunks but only if a highway has been generated. <br>
+     * <br>
+     * {@link #primer} contains the {@link ChunkAccess} for this chunk. <br>
+     * <br>
+     * This event is not {@link Cancelable}.<br>
+     * <br>
+     * This event does not have a result. {@link HasResult}<br>
+     * <br>
+     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+     **/
+    public static class PostGenHighwayChunkEvent extends LostCityEvent {
+        private final ChunkAccess primer;
+
+        public PostGenHighwayChunkEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
             super(world, lostCities, chunkX, chunkZ);
             this.primer = primer;
         }
