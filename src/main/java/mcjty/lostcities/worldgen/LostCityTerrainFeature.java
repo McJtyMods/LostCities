@@ -903,10 +903,6 @@ public class LostCityTerrainFeature {
                 generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), false);
             }
         }
-        if (levelX >=0 || levelZ >=0) {
-            LostCityEvent.PostGenHighwayChunkEvent postevent = new LostCityEvent.PostGenHighwayChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
-            MinecraftForge.EVENT_BUS.post(postevent);
-        }
     }
 
     private static boolean isClearableAboveHighway(BlockState st) {
@@ -949,6 +945,14 @@ public class LostCityTerrainFeature {
                     }
                 }
             }
+        }
+
+        LostCityEvent.PostGenHighwayChunkEvent postevent = new LostCityEvent.PostGenHighwayChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, info.chunkX, info.chunkZ, driver.getPrimer(), part.getId());
+        MinecraftForge.EVENT_BUS.post(postevent);
+
+        if (postevent.isChanged()) {
+            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), postevent.getNewPart().toString());
+            generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
         }
 
         Character support = part.getMetaChar(ILostCities.META_SUPPORT);

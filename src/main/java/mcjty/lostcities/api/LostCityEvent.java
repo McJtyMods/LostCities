@@ -1,5 +1,6 @@
 package mcjty.lostcities.api;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.common.MinecraftForge;
@@ -187,7 +188,8 @@ public class LostCityEvent extends Event {
 
     /**
      * PostGenHighwayChunkEvent is fired right after generation of a chunk containing a highway.<br>
-     * NOTE! This will be called for both city and outside chunks but only if a highway has been generated. <br>
+     * NOTE! This will be called for both city and outside chunks but only if a highway has been
+     * generated but before supports have been. <br>
      * <br>
      * {@link #primer} contains the {@link ChunkAccess} for this chunk. <br>
      * <br>
@@ -199,14 +201,32 @@ public class LostCityEvent extends Event {
      **/
     public static class PostGenHighwayChunkEvent extends LostCityEvent {
         private final ChunkAccess primer;
+        private ResourceLocation oldPart;
+        private ResourceLocation newPart = new ResourceLocation("");
+        private boolean changed = false;
 
-        public PostGenHighwayChunkEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
+        public PostGenHighwayChunkEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer, ResourceLocation part) {
             super(world, lostCities, chunkX, chunkZ);
             this.primer = primer;
+            this.oldPart = part;
         }
 
         public ChunkAccess getChunkAccess() {
             return primer;
+        }
+
+        public ResourceLocation getPart() {
+            return oldPart;
+        }
+        public ResourceLocation getNewPart() {
+            return newPart;
+        }
+        public void setPart(ResourceLocation part) {
+            newPart = part;
+            changed = true;
+        }
+        public boolean isChanged() {
+            return changed;
         }
     }
 
