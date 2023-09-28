@@ -1,13 +1,13 @@
 [
 {
-  "modid": "lostcitiessquarded",
+  "modid": "lostcities",
   "name": "The Lost Cities Squared",
-  "description": "A modified version of The Lost Cities World Generator",
-  "version": "1.0",
-  "mcversion": "1.12.2",
+  "description": "A fork of The Lost Cities world generator",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["McJty, strubium"],
+  "authorList": ["McJty"],
   "credits": "",
   "logoFile": "",
   "screenshots": [],
