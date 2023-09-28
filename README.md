@@ -20,7 +20,7 @@ Hello and welcome to Strubium steals code from people to make a old mod slightly
 ## Future Plans
 * A palette that uses MWC Props
 * Stop using dungeon loot in citys.
-* A config system for loot city loot as 1.12.2 doesnt support datapacks   
+* A config system for city loot as 1.12.2 doesnt support datapacks   
 * Remastered Chisel profile (It will look nicer)
 
 ## Really Far in the Future Plans
