@@ -7,15 +7,13 @@ Hello and welcome to Strubium steals code from people to make a old mod slightly
 (Original Mod: [The Lost Cities](https://github.com/McJtyMods/LostCities))
 
 ## Compatibility 
-* The Lost Soul's: Untested, may or may not work.
-
+* The Lost Soul's: Fully Functional Support
 
 ## Changes
 * TileEntitys now get special treatment and arent placed as normal blocks. (Not my work, this is the power of Burchard36) 
 * New "nospawner" profile. Generates buildings with loot, but without mod spawners.
 * New "geopol" profile. Generate cities with the power of [GeoPol!](https://github.com/markgyoni/geopol)
 * Tweeks to the "onlycity" profile. Railways + Highways. 
-  
 
 ## Future Plans
 * A palette that uses MWC Props
