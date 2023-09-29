@@ -1,2 +1,12 @@
+The Lost Cities Squared Dev-2:
+* New "experimental" profile for my testing. May work, may not.  
+* Library.json changes:
+  * Brewing stands will generate less frequently in city's.
+  * Enchanting tables will generate less frequently city's.
+  * Slight chance to generate air in place of crafting tables or furances.
+* Un-privated the "bio_wasteland" and "water_empty" profiles. They are used internally for waterbubbles and biospheres respectively.
+* Removed the ugly Blue and Light Blue glass colors from generating in cities.
+* Changed the Mod name and Verison. 
+
 The Lost Cities Squared Dev-1:
 * New "nospawner" profile
