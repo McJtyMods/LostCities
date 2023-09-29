@@ -88,22 +88,6 @@
         },
         {
           "factor": 1.0,
-          "palette": "glass_full_blue"
-        },
-        {
-          "factor": 1.0,
-          "palette": "glass_pane_blue"
-        },
-        {
-          "factor": 1.0,
-          "palette": "glass_full_light_blue"
-        },
-        {
-          "factor": 1.0,
-          "palette": "glass_pane_light_blue"
-        },
-        {
-          "factor": 1.0,
           "palette": "glass_full_gray"
         },
         {
@@ -375,78 +359,6 @@
       {
         "char": "a",
         "block": "minecraft:stained_glass_pane@7"
-      }
-    ]
-  },
-  {
-    "type": "palette",
-    "name": "glass_full_blue",
-    "palette": [
-      {
-        "char": "+",
-        "block": "minecraft:stained_glass@11"
-      },
-      {
-        "char": "`",
-        "block": "minecraft:stained_glass_pane@11"
-      },
-      {
-        "char": "a",
-        "block": "minecraft:stained_glass@11"
-      }
-    ]
-  },
-  {
-    "type": "palette",
-    "name": "glass_pane_blue",
-    "palette": [
-      {
-        "char": "+",
-        "block": "minecraft:stained_glass@11"
-      },
-      {
-        "char": "`",
-        "block": "minecraft:stained_glass_pane@11"
-      },
-      {
-        "char": "a",
-        "block": "minecraft:stained_glass_pane@11"
-      }
-    ]
-  },
-  {
-    "type": "palette",
-    "name": "glass_full_light_blue",
-    "palette": [
-      {
-        "char": "+",
-        "block": "minecraft:stained_glass@3"
-      },
-      {
-        "char": "`",
-        "block": "minecraft:stained_glass_pane@3"
-      },
-      {
-        "char": "a",
-        "block": "minecraft:stained_glass@3"
-      }
-    ]
-  },
-  {
-    "type": "palette",
-    "name": "glass_pane_light_blue",
-    "palette": [
-      {
-        "char": "+",
-        "block": "minecraft:stained_glass@3"
-      },
-      {
-        "char": "`",
-        "block": "minecraft:stained_glass_pane@3"
-      },
-      {
-        "char": "a",
-        "block": "minecraft:stained_glass_pane@3"
       }
     ]
   },

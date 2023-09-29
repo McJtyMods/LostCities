@@ -25,8 +25,8 @@ public class LostCityConfiguration {
     public static final String PROFILES_COMMENT = "List of all supported profiles (used for world creation). Warning! Make sure there is always a 'default' profile!";
     public static final String PRIVATE_PROFILES_COMMENT = "List of privatep profiles that cannot be selected by the player but are only used as a child profile of another one";
 
-    public static final String[] DEFAULT_PROFILES = new String[]{"default", "cavern", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "nospawner", "ancient", "wasteland", "chisel", "atlantis", "realistic", "geopol"};
-    public static final String[] PRIVATE_PROFILES = new String[]{"bio_wasteland", "water_empty"};
+    public static final String[] DEFAULT_PROFILES = new String[]{"default", "cavern", "nodamage", "rarecities", "floating", "space", "waterbubbles", "biosphere", "onlycities", "tallbuildings", "safe", "nospawner", "ancient", "wasteland", "chisel", "atlantis", "realistic", "geopol","experimental","bio_wasteland", "water_empty"};
+    public static final String[] PRIVATE_PROFILES = new String[]{};
 
     public static String[] BLOCKS_REQUIRING_LIGHTING_UPDATES = new String[] {
             "minecraft:glowstone",
@@ -468,7 +468,13 @@ public class LostCityConfiguration {
         profile.MAX_CAVE_HEIGHT = 64;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("water_empty", false);
+        profile = new LostCityProfile("experimental", true);
+        profile.setDescription("Experimental Profile, might not work");
+        profile.setIconFile("textures/gui/transparentlogo.png");
+        profile.CITY_MAXRADIUS = 256;
+        standardProfiles.put(profile.getName(), profile);
+
+        profile = new LostCityProfile("water_empty", true);
         profile.setDescription("Private empty terrain for waterbubbles");
         profile.WATERLEVEL_OFFSET = -80;
         profile.RAILWAYS_ENABLED = false;
@@ -488,7 +494,7 @@ public class LostCityConfiguration {
         profile.BUILDING_CHANCE = 0.0f;
         standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("bio_wasteland", false);
+        profile = new LostCityProfile("bio_wasteland", true);
         profile.setDescription("Private wasteland for biospheres");
         profile.GROUNDLEVEL = 40;
         profile.WATERLEVEL_OFFSET = 70;
