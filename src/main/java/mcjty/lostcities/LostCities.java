@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.event.*;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Mod(modid = LostCities.MODID, name="The Lost Cities",
+@Mod(modid = LostCities.MODID, name="The Lost Cities Squared",
         dependencies =
                         "after:forge@[" + LostCities.MIN_FORGE11_VER + ",)",
         version = LostCities.VERSION,
@@ -24,7 +24,7 @@ import java.util.function.Function;
         acceptableRemoteVersions = "*")
 public class LostCities {
     public static final String MODID = "lostcities";
-    public static final String VERSION = "2.0.22";
+    public static final String VERSION = "Dev-2";
     public static final String MIN_FORGE11_VER = "13.19.0.2176";
 
     @SidedProxy(clientSide="mcjty.lostcities.setup.ClientProxy", serverSide="mcjty.lostcities.setup.ServerProxy")
