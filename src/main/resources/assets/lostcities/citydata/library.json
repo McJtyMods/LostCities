@@ -207,7 +207,7 @@
             "block": "minecraft:crafting_table"
           },
           {
-            "random": 7,
+            "random": 5,
             "block": "minecraft:brewing_stand"
           },
           {
@@ -219,12 +219,16 @@
             "block": "minecraft:cauldron"
           },
           {
-            "random": 2,
+            "random": 1,
             "block": "minecraft:enchanting_table"
           },
           {
             "random": 1000,
             "block": "minecraft:web"
+          },
+          {
+            "random": 20,
+            "block": "minecraft:air"
           }
         ]
       },
@@ -259,7 +263,16 @@
       },
       {
         "char": "L",
-        "block": "minecraft:bookshelf"
+        "blocks": [
+          {
+            "random": 1,
+            "block": "minecraft:air"
+          },
+          {
+            "random": 1000,
+            "block": "minecraft:bookshelf"
+          }
+        ]
       },
       {
         "char": "W",
@@ -437,7 +450,7 @@
         "bridge": "bridge_open"
       },
       {
-        "factor": 1.0,
+        "factor": 0.25,
         "bridge": "bridge_covered"
       }
     ],
