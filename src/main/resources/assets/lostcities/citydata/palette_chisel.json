@@ -88,22 +88,6 @@
         },
         {
           "factor": 1.0,
-          "palette": "glass_full_blue"
-        },
-        {
-          "factor": 1.0,
-          "palette": "glass_pane_blue"
-        },
-        {
-          "factor": 1.0,
-          "palette": "glass_full_light_blue"
-        },
-        {
-          "factor": 1.0,
-          "palette": "glass_pane_light_blue"
-        },
-        {
-          "factor": 1.0,
           "palette": "glass_full_gray"
         },
         {
