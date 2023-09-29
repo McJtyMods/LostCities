@@ -471,8 +471,6 @@ public class LostCityConfiguration {
         profile = new LostCityProfile("experimental", true);
         profile.setDescription("Experimental Profile, might not work");
         profile.setIconFile("textures/gui/transparentlogo.png");
-        profile.setStreetBaseBlock("minecraft:planks");
-        profile.setStreetBlock("minecraft:stone");
         profile.CITY_MAXRADIUS = 256;
         standardProfiles.put(profile.getName(), profile);
 
