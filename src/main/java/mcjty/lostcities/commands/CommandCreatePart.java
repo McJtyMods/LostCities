@@ -15,7 +15,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraft.core.BlockPos;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.commands.arguments.coordinates.WorldCoordinates;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -30,20 +31,27 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
                 .requires(cs -> cs.hasPermission(1))
                 .then(Commands.argument("name", ResourceLocationArgument.id())
                         .suggests(ModCommands.getPartSuggestionProvider())
-                        .executes(CMD));
+                        .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                                .executes(CMD)));
     }
 
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ResourceLocation name = context.getArgument("name", ResourceLocation.class);
-        BuildingPart part = AssetRegistries.PARTS.get(context.getSource().getLevel(), name);
+        BuildingPart part = null;
+        try {
+            part = AssetRegistries.PARTS.get(context.getSource().getLevel(), name);
+        } catch (Exception e) {
+            part = null;
+        }
         if (part == null) {
             context.getSource().sendFailure(Component.literal("Error finding part '" + name + "'!").withStyle(ChatFormatting.RED));
             return 0;
         }
 
         ServerPlayer player = context.getSource().getPlayerOrException();
-        BlockPos start = player.blockPosition();
+        WorldCoordinates start = context.getArgument("pos", WorldCoordinates.class);
+
 
         ServerLevel level = (ServerLevel) player.level();
         IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
@@ -52,7 +60,7 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
             return 0;
         }
 
-        Editor.startEditing( part, player, start, level, dimInfo);
+        Editor.startEditing(part, player, start.getBlockPos(context.getSource()), level, dimInfo);
 
         return 0;
     }

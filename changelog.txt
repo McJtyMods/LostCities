@@ -1,3 +1,6 @@
+Upcoming:
+- The createpart command now supports a (relative) position argument. This allows you to create a part at a specific location
+
 1.20-7.0.1:
 - TqLxQuanZ changed hardAir to structure_void so that the commandblock can be used again
 
