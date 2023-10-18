@@ -15,6 +15,8 @@ import mcjty.lostcities.worldgen.lost.cityassets.*;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.commands.arguments.coordinates.WorldCoordinates;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -37,7 +39,9 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
                 .then(Commands.argument("name", ResourceLocationArgument.id())
                         .suggests(ModCommands.getBuildingSuggestionProvider())
                         .then(Commands.argument("floors", IntegerArgumentType.integer(1, 20))
-                                .then(Commands.argument("cellars", IntegerArgumentType.integer(0, 10)).executes(CMD))));
+                                .then(Commands.argument("cellars", IntegerArgumentType.integer(0, 10))
+                                        .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                                                .executes(CMD)))));
     }
 
 
@@ -54,7 +58,8 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
 
         ServerPlayer player = context.getSource().getPlayerOrException();
         ServerLevel level = (ServerLevel) player.level();
-        BlockPos bottom = player.blockPosition().below();
+        WorldCoordinates pos = context.getArgument("pos", WorldCoordinates.class);
+        BlockPos bottom = pos.getBlockPos(context.getSource());
 
         IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
         if (dimInfo == null) {
@@ -63,10 +68,6 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
         }
         BuildingInfo info = BuildingInfo.getBuildingInfo(bottom.getX() >> 4, bottom.getZ() >> 4, dimInfo);
         info.setBuildingType(building, cellars, floors, bottom.getY());
-
-        Character borderBlock = info.getCityStyle().getBorderBlock();
-        CompiledPalette palette = info.getCompiledPalette();
-        char fillerBlock = info.getBuilding().getFillerBlock();
 
         ChunkPos cp = new ChunkPos(bottom);
 

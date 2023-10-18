@@ -1,3 +1,6 @@
+Upcoming:
+- The createbuilding command now supports a (relative) position argument. This allows you to create a building at a specific location
+
 1.20-7.0.2:
 - The createpart command now supports a (relative) position argument. This allows you to create a part at a specific location
 
