@@ -1,3 +1,6 @@
+Upcoming:
+- TqLxQuanZ fixed a problem where a building has an extreme rare chance to not generate
+
 1.19-6.0.18:
 - TqLxQuanZ changed hardAir to structure_void so that the commandblock can be used again
 
