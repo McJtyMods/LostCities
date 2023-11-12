@@ -104,7 +104,7 @@ public class Tools {
                 return pair;
             }
         }
-        return null;
+        return elements.get(elements.size() - 1);
     }
 
     public static Iterable<Holder<Block>> getBlocksForTag(TagKey<Block> rl) {
