@@ -1,3 +1,6 @@
+Upcoming:
+- TqLxQuanZ fixed a problem where a building has an extreme rare chance to not generate
+
 1.20-7.0.3:
 - The createbuilding command now supports a (relative) position argument. This allows you to create a building at a specific location
 

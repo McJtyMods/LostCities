@@ -92,7 +92,7 @@ public class Tools {
                 return pair;
             }
         }
-        return null;
+        return elements.get(elements.size() - 1);
     }
 
     public static <T> T getRandomFromList(Random random, List<T> list, Function<T, Float> weightGetter) {
