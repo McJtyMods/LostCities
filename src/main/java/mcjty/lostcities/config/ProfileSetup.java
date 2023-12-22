@@ -72,6 +72,7 @@ public class ProfileSetup {
         profile.LANDSCAPE_TYPE = LandscapeType.FLOATING;
         profile.HORIZON = 0;
 //        profile.WATERLEVEL_OFFSET = 70;
+        profile.HIGHWAY_SUPPORTS = false;
         profile.BUILDING_MAXCELLARS = 1;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;

@@ -604,13 +604,21 @@ public class LostCityTerrainFeature {
         for (int x = tlChunkX ; x < tlChunkX + w ; x++) {
             for (int z = tlChunkZ; z < tlChunkZ + h; z++) {
                 BuildingInfo tinfo = BuildingInfo.getBuildingInfo(x, z, provider);
+                ChunkHeightmap heightmap = getHeightmap(x, z, provider.getWorld());
                 if (!isValidScatterBiome(reference, x, z)) {
                     return;
                 }
                 if (!avoidScattered(tinfo)) {
                     return;
                 }
-                ChunkHeightmap heightmap = getHeightmap(x, z, provider.getWorld());
+                if (!reference.isAllowVoid()) {
+                    if (!(profile.isDefault() || profile.isCavern())) {
+                        // We are in a world that can have void chunks. Check if this chunk is a void chunk
+                        if (heightmap.getHeight(8, 8) <= this.provider.getWorld().getMinBuildHeight()+3) {
+                            return;
+                        }
+                    }
+                }
                 minheight = Math.min(minheight, heightmap.getMinimumHeight());
                 maxheight = Math.max(maxheight, heightmap.getMaximumHeight());
                 avgheight += heightmap.getAverageHeight();

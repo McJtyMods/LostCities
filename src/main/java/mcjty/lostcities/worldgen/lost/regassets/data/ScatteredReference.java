@@ -12,6 +12,7 @@ public class ScatteredReference {
             instance.group(
                     Codec.STRING.fieldOf("name").forGetter(l -> l.name),
                     Codec.INT.fieldOf("weight").forGetter(l -> l.weight),
+                    Codec.BOOL.optionalFieldOf("allowvoid").forGetter(l -> Optional.ofNullable(l.allowvoid)),
                     BiomeMatcher.CODEC.optionalFieldOf("biomes").forGetter(l -> Optional.ofNullable(l.biomeMatcher)),
                     Codec.INT.optionalFieldOf("maxheightdiff").forGetter(l -> Optional.ofNullable(l.maxheightdiff))
             ).apply(instance, ScatteredReference::new));
@@ -20,10 +21,12 @@ public class ScatteredReference {
     private final int weight;
     private final BiomeMatcher biomeMatcher;
     private final Integer maxheightdiff;
+    private final Boolean allowvoid;
 
-    public ScatteredReference(String name, int weight, Optional<BiomeMatcher> biomeMatcher, Optional<Integer> maxheightdiff) {
+    public ScatteredReference(String name, int weight, Optional<Boolean> allowvoid, Optional<BiomeMatcher> biomeMatcher, Optional<Integer> maxheightdiff) {
         this.name = name;
         this.weight = weight;
+        this.allowvoid = allowvoid.orElse(null);
         this.biomeMatcher = biomeMatcher.orElse(null);
         this.maxheightdiff = maxheightdiff.orElse(null);
     }
@@ -43,5 +46,9 @@ public class ScatteredReference {
 
     public Integer getMaxheightdiff() {
         return maxheightdiff;
+    }
+
+    public boolean isAllowVoid() {
+        return allowvoid != null && allowvoid;
     }
 }
