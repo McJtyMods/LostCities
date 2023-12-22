@@ -257,9 +257,15 @@ public class ForgeEventHandlers {
 
     private boolean isValidStandingPosition(Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
+        if (!state.isFaceSturdy(world, pos, Direction.UP)) {
+            return false;
+        }
+        if (!world.getBlockState(pos.above()).isAir() || !world.getBlockState(pos.above(2)).isAir()) {
+            return false;
+        }
+        return true;
 //        return state.getBlock().isTopSolid(state) && state.getBlock().isFullCube(state) && state.getBlock().isOpaqueCube(state) && world.isAirBlock(pos.up()) && world.isAirBlock(pos.up(2));
-        // @todo 1.14
-        return state.canOcclude();
+//        return state.canOcclude();
     }
 
     private boolean isValidSpawnBed(Level world, BlockPos pos) {
