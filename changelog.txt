@@ -2,6 +2,7 @@ Upcoming:
 - New 'allowvoid' keyword for scattered references. This allows you to specify that a building can be placed in void chunks. By default this is false
 - Reintroduced and tweaked the 'floating' profile. This is meant to be used in combination with Lost Worlds mod
 - No longer spawn player in solid blocks for the lost city dimension and in combination with Lost Worlds
+- Better spawn location for cavern style worlds
 
 1.20-7.0.4:
 - TqLxQuanZ fixed a problem where a building has an extreme rare chance to not generate

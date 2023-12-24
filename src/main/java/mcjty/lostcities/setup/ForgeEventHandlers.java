@@ -189,23 +189,20 @@ public class ForgeEventHandlers {
 
             // Potentially set the spawn point
             switch (profile.LANDSCAPE_TYPE) {
-                case DEFAULT:
-                case SPHERES:
-                case CAVERN:
+                case DEFAULT, SPHERES -> {
                     if (needsCheck) {
                         BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
                         event.getSettings().setSpawn(pos, 0.0f);
                         spawnPositions.put(serverLevel.dimension(), pos);
                         event.setCanceled(true);
                     }
-                    break;
-                case FLOATING:
-                case SPACE:
+                }
+                case FLOATING, SPACE, CAVERN -> {
                     BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
                     event.getSettings().setSpawn(pos, 0.0f);
                     spawnPositions.put(serverLevel.dimension(), pos);
                     event.setCanceled(true);
-                    break;
+                }
             }
         }
     }
@@ -258,6 +255,9 @@ public class ForgeEventHandlers {
     private boolean isValidStandingPosition(Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         if (!state.isFaceSturdy(world, pos, Direction.UP)) {
+            return false;
+        }
+        if (state.is(Blocks.BEDROCK)) {
             return false;
         }
         if (!world.getBlockState(pos.above()).isAir() || !world.getBlockState(pos.above(2)).isAir()) {
