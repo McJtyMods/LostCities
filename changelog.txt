@@ -3,6 +3,7 @@ Upcoming:
 - Reintroduced and tweaked the 'floating' profile. This is meant to be used in combination with Lost Worlds mod
 - No longer spawn player in solid blocks for the lost city dimension and in combination with Lost Worlds
 - Better spawn location for cavern style worlds
+- In floating profile the underside of buildings is generated better
 
 1.20-7.0.4:
 - TqLxQuanZ fixed a problem where a building has an extreme rare chance to not generate

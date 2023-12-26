@@ -2839,7 +2839,8 @@ public class LostCityTerrainFeature {
                 for (int z = 0; z < 16; ++z) {
                     driver.current(x, info.maxBuildHeight - 1, z);
                     int minHeight = info.minBuildHeight;
-                    while (driver.getBlock() == air && driver.getY() > minHeight) {
+                    int lowestToFill = Math.max(minHeight, lowestLevel - 8);
+                    while (driver.getBlock() == air && driver.getY() > lowestToFill) {
                         driver.decY();
                     }
 
