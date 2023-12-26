@@ -480,8 +480,8 @@ public class BuildingInfo implements ILostChunkInfo {
      * Initialize the chunk characteristics with the multi building information
      */
     private static void initMultiBuildingSection(LostChunkCharacteristics characteristics, int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        for (int x = -2 ; x <= 0 ; x++) {
-            for (int z = -2 ; z <= 0 ; z++) {
+        for (int x = -profile.MULTI_MAX_X + 1 ; x <= 0 ; x++) {
+            for (int z = -profile.MULTI_MAX_Z + 1 ; z <= 0 ; z++) {
                 MultiBuilding building = isTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile);
                 if (building != null) {
                     if (building.getDimX() > -x && building.getDimZ() > -z) {
@@ -630,8 +630,10 @@ public class BuildingInfo implements ILostChunkInfo {
         //      xxxx
         //      xxO.
         //      xx..
-        for (int x = -2 ; x <= 1 ; x++) {
-            for (int z = -2 ; z <= 1 ; z++) {
+        int multiMaxSizeX = profile.MULTI_MAX_X - 1;
+        int multiMaxSizeZ = profile.MULTI_MAX_Z - 1;
+        for (int x = -multiMaxSizeX ; x <= 0 ; x++) {
+            for (int z = -multiMaxSizeZ ; z <= 0 ; z++) {
                 if (x == 0 && z == 0) {
                     if (!isCandidateForTopLeftOfMultiBuilding(chunkX, chunkZ, provider, profile, cityStyle)) {
                         return null;

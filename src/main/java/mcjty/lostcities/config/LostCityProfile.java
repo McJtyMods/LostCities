@@ -150,6 +150,8 @@ public class LostCityProfile implements ILostCityProfile {
     public float BRIDGE_CHANCE = .7f;
     public float FOUNTAIN_CHANCE = .05f;
     public float BUILDING2X2_CHANCE = .03f;
+    public int MULTI_MAX_X = 3;
+    public int MULTI_MAX_Z = 3;
     public boolean BRIDGE_SUPPORTS = true;
 
     public int BEDROCK_LAYER = 1;
@@ -322,6 +324,8 @@ public class LostCityProfile implements ILostCityProfile {
 
         BUILDING2X2_CHANCE = cfg.getFloat("building2x2Chance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING2X2_CHANCE, 0.0f, 1.0f, "The chance that a chunk can possibly be the top-left chunk of 2x2 building. " +
                 "There actually being a 2x2 building also depends on the condition of those other chunks");
+        MULTI_MAX_X = cfg.getInt("multi_max_x", LostCityProfile.CATEGORY_LOSTCITY, MULTI_MAX_X, 2, 8, "The X size of the multi building can be maximum allowed, higher means more performance cost. ");
+        MULTI_MAX_Z = cfg.getInt("multi_max_z", LostCityProfile.CATEGORY_LOSTCITY, MULTI_MAX_Z, 2, 8, "The Z size of the multi building can be maximum allowed, higher means more performance cost. ");
         CORRIDOR_CHANCE = cfg.getFloat("corridorChance", LostCityProfile.CATEGORY_LOSTCITY, CORRIDOR_CHANCE, 0.0f, 1.0f, "The chance that a chunk can possibly contain a corridor. " +
                 "There actually being a corridor also depends on the presence of adjacent corridors");
         BRIDGE_CHANCE = cfg.getFloat("bridgeChance", LostCityProfile.CATEGORY_LOSTCITY, BRIDGE_CHANCE, 0.0f, 1.0f, "The chance that a chunk can possibly contain a bridge. " +
