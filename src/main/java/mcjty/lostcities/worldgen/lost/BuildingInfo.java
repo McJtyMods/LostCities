@@ -481,15 +481,17 @@ public class BuildingInfo implements ILostChunkInfo {
      * Initialize the chunk characteristics with the multi building information
      */
     private static void initMultiBuildingSection(LostChunkCharacteristics characteristics, int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        for (int x = -profile.MULTI_MAX_X + 1 ; x <= 0 ; x++) {
-            for (int z = -profile.MULTI_MAX_Z + 1 ; z <= 0 ; z++) {
-                MultiBuilding building = isTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile);
-                if (building != null) {
-                    if (building.getDimX() > -x && building.getDimZ() > -z) {
-                        characteristics.multiPos = new MultiPos(-x, -z, building.getDimX(), building.getDimZ());
-                        characteristics.multiBuilding = building;
-                        return;
-                    }
+        int multiMaxSizeX = profile.MULTI_MAX_X;
+        int multiMaxSizeZ = profile.MULTI_MAX_Z;
+        for (int i = -(multiMaxSizeX * multiMaxSizeZ) + 1 ; i <= 0 ; i++) {
+            int x = i / multiMaxSizeX;
+            int z = i % multiMaxSizeZ;
+            MultiBuilding building = isTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile);
+            if (building != null) {
+                if (building.getDimX() > -x && building.getDimZ() > -z) {
+                    characteristics.multiPos = new MultiPos(-x, -z, building.getDimX(), building.getDimZ());
+                    characteristics.multiBuilding = building;
+                    return;
                 }
             }
         }
@@ -631,19 +633,20 @@ public class BuildingInfo implements ILostChunkInfo {
         //      xxxx
         //      xxO.
         //      xx..
-        int multiMaxSizeX = profile.MULTI_MAX_X - 1;
-        int multiMaxSizeZ = profile.MULTI_MAX_Z - 1;
-        for (int x = -multiMaxSizeX ; x <= 0 ; x++) {
-            for (int z = -multiMaxSizeZ ; z <= 0 ; z++) {
-                if (x == 0 && z == 0) {
-                    if (!isCandidateForTopLeftOfMultiBuilding(chunkX, chunkZ, provider, profile, cityStyle)) {
-                        return null;
-                    }
-                } if (x < 0 || z < 0) {
-                    CityStyle otherStyle = City.getCityStyle(chunkX + x, chunkZ + z, provider, profile);
-                    if (isCandidateForTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile, otherStyle)) {
-                        return null;
-                    }
+        int multiMaxSizeX = building.getDimX();
+        int multiMaxSizeZ = building.getDimZ();
+        for (int i = -(multiMaxSizeX * multiMaxSizeZ) + 1 ; i <= 0 ; i++) {
+            int x = i / multiMaxSizeX - 1;
+            int z = i % multiMaxSizeZ - 1;
+            if (x == 0 && z == 0) {
+                if (!isCandidateForTopLeftOfMultiBuilding(chunkX, chunkZ, provider, profile, cityStyle)) {
+                    return null;
+                }
+            }
+            if (x < 0 || z < 0) {
+                CityStyle otherStyle = City.getCityStyle(chunkX + x, chunkZ + z, provider, profile);
+                if (isCandidateForTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile, otherStyle)) {
+                    return null;
                 }
             }
         }
@@ -655,11 +658,11 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         // Check if all chunks for the size of the multibuilding are candidates
-        for (int x = 0 ; x < building.getDimX() ; x++) {
-            for (int z = 0 ; z < building.getDimZ() ; z++) {
-                if ((x != 0 || z != 0) && !isMultiBuildingCandidate(chunkX+x, chunkZ+z, provider, profile, cityStyle)) {
-                    return null;
-                }
+        for (int i = 0 ; i < (multiMaxSizeX * multiMaxSizeZ) ; i++) {
+            int x = i / multiMaxSizeX;
+            int z = i % multiMaxSizeZ;
+            if ((x != 0 || z != 0) && !isMultiBuildingCandidate(chunkX+x, chunkZ+z, provider, profile, cityStyle)) {
+                return null;
             }
         }
         return building;
