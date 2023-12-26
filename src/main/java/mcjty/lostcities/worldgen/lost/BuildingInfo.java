@@ -630,10 +630,10 @@ public class BuildingInfo implements ILostChunkInfo {
         //      xxxx
         //      xxO.
         //      xx..
-        int multiMaxSizeX = profile.MULTI_MAX_X - 1;
-        int multiMaxSizeZ = profile.MULTI_MAX_Z - 1;
-        for (int x = -multiMaxSizeX ; x <= 0 ; x++) {
-            for (int z = -multiMaxSizeZ ; z <= 0 ; z++) {
+        int multiMaxSizeX = building.getDimX() - 1;
+        int multiMaxSizeZ = building.getDimZ() - 1;
+        for (int x = -multiMaxSizeX ; x <= 1 ; x++) {
+            for (int z = -multiMaxSizeZ ; z <= 1 ; z++) {
                 if (x == 0 && z == 0) {
                     if (!isCandidateForTopLeftOfMultiBuilding(chunkX, chunkZ, provider, profile, cityStyle)) {
                         return null;
