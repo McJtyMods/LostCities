@@ -1,6 +1,5 @@
 package mcjty.lostcities.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
@@ -15,6 +14,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 
@@ -27,7 +27,6 @@ import java.util.Random;
 public class GuiLCConfig extends Screen {
 
     private final Screen parent;
-//    private final WorldType worldType;
 
     private Button profileButton;
     private Button worldstyleButton;
@@ -51,10 +50,9 @@ public class GuiLCConfig extends Screen {
 
     private final LostCitySetup localSetup = new LostCitySetup(this::refreshPreview);
 
-    public GuiLCConfig(Screen parent) { // @todo 1.16}, WorldType worldType) {
+    public GuiLCConfig(Screen parent) {
         super(ComponentFactory.literal("Lost City Configuration"));
         this.parent = parent;
-//        this.worldType = worldType;
         localSetup.copyFrom(LostCitySetup.CLIENT_SETUP);
     }
 
@@ -89,27 +87,27 @@ public class GuiLCConfig extends Screen {
         // @todo 1.19.3
 //        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 
-        profileButton = addRenderableWidget(new ButtonExt(this, 55, 10, 80, 20, ComponentFactory.literal(localSetup.getProfileLabel()), p -> {
-            localSetup.toggleProfile(/* @todo 1.16 worldType*/);
+        profileButton = addRenderableWidget(new ButtonExt(55, 10, 80, 20, ComponentFactory.literal(localSetup.getProfileLabel()), p -> {
+            localSetup.toggleProfile();
             updateValues();
         }).tooltip(ComponentFactory.literal("Select a standard profile for your Lost City worldgen")));
 
-        worldstyleButton = addRenderableWidget(new ButtonExt(this, 145, 10, 120, 20, ComponentFactory.literal(localSetup.getWorldStyleLabel()), p -> {
+        worldstyleButton = addRenderableWidget(new ButtonExt(145, 10, 120, 20, ComponentFactory.literal(localSetup.getWorldStyleLabel()), p -> {
             localSetup.toggleWorldStyle();
             updateValues();
         }).tooltip(ComponentFactory.literal("Select the worldstyle to use for this profile")));
 
-        customizeButton = addRenderableWidget(new ButtonExt(this, 275, 10, 70, 20, ComponentFactory.literal("Customize"), p -> {
+        customizeButton = addRenderableWidget(new ButtonExt(275, 10, 70, 20, ComponentFactory.literal("Customize"), p -> {
             localSetup.customize();
             updateValues();
         }).tooltip(ComponentFactory.literal("Create a customized version of the currently selected profile")));
-        modeButton = addRenderableWidget(new ButtonExt(this, 355, 10, 70, 20, ComponentFactory.literal(mode), p -> toggleMode())
+        modeButton = addRenderableWidget(new ButtonExt(355, 10, 70, 20, ComponentFactory.literal(mode), p -> toggleMode())
             .tooltip(ComponentFactory.literal("Switch between different configuration pages")));
 
 
         addRenderableWidget(Button.builder(ComponentFactory.literal("Done"), p -> done()).bounds(10, this.height - 30, 120, 20).build());
         addRenderableWidget(Button.builder(ComponentFactory.literal("Cancel"), p -> cancel()).bounds(this.width - 130, this.height - 30, 120, 20).build());
-        addRenderableWidget(new ButtonExt(this, this.width - 35, 35, 30, 20, ComponentFactory.literal("Rnd"), p -> randomizePreview())
+        addRenderableWidget(new ButtonExt(this.width - 35, 35, 30, 20, ComponentFactory.literal("Rnd"), p -> randomizePreview())
                 .tooltip(ComponentFactory.literal("Randomize the seed for the preview (does not affect the generated world)")));
 
         initCities(110);
@@ -248,10 +246,7 @@ public class GuiLCConfig extends Screen {
     }
 
     public <T extends AbstractWidget> T addWidget(T widget) {
-        this.addRenderableWidget(widget);
-//        this.buttons.add(widget); // @todo 1.18
-//        this.children.add(widget);
-        return widget;
+        return this.addRenderableWidget(widget);
     }
 
     private void randomizePreview() {
@@ -439,6 +434,7 @@ public class GuiLCConfig extends Screen {
     private void updateValues() {
         elements.forEach(GuiElement::update);
         refreshPreview();
+        profileButton.setTooltip(Tooltip.create(getLocalSetup().getProfileInfo()));
     }
 
     private void refreshButtons() {
@@ -493,8 +489,10 @@ public class GuiLCConfig extends Screen {
         for(GuiEventListener listener : this.children()) {
             if (listener instanceof AbstractWidget widget) {
                 if (widget.isMouseOver(mouseX, mouseY) && widget.visible) {
-                    // @todo 1.19.3
-//                    widget.renderToolTip(stack, mouseX, mouseY);
+                    Tooltip tooltip = widget.getTooltip();
+                    if (tooltip != null) {
+                        setTooltipForNextRenderPass(tooltip.toCharSequence(this.minecraft));
+                    }
                     break;
                 }
             }

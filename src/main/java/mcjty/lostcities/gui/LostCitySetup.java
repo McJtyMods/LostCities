@@ -3,7 +3,10 @@ package mcjty.lostcities.gui;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.ProfileSetup;
+import mcjty.lostcities.varia.ComponentFactory;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -57,6 +60,12 @@ public class LostCitySetup {
 
     public String getProfileLabel() {
         return profile == null ? "Disabled" : profile;
+    }
+
+    public Component getProfileInfo() {
+        return get()
+                .map(p -> ComponentFactory.literal(p.getDescription() + "\n").append(ComponentFactory.literal(p.getExtraDescription()).withStyle(ChatFormatting.AQUA)))
+                .orElse(ComponentFactory.literal("Click here to select a profile for your Lost Cities"));
     }
 
     public String getWorldStyleLabel() {
@@ -144,14 +153,9 @@ public class LostCitySetup {
         refreshPreview.run();
     }
 
-    public void toggleProfile(/* @todo 1.16 WorldType worldType */) {
+    public void toggleProfile() {
         if (profiles == null) {
             String preferedProfile = "default";
-            // @todo 1.16
-//            if ("lc_cavern".equals(worldType.getName())) {
-//                preferedProfile = "cavern";
-//            }
-
             profiles = ProfileSetup.STANDARD_PROFILES.entrySet().stream()
                     .filter(entry -> entry.getValue().isPublic())
                     .map(Map.Entry::getKey)
@@ -168,11 +172,7 @@ public class LostCitySetup {
         }
 
         if (profile == null) {
-//            if (customizedProfile != null) {
-//                profile = "customized";
-//            } else {
-                profile = profiles.get(0);
-//            }
+            profile = profiles.get(0);
         } else {
             int i = profiles.indexOf(profile);
             if (i == -1 || i >= profiles.size()-1) {

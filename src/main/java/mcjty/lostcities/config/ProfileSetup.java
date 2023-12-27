@@ -32,8 +32,8 @@ public class ProfileSetup {
         STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("cavern", true);
-        profile.setDescription("This is a cavern type world (like the nether)");
-        profile.setExtraDescription("There are lights in the building but the outside is very dark. Warning! This is pretty heavy on performance!");
+        profile.setDescription("This profile is meant for a cavern type world. Use this in combination with the Lost Worlds caves world type");
+        profile.setExtraDescription("There are lights in the building but the outside is very dark. This is very hard. It's recommended you enable a bonus chest!");
         profile.setIconFile("textures/gui/icon_cavern.png");
         profile.LANDSCAPE_TYPE = LandscapeType.CAVERN;
         profile.HORIZON = 128;
@@ -65,8 +65,8 @@ public class ProfileSetup {
         STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("floating", true);
-        profile.setDescription("Cities on floating islands");
-        profile.setExtraDescription("Note! No villages or strongholds in this profile!");
+        profile.setDescription("Cities on floating islands. Preferably use this in combination with the Lost Worlds islands or islandsw world types");
+        profile.setExtraDescription("Note! No mineshafts or strongholds in this profile!");
         profile.setIconFile("textures/gui/icon_floating.png");
         profile.CITY_CHANCE = 0.03f;
         profile.LANDSCAPE_TYPE = LandscapeType.FLOATING;
@@ -260,7 +260,7 @@ public class ProfileSetup {
 
         profile = new LostCityProfile("wasteland", true);
         profile.setDescription("Wasteland, no water, bare land");
-        profile.setExtraDescription("This profile works best with Biomes O Plenty");
+        profile.setExtraDescription("This profile works best with Biomes O Plenty and the Wastify mod");
         profile.setIconFile("textures/gui/icon_wasteland.png");
 //        profile.WATERLEVEL_OFFSET = 70;
         profile.VINE_CHANCE = 0.003f;

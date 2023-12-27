@@ -18,7 +18,7 @@ public class BooleanElement extends GuiElement {
         this.gui = gui;
         this.attribute = attribute;
         Boolean c = gui.getLocalSetup().get().map(h -> (Boolean) h.toConfiguration().get(attribute)).orElse(false);
-        field = new ButtonExt(gui, x, y, 60, 16, c ? ComponentFactory.literal("On") : ComponentFactory.literal("Off"), button -> {
+        field = new ButtonExt(x, y, 60, 16, c ? ComponentFactory.literal("On") : ComponentFactory.literal("Off"), button -> {
             Component message = button.getMessage();
             if ("On".equals(message.getString())) { // @todo 1.16 getString() is ugly here!
                 button.setMessage(ComponentFactory.literal("Off"));
