@@ -79,6 +79,12 @@ public class LostCityTerrainFeature {
     private final NoiseGeneratorPerlin rubbleNoise;
     private final NoiseGeneratorPerlin leavesNoise;
     private final NoiseGeneratorPerlin ruinNoise;
+    private final NoiseGeneratorPerlin bottomLayerNoise;    // Used in floating profile for the underside of buildings
+
+    private double[] rubbleBuffer = new double[256];
+    private double[] leavesBuffer = new double[256];
+    private double[] ruinBuffer = new double[256];
+    private double[] bottomLayerBuffer = new double[256];
 
     private BlockState[] randomLeafs = null;
     private BlockState[] randomDirt = null;
@@ -102,6 +108,7 @@ public class LostCityTerrainFeature {
         this.rubbleNoise = new NoiseGeneratorPerlin(rand, 4);
         this.leavesNoise = new NoiseGeneratorPerlin(rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);
+        this.bottomLayerNoise = new NoiseGeneratorPerlin(rand, 4);
 
         air = Blocks.AIR.defaultBlockState();
         hardAir = Blocks.STRUCTURE_VOID.defaultBlockState();
@@ -1761,9 +1768,6 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private double[] rubbleBuffer = new double[256];
-    private double[] leavesBuffer = new double[256];
-
     private void generateRubble(int chunkX, int chunkZ, BuildingInfo info) {
         this.rubbleBuffer = this.rubbleNoise.getRegion(this.rubbleBuffer, (chunkX * 16), (chunkZ * 16), 16, 16, 1.0 / 16.0, 1.0 / 16.0, 1.0D);
         this.leavesBuffer = this.leavesNoise.getRegion(this.leavesBuffer, (chunkX * 64), (chunkZ * 64), 16, 16, 1.0 / 64.0, 1.0 / 64.0, 4.0D);
@@ -1841,8 +1845,6 @@ public class LostCityTerrainFeature {
         return (int) h;
     }
 
-
-    private double[] ruinBuffer = new double[256];
 
     private void generateRuins(BuildingInfo info) {
         if (info.ruinHeight < 0) {
@@ -2835,11 +2837,13 @@ public class LostCityTerrainFeature {
             // For floating worldgen we try to fit the underside of the building better with the island
             // We also remove all blocks from the inside because we generate buildings on top of
             // generated chunks as opposed to blank chunks with non-floating worlds
+            this.bottomLayerBuffer = this.bottomLayerNoise.getRegion(this.bottomLayerBuffer, (info.chunkX * 16), (info.chunkZ * 16), 16, 16, 8.0 / 16.0, 8.0 / 16.0, 1.0D);
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
+                    double vr = bottomLayerBuffer[x + z * 16] / 4.0f;
                     driver.current(x, info.maxBuildHeight - 1, z);
                     int minHeight = info.minBuildHeight;
-                    int lowestToFill = Math.max(minHeight, lowestLevel - 8);
+                    int lowestToFill = Math.max(minHeight, lowestLevel - 6 - (int)vr);
                     while (driver.getBlock() == air && driver.getY() > lowestToFill) {
                         driver.decY();
                     }
