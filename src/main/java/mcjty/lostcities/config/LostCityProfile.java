@@ -112,6 +112,7 @@ public class LostCityProfile implements ILostCityProfile {
     public float CITYSPHERE_OUTSIDE_SURFACE_VARIATION = 1.0f;
     public float CITYSPHERE_MONORAIL_CHANCE = 0.8f;
     public int CITYSPHERE_CLEARABOVE = 0;
+    public int CITYSPHERE_CLEARBELOW = 0;
 
     public int CITYSPHERE_OUTSIDE_GROUNDLEVEL = -1; // DEPRECATED
 
@@ -236,6 +237,7 @@ public class LostCityProfile implements ILostCityProfile {
         CITYSPHERE_FACTOR = cfg.getFloat("citySphereFactor", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_FACTOR, 0.1f, 10.0f, "Only used in 'space' landscape. This factor will be multiplied with the radius of the city to calculate the radius of the outer sphere");
         CITYSPHERE_CHANCE = cfg.getFloat("citySphereChance", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_CHANCE, 0.0f, 1.0f, "The chance that a city sphere will be generated");
         CITYSPHERE_CLEARABOVE = cfg.getInt("citySphereClearAbove", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_CLEARABOVE, 0, 1024, "Number of blocks to clear above the top city sphere glass (0 is disabled)");
+        CITYSPHERE_CLEARBELOW = cfg.getInt("citySphereClearBelow", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_CLEARBELOW, 0, 1024, "Number of blocks to clear below the top city sphere (0 is disabled)");
         CITYSPHERE_SURFACE_VARIATION = cfg.getFloat("sphereSurfaceVariation", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface inside a city sphere more varied");
         CITYSPHERE_OUTSIDE_SURFACE_VARIATION = cfg.getFloat("outsideSurfaceVariation", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_OUTSIDE_SURFACE_VARIATION, 0.0f, 1.0f, "Smaller numbers make the surface outside a city sphere more varied");
         CITYSPHERE_MONORAIL_CHANCE = cfg.getFloat("monorailChance", LostCityProfile.CATEGORY_CITY_SPHERES, CITYSPHERE_MONORAIL_CHANCE, 0.0f, 1.0f, "The chance that a city will have a monorail connection in a certain direction. There will only be an actual connection if there is a city in that direction that also wants a monorail");

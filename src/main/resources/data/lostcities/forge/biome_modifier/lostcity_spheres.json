@@ -2,5 +2,5 @@
   "type": "forge:add_features",
   "biomes": "#minecraft:is_overworld",
   "features": "lostcities:spheres",
-  "step": "vegetal_decoration"
+  "step": "top_layer_modification"
 }

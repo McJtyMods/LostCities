@@ -1,10 +1,12 @@
 Upcoming:
 - New 'allowvoid' keyword for scattered references. This allows you to specify that a building can be placed in void chunks. By default this is false
-- Reintroduced and tweaked the 'floating' profile. This is meant to be used in combination with Lost Worlds mod
+- Reintroduced and tweaked the 'floating', 'caves', and 'space' profiles. These are meant to be used in combination with Lost Worlds mod
 - No longer spawn player in solid blocks for the lost city dimension and in combination with Lost Worlds
 - Better spawn location for cavern style worlds
 - In floating profile the underside of buildings is generated better
 - Tooltips are back in the Lost City configuration screen. Added info about cavern and floating profiles
+- Added new profile option ('citySphereClearBelow') to clear below spheres
+- Moved the sphere feature to a later decoration step
 
 1.20-7.0.4:
 - TqLxQuanZ fixed a problem where a building has an extreme rare chance to not generate

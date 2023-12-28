@@ -432,12 +432,23 @@ public class LostCityTerrainFeature {
                         } else {
                             // Optionally clear above the sphere
                             if (profile.CITYSPHERE_CLEARABOVE > 0) {
-                                maxY = Math.min(provider.getWorld().getMaxBuildHeight(), y + profile.CITYSPHERE_CLEARABOVE);
+                                int mY = Math.min(provider.getWorld().getMaxBuildHeight(), y + profile.CITYSPHERE_CLEARABOVE);
                                 int yy = y;
-                                while (yy <= maxY) {
+                                while (yy <= mY) {
                                     driver.block(air);
                                     driver.incY();
                                     yy++;
+                                }
+                            }
+                            // Optionall clear below the sphere
+                            if (profile.CITYSPHERE_CLEARBELOW > 0) {
+                                driver.current(x, minY-1, z);
+                                int mY = Math.max(provider.getWorld().getMinBuildHeight(), minY-1 - profile.CITYSPHERE_CLEARBELOW);
+                                int yy = minY-1;
+                                while (yy >= mY) {
+                                    driver.block(air);
+                                    driver.decY();
+                                    yy--;
                                 }
                             }
                             break;
