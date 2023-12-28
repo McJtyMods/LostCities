@@ -324,10 +324,10 @@ public class LostCityTerrainFeature {
         }
         generateRailwayDungeons(info);
 
-        if (profile.isSpace()) {
-            generateMonorails(info);
-        }
-
+//        if (profile.isSpace()) {
+//            generateMonorails(info);
+//        }
+//
         fixTorches(info);
 
         // We make a new random here because the primer for a normal chunk may have
@@ -375,6 +375,11 @@ public class LostCityTerrainFeature {
                 int cx = cc.getX() - chunkX * 16;
                 int cz = cc.getZ() - chunkZ * 16;
                 fillSphere(cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getSideBlock());
+            }
+
+            if (profile.isSpace()) {
+                BuildingInfo info = BuildingInfo.getBuildingInfo(chunk.getPos().x, chunk.getPos().z, provider);
+                generateMonorails(info);
             }
 
             driver.actuallyGenerate(chunk);
