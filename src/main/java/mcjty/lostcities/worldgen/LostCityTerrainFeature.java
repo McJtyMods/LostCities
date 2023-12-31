@@ -409,6 +409,7 @@ public class LostCityTerrainFeature {
                             BlockState glass, BlockState sideBlock) {
         double sqradius = radius * radius;
         double sqradiusOffset = (radius-2) * (radius-2);
+        double sqradiusOuter = (radius+2) * (radius+2);
 
         int minY = Math.max(provider.getWorld().getMinBuildHeight(), centery-radius-1);
         int maxY = Math.min(provider.getWorld().getMaxBuildHeight(), centery+radius+1);
@@ -417,12 +418,16 @@ public class LostCityTerrainFeature {
             double dxdx = (x - centerx) * (x - centerx);
             for (int z = 0; z < 16; z++) {
                 double dzdz = (z - centerz) * (z - centerz);
+                int bottom = Integer.MAX_VALUE;
                 if (dxdx + dzdz <= sqradius) {
                     driver.current(x, minY, z);
                     for (int y = minY; y <= centery; y++) {
                         double dydy = (y - centery) * (y - centery);
                         double sqdist = dxdx + dydy + dzdz;
                         if (sqdist <= sqradius && sqdist >= sqradiusOffset) {
+                            if (y < bottom) {
+                                bottom = y-1;
+                            }
                             driver.block(sideBlock);
                         }
                         driver.incY();
@@ -445,12 +450,28 @@ public class LostCityTerrainFeature {
                                     yy++;
                                 }
                             }
+                            if (profile.CITYSPHERE_CLEARABOVE_UNTIL_AIR) {
+                                // Clear until we hit air
+                                while (driver.getBlock() != air) {
+                                    driver.block(air);
+                                    driver.incY();
+                                }
+                            }
                             // Optionall clear below the sphere
-                            if (profile.CITYSPHERE_CLEARBELOW > 0) {
-                                driver.current(x, minY-1, z);
-                                int mY = Math.max(provider.getWorld().getMinBuildHeight(), minY-1 - profile.CITYSPHERE_CLEARBELOW);
-                                int yy = minY-1;
+                            int yy = bottom;
+                            if (profile.CITYSPHERE_CLEARBELOW > 0 && bottom != Integer.MAX_VALUE) {
+                                driver.current(x, yy, z);
+                                int mY = Math.max(provider.getWorld().getMinBuildHeight(), bottom - profile.CITYSPHERE_CLEARBELOW);
                                 while (yy >= mY) {
+                                    driver.block(air);
+                                    driver.decY();
+                                    yy--;
+                                }
+                            }
+                            if (profile.CITYSPHERE_CLEARBELOW_UNTIL_AIR && bottom != Integer.MAX_VALUE) {
+                                // Clear until we hit air or go below build limit
+                                driver.current(x, yy, z);
+                                while (driver.getBlock() != air && yy > provider.getWorld().getMinBuildHeight()) {
                                     driver.block(air);
                                     driver.decY();
                                     yy--;
@@ -459,6 +480,15 @@ public class LostCityTerrainFeature {
                             break;
                         }
                         driver.incY();
+                    }
+                } else if (dxdx + dzdz <= sqradiusOuter) {
+                    // If we are in a space profile then we clear the sphere area too
+                    if (profile.isFloating() || profile.isSpace()) {
+                        driver.current(x, minY, z);
+                        for (int y = minY; y < maxY; y++) {
+                            driver.block(air);
+                            driver.incY();
+                        }
                     }
                 }
             }
@@ -2934,17 +2964,18 @@ public class LostCityTerrainFeature {
 
     // Used for space type worlds: fill underside the building/street until a block is encountered
     private void fillToGround(BuildingInfo info, int lowestLevel, Character borderBlock) {
+        int deepestY = Math.max(1, lowestLevel - 10);
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int y = lowestLevel - 1;
                 driver.current(x, y, z);
                 if (isSide(x, z)) {
-                    while (y > 1 && driver.getBlock() == air) {
+                    while (y > deepestY && driver.getBlock() == air) {
                         driver.block(info.getCompiledPalette().get(borderBlock)).decY();
                         y--;
                     }
                 } else {
-                    while (y > 1 && driver.getBlock() == air) {
+                    while (y > deepestY && driver.getBlock() == air) {
                         driver.block(base).decY();
                         y--;
                     }

@@ -94,8 +94,10 @@ public class ProfileSetup {
         profile.SPAWN_SPHERE = "<in>";
         profile.HORIZON = 0;
         profile.CITYSPHERE_CHANCE = 0.9f;
-        profile.CITYSPHERE_CLEARABOVE = 20;
-        profile.CITYSPHERE_CLEARBELOW = 20;
+        profile.CITYSPHERE_CLEARABOVE = 8;
+        profile.CITYSPHERE_CLEARABOVE_UNTIL_AIR = true;
+        profile.CITYSPHERE_CLEARBELOW = 8;
+        profile.CITYSPHERE_CLEARBELOW_UNTIL_AIR = true;
         profile.RAILWAYS_CAN_END = true;
         profile.RAILWAYS_ENABLED = false;
         profile.RAILWAY_STATIONS_ENABLED = false;
