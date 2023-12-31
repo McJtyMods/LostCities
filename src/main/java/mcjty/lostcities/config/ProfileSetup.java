@@ -86,7 +86,7 @@ public class ProfileSetup {
         STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("space", true);
-        profile.setDescription("Cities in floating glass bubbles. Use this in combination with Lost Worlds void world type");
+        profile.setDescription("Cities in floating glass bubbles. Use this in combination with Lost Worlds 'spheres' world type");
         profile.setExtraDescription("Note! No villages, mineshafts or strongholds in this profile!");
         profile.setIconFile("textures/gui/icon_space.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;

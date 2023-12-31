@@ -385,7 +385,7 @@ public class CitySphere implements ILostSphere {
      * spheres that are disabled so always test for that! If this returns EMPTY there is no sphere at all
      */
     @Nonnull
-    public static CitySphere getCitySphere(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static synchronized CitySphere getCitySphere(int chunkX, int chunkZ, IDimensionInfo provider) {
         ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
         if (!CITY_SPHERE_CACHE.containsKey(coord)) {
             for (PredefinedSphere predef : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {

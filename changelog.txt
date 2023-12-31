@@ -7,6 +7,7 @@ Upcoming:
 - Tooltips are back in the Lost City configuration screen. Added info about cavern and floating profiles
 - Added new profile option ('citySphereClearBelow') to clear below spheres
 - Moved the sphere feature to a later decoration step
+- Potentially fixed a threading related crash with spheres
 
 1.20-7.0.4:
 - TqLxQuanZ fixed a problem where a building has an extreme rare chance to not generate
