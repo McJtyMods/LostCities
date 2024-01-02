@@ -106,8 +106,8 @@ public class GuiLCConfig extends Screen {
             .tooltip(ComponentFactory.literal("Switch between different configuration pages")));
 
 
-        addRenderableWidget(Button.builder(ComponentFactory.literal("Done"), p -> done()).bounds(10, this.height - 30, 120, 20).build());
-        addRenderableWidget(Button.builder(ComponentFactory.literal("Cancel"), p -> cancel()).bounds(this.width - 130, this.height - 30, 120, 20).build());
+        addRenderableWidget(Button.builder(ComponentFactory.literal("Done"), p -> done()).bounds(10, this.height - 22, 120, 20).build());
+        addRenderableWidget(Button.builder(ComponentFactory.literal("Cancel"), p -> cancel()).bounds(this.width - 130, this.height - 22, 120, 20).build());
         addRenderableWidget(new ButtonExt(this.width - 35, 35, 30, 20, ComponentFactory.literal("Rnd"), p -> randomizePreview())
                 .tooltip(ComponentFactory.literal("Randomize the seed for the preview (does not affect the generated world)")));
 
@@ -217,6 +217,8 @@ public class GuiLCConfig extends Screen {
 
     private void initCities(int left) {
         start("Cities");
+        addRenderableWidget(new TextExt(this,10, 30, 240, 2, getFont(), ComponentFactory.literal("Cities are the main feature of Lost Cities. They are generated in a grid pattern. The rarity of cities is determined by the 'Rarity' setting. The 'Threshold' setting determines how much of the world is covered by cities. The 'Scale/Offset' setting determines how the cities are distributed over the world. The 'Inner scale' setting determines how much the cities are clustered together. The 'Parks' setting determines how many parks are generated in a city. The 'Fountains' setting determines how many fountains are generated in a city.")));
+        nl();
         addDouble(left,120, "cities.cityChance").label("Rarity:"); nl();
         perlinScaleElement = addDouble(left,45, "cities.cityPerlinScale").label("Scale/Offset:");
         perlinOffsetElement = addDouble(left + 55,45, "cities.cityPerlinOffset"); nl();
