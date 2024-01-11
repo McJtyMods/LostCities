@@ -366,6 +366,7 @@ public class LostCityTerrainFeature {
 
             int chunkX = chunk.getPos().x;
             int chunkZ = chunk.getPos().z;
+
             if (chunkX == 4 && chunkZ == -4) {
                 System.out.println("LostCityTerrainFeature.generateSpheres");
             }
