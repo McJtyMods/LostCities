@@ -367,6 +367,10 @@ public class LostCityTerrainFeature {
             int chunkX = chunk.getPos().x;
             int chunkZ = chunk.getPos().z;
 
+            if (chunkX == 4 && chunkZ == -4) {
+                System.out.println("LostCityTerrainFeature.generateSpheres");
+            }
+
             CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
             CitySphere.initSphere(sphere, provider);   // Make sure city sphere information is complete
             if (sphere.isEnabled()) {
@@ -413,6 +417,7 @@ public class LostCityTerrainFeature {
 
         int minY = Math.max(provider.getWorld().getMinBuildHeight(), centery-radius-1);
         int maxY = Math.min(provider.getWorld().getMaxBuildHeight(), centery+radius+1);
+        int seaLevel = Tools.getSeaLevel(provider.getWorld());
 
         for (int x = 0 ; x < 16 ; x++) {
             double dxdx = (x - centerx) * (x - centerx);
@@ -441,11 +446,11 @@ public class LostCityTerrainFeature {
                             }
                         } else {
                             // Optionally clear above the sphere
+                            int yy = y;
                             if (profile.CITYSPHERE_CLEARABOVE > 0) {
                                 int mY = Math.min(provider.getWorld().getMaxBuildHeight(), y + profile.CITYSPHERE_CLEARABOVE);
-                                int yy = y;
                                 while (yy <= mY) {
-                                    driver.block(air);
+                                    driver.block(yy <= seaLevel ? liquid : air);
                                     driver.incY();
                                     yy++;
                                 }
@@ -453,17 +458,18 @@ public class LostCityTerrainFeature {
                             if (profile.CITYSPHERE_CLEARABOVE_UNTIL_AIR) {
                                 // Clear until we hit air
                                 while (driver.getBlock() != air) {
-                                    driver.block(air);
+                                    driver.block(yy <= seaLevel ? liquid : air);
                                     driver.incY();
+                                    yy++;
                                 }
                             }
                             // Optionall clear below the sphere
-                            int yy = bottom;
+                            yy = bottom;
                             if (profile.CITYSPHERE_CLEARBELOW > 0 && bottom != Integer.MAX_VALUE) {
                                 driver.current(x, yy, z);
                                 int mY = Math.max(provider.getWorld().getMinBuildHeight(), bottom - profile.CITYSPHERE_CLEARBELOW);
                                 while (yy >= mY) {
-                                    driver.block(air);
+                                    driver.block(yy <= seaLevel ? liquid : air);
                                     driver.decY();
                                     yy--;
                                 }
@@ -471,8 +477,8 @@ public class LostCityTerrainFeature {
                             if (profile.CITYSPHERE_CLEARBELOW_UNTIL_AIR && bottom != Integer.MAX_VALUE) {
                                 // Clear until we hit air or go below build limit
                                 driver.current(x, yy, z);
-                                while (driver.getBlock() != air && yy > provider.getWorld().getMinBuildHeight()) {
-                                    driver.block(air);
+                                while (driver.getBlock() != (yy <= seaLevel ? liquid : air) && yy > provider.getWorld().getMinBuildHeight()) {
+                                    driver.block(yy <= seaLevel ? liquid : air);
                                     driver.decY();
                                     yy--;
                                 }
@@ -486,7 +492,7 @@ public class LostCityTerrainFeature {
                     if (profile.isFloating() || profile.isSpace()) {
                         driver.current(x, minY, z);
                         for (int y = minY; y < maxY; y++) {
-                            driver.block(air);
+                            driver.block(y <= seaLevel ? liquid : air);
                             driver.incY();
                         }
                     }
