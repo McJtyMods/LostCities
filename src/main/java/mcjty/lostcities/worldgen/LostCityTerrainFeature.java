@@ -15,12 +15,14 @@ import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.data.*;
+import mcjty.lostcities.api.ILostWorldsChunkGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
@@ -367,10 +369,6 @@ public class LostCityTerrainFeature {
             int chunkX = chunk.getPos().x;
             int chunkZ = chunk.getPos().z;
 
-            if (chunkX == 4 && chunkZ == -4) {
-                System.out.println("LostCityTerrainFeature.generateSpheres");
-            }
-
             CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
             CitySphere.initSphere(sphere, provider);   // Make sure city sphere information is complete
             if (sphere.isEnabled()) {
@@ -418,6 +416,19 @@ public class LostCityTerrainFeature {
         int minY = Math.max(provider.getWorld().getMinBuildHeight(), centery-radius-1);
         int maxY = Math.min(provider.getWorld().getMaxBuildHeight(), centery+radius+1);
         int seaLevel = Tools.getSeaLevel(provider.getWorld());
+        ChunkGenerator generator;
+        if (provider.getWorld() instanceof WorldGenRegion region) {
+            generator = ((ServerChunkCache)region.getChunkSource()).getGenerator();
+        } else {
+            generator = ((ServerLevel) provider.getWorld()).getChunkSource().getGenerator();
+        }
+        int outerSeaLevel = -1000;
+        if (generator instanceof ILostWorldsChunkGenerator lw) {
+            Integer o = lw.getOuterSeaLevel();
+            if (o != null) {
+                outerSeaLevel = o;
+            }
+        }
 
         for (int x = 0 ; x < 16 ; x++) {
             double dxdx = (x - centerx) * (x - centerx);
@@ -450,7 +461,7 @@ public class LostCityTerrainFeature {
                             if (profile.CITYSPHERE_CLEARABOVE > 0) {
                                 int mY = Math.min(provider.getWorld().getMaxBuildHeight(), y + profile.CITYSPHERE_CLEARABOVE);
                                 while (yy <= mY) {
-                                    driver.block(yy <= seaLevel ? liquid : air);
+                                    driver.block(yy <= outerSeaLevel ? liquid : air);
                                     driver.incY();
                                     yy++;
                                 }
@@ -458,7 +469,7 @@ public class LostCityTerrainFeature {
                             if (profile.CITYSPHERE_CLEARABOVE_UNTIL_AIR) {
                                 // Clear until we hit air
                                 while (driver.getBlock() != air) {
-                                    driver.block(yy <= seaLevel ? liquid : air);
+                                    driver.block(yy <= outerSeaLevel ? liquid : air);
                                     driver.incY();
                                     yy++;
                                 }
@@ -469,7 +480,7 @@ public class LostCityTerrainFeature {
                                 driver.current(x, yy, z);
                                 int mY = Math.max(provider.getWorld().getMinBuildHeight(), bottom - profile.CITYSPHERE_CLEARBELOW);
                                 while (yy >= mY) {
-                                    driver.block(yy <= seaLevel ? liquid : air);
+                                    driver.block(yy <= outerSeaLevel ? liquid : air);
                                     driver.decY();
                                     yy--;
                                 }
@@ -478,7 +489,7 @@ public class LostCityTerrainFeature {
                                 // Clear until we hit air or go below build limit
                                 driver.current(x, yy, z);
                                 while (driver.getBlock() != (yy <= seaLevel ? liquid : air) && yy > provider.getWorld().getMinBuildHeight()) {
-                                    driver.block(yy <= seaLevel ? liquid : air);
+                                    driver.block(yy <= outerSeaLevel ? liquid : air);
                                     driver.decY();
                                     yy--;
                                 }
@@ -492,7 +503,7 @@ public class LostCityTerrainFeature {
                     if (profile.isFloating() || profile.isSpace()) {
                         driver.current(x, minY, z);
                         for (int y = minY; y < maxY; y++) {
-                            driver.block(y <= seaLevel ? liquid : air);
+                            driver.block(y <= outerSeaLevel ? liquid : air);
                             driver.incY();
                         }
                     }
