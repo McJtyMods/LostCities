@@ -8,6 +8,7 @@ Upcoming:
 - Added new profile option ('citySphereClearBelow') to clear below spheres
 - Moved the sphere feature to a later decoration step
 - Potentially fixed a threading related crash with spheres
+- New API to allow another mod to set the default profile for the overworld
 
 1.20-7.0.4:
 - TqLxQuanZ fixed a problem where a building has an extreme rare chance to not generate
