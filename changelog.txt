@@ -1,4 +1,4 @@
-Upcoming:
+1.20-7.1.0:
 - New 'allowvoid' keyword for scattered references. This allows you to specify that a building can be placed in void chunks. By default this is false
 - Reintroduced and tweaked the 'floating', 'caves', and 'space' profiles. These are meant to be used in combination with Lost Worlds mod
 - No longer spawn player in solid blocks for the lost city dimension and in combination with Lost Worlds
