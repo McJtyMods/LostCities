@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.0.20:
 - TqLxQuanZ did various optimizations to Lost Cities worldgen and improved multibuilding handling
 
 1.19-6.0.19:
