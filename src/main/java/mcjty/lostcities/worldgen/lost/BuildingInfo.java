@@ -481,17 +481,136 @@ public class BuildingInfo implements ILostChunkInfo {
      * Initialize the chunk characteristics with the multi building information
      */
     private static void initMultiBuildingSection(LostChunkCharacteristics characteristics, int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        for (int x = -2 ; x <= 0 ; x++) {
-            for (int z = -2 ; z <= 0 ; z++) {
-                MultiBuilding building = isTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile);
-                if (building != null) {
-                    if (building.getDimX() > -x && building.getDimZ() > -z) {
-                        characteristics.multiPos = new MultiPos(-x, -z, building.getDimX(), building.getDimZ());
-                        characteristics.multiBuilding = building;
-                        return;
+        MultiBuilding building = null;
+        CityStyle cityStyle = City.getCityStyle(chunkX, chunkZ, provider, profile);
+        ResourceKey<Level> type = provider.getType();
+
+        boolean existingMulti = false;
+        boolean isMultiCandidate = false;
+        boolean allowCheck = true;
+        int candidateX = 0;
+        int candidateZ = 0;
+
+        int multiMaxSizeX = profile.MULTI_MAX_X - 1;
+        int multiMaxSizeZ = profile.MULTI_MAX_Z - 1;
+        for (int x = -multiMaxSizeX ; x <= 0 ; x++) {
+            if (!allowCheck)
+            {
+                break;
+            }
+            for (int z = -multiMaxSizeZ ; z <= 0 ; z++) {
+                if (!allowCheck)
+                {
+                    break;
+                }
+                cityStyle = City.getCityStyle(chunkX + x, chunkZ + z, provider, profile);
+                if (!cityStyle.hasMultiBuildings())
+                {
+                    characteristics.multiPos = MultiPos.SINGLE;
+                    characteristics.multiBuilding = null;
+                    return;
+                }
+                if (isCandidateForTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile, cityStyle)) {
+                    isMultiCandidate = true;
+                    allowCheck = false;
+                    candidateX = x;
+                    candidateZ = z;
+                    break;
+                }
+            }
+        }
+
+        // There is no multibuilding candidate here.
+        if (!isMultiCandidate)
+        {
+            characteristics.multiPos = MultiPos.SINGLE;
+            characteristics.multiBuilding = null;
+            return;
+        }
+
+        // If there is a candidate, we start making it as our current top left root
+        int rootX = chunkX + candidateX;
+        int rootZ = chunkZ + candidateZ;
+
+        // If there is multibuilding and it is a predefined building, then we just get the result.
+        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(rootX, rootZ, type);
+        if (predefinedBuilding != null && predefinedBuilding.multi()) {
+            // Regardless of other conditions, this is the top left of a multibuilding
+            building = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), predefinedBuilding.building());
+            characteristics.multiPos = new MultiPos(-candidateX, -candidateZ, building.getDimX(), building.getDimZ());
+            characteristics.multiBuilding = building;
+            return;
+        }
+
+        // if there is candidate, means we can set this chunk as multipos
+        Random rand = getMultiBuildingRandom(rootX, rootZ, provider.getSeed());
+        String name = cityStyle.getRandomMultiBuilding(rand);
+        if (name != null) {
+            building = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), name);
+        }
+        else
+        {
+            characteristics.multiPos = MultiPos.SINGLE;
+            characteristics.multiBuilding = null;
+            return;
+        }
+
+        if (building == null)
+        {
+            characteristics.multiPos = MultiPos.SINGLE;
+            characteristics.multiBuilding = null;
+            return;
+        }
+
+        for (int x = -multiMaxSizeX ; x < building.getDimX() ; x++) {
+            for (int z = -multiMaxSizeZ ; z < building.getDimZ() ; z++) {
+                // the Inner square check
+                if (x < 0 || z < 0)
+                {
+                    CityStyle otherStyle = City.getCityStyle(rootX + x, rootZ + z, provider, profile);
+                    if (isCandidateForTopLeftOfMultiBuilding(rootX + x, rootZ + z, provider, profile, otherStyle)) {
+                        int borderX = rootX + x + multiMaxSizeX;
+                        int borderZ = rootZ + z + multiMaxSizeZ;
+                        if (borderX >= rootX && borderZ >= rootZ)
+                        {
+                            existingMulti = true;
+                        }
                     }
                 }
             }
+        }
+
+        // there's already a multibuilding blocking the current multibuilding
+        if (existingMulti)
+        {
+            characteristics.multiPos = MultiPos.SINGLE;
+            characteristics.multiBuilding = null;
+            return;
+        }
+
+        // There is no other multibuilding candidate topleft of  this one. So we test further
+        PredefinedStreet predefinedStreet = City.getPredefinedStreet(rootX, rootZ, provider.getType());
+        if (predefinedStreet != null) {
+            characteristics.multiPos = MultiPos.SINGLE;
+            characteristics.multiBuilding = null;
+            return;   // There is a street here so no building
+        }
+
+        // Check if all chunks for the size of the multibuilding are candidates
+        for (int x = 0 ; x < building.getDimX() ; x++) {
+            for (int z = 0 ; z < building.getDimZ() ; z++) {
+                if ((x != 0 || z != 0) && !isMultiBuildingCandidate(rootX + x, rootZ + z, provider, profile, cityStyle)) {
+                    characteristics.multiPos = MultiPos.SINGLE;
+                    characteristics.multiBuilding = null;
+                    return;
+                }
+            }
+        }
+        if (building.getDimX() > -candidateX && building.getDimZ() > -candidateZ)
+        {
+            characteristics.multiPos = new MultiPos(-candidateX, -candidateZ, building.getDimX(), building.getDimZ());
+            characteristics.multiBuilding = building;
+            return;
         }
         characteristics.multiPos = MultiPos.SINGLE;
         characteristics.multiBuilding = null;
@@ -598,69 +717,6 @@ public class BuildingInfo implements ILostChunkInfo {
             }
         }
         return cnt > 12;    // We make a tunnel if more then half of the chunk is above the highway
-    }
-
-    /**
-     * If possible get the multibuilding that would fit here. Returns null if not suitable
-     * This function does not use cached building info or characteristics
-     */
-    @Nullable
-    private static MultiBuilding isTopLeftOfMultiBuilding(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        ResourceKey<Level> type = provider.getType();
-        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
-        if (predefinedBuilding != null && predefinedBuilding.multi()) {
-            // Regardless of other conditions, this is the top left of a multibuilding
-            return AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), predefinedBuilding.building());
-        }
-
-        CityStyle cityStyle = City.getCityStyle(chunkX, chunkZ, provider, profile);
-        if (!cityStyle.hasMultiBuildings()) {
-            return null;
-        }
-
-        Random rand = getMultiBuildingRandom(chunkX, chunkZ, provider.getSeed());
-        String name = cityStyle.getRandomMultiBuilding(rand);
-        if (name == null) {
-            return null;
-        }
-        MultiBuilding building = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), name);
-
-        // First make sure that there is no other candidate for a multibuilding top-left of us
-        // Area to check (x) with O the current chunk:
-        //      xxxx
-        //      xxxx
-        //      xxO.
-        //      xx..
-        for (int x = -2 ; x <= 1 ; x++) {
-            for (int z = -2 ; z <= 1 ; z++) {
-                if (x == 0 && z == 0) {
-                    if (!isCandidateForTopLeftOfMultiBuilding(chunkX, chunkZ, provider, profile, cityStyle)) {
-                        return null;
-                    }
-                } if (x < 0 || z < 0) {
-                    CityStyle otherStyle = City.getCityStyle(chunkX + x, chunkZ + z, provider, profile);
-                    if (isCandidateForTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile, otherStyle)) {
-                        return null;
-                    }
-                }
-            }
-        }
-
-        // There is no other multibuilding candidate topleft of this one. So we test further
-        PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
-        if (predefinedStreet != null) {
-            return null;   // There is a street here so no building
-        }
-
-        // Check if all chunks for the size of the multibuilding are candidates
-        for (int x = 0 ; x < building.getDimX() ; x++) {
-            for (int z = 0 ; z < building.getDimZ() ; z++) {
-                if ((x != 0 || z != 0) && !isMultiBuildingCandidate(chunkX+x, chunkZ+z, provider, profile, cityStyle)) {
-                    return null;
-                }
-            }
-        }
-        return building;
     }
 
     public static void cleanCache() {

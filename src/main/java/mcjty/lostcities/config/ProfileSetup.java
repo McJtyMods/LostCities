@@ -32,8 +32,9 @@ public class ProfileSetup {
         STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("cavern", true);
-        profile.setDescription("This profile is meant for a cavern type world. Use this in combination with the Lost Worlds caves world type");
-        profile.setExtraDescription("There are lights in the building but the outside is very dark. This is very hard. It's recommended you enable a bonus chest!");
+        profile.setDescription("This profile is meant for a cavern type world. There are lights in the building but the outside is very dark.");
+        profile.setExtraDescription("This is very hard. It's recommended you enable a bonus chest!");
+        profile.setWarning("Use this in combination with the Lost Worlds 'caves' world type");
         profile.setIconFile("textures/gui/icon_cavern.png");
         profile.LANDSCAPE_TYPE = LandscapeType.CAVERN;
         profile.HORIZON = 128;
@@ -65,8 +66,9 @@ public class ProfileSetup {
         STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("floating", true);
-        profile.setDescription("Cities on floating islands. Preferably use this in combination with the Lost Worlds islands or islandsw world types");
+        profile.setDescription("Cities on floating islands");
         profile.setExtraDescription("Note! No mineshafts or strongholds in this profile!");
+        profile.setWarning("Preferably use this in combination with the Lost Worlds 'islands' world type");
         profile.setIconFile("textures/gui/icon_floating.png");
         profile.CITY_CHANCE = 0.03f;
         profile.LANDSCAPE_TYPE = LandscapeType.FLOATING;
@@ -86,8 +88,9 @@ public class ProfileSetup {
         STANDARD_PROFILES.put(profile.getName(), profile);
 
         profile = new LostCityProfile("space", true);
-        profile.setDescription("Cities in floating glass bubbles. Use this in combination with Lost Worlds 'spheres' world type");
+        profile.setDescription("Cities in floating glass bubbles");
         profile.setExtraDescription("Note! No villages, mineshafts or strongholds in this profile!");
+        profile.setWarning("Preferably use this in combination with the Lost Worlds 'spheres' world type");
         profile.setIconFile("textures/gui/icon_space.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPACE;
         profile.CITYSPHERE_OUTSIDE_PROFILE = "void_outside";
@@ -155,7 +158,7 @@ public class ProfileSetup {
 
         profile = new LostCityProfile("biosphere", true);
         profile.setDescription("Jungles in big glass bubbles on a barren landscape");
-        profile.setExtraDescription("This profile works best with Biomes O Plenty");
+        profile.setWarning("Preferably use this in combination with the Lost Worlds 'normal' world type");
         profile.setIconFile("textures/gui/icon_biosphere.png");
         profile.LANDSCAPE_TYPE = LandscapeType.SPHERES;
         profile.HORIZON = 30;
@@ -274,13 +277,15 @@ public class ProfileSetup {
         profile.AVOID_FOLIAGE = true;
         STANDARD_PROFILES.put(profile.getName(), profile);
 
-//        profile = new LostCityProfile("atlantis", true);
-//        profile.setDescription("Drowned cities, raised waterlevel");
-//        profile.setIconFile("textures/gui/icon_atlantis.png");
-////        profile.WATERLEVEL_OFFSET = -20;
-//        profile.RUIN_CHANCE = 0.1f;
-//        standardProfiles.put(profile.getName(), profile);
-//
+        profile = new LostCityProfile("atlantis", true);
+        profile.setDescription("Drowned cities, raised waterlevel (to 89)");
+        profile.setWarning("Preferably use this in combination with the Lost Worlds 'atlantis' world type");
+        profile.setIconFile("textures/gui/icon_atlantis.png");
+//        profile.WATERLEVEL_OFFSET = -20;
+        profile.SEALEVEL = 89;
+        profile.RUIN_CHANCE = 0.1f;
+        STANDARD_PROFILES.put(profile.getName(), profile);
+
 //        profile = new LostCityProfile("chisel", true);
 //        profile.setDescription("Use Chisel blocks (only if chisel is available!)");
 //        profile.setIconFile("textures/gui/icon_chisel.png");

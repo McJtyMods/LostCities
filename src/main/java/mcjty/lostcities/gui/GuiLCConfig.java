@@ -56,7 +56,7 @@ public class GuiLCConfig extends Screen {
         localSetup.copyFrom(LostCitySetup.CLIENT_SETUP);
     }
 
-    private static void selectProfile(String profileName, @Nullable LostCityProfile profile) {
+    public static void selectProfile(String profileName, @Nullable LostCityProfile profile) {
         Config.profileFromClient = profileName;
 
         LostCityFeature.globalDimensionInfoDirtyCounter++;

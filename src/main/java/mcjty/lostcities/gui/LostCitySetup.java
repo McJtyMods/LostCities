@@ -64,7 +64,10 @@ public class LostCitySetup {
 
     public Component getProfileInfo() {
         return get()
-                .map(p -> ComponentFactory.literal(p.getDescription() + "\n").append(ComponentFactory.literal(p.getExtraDescription()).withStyle(ChatFormatting.AQUA)))
+                .map(p -> ComponentFactory.literal(p.getDescription() + "\n").append(
+                        ComponentFactory.literal(p.getExtraDescription() + "\n").withStyle(ChatFormatting.AQUA)).append(
+                        ComponentFactory.literal(p.getWarning()).withStyle(ChatFormatting.RED)
+                ))
                 .orElse(ComponentFactory.literal("Click here to select a profile for your Lost Cities"));
     }
 

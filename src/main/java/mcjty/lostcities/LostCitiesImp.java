@@ -1,6 +1,7 @@
 package mcjty.lostcities;
 
 import mcjty.lostcities.api.*;
+import mcjty.lostcities.gui.GuiLCConfig;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.worldgen.IDimensionInfo;
@@ -35,6 +36,11 @@ public class LostCitiesImp implements ILostCities {
     @Override
     public void registerDimension(ResourceKey<Level> key, String profile) {
         Config.registerLostCityDimension(key, profile);
+    }
+
+    @Override
+    public void setOverworldProfile(String profile) {
+        GuiLCConfig.selectProfile(profile, null);
     }
 
     public record LostCityInformation(IDimensionInfo dimensionInfo) implements ILostCityInformation {

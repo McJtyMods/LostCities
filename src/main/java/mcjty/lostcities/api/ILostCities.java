@@ -39,4 +39,9 @@ public interface ILostCities {
      * (for example in buildSurface)
      */
     void registerDimension(ResourceKey<Level> key, String profile);
+
+    /**
+     * Call this client-side(!) before a world is created. It allows you to set the profile for the overworld
+     */
+    void setOverworldProfile(String profile);
 }
