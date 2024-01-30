@@ -257,7 +257,7 @@ public class BuildingInfo implements ILostChunkInfo {
         if (isCity) {
             return groundLevel + cityLevel * FLOORHEIGHT;
         } else {
-            return groundLevel + cityLevel * FLOORHEIGHT -1;
+            return groundLevel + cityLevel * FLOORHEIGHT - 1;
         }
     }
 
@@ -342,9 +342,9 @@ public class BuildingInfo implements ILostChunkInfo {
             // different styled cities mix
             if (characteristics.isCity && !characteristics.couldHaveBuilding) {
                 Counter<String> counter = new Counter<>();
-                for (int cx = -1 ; cx <= 1 ; cx++) {
-                    for (int cz = -1 ; cz <= 1 ; cz++) {
-                        cityStyle = City.getCityStyle(key.chunkX()+cx, key.chunkZ()+cz, provider, profile);
+                for (int cx = -1; cx <= 1; cx++) {
+                    for (int cz = -1; cz <= 1; cz++) {
+                        cityStyle = City.getCityStyle(key.chunkX() + cx, key.chunkZ() + cz, provider, profile);
                         counter.add(cityStyle.getName());
                         if (cx == 0 && cz == 0) {
                             counter.add(cityStyle.getName());   // Add this chunk again for a bias
@@ -456,7 +456,7 @@ public class BuildingInfo implements ILostChunkInfo {
         } else if (hasHighway(chunkX, chunkZ, provider, profile)) {
             // We are above a highway. Check if we have room for a building
             int maxh = Math.max(Highway.getXHighwayLevel(chunkX, chunkZ, provider, profile), Highway.getZHighwayLevel(chunkX, chunkZ, provider, profile));
-            b = cityLevel > maxh+1;       // Allow a building if it is higher then the maximum highway + one
+            b = cityLevel > maxh + 1;       // Allow a building if it is higher then the maximum highway + one
             // Later we will take care to make sure we don't have too many cellars
             // Note that for easy of coding we still disallow multi-buildings above highways
         } else if (hasRailway(chunkX, chunkZ, provider, profile)) {
@@ -493,19 +493,16 @@ public class BuildingInfo implements ILostChunkInfo {
 
         int multiMaxSizeX = profile.MULTI_MAX_X - 1;
         int multiMaxSizeZ = profile.MULTI_MAX_Z - 1;
-        for (int x = -multiMaxSizeX ; x <= 0 ; x++) {
-            if (!allowCheck)
-            {
+        for (int x = -multiMaxSizeX; x <= 0; x++) {
+            if (!allowCheck) {
                 break;
             }
-            for (int z = -multiMaxSizeZ ; z <= 0 ; z++) {
-                if (!allowCheck)
-                {
+            for (int z = -multiMaxSizeZ; z <= 0; z++) {
+                if (!allowCheck) {
                     break;
                 }
                 cityStyle = City.getCityStyle(chunkX + x, chunkZ + z, provider, profile);
-                if (!cityStyle.hasMultiBuildings())
-                {
+                if (!cityStyle.hasMultiBuildings()) {
                     characteristics.multiPos = MultiPos.SINGLE;
                     characteristics.multiBuilding = null;
                     return;
@@ -521,8 +518,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         // There is no multibuilding candidate here.
-        if (!isMultiCandidate)
-        {
+        if (!isMultiCandidate) {
             characteristics.multiPos = MultiPos.SINGLE;
             characteristics.multiBuilding = null;
             return;
@@ -547,32 +543,27 @@ public class BuildingInfo implements ILostChunkInfo {
         String name = cityStyle.getRandomMultiBuilding(rand);
         if (name != null) {
             building = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), name);
-        }
-        else
-        {
+        } else {
             characteristics.multiPos = MultiPos.SINGLE;
             characteristics.multiBuilding = null;
             return;
         }
 
-        if (building == null)
-        {
+        if (building == null) {
             characteristics.multiPos = MultiPos.SINGLE;
             characteristics.multiBuilding = null;
             return;
         }
 
-        for (int x = -multiMaxSizeX ; x < building.getDimX() ; x++) {
-            for (int z = -multiMaxSizeZ ; z < building.getDimZ() ; z++) {
+        for (int x = -multiMaxSizeX; x < building.getDimX(); x++) {
+            for (int z = -multiMaxSizeZ; z < building.getDimZ(); z++) {
                 // the Inner square check
-                if (x < 0 || z < 0)
-                {
+                if (x < 0 || z < 0) {
                     CityStyle otherStyle = City.getCityStyle(rootX + x, rootZ + z, provider, profile);
                     if (isCandidateForTopLeftOfMultiBuilding(rootX + x, rootZ + z, provider, profile, otherStyle)) {
                         int borderX = rootX + x + multiMaxSizeX;
                         int borderZ = rootZ + z + multiMaxSizeZ;
-                        if (borderX >= rootX && borderZ >= rootZ)
-                        {
+                        if (borderX >= rootX && borderZ >= rootZ) {
                             existingMulti = true;
                         }
                     }
@@ -581,8 +572,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         // there's already a multibuilding blocking the current multibuilding
-        if (existingMulti)
-        {
+        if (existingMulti) {
             characteristics.multiPos = MultiPos.SINGLE;
             characteristics.multiBuilding = null;
             return;
@@ -597,8 +587,8 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         // Check if all chunks for the size of the multibuilding are candidates
-        for (int x = 0 ; x < building.getDimX() ; x++) {
-            for (int z = 0 ; z < building.getDimZ() ; z++) {
+        for (int x = 0; x < building.getDimX(); x++) {
+            for (int z = 0; z < building.getDimZ(); z++) {
                 if ((x != 0 || z != 0) && !isMultiBuildingCandidate(rootX + x, rootZ + z, provider, profile, cityStyle)) {
                     characteristics.multiPos = MultiPos.SINGLE;
                     characteristics.multiBuilding = null;
@@ -606,8 +596,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
             }
         }
-        if (building.getDimX() > -candidateX && building.getDimZ() > -candidateZ)
-        {
+        if (building.getDimX() > -candidateX && building.getDimZ() > -candidateZ) {
             characteristics.multiPos = new MultiPos(-candidateX, -candidateZ, building.getDimX(), building.getDimZ());
             characteristics.multiBuilding = building;
             return;
@@ -628,9 +617,9 @@ public class BuildingInfo implements ILostChunkInfo {
         MultiPos mp = thisone.multiPos;
         int topX = chunkX - mp.x();
         int topZ = chunkZ - mp.z();
-        for (int x = 0 ; x < mp.w() ; x++) {
-            for (int z = 0 ; z < mp.h() ; z++) {
-                level += getCityLevel(topX+x, topZ+z, provider);
+        for (int x = 0; x < mp.w(); x++) {
+            for (int z = 0; z < mp.h(); z++) {
+                level += getCityLevel(topX + x, topZ + z, provider);
             }
         }
         return level / (mp.w() * mp.h());
@@ -709,8 +698,8 @@ public class BuildingInfo implements ILostChunkInfo {
         int highwayHeight = groundLevel + level * FLOORHEIGHT + 3;
         // If there are many places in the chunk above this height we will need a tunnel
         int cnt = 0;
-        for (int x = 2 ; x < 16 ; x += 3) {
-            for (int z = 2 ; z < 16 ; z += 3) {
+        for (int x = 2; x < 16; x += 3) {
+            for (int z = 2; z < 16; z += 3) {
                 if (heightmap.getHeight(x, z) > highwayHeight) {
                     cnt++;
                 }
@@ -901,8 +890,8 @@ public class BuildingInfo implements ILostChunkInfo {
             int maxfloors = getMaxfloors(cs);
             int f = profile.BUILDING_MINFLOORS + rand.nextInt((int) (profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (profile.BUILDING_MAXFLOORS_CHANCE - profile.BUILDING_MINFLOORS_CHANCE)));
             f++;
-            if (f > maxfloors+1) {
-                f = maxfloors+1;
+            if (f > maxfloors + 1) {
+                f = maxfloors + 1;
             }
             int minfloors = getMinfloors(cs);
             if (f < minfloors) {
@@ -912,9 +901,9 @@ public class BuildingInfo implements ILostChunkInfo {
             if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
                 float reldest = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
                 if (reldest > .6f) {
-                    f = Math.max(minfloors, f-2);
+                    f = Math.max(minfloors, f - 2);
                 } else if (reldest > .5f) {
-                    f = Math.max(minfloors, f-1);
+                    f = Math.max(minfloors, f - 1);
                 }
             }
 
@@ -926,10 +915,10 @@ public class BuildingInfo implements ILostChunkInfo {
 
             int maxcellars = getMaxcellars(cs);
             int mincellars = Math.max(profile.BUILDING_MINCELLARS, buildingType.getMinCellars());
-            int fb = mincellars + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars+1));
+            int fb = mincellars + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars + 1));
             if (getMaxHighwayLevel() >= 0) {
                 // If we are above a highway we make sure we can't have too many cellars
-                fb = Math.min(cityLevel-getMaxHighwayLevel()-1, fb);
+                fb = Math.min(cityLevel - getMaxHighwayLevel() - 1, fb);
                 if (fb < 0) {
                     fb = 0;
                 }
@@ -1079,13 +1068,13 @@ public class BuildingInfo implements ILostChunkInfo {
         }
         return maxfloors;
     }
-    
+
     public Boolean getAllowDoors() {
-    	return buildingType.getAllowDoors();
+        return buildingType.getAllowDoors();
     }
 
     public Boolean getAllowFillers() {
-    	return buildingType.getAllowFillers();
+        return buildingType.getAllowFillers();
     }
 
     public int getHighwayXLevel() {
@@ -1141,7 +1130,6 @@ public class BuildingInfo implements ILostChunkInfo {
         // @todo for now
         return getCityLevelFloating(chunkX, chunkZ, provider);
     }
-
 
 
     private static int getCityLevelSpace(int chunkX, int chunkZ, IDimensionInfo provider) {
@@ -1826,22 +1814,22 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public void updateMinMaxL2(MinMax minMax, int offs) {
         MinMax h = getDesiredMaxHeightL1();
-        if ((h.min-offs) < minMax.min) {
-            minMax.min = h.min-offs;
+        if ((h.min - offs) < minMax.min) {
+            minMax.min = h.min - offs;
         }
-        if ((h.max+offs) < minMax.max) {
-            minMax.max = h.max+offs;
+        if ((h.max + offs) < minMax.max) {
+            minMax.max = h.max + offs;
         }
     }
 
 
     private void updateMinMaxL1(MinMax minMax, int offs) {
         int h = getLowestCityHeightAtChunkCorner();
-        if ((h-offs) < minMax.min) {
-            minMax.min = h-offs;
+        if ((h - offs) < minMax.min) {
+            minMax.min = h - offs;
         }
-        if ((h+offs) < minMax.max) {
-            minMax.max = h+offs;
+        if ((h + offs) < minMax.max) {
+            minMax.max = h + offs;
         }
     }
 
