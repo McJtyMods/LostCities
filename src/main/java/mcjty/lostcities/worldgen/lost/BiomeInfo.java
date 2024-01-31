@@ -30,10 +30,6 @@ public class BiomeInfo {
         return BIOME_INFO_MAP.get(coord);
     }
 
-    public static BiomeInfo getBiomeInfo(IDimensionInfo provider, int chunkX, int chunkZ) {
-        return getBiomeInfo(provider, new ChunkCoord(provider.dimension(), chunkX, chunkZ));
-    }
-
     public Holder<Biome> getMainBiome() {
         return mainBiome;
     }

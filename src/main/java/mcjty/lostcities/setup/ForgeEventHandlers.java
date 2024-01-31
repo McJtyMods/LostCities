@@ -5,6 +5,7 @@ import mcjty.lostcities.commands.ModCommands;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.playerdata.PlayerProperties;
 import mcjty.lostcities.playerdata.PropertiesDispatcher;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
@@ -148,7 +149,8 @@ public class ForgeEventHandlers {
             } else if (!profile.SPAWN_SPHERE.isEmpty()) {
                 if ("<in>".equals(profile.SPAWN_SPHERE)) {
                     isSuitable = blockPos -> {
-                        CitySphere sphere = CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, dimensionInfo);
+                        ChunkCoord coord = new ChunkCoord(dimensionInfo.getType(), blockPos.getX() >> 4, blockPos.getZ() >> 4);
+                        CitySphere sphere = CitySphere.getCitySphere(coord, dimensionInfo);
                         if (!sphere.isEnabled()) {
                             return false;
                         }
@@ -158,7 +160,8 @@ public class ForgeEventHandlers {
                     needsCheck = true;
                 } else if ("<out>".equals(profile.SPAWN_SPHERE)) {
                     isSuitable = blockPos -> {
-                        CitySphere sphere = CitySphere.getCitySphere(blockPos.getX() >> 4, blockPos.getZ() >> 4, dimensionInfo);
+                        ChunkCoord coord = new ChunkCoord(dimensionInfo.getType(), blockPos.getX() >> 4, blockPos.getZ() >> 4);
+                        CitySphere sphere = CitySphere.getCitySphere(coord, dimensionInfo);
                         if (!sphere.isEnabled()) {
                             return true;
                         }
@@ -208,7 +211,8 @@ public class ForgeEventHandlers {
     }
 
     private boolean isOutsideBuilding(IDimensionInfo provider, BlockPos pos) {
-        BuildingInfo info = BuildingInfo.getBuildingInfo(pos.getX() >> 4, pos.getZ() >> 4, provider);
+        ChunkCoord coord = new ChunkCoord(provider.getType(), pos.getX() >> 4, pos.getZ() >> 4);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
         return !(info.isCity() && info.hasBuilding);
     }
 
@@ -234,7 +238,8 @@ public class ForgeEventHandlers {
                     continue;
                 }
 
-                LostCityProfile profile = BuildingInfo.getProfile(x >> 4, z >> 4, provider);
+                ChunkCoord coord = new ChunkCoord(provider.getType(), x >> 4, z >> 4);
+                LostCityProfile profile = BuildingInfo.getProfile(coord, provider);
 
                 for (int y = profile.GROUNDLEVEL-5 ; y < 125 ; y++) {
                     BlockPos pos = new BlockPos(x, y, z);

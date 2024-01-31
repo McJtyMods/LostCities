@@ -8,6 +8,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lostcities.setup.Registration;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
@@ -66,7 +67,8 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
             context.getSource().sendFailure(ComponentFactory.literal("This dimension doesn't support Lost Cities!"));
             return 0;
         }
-        BuildingInfo info = BuildingInfo.getBuildingInfo(bottom.getX() >> 4, bottom.getZ() >> 4, dimInfo);
+        ChunkCoord coord = new ChunkCoord(level.dimension(), bottom.getX() >> 4, bottom.getZ() >> 4);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimInfo);
         info.setBuildingType(building, cellars, floors, bottom.getY());
 
         ChunkPos cp = new ChunkPos(bottom);
