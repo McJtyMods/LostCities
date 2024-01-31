@@ -3,6 +3,7 @@ package mcjty.lostcities;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.Registration;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
@@ -41,7 +42,8 @@ public class LostCitiesImp implements ILostCities {
 
         @Override
         public ILostChunkInfo getChunkInfo(int chunkX, int chunkZ) {
-            return BuildingInfo.getBuildingInfo(chunkX, chunkZ, dimensionInfo);
+            ChunkCoord coord = new ChunkCoord(dimensionInfo.getType(), chunkX, chunkZ);
+            return BuildingInfo.getBuildingInfo(coord, dimensionInfo);
         }
 
         @Override

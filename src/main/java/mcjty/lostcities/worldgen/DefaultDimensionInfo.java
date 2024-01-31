@@ -1,6 +1,7 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.core.BlockPos;
@@ -90,10 +91,16 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 
     @Override
     public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
-        return feature.getHeightmap(chunkX, chunkZ, getWorld());
+        ChunkCoord coord = new ChunkCoord(getType(), chunkX, chunkZ);
+        return feature.getHeightmap(coord, getWorld());
     }
 
-//    @Override
+    @Override
+    public ChunkHeightmap getHeightmap(ChunkCoord coord) {
+        return feature.getHeightmap(coord, getWorld());
+    }
+
+    //    @Override
 //    public Biome[] getBiomes(int chunkX, int chunkZ) {
 //        AbstractChunkProvider chunkProvider = getWorld().getChunkProvider();
 //        if (chunkProvider instanceof ServerChunkProvider) {
