@@ -71,6 +71,7 @@ public class LostCityTerrainFeature {
     private Set<BlockState> railStates = null;
     private Set<BlockState> statesNeedingTodo = null;
     private Set<BlockState> statesNeedingLightingUpdate = null;
+    private Set<BlockState> statesNeedingPoiUpdate = null;
 
     private char street;
     private char streetBase;
@@ -213,6 +214,16 @@ public class LostCityTerrainFeature {
             }
         }
         return statesNeedingLightingUpdate;
+    }
+
+    private Set<BlockState> getStatesNeedingPoiUpdate() {
+        if (statesNeedingPoiUpdate == null) {
+            statesNeedingPoiUpdate = new HashSet<>();
+            for (Holder<Block> bh : Tools.getBlocksForTag(LostTags.NEEDSPOI_TAG)) {
+                addStates(bh.value(), statesNeedingPoiUpdate);
+            }
+        }
+        return statesNeedingPoiUpdate;
     }
 
     private static void addStates(Block block, Set<BlockState> set) {
@@ -2436,8 +2447,9 @@ public class LostCityTerrainFeature {
                                     b = handleBlockEntity(info, part, oy, provider.getWorld(), rx, rz, y, b, inf);
                                 }
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
-                                BlockPos pos = driver.getCurrentCopy();
-                                updateNeeded(info, pos);
+                                updateNeeded(info, driver.getCurrentCopy());
+                            } else if (getStatesNeedingPoiUpdate().contains(b)) {
+                                GlobalTodo.getData(provider.getWorld().getLevel()).addPoi(driver.getCurrentCopy());
                             } else if (getStatesNeedingTodo().contains(b)) {
                                 b = handleTodo(info, oy, provider.getWorld(), rx, rz, y, b);
                             }
