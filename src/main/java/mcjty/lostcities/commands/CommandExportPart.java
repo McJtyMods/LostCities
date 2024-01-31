@@ -11,6 +11,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import mcjty.lostcities.editor.EditorInfo;
 import mcjty.lostcities.setup.Registration;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
@@ -72,7 +73,8 @@ public class CommandExportPart implements Command<CommandSourceStack> {
             return 0;
         }
 
-        BuildingInfo info = BuildingInfo.getBuildingInfo(start.getX() >> 4, start.getZ() >> 4, dimInfo);
+        ChunkCoord coord = new ChunkCoord(dimInfo.getType(), start.getX() >> 4, start.getZ() >> 4);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimInfo);
         CompiledPalette palette = info.getCompiledPalette();
         Palette partPalette = part.getLocalPalette(level);
         Palette buildingPalette = info.getBuilding().getLocalPalette(level);

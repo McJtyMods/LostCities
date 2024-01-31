@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lostcities.setup.Registration;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import net.minecraft.commands.CommandSourceStack;
@@ -35,7 +36,8 @@ public class CommandMap implements Command<CommandSourceStack> {
             for (int z = pos.z - 20 ; z <= pos.z + 20 ; z++) {
                 StringBuilder buf = new StringBuilder();
                 for (int x = pos.x - 20 ; x <= pos.x + 20 ; x++) {
-                    BuildingInfo info = BuildingInfo.getBuildingInfo(pos.x + x, pos.z + z, dimInfo);
+                    ChunkCoord coord = new ChunkCoord(dimInfo.getType(), x, z);
+                    BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimInfo);
                     if (info.isCity && info.hasBuilding) {
                         buf.append("B");
                     } else if (info.isCity) {

@@ -1,6 +1,7 @@
 package mcjty.lostcities.gui;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
@@ -161,7 +162,9 @@ public class NullDimensionInfo implements IDimensionInfo {
     }
 
     @Override
-    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
+    public ChunkHeightmap getHeightmap(ChunkCoord coord) {
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL);
         char b = getBiomeChar(chunkX, chunkZ);
         int y = switch (b) {
@@ -174,12 +177,14 @@ public class NullDimensionInfo implements IDimensionInfo {
             case 'd' -> 65;
             default -> 65;
         };
-        for (int x = 0 ; x < 16 ; x++) {
-            for (int z = 0 ; z < 16 ; z++) {
-                heightmap.update(x, y, z);
-            }
-        }
+        heightmap.update(y);
         return heightmap;
+    }
+
+    @Override
+    public ChunkHeightmap getHeightmap(int chunkX, int chunkZ) {
+        ChunkCoord coord = new ChunkCoord(getType(), chunkX, chunkZ);
+        return getHeightmap(coord);
     }
 
     public char getBiomeChar(int chunkX, int chunkZ) {

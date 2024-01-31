@@ -6,25 +6,18 @@ import mcjty.lostcities.config.LandscapeType;
  * A heightmap for a chunk
  */
 public class ChunkHeightmap {
-    private final short[] heightmap = new short[16*16];
+    private int height;
     private final LandscapeType type;
     private final int groundLevel;
-    private Integer maxHeight = null;
-    private Integer minHeight = null;
-    private Integer avgHeight = null;
 
     public ChunkHeightmap(LandscapeType type, int groundLevel) {
         this.groundLevel = groundLevel;
         this.type = type;
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                heightmap[z * 16 + x] = Short.MIN_VALUE;
-            }
-        }
+        height = Short.MIN_VALUE;
     }
 
-    public void update(int x, int y, int z) {
-        int current = heightmap[z * 16 + x];
+    public void update(int y) {
+        int current = height;
         if (y <= current) {
             return;
         }
@@ -36,66 +29,13 @@ public class ChunkHeightmap {
                 return;
             }
             if (y == 100) {
-                heightmap[z * 16 + x] = (byte) 127;
-                return;
-            }
-            heightmap[z * 16 + x] = (short) y;
-        } else if (type == LandscapeType.SPACE) {
-            heightmap[z * 16 + x] = (short) y;
-        } else {
-            heightmap[z * 16 + x] = (short) y;
-        }
-    }
-
-    public int getHeight(int x, int z) {
-        return heightmap[z*16+x];
-    }
-
-    public void setHeight(int x, int z, int height) {
-        heightmap[z*16+x] = (short) height;
-    }
-
-    private void calculateHeightInfo() {
-        int max = Short.MIN_VALUE;
-        int min = Short.MAX_VALUE;
-        int avg = 0;
-        for (int x = 0 ; x < 16 ; x++) {
-            for (int z = 0 ; z < 16 ; z++) {
-                int h = getHeight(x, z);
-                if (h > max) {
-                    max = h;
-                }
-                if (h < min) {
-                    min = h;
-                }
-                avg += h;
+                y = 127;
             }
         }
-        avgHeight = avg / 256;
-        minHeight = min;
-        maxHeight = max;
+        height = y;
     }
 
-    public int getAverageHeight() {
-        if (avgHeight == null) {
-            calculateHeightInfo();
-        }
-        return avgHeight;
-
+    public int getHeight() {
+        return height;
     }
-
-    public int getMinimumHeight() {
-        if (minHeight == null) {
-            calculateHeightInfo();
-        }
-        return minHeight;
-    }
-
-    public int getMaximumHeight() {
-        if (maxHeight == null) {
-            calculateHeightInfo();
-        }
-        return maxHeight;
-    }
-
 }

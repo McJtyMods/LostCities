@@ -145,6 +145,7 @@ public class BuildingInfo implements ILostChunkInfo {
     // BuildingInfo cache
     private static final Map<ChunkCoord, BuildingInfo> BUILDING_INFO_MAP = new HashMap<>();
     private static final Map<ChunkCoord, LostChunkCharacteristics> CITY_INFO_MAP = new HashMap<>();
+    private static final Map<ChunkCoord, Integer> CITY_LEVEL_CACHE = new HashMap<>();
 
     public void addTorchTodo(BlockPos index) {
         torchTodo.add(index);
@@ -207,28 +208,28 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public BuildingInfo getXmin() {
         if (xmin == null) {
-            xmin = getBuildingInfo(chunkX - 1, chunkZ, provider);
+            xmin = getBuildingInfo(coord.west(), provider);
         }
         return xmin;
     }
 
     public BuildingInfo getXmax() {
         if (xmax == null) {
-            xmax = getBuildingInfo(chunkX + 1, chunkZ, provider);
+            xmax = getBuildingInfo(coord.east(), provider);
         }
         return xmax;
     }
 
     public BuildingInfo getZmin() {
         if (zmin == null) {
-            zmin = getBuildingInfo(chunkX, chunkZ - 1, provider);
+            zmin = getBuildingInfo(coord.north(), provider);
         }
         return zmin;
     }
 
     public BuildingInfo getZmax() {
         if (zmax == null) {
-            zmax = getBuildingInfo(chunkX, chunkZ + 1, provider);
+            zmax = getBuildingInfo(coord.south(), provider);
         }
         return zmax;
     }
@@ -278,7 +279,7 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public CityStyle getCityStyle() {
-        return (CityStyle) getChunkCharacteristics(coord, chunkX, chunkZ, provider).cityStyle;
+        return (CityStyle) getChunkCharacteristics(coord, provider).cityStyle;
     }
 
     // Version for usage inside the gui
@@ -289,17 +290,17 @@ public class BuildingInfo implements ILostChunkInfo {
         return characteristics.couldHaveBuilding;
     }
 
-    public static synchronized LostChunkCharacteristics getChunkCharacteristicsGui(int chunkX, int chunkZ, IDimensionInfo provider) {
-        ResourceKey<Level> type = provider.getType();
-        ChunkCoord key = new ChunkCoord(type, chunkX, chunkZ);
+    public static synchronized LostChunkCharacteristics getChunkCharacteristicsGui(ChunkCoord key, IDimensionInfo provider) {
         if (CITY_INFO_MAP.containsKey(key)) {
             return CITY_INFO_MAP.get(key);
         } else {
-            LostCityProfile profile = getProfile(chunkX, chunkZ, provider);
+            int chunkX = key.chunkX();
+            int chunkZ = key.chunkZ();
+            LostCityProfile profile = getProfile(key, provider);
             LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
 
-            characteristics.isCity = isCityRaw(chunkX, chunkZ, provider, profile);
-            characteristics.cityLevel = getCityLevel(chunkX, chunkZ, provider);
+            characteristics.isCity = isCityRaw(key, provider, profile);
+            characteristics.cityLevel = getCityLevel(key, provider);
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
             characteristics.couldHaveBuilding = characteristics.isCity && rand.nextFloat() < profile.BUILDING_CHANCE;
             CITY_INFO_MAP.put(key, characteristics);
@@ -307,30 +308,27 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
-    public static LostChunkCharacteristics getChunkCharacteristics(int chunkX, int chunkZ, IDimensionInfo provider) {
-        return getChunkCharacteristics(new ChunkCoord(provider.dimension(), chunkX, chunkZ), chunkX, chunkZ, provider);
-    }
-
-    public static synchronized LostChunkCharacteristics getChunkCharacteristics(ChunkCoord key, int chunkX, int chunkZ, IDimensionInfo provider) {
-        ResourceKey<Level> type = provider.getType();
-        if (CITY_INFO_MAP.containsKey(key)) {
-            return CITY_INFO_MAP.get(key);
+    public static synchronized LostChunkCharacteristics getChunkCharacteristics(ChunkCoord coord, IDimensionInfo provider) {
+        if (CITY_INFO_MAP.containsKey(coord)) {
+            return CITY_INFO_MAP.get(coord);
         } else {
-            LostCityProfile profile = getProfile(chunkX, chunkZ, provider);
+            int chunkX = coord.chunkX();
+            int chunkZ = coord.chunkZ();
+            LostCityProfile profile = getProfile(coord, provider);
             LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
 
-            characteristics.isCity = isCityRaw(chunkX, chunkZ, provider, profile);
-            initMultiBuildingSection(characteristics, chunkX, chunkZ, provider, profile);
+            characteristics.isCity = isCityRaw(coord, provider, profile);
+            initMultiBuildingSection(characteristics, coord, provider, profile);
             if (characteristics.multiPos.isSingle()) {
-                characteristics.cityLevel = getCityLevel(chunkX, chunkZ, provider);
+                characteristics.cityLevel = getCityLevel(coord, provider);
             } else {
-                characteristics.cityLevel = getAverageCityLevel(characteristics, chunkX, chunkZ, provider);
+                characteristics.cityLevel = getAverageCityLevel(characteristics, coord, provider);
             }
             Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
-            characteristics.couldHaveBuilding = characteristics.isCity && checkBuildingPossibility(chunkX, chunkZ, provider, profile, characteristics.multiPos, characteristics.cityLevel, rand);
+            characteristics.couldHaveBuilding = characteristics.isCity && checkBuildingPossibility(coord, provider, profile, characteristics.multiPos, characteristics.cityLevel, rand);
             if ((profile.isSpace() || profile.isSpheres()) && characteristics.multiPos.isSingle()) {
                 // Minimize cities at the edge of the city in an orb
-                float dist = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
+                float dist = CitySphere.getRelativeDistanceToCityCenter(coord, provider);
                 if (dist > .7f) {
                     characteristics.couldHaveBuilding = false;
                 }
@@ -342,9 +340,10 @@ public class BuildingInfo implements ILostChunkInfo {
             // different styled cities mix
             if (characteristics.isCity && !characteristics.couldHaveBuilding) {
                 Counter<String> counter = new Counter<>();
-                for (int cx = -1 ; cx <= 1 ; cx++) {
-                    for (int cz = -1 ; cz <= 1 ; cz++) {
-                        cityStyle = City.getCityStyle(key.chunkX()+cx, key.chunkZ()+cz, provider, profile);
+                for (int cx = -1; cx <= 1; cx++) {
+                    for (int cz = -1; cz <= 1; cz++) {
+                        ChunkCoord key = coord.offset(cx, cz);
+                        cityStyle = City.getCityStyle(key, provider, profile);
                         counter.add(cityStyle.getName());
                         if (cx == 0 && cz == 0) {
                             counter.add(cityStyle.getName());   // Add this chunk again for a bias
@@ -353,14 +352,13 @@ public class BuildingInfo implements ILostChunkInfo {
                 }
                 cityStyle = AssetRegistries.CITYSTYLES.get(provider.getWorld(), counter.getMostOccuring());
             } else {
-                cityStyle = City.getCityStyle(chunkX, chunkZ, provider, profile);
+                cityStyle = City.getCityStyle(coord, provider, profile);
             }
             characteristics.cityStyle = cityStyle;
 
-
             WorldGenLevel world = provider.getWorld();
             if (characteristics.multiPos.isMulti() && !characteristics.multiPos.isTopLeft()) {
-                LostChunkCharacteristics topleft = getTopLeftCityInfo(characteristics, chunkX, chunkZ, provider);
+                LostChunkCharacteristics topleft = getTopLeftCityInfo(characteristics, coord, provider);
 //                characteristics.multiBuilding = topleft.multiBuilding;
                 if (characteristics.multiBuilding != null) {
                     String b = characteristics.multiBuilding.getBuilding(characteristics.multiPos.x(), characteristics.multiPos.z());
@@ -373,7 +371,7 @@ public class BuildingInfo implements ILostChunkInfo {
                     }
                 }
             } else {
-                PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
+                PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(coord);
                 if (characteristics.multiPos.isTopLeft()) {
 //                    String name = cityStyle.getRandomMultiBuilding(rand);
 //                    if (predefinedBuilding != null) {
@@ -399,7 +397,7 @@ public class BuildingInfo implements ILostChunkInfo {
                     chunkX, chunkZ, characteristics);
             MinecraftForge.EVENT_BUS.post(event);
 
-            CITY_INFO_MAP.put(key, characteristics);
+            CITY_INFO_MAP.put(coord, characteristics);
             return characteristics;
         }
     }
@@ -407,41 +405,41 @@ public class BuildingInfo implements ILostChunkInfo {
     /**
      * Don't use the cache as we're busy building the cache.
      */
-    public static boolean isCityRaw(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        if (isVoidChunk(chunkX, chunkZ, provider)) {
+    public static boolean isCityRaw(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        if (isVoidChunk(coord, provider)) {
             // If we have a void chunk then no city here
             return false;
         } else if (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) {
-            if (CitySphere.onCitySphereBorder(chunkX, chunkZ, provider)) {
+            if (CitySphere.onCitySphereBorder(coord, provider)) {
                 return false;
-            } else if (CitySphere.hasMonorailStation(chunkX, chunkZ, provider)) {
+            } else if (CitySphere.hasMonorailStation(coord, provider)) {
                 return false;
             }
         }
 
-        float cityFactor = City.getCityFactor(chunkX, chunkZ, provider, profile);
+        float cityFactor = City.getCityFactor(coord, provider, profile);
         return cityFactor > profile.CITY_THRESHOLD;
     }
 
-    public static boolean isCity(int chunkX, int chunkZ, IDimensionInfo provider) {
-        return getChunkCharacteristics(new ChunkCoord(provider.dimension(), chunkX, chunkZ), chunkX, chunkZ, provider).isCity;  // @todo avoid this new?
+    public static boolean isCity(ChunkCoord coord, IDimensionInfo provider) {
+        return getChunkCharacteristics(coord, provider).isCity;
     }
 
-    private static boolean checkBuildingPossibility(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, MultiPos section, int cityLevel, Random rand) {
+    private static boolean checkBuildingPossibility(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile, MultiPos section, int cityLevel, Random rand) {
         boolean b;
         float bc = rand.nextFloat();
         ResourceKey<Level> type = provider.getType();
 
-        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
+        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(coord);
         if (predefinedBuilding != null) {
             return true;    // We don't need other tests
         }
-        PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
+        PredefinedStreet predefinedStreet = City.getPredefinedStreet(coord);
         if (predefinedStreet != null) {
             return false;   // No building here
         }
 
-        CityStyle style = City.getCityStyle(chunkX, chunkZ, provider, profile);
+        CityStyle style = City.getCityStyle(coord, provider, profile);
         float buildingChance = profile.BUILDING_CHANCE;
         if (style.getBuildingChance() != null) {
             buildingChance = style.getBuildingChance();
@@ -453,15 +451,15 @@ public class BuildingInfo implements ILostChunkInfo {
         } else if (bc >= buildingChance) {
             // Random says we should have no building here
             b = false;
-        } else if (hasHighway(chunkX, chunkZ, provider, profile)) {
+        } else if (hasHighway(coord, provider, profile)) {
             // We are above a highway. Check if we have room for a building
-            int maxh = Math.max(Highway.getXHighwayLevel(chunkX, chunkZ, provider, profile), Highway.getZHighwayLevel(chunkX, chunkZ, provider, profile));
-            b = cityLevel > maxh+1;       // Allow a building if it is higher then the maximum highway + one
+            int maxh = Math.max(Highway.getXHighwayLevel(coord, provider, profile), Highway.getZHighwayLevel(coord, provider, profile));
+            b = cityLevel > maxh + 1;       // Allow a building if it is higher than the maximum highway + one
             // Later we will take care to make sure we don't have too many cellars
             // Note that for easy of coding we still disallow multi-buildings above highways
-        } else if (hasRailway(chunkX, chunkZ, provider, profile)) {
+        } else if (hasRailway(coord, provider, profile)) {
             // We are above a railway. Check if we have room for a building
-            Railway.RailChunkInfo info = Railway.getRailChunkType(chunkX, chunkZ, provider, profile);
+            Railway.RailChunkInfo info = Railway.getRailChunkType(coord, provider, profile);
             if (info.getType() == RailChunkType.STATION_UNDERGROUND) {
                 b = false;  // No building directly above the underground station
             } else {
@@ -480,10 +478,9 @@ public class BuildingInfo implements ILostChunkInfo {
     /**
      * Initialize the chunk characteristics with the multi building information
      */
-    private static void initMultiBuildingSection(LostChunkCharacteristics characteristics, int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
+    private static void initMultiBuildingSection(LostChunkCharacteristics characteristics, ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
         MultiBuilding building = null;
-        CityStyle cityStyle = City.getCityStyle(chunkX, chunkZ, provider, profile);
-        ResourceKey<Level> type = provider.getType();
+        CityStyle cityStyle = City.getCityStyle(coord, provider, profile);
 
         boolean existingMulti = false;
         boolean isMultiCandidate = false;
@@ -498,19 +495,15 @@ public class BuildingInfo implements ILostChunkInfo {
             {
                 break;
             }
-            for (int z = -multiMaxSizeZ ; z <= 0 ; z++) {
-                if (!allowCheck)
-                {
-                    break;
-                }
-                cityStyle = City.getCityStyle(chunkX + x, chunkZ + z, provider, profile);
-                if (!cityStyle.hasMultiBuildings())
-                {
+            for (int z = -multiMaxSizeZ; z <= 0; z++) {
+                ChunkCoord key = coord.offset(x, z);
+                cityStyle = City.getCityStyle(key, provider, profile);
+                if (!cityStyle.hasMultiBuildings()) {
                     characteristics.multiPos = MultiPos.SINGLE;
                     characteristics.multiBuilding = null;
                     return;
                 }
-                if (isCandidateForTopLeftOfMultiBuilding(chunkX + x, chunkZ + z, provider, profile, cityStyle)) {
+                if (isCandidateForTopLeftOfMultiBuilding(key, provider, profile, cityStyle)) {
                     isMultiCandidate = true;
                     allowCheck = false;
                     candidateX = x;
@@ -529,11 +522,10 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         // If there is a candidate, we start making it as our current top left root
-        int rootX = chunkX + candidateX;
-        int rootZ = chunkZ + candidateZ;
+        ChunkCoord root = coord.offset(candidateX, candidateZ);
 
         // If there is multibuilding and it is a predefined building, then we just get the result.
-        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(rootX, rootZ, type);
+        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(root);
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             // Regardless of other conditions, this is the top left of a multibuilding
             building = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), predefinedBuilding.building());
@@ -543,7 +535,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         // if there is candidate, means we can set this chunk as multipos
-        Random rand = getMultiBuildingRandom(rootX, rootZ, provider.getSeed());
+        Random rand = getMultiBuildingRandom(root.chunkX(), root.chunkZ(), provider.getSeed());
         String name = cityStyle.getRandomMultiBuilding(rand);
         if (name != null) {
             building = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), name);
@@ -565,14 +557,13 @@ public class BuildingInfo implements ILostChunkInfo {
         for (int x = -multiMaxSizeX ; x < building.getDimX() ; x++) {
             for (int z = -multiMaxSizeZ ; z < building.getDimZ() ; z++) {
                 // the Inner square check
-                if (x < 0 || z < 0)
-                {
-                    CityStyle otherStyle = City.getCityStyle(rootX + x, rootZ + z, provider, profile);
-                    if (isCandidateForTopLeftOfMultiBuilding(rootX + x, rootZ + z, provider, profile, otherStyle)) {
-                        int borderX = rootX + x + multiMaxSizeX;
-                        int borderZ = rootZ + z + multiMaxSizeZ;
-                        if (borderX >= rootX && borderZ >= rootZ)
-                        {
+                if (x < 0 || z < 0) {
+                    ChunkCoord root2 = root.offset(x, z);
+                    CityStyle otherStyle = City.getCityStyle(root2, provider, profile);
+                    if (isCandidateForTopLeftOfMultiBuilding(root2, provider, profile, otherStyle)) {
+                        int borderX = root.chunkX() + x + multiMaxSizeX;
+                        int borderZ = root.chunkZ() + z + multiMaxSizeZ;
+                        if (borderX >= root.chunkX() && borderZ >= root.chunkZ()) {
                             existingMulti = true;
                         }
                     }
@@ -589,7 +580,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         // There is no other multibuilding candidate topleft of  this one. So we test further
-        PredefinedStreet predefinedStreet = City.getPredefinedStreet(rootX, rootZ, provider.getType());
+        PredefinedStreet predefinedStreet = City.getPredefinedStreet(root);
         if (predefinedStreet != null) {
             characteristics.multiPos = MultiPos.SINGLE;
             characteristics.multiBuilding = null;
@@ -597,9 +588,10 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         // Check if all chunks for the size of the multibuilding are candidates
-        for (int x = 0 ; x < building.getDimX() ; x++) {
-            for (int z = 0 ; z < building.getDimZ() ; z++) {
-                if ((x != 0 || z != 0) && !isMultiBuildingCandidate(rootX + x, rootZ + z, provider, profile, cityStyle)) {
+        for (int x = 0; x < building.getDimX(); x++) {
+            for (int z = 0; z < building.getDimZ(); z++) {
+                ChunkCoord root2 = root.offset(x, z);
+                if ((x != 0 || z != 0) && !isMultiBuildingCandidate(root2, provider, profile, cityStyle)) {
                     characteristics.multiPos = MultiPos.SINGLE;
                     characteristics.multiBuilding = null;
                     return;
@@ -620,47 +612,47 @@ public class BuildingInfo implements ILostChunkInfo {
         if (multiBuildingPos.isTopLeft()) {
             return this;
         }
-        return getBuildingInfo(chunkX - multiBuildingPos.x(), chunkZ - multiBuildingPos.z(), provider);
+        ChunkCoord key = coord.offset(-multiBuildingPos.x(), -multiBuildingPos.z());
+        return getBuildingInfo(key, provider);
     }
 
-    private static int getAverageCityLevel(LostChunkCharacteristics thisone, int chunkX, int chunkZ, IDimensionInfo provider) {
+    private static int getAverageCityLevel(LostChunkCharacteristics thisone, ChunkCoord coord, IDimensionInfo provider) {
         int level = 0;
         MultiPos mp = thisone.multiPos;
-        int topX = chunkX - mp.x();
-        int topZ = chunkZ - mp.z();
-        for (int x = 0 ; x < mp.w() ; x++) {
-            for (int z = 0 ; z < mp.h() ; z++) {
-                level += getCityLevel(topX+x, topZ+z, provider);
+        int topX = coord.chunkX() - mp.x();
+        int topZ = coord.chunkZ() - mp.z();
+        for (int x = 0; x < mp.w(); x++) {
+            for (int z = 0; z < mp.h(); z++) {
+                ChunkCoord key = coord.offset(x, z);
+                level += getCityLevel(key, provider);
             }
         }
         return level / (mp.w() * mp.h());
     }
 
-    private static LostChunkCharacteristics getTopLeftCityInfo(LostChunkCharacteristics thisone, int chunkX, int chunkZ, IDimensionInfo provider) {
+    private static LostChunkCharacteristics getTopLeftCityInfo(LostChunkCharacteristics thisone, ChunkCoord coord, IDimensionInfo provider) {
         if (thisone.multiPos.isTopLeft()) {
             return thisone;
         }
-        int cx = chunkX - thisone.multiPos.x();
-        int cz = chunkZ - thisone.multiPos.z();
-        return getChunkCharacteristics(cx, cz, provider);
+        ChunkCoord key = coord.offset(-thisone.multiPos.x(), -thisone.multiPos.z());
+        return getChunkCharacteristics(key, provider);
     }
 
     /**
      * Check if this chunk is a candidate for the top left of a multibuilding.
      * This function does not use the cached building info or characteristics
      */
-    private static boolean isCandidateForTopLeftOfMultiBuilding(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile, CityStyle cityStyle) {
-        ResourceKey<Level> type = provider.getType();
-        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
+    private static boolean isCandidateForTopLeftOfMultiBuilding(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile, CityStyle cityStyle) {
+        PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(coord);
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return true;    // We don't need other tests. This is the top-left of a multibuilding
         }
-        PredefinedStreet predefinedStreet = City.getPredefinedStreet(chunkX, chunkZ, type);
+        PredefinedStreet predefinedStreet = City.getPredefinedStreet(coord);
         if (predefinedStreet != null) {
             return false;   // There is a street here so no building
         }
-        if (isMultiBuildingCandidate(chunkX, chunkZ, provider, profile, cityStyle)) {
-            Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
+        if (isMultiBuildingCandidate(coord, provider, profile, cityStyle)) {
+            Random rand = getBuildingRandom(coord.chunkX(), coord.chunkZ(), provider.getSeed());
             return rand.nextFloat() < profile.BUILDING2X2_CHANCE;
         } else {
             return false;
@@ -671,11 +663,11 @@ public class BuildingInfo implements ILostChunkInfo {
      * Check if this chunk is suitable for a multibuilding.
      * This function does not use the cached building info or characteristics
      */
-    private static boolean isMultiBuildingCandidate(int chunkX, int chunkZ, IDimensionInfo provider,
+    private static boolean isMultiBuildingCandidate(ChunkCoord coord, IDimensionInfo provider,
                                                     LostCityProfile profile, CityStyle cityStyle) {
-        boolean result = isCityRaw(chunkX, chunkZ, provider, profile) && !hasHighway(chunkX, chunkZ, provider, profile) && !hasRailway(chunkX, chunkZ, provider, profile);
+        boolean result = isCityRaw(coord, provider, profile) && !hasHighway(coord, provider, profile) && !hasRailway(coord, provider, profile);
         if (result) {
-            CityStyle style = City.getCityStyle(chunkX, chunkZ, provider, profile);
+            CityStyle style = City.getCityStyle(coord, provider, profile);
             if (!cityStyle.hasMultiBuildings()) {
                 return false;
             }
@@ -684,16 +676,16 @@ public class BuildingInfo implements ILostChunkInfo {
         return false;
     }
 
-    private static boolean hasHighway(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        return Highway.getXHighwayLevel(chunkX, chunkZ, provider, profile) >= 0 || Highway.getZHighwayLevel(chunkX, chunkZ, provider, profile) >= 0;
+    private static boolean hasHighway(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        return Highway.getXHighwayLevel(coord, provider, profile) >= 0 || Highway.getZHighwayLevel(coord, provider, profile) >= 0;
     }
 
-    private static boolean hasRailway(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        return Railway.getRailChunkType(chunkX, chunkZ, provider, profile).getType() != RailChunkType.NONE;
+    private static boolean hasRailway(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        return Railway.getRailChunkType(coord, provider, profile).getType() != RailChunkType.NONE;
     }
 
     public Railway.RailChunkInfo getRailInfo() {
-        return Railway.getRailChunkType(chunkX, chunkZ, provider, profile);
+        return Railway.getRailChunkType(coord, provider, profile);
     }
 
     // Return true if a highway at this level would be a tunnel
@@ -708,28 +700,20 @@ public class BuildingInfo implements ILostChunkInfo {
         // The height at which the highway would be + a threshold of 3
         int highwayHeight = groundLevel + level * FLOORHEIGHT + 3;
         // If there are many places in the chunk above this height we will need a tunnel
-        int cnt = 0;
-        for (int x = 2 ; x < 16 ; x += 3) {
-            for (int z = 2 ; z < 16 ; z += 3) {
-                if (heightmap.getHeight(x, z) > highwayHeight) {
-                    cnt++;
-                }
-            }
-        }
-        return cnt > 12;    // We make a tunnel if more then half of the chunk is above the highway
+        return heightmap.getHeight() > highwayHeight;
     }
 
     public static void cleanCache() {
         BUILDING_INFO_MAP.clear();
         CITY_INFO_MAP.clear();
+        CITY_LEVEL_CACHE.clear();
     }
 
-    public static synchronized BuildingInfo getBuildingInfo(int chunkX, int chunkZ, IDimensionInfo provider) {
-        ChunkCoord key = new ChunkCoord(provider.getType(), chunkX, chunkZ);
+    public static synchronized BuildingInfo getBuildingInfo(ChunkCoord key, IDimensionInfo provider) {
         if (BUILDING_INFO_MAP.containsKey(key)) {
             return BUILDING_INFO_MAP.get(key);
         }
-        BuildingInfo info = new BuildingInfo(key, chunkX, chunkZ, provider);
+        BuildingInfo info = new BuildingInfo(key, provider);
         BUILDING_INFO_MAP.put(key, info);
         return info;
     }
@@ -737,9 +721,9 @@ public class BuildingInfo implements ILostChunkInfo {
     /**
      * Find the correct profile for this chunk. This takes space sphere worlds into account
      */
-    public static LostCityProfile getProfile(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static LostCityProfile getProfile(ChunkCoord coord, IDimensionInfo provider) {
         if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres())) {
-            if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
+            if (CitySphere.intersectsWithCitySphere(coord, provider)) {
                 return provider.getProfile();
             } else {
                 return provider.getOutsideProfile();
@@ -773,7 +757,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
                 @Override
                 public boolean isSphere() {
-                    return CitySphere.isInSphere(chunkX, chunkZ, new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8), provider);
+                    return CitySphere.isInSphere(coord, new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8), provider);
                 }
 
                 @Override
@@ -789,19 +773,19 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
-    private BuildingInfo(ChunkCoord key, int chunkX, int chunkZ, IDimensionInfo provider) {
+    private BuildingInfo(ChunkCoord key, IDimensionInfo provider) {
         this.provider = provider;
         this.minBuildHeight = provider.getWorld().getMinBuildHeight();
         this.maxBuildHeight = provider.getWorld().getMaxBuildHeight();
-        this.chunkX = chunkX;
-        this.chunkZ = chunkZ;
+        this.chunkX = key.chunkX();
+        this.chunkZ = key.chunkZ();
         ResourceKey<Level> type = provider.getType();
         this.coord = key;
 
-        outsideChunk = (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && !CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider);
-        profile = getProfile(chunkX, chunkZ, provider);
+        outsideChunk = (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && !CitySphere.intersectsWithCitySphere(key, provider);
+        profile = getProfile(key, provider);
 
-        LostChunkCharacteristics characteristics = getChunkCharacteristics(key, chunkX, chunkZ, provider);
+        LostChunkCharacteristics characteristics = getChunkCharacteristics(key, provider);
 
         cityLevel = characteristics.cityLevel;
         buildingType = characteristics.buildingType;
@@ -813,19 +797,19 @@ public class BuildingInfo implements ILostChunkInfo {
 
         boolean b = characteristics.couldHaveBuilding;
         if (b && multiBuildingPos.isSingle()) {
-            if (rand.nextFloat() < getChunkCharacteristics(chunkX - 1, chunkZ, provider).buildingType.getPrefersLonely()) {
+            if (rand.nextFloat() < getChunkCharacteristics(coord.west(), provider).buildingType.getPrefersLonely()) {
                 b = false;
-            } else if (rand.nextFloat() < getChunkCharacteristics(chunkX + 1, chunkZ, provider).buildingType.getPrefersLonely()) {
+            } else if (rand.nextFloat() < getChunkCharacteristics(coord.east(), provider).buildingType.getPrefersLonely()) {
                 b = false;
-            } else if (rand.nextFloat() < getChunkCharacteristics(chunkX, chunkZ - 1, provider).buildingType.getPrefersLonely()) {
+            } else if (rand.nextFloat() < getChunkCharacteristics(coord.north(), provider).buildingType.getPrefersLonely()) {
                 b = false;
-            } else if (rand.nextFloat() < getChunkCharacteristics(chunkX, chunkZ + 1, provider).buildingType.getPrefersLonely()) {
+            } else if (rand.nextFloat() < getChunkCharacteristics(coord.south(), provider).buildingType.getPrefersLonely()) {
                 b = false;
             }
         }
 
         boolean c = characteristics.isCity;
-        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.isCitySphereCenter(chunkX, chunkZ, provider)) {
+        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.isCitySphereCenter(coord, provider)) {
             CitySphereSettings settings = provider.getWorldStyle().getCitysphereSettings();
             if (settings != null) {
                 CitySphereSettings.CitySphereCenterType centertype = settings.getCenterType();
@@ -881,9 +865,9 @@ public class BuildingInfo implements ILostChunkInfo {
             noLoot = topleft.noLoot;
             ruinHeight = topleft.ruinHeight;
         } else {
-            PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(chunkX, chunkZ, type);
-            highwayXLevel = Highway.getXHighwayLevel(chunkX, chunkZ, provider, profile);
-            highwayZLevel = Highway.getZHighwayLevel(chunkX, chunkZ, provider, profile);
+            PredefinedBuilding predefinedBuilding = City.getPredefinedBuilding(key);
+            highwayXLevel = Highway.getXHighwayLevel(key, provider, profile);
+            highwayZLevel = Highway.getZHighwayLevel(key, provider, profile);
 
             if (rand.nextDouble() < profile.PARK_CHANCE) {
                 streetType = StreetType.values()[rand.nextInt(StreetType.values().length)];
@@ -896,7 +880,7 @@ public class BuildingInfo implements ILostChunkInfo {
                 fountainType = null;
             }
             parkType = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), cs.getRandomPark(rand));
-            float cityFactor = City.getCityFactor(chunkX, chunkZ, provider, profile);
+            float cityFactor = City.getCityFactor(coord, provider, profile);
 
             int maxfloors = getMaxfloors(cs);
             int f = profile.BUILDING_MINFLOORS + rand.nextInt((int) (profile.BUILDING_MINFLOORS_CHANCE + (cityFactor + .1f) * (profile.BUILDING_MAXFLOORS_CHANCE - profile.BUILDING_MINFLOORS_CHANCE)));
@@ -909,8 +893,8 @@ public class BuildingInfo implements ILostChunkInfo {
                 f = minfloors;
             }
 
-            if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
-                float reldest = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
+            if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.intersectsWithCitySphere(key, provider)) {
+                float reldest = CitySphere.getRelativeDistanceToCityCenter(coord, provider);
                 if (reldest > .6f) {
                     f = Math.max(minfloors, f-2);
                 } else if (reldest > .5f) {
@@ -970,7 +954,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
                 @Override
                 public boolean isSphere() {
-                    return CitySphere.isInSphere(chunkX, chunkZ, new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8), provider);
+                    return CitySphere.isInSphere(coord, new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8), provider);
                 }
 
                 @Override
@@ -986,8 +970,8 @@ public class BuildingInfo implements ILostChunkInfo {
             floorTypes[i] = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), randomPart);
             randomPart = building.getRandomPart2(rand, conditionContext);
             floorTypes2[i] = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);    // null is legal
-            connectionAtX[i] = isCity(chunkX - 1, chunkZ, provider) && (rand.nextFloat() < profile.BUILDING_DOORWAYCHANCE);
-            connectionAtZ[i] = isCity(chunkX, chunkZ - 1, provider) && (rand.nextFloat() < profile.BUILDING_DOORWAYCHANCE);
+            connectionAtX[i] = isCity(coord.west(), provider) && (rand.nextFloat() < profile.BUILDING_DOORWAYCHANCE);
+            connectionAtZ[i] = isCity(coord.north(), provider) && (rand.nextFloat() < profile.BUILDING_DOORWAYCHANCE);
         }
 
         if (hasBuilding && cellars > 0) {
@@ -1025,14 +1009,14 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public boolean hasHorizontalMonorail() {
         if (horizontalMonorail == null) {
-            horizontalMonorail = CitySphere.hasHorizontalMonorail(chunkX, chunkZ, provider);
+            horizontalMonorail = CitySphere.hasHorizontalMonorail(coord, provider);
         }
         return horizontalMonorail;
     }
 
     public boolean hasVerticalMonorail() {
         if (verticalMonorail == null) {
-            verticalMonorail = CitySphere.hasVerticalMonorail(chunkX, chunkZ, provider);
+            verticalMonorail = CitySphere.hasVerticalMonorail(coord, provider);
         }
         return verticalMonorail;
     }
@@ -1079,7 +1063,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
         return maxfloors;
     }
-    
+
     public Boolean getAllowDoors() {
     	return buildingType.getAllowDoors();
     }
@@ -1089,11 +1073,11 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public int getHighwayXLevel() {
-        return Highway.getXHighwayLevel(chunkX, chunkZ, provider, profile);
+        return Highway.getXHighwayLevel(coord, provider, profile);
     }
 
     public int getHighwayZLevel() {
-        return Highway.getZHighwayLevel(chunkX, chunkZ, provider, profile);
+        return Highway.getZHighwayLevel(coord, provider, profile);
     }
 
 
@@ -1101,21 +1085,9 @@ public class BuildingInfo implements ILostChunkInfo {
      * Return true if this is a void chunk (only for floating island worldtype). This does
      * not use the cache so it is safe to use when the cache is building
      */
-    public static boolean isVoidChunk(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static boolean isVoidChunk(ChunkCoord coord, IDimensionInfo provider) {
         if (provider.getProfile().isFloating()) {
-            if (provider.getHeightmap(chunkX, chunkZ).getHeight(8, 8) <= 0) {
-                return true;
-            }
-            if (provider.getHeightmap(chunkX, chunkZ).getHeight(3, 3) <= 0) {
-                return true;
-            }
-            if (provider.getHeightmap(chunkX, chunkZ).getHeight(12, 3) <= 0) {
-                return true;
-            }
-            if (provider.getHeightmap(chunkX, chunkZ).getHeight(3, 12) <= 0) {
-                return true;
-            }
-            return provider.getHeightmap(chunkX, chunkZ).getHeight(12, 12) <= 0;
+            return provider.getHeightmap(coord).getHeight() <= 0;
         } else {
             return false;
         }
@@ -1123,31 +1095,39 @@ public class BuildingInfo implements ILostChunkInfo {
 
 
     /**
-     * This function does not use the cache. So safe to use when the cache is building
+//     * This function does not use the cache. So safe to use when the cache is building
+     * This function uses its own cache.
      */
-    public static int getCityLevel(int chunkX, int chunkZ, IDimensionInfo provider) {
-        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres())) {
-            return getCityLevelSpace(chunkX, chunkZ, provider);
-        } else if (provider.getProfile().isFloating()) {
-            return getCityLevelFloating(chunkX, chunkZ, provider);
-        } else if (provider.getProfile().isCavern()) {
-            return getCityLevelCavern(chunkX, chunkZ, provider);
-        } else {
-            return getCityLevelNormal(chunkX, chunkZ, provider, provider.getProfile());
+    public static synchronized int getCityLevel(ChunkCoord key, IDimensionInfo provider) {
+        if (CITY_LEVEL_CACHE.containsKey(key)) {
+            return CITY_LEVEL_CACHE.get(key);
         }
+        int result;
+        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres())) {
+            result = getCityLevelSpace(key, provider);
+        } else if (provider.getProfile().isFloating()) {
+            result = getCityLevelFloating(key, provider);
+        } else if (provider.getProfile().isCavern()) {
+            result =  getCityLevelCavern(key, provider);
+        } else {
+            result = getCityLevelNormal(key, provider, provider.getProfile());
+        }
+        CITY_LEVEL_CACHE.put(key, result);
+        return result;
     }
 
-    private static int getCityLevelCavern(int chunkX, int chunkZ, IDimensionInfo provider) {
+    private static int getCityLevelCavern(ChunkCoord coord, IDimensionInfo provider) {
         // @todo for now
-        return getCityLevelFloating(chunkX, chunkZ, provider);
+        return getCityLevelFloating(coord, provider);
     }
 
 
-
-    private static int getCityLevelSpace(int chunkX, int chunkZ, IDimensionInfo provider) {
-        if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
+    private static int getCityLevelSpace(ChunkCoord coord, IDimensionInfo provider) {
+        if (CitySphere.intersectsWithCitySphere(coord, provider)) {
             // In the sphere
-            float dist = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
+            int chunkX = coord.chunkX();
+            int chunkZ = coord.chunkZ();
+            float dist = CitySphere.getRelativeDistanceToCityCenter(coord, provider);
             Random rand = new Random(provider.getSeed() + chunkZ * 817505771L + chunkX * 217645177L);
             rand.nextFloat();
             rand.nextFloat();
@@ -1161,47 +1141,18 @@ public class BuildingInfo implements ILostChunkInfo {
                 return 0;
             }
         } else {
-            return getCityLevelNormal(chunkX, chunkZ, provider, provider.getOutsideProfile());
+            return getCityLevelNormal(coord, provider, provider.getOutsideProfile());
         }
     }
 
-    private static int getCityLevelNormal(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
-        ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
-        int height = heightmap.getAverageHeight();
+    private static int getCityLevelNormal(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        ChunkHeightmap heightmap = provider.getHeightmap(coord);
+        int height = heightmap.getHeight();
         return getLevelBasedOnHeight(height, profile);
     }
 
-    private static int getCityLevelFloating(int chunkX, int chunkZ, IDimensionInfo provider) {
-        int cnt = 0;
-        int h = 0;
-        int h0 = provider.getHeightmap(chunkX, chunkZ).getHeight(8, 8);
-        if (h0 > 1) {
-            h += h0;
-            cnt++;
-        }
-        int h1 = provider.getHeightmap(chunkX, chunkZ).getHeight(3, 3);
-        if (h1 > 1) {
-            h += h1;
-            cnt++;
-        }
-        int h2 = provider.getHeightmap(chunkX, chunkZ).getHeight(12, 3);
-        if (h2 > 1) {
-            h += h2;
-            cnt++;
-        }
-        int h3 = provider.getHeightmap(chunkX, chunkZ).getHeight(3, 12);
-        if (h3 > 1) {
-            h += h3;
-            cnt++;
-        }
-        int h4 = provider.getHeightmap(chunkX, chunkZ).getHeight(12, 12);
-        if (h4 > 1) {
-            h += h4;
-            cnt++;
-        }
-        if (cnt > 0) {
-            h = h / cnt;
-        }
+    private static int getCityLevelFloating(ChunkCoord coord, IDimensionInfo provider) {
+        int h = provider.getHeightmap(coord).getHeight();
         return getLevelBasedOnHeight(h, provider.getProfile());
     }
 
@@ -1292,7 +1243,8 @@ public class BuildingInfo implements ILostChunkInfo {
                 for (int cx = -1; cx <= 1; cx++) {
                     for (int cz = -1; cz <= 1; cz++) {
                         if (cx != 0 || cz != 0) {
-                            BuildingInfo adjacent = getBuildingInfo(chunkX + cx, chunkZ + cz, provider);
+                            ChunkCoord key = coord.offset(cx, cz);
+                            BuildingInfo adjacent = getBuildingInfo(key, provider);
                             if (adjacent.getStairDirection() != null && adjacent.stairPriority > stairPriority) {
                                 actualStairDirection = null;
                                 break;
@@ -1908,16 +1860,16 @@ public class BuildingInfo implements ILostChunkInfo {
     @Override
     public ILostCityInfo getCityInfo() {
         // @todo REWRITE FOR THE NEW CITY FACTOR
-        if (City.isCityCenter(chunkX, chunkZ, provider)) {
+        if (City.isCityCenter(coord, provider)) {
             return new ILostCityInfo() {
                 @Override
                 public float getCityRadius() {
-                    return City.getCityRadius(chunkX, chunkZ, provider);
+                    return City.getCityRadius(coord, provider);
                 }
 
                 @Override
                 public String getCityStyle() {
-                    return City.getCityStyleForCityCenter(chunkX, chunkZ, provider);
+                    return City.getCityStyleForCityCenter(coord, provider);
                 }
             };
         } else {
@@ -1939,7 +1891,7 @@ public class BuildingInfo implements ILostChunkInfo {
     @Nullable
     @Override
     public ILostSphere getSphere() {
-        CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+        CitySphere sphere = CitySphere.getCitySphere(coord, provider);
         if (sphere.isEnabled()) {
             return sphere;
         }
@@ -1948,7 +1900,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
     @Nullable
     public static CitySphere getSphereInt(int x, int y, int z, IDimensionInfo provider) {
-        CitySphere sphere = CitySphere.getCitySphere(x >> 4, z >> 4, provider);
+        ChunkCoord coord = new ChunkCoord(provider.dimension(), x >> 4, z >> 4);
+        CitySphere sphere = CitySphere.getCitySphere(coord, provider);
         if (sphere.isEnabled()) {
             double sqdist = sphere.getCenterPos().distToCenterSqr(x, y, z);
             if (sqdist <= sphere.getRadius() * sphere.getRadius()) {
@@ -1960,7 +1913,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
     @Nullable
     public static CitySphere getSphereInt(int x, int z, IDimensionInfo provider) {
-        CitySphere sphere = CitySphere.getCitySphere(x >> 4, z >> 4, provider);
+        ChunkCoord coord = new ChunkCoord(provider.dimension(), x >> 4, z >> 4);
+        CitySphere sphere = CitySphere.getCitySphere(coord, provider);
         if (sphere.isEnabled()) {
             double sqdist = sphere.getCenterPos().distToCenterSqr(x, sphere.getCenterPos().getY(), z);
             if (sqdist <= sphere.getRadius() * sphere.getRadius()) {

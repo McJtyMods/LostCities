@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.LostChunkCharacteristics;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -34,8 +35,9 @@ public class ErrorLogger {
     public static void logChunkInfo(int chunkX, int chunkZ, IDimensionInfo provider) {
         Logger logger = LostCities.getLogger();
         try {
-            logger.info("IsCity: " + BuildingInfo.isCityRaw(chunkX, chunkZ, provider, provider.getProfile()));
-            LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(chunkX, chunkZ, provider);
+            ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
+            logger.info("IsCity: " + BuildingInfo.isCityRaw(coord, provider, provider.getProfile()));
+            LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(coord, provider);
             logger.info("    Level: " + characteristics.cityLevel);
             if (characteristics.multiBuilding != null) {
                 logger.info("    Multibuilding: " + characteristics.multiBuilding.getName());
@@ -43,7 +45,7 @@ public class ErrorLogger {
             if (characteristics.buildingType != null) {
                 logger.info("    Building: " + characteristics.buildingType.getName());
             }
-            BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+            BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
             if (info.hasBuilding) {
                 logger.info("        Floors: " + info.getNumFloors());
                 logger.info("        Cellars: " + info.getNumCellars());
