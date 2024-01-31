@@ -283,8 +283,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
     // Version for usage inside the gui
     public static boolean hasBuildingGui(int chunkX, int chunkZ, IDimensionInfo provider, LostChunkCharacteristics characteristics) {
-        Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
-        rand.nextFloat();       // Compatibility?
+//        Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
+//        rand.nextFloat();       // Compatibility?
 
         return characteristics.couldHaveBuilding;
     }
@@ -498,9 +498,6 @@ public class BuildingInfo implements ILostChunkInfo {
                 break;
             }
             for (int z = -multiMaxSizeZ; z <= 0; z++) {
-                if (!allowCheck) {
-                    break;
-                }
                 cityStyle = City.getCityStyle(chunkX + x, chunkZ + z, provider, profile);
                 if (!cityStyle.hasMultiBuildings()) {
                     characteristics.multiPos = MultiPos.SINGLE;
@@ -750,7 +747,7 @@ public class BuildingInfo implements ILostChunkInfo {
         floorTypes2 = new BuildingPart[floors + cellars + 1];
 
         Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
-        rand.nextFloat();       // Compatibility?
+//        rand.nextFloat();       // Compatibility?
 
         for (int i = 0; i <= floors + cellars; i++) {
             ConditionContext conditionContext = new ConditionContext(cityLevel + i - cellars, i - cellars, cellars, floors, "<none>", building.getName(),
@@ -798,7 +795,7 @@ public class BuildingInfo implements ILostChunkInfo {
         multiBuildingPos = characteristics.multiPos;
 
         Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
-        rand.nextFloat();       // Compatibility?
+//        rand.nextFloat();       // Compatibility?
 
         boolean b = characteristics.couldHaveBuilding;
         if (b && multiBuildingPos.isSingle()) {
@@ -1137,8 +1134,8 @@ public class BuildingInfo implements ILostChunkInfo {
             // In the sphere
             float dist = CitySphere.getRelativeDistanceToCityCenter(chunkX, chunkZ, provider);
             Random rand = new Random(provider.getSeed() + chunkZ * 817505771L + chunkX * 217645177L);
-            rand.nextFloat();
-            rand.nextFloat();
+//            rand.nextFloat();
+//            rand.nextFloat();
             if (dist < .3f) {
                 return 2 + rand.nextInt(2);
             } else if (dist < .4f) {
@@ -1543,15 +1540,15 @@ public class BuildingInfo implements ILostChunkInfo {
 
     public static Random getBuildingRandom(int chunkX, int chunkZ, long seed) {
         QualityRandom random = new QualityRandom(seed + chunkZ * 341873128712L + chunkX * 132897987541L);
-        random.nextFloat();
-        random.nextFloat();
+//        random.nextFloat();
+//        random.nextFloat();
         return random;
     }
 
     public static Random getMultiBuildingRandom(int chunkX, int chunkZ, long seed) {
         QualityRandom random = new QualityRandom(seed + chunkZ * 8987899751L + chunkX * 189878980451L);
-        random.nextFloat();
-        random.nextFloat();
+//        random.nextFloat();
+//        random.nextFloat();
         return random;
     }
 

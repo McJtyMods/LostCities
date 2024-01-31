@@ -630,8 +630,8 @@ public class LostCityTerrainFeature {
         int az = (chunkZ + 2000000) / scatteredSettings.getAreasize();
 
         QualityRandom scatteredRandom = new QualityRandom(provider.getSeed() + ax * 5564338337L + az * 25564337621L);
-        scatteredRandom.nextFloat();
-        scatteredRandom.nextFloat();
+//        scatteredRandom.nextFloat();
+//        scatteredRandom.nextFloat();
 
         if (scatteredRandom.nextFloat() < scatteredSettings.getChance()) {
             // No scattered structure in this area
@@ -1168,21 +1168,21 @@ public class LostCityTerrainFeature {
     private static final Random RANDOMIZED_OFFSET = new Random();
     public static int getRandomizedOffset(int chunkX, int chunkZ, int min, int max) {
         RANDOMIZED_OFFSET.setSeed(chunkZ * 256203221L + chunkX * 899809363L);
-        RANDOMIZED_OFFSET.nextFloat();
+//        RANDOMIZED_OFFSET.nextFloat();
         return RANDOMIZED_OFFSET.nextInt(max - min + 1) + min;
     }
 
     private static final Random RANDOMIZED_OFFSET_L1 = new Random();
     public static int getHeightOffsetL1(int chunkX, int chunkZ) {
         RANDOMIZED_OFFSET_L1.setSeed(chunkZ * 341873128712L + chunkX * 132897987541L);
-        RANDOMIZED_OFFSET_L1.nextFloat();
+//        RANDOMIZED_OFFSET_L1.nextFloat();
         return RANDOMIZED_OFFSET_L1.nextInt(5);
     }
 
     private static final Random RANDOMIZED_OFFSET_L2 = new Random();
     public static int getHeightOffsetL2(int chunkX, int chunkZ) {
         RANDOMIZED_OFFSET_L2.setSeed(chunkZ * 132897987541L + chunkX * 341873128712L);
-        RANDOMIZED_OFFSET_L2.nextFloat();
+//        RANDOMIZED_OFFSET_L2.nextFloat();
         return RANDOMIZED_OFFSET_L2.nextInt(5);
     }
 
@@ -1436,22 +1436,23 @@ public class LostCityTerrainFeature {
         int cx = chunkX << 4;
         int cz = chunkZ << 4;
         RandomState randomState = chunkProvider.randomState();
-        int height00 = generator.getBaseHeight(cx + 3, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
-        int height10 = generator.getBaseHeight(cx + 12, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
-        int height01 = generator.getBaseHeight(cx + 3, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
-        int height11 = generator.getBaseHeight(cx + 12, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
+        int height = generator.getBaseHeight(cx + 8, cz + 8, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
+//        int height00 = generator.getBaseHeight(cx + 3, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
+//        int height10 = generator.getBaseHeight(cx + 12, cz + 3, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
+//        int height01 = generator.getBaseHeight(cx + 3, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
+//        int height11 = generator.getBaseHeight(cx + 12, cz + 12, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                int y;
-                if (x < 8 && z < 8) {
-                    y = height00;
-                } else if (x < 8) {
-                    y = height01;
-                } else if (z < 8) {
-                    y = height10;
-                } else {
-                    y = height11;
-                }
+                int y = height;
+//                if (x < 8 && z < 8) {
+//                    y = height00;
+//                } else if (x < 8) {
+//                    y = height01;
+//                } else if (z < 8) {
+//                    y = height10;
+//                } else {
+//                    y = height11;
+//                }
                 heightmap.update(x, y, z);
             }
         }
@@ -2253,8 +2254,8 @@ public class LostCityTerrainFeature {
     private static final Random VEGETATION_RAND = new Random();
     private void generateRandomVegetation(BuildingInfo info, int height) {
         VEGETATION_RAND.setSeed(provider.getSeed() * 377 + info.chunkZ * 341873128712L + info.chunkX * 132897987541L);
-        VEGETATION_RAND.nextFloat();
-        VEGETATION_RAND.nextFloat();
+//        VEGETATION_RAND.nextFloat();
+//        VEGETATION_RAND.nextFloat();
 
         if (info.getXmin().hasBuilding) {
             for (int x = 0; x < info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS; x++) {

@@ -38,6 +38,9 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
         super(NoneFeatureConfiguration.CODEC);
     }
 
+    private static final long[] times = new long[1000];
+    private static long totalCnt = 0;
+
     @Override
     public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
         WorldGenLevel level = context.level();
@@ -55,7 +58,18 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
                 int chunkZ = center.z;
                 diminfo.setWorld(level);
                 try {
+                    long start = System.currentTimeMillis();
                     diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
+                    long end = System.currentTimeMillis();
+                    times[(int) (totalCnt % 1000)] = end - start;
+                    totalCnt++;
+                    if (totalCnt % 1000 == 0) {
+                        long totalTime = 0;
+                        for (int i = 0 ; i < 1000 ; i++) {
+                            totalTime += times[i];
+                        }
+                        System.out.println("Average time for generating a chunk: " + (totalTime / 1000.0f) + "ms");
+                    }
                 } catch (Exception e) {
                     LostCities.getLogger().error("Error generating chunk {},{}: {}", chunkX, chunkZ, e.getMessage(), e);
                     ErrorLogger.logChunkInfo(chunkX, chunkZ, diminfo);

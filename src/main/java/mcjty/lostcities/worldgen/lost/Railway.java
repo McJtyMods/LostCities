@@ -97,8 +97,8 @@ public class Railway {
      */
     private static RailChunkInfo getRailChunkTypeInternal(int chunkX, int chunkZ, IDimensionInfo provider) {
         QualityRandom randomRailChunkType = new QualityRandom(provider.getSeed() + chunkZ * 2600003897L + chunkX * 43600002517L);
-        randomRailChunkType.nextFloat();
-        randomRailChunkType.nextFloat();
+//        randomRailChunkType.nextFloat();
+//        randomRailChunkType.nextFloat();
 
         LostCityProfile profile = BuildingInfo.getProfile(chunkX, chunkZ, provider);
         RailwayParts railwayParts = provider.getWorldStyle().getPartSelector().railwayParts();
