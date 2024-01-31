@@ -22,4 +22,7 @@ public class LostTags {
 
     public static final ResourceLocation LIGHTS = new ResourceLocation(LostCities.MODID, "lights");
     public static final TagKey<Block> LIGHTS_TAG = TagKey.create(Registries.BLOCK, LIGHTS);
+
+    public static final ResourceLocation NEEDSPOI = new ResourceLocation(LostCities.MODID, "needspoi");
+    public static final TagKey<Block> NEEDSPOI_TAG = TagKey.create(Registries.BLOCK, NEEDSPOI);
 }

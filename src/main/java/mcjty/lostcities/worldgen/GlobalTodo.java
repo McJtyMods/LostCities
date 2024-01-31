@@ -21,7 +21,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class GlobalTodo extends SavedData {
@@ -33,6 +35,8 @@ public class GlobalTodo extends SavedData {
     private Map<BlockPos, Pair<BlockState, ResourceLocation>> todoSpawners = new HashMap<>();
     // This is generic block entity data that still has to be placed in the world
     private Map<BlockPos, Pair<BlockState, CompoundTag>> todoBlockEntities = new HashMap<>();
+    // Todo blocks that require POI
+    private Set<BlockPos> todoPoi = new HashSet<>();
 
     @Nonnull
     public static GlobalTodo getData(Level world) {
@@ -68,6 +72,12 @@ public class GlobalTodo extends SavedData {
             CompoundTag tag = blockEntityTag.getCompound("tag");
             addBlockEntityTodo(pos, state, tag);
         }
+        ListTag poi = nbt.getList("poi", Tag.TAG_COMPOUND);
+        for (Tag p : poi) {
+            CompoundTag pTag = (CompoundTag) p;
+            BlockPos pos = NbtUtils.readBlockPos(pTag);
+            addPoi(pos);
+        }
     }
 
     @Override
@@ -90,6 +100,9 @@ public class GlobalTodo extends SavedData {
             blockEntities.add(blockEntityTag);
         });
         tag.put("blockentities", blockEntities);
+        ListTag poi = new ListTag();
+        todoPoi.forEach(pos -> poi.add(NbtUtils.writeBlockPos(pos)));
+        tag.put("poi", poi);
         return tag;
     }
 
@@ -122,6 +135,10 @@ public class GlobalTodo extends SavedData {
 //        });
     }
 
+    public void addPoi(BlockPos pos) {
+        todoPoi.add(pos);
+    }
+
     public void executeAndClearTodo(ServerLevel level) {
         Map<BlockPos, Consumer<ServerLevel>> copy = this.todo;
         this.todo = new HashMap<>();
@@ -147,6 +164,17 @@ public class GlobalTodo extends SavedData {
             BlockEntity be = level.getBlockEntity(pos);
             if (be != null) {
                 be.load(tag);
+            }
+        });
+
+        var copyPoi = this.todoPoi;
+        this.todoPoi = new HashSet<>();
+        copyPoi.forEach(pos -> {
+            BlockState state = level.getBlockState(pos);
+            Block block = state.getBlock();
+            if (block == Blocks.AIR) {
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+                level.setBlock(pos, state, Block.UPDATE_CLIENTS);
             }
         });
     }
