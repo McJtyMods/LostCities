@@ -2512,10 +2512,12 @@ public class LostCityTerrainFeature {
                                 } else if (inf.tag() != null) {
                                     b = handleBlockEntity(info, part, oy, provider.getWorld(), rx, rz, y, b, inf);
                                 }
+                            } else if (getStatesNeedingPoiUpdate().contains(b)) {
+                                // If this block has POI data we need to delay setting it
+                                GlobalTodo.getData(provider.getWorld().getLevel()).addPoi(driver.getCurrentCopy(), b);
+                                b = air;
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
                                 updateNeeded(info, driver.getCurrentCopy());
-                            } else if (getStatesNeedingPoiUpdate().contains(b)) {
-                                GlobalTodo.getData(provider.getWorld().getLevel()).addPoi(driver.getCurrentCopy());
                             } else if (getStatesNeedingTodo().contains(b)) {
                                 b = handleTodo(info, oy, provider.getWorld(), rx, rz, y, b);
                             }
