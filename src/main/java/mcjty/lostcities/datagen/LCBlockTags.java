@@ -46,8 +46,8 @@ public class LCBlockTags extends BlockTagsProvider {
         tag(LostTags.ROTATABLE_TAG).addTag(net.minecraft.tags.BlockTags.STAIRS);
         tag(LostTags.NOT_BREAKABLE_TAG).add(Blocks.BEDROCK, Blocks.END_PORTAL, Blocks.END_PORTAL_FRAME, Blocks.END_GATEWAY);
 
-        // @todo add more!!!
-        tag(LostTags.NEEDSPOI_TAG).add(Blocks.BREWING_STAND);
+        tag(LostTags.NEEDSPOI_TAG).add(Blocks.BREWING_STAND, Blocks.CAULDRON, Blocks.BARREL, Blocks.BLAST_FURNACE, Blocks.SMOKER,
+                Blocks.COMPOSTER, Blocks.FLETCHING_TABLE, Blocks.LECTERN, Blocks.STONECUTTER, Blocks.LOOM, Blocks.SMITHING_TABLE, Blocks.GRINDSTONE);
     }
 
     @Override
