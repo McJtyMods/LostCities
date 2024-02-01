@@ -622,7 +622,7 @@ public class BuildingInfo implements ILostChunkInfo {
         int topZ = coord.chunkZ() - mp.z();
         for (int x = 0; x < mp.w(); x++) {
             for (int z = 0; z < mp.h(); z++) {
-                ChunkCoord key = coord.offset(x, z);
+                ChunkCoord key = new ChunkCoord(provider.dimension(), topX + x, topZ + z);
                 level += getCityLevel(key, provider);
             }
         }
