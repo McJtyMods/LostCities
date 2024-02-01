@@ -18,9 +18,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class GlobalTodo extends SavedData {
@@ -33,7 +31,7 @@ public class GlobalTodo extends SavedData {
     // This is generic block entity data that still has to be placed in the world
     private Map<BlockPos, Pair<BlockState, CompoundTag>> todoBlockEntities = new HashMap<>();
     // Todo blocks that require POI
-    private Set<BlockPos> todoPoi = new HashSet<>();
+    private Map<BlockPos, BlockState> todoPoi = new HashMap<>();
 
     @Nonnull
     public static GlobalTodo getData(Level world) {
@@ -67,8 +65,9 @@ public class GlobalTodo extends SavedData {
         ListTag poi = nbt.getList("poi", Tag.TAG_COMPOUND);
         for (Tag p : poi) {
             CompoundTag pTag = (CompoundTag) p;
-            BlockPos pos = NbtUtils.readBlockPos(pTag);
-            addPoi(pos);
+            BlockPos pos = NbtUtils.readBlockPos(pTag.getCompound("pos"));
+            BlockState state = NbtUtils.readBlockState(pTag.getCompound("state"));
+            addPoi(pos, state);
         }
     }
 
@@ -93,8 +92,12 @@ public class GlobalTodo extends SavedData {
         });
         tag.put("blockentities", blockEntities);
         ListTag poi = new ListTag();
-        todoPoi.forEach(pos -> poi.add(NbtUtils.writeBlockPos(pos)));
-        tag.put("poi", poi);
+        todoPoi.entrySet().forEach(entry -> {
+            CompoundTag pTag = new CompoundTag();
+            pTag.put("pos", NbtUtils.writeBlockPos(entry.getKey()));
+            pTag.put("state", NbtUtils.writeBlockState(entry.getValue()));
+            poi.add(pTag);
+        });
         return tag;
     }
 
@@ -104,31 +107,14 @@ public class GlobalTodo extends SavedData {
 
     public void addSpawnerTodo(BlockPos pos, BlockState spawnerState, ResourceLocation randomEntity) {
         todoSpawners.put(pos, Pair.of(spawnerState, randomEntity));
-//        todo.put(pos, level -> {
-//            if (level.getBlockState(pos).getBlock() == spawnerState.getBlock()) {
-//                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-//                level.setBlock(pos, spawnerState, Block.UPDATE_CLIENTS);
-//                LostCityTerrainFeature.createSpawner(level, pos, randomEntity);
-//            }
-//        });
     }
 
     public void addBlockEntityTodo(BlockPos pos, BlockState state, CompoundTag tag) {
         todoBlockEntities.put(pos, Pair.of(state, tag));
-//        todo.put(pos, level -> {
-//            if (level.getBlockState(pos).getBlock() == state.getBlock()) {
-//                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-//                level.setBlock(pos, state, Block.UPDATE_CLIENTS);
-//                BlockEntity be = level.getBlockEntity(pos);
-//                if (be != null) {
-//                    be.load(tag);
-//                }
-//            }
-//        });
     }
 
-    public void addPoi(BlockPos pos) {
-        todoPoi.add(pos);
+    public void addPoi(BlockPos pos, BlockState state) {
+        todoPoi.put(pos, state);
     }
 
     public void executeAndClearTodo(ServerLevel level) {
@@ -160,14 +146,11 @@ public class GlobalTodo extends SavedData {
         });
 
         var copyPoi = this.todoPoi;
-        this.todoPoi = new HashSet<>();
-        copyPoi.forEach(pos -> {
-            BlockState state = level.getBlockState(pos);
-            Block block = state.getBlock();
-            if (block == Blocks.AIR) {
-                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-                level.setBlock(pos, state, Block.UPDATE_CLIENTS);
-            }
+        this.todoPoi = new HashMap<>();
+        copyPoi.entrySet().forEach(entry -> {
+            BlockPos pos = entry.getKey();
+            BlockState state = entry.getValue();
+            level.setBlock(pos, state, Block.UPDATE_ALL);
         });
     }
 }
