@@ -696,7 +696,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         // Get the (possbily cached) heightmap for this chunk
-        ChunkHeightmap heightmap = provider.getHeightmap(chunkX, chunkZ);
+        ChunkHeightmap heightmap = provider.getHeightmap(coord);
         // The height at which the highway would be + a threshold of 3
         int highwayHeight = groundLevel + level * FLOORHEIGHT + 3;
         // If there are many places in the chunk above this height we will need a tunnel
@@ -779,7 +779,6 @@ public class BuildingInfo implements ILostChunkInfo {
         this.maxBuildHeight = provider.getWorld().getMaxBuildHeight();
         this.chunkX = key.chunkX();
         this.chunkZ = key.chunkZ();
-        ResourceKey<Level> type = provider.getType();
         this.coord = key;
 
         outsideChunk = (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && !CitySphere.intersectsWithCitySphere(key, provider);

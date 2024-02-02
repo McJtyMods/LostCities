@@ -265,6 +265,8 @@ public class LostCityTerrainFeature {
         int chunkZ = chunk.getPos().z;
 
         ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
+
+        ChunkHeightmap heightmap = getHeightmap(coord, provider.getWorld());
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
 
         // @todo this setup is not very clean
@@ -290,10 +292,10 @@ public class LostCityTerrainFeature {
         }
 
         if (doCity) {
-            doCityChunk(info);
+            doCityChunk(info, heightmap);
         } else {
             // We already have a prefilled core chunk (as generated from doCoreChunk)
-            doNormalChunk(info);
+            doNormalChunk(info, heightmap);
         }
 
         if (profile.isSpace() || profile.isSpheres()) {
@@ -317,7 +319,7 @@ public class LostCityTerrainFeature {
 
         Railway.RailChunkInfo railInfo = info.getRailInfo();
         if (railInfo.getType() != RailChunkType.NONE) {
-            generateRailways(info, railInfo);
+            generateRailways(info, railInfo, heightmap);
         }
         generateRailwayDungeons(info);
 
@@ -536,10 +538,10 @@ public class LostCityTerrainFeature {
         info.clearTorchTodo();
     }
 
-    private void doNormalChunk(BuildingInfo info) {
+    private void doNormalChunk(BuildingInfo info, ChunkHeightmap heightmap) {
 //        debugClearChunk(chunkX, chunkZ, primer);
         if (profile.isDefault() || profile.isSpheres()) {
-            correctTerrainShape(info.coord);
+            correctTerrainShape(info.coord, heightmap);
 //            flattenChunkToCityBorder(chunkX, chunkZ);
         }
 
@@ -554,7 +556,7 @@ public class LostCityTerrainFeature {
         ScatteredSettings scatteredSettings = provider.getWorldStyle().getScatteredSettings();
         if (scatteredSettings != null) {
             if (avoidScattered(info)) {
-                generateScattered(info, scatteredSettings);
+                generateScattered(info, scatteredSettings, heightmap);
             }
         }
     }
@@ -563,7 +565,7 @@ public class LostCityTerrainFeature {
         return !(info.isCity || info.hasBridge(provider) || Highway.hasHighway(info.coord, provider, profile));
     }
 
-    private void generateScattered(BuildingInfo info, ScatteredSettings scatteredSettings) {
+    private void generateScattered(BuildingInfo info, ScatteredSettings scatteredSettings, ChunkHeightmap heightmap) {
         int chunkX = info.chunkX;
         int chunkZ = info.chunkZ;
 
@@ -654,7 +656,7 @@ public class LostCityTerrainFeature {
                 buildingName = buildings.get(scatteredRandom.nextInt(buildings.size()));
             }
             Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
-            int lowestLevel = handleScatteredTerrain(info, scattered);
+            int lowestLevel = handleScatteredTerrain(info, scattered, heightmap);
             generateScatteredBuilding(info, building, scatteredRandom, lowestLevel, scattered.getTerrainfix());
         } else {
             int lowestLevel = handleScatteredTerrainMulti(info, scattered, multiBuilding, minheight, maxheight, avgheight);
@@ -788,9 +790,7 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private int handleScatteredTerrain(BuildingInfo info, Scattered scattered) {
-        ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
-
+    private int handleScatteredTerrain(BuildingInfo info, Scattered scattered, ChunkHeightmap heightmap) {
         int lowestLevel = switch (scattered.getTerrainheight()) {
             case LOWEST -> heightmap.getHeight();
             case AVERAGE -> heightmap.getHeight();
@@ -1142,7 +1142,7 @@ public class LostCityTerrainFeature {
      * or up the top layer (6 thick) of the terrain. In a chunk these heights are interpolated
      * (bilinear interpolation).
      */
-    private void correctTerrainShape(ChunkCoord coord) {
+    private void correctTerrainShape(ChunkCoord coord, ChunkHeightmap heightmap) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
         BuildingInfo.MinMax mm00 = info.getDesiredMaxHeightL2();
         BuildingInfo.MinMax mm10 = info.getXmax().getDesiredMaxHeightL2();
@@ -1161,7 +1161,6 @@ public class LostCityTerrainFeature {
         if (max00 < 256 || max10 < 256 || max01 < 256 || max11 < 256 ||
                 min00 < 256 || min10 < 256 || min01 < 256 || min11 < 256) {
             // We need to fit the terrain between the upper and lower mesh here
-            ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
             int maxHeightP = heightmap.getHeight() + 10;
             int minHeightP = heightmap.getHeight() - 10;
             if (max00 >= 256) {
@@ -1316,8 +1315,7 @@ public class LostCityTerrainFeature {
      * @param info
      * @return
      */
-    public int getMinHeightAt(BuildingInfo info, int x, int z) {
-        ChunkHeightmap heightmap = getHeightmap(info.coord, info.provider.getWorld());
+    public int getMinHeightAt(BuildingInfo info, int x, int z, ChunkHeightmap heightmap) {
         int height = heightmap.getHeight();
         WorldGenLevel world = info.provider.getWorld();
         int adjacent;
@@ -1370,10 +1368,8 @@ public class LostCityTerrainFeature {
         heightmap.update(height);
     }
 
-    private void doCityChunk(BuildingInfo info) {
+    private void doCityChunk(BuildingInfo info, ChunkHeightmap heightmap) {
         boolean building = info.hasBuilding;
-
-        ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
 
         if (info.profile.isDefault() || info.profile.isSpheres()) {
             int minHeight = info.minBuildHeight;
@@ -1456,7 +1452,7 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void generateRailways(BuildingInfo info, Railway.RailChunkInfo railInfo) {
+    private void generateRailways(BuildingInfo info, Railway.RailChunkInfo railInfo, ChunkHeightmap heightmap) {
         RailwayParts railwayParts = provider.getWorldStyle().getPartSelector().railwayParts();
         int height = info.groundLevel + railInfo.getLevel() * FLOORHEIGHT;
         RailChunkType type = railInfo.getType();
@@ -1557,7 +1553,6 @@ public class LostCityTerrainFeature {
         }
         int h = generatePart(info, part, transform, 0, height, 0, false);
         if (clearUpper) {
-            ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
             int maxh = heightmap.getHeight() + 4;
             if (h < maxh) {
                 for (int x = 0; x < 16; x++) {
@@ -1960,10 +1955,10 @@ public class LostCityTerrainFeature {
             generateFrontPart(info, height, info.getZmax(), Transform.ROTATE_270);
         }
 
-        generateBorders(info, canDoParks);
+        generateBorders(info, canDoParks, heightmap);
     }
 
-    private void generateBorders(BuildingInfo info, boolean canDoParks) {
+    private void generateBorders(BuildingInfo info, boolean canDoParks, ChunkHeightmap heightmap) {
         Character borderBlock = info.getCityStyle().getBorderBlock();
 
         switch (info.profile.LANDSCAPE_TYPE) {
@@ -1977,25 +1972,25 @@ public class LostCityTerrainFeature {
         if (doBorder(info, Direction.XMIN)) {
             int x = 0;
             for (int z = 0; z < 16; z++) {
-                generateBorder(info, canDoParks, x, z, Direction.XMIN.get(info));
+                generateBorder(info, canDoParks, x, z, Direction.XMIN.get(info), heightmap);
             }
         }
         if (doBorder(info, Direction.XMAX)) {
             int x = 15;
             for (int z = 0; z < 16; z++) {
-                generateBorder(info, canDoParks, x, z, Direction.XMAX.get(info));
+                generateBorder(info, canDoParks, x, z, Direction.XMAX.get(info), heightmap);
             }
         }
         if (doBorder(info, Direction.ZMIN)) {
             int z = 0;
             for (int x = 0; x < 16; x++) {
-                generateBorder(info, canDoParks, x, z, Direction.ZMIN.get(info));
+                generateBorder(info, canDoParks, x, z, Direction.ZMIN.get(info), heightmap);
             }
         }
         if (doBorder(info, Direction.ZMAX)) {
             int z = 15;
             for (int x = 0; x < 16; x++) {
-                generateBorder(info, canDoParks, x, z, Direction.ZMAX.get(info));
+                generateBorder(info, canDoParks, x, z, Direction.ZMAX.get(info), heightmap);
             }
         }
     }
@@ -2051,15 +2046,14 @@ public class LostCityTerrainFeature {
     /**
      * Generate a single border column for one side of a street block
      */
-    private void generateBorder(BuildingInfo info, boolean canDoParks, int x, int z, BuildingInfo adjacent) {
+    private void generateBorder(BuildingInfo info, boolean canDoParks, int x, int z, BuildingInfo adjacent, ChunkHeightmap heightmap) {
         Character borderBlock = info.getCityStyle().getBorderBlock();
         Character wallBlock = info.getCityStyle().getWallBlock();
         BlockState wall = info.getCompiledPalette().get(wallBlock);
 
         switch (info.profile.LANDSCAPE_TYPE) {
             case DEFAULT, SPHERES -> {
-                ChunkHeightmap heightmap = getHeightmap(info.coord, info.provider.getWorld());
-                int y = getMinHeightAt(info, x, z);
+                int y = getMinHeightAt(info, x, z, heightmap);
                 if (y < info.getCityGroundLevel()+1) {
                     // We are above heightmap level. Generated a border from that level to our ground level
                     setBlocksFromPalette(x, y-1, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
@@ -2085,13 +2079,13 @@ public class LostCityTerrainFeature {
             case FLOATING -> {
                 setBlocksFromPalette(x, info.getCityGroundLevel() - 3, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
                 if (isCorner(x, z)) {
-                    generateBorderSupport(info, wall, x, z, 3);
+                    generateBorderSupport(info, wall, x, z, 3, heightmap);
                 }
             }
             case CAVERN -> {
                 setBlocksFromPalette(x, info.getCityGroundLevel() - 2, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
                 if (isCorner(x, z)) {
-                    generateBorderSupport(info, wall, x, z, 2);
+                    generateBorderSupport(info, wall, x, z, 2, heightmap);
                 }
             }
         }
@@ -2107,8 +2101,7 @@ public class LostCityTerrainFeature {
     /**
      * Generate a column of wall blocks (and stone below that in water)
      */
-    private void generateBorderSupport(BuildingInfo info, BlockState wall, int x, int z, int offset) {
-        ChunkHeightmap heightmap = getHeightmap(info.coord, provider.getWorld());
+    private void generateBorderSupport(BuildingInfo info, BlockState wall, int x, int z, int offset, ChunkHeightmap heightmap) {
         int height = heightmap.getHeight();
         if (height > 1) {
             // None void
@@ -2872,7 +2865,7 @@ public class LostCityTerrainFeature {
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     if (isSide(x, z)) {
-                        int y = getMinHeightAt(info, x, z);
+                        int y = getMinHeightAt(info, x, z, heightmap);
                         if (y >= lowestLevel) {
                             // The building generates below heightmap height. So we generate a border of 3 only
                             y = lowestLevel-3;
