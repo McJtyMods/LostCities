@@ -8,10 +8,7 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.editor.EditModeData;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
-import mcjty.lostcities.varia.ChunkCoord;
-import mcjty.lostcities.varia.NoiseGeneratorPerlin;
-import mcjty.lostcities.varia.QualityRandom;
-import mcjty.lostcities.varia.Tools;
+import mcjty.lostcities.varia.*;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.data.*;
@@ -93,6 +90,7 @@ public class LostCityTerrainFeature {
     private final RandomSource rand;
 
     private final Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
+    private final Statistics statistics = new Statistics();
 
     public LostCityTerrainFeature(IDimensionInfo provider, LostCityProfile profile, RandomSource rand) {
         this.provider = provider;
@@ -257,6 +255,8 @@ public class LostCityTerrainFeature {
     }
 
     public void generate(WorldGenRegion region, ChunkAccess chunk) {
+        long start = System.currentTimeMillis();
+
         LevelAccessor oldRegion = driver.getRegion();
         ChunkAccess oldChunk = driver.getPrimer();
         driver.setPrimer(region, chunk);
@@ -346,6 +346,13 @@ public class LostCityTerrainFeature {
         driver.actuallyGenerate(chunk);
         driver.setPrimer(oldRegion, oldChunk);
         ChunkFixer.fix(provider, coord);
+
+        long time = System.currentTimeMillis() - start;
+        statistics.addTime(time);
+    }
+
+    public Statistics getStatistics() {
+        return statistics;
     }
 
     private int getTopLevel(BuildingInfo info) {
