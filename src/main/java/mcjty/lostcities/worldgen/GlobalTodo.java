@@ -160,7 +160,9 @@ public class GlobalTodo extends SavedData {
         copyPoi.entrySet().forEach(entry -> {
             BlockPos pos = entry.getKey();
             BlockState state = entry.getValue();
-            level.setBlock(pos, state, Block.UPDATE_ALL);
+            if (!level.getPoiManager().getType(pos).isPresent()) {
+                level.setBlock(pos, state, Block.UPDATE_ALL);
+            }
         });
     }
 }
