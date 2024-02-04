@@ -29,15 +29,15 @@ public class CommandStats implements Command<CommandSourceStack> {
     @Override
     public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo((WorldGenLevel) player.level());
+        IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo((WorldGenLevel) player.level);
         if (dimInfo != null) {
             Statistics statistics = dimInfo.getFeature().getStatistics();
             float averageTime = statistics.getAverageTime();
             long minTime = statistics.getMinTime();
             long maxTime = statistics.getMaxTime();
-            context.getSource().sendSuccess(() -> Component.literal("Average time: " + averageTime + "ms").withStyle(ChatFormatting.YELLOW), false);
-            context.getSource().sendSuccess(() -> Component.literal("Min time: " + minTime + "ms").withStyle(ChatFormatting.YELLOW), false);
-            context.getSource().sendSuccess(() -> Component.literal("Max time: " + maxTime + "ms").withStyle(ChatFormatting.YELLOW), false);
+            context.getSource().sendSuccess(Component.literal("Average time: " + averageTime + "ms").withStyle(ChatFormatting.YELLOW), false);
+            context.getSource().sendSuccess(Component.literal("Min time: " + minTime + "ms").withStyle(ChatFormatting.YELLOW), false);
+            context.getSource().sendSuccess(Component.literal("Max time: " + maxTime + "ms").withStyle(ChatFormatting.YELLOW), false);
         } else {
             context.getSource().sendFailure(Component.literal("No dimension info found!").withStyle(ChatFormatting.RED));
         }
