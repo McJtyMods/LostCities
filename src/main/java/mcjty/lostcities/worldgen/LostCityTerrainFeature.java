@@ -1361,8 +1361,7 @@ public class LostCityTerrainFeature {
         ChunkGenerator generator = chunkProvider.getGenerator();
         int cx = chunkX << 4;
         int cz = chunkZ << 4;
-        RandomState randomState = chunkProvider.randomState();
-        int height = generator.getBaseHeight(cx + 8, cz + 8, Heightmap.Types.OCEAN_FLOOR_WG, region, randomState);
+        int height = generator.getBaseHeight(cx + 8, cz + 8, Heightmap.Types.OCEAN_FLOOR_WG, region);
         heightmap.update(height);
     }
 
@@ -2512,7 +2511,7 @@ public class LostCityTerrainFeature {
                         if (level.isAreaLoaded(pos, 1)) {
                             level.setBlock(pos, state, Block.UPDATE_CLIENTS);
                             // We do rand.fork() to avoid accessing LegacyRandomSource from multiple threads
-                            saplingBlock.advanceTree(level, pos, state, rand.fork());
+                            saplingBlock.advanceTree(level, pos, state, rand);
                         }
                     });
                 }

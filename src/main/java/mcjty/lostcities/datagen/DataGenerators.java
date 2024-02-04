@@ -13,7 +13,7 @@ public class DataGenerators {
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
         if (event.includeServer()) {
-            BlockTags blockTags = new BlockTags(generator, event.getExistingFileHelper());
+            LCBlockTags blockTags = new LCBlockTags(generator, event.getExistingFileHelper());
             generator.addProvider(blockTags);
         }
     }

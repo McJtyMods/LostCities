@@ -12,6 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.WorldGenLevel;
 
@@ -35,11 +36,11 @@ public class CommandStats implements Command<CommandSourceStack> {
             float averageTime = statistics.getAverageTime();
             long minTime = statistics.getMinTime();
             long maxTime = statistics.getMaxTime();
-            context.getSource().sendSuccess(Component.literal("Average time: " + averageTime + "ms").withStyle(ChatFormatting.YELLOW), false);
-            context.getSource().sendSuccess(Component.literal("Min time: " + minTime + "ms").withStyle(ChatFormatting.YELLOW), false);
-            context.getSource().sendSuccess(Component.literal("Max time: " + maxTime + "ms").withStyle(ChatFormatting.YELLOW), false);
+            context.getSource().sendSuccess(new TextComponent("Average time: " + averageTime + "ms").withStyle(ChatFormatting.YELLOW), false);
+            context.getSource().sendSuccess(new TextComponent("Min time: " + minTime + "ms").withStyle(ChatFormatting.YELLOW), false);
+            context.getSource().sendSuccess(new TextComponent("Max time: " + maxTime + "ms").withStyle(ChatFormatting.YELLOW), false);
         } else {
-            context.getSource().sendFailure(Component.literal("No dimension info found!").withStyle(ChatFormatting.RED));
+            context.getSource().sendFailure(new TextComponent("No dimension info found!").withStyle(ChatFormatting.RED));
         }
         return 0;
     }

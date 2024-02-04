@@ -2,7 +2,6 @@ package mcjty.lostcities.datagen;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.LostTags;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.tags.BlockTags;
@@ -15,7 +14,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public class LCBlockTags extends BlockTagsProvider {
 
