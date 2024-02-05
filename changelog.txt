@@ -1,3 +1,8 @@
+Upcoming:
+- Very big optimizations to Lost City generation. On average generation of a city chunk will be 2 times faster.
+- New 'stats' command to show average chunk generation time
+- Finally fixed the POI warning that was spamming the log during chunk generation
+
 1.20-7.1.0:
 - New 'allowvoid' keyword for scattered references. This allows you to specify that a building can be placed in void chunks. By default this is false
 - Reintroduced and tweaked the 'floating', 'caves', and 'space' profiles. These are meant to be used in combination with Lost Worlds mod
