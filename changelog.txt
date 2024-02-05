@@ -1,4 +1,4 @@
-Upcoming:
+1.20-7.1.1:
 - Very big optimizations to Lost City generation. On average generation of a city chunk will be 2 times faster.
 - New 'stats' command to show average chunk generation time
 - Finally fixed the POI warning that was spamming the log during chunk generation
