@@ -6,7 +6,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.minecraftforge.registries.DeferredRegister;
 
@@ -48,8 +47,7 @@ public class CustomRegistries {
     public static final ResourceKey<Registry<ScatteredRE>> SCATTERED_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "scattered"));
     public static final DeferredRegister<ScatteredRE> SCATTERED_DEFERRED_REGISTER = DeferredRegister.create(SCATTERED_REGISTRY_KEY, LostCities.MODID);
 
-    public static void init() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+    public static void init(IEventBus bus) {
         BUILDING_DEFERRED_REGISTER.register(bus);
         PALETTE_DEFERRED_REGISTER.register(bus);
         PART_DEFERRED_REGISTER.register(bus);
