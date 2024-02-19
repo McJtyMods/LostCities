@@ -10,7 +10,7 @@ public class PacketHandler {
     private static int ID = 12;
     private static int packetId = 0;
 
-    public static SimpleChannel INSTANCE = null;
+    private static SimpleChannel INSTANCE = null;
 
     public static int nextPacketID() {
         return packetId++;
