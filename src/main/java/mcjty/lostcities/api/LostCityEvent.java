@@ -2,9 +2,9 @@ package mcjty.lostcities.api;
 
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.neoforged.neoforge.common.MinecraftForge;
+import net.neoforged.neoforge.eventbus.api.Cancelable;
+import net.neoforged.neoforge.eventbus.api.Event;
 
 /**
  * LostCityEvent is fired whenever an event involving a Lost City chunk generation occurs. <br>

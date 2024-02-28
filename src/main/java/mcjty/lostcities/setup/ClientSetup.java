@@ -1,7 +1,7 @@
 package mcjty.lostcities.setup;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.common.MinecraftForge;
+import net.neoforged.neoforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class ClientSetup {
 

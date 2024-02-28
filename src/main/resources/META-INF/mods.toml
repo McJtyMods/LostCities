@@ -7,6 +7,9 @@ displayURL="http://github.com/McJtyMods/LostCities/"
 #credits="Thanks for this example mod goes to Java" #optional
 authors="McJty"
 
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
+
 [[mods]]
 modId="lostcities"
 version="${file.jarVersion}"

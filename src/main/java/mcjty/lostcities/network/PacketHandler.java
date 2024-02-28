@@ -3,8 +3,8 @@ package mcjty.lostcities.network;
 
 import mcjty.lostcities.LostCities;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.NetworkRegistry;
+import net.neoforged.neoforge.network.simple.SimpleChannel;
 
 public class PacketHandler {
     private static int ID = 12;
