@@ -94,8 +94,6 @@ public class City {
         int chunkX = coord.chunkX();
         int chunkZ = coord.chunkZ();
         Random cityCenterRandom = new Random(chunkZ * 797003437L + chunkX * 295075153L);
-        cityCenterRandom.nextFloat();
-        cityCenterRandom.nextFloat();
         if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres())) {
             // @todo config
             CitySphere sphere = CitySphere.getCitySphere(coord, provider);
@@ -124,8 +122,6 @@ public class City {
         int chunkX = coord.chunkX();
         int chunkZ = coord.chunkZ();
         Random cityRadiusRandom = new Random(chunkZ * 100001653L + chunkX * 295075153L);
-        cityRadiusRandom.nextFloat();
-        cityRadiusRandom.nextFloat();
         LostCityProfile profile = provider.getProfile();
         int cityRange = profile.CITY_MAXRADIUS - profile.CITY_MINRADIUS;
         if (cityRange < 1) {
@@ -154,8 +150,6 @@ public class City {
         int chunkX = coord.chunkX();
         int chunkZ = coord.chunkZ();
         Random cityStyleForCenterRandom = new Random(chunkZ * 899809363L + chunkX * 256203221L);
-//        cityStyleForCenterRandom.nextFloat();
-//        cityStyleForCenterRandom.nextFloat();
         return provider.getWorldStyle().getRandomCityStyle(provider, coord, cityStyleForCenterRandom);
     }
 
@@ -165,8 +159,6 @@ public class City {
         int chunkX = coord.chunkX();
         int chunkZ = coord.chunkZ();
         Random cityStyleRandom = new Random(provider.getSeed() + chunkZ * 593441843L + chunkX * 217645177L);
-        cityStyleRandom.nextFloat();
-        cityStyleRandom.nextFloat();
 
         if (profile.CITY_CHANCE < 0) {
             WorldGenLevel world = provider.getWorld();
