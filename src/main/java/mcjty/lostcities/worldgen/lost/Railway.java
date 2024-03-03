@@ -99,8 +99,6 @@ public class Railway {
         int chunkX = key.chunkX();
         int chunkZ = key.chunkZ();
         QualityRandom randomRailChunkType = new QualityRandom(provider.getSeed() + chunkZ * 2600003897L + chunkX * 43600002517L);
-//        randomRailChunkType.nextFloat();
-//        randomRailChunkType.nextFloat();
 
         LostCityProfile profile = BuildingInfo.getProfile(key, provider);
         RailwayParts railwayParts = provider.getWorldStyle().getPartSelector().railwayParts();

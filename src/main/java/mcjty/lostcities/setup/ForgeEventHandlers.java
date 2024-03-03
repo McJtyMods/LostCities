@@ -223,8 +223,6 @@ public class ForgeEventHandlers {
     private BlockPos findSafeSpawnPoint(Level world, IDimensionInfo provider, @Nonnull Predicate<BlockPos> isSuitable,
                                     @Nonnull ServerLevelData serverLevelData) {
         Random rand = new Random(provider.getSeed());
-//        rand.nextFloat();
-//        rand.nextFloat();
         int radius = 200;
         int attempts = 0;
 //        int bottom = world.getWorldType().getMinimumSpawnHeight(world);
