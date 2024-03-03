@@ -56,8 +56,6 @@ public class CitySphere implements ILostSphere {
         CityStyle cs = info.getCityStyle();
 
         Random rand = new Random(info.provider.getSeed() + center.chunkX() * 837971201L + center.chunkZ() * 961744153L);
-        rand.nextFloat();
-        rand.nextFloat();
 
         BlockState glass = info.getCompiledPalette().get(cs.getSphereGlassBlock(), rand);
         BlockState base = info.getCompiledPalette().get(cs.getSphereBlock(), rand);
@@ -371,8 +369,6 @@ public class CitySphere implements ILostSphere {
         int chunkX = center.chunkX();
         int chunkZ = center.chunkZ();
         Random rand = new Random(provider.getSeed() + chunkX * 961744153L + chunkZ * 837971201L);
-        rand.nextFloat();
-        rand.nextFloat();
         CitySphere citySphere;
         // This information is for city spheres. This information is only relevant
         // in the chunk representing the center of the city

@@ -581,8 +581,6 @@ public class LostCityTerrainFeature {
         int az = (chunkZ + 2000000) / scatteredSettings.getAreasize();
 
         QualityRandom scatteredRandom = new QualityRandom(provider.getSeed() + ax * 5564338337L + az * 25564337621L);
-        scatteredRandom.nextFloat();
-        scatteredRandom.nextFloat();
 
         if (scatteredRandom.nextFloat() < scatteredSettings.getChance()) {
             // No scattered structure in this area
@@ -1110,21 +1108,18 @@ public class LostCityTerrainFeature {
     private static final Random RANDOMIZED_OFFSET = new Random();
     public static int getRandomizedOffset(int chunkX, int chunkZ, int min, int max) {
         RANDOMIZED_OFFSET.setSeed(chunkZ * 256203221L + chunkX * 899809363L);
-        RANDOMIZED_OFFSET.nextFloat();
         return RANDOMIZED_OFFSET.nextInt(max - min + 1) + min;
     }
 
     private static final Random RANDOMIZED_OFFSET_L1 = new Random();
     public static int getHeightOffsetL1(int chunkX, int chunkZ) {
         RANDOMIZED_OFFSET_L1.setSeed(chunkZ * 341873128712L + chunkX * 132897987541L);
-        RANDOMIZED_OFFSET_L1.nextFloat();
         return RANDOMIZED_OFFSET_L1.nextInt(5);
     }
 
     private static final Random RANDOMIZED_OFFSET_L2 = new Random();
     public static int getHeightOffsetL2(int chunkX, int chunkZ) {
         RANDOMIZED_OFFSET_L2.setSeed(chunkZ * 132897987541L + chunkX * 341873128712L);
-        RANDOMIZED_OFFSET_L2.nextFloat();
         return RANDOMIZED_OFFSET_L2.nextInt(5);
     }
 
@@ -2175,8 +2170,6 @@ public class LostCityTerrainFeature {
     private static final Random VEGETATION_RAND = new Random();
     private void generateRandomVegetation(BuildingInfo info, int height) {
         VEGETATION_RAND.setSeed(provider.getSeed() * 377 + info.chunkZ * 341873128712L + info.chunkX * 132897987541L);
-        VEGETATION_RAND.nextFloat();
-        VEGETATION_RAND.nextFloat();
 
         if (info.getXmin().hasBuilding) {
             for (int x = 0; x < info.profile.THICKNESS_OF_RANDOM_LEAFBLOCKS; x++) {
