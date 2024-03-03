@@ -161,7 +161,9 @@ public class GlobalTodo extends SavedData {
             BlockPos pos = entry.getKey();
             BlockState state = entry.getValue();
             if (!level.getPoiManager().getType(pos).isPresent()) {
-                level.setBlock(pos, state, Block.UPDATE_ALL);
+                if (level.getBlockState(pos).getBlock() == state.getBlock()) {
+                    level.setBlock(pos, state, Block.UPDATE_ALL);
+                }
             }
         });
     }

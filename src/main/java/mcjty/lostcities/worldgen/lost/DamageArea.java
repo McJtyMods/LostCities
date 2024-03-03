@@ -38,8 +38,6 @@ public class DamageArea {
         chunkBox = new AABB(chunkX * 16, 0, chunkZ * 16, chunkX * 16 + 15, 256, chunkZ * 16 + 15);
 
         Random damageRandom = new Random(seed + chunkZ * 295075153L + chunkX * 899826547L);
-//        damageRandom.nextFloat();
-//        damageRandom.nextFloat();
 
         int offset = (Math.max(info.profile.EXPLOSION_MAXRADIUS, info.profile.MINI_EXPLOSION_MAXRADIUS)+15) / 16;
         for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
@@ -102,8 +100,6 @@ public class DamageArea {
 
     private Explosion getExplosionAt(ChunkCoord coord, IDimensionInfo provider) {
         Random randomExplosion = new Random(seed + coord.chunkZ() * 295075153L + coord.chunkX() * 797003437L);
-//        randomExplosion.nextFloat();
-//        randomExplosion.nextFloat();
         if (randomExplosion.nextFloat() < profile.EXPLOSION_CHANCE) {
             return new Explosion(profile.EXPLOSION_MINRADIUS + randomExplosion.nextInt(profile.EXPLOSION_MAXRADIUS - profile.EXPLOSION_MINRADIUS),
                     new BlockPos(coord.chunkX() * 16 + randomExplosion.nextInt(16),
@@ -115,8 +111,6 @@ public class DamageArea {
 
     private Explosion getMiniExplosionAt(ChunkCoord coord, IDimensionInfo provider) {
         Random randomMiniExplosion = new Random(seed + coord.chunkZ() * 1400305337L + coord.chunkX() * 573259391L);
-//        randomMiniExplosion.nextFloat();
-//        randomMiniExplosion.nextFloat();
         if (randomMiniExplosion.nextFloat() < profile.MINI_EXPLOSION_CHANCE) {
             return new Explosion(profile.MINI_EXPLOSION_MINRADIUS + randomMiniExplosion.nextInt(profile.MINI_EXPLOSION_MAXRADIUS - profile.MINI_EXPLOSION_MINRADIUS),
                     new BlockPos(coord.chunkX() * 16 + randomMiniExplosion.nextInt(16),
