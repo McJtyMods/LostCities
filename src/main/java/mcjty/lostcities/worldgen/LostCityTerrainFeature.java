@@ -1995,7 +1995,10 @@ public class LostCityTerrainFeature {
                         driver.block(elevation).incZ();
                     }
                 }
-                height++;
+                if (info.profile.PARK_ELEVATION)
+                {
+                    height++;
+                }
             }
 
             switch (streetType) {
@@ -2366,10 +2369,10 @@ public class LostCityTerrainFeature {
                             }
                         }
                         if (b == null) {
-                            b = compiledPalette.get(street);
+                            b = info.profile.PARK_BORDER ? compiledPalette.get(street) : grass.get();
                         }
                     } else {
-                        b = compiledPalette.get(street);
+                        b = info.profile.PARK_BORDER ? compiledPalette.get(street) : grass.get();
                     }
                 } else {
                     b = grass.get();
