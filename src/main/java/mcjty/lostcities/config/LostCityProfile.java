@@ -154,6 +154,10 @@ public class LostCityProfile implements ILostCityProfile {
     public int MULTI_MAX_Z = 2;
     public boolean BRIDGE_SUPPORTS = true;
 
+    public boolean PARK_ELEVATION = true;
+
+    public boolean PARK_BORDER = true;
+
     public int BEDROCK_LAYER = 1;
 
     public float HORIZON = -1f;
@@ -332,6 +336,10 @@ public class LostCityProfile implements ILostCityProfile {
                 "There actually being a bridge also depends on the presence of adjacent bridges and other conditions");
         BRIDGE_SUPPORTS = cfg.getBoolean("bridgeSupports", LostCityProfile.CATEGORY_LOSTCITY, BRIDGE_SUPPORTS,
                 "If true bridges get supports when needed. You can disable this if you have bridges that span void chunks");
+        PARK_ELEVATION = cfg.getBoolean("parkElevation", LostCityProfile.CATEGORY_LOSTCITY, PARK_ELEVATION,
+                "If true parks get an extra layer of elevation");
+        PARK_BORDER = cfg.getBoolean("parkBorder", LostCityProfile.CATEGORY_LOSTCITY, PARK_BORDER,
+                "If true parks border will use the street block as base.");
 
         FOUNTAIN_CHANCE = cfg.getFloat("fountainChance", LostCityProfile.CATEGORY_LOSTCITY, FOUNTAIN_CHANCE, 0.0f, 1.0f, "The chance that a street section contains a fountain");
 
