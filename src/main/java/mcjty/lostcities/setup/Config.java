@@ -9,7 +9,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,19 +21,19 @@ public class Config {
     public static final String CATEGORY_GENERAL = "general";
     public static final boolean DEBUG = false;
 
-    public static ForgeConfigSpec.ConfigValue<String> SPECIAL_BED_BLOCK;// = "minecraft:diamond_block";
+    public static ModConfigSpec.ConfigValue<String> SPECIAL_BED_BLOCK;// = "minecraft:diamond_block";
 
     private static final String[] DEFAULT_DIMENSION_PROFILES = new String[] {
             "lostcities:lostcity=default"
     };
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_PROFILES;
+    private static final ModConfigSpec.ConfigValue<List<? extends String>> DIMENSION_PROFILES;
     private static Map<ResourceKey<Level>, String> dimensionProfileCache = null;
 
     // Profile as selected by the client
     public static String profileFromClient = null;
     public static String jsonFromClient = null;
-    public static final ForgeConfigSpec.ConfigValue<String> SELECTED_PROFILE;
-    public static final ForgeConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
+    public static final ModConfigSpec.ConfigValue<String> SELECTED_PROFILE;
+    public static final ModConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
 
     public static void reset() {
         profileFromClient = null;
@@ -108,9 +108,9 @@ public class Config {
         return dimensionProfileCache.get(type);
     }
 
-    private static final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
-    private static final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
-    private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
+    private static final ModConfigSpec.Builder COMMON_BUILDER = new ModConfigSpec.Builder();
+    private static final ModConfigSpec.Builder CLIENT_BUILDER = new ModConfigSpec.Builder();
+    private static final ModConfigSpec.Builder SERVER_BUILDER = new ModConfigSpec.Builder();
 
     static {
         COMMON_BUILDER.comment("General settings").push(CATEGORY_PROFILES);
@@ -137,8 +137,8 @@ public class Config {
         SERVER_CONFIG = SERVER_BUILDER.build();
     }
 
-    public static final ForgeConfigSpec COMMON_CONFIG;
-    public static final ForgeConfigSpec CLIENT_CONFIG;
-    public static final ForgeConfigSpec SERVER_CONFIG;
+    public static final ModConfigSpec COMMON_CONFIG;
+    public static final ModConfigSpec CLIENT_CONFIG;
+    public static final ModConfigSpec SERVER_CONFIG;
 
 }

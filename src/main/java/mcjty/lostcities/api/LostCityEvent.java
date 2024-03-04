@@ -2,7 +2,7 @@ package mcjty.lostcities.api;
 
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.neoforged.neoforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.eventbus.api.Cancelable;
 import net.neoforged.neoforge.eventbus.api.Event;
 

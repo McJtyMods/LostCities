@@ -4,7 +4,7 @@ import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.ILostCitiesPre;
 import mcjty.lostcities.setup.*;
 import net.neoforged.neoforge.api.distmarker.Dist;
-import net.neoforged.neoforge.eventbus.api.IEventBus;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.fml.ModLoadingContext;
 import net.neoforged.neoforge.fml.common.Mod;
 import net.neoforged.neoforge.fml.config.ModConfig;
