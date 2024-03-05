@@ -133,8 +133,6 @@ public class BiomeTranslator {
                 if (biomeId != null) {
                     long seed = biomeId.hashCode();
                     Random random = new Random(seed);
-                    random.nextFloat();
-                    random.nextFloat();
                     translationMap.put(biomeId, bestFit.get(random.nextInt(bestFit.size())));
                 }
             }
