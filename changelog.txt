@@ -1,3 +1,7 @@
+Upcoming:
+- TqLxQuanZ fixed the bug that some POI's lingered after explosions (like brewing stands)
+- TqLxQuanZ added park elevation and park border options
+
 1.19-6.0.21:
 - Very big optimizations to Lost City generation. On average generation of a city chunk will be 2 times faster.
 - New 'stats' command to show average chunk generation time
