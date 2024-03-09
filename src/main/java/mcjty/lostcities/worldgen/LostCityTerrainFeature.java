@@ -2615,7 +2615,7 @@ public class LostCityTerrainFeature {
         BlockEntity tileentity = world.getBlockEntity(pos);
         if (tileentity instanceof SpawnerBlockEntity spawner) {
             BaseSpawner logic = spawner.getSpawner();
-            logic.setEntityId(ForgeRegistries.ENTITY_TYPES.getValue(randomEntity), world, world.random, pos);
+            logic.setEntityId(BuiltInRegistries.ENTITY_TYPE.getValue(randomEntity), world, world.random, pos);
             spawner.setChanged();
             if (Config.DEBUG) {
                 ModSetup.getLogger().debug("generateLootSpawners: mob={} pos={}", randomEntity.toString(), pos);
