@@ -1,5 +1,6 @@
 package mcjty.lostcities.worldgen;
 
+import mcjty.lostcities.LostCities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -92,10 +93,10 @@ public class GlobalTodo extends SavedData {
         });
         tag.put("blockentities", blockEntities);
         ListTag poi = new ListTag();
-        todoPoi.entrySet().forEach(entry -> {
+        todoPoi.forEach((pos, state) -> {
             CompoundTag pTag = new CompoundTag();
-            pTag.put("pos", NbtUtils.writeBlockPos(entry.getKey()));
-            pTag.put("state", NbtUtils.writeBlockState(entry.getValue()));
+            pTag.put("pos", NbtUtils.writeBlockPos(pos));
+            pTag.put("state", NbtUtils.writeBlockState(state));
             poi.add(pTag);
         });
         return tag;
@@ -147,9 +148,7 @@ public class GlobalTodo extends SavedData {
 
         var copyPoi = this.todoPoi;
         this.todoPoi = new HashMap<>();
-        copyPoi.entrySet().forEach(entry -> {
-            BlockPos pos = entry.getKey();
-            BlockState state = entry.getValue();
+        copyPoi.forEach((pos, state) -> {
             if (!level.getPoiManager().getType(pos).isPresent()) {
                 if (level.getBlockState(pos).getBlock() == state.getBlock()) {
                     level.setBlock(pos, state, Block.UPDATE_ALL);
