@@ -611,8 +611,11 @@ public class LostCityTerrainFeature {
 
     private void doNormalChunk(BuildingInfo info, ChunkHeightmap heightmap) {
 //        debugClearChunk(chunkX, chunkZ, primer);
+        // TqLxQuanZ: Used for detect the shape correcting in the normal chunk, if there's a terrain shape correct happening,
+        // do not attempt to generate scattered building as they'll float in midair since it uses heightmap.
+        boolean trimmed = false;
         if (profile.isDefault() || profile.isSpheres()) {
-            correctTerrainShape(info.coord, heightmap);
+            trimmed = correctTerrainShape(info.coord, heightmap);
 //            flattenChunkToCityBorder(chunkX, chunkZ);
         }
 
@@ -626,7 +629,7 @@ public class LostCityTerrainFeature {
 
         ScatteredSettings scatteredSettings = provider.getWorldStyle().getScatteredSettings();
         if (scatteredSettings != null) {
-            if (avoidScattered(info)) {
+            if (avoidScattered(info) && !trimmed) {
                 generateScattered(info, scatteredSettings, heightmap);
             }
         }
@@ -1216,7 +1219,7 @@ public class LostCityTerrainFeature {
      * or up the top layer (6 thick) of the terrain. In a chunk these heights are interpolated
      * (bilinear interpolation).
      */
-    private void correctTerrainShape(ChunkCoord coord, ChunkHeightmap heightmap) {
+    private boolean correctTerrainShape(ChunkCoord coord, ChunkHeightmap heightmap) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
         BuildingInfo.MinMax mm00 = info.getDesiredMaxHeightL2();
         BuildingInfo.MinMax mm10 = info.getXmax().getDesiredMaxHeightL2();
@@ -1232,6 +1235,7 @@ public class LostCityTerrainFeature {
         float max10 = mm10.max;
         float max01 = mm01.max;
         float max11 = mm11.max;
+        boolean trimmed = false;
         if (max00 < 256 || max10 < 256 || max01 < 256 || max11 < 256 ||
                 min00 < 256 || min10 < 256 || min01 < 256 || min11 < 256) {
             // We need to fit the terrain between the upper and lower mesh here
@@ -1275,11 +1279,13 @@ public class LostCityTerrainFeature {
 
                     if (!moved) {
                         float minheight = minh0 + (minh1 - minh0) * (15.0f - z) / 15.0f;
-                        moveUp(x, z, (int) minheight, info.waterLevel > info.groundLevel);
+                        moved = moveUp(x, z, (int) minheight, info.waterLevel > info.groundLevel);
                     }
+                    trimmed |= moved;
                 }
             }
         }
+        return trimmed;
     }
 
     // Return true if state is air or liquid
@@ -1303,7 +1309,7 @@ public class LostCityTerrainFeature {
         return Tools.hasTag(state.getBlock(), LostTags.FOLIAGE_TAG);
     }
 
-    private void moveUp(int x, int z, int height, boolean dowater) {
+    private boolean moveUp(int x, int z, int height, boolean dowater) {
         // Find the first non-empty block starting at the given height
         driver.current(x, height, z);
         int minHeight = provider.getWorld().getMinBuildHeight();
@@ -1313,7 +1319,7 @@ public class LostCityTerrainFeature {
         }
 
         if (driver.getY() >= height) {
-            return; // Nothing to do
+            return false; // Nothing to do
         }
 
         int idx = driver.getY();    // Points to non-empty block below the empty block
@@ -1327,6 +1333,7 @@ public class LostCityTerrainFeature {
             driver.decY();
             idx--;
         }
+        return true;
     }
 
     private final BlockState[] buffer = new BlockState[6];
