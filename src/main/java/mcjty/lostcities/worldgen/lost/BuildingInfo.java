@@ -317,8 +317,17 @@ public class BuildingInfo implements ILostChunkInfo {
             LostCityProfile profile = getProfile(coord, provider);
             LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
 
+            WorldGenLevel world = provider.getWorld();
             characteristics.isCity = isCityRaw(coord, provider, profile);
-            initMultiBuildingSection(characteristics, coord, provider, profile);
+
+            if (!characteristics.isCity) {
+                characteristics.multiPos = MultiPos.SINGLE;
+                characteristics.multiBuilding = null;
+            }
+            else {
+                initMultiBuildingSection(characteristics, coord, provider, profile);
+            }
+
             if (characteristics.multiPos.isSingle()) {
                 characteristics.cityLevel = getCityLevel(coord, provider);
             } else {
@@ -350,13 +359,12 @@ public class BuildingInfo implements ILostChunkInfo {
                         }
                     }
                 }
-                cityStyle = AssetRegistries.CITYSTYLES.get(provider.getWorld(), counter.getMostOccuring());
+                cityStyle = AssetRegistries.CITYSTYLES.get(world, counter.getMostOccuring());
             } else {
                 cityStyle = City.getCityStyle(coord, provider, profile);
             }
             characteristics.cityStyle = cityStyle;
 
-            WorldGenLevel world = provider.getWorld();
             if (characteristics.multiPos.isMulti() && !characteristics.multiPos.isTopLeft()) {
                 LostChunkCharacteristics topleft = getTopLeftCityInfo(characteristics, coord, provider);
 //                characteristics.multiBuilding = topleft.multiBuilding;
