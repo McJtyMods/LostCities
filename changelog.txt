@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.0.24:
 - TqLxQuanZ speed up world generation speed if the chunk is not a city
 
 1.19-6.0.23:
