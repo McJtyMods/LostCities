@@ -1,3 +1,6 @@
+Upcoming:
+- TqLxQuanZ speed up world generation speed if the chunk is not a city
+
 1.19-6.0.23:
 - TqLxQuanZ fixed the scattered building can generate on air when there's a terrain correction in the current chunk
 - TqLxQuanZ fixed the scattered building can generate on air when there's a terrain correction in the current chunk.
