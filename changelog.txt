@@ -1,13 +1,16 @@
+Upcoming:
+- TqLxQuanZ speed up world generation speed if the chunk is not a city
+
 1.18-5.3.25:
 - TqLxQuanZ fixed the scattered building can generate on air when there's a terrain correction in the current chunk
-- TqLxQuanZ fixed the scattered building can generate on air when there's a terrain correction in the current chunk.
+- TqLxQuanZ fixed the scattered building can generate on air when there's a terrain correction in the current chunk
 
 1.18-5.3.24:
 - TqLxQuanZ fixed the bug that some POI's lingered after explosions (like brewing stands)
 - TqLxQuanZ added park elevation and park border options
 
 1.18-5.3.23:
-- Very big optimizations to Lost City generation. On average generation of a city chunk will be 2 times faster.
+- Very big optimizations to Lost City generation. On average generation of a city chunk will be 2 times faster
 - New 'stats' command to show average chunk generation time
 - Finally fixed the POI warning that was spamming the log during chunk generation
 
