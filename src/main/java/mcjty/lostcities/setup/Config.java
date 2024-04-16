@@ -33,6 +33,7 @@ public class Config {
     public static String jsonFromClient = null;
     public static final ForgeConfigSpec.ConfigValue<String> SELECTED_PROFILE;
     public static final ForgeConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
+    public static final ForgeConfigSpec.IntValue TODO_QUEUE_SIZE;
 
     public static void reset() {
         profileFromClient = null;
@@ -126,6 +127,7 @@ public class Config {
 
         SELECTED_PROFILE = SERVER_BUILDER.define("selectedProfile", "<CHECK>"); // Default is dummy value that tells the system to check in profileFromClient
         SELECTED_CUSTOM_JSON = SERVER_BUILDER.define("selectedCustomJson", "");
+        TODO_QUEUE_SIZE = SERVER_BUILDER.comment("The size of the todo queues for the lost city generator").defineInRange("todoQueueSize", 20, 1, 100000);
 
         SERVER_BUILDER.pop();
         COMMON_BUILDER.pop();
