@@ -1,7 +1,11 @@
 Upcoming:
+- Optimization to make it so that buildings with tons of spawners, chests, and other tile entities will cause less lag on a server by spreading the load over multiple ticks. Use the 'todoQueueSize' server config to configure this. By default it is set to 20
+- Fixed a bug where the POI todo wasn't persisted
+
+1.20-7.1.4:
 - TqLxQuanZ speed up world generation speed if the chunk is not a city
 
-Upcoming:
+1.20-7.1.3:
 - TqLxQuanZ fixed the scattered building can generate on air when there's a terrain correction in the current chunk
 - TqLxQuanZ fixed the scattered building can generate on air when there's a terrain correction in the current chunk.
 
