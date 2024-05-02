@@ -89,6 +89,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     @Nullable
     public IDimensionInfo getDimensionInfo(WorldGenLevel world) {
         if (globalDimensionInfoDirtyCounter != dimensionInfoDirtyCounter) {
+            System.out.println("LostCityFeature.getDimensionInfo: clearing cache!");
             // Force clear of cache
             AssetRegistries.reset();
             dimensionInfo.clear();

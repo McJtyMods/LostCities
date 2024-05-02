@@ -37,6 +37,7 @@ public class Config {
     public static final ForgeConfigSpec.IntValue TODO_QUEUE_SIZE;
 
     public static void reset() {
+        System.out.println("Config.reset");
         profileFromClient = null;
         jsonFromClient = null;
         dimensionProfileCache = null;
@@ -73,6 +74,7 @@ public class Config {
                 }
             }
             String selectedProfile = Config.SELECTED_PROFILE.get();
+            System.out.println("selectedProfile = " + selectedProfile);
             if ("<CHECK>".equals(selectedProfile)) {
                 if (Config.profileFromClient != null && !Config.profileFromClient.isEmpty()) {
                     Config.SELECTED_PROFILE.set(Config.profileFromClient);
