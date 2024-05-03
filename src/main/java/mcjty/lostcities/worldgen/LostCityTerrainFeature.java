@@ -2741,7 +2741,6 @@ public class LostCityTerrainFeature {
 
         // Fix lowest level so it goes above minimum build height
         while (lowestLevel <= min) {
-            System.out.println("------------------------------ " + lowestLevel);
             lowestLevel += FLOORHEIGHT;
             cellars--;
             if (cellars < 0) {
@@ -2750,7 +2749,6 @@ public class LostCityTerrainFeature {
         }
 
         while (info.getCityGroundLevel() + floors * FLOORHEIGHT >= max) {
-            System.out.println("++++++++++++++++++++++++++++++ " + floors);
             floors--;
             if (floors < 0) {
                 return;     // Bail out, this is a degenerate case

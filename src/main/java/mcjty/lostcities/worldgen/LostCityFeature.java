@@ -4,6 +4,7 @@ import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.setup.Config;
+import mcjty.lostcities.setup.ForgeEventHandlers;
 import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import net.minecraft.core.Holder;
@@ -89,11 +90,8 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     @Nullable
     public IDimensionInfo getDimensionInfo(WorldGenLevel world) {
         if (globalDimensionInfoDirtyCounter != dimensionInfoDirtyCounter) {
-            System.out.println("LostCityFeature.getDimensionInfo: clearing cache!");
             // Force clear of cache
-            AssetRegistries.reset();
-            dimensionInfo.clear();
-            dimensionInfoDirtyCounter = globalDimensionInfoDirtyCounter;
+            cleanUp();
         }
         ResourceKey<Level> type = world.getLevel().dimension();
         String profileName = Config.getProfileForDimension(type);
@@ -110,5 +108,13 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
             return dimensionInfo.get(type);
         }
         return null;
+    }
+
+    public void cleanUp() {
+        LostCities.lostCitiesImp.cleanUp();
+        ForgeEventHandlers.cleanUp();
+        AssetRegistries.reset();
+        dimensionInfo.clear();
+        dimensionInfoDirtyCounter = globalDimensionInfoDirtyCounter;
     }
 }

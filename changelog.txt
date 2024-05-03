@@ -1,3 +1,6 @@
+1.18-5.3.28:
+- Fixed a bug where switching worlds with different profiles would sometimes cause the old profile to be used
+
 1.18-5.3.27:
 - Optimization to make it so that buildings with tons of spawners, chests, and other tile entities will cause less lag on a server by spreading the load over multiple ticks. Use the 'todoQueueSize' server config to configure this. By default it is set to 20
 - Fixed a bug where the POI todo wasn't persisted

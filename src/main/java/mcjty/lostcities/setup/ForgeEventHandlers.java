@@ -118,17 +118,16 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onServerStarting(ServerAboutToStartEvent event) {
-        System.out.println("STARTING ####################### ForgeEventHandlers.cleanUp");
         cleanUp();
     }
 
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event) {
-        System.out.println("STOPPING ---####################### ForgeEventHandlers.cleanUp");
         cleanUp();
+        Config.reset();
     }
 
-    private static void cleanUp() {
+    public static void cleanUp() {
         Config.resetProfileCache();
         BuildingInfo.cleanCache();
         Highway.cleanCache();

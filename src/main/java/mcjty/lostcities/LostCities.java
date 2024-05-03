@@ -72,7 +72,7 @@ public class LostCities {
     private void processIMC(final InterModProcessEvent event) {
         event.getIMCStream(ILostCities.GET_LOST_CITIES::equals).forEach(message -> {
             Supplier<Function<ILostCities, Void>> supplier = message.getMessageSupplier();
-            supplier.get().apply(new LostCitiesImp());
+            supplier.get().apply(lostCitiesImp);
         });
     }
 }
