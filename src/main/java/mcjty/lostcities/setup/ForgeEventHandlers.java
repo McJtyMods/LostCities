@@ -39,7 +39,9 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -106,7 +108,18 @@ public class ForgeEventHandlers {
     }
 
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
+    public void onServerStarting(ServerAboutToStartEvent event) {
+        cleanUp();
+    }
+
+    @SubscribeEvent
+    public void onServerStopping(ServerStoppingEvent event) {
+        cleanUp();
+        Config.reset();
+    }
+
+    public static void cleanUp() {
+        Config.resetProfileCache();
         BuildingInfo.cleanCache();
         Highway.cleanCache();
         Railway.cleanCache();
