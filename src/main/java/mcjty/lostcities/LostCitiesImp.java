@@ -20,6 +20,10 @@ public class LostCitiesImp implements ILostCities {
 
     private final Map<ResourceKey<Level>, LostCityInformation> info = new HashMap<>();
 
+    public void cleanUp() {
+        info.clear();
+    }
+
     @Nullable
     @Override
     public ILostCityInformation getLostInfo(Level world) {
