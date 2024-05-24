@@ -69,6 +69,7 @@ public class GlobalTodo extends SavedData {
             BlockState state = NbtUtils.readBlockState(pTag.getCompound("state"));
             addPoi(pos, state);
         }
+        setDirty();
     }
 
     @Override
@@ -104,18 +105,22 @@ public class GlobalTodo extends SavedData {
 
     public void addTodo(BlockPos pos, Consumer<ServerLevel> code) {
         todo.add(pos, code);
+        setDirty();
     }
 
     public void addSpawnerTodo(BlockPos pos, BlockState spawnerState, ResourceLocation randomEntity) {
         todoSpawners.add(pos, Pair.of(spawnerState, randomEntity));
+        setDirty();
     }
 
     public void addBlockEntityTodo(BlockPos pos, BlockState state, CompoundTag tag) {
         todoBlockEntities.add(pos, Pair.of(state, tag));
+        setDirty();
     }
 
     public void addPoi(BlockPos pos, BlockState state) {
         todoPoi.add(pos, state);
+        setDirty();
     }
 
     public void executeAndClearTodo(ServerLevel level) {
@@ -148,5 +153,6 @@ public class GlobalTodo extends SavedData {
                 }
             }
         });
+        setDirty();
     }
 }
