@@ -1,3 +1,6 @@
+1.20-7.1.7:
+- TqLxQuanZ fixed a problem where generation data wasn't properly saved which could cause generation errors if you exited the world and re-entered
+
 1.20-7.1.6:
 - Fixed a bug where switching worlds with different profiles would sometimes cause the old profile to be used
 
