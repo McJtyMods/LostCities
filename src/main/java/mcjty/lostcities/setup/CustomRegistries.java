@@ -2,6 +2,7 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.lost.regassets.*;
+import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -47,6 +48,9 @@ public class CustomRegistries {
     public static final ResourceKey<Registry<ScatteredRE>> SCATTERED_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "scattered"));
     public static final DeferredRegister<ScatteredRE> SCATTERED_DEFERRED_REGISTER = DeferredRegister.create(SCATTERED_REGISTRY_KEY, LostCities.MODID);
 
+    public static final ResourceKey<Registry<StuffSettingsRE>> STUFF_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "stuff"));
+    public static final DeferredRegister<StuffSettingsRE> STUFF_DEFERRED_REGISTER = DeferredRegister.create(STUFF_REGISTRY_KEY, LostCities.MODID);
+
     public static void init(IEventBus bus) {
         BUILDING_DEFERRED_REGISTER.register(bus);
         PALETTE_DEFERRED_REGISTER.register(bus);
@@ -60,6 +64,7 @@ public class CustomRegistries {
         PREDEFINEDCITIES_DEFERRED_REGISTER.register(bus);
         PREDEFINEDSPHERES_DEFERRED_REGISTER.register(bus);
         SCATTERED_DEFERRED_REGISTER.register(bus);
+        STUFF_DEFERRED_REGISTER.register(bus);
     }
 
     public static void onDataPackRegistry(DataPackRegistryEvent.NewRegistry event) {
@@ -75,5 +80,6 @@ public class CustomRegistries {
         event.dataPackRegistry(PREDEFINEDCITIES_REGISTRY_KEY, PredefinedCityRE.CODEC);
         event.dataPackRegistry(PREDEFINEDSPHERES_REGISTRY_KEY, PredefinedSphereRE.CODEC);
         event.dataPackRegistry(SCATTERED_REGISTRY_KEY, ScatteredRE.CODEC);
+        event.dataPackRegistry(STUFF_REGISTRY_KEY, StuffSettingsRE.CODEC);
     }
 }

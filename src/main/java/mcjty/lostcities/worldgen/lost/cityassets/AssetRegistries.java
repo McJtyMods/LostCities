@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 
 import mcjty.lostcities.setup.CustomRegistries;
 import mcjty.lostcities.worldgen.lost.regassets.*;
+import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
 
 public class AssetRegistries {
 
@@ -17,6 +18,7 @@ public class AssetRegistries {
     public static final RegistryAssetRegistry<Scattered, ScatteredRE> SCATTERED = new RegistryAssetRegistry<>(CustomRegistries.SCATTERED_REGISTRY_KEY, Scattered::new);
     public static final RegistryAssetRegistry<PredefinedCity, PredefinedCityRE> PREDEFINED_CITIES = new RegistryAssetRegistry<>(CustomRegistries.PREDEFINEDCITIES_REGISTRY_KEY, PredefinedCity::new);
     public static final RegistryAssetRegistry<PredefinedSphere, PredefinedSphereRE> PREDEFINED_SPHERES = new RegistryAssetRegistry<>(CustomRegistries.PREDEFINEDSPHERES_REGISTRY_KEY, PredefinedSphere::new);
+    public static final RegistryAssetRegistry<Stuff, StuffSettingsRE> STUFF = new RegistryAssetRegistry<>(CustomRegistries.STUFF_REGISTRY_KEY, Stuff::new);
 
     public static void reset() {
         VARIANTS.reset();
@@ -30,5 +32,6 @@ public class AssetRegistries {
         PALETTES.reset();
         PREDEFINED_CITIES.reset();
         PREDEFINED_SPHERES.reset();
+        STUFF.reset();
     }
 }

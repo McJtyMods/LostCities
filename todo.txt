@@ -1,1 +1,4 @@
-- Make explosions go upwards more for a more realistic shape
+Lost Souls on multibuildings
+Loot depending on blocktype
+Scattered blocks in cities
+
