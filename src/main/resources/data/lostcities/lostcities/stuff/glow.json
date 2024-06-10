@@ -1,11 +1,12 @@
 {
-  "blocks": "  h",
-  "minheight": 60,
-  "maxheight": 90,
+  "column": ":::h",
+  "minheight": 80,
+  "maxheight": 120,
   "mincount": 2,
   "maxcount": 7,
   "attempts": 10,
-  "inbuilding": false,
+  "inbuilding": true,
+  "seesky": true,
   "biomes": {
     "excluding": [
       "#minecraft:is_ocean",
@@ -13,9 +14,17 @@
       "#minecraft:is_beach"
     ]
   },
-  "block": {
+  "blocks": {
     "if_any": [
-      "#forge:stone"
+      "#forge:stone",
+      "minecraft:andesite"
+    ]
+  },
+  "buildings": {
+    "if_any": [
+      "lostcities:building1",
+      "lostcities:building2",
+      "lostcities:building3"
     ]
   }
 }

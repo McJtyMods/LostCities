@@ -3,6 +3,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 import mcjty.lostcities.setup.CustomRegistries;
 import mcjty.lostcities.worldgen.lost.regassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
+import net.minecraft.world.level.CommonLevelAccessor;
 
 public class AssetRegistries {
 
@@ -20,6 +21,8 @@ public class AssetRegistries {
     public static final RegistryAssetRegistry<PredefinedSphere, PredefinedSphereRE> PREDEFINED_SPHERES = new RegistryAssetRegistry<>(CustomRegistries.PREDEFINEDSPHERES_REGISTRY_KEY, PredefinedSphere::new);
     public static final RegistryAssetRegistry<Stuff, StuffSettingsRE> STUFF = new RegistryAssetRegistry<>(CustomRegistries.STUFF_REGISTRY_KEY, Stuff::new);
 
+    private static boolean loaded = false;
+
     public static void reset() {
         VARIANTS.reset();
         CONDITIONS.reset();
@@ -33,5 +36,18 @@ public class AssetRegistries {
         PREDEFINED_CITIES.reset();
         PREDEFINED_SPHERES.reset();
         STUFF.reset();
+        loaded = false;
+    }
+
+    public static void load(CommonLevelAccessor level) {
+        if (loaded) {
+            return;
+        }
+        PARTS.loadAll(level);
+        BUILDINGS.loadAll(level);
+        STUFF.loadAll(level);
+        PREDEFINED_CITIES.loadAll(level);
+        PREDEFINED_SPHERES.loadAll(level);
+        loaded = true;
     }
 }

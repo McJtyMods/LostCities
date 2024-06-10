@@ -179,6 +179,10 @@
       ]
     },
     {
+      "char": "\\",
+      "block": "minecraft:cobweb"
+    },
+    {
       "char": "*",
       "block": "minecraft:potted_cactus"
     },
