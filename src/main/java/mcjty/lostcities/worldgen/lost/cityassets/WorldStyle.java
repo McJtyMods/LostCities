@@ -78,8 +78,8 @@ public class WorldStyle implements ILostCityAsset {
         return scatteredSettings;
     }
 
-    public float getCityChanceMultiplier(IDimensionInfo provider, int chunkX, int chunkZ) {
-        Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
+    public float getCityChanceMultiplier(IDimensionInfo provider, ChunkCoord coord) {
+        Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, coord).getMainBiome();
         for (Pair<Predicate<Holder<Biome>>, Float> pair : cityBiomeMultiplier) {
             if (pair.getLeft().test(biome)) {
                 return pair.getRight();
@@ -88,8 +88,8 @@ public class WorldStyle implements ILostCityAsset {
         return 1.0f;
     }
 
-    public String getRandomCityStyle(IDimensionInfo provider, int chunkX, int chunkZ, Random random) {
-        Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, new ChunkCoord(provider.getType(), chunkX, chunkZ)).getMainBiome();
+    public String getRandomCityStyle(IDimensionInfo provider, ChunkCoord coord, Random random) {
+        Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, coord).getMainBiome();
         List<Pair<Float, String>> ct = new ArrayList<>();
         for (Pair<Predicate<Holder<Biome>>, Pair<Float, String>> pair : cityStyleSelector) {
             if (pair.getKey().test(biome)) {

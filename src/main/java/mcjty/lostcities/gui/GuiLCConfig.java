@@ -6,6 +6,7 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.gui.elements.*;
 import mcjty.lostcities.setup.Config;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.*;
@@ -289,12 +290,13 @@ public class GuiLCConfig extends Screen {
                 int sx = x * 3 + this.width - 190;
                 int sz = z * 3 + 32;
                 int color = 0;
-                Railway.RailChunkInfo type = Railway.getRailChunkType(x, z, diminfo, profile);
+                ChunkCoord c = new ChunkCoord(diminfo.dimension(), x, z);
+                Railway.RailChunkInfo type = Railway.getRailChunkType(c, diminfo, profile);
                 if (type.getType() != RailChunkType.NONE) {
                     color = 0x99992222;
                 }
-                int levelX = Highway.getXHighwayLevel(x, z, diminfo, profile);
-                int levelZ = Highway.getZHighwayLevel(x, z, diminfo, profile);
+                int levelX = Highway.getXHighwayLevel(c, diminfo, profile);
+                int levelZ = Highway.getZHighwayLevel(c, diminfo, profile);
                 if (levelX >= 0 || levelZ >= 0) {
                     if (color == 0) {
                         color = 0x99ffffff;
@@ -421,7 +423,8 @@ public class GuiLCConfig extends Screen {
                     default -> 0x005500;
                 };
                 graphics.fill(sx, sz, sx + 3, sz + 3, 0xff000000 + soften(color, soft));
-                LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristicsGui(x, z, diminfo);
+                ChunkCoord coord = new ChunkCoord(diminfo.dimension(), x, z);
+                LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristicsGui(coord, diminfo);
                 if (characteristics.isCity) {
                     color = 0x995555;
                     if (BuildingInfo.hasBuildingGui(x, z, diminfo, characteristics)) {

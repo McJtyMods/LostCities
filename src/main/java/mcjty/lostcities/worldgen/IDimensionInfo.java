@@ -1,6 +1,7 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -32,6 +33,8 @@ public interface IDimensionInfo {
     LostCityTerrainFeature getFeature();
 
     ChunkHeightmap getHeightmap(int chunkX, int chunkZ);
+
+    ChunkHeightmap getHeightmap(ChunkCoord coord);
 
 //    Biome[] getBiomes(int chunkX, int chunkZ);
 

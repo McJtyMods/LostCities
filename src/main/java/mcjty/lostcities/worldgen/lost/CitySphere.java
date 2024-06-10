@@ -52,12 +52,10 @@ public class CitySphere implements ILostSphere {
         }
 
         ChunkCoord center = sphere.getCenter();
-        BuildingInfo info = BuildingInfo.getBuildingInfo(center.chunkX(), center.chunkZ(), provider);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(center, provider);
         CityStyle cs = info.getCityStyle();
 
         Random rand = new Random(info.provider.getSeed() + center.chunkX() * 837971201L + center.chunkZ() * 961744153L);
-        rand.nextFloat();
-        rand.nextFloat();
 
         BlockState glass = info.getCompiledPalette().get(cs.getSphereGlassBlock(), rand);
         BlockState base = info.getCompiledPalette().get(cs.getSphereBlock(), rand);
@@ -65,10 +63,10 @@ public class CitySphere implements ILostSphere {
         sphere.setBlocks(glass, base, side);
     }
 
-    public static boolean isInSphere(int chunkX, int chunkZ, BlockPos pos, IDimensionInfo provider) {
+    public static boolean isInSphere(ChunkCoord coord, BlockPos pos, IDimensionInfo provider) {
         boolean sphere = false;
         if (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) {
-            CitySphere citySphere = getCitySphere(chunkX, chunkZ, provider);
+            CitySphere citySphere = getCitySphere(coord, provider);
             if (citySphere.isEnabled()) {
                 double sqdist = squaredDistance(citySphere.getCenterPos().getX(), citySphere.getCenterPos().getZ(), pos.getX(), pos.getZ());
                 if (sqdist <= citySphere.getRadius() * citySphere.getRadius()) {
@@ -83,27 +81,30 @@ public class CitySphere implements ILostSphere {
      * Given a chunk coordinate return the relative distance (number between 0 and 1) for the nearest city sphere.
      * This only works for space type worlds!
      */
-    public static float getRelativeDistanceToCityCenter(int chunkX, int chunkZ, IDimensionInfo provider) {
-        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
+    public static float getRelativeDistanceToCityCenter(ChunkCoord coord, IDimensionInfo provider) {
+        CitySphere sphere = getCitySphere(coord, provider);
         BlockPos centerPos = sphere.getCenterPos();
         float radius = sphere.getRadius();
-        int cx = chunkX*16+8;
-        int cz = chunkZ*16+8;
+        int cx = coord.chunkX()*16+8;
+        int cz = coord.chunkZ()*16+8;
         int sqdist = (cx - centerPos.getX()) * (cx - centerPos.getX()) + (cz - centerPos.getZ()) * (cz - centerPos.getZ());
         return (float) (Math.sqrt(sqdist) / radius);
     }
 
-    private static boolean hasNonStationMonoRail(int chunkX, int chunkZ, IDimensionInfo provider) {
-        if (!fullyInsideCitySpere(chunkX, chunkZ, provider)) {
-            return hasHorizontalMonorail(chunkX, chunkZ, provider) || hasVerticalMonorail(chunkX, chunkZ, provider);
+    private static boolean hasNonStationMonoRail(ChunkCoord coord, IDimensionInfo provider) {
+        if (!fullyInsideCitySpere(coord, provider)) {
+            return hasHorizontalMonorail(coord, provider) || hasVerticalMonorail(coord, provider);
         }
         return false;
     }
 
-    public static boolean hasMonorailStation(int chunkX, int chunkZ, IDimensionInfo provider) {
-        if (fullyInsideCitySpere(chunkX, chunkZ, provider)) {
+    public static boolean hasMonorailStation(ChunkCoord coord, IDimensionInfo provider) {
+        if (fullyInsideCitySpere(coord, provider)) {
             // If there is a non enclosed monorail nearby we generate a station
-            return hasNonStationMonoRail(chunkX-1, chunkZ, provider) || hasNonStationMonoRail(chunkX+1, chunkZ, provider) || hasNonStationMonoRail(chunkX, chunkZ-1, provider) || hasNonStationMonoRail(chunkX, chunkZ+1, provider);
+            return hasNonStationMonoRail(coord.west(), provider) ||
+                    hasNonStationMonoRail(coord.east(), provider) ||
+                    hasNonStationMonoRail(coord.north(), provider) ||
+                    hasNonStationMonoRail(coord.south(), provider);
         }
         return false;
     }
@@ -154,7 +155,9 @@ public class CitySphere implements ILostSphere {
      * Return true if there is a horizontal monorail here. This is the case if this chunk is on a city center multiple
      * (i.e. multiple of 16) and if there are cities left and right that both want a monorail in the correct direction
      */
-    public static boolean hasHorizontalMonorail(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static boolean hasHorizontalMonorail(ChunkCoord coord, IDimensionInfo provider) {
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         if ((chunkZ & 0xf) == 8) {
             // There is a city center on this vertical chunk coordinate
             // Find the first city on the right (with a limit)
@@ -163,7 +166,8 @@ public class CitySphere implements ILostSphere {
             for (int cx = chunkX+1 ; cx < chunkX+64 ; cx++) {
                 if ((cx & 0xf) == 8) {
                     // This could be a city center
-                    CitySphere sphere = getCitySphere(cx, chunkZ, provider);
+                    ChunkCoord c = new ChunkCoord(provider.getType(), cx, chunkZ);
+                    CitySphere sphere = getCitySphere(c, provider);
                     if (sphere.isEnabled()) {
                         if (!sphere.monorailWestCandidate) {
                             return false;
@@ -182,7 +186,8 @@ public class CitySphere implements ILostSphere {
             for (int cx = chunkX-1 ; cx > chunkX-64 ; cx--) {
                 if ((cx & 0xf) == 8) {
                     // This could be a city center
-                    CitySphere sphere = getCitySphere(cx, chunkZ, provider);
+                    ChunkCoord c = new ChunkCoord(provider.getType(), cx, chunkZ);
+                    CitySphere sphere = getCitySphere(c, provider);
                     if (sphere.isEnabled()) {
                         if (!sphere.monorailEastCandidate) {
                             return false;
@@ -199,13 +204,16 @@ public class CitySphere implements ILostSphere {
         }
     }
 
-    public static boolean hasVerticalMonorail(int chunkX, int chunkZ, IDimensionInfo provider) {
+    public static boolean hasVerticalMonorail(ChunkCoord coord, IDimensionInfo provider) {
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         if ((chunkX & 0xf) == 8) {
             boolean result = false;
             for (int cz = chunkZ+1 ; cz < chunkZ+64 ; cz++) {
                 if ((cz & 0xf) == 8) {
                     // This could be a city center
-                    CitySphere sphere = getCitySphere(chunkX, cz, provider);
+                    ChunkCoord c = new ChunkCoord(provider.getType(), chunkX, cz);
+                    CitySphere sphere = getCitySphere(c, provider);
                     if (sphere.isEnabled()) {
                         if (!sphere.monorailNorthCandidate) {
                             return false;
@@ -223,7 +231,8 @@ public class CitySphere implements ILostSphere {
             for (int cz = chunkZ-1 ; cz > chunkZ-64 ; cz--) {
                 if ((cz & 0xf) == 8) {
                     // This could be a city center
-                    CitySphere sphere = getCitySphere(chunkX, cz, provider);
+                    ChunkCoord c = new ChunkCoord(provider.getType(), chunkX, cz);
+                    CitySphere sphere = getCitySphere(c, provider);
                     if (sphere.isEnabled()) {
                         if (!sphere.monorailSouthCandidate) {
                             return false;
@@ -244,7 +253,7 @@ public class CitySphere implements ILostSphere {
      * From the center
      */
     private static float getSphereRadius(ChunkCoord center, IDimensionInfo provider, Random rand) {
-        PredefinedCity city = City.getPredefinedCity(center.chunkX(), center.chunkZ(), provider.getType());
+        PredefinedCity city = City.getPredefinedCity(center);
         LostCityProfile profile = provider.getProfile();
         if (city != null) {
             return city.getRadius() * profile.CITYSPHERE_FACTOR;
@@ -256,11 +265,13 @@ public class CitySphere implements ILostSphere {
     /**
      * Return true if a given chunk is fully enclosed in a city sphere
      */
-    public static boolean fullyInsideCitySpere(int chunkX, int chunkZ, IDimensionInfo provider) {
-        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
+    public static boolean fullyInsideCitySpere(ChunkCoord coord, IDimensionInfo provider) {
+        CitySphere sphere = getCitySphere(coord, provider);
         if (!sphere.isEnabled()) {
             return false;
         }
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         float radius = sphere.getRadius();
         BlockPos cc = sphere.getCenterPos();
         double sqradiusOffset = (radius-2) * (radius-2);
@@ -284,14 +295,14 @@ public class CitySphere implements ILostSphere {
     /**
      * Return true if a given chunk is partially or fully enclosed in a city sphere
      */
-    public static boolean intersectsWithCitySphere(int chunkX, int chunkZ, IDimensionInfo provider) {
-        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
+    public static boolean intersectsWithCitySphere(ChunkCoord coord, IDimensionInfo provider) {
+        CitySphere sphere = getCitySphere(coord, provider);
         if (!sphere.isEnabled()) {
             return false;
         }
         float radius = sphere.getRadius();
         BlockPos cc = sphere.getCenterPos();
-        return intersectChunkWithSphere(chunkX, chunkZ, radius, cc);
+        return intersectChunkWithSphere(coord.chunkX(), coord.chunkZ(), radius, cc);
     }
 
     private static boolean intersectChunkWithSphere(int chunkX, int chunkZ, float radius, BlockPos cc) {
@@ -317,11 +328,13 @@ public class CitySphere implements ILostSphere {
     /**
      * Return true if a given chunk is partially enclosed in a city sphere (i.e. on the sphere border)
      */
-    public static boolean onCitySphereBorder(int chunkX, int chunkZ, IDimensionInfo provider) {
-        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
+    public static boolean onCitySphereBorder(ChunkCoord coord, IDimensionInfo provider) {
+        CitySphere sphere = getCitySphere(coord, provider);
         if (!sphere.isEnabled()) {
             return false;
         }
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         float radius = sphere.getRadius();
         BlockPos cc = sphere.getCenterPos();
         double sqradiusOffset = radius * radius;
@@ -356,8 +369,6 @@ public class CitySphere implements ILostSphere {
         int chunkX = center.chunkX();
         int chunkZ = center.chunkZ();
         Random rand = new Random(provider.getSeed() + chunkX * 961744153L + chunkZ * 837971201L);
-        rand.nextFloat();
-        rand.nextFloat();
         CitySphere citySphere;
         // This information is for city spheres. This information is only relevant
         // in the chunk representing the center of the city
@@ -375,9 +386,9 @@ public class CitySphere implements ILostSphere {
         return citySphere;
     }
 
-    public static boolean isCitySphereCenter(int chunkX, int chunkZ, IDimensionInfo provider) {
-        CitySphere sphere = getCitySphere(chunkX, chunkZ, provider);
-        return sphere.isEnabled() && sphere.getCenter().chunkX() == chunkX && sphere.getCenter().chunkZ() == chunkZ;
+    public static boolean isCitySphereCenter(ChunkCoord coord, IDimensionInfo provider) {
+        CitySphere sphere = getCitySphere(coord, provider);
+        return sphere.isEnabled() && sphere.getCenter().chunkX() == coord.chunkX() && sphere.getCenter().chunkZ() == coord.chunkZ();
     }
 
     /**
@@ -385,12 +396,11 @@ public class CitySphere implements ILostSphere {
      * spheres that are disabled so always test for that! If this returns EMPTY there is no sphere at all
      */
     @Nonnull
-    public static synchronized CitySphere getCitySphere(int chunkX, int chunkZ, IDimensionInfo provider) {
-        ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
+    public static synchronized CitySphere getCitySphere(ChunkCoord coord, IDimensionInfo provider) {
         if (!CITY_SPHERE_CACHE.containsKey(coord)) {
             for (PredefinedSphere predef : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
                 if (predef.getDimension() == provider.getType()) {
-                    if (intersectChunkWithSphere(chunkX, chunkZ, predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
+                    if (intersectChunkWithSphere(coord.chunkX(), coord.chunkZ(), predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
                         ChunkCoord center = new ChunkCoord(provider.getType(), predef.getChunkX(), predef.getChunkZ());
                         CitySphere sphere = getSphereAtCenter(center, provider, predef);
                         updateCache(coord, sphere);
@@ -403,8 +413,8 @@ public class CitySphere implements ILostSphere {
             if (provider.getProfile().CITYSPHERE_ONLY_PREDEFINED) {
                 sphere = EMPTY;
             } else {
-                int cx = (chunkX & ~0xf) + 8;
-                int cz = (chunkZ & ~0xf) + 8;
+                int cx = (coord.chunkX() & ~0xf) + 8;
+                int cz = (coord.chunkZ() & ~0xf) + 8;
                 ChunkCoord center = new ChunkCoord(provider.getType(), cx, cz);
                 sphere = getSphereAtCenter(center, provider, null);
             }

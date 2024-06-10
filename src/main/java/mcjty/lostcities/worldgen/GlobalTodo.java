@@ -1,6 +1,9 @@
 package mcjty.lostcities.worldgen;
 
+import mcjty.lostcities.setup.Config;
+import mcjty.lostcities.varia.TodoQueue;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -20,19 +23,19 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class GlobalTodo extends SavedData {
 
     public static final String NAME = "LostCityTodo";
     // Todo is not persisted. It's currently only for saplings
-    private Map<BlockPos, Consumer<ServerLevel>> todo = new HashMap<>();
+    private TodoQueue<Consumer<ServerLevel>> todo = new TodoQueue<>();
     // This is for spawners and is more important (and persisted)
-    private Map<BlockPos, Pair<BlockState, ResourceLocation>> todoSpawners = new HashMap<>();
+    private TodoQueue<Pair<BlockState, ResourceLocation>> todoSpawners = new TodoQueue<>();
     // This is generic block entity data that still has to be placed in the world
-    private Map<BlockPos, Pair<BlockState, CompoundTag>> todoBlockEntities = new HashMap<>();
+    private TodoQueue<Pair<BlockState, CompoundTag>> todoBlockEntities = new TodoQueue<>();
+    // Todo blocks that require POI
+    private TodoQueue<BlockState> todoPoi = new TodoQueue<>();
 
     @Nonnull
     public static GlobalTodo getData(Level world) {
@@ -68,6 +71,14 @@ public class GlobalTodo extends SavedData {
             CompoundTag tag = blockEntityTag.getCompound("tag");
             addBlockEntityTodo(pos, state, tag);
         }
+        ListTag poi = nbt.getList("poi", Tag.TAG_COMPOUND);
+        for (Tag p : poi) {
+            CompoundTag pTag = (CompoundTag) p;
+            BlockPos pos = NbtUtils.readBlockPos(pTag.getCompound("pos"));
+            BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), pTag.getCompound("state"));
+            addPoi(pos, state);
+        }
+        setDirty();
     }
 
     @Override
@@ -90,46 +101,43 @@ public class GlobalTodo extends SavedData {
             blockEntities.add(blockEntityTag);
         });
         tag.put("blockentities", blockEntities);
+        ListTag poi = new ListTag();
+        todoPoi.forEach((pos, state) -> {
+            CompoundTag pTag = new CompoundTag();
+            pTag.put("pos", NbtUtils.writeBlockPos(pos));
+            pTag.put("state", NbtUtils.writeBlockState(state));
+            poi.add(pTag);
+        });
+        tag.put("poi", poi);
         return tag;
     }
 
     public void addTodo(BlockPos pos, Consumer<ServerLevel> code) {
-        todo.put(pos, code);
+        todo.add(pos, code);
+        setDirty();
     }
 
     public void addSpawnerTodo(BlockPos pos, BlockState spawnerState, ResourceLocation randomEntity) {
-        todoSpawners.put(pos, Pair.of(spawnerState, randomEntity));
-//        todo.put(pos, level -> {
-//            if (level.getBlockState(pos).getBlock() == spawnerState.getBlock()) {
-//                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-//                level.setBlock(pos, spawnerState, Block.UPDATE_CLIENTS);
-//                LostCityTerrainFeature.createSpawner(level, pos, randomEntity);
-//            }
-//        });
+        todoSpawners.add(pos, Pair.of(spawnerState, randomEntity));
+        setDirty();
     }
 
     public void addBlockEntityTodo(BlockPos pos, BlockState state, CompoundTag tag) {
-        todoBlockEntities.put(pos, Pair.of(state, tag));
-//        todo.put(pos, level -> {
-//            if (level.getBlockState(pos).getBlock() == state.getBlock()) {
-//                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-//                level.setBlock(pos, state, Block.UPDATE_CLIENTS);
-//                BlockEntity be = level.getBlockEntity(pos);
-//                if (be != null) {
-//                    be.load(tag);
-//                }
-//            }
-//        });
+        todoBlockEntities.add(pos, Pair.of(state, tag));
+        setDirty();
+    }
+
+    public void addPoi(BlockPos pos, BlockState state) {
+        todoPoi.add(pos, state);
+        setDirty();
     }
 
     public void executeAndClearTodo(ServerLevel level) {
-        Map<BlockPos, Consumer<ServerLevel>> copy = this.todo;
-        this.todo = new HashMap<>();
-        copy.forEach((pos, code) -> code.accept(level));
+        int todoSize = Config.TODO_QUEUE_SIZE.get();
 
-        var copySpawners = this.todoSpawners;
-        this.todoSpawners = new HashMap<>();
-        copySpawners.forEach((pos, pair) -> {
+        this.todo.forEach(todoSize, (pos, code) -> code.accept(level));
+
+        this.todoSpawners.forEach(todoSize, (pos, pair) -> {
             BlockState spawnerState = pair.getLeft();
             ResourceLocation randomEntity = pair.getRight();
             if (level.getBlockState(pos).getBlock() == spawnerState.getBlock()) {
@@ -139,15 +147,21 @@ public class GlobalTodo extends SavedData {
             }
         });
 
-        var copyBlockEntities = this.todoBlockEntities;
-        this.todoBlockEntities = new HashMap<>();
-        copyBlockEntities.forEach((pos, pair) -> {
-            BlockState state = pair.getLeft();
+        this.todoBlockEntities.forEach(todoSize, (pos, pair) -> {
             CompoundTag tag = pair.getRight();
             BlockEntity be = level.getBlockEntity(pos);
             if (be != null) {
                 be.load(tag);
             }
         });
+
+        this.todoPoi.forEach(todoSize, (pos, state) -> {
+            if (level.getPoiManager().getType(pos).isEmpty()) {
+                if (level.getBlockState(pos).getBlock() == state.getBlock()) {
+                    level.setBlock(pos, state, Block.UPDATE_ALL);
+                }
+            }
+        });
+        setDirty();
     }
 }

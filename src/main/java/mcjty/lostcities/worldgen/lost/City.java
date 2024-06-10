@@ -40,7 +40,7 @@ public class City {
         return CITY_RARITY_MAP.computeIfAbsent(level, k -> new CityRarityMap(seed, scale, offset, innerScale));
     }
 
-    public static PredefinedCity getPredefinedCity(int chunkX, int chunkZ, ResourceKey<Level> type) {
+    public static PredefinedCity getPredefinedCity(ChunkCoord coord) {
         if (predefinedCityMap == null) {
             predefinedCityMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -50,10 +50,10 @@ public class City {
         if (predefinedCityMap.isEmpty()) {
             return null;
         }
-        return predefinedCityMap.get(new ChunkCoord(type, chunkX, chunkZ));
+        return predefinedCityMap.get(coord);
     }
 
-    public static PredefinedBuilding getPredefinedBuilding(int chunkX, int chunkZ, ResourceKey<Level> type) {
+    public static PredefinedBuilding getPredefinedBuilding(ChunkCoord coord) {
         if (predefinedBuildingMap == null) {
             predefinedBuildingMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -66,10 +66,10 @@ public class City {
         if (predefinedBuildingMap.isEmpty()) {
             return null;
         }
-        return predefinedBuildingMap.get(new ChunkCoord(type, chunkX, chunkZ));
+        return predefinedBuildingMap.get(coord);
     }
 
-    public static PredefinedStreet getPredefinedStreet(int chunkX, int chunkZ, ResourceKey<Level> type) {
+    public static PredefinedStreet getPredefinedStreet(ChunkCoord coord) {
         if (predefinedStreetMap == null) {
             predefinedStreetMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -82,21 +82,21 @@ public class City {
         if (predefinedStreetMap.isEmpty()) {
             return null;
         }
-        return predefinedStreetMap.get(new ChunkCoord(type, chunkX, chunkZ));
+        return predefinedStreetMap.get(coord);
     }
 
 
-    public static boolean isCityCenter(int chunkX, int chunkZ, IDimensionInfo provider) {
-        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider.getType());
+    public static boolean isCityCenter(ChunkCoord coord, IDimensionInfo provider) {
+        PredefinedCity city = getPredefinedCity(coord);
         if (city != null) {
             return true;
         }
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         Random cityCenterRandom = new Random(chunkZ * 797003437L + chunkX * 295075153L);
-        cityCenterRandom.nextFloat();
-        cityCenterRandom.nextFloat();
         if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres())) {
             // @todo config
-            CitySphere sphere = CitySphere.getCitySphere(chunkX, chunkZ, provider);
+            CitySphere sphere = CitySphere.getCitySphere(coord, provider);
             if (!sphere.isEnabled()) {
                 // No sphere
                 return cityCenterRandom.nextDouble() < provider.getOutsideProfile().CITY_CHANCE;
@@ -114,21 +114,21 @@ public class City {
     /**
      * Return the radius of the city with the given center
      */
-    public static float getCityRadius(int chunkX, int chunkZ, IDimensionInfo provider) {
-        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider.getType());
+    public static float getCityRadius(ChunkCoord coord, IDimensionInfo provider) {
+        PredefinedCity city = getPredefinedCity(coord);
         if (city != null) {
             return city.getRadius();
         }
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         Random cityRadiusRandom = new Random(chunkZ * 100001653L + chunkX * 295075153L);
-        cityRadiusRandom.nextFloat();
-        cityRadiusRandom.nextFloat();
         LostCityProfile profile = provider.getProfile();
         int cityRange = profile.CITY_MAXRADIUS - profile.CITY_MINRADIUS;
         if (cityRange < 1) {
             cityRange = 1;
         }
         if (profile.isSpace() || profile.isSpheres()) {
-            if (CitySphere.intersectsWithCitySphere(chunkX, chunkZ, provider)) {
+            if (CitySphere.intersectsWithCitySphere(coord, provider)) {
                 return profile.CITY_MINRADIUS + cityRadiusRandom.nextInt(cityRange);
             } else {
                 return provider.getOutsideProfile().CITY_MINRADIUS + cityRadiusRandom.nextInt(provider.getOutsideProfile().CITY_MAXRADIUS - provider.getOutsideProfile().CITY_MINRADIUS);
@@ -139,26 +139,26 @@ public class City {
     }
 
     // Call this on a city center to get the style of that city
-    public static String getCityStyleForCityCenter(int chunkX, int chunkZ, IDimensionInfo provider) {
-        PredefinedCity city = getPredefinedCity(chunkX, chunkZ, provider.getType());
+    public static String getCityStyleForCityCenter(ChunkCoord coord, IDimensionInfo provider) {
+        PredefinedCity city = getPredefinedCity(coord);
         if (city != null) {
             if (city.getCityStyle() != null) {
                 return city.getCityStyle();
             }
             // Otherwise we chose a random city style
         }
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         Random cityStyleForCenterRandom = new Random(chunkZ * 899809363L + chunkX * 256203221L);
-        cityStyleForCenterRandom.nextFloat();
-        cityStyleForCenterRandom.nextFloat();
-        return provider.getWorldStyle().getRandomCityStyle(provider, chunkX, chunkZ, cityStyleForCenterRandom);
+        return provider.getWorldStyle().getRandomCityStyle(provider, coord, cityStyleForCenterRandom);
     }
 
     // Calculate the citystyle based on all surrounding cities
-    public static CityStyle getCityStyle(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
+    public static CityStyle getCityStyle(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
         List<Pair<Float, String>> styles = new ArrayList<>();
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         Random cityStyleRandom = new Random(provider.getSeed() + chunkZ * 593441843L + chunkX * 217645177L);
-        cityStyleRandom.nextFloat();
-        cityStyleRandom.nextFloat();
 
         if (profile.CITY_CHANCE < 0) {
             WorldGenLevel world = provider.getWorld();
@@ -168,14 +168,15 @@ public class City {
             if (factor < profile.CITY_STYLE_THRESHOLD) {
                 styles.add(Pair.of(factor, profile.CITY_STYLE_ALTERNATIVE));
             } else {
-                styles.add(Pair.of(factor, getCityStyleForCityCenter(chunkX, chunkZ, provider)));
+                styles.add(Pair.of(factor, getCityStyleForCityCenter(coord, provider)));
             }
         } else {
             int offset = (profile.CITY_MAXRADIUS + 15) / 16;
             for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
                 for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                    if (isCityCenter(cx, cz, provider)) {
-                        float radius = getCityRadius(cx, cz, provider);
+                    ChunkCoord c = new ChunkCoord(provider.getType(), cx, cz);
+                    if (isCityCenter(c, provider)) {
+                        float radius = getCityRadius(c, provider);
                         float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
                         if (sqdist < radius * radius) {
                             float dist = (float) Math.sqrt(sqdist);
@@ -183,7 +184,7 @@ public class City {
                             if (factor < profile.CITY_STYLE_THRESHOLD) {
                                 styles.add(Pair.of(factor, profile.CITY_STYLE_ALTERNATIVE));
                             } else {
-                                styles.add(Pair.of(factor, getCityStyleForCityCenter(chunkX, chunkZ, provider)));
+                                styles.add(Pair.of(factor, getCityStyleForCityCenter(coord, provider)));
                             }
                         }
                     }
@@ -193,7 +194,7 @@ public class City {
 
         String cityStyleName;
         if (styles.isEmpty()) {
-            cityStyleName = provider.getWorldStyle().getRandomCityStyle(provider, chunkX, chunkZ, cityStyleRandom);
+            cityStyleName = provider.getWorldStyle().getRandomCityStyle(provider, coord, cityStyleRandom);
         } else {
             Pair<Float, String> fromList = Tools.getRandomFromList(cityStyleRandom, styles, Pair::getLeft);
             if (fromList == null) {
@@ -205,32 +206,34 @@ public class City {
         return AssetRegistries.CITYSTYLES.get(provider.getWorld(), cityStyleName);
     }
 
-    public static float getCityFactor(int chunkX, int chunkZ, IDimensionInfo provider, LostCityProfile profile) {
+    public static float getCityFactor(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
         ResourceKey<Level> type = provider.getType();
         // If we have a predefined building here we force a high city factor
 
-        PredefinedBuilding predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ, type);
+        PredefinedBuilding predefinedBuilding = getPredefinedBuilding(coord);
         if (predefinedBuilding != null) {
             return 1.0f;
         }
-        PredefinedStreet predefinedStreet = getPredefinedStreet(chunkX, chunkZ, type);
+        PredefinedStreet predefinedStreet = getPredefinedStreet(coord);
         if (predefinedStreet != null) {
             return 1.0f;
         }
 
-        predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ, type);
+        predefinedBuilding = getPredefinedBuilding(coord.west());
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return 1.0f;
         }
-        predefinedBuilding = getPredefinedBuilding(chunkX-1, chunkZ-1, type);
+        predefinedBuilding = getPredefinedBuilding(coord.northWest());
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return 1.0f;
         }
-        predefinedBuilding = getPredefinedBuilding(chunkX, chunkZ-1, type);
+        predefinedBuilding = getPredefinedBuilding(coord.north());
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return 1.0f;
         }
 
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         float factor = 0;
         if (profile.CITY_CHANCE < 0) {
             CityRarityMap rarityMap = getCityRarityMap(provider.dimension(), provider.getSeed(),
@@ -240,11 +243,12 @@ public class City {
             int offset = (profile.CITY_MAXRADIUS + 15) / 16;
             for (int cx = chunkX - offset; cx <= chunkX + offset; cx++) {
                 for (int cz = chunkZ - offset; cz <= chunkZ + offset; cz++) {
-                    LostCityProfile pro = BuildingInfo.getProfile(cx, cz, provider);
+                    ChunkCoord c = new ChunkCoord(type, cx, cz);
+                    LostCityProfile pro = BuildingInfo.getProfile(c, provider);
                     // Only count cities that are in the same 'profile' as this one
                     if (pro == profile) {
-                        if (isCityCenter(cx, cz, provider)) {
-                            float radius = getCityRadius(cx, cz, provider);
+                        if (isCityCenter(c, provider)) {
+                            float radius = getCityRadius(c, provider);
                             float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
                             if (sqdist < radius * radius) {
                                 float dist = (float) Math.sqrt(sqdist);
@@ -258,7 +262,7 @@ public class City {
 
         if (factor > 0.0001 && provider.getWorld() != null) {
             WorldStyle worldStyle = AssetRegistries.WORLDSTYLES.get(provider.getWorld(), profile.getWorldStyle());
-            float multiplier = worldStyle.getCityChanceMultiplier(provider, chunkX, chunkZ);
+            float multiplier = worldStyle.getCityChanceMultiplier(provider, coord);
             factor *= multiplier;
         }
 

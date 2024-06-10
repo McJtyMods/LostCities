@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lostcities.setup.Registration;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
@@ -35,7 +36,8 @@ public class CommandDebug implements Command<CommandSourceStack> {
         BlockPos position = player.blockPosition();
         IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo((WorldGenLevel) player.level());
         if (dimInfo != null) {
-            BuildingInfo info = BuildingInfo.getBuildingInfo(position.getX() >> 4, position.getZ() >> 4, dimInfo);
+            ChunkCoord coord = new ChunkCoord(dimInfo.getType(), position.getX() >> 4, position.getZ() >> 4);
+            BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimInfo);
             System.out.println("profile = " + info.profile.getName());
 //            System.out.println("provider.hasMansion = " + info.provider.hasMansion(info.chunkX, info.chunkZ));
             System.out.println("buildingType = " + info.buildingType.getName());
@@ -46,7 +48,7 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("isCity = " + info.isCity);
             System.out.println("chunkX = " + info.chunkX);
             System.out.println("chunkZ = " + info.chunkZ);
-            System.out.println("getCityStyle() = " + BuildingInfo.getChunkCharacteristics(info.coord, info.chunkX, info.chunkZ, info.provider).cityStyle.getName());
+            System.out.println("getCityStyle() = " + BuildingInfo.getChunkCharacteristics(info.coord, info.provider).cityStyle.getName());
             System.out.println("streetType = " + info.streetType);
             System.out.println("ruinHeight = " + info.ruinHeight);
             System.out.println("tunnel0 = " + info.isTunnel(0));
@@ -54,16 +56,16 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("getHighwayXLevel() = " + info.getHighwayXLevel());
             System.out.println("getHighwayZLevel() = " + info.getHighwayZLevel());
 
-            float reldist = CitySphere.getRelativeDistanceToCityCenter(info.chunkX, info.chunkZ, dimInfo);
+            float reldist = CitySphere.getRelativeDistanceToCityCenter(info.coord, dimInfo);
             System.out.println("reldist = " + reldist);
 
-            Railway.RailChunkInfo railInfo = Railway.getRailChunkType(info.chunkX, info.chunkZ, info.provider, info.profile);
+            Railway.RailChunkInfo railInfo = Railway.getRailChunkType(info.coord, info.provider, info.profile);
             System.out.println("railInfo.getType() = " + railInfo.getType());
             System.out.println("railInfo.getLevel() = " + railInfo.getLevel());
             System.out.println("railInfo.getDirection() = " + railInfo.getDirection());
             System.out.println("railInfo.getRails() = " + railInfo.getRails());
 
-            CitySphere sphere = CitySphere.getCitySphere(info.chunkX, info.chunkZ, dimInfo);
+            CitySphere sphere = CitySphere.getCitySphere(info.coord, dimInfo);
             System.out.println("sphere.cityCenter = " + sphere.getCenter());
             System.out.println("sphere.isEnabled() = " + sphere.isEnabled());
             System.out.println("sphere.radius = " + sphere.getRadius());
@@ -72,14 +74,7 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("explosions = " + explosions);
 
             ChunkHeightmap heightmap = dimInfo.getFeature().getHeightmap(info.coord, (WorldGenLevel) player.level());
-            int avg = 0;
-            for (int x = 0 ; x < 16 ; x++) {
-                for (int z = 0 ; z < 16 ; z++) {
-                    avg += heightmap.getHeight(x, z);
-                }
-            }
-            avg /= 16*16;
-            System.out.println("Average chunk height (heightmap): " + avg);
+            System.out.println("Chunk height (heightmap): " + heightmap.getHeight());
 
             System.out.println("dimInfo.getProfile().BUILDING_MINFLOORS = " + dimInfo.getProfile().BUILDING_MINFLOORS);
             System.out.println("dimInfo.getProfile().BUILDING_MAXFLOORS = " + dimInfo.getProfile().BUILDING_MAXFLOORS);

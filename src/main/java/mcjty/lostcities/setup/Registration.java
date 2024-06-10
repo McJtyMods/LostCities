@@ -19,8 +19,7 @@ public class Registration {
 
     public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(Registries.FEATURE, LostCities.MODID);
 
-    public static void init() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+    public static void init(IEventBus bus) {
         FEATURES.register(bus);
     }
 

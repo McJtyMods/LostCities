@@ -1,5 +1,6 @@
 package mcjty.lostcities.worldgen;
 
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
@@ -14,25 +15,27 @@ import java.util.Random;
 public class ChunkFixer {
 
 
-    private static void executePostTodo(Random random, int chunkX, int chunkZ, IDimensionInfo provider) {
-        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+    private static void executePostTodo(ChunkCoord coord, IDimensionInfo provider) {
+        BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
         info.getPostTodo().forEach((pos, runnable) -> runnable.run());
         info.clearPostTodo();
     }
 
-    private static void generateVines(Random random, int chunkX, int chunkZ, LevelAccessor world, IDimensionInfo provider) {
+    private static void generateVines(ChunkCoord coord, LevelAccessor world, IDimensionInfo provider) {
         float vineChance = provider.getProfile().VINE_CHANCE;
         if (vineChance < 0.000001) {
             return;
         }
+        int chunkX = coord.chunkX();
+        int chunkZ = coord.chunkZ();
         int cx = chunkX * 16;
         int cz = chunkZ * 16;
-        BuildingInfo info = BuildingInfo.getBuildingInfo(chunkX, chunkZ, provider);
+        BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
 
         int maxHeight = info.getMaxHeight();
 
         if (info.hasBuilding) {
-            if (world.getChunk(chunkX + 1, chunkZ).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
+            if (world.getChunk(coord.chunkX() + 1, coord.chunkZ()).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getXmax();
                 int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
                 for (int z = 0; z < 15; z++) {
@@ -106,8 +109,8 @@ public class ChunkFixer {
     }
 
 
-    public static void fix(IDimensionInfo info, int chunkX, int chunkZ) {
-        generateVines(info.getRandom(), chunkX, chunkZ, info.getWorld(), info);
-        executePostTodo(info.getRandom(), chunkX, chunkZ, info);
+    public static void fix(IDimensionInfo info, ChunkCoord coord) {
+        generateVines(coord, info.getWorld(), info);
+        executePostTodo(coord, info);
     }
 }

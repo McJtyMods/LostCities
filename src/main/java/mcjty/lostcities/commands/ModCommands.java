@@ -23,6 +23,7 @@ public class ModCommands {
                 Commands.literal(LostCities.MODID)
                         .then(CommandCreateBuilding.register(dispatcher))
                         .then(CommandDebug.register(dispatcher))
+                        .then(CommandStats.register(dispatcher))
                         .then(CommandMap.register(dispatcher))
                         .then(CommandSaveProfile.register(dispatcher))
                         .then(CommandCreatePart.register(dispatcher))
