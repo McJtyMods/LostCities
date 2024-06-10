@@ -13,12 +13,41 @@ import java.util.function.Predicate;
 /**
  * Biome matcher kindly donated by Tslat (from https://github.com/Tslat/Advent-Of-Ascension/blob/1.19/source/content/world/gen/BiomeMatcher.java)
  */
-public record BiomeMatcher(Optional<List<HolderSet<Biome>>> ifAll, Optional<List<HolderSet<Biome>>> ifAny, Optional<List<HolderSet<Biome>>> excluding) implements Predicate<Holder<Biome>> {
+public class BiomeMatcher implements Predicate<Holder<Biome>> {
+	private final Optional<List<HolderSet<Biome>>> ifAll;
+	private final Optional<List<HolderSet<Biome>>> ifAny;
+	private final Optional<List<HolderSet<Biome>>> excluding;
+
 	public static final Codec<BiomeMatcher> CODEC = RecordCodecBuilder.create(codec -> codec.group(
-			Biome.LIST_CODEC.listOf().optionalFieldOf("if_all").forGetter(BiomeMatcher::ifAll),
-			Biome.LIST_CODEC.listOf().optionalFieldOf("if_any").forGetter(BiomeMatcher::ifAny),
-			Biome.LIST_CODEC.listOf().optionalFieldOf("excluding").forGetter(BiomeMatcher::excluding)
+			Biome.LIST_CODEC.listOf().optionalFieldOf("if_all").forGetter(BiomeMatcher::getIfAll),
+			Biome.LIST_CODEC.listOf().optionalFieldOf("if_any").forGetter(BiomeMatcher::getIfAny),
+			Biome.LIST_CODEC.listOf().optionalFieldOf("excluding").forGetter(BiomeMatcher::getExcluding)
 	).apply(codec, BiomeMatcher::new));
+
+	public BiomeMatcher(Optional<List<HolderSet<Biome>>> ifAll, Optional<List<HolderSet<Biome>>> ifAny, Optional<List<HolderSet<Biome>>> excluding) {
+		this.ifAll = ifAll;
+		this.ifAny = ifAny;
+		this.excluding = excluding;
+	}
+
+	private Optional<List<HolderSet<Biome>>> getIfAll() {
+		return ifAll;
+	}
+
+	private Optional<List<HolderSet<Biome>>> getIfAny() {
+		return ifAny;
+	}
+
+	private Optional<List<HolderSet<Biome>>> getExcluding() {
+		return excluding;
+	}
+
+	public static final BiomeMatcher ANY = new BiomeMatcher(Optional.empty(), Optional.empty(), Optional.empty()) {
+		@Override
+		public boolean test(Holder<Biome> biome) {
+			return true;
+		}
+	};
 
 	@Override
 	public boolean test(Holder<Biome> biome) {

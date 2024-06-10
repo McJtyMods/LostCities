@@ -2,32 +2,123 @@ package mcjty.lostcities.worldgen.lost.regassets.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.world.level.biome.Biome;
+import mcjty.lostcities.varia.Tools;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.level.PistonEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-public record BlockMatcher(Optional<List<BlockState>> ifAll, Optional<List<BlockState>> ifAny, Optional<List<BlockState>> excluding) implements Predicate<BlockState> {
-	public static final Codec<BlockMatcher> CODEC = RecordCodecBuilder.create(codec -> codec.group(
-			BlockState.CODEC.listOf().optionalFieldOf("if_all").forGetter(BlockMatcher::ifAll),
-			BlockState.CODEC.listOf().optionalFieldOf("if_any").forGetter(BlockMatcher::ifAny),
-			BlockState.CODEC.listOf().optionalFieldOf("excluding").forGetter(BlockMatcher::excluding)
-	).apply(codec, BlockMatcher::new));
+public class BlockMatcher implements Predicate<BlockState> {
+    private final Optional<List<String>> ifAll;
+    private final Optional<List<String>> ifAny;
+    private final Optional<List<String>> excluding;
+    private final Predicate<BlockState> predicate;
 
-	@Override
-	public boolean test(BlockState state) {
-		if (ifAll.isPresent() && !ifAll.get().stream().allMatch(s -> s.equals(state))) {
-			return false;
-		}
+    public static final Codec<BlockMatcher> CODEC = RecordCodecBuilder.create(codec -> codec.group(
+            Codec.STRING.listOf().optionalFieldOf("if_all").forGetter(BlockMatcher::getIfAll),
+            Codec.STRING.listOf().optionalFieldOf("if_any").forGetter(BlockMatcher::getIfAny),
+            Codec.STRING.listOf().optionalFieldOf("excluding").forGetter(BlockMatcher::getExcluding)
+    ).apply(codec, BlockMatcher::new));
 
-		if (ifAny.isPresent() && ifAny.get().stream().noneMatch(s -> s.equals(state))) {
-			return false;
-		}
+    private Predicate<BlockState> getStatePredicate(String matcher) {
+        if (matcher.startsWith("#")) {
+            TagKey<Block> tagKey = TagKey.create(Registries.BLOCK, new ResourceLocation(matcher.substring(1)));
+            return state -> state.is(tagKey);
+        } else {
+            Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(matcher));
+            return state -> state.getBlock() == b;
+        }
+    }
 
-		return excluding.isEmpty() || excluding.get().stream().noneMatch(s -> s.equals(state));
-	}
+    public boolean isAny() {
+        return ifAll.isEmpty() && ifAny.isEmpty() && excluding.isEmpty();
+    }
+
+    private Predicate<BlockState> getNotStatePredicate(String matcher) {
+        if (matcher.startsWith("#")) {
+            TagKey<Block> tagKey = TagKey.create(Registries.BLOCK, new ResourceLocation(matcher.substring(1)));
+            return state -> !state.is(tagKey);
+        } else {
+            Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(matcher));
+            return state -> state.getBlock() != b;
+        }
+    }
+
+    public BlockMatcher(Optional<List<String>> ifAll, Optional<List<String>> ifAny, Optional<List<String>> excluding) {
+        this.ifAll = ifAll;
+        this.ifAny = ifAny;
+        this.excluding = excluding;
+        Predicate<BlockState> p = null;
+        if (ifAll.isPresent()) {
+            for (String s : ifAll.get()) {
+                Predicate<BlockState> q = getStatePredicate(s);
+                if (p == null) {
+                    p = q;
+                } else {
+                    p = p.and(q);
+                }
+            }
+        }
+        if (ifAny.isPresent()) {
+            Predicate<BlockState> q = null;
+            for (String s : ifAny.get()) {
+                Predicate<BlockState> sp = getStatePredicate(s);
+                if (q == null) {
+					q = sp;
+				} else {
+					q = q.or(sp);
+				}
+            }
+            if (p == null) {
+                p = q;
+            } else if (q != null) {
+                p = p.and(q);
+            }
+        }
+        if (excluding.isPresent()) {
+            Predicate<BlockState> q = null;
+            for (String s : excluding.get()) {
+                Predicate<BlockState> sp = getNotStatePredicate(s);
+                if (q == null) {
+                    q = sp;
+                } else {
+                    q = q.and(sp);
+                }
+            }
+        }
+        this.predicate = p == null ? (state) -> true : p;
+    }
+
+    private Optional<List<String>> getIfAll() {
+        return ifAll;
+    }
+
+    private Optional<List<String>> getIfAny() {
+        return ifAny;
+    }
+
+    private Optional<List<String>> getExcluding() {
+        return excluding;
+    }
+
+    public static final BlockMatcher ANY = new BlockMatcher(Optional.empty(), Optional.empty(), Optional.empty()) {
+        @Override
+        public boolean test(BlockState state) {
+            return true;
+        }
+    };
+
+    @Override
+    public boolean test(BlockState state) {
+        return predicate.test(state);
+    }
 }
