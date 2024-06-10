@@ -12,6 +12,7 @@ import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.*;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
+import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import mcjty.lostcities.api.ILostWorldsChunkGenerator;
 import net.minecraft.core.BlockPos;
@@ -1522,6 +1523,43 @@ public class LostCityTerrainFeature {
                 generateRubble(info);
             }
         }
+
+        generateStuff(info);
+    }
+
+    private void generateStuff(BuildingInfo info) {
+        rand.setSeed(info.coord.chunkX() * 2570174657L + info.coord.chunkZ() * 101754695981L);
+        BiomeInfo biome = BiomeInfo.getBiomeInfo(provider, info.coord);
+        CompiledPalette palette = info.getCompiledPalette();
+        AssetRegistries.STUFF.getIterable().forEach(stuff -> {
+            StuffSettingsRE settings = stuff.getSettings();
+            int attempts = settings.getAttempts();
+            int minheight = settings.getMinheight();
+            int maxheight = settings.getMaxheight();
+            int mincount = settings.getMincount();
+            int maxcount = settings.getMaxcount();
+            int count = rand.nextInt(maxcount - mincount) + mincount;
+            for (int j = 0; j < count; j++) {
+                for (int i = 0; i < attempts; i++) {
+                    int x = rand.nextInt(16);
+                    int z = rand.nextInt(16);
+                    int y = rand.nextInt(maxheight - minheight) + minheight;
+                    if (settings.getBiomeMatcher().test(biome.getMainBiome())) {
+                        if (settings.getBlockMatcher().test(driver.getBlock(x, y, z))) {
+                            String blocks = settings.getBlocks();
+                            // Iterate over all characters of the block
+                            driver.current(x, y, z);
+                            for (int k = 0; k < blocks.length(); k++) {
+                                char c = blocks.charAt(k);
+                                BlockState block = palette.get(c);
+                                driver.add(block);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void generateRailwayDungeons(BuildingInfo info) {
