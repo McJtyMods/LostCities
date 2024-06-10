@@ -2,6 +2,7 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.lost.regassets.*;
+import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -64,6 +65,9 @@ public class CustomRegistries {
     public static final DeferredRegister<ScatteredRE> SCATTERED_DEFERRED_REGISTER = DeferredRegister.create(SCATTERED_REGISTRY_KEY, LostCities.MODID);
     public static final Supplier<IForgeRegistry<ScatteredRE>> SCATTERED_REGISTRY = SCATTERED_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<ScatteredRE>().dataPackRegistry(ScatteredRE.CODEC));
 
+    public static final ResourceKey<Registry<StuffSettingsRE>> STUFF_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "stuff"));
+    public static final DeferredRegister<StuffSettingsRE> STUFF_DEFERRED_REGISTER = DeferredRegister.create(STUFF_REGISTRY_KEY, LostCities.MODID);
+
     public static void init() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         BUILDING_DEFERRED_REGISTER.register(bus);
@@ -78,6 +82,7 @@ public class CustomRegistries {
         PREDEFINEDCITIES_DEFERRED_REGISTER.register(bus);
         PREDEFINEDSPHERES_DEFERRED_REGISTER.register(bus);
         SCATTERED_DEFERRED_REGISTER.register(bus);
+        STUFF_DEFERRED_REGISTER.register(bus);
     }
 
 }
