@@ -1,0 +1,21 @@
+{
+  "column": "\\",
+  "minheight": 30,
+  "maxheight": 120,
+  "mincount": 10,
+  "maxcount": 30,
+  "attempts": 10,
+  "inbuilding": true,
+  "upperblock": {
+    "excluding": [
+      "minecraft:air"
+    ]
+  },
+  "buildings": {
+    "if_any": [
+      "lostcities:building1",
+      "lostcities:building2",
+      "lostcities:building3"
+    ]
+  }
+}

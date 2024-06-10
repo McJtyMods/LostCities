@@ -74,6 +74,20 @@ public class RegistryAssetRegistry<T extends ILostCityAsset, R> implements ILost
         return t;
     }
 
+    public void loadAll(CommonLevelAccessor level) {
+        Registry<R> registry = level.registryAccess().registryOrThrow(registryKey);
+        for (R r : registry) {
+            ResourceLocation name = registry.getKey(r);
+            if (!assets.containsKey(name)) {
+                if (r instanceof IAsset asset) {
+                    asset.setRegistryName(name);
+                }
+                T t = assetConstructor.apply(r);
+                assets.put(name, t);
+            }
+        }
+    }
+
     @Override
     public Iterable<T> getIterable() {
         return assets.values();

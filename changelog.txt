@@ -1,4 +1,9 @@
 1.19-6.0.27:
+Upcoming:
+- New 'stuff' feature. Using this you can define various random small objects that can be generated through cities (both inside and outside buildings)
+- Fixed a bug where predefined cities and spheres wouldn't work at all
+
+1.20-7.1.7:
 - TqLxQuanZ fixed a problem where generation data wasn't properly saved which could cause generation errors if you exited the world and re-entered
 
 1.19-6.0.26:

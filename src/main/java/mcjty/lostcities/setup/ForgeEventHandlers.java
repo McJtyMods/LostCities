@@ -103,6 +103,7 @@ public class ForgeEventHandlers {
     @SubscribeEvent
     public void onWorldTick(TickEvent.LevelTickEvent event) {
         if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
+            AssetRegistries.load(serverLevel);
             GlobalTodo.getData(serverLevel).executeAndClearTodo(serverLevel);
         }
     }
