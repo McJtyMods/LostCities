@@ -1,6 +1,5 @@
 {
   "column": ":::h",
-  "minheight": 80,
   "maxheight": 120,
   "mincount": 2,
   "maxcount": 7,

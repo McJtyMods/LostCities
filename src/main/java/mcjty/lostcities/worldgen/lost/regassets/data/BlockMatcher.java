@@ -81,13 +81,12 @@ public class BlockMatcher implements Predicate<BlockState> {
             }
         }
         if (excluding.isPresent()) {
-            Predicate<BlockState> q = null;
             for (String s : excluding.get()) {
                 Predicate<BlockState> sp = getNotStatePredicate(s);
-                if (q == null) {
-                    q = sp;
+                if (p == null) {
+                    p = sp;
                 } else {
-                    q = q.and(sp);
+                    p = p.and(sp);
                 }
             }
         }

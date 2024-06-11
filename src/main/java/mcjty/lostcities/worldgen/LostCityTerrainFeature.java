@@ -1469,7 +1469,7 @@ public class LostCityTerrainFeature {
                 ResourceLocationMatcher buildingMatcher = settings.getBuildingMatcher();
                 if (buildingMatcher.isAny() || buildingMatcher.test(info.buildingType.getId())) {
                     if (settings.getBiomeMatcher().test(biome.getMainBiome())) {
-                        actuallyGenerateStuff(info, settings, palette);
+                        actuallyGenerateStuff(info, settings, palette, inBuilding == Boolean.TRUE);
                     }
                 }
             }
@@ -1483,11 +1483,24 @@ public class LostCityTerrainFeature {
         return matcher.test(driver.getBlock(x, y, z));
     }
 
-    private void actuallyGenerateStuff(BuildingInfo info, StuffSettingsRE settings, CompiledPalette palette) {
+    private void actuallyGenerateStuff(BuildingInfo info, StuffSettingsRE settings, CompiledPalette palette, boolean inBuilding) {
         WorldGenLevel level = info.provider.getWorld();
         int attempts = settings.getAttempts();
-        int minheight = settings.getMinheight();
-        int maxheight = settings.getMaxheight();
+        Integer minheight = settings.getMinheight();
+        Integer maxheight = settings.getMaxheight();
+        if (minheight == null) {
+            minheight = info.groundLevel;
+            if (inBuilding && info.hasBuilding) {
+                int lowestLevel = info.getCityGroundLevel() - info.cellars * FLOORHEIGHT;
+                minheight = lowestLevel;
+            }
+        }
+        if (maxheight == null) {
+            maxheight = minheight + 50;
+            if (inBuilding && info.hasBuilding) {
+                maxheight = info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT + 10; // 10 margine about highest floor
+            }
+        }
         int mincount = settings.getMincount();
         int maxcount = settings.getMaxcount();
         int count = rand.nextInt(maxcount - mincount) + mincount;
@@ -1499,7 +1512,7 @@ public class LostCityTerrainFeature {
                 String blocks = settings.getColumn();
                 if (testBlock(settings.getBlockMatcher(), x, y-1, z) && testBlock(settings.getUpperBlockMatcher(), x, y + blocks.length(), z)) {
                     Boolean isSeesky = settings.isSeesky();
-                    if (isSeesky != null && isSeesky == level.canSeeSky(new BlockPos(info.coord.chunkX() * 16 + x, y, info.coord.chunkZ() * 16 + z))) {
+                    if (isSeesky == null || isSeesky == level.canSeeSky(new BlockPos(info.coord.chunkX() * 16 + x, y, info.coord.chunkZ() * 16 + z))) {
                         // Iterate over all characters of the block
                         boolean ok = true;
                         for (int k = 0; k < blocks.length(); k++) {
@@ -2824,7 +2837,6 @@ public class LostCityTerrainFeature {
 
         // Fix lowest level so it goes above minimum build height
         while (lowestLevel <= min) {
-            System.out.println("------------------------------ " + lowestLevel);
             lowestLevel += FLOORHEIGHT;
             cellars--;
             if (cellars < 0) {
@@ -2833,7 +2845,6 @@ public class LostCityTerrainFeature {
         }
 
         while (info.getCityGroundLevel() + floors * FLOORHEIGHT >= max) {
-            System.out.println("++++++++++++++++++++++++++++++ " + floors);
             floors--;
             if (floors < 0) {
                 return;     // Bail out, this is a degenerate case
