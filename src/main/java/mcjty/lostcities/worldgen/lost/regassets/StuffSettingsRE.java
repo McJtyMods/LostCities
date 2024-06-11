@@ -15,8 +15,8 @@ public class StuffSettingsRE implements IAsset<StuffSettingsRE> {
     public static final Codec<StuffSettingsRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.STRING.fieldOf("column").forGetter(l -> l.column),
-                    Codec.INT.fieldOf("minheight").forGetter(l -> l.minheight),
-                    Codec.INT.fieldOf("maxheight").forGetter(l -> l.maxheight),
+                    Codec.INT.optionalFieldOf("minheight").forGetter(l -> Optional.ofNullable(l.minheight)),
+                    Codec.INT.optionalFieldOf("maxheight").forGetter(l -> Optional.ofNullable(l.maxheight)),
                     Codec.INT.fieldOf("mincount").forGetter(l -> l.mincount),
                     Codec.INT.fieldOf("maxcount").forGetter(l -> l.maxcount),
                     Codec.INT.fieldOf("attempts").forGetter(l -> l.attempts),
@@ -30,8 +30,8 @@ public class StuffSettingsRE implements IAsset<StuffSettingsRE> {
 
     private ResourceLocation name;
     private final String column;
-    private final int minheight;
-    private final int maxheight;
+    private final Integer minheight;
+    private final Integer maxheight;
     private final int mincount;
     private final int maxcount;
     private final int attempts;
@@ -42,14 +42,14 @@ public class StuffSettingsRE implements IAsset<StuffSettingsRE> {
     private final BlockMatcher upperBlockMatcher;
     private final ResourceLocationMatcher buildingMatcher;
 
-    public StuffSettingsRE(String column, int minheight, int maxheight, int mincount, int maxcount, int attempts,
+    public StuffSettingsRE(String column, Optional<Integer> minheight, Optional<Integer> maxheight, int mincount, int maxcount, int attempts,
                            Optional<Boolean> inbuilding, Optional<Boolean> seesky,
                            Optional<BiomeMatcher> biomeMatcher, Optional<BlockMatcher> blockMatcher,
                            Optional<BlockMatcher> upperBlockMatcher,
                            Optional<ResourceLocationMatcher> buildingMatcher) {
         this.column = column;
-        this.minheight = minheight;
-        this.maxheight = maxheight;
+        this.minheight = minheight.orElse(null);
+        this.maxheight = maxheight.orElse(null);
         this.mincount = mincount;
         this.maxcount = maxcount;
         this.attempts = attempts;
@@ -65,11 +65,11 @@ public class StuffSettingsRE implements IAsset<StuffSettingsRE> {
         return column;
     }
 
-    public int getMinheight() {
+    public Integer getMinheight() {
         return minheight;
     }
 
-    public int getMaxheight() {
+    public Integer getMaxheight() {
         return maxheight;
     }
 
