@@ -1,12 +1,10 @@
 {
   "column": "\\",
-  "minheight": 30,
-  "maxheight": 120,
   "mincount": 10,
   "maxcount": 30,
   "attempts": 10,
   "inbuilding": true,
-  "upperblock": {
+  "upperblocks": {
     "excluding": [
       "minecraft:air"
     ]

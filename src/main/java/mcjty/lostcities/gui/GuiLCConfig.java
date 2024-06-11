@@ -217,7 +217,9 @@ public class GuiLCConfig extends Screen {
 
     private void initCities(int left) {
         start("Cities");
-        addRenderableWidget(new TextExt(this,10, 30, 240, 2, getFont(), ComponentFactory.literal("Cities are the main feature of Lost Cities. They are generated in a grid pattern. The rarity of cities is determined by the 'Rarity' setting. The 'Threshold' setting determines how much of the world is covered by cities. The 'Scale/Offset' setting determines how the cities are distributed over the world. The 'Inner scale' setting determines how much the cities are clustered together. The 'Parks' setting determines how many parks are generated in a city. The 'Fountains' setting determines how many fountains are generated in a city.")));
+        TextExt info = addRenderableWidget(new TextExt(this, 10, 30, 230, 3, getFont(),
+                ComponentFactory.literal("Cities are the main feature of Lost Cities. In this page you can control the rarity of them")));
+        add(new WidgetElement(info, curpage, 10, 30));
         nl();
         addDouble(left,120, "cities.cityChance").label("Rarity:"); nl();
         perlinScaleElement = addDouble(left,45, "cities.cityPerlinScale").label("Scale/Offset:");
