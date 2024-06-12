@@ -1,5 +1,6 @@
 Upcoming:
 - New 'stuff' feature. Using this you can define various random small objects that can be generated through cities (both inside and outside buildings)
+- City styles can now specify what type of stuff they want to generate. Stuff that is marked with the tag 'all' is always generated
 - Fixed a bug where predefined cities and spheres wouldn't work at all
 
 1.20-7.1.7:
