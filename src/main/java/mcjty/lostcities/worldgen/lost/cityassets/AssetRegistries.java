@@ -5,6 +5,11 @@ import mcjty.lostcities.worldgen.lost.regassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
 import net.minecraft.world.level.CommonLevelAccessor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class AssetRegistries {
 
     public static final RegistryAssetRegistry<Variant, VariantRE> VARIANTS = new RegistryAssetRegistry<>(CustomRegistries.VARIANTS_REGISTRY_KEY, Variant::new);
@@ -21,6 +26,8 @@ public class AssetRegistries {
     public static final RegistryAssetRegistry<PredefinedSphere, PredefinedSphereRE> PREDEFINED_SPHERES = new RegistryAssetRegistry<>(CustomRegistries.PREDEFINEDSPHERES_REGISTRY_KEY, PredefinedSphere::new);
     public static final RegistryAssetRegistry<Stuff, StuffSettingsRE> STUFF = new RegistryAssetRegistry<>(CustomRegistries.STUFF_REGISTRY_KEY, Stuff::new);
 
+    public static final Map<String, List<Stuff>> STUFF_BY_TAG = new HashMap<>();
+
     private static boolean loaded = false;
 
     public static void reset() {
@@ -36,6 +43,7 @@ public class AssetRegistries {
         PREDEFINED_CITIES.reset();
         PREDEFINED_SPHERES.reset();
         STUFF.reset();
+        STUFF_BY_TAG.clear();
         loaded = false;
     }
 
@@ -48,6 +56,10 @@ public class AssetRegistries {
         STUFF.loadAll(level);
         PREDEFINED_CITIES.loadAll(level);
         PREDEFINED_SPHERES.loadAll(level);
+        STUFF.getIterable().forEach(stuff -> stuff.getSettings().getTags().forEach(tag -> {
+            List<Stuff> list = STUFF_BY_TAG.computeIfAbsent(tag, k -> new ArrayList<>());
+            list.add(stuff);
+        }));
         loaded = true;
     }
 }

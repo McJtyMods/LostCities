@@ -1462,18 +1462,20 @@ public class LostCityTerrainFeature {
         rand.setSeed(info.coord.chunkX() * 2570174657L + info.coord.chunkZ() * 101754695981L);
         BiomeInfo biome = BiomeInfo.getBiomeInfo(provider, info.coord);
         CompiledPalette palette = info.getCompiledPalette();
-        AssetRegistries.STUFF.getIterable().forEach(stuff -> {
-            StuffSettingsRE settings = stuff.getSettings();
-            Boolean inBuilding = settings.isInBuilding();
-            if (inBuilding != null && inBuilding == info.hasBuilding) {
-                ResourceLocationMatcher buildingMatcher = settings.getBuildingMatcher();
-                if (buildingMatcher.isAny() || buildingMatcher.test(info.buildingType.getId())) {
-                    if (settings.getBiomeMatcher().test(biome.getMainBiome())) {
-                        actuallyGenerateStuff(info, settings, palette, inBuilding == Boolean.TRUE);
+        for (String tag : info.getCityStyle().getStuffTags()) {
+            for (Stuff stuff : AssetRegistries.STUFF_BY_TAG.get(tag)) {
+                StuffSettingsRE settings = stuff.getSettings();
+                Boolean inBuilding = settings.isInBuilding();
+                if (inBuilding != null && inBuilding == info.hasBuilding) {
+                    ResourceLocationMatcher buildingMatcher = settings.getBuildingMatcher();
+                    if (buildingMatcher.isAny() || buildingMatcher.test(info.buildingType.getId())) {
+                        if (settings.getBiomeMatcher().test(biome.getMainBiome())) {
+                            actuallyGenerateStuff(info, settings, palette, inBuilding == Boolean.TRUE);
+                        }
                     }
                 }
             }
-        });
+        }
     }
 
     private boolean testBlock(BlockMatcher matcher, int x, int y, int z) {

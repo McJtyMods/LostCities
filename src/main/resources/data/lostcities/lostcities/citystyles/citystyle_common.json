@@ -1,5 +1,6 @@
 {
   "inherit": "citystyle_config",
+  "stuff_tags": ["rubble"],
   "streetblocks": {
     "border": "y",
     "wall": "w",
