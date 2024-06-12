@@ -8,12 +8,15 @@ import mcjty.lostcities.worldgen.lost.regassets.data.ResourceLocationMatcher;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public class StuffSettingsRE implements IAsset<StuffSettingsRE> {
 
     public static final Codec<StuffSettingsRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
+                    Codec.STRING.listOf().optionalFieldOf("tags").forGetter(l -> l.tags.isEmpty() ? Optional.empty() : Optional.of(l.tags)),
                     Codec.STRING.fieldOf("column").forGetter(l -> l.column),
                     Codec.INT.optionalFieldOf("minheight").forGetter(l -> Optional.ofNullable(l.minheight)),
                     Codec.INT.optionalFieldOf("maxheight").forGetter(l -> Optional.ofNullable(l.maxheight)),
@@ -29,6 +32,7 @@ public class StuffSettingsRE implements IAsset<StuffSettingsRE> {
             ).apply(instance, StuffSettingsRE::new));
 
     private ResourceLocation name;
+    private final List<String> tags;
     private final String column;
     private final Integer minheight;
     private final Integer maxheight;
@@ -42,11 +46,14 @@ public class StuffSettingsRE implements IAsset<StuffSettingsRE> {
     private final BlockMatcher upperBlockMatcher;
     private final ResourceLocationMatcher buildingMatcher;
 
-    public StuffSettingsRE(String column, Optional<Integer> minheight, Optional<Integer> maxheight, int mincount, int maxcount, int attempts,
+    public StuffSettingsRE(Optional<List<String>> tags,
+                           String column,
+                           Optional<Integer> minheight, Optional<Integer> maxheight, int mincount, int maxcount, int attempts,
                            Optional<Boolean> inbuilding, Optional<Boolean> seesky,
                            Optional<BiomeMatcher> biomeMatcher, Optional<BlockMatcher> blockMatcher,
                            Optional<BlockMatcher> upperBlockMatcher,
                            Optional<ResourceLocationMatcher> buildingMatcher) {
+        this.tags = tags.orElse(Collections.emptyList());
         this.column = column;
         this.minheight = minheight.orElse(null);
         this.maxheight = maxheight.orElse(null);
@@ -59,6 +66,10 @@ public class StuffSettingsRE implements IAsset<StuffSettingsRE> {
         this.blockMatcher = blockMatcher.orElse(BlockMatcher.ANY);
         this.upperBlockMatcher = upperBlockMatcher.orElse(BlockMatcher.ANY);
         this.buildingMatcher = buildingMatcher.orElse(ResourceLocationMatcher.ANY);
+    }
+
+    public List<String> getTags() {
+        return tags;
     }
 
     public String getColumn() {

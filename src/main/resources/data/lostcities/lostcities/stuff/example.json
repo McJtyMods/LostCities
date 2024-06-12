@@ -4,7 +4,7 @@
   "mincount": 2,
   "maxcount": 7,
   "attempts": 10,
-  "inbuilding": true,
+  "inbuilding": false,
   "seesky": true,
   "biomes": {
     "excluding": [

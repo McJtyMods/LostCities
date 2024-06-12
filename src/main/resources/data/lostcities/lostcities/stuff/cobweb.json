@@ -1,19 +1,13 @@
 {
+  "tags": ["rubble"],
   "column": "\\",
-  "mincount": 10,
-  "maxcount": 30,
-  "attempts": 10,
+  "mincount": 5,
+  "maxcount": 20,
+  "attempts": 4,
   "inbuilding": true,
   "upperblocks": {
     "excluding": [
       "minecraft:air"
-    ]
-  },
-  "buildings": {
-    "if_any": [
-      "lostcities:building1",
-      "lostcities:building2",
-      "lostcities:building3"
     ]
   }
 }

@@ -9,13 +9,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.CommonLevelAccessor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class CityStyle implements ILostCityCityStyle {
 
     private final ResourceLocation name;
+
+    private final Set<String> stuffTags = new HashSet<>();
 
     private final List<ObjectSelector> buildingSelector = new ArrayList<>();
     private final List<ObjectSelector> bridgeSelector = new ArrayList<>();
@@ -72,6 +72,10 @@ public class CityStyle implements ILostCityCityStyle {
         name = object.getRegistryName();
         inherit = object.getInherit();
         style = object.getStyle();
+        stuffTags.add("all");
+        if (object.getStuffTags() != null) {
+            stuffTags.addAll(object.getStuffTags());
+        }
         explosionChance = object.getExplosionChance();
         object.getBuildingSettings().ifPresent(s -> {
             buildingChance = s.getBuildingChance();
@@ -262,6 +266,7 @@ public class CityStyle implements ILostCityCityStyle {
                 if (style == null) {
                     style = inheritFrom.getStyle();
                 }
+                stuffTags.addAll(inheritFrom.stuffTags);
                 buildingSelector.addAll(inheritFrom.buildingSelector);
                 bridgeSelector.addAll(inheritFrom.bridgeSelector);
                 parkSelector.addAll(inheritFrom.parkSelector);
@@ -347,6 +352,10 @@ public class CityStyle implements ILostCityCityStyle {
         } else {
             return fromList.value();
         }
+    }
+
+    public Set<String> getStuffTags() {
+        return stuffTags;
     }
 
     public String getRandomStair(Random random) {
