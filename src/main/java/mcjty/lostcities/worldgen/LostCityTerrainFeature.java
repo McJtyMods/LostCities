@@ -1536,14 +1536,17 @@ public class LostCityTerrainFeature {
         BiomeInfo biome = BiomeInfo.getBiomeInfo(provider, info.coord);
         CompiledPalette palette = info.getCompiledPalette();
         for (String tag : info.getCityStyle().getStuffTags()) {
-            for (Stuff stuff : AssetRegistries.STUFF_BY_TAG.get(tag)) {
-                StuffSettingsRE settings = stuff.getSettings();
-                Boolean inBuilding = settings.isInBuilding();
-                if (inBuilding != null && inBuilding == info.hasBuilding) {
-                    ResourceLocationMatcher buildingMatcher = settings.getBuildingMatcher();
-                    if (buildingMatcher.isAny() || buildingMatcher.test(info.buildingType.getId())) {
-                        if (settings.getBiomeMatcher().test(biome.getMainBiome())) {
-                            actuallyGenerateStuff(info, settings, palette, inBuilding == Boolean.TRUE);
+            List<Stuff> stuffs = AssetRegistries.STUFF_BY_TAG.get(tag);
+            if (stuffs != null) {
+                for (Stuff stuff : stuffs) {
+                    StuffSettingsRE settings = stuff.getSettings();
+                    Boolean inBuilding = settings.isInBuilding();
+                    if (inBuilding != null && inBuilding == info.hasBuilding) {
+                        ResourceLocationMatcher buildingMatcher = settings.getBuildingMatcher();
+                        if (buildingMatcher.isAny() || buildingMatcher.test(info.buildingType.getId())) {
+                            if (settings.getBiomeMatcher().test(biome.getMainBiome())) {
+                                actuallyGenerateStuff(info, settings, palette, inBuilding == Boolean.TRUE);
+                            }
                         }
                     }
                 }
@@ -1571,9 +1574,9 @@ public class LostCityTerrainFeature {
             }
         }
         if (maxheight == null) {
-            maxheight = minheight + 50;
+            maxheight = minheight + 20;
             if (inBuilding && info.hasBuilding) {
-                maxheight = info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT + 10; // 10 margine about highest floor
+                maxheight = info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT + 10; // 10 margine above highest floor
             }
         }
         int mincount = settings.getMincount();

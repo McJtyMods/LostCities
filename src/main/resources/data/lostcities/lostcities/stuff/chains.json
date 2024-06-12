@@ -1,8 +1,8 @@
 {
   "tags": ["rubble"],
-  "column": "\\",
+  "column": "{",
   "mincount": 5,
-  "maxcount": 20,
+  "maxcount": 10,
   "attempts": 8,
   "inbuilding": true,
   "upperblocks": {

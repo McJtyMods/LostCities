@@ -183,6 +183,10 @@
       "block": "minecraft:cobweb"
     },
     {
+      "char": "{",
+      "block": "minecraft:chain"
+    },
+    {
       "char": "*",
       "block": "minecraft:potted_cactus"
     },
