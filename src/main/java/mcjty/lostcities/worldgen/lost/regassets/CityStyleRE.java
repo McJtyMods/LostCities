@@ -6,6 +6,7 @@ import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 
 public class CityStyleRE implements IAsset<CityStyleRE> {
@@ -15,6 +16,7 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
                     Codec.FLOAT.optionalFieldOf("explosionchance").forGetter(l -> Optional.ofNullable(l.explosionChance)),
                     Codec.STRING.optionalFieldOf("style").forGetter(l -> Optional.ofNullable(l.style)),
                     Codec.STRING.optionalFieldOf("inherit").forGetter(l -> Optional.ofNullable(l.inherit)),
+                    Codec.STRING.listOf().optionalFieldOf("stuff_tags").forGetter(l -> Optional.ofNullable(l.stuffTags)),
                     GeneralSettings.CODEC.optionalFieldOf("generalblocks").forGetter(l -> Optional.ofNullable(l.generalSettings)),
                     BuildingSettings.CODEC.optionalFieldOf("buildingsettings").forGetter(l -> Optional.ofNullable(l.buildingSettings)),
                     CorridorSettings.CODEC.optionalFieldOf("corridorblocks").forGetter(l -> Optional.ofNullable(l.corridorSettings)),
@@ -31,6 +33,8 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
     private final String style;
     private final String inherit;
 
+    private final List<String> stuffTags;
+
     private final GeneralSettings generalSettings;
     private final BuildingSettings buildingSettings;
     private final CorridorSettings corridorSettings;
@@ -45,6 +49,7 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
             Optional<Float> explosionChance,
             Optional<String> style,
             Optional<String> inherit,
+            Optional<List<String>> stuffTags,
             Optional<GeneralSettings> generalSettings,
             Optional<BuildingSettings> buildingSettings,
             Optional<CorridorSettings> corridorSettings,
@@ -56,6 +61,7 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
         this.explosionChance = explosionChance.orElse(null);
         this.style = style.orElse(null);
         this.inherit = inherit.orElse(null);
+        this.stuffTags = stuffTags.orElse(null);
         this.generalSettings = generalSettings.orElse(null);
         this.buildingSettings = buildingSettings.orElse(null);
         this.corridorSettings = corridorSettings.orElse(null);
@@ -68,6 +74,11 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
 
     public Float getExplosionChance() {
         return explosionChance;
+    }
+
+    @Nullable
+    public List<String> getStuffTags() {
+        return stuffTags;
     }
 
     public String getStyle() {
