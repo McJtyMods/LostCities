@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.0.29:
 - Fixed a crash with the new 'stuff' feature
 
 1.19-6.0.28:
