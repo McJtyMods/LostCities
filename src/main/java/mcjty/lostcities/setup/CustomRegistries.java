@@ -67,6 +67,7 @@ public class CustomRegistries {
 
     public static final ResourceKey<Registry<StuffSettingsRE>> STUFF_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "stuff"));
     public static final DeferredRegister<StuffSettingsRE> STUFF_DEFERRED_REGISTER = DeferredRegister.create(STUFF_REGISTRY_KEY, LostCities.MODID);
+    public static final Supplier<IForgeRegistry<StuffSettingsRE>> STUFF_REGISTRY = STUFF_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<StuffSettingsRE>().dataPackRegistry(StuffSettingsRE.CODEC));
 
     public static void init() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
