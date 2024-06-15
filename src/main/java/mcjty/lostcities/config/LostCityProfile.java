@@ -6,12 +6,12 @@ import com.google.gson.JsonParser;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCityProfile;
 import mcjty.lostcities.setup.ModSetup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 
 public class LostCityProfile implements ILostCityProfile {
 
@@ -204,7 +204,7 @@ public class LostCityProfile implements ILostCityProfile {
         if (iconFile == null || iconFile.isEmpty()) {
             return null;
         }
-        icon = new ResourceLocation(LostCities.MODID, iconFile);
+        icon = ResourceLocation.fromNamespaceAndPath(LostCities.MODID, iconFile);
         return icon;
     }
 
@@ -529,7 +529,7 @@ public class LostCityProfile implements ILostCityProfile {
 
     public BlockState getLiquidBlock() {
         if (liquidBlock == null) {
-            Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(LIQUID_BLOCK));
+            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(LIQUID_BLOCK));
             if (b == null) {
                 ModSetup.getLogger().error("Bad liquid block: {}!", LIQUID_BLOCK);
                 liquidBlock = Blocks.WATER.defaultBlockState();
@@ -542,7 +542,7 @@ public class LostCityProfile implements ILostCityProfile {
 
     public BlockState getBaseBlock() {
         if (baseBlock == null) {
-            Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(BASE_BLOCK));
+            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(BASE_BLOCK));
             if (b == null) {
                 ModSetup.getLogger().error("Bad base block: {}!", BASE_BLOCK);
                 baseBlock = Blocks.STONE.defaultBlockState();

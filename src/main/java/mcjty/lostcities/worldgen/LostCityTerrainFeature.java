@@ -15,6 +15,7 @@ import mcjty.lostcities.worldgen.lost.cityassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -45,7 +46,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
@@ -622,7 +622,7 @@ public class LostCityTerrainFeature {
         int chunkX = info.chunkX;
         int chunkZ = info.chunkZ;
         LostCityEvent.PostGenOutsideChunkEvent postevent = new LostCityEvent.PostGenOutsideChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
-        MinecraftForge.EVENT_BUS.post(postevent);
+        NeoForge.EVENT_BUS.post(postevent);
 
         generateBridges(info);
         generateHighways(info);
@@ -1496,7 +1496,7 @@ public class LostCityTerrainFeature {
             }
         }
         LostCityEvent.PostGenCityChunkEvent postevent = new LostCityEvent.PostGenCityChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
-        MinecraftForge.EVENT_BUS.post(postevent);
+        NeoForge.EVENT_BUS.post(postevent);
 
         if (info.profile.RUIN_CHANCE > 0.0) {
             generateRuins(info);
@@ -2621,7 +2621,7 @@ public class LostCityTerrainFeature {
         BlockEntity tileentity = world.getBlockEntity(pos);
         if (tileentity instanceof SpawnerBlockEntity spawner) {
             BaseSpawner logic = spawner.getSpawner();
-            logic.setEntityId(BuiltInRegistries.ENTITY_TYPE.getValue(randomEntity), world, world.random, pos);
+            logic.setEntityId(BuiltInRegistries.ENTITY_TYPE.get(randomEntity), world, world.random, pos);
             spawner.setChanged();
             if (Config.DEBUG) {
                 ModSetup.getLogger().debug("generateLootSpawners: mob={} pos={}", randomEntity.toString(), pos);

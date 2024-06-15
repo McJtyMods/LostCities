@@ -31,7 +31,7 @@ public class DataTools {
         if (name.contains(":")) {
             return new ResourceLocation(name);
         } else {
-            return new ResourceLocation(LostCities.MODID, name);
+            return ResourceLocation.fromNamespaceAndPath(LostCities.MODID, name);
         }
     }
 }

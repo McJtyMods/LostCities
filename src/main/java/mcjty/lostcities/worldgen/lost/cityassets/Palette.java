@@ -36,7 +36,7 @@ public class Palette implements ILostCityAsset {
     }
 
     public Palette(String name) {
-        this.name = new ResourceLocation(LostCities.MODID, name);
+        this.name = ResourceLocation.fromNamespaceAndPath(LostCities.MODID, name);
     }
 
     public void merge(Palette other) {

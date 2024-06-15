@@ -10,7 +10,6 @@ import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.server.commands.ResetChunksCommand;
 
 import javax.annotation.Nonnull;
 import java.util.stream.Stream;
@@ -34,7 +33,8 @@ public class ModCommands {
         );
 
         dispatcher.register(Commands.literal("lost").redirect(commands));
-        ResetChunksCommand.register(dispatcher);
+        // @todo 1.21
+//        ResetChunksCommand.register(dispatcher);
     }
 
     @Nonnull

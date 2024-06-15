@@ -2,9 +2,8 @@ package mcjty.lostcities.api;
 
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.eventbus.api.Cancelable;
-import net.neoforged.neoforge.eventbus.api.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
 /**
  * LostCityEvent is fired whenever an event involving a Lost City chunk generation occurs. <br>
@@ -90,8 +89,7 @@ public class LostCityEvent extends Event {
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
-    @Cancelable
-    public static class PreGenCityChunkEvent extends LostCityEvent {
+    public static class PreGenCityChunkEvent extends LostCityEvent implements ICancellableEvent {
         private final ChunkAccess primer;
 
         public PreGenCityChunkEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
@@ -171,8 +169,7 @@ public class LostCityEvent extends Event {
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
-    @Cancelable
-    public static class PreExplosionEvent extends LostCityEvent {
+    public static class PreExplosionEvent extends LostCityEvent implements ICancellableEvent {
         private final ChunkAccess primer;
 
         public PreExplosionEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {

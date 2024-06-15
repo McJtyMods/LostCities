@@ -24,7 +24,7 @@ public class PacketHandler {
     }
 
     public static void registerMessages(String channelName) {
-        INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(LostCities.MODID, channelName), () -> "1.0", s -> true, s -> true);
+        INSTANCE = NetworkRegistry.newSimpleChannel(ResourceLocation.fromNamespaceAndPath(LostCities.MODID, channelName), () -> "1.0", s -> true, s -> true);
         registerMessages();
     }
 

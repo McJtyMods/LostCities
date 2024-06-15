@@ -9,8 +9,8 @@ import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.world.level.block.state.properties.WallSide;
 import net.minecraft.world.level.chunk.BulkSectionAccess;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import javax.annotation.Nullable;
@@ -205,7 +205,7 @@ public class ChunkDriver {
             ChunkAccess chunk = region.getChunk(pos);
             if (chunk == thisChunk) {
                 setBlock(pos, newAdjacent);
-            } else if (chunk.getStatus().isOrAfter(ChunkStatus.FULL)) {
+            } else if (chunk.getPersistedStatus().isOrAfter(ChunkStatus.FULL)) {
                 region.setBlock(pos, newAdjacent, Block.UPDATE_CLIENTS);
             }
         }

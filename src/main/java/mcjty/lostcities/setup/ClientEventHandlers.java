@@ -46,7 +46,7 @@ public class ClientEventHandlers {
 
     private Button lostCitiesButton = null;
 
-    private final static ResourceLocation txt = new ResourceLocation(LostCities.MODID, "textures/gui/configicon.png");
+    private final static ResourceLocation txt = ResourceLocation.fromNamespaceAndPath(LostCities.MODID, "textures/gui/configicon.png");
 
     @SubscribeEvent
     public void onGuiDraw(ScreenEvent.Render event) {

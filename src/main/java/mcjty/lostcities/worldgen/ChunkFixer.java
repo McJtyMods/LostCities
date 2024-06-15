@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 
 import java.util.Random;
 
@@ -35,7 +35,7 @@ public class ChunkFixer {
         int maxHeight = info.getMaxHeight();
 
         if (info.hasBuilding) {
-            if (world.getChunk(coord.chunkX() + 1, coord.chunkZ()).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
+            if (world.getChunk(coord.chunkX() + 1, coord.chunkZ()).getPersistedStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getXmax();
                 int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
                 for (int z = 0; z < 15; z++) {
