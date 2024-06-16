@@ -10,8 +10,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 
-import java.util.Random;
-
 public class ChunkFixer {
 
 
@@ -48,7 +46,7 @@ public class ChunkFixer {
             }
         }
         if (info.getXmax().hasBuilding) {
-            if (world.getChunk(chunkX + 1, chunkZ).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
+            if (world.getChunk(chunkX + 1, chunkZ).getPersistedStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getXmax();
                 int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
                 for (int z = 0; z < 15; z++) {
@@ -62,7 +60,7 @@ public class ChunkFixer {
         }
 
         if (info.hasBuilding) {
-            if (world.getChunk(chunkX, chunkZ + 1).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
+            if (world.getChunk(chunkX, chunkZ + 1).getPersistedStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getZmax();
                 int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
                 for (int x = 0; x < 15; x++) {
@@ -75,7 +73,7 @@ public class ChunkFixer {
             }
         }
         if (info.getZmax().hasBuilding) {
-            if (world.getChunk(chunkX, chunkZ + 1).getStatus().isOrAfter(ChunkStatus.FEATURES)) {
+            if (world.getChunk(chunkX, chunkZ + 1).getPersistedStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getZmax();
                 int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
                 for (int x = 0; x < 15; x++) {

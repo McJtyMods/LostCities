@@ -343,7 +343,8 @@ public class LostCityTerrainFeature {
         rand.setSeed(chunkX * 257017164707L + chunkZ * 101754694003L);
 
         LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
-        if (!MinecraftForge.EVENT_BUS.post(event)) {
+        LostCityEvent.PreExplosionEvent posted = NeoForge.EVENT_BUS.post(event);    // @todo 1.21 is this right?
+        if (!posted.isCanceled()) {
             if (info.getDamageArea().hasExplosions()) {
                 breakBlocksForDamageNew(chunkX, chunkZ, info);
                 fixAfterExplosion(info);
@@ -1488,7 +1489,8 @@ public class LostCityTerrainFeature {
         int chunkX = info.chunkX;
         int chunkZ = info.chunkZ;
         LostCityEvent.PreGenCityChunkEvent event = new LostCityEvent.PreGenCityChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
-        if (!MinecraftForge.EVENT_BUS.post(event)) {
+        LostCityEvent.PreGenCityChunkEvent posted = NeoForge.EVENT_BUS.post(event); // @todo 1.21 is this right?
+        if (!posted.isCanceled()) {
             if (building) {
                 generateBuilding(info, heightmap);
             } else {
@@ -2654,7 +2656,7 @@ public class LostCityTerrainFeature {
         if (randomValue == null) {
             throw new RuntimeException("Condition '" + cnd.getName() + "' did not return a valid mob!");
         }
-        return new ResourceLocation(randomValue);
+        return ResourceLocation.parse(randomValue);
     }
 
 
@@ -2674,7 +2676,7 @@ public class LostCityTerrainFeature {
             return;
         }
         BlockEntity tileentity = world.getBlockEntity(pos);
-        if (tileentity instanceof RandomizableContainerBlockEntity) {
+        if (tileentity instanceof RandomizableContainerBlockEntity rcbe) {
             if (todo != null) {
                 String lootTable = todo.getCondition();
                 int level = (pos.getY() - diminfo.getProfile().GROUNDLEVEL) / FLOORHEIGHT;
@@ -2697,7 +2699,7 @@ public class LostCityTerrainFeature {
 //                if (LostCityConfiguration.DEBUG) {
 //                    LostCities.setup.getLogger().debug("createLootChest: loot=" + randomValue + " pos=" + pos.toString());
 //                }
-                RandomizableContainerBlockEntity.setLootTable(world, random, pos, new ResourceLocation(randomValue));
+                rcbe.setLootTable(ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(randomValue)));
             }
         }
     }

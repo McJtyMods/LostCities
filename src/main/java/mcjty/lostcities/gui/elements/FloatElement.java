@@ -63,7 +63,7 @@ public class FloatElement extends GuiElement {
 
     @Override
     public void tick() {
-        field.tick();
+//        field.tick(); // @todo 1.21
     }
 
     @Override

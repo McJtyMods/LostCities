@@ -27,7 +27,7 @@ public class PredefinedCity implements ILostCityAsset {
 
     public PredefinedCity(PredefinedCityRE object) {
         name = object.getRegistryName();
-        dimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(object.getDimension()));
+        dimension = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(object.getDimension()));
         chunkX = object.getChunkX();
         chunkZ = object.getChunkZ();
         radius = object.getRadius();

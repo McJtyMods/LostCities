@@ -2,7 +2,6 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.api.ILostCityProfileSetup;
 import mcjty.lostcities.config.ProfileSetup;
-import mcjty.lostcities.network.PacketHandler;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;

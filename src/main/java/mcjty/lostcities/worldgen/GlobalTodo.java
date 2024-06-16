@@ -3,6 +3,7 @@ package mcjty.lostcities.worldgen;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.varia.TodoQueue;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -43,7 +44,7 @@ public class GlobalTodo extends SavedData {
             throw new RuntimeException("Don't access this client-side!");
         }
         DimensionDataStorage storage = ((ServerLevel) world).getDataStorage();
-        return storage.computeIfAbsent(GlobalTodo::new, GlobalTodo::new, NAME);
+        return storage.computeIfAbsent(new Factory<>(GlobalTodo::new, (compoundTag, provider) -> new GlobalTodo(compoundTag)) , NAME);
     }
 
     public GlobalTodo() {
@@ -58,15 +59,15 @@ public class GlobalTodo extends SavedData {
         ListTag spawners = nbt.getList("spawners", Tag.TAG_COMPOUND);
         for (Tag spawner : spawners) {
             CompoundTag spawnerTag = (CompoundTag) spawner;
-            BlockPos pos = NbtUtils.readBlockPos(spawnerTag.getCompound("pos"));
+            BlockPos pos = NbtUtils.readBlockPos(spawnerTag, "pos").get();
             BlockState state = NbtUtils.readBlockState(getOverworld().holderLookup(Registries.BLOCK), spawnerTag.getCompound("state"));
-            ResourceLocation entity = new ResourceLocation(spawnerTag.getString("entity"));
+            ResourceLocation entity = ResourceLocation.parse(spawnerTag.getString("entity"));
             addSpawnerTodo(pos, state, entity);
         }
         ListTag blockEntities = nbt.getList("blockentities", Tag.TAG_COMPOUND);
         for (Tag blockEntity : blockEntities) {
             CompoundTag blockEntityTag = (CompoundTag) blockEntity;
-            BlockPos pos = NbtUtils.readBlockPos(blockEntityTag.getCompound("pos"));
+            BlockPos pos = NbtUtils.readBlockPos(blockEntityTag, "pos").get();
             BlockState state = NbtUtils.readBlockState(getOverworld().holderLookup(Registries.BLOCK), blockEntityTag.getCompound("state"));
             CompoundTag tag = blockEntityTag.getCompound("tag");
             addBlockEntityTodo(pos, state, tag);
@@ -74,14 +75,14 @@ public class GlobalTodo extends SavedData {
         ListTag poi = nbt.getList("poi", Tag.TAG_COMPOUND);
         for (Tag p : poi) {
             CompoundTag pTag = (CompoundTag) p;
-            BlockPos pos = NbtUtils.readBlockPos(pTag.getCompound("pos"));
+            BlockPos pos = NbtUtils.readBlockPos(pTag, "pos").get();    // @todo 1.21 cleanup
             BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), pTag.getCompound("state"));
             addPoi(pos, state);
         }
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider holderLookup) {
         ListTag spawners = new ListTag();
         todoSpawners.forEach((pos, pair) -> {
             CompoundTag spawnerTag = new CompoundTag();
@@ -146,7 +147,7 @@ public class GlobalTodo extends SavedData {
             CompoundTag tag = pair.getRight();
             BlockEntity be = level.getBlockEntity(pos);
             if (be != null) {
-                be.load(tag);
+                be.loadWithComponents(tag, null);   // @todo 1.21 FIX THIS
             }
         });
 

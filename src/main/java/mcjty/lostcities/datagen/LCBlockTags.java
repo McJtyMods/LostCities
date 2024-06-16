@@ -3,6 +3,7 @@ package mcjty.lostcities.datagen;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.LostTags;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -11,7 +12,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -37,12 +37,12 @@ public class LCBlockTags extends BlockTagsProvider {
         for (TagKey<Block> tag : PLANT_TAGS) {
             tag(LostTags.FOLIAGE_TAG).addTag(tag);
         }
-        tag(LostTags.EASY_BREAKABLE_TAG).addTags(Tags.Blocks.GLASS);
-        for (Block block : ForgeRegistries.BLOCKS.getValues()) {
-            if (block.defaultBlockState().getLightEmission() > 0) {
-                tag(LostTags.LIGHTS_TAG).add(block);
+        tag(LostTags.EASY_BREAKABLE_TAG).addTags(Tags.Blocks.GLASS_BLOCKS);
+        BuiltInRegistries.BLOCK.stream().forEach(block -> {
+            if (block.defaultBlockState().getDestroySpeed(null, null) < 0.6f) {
+                tag(LostTags.EASY_BREAKABLE_TAG).add(block);
             }
-        }
+        });
 
         tag(LostTags.ROTATABLE_TAG).addTag(net.minecraft.tags.BlockTags.STAIRS);
         tag(LostTags.NOT_BREAKABLE_TAG).add(Blocks.BEDROCK, Blocks.END_PORTAL, Blocks.END_PORTAL_FRAME, Blocks.END_GATEWAY);

@@ -5,7 +5,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -18,7 +17,6 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -47,7 +45,7 @@ public class Tools {
 
     public static String stateToString(BlockState state) {
         StringBuilder stringbuilder = new StringBuilder();
-        stringbuilder.append(ForgeRegistries.BLOCKS.getKey(state.getBlock()));
+        stringbuilder.append(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
         if (!state.getValues().isEmpty()) {
             stringbuilder.append('[');
             stringbuilder.append(state.getValues().entrySet().stream().map(PROPERTY_MAPPER).collect(Collectors.joining(",")));

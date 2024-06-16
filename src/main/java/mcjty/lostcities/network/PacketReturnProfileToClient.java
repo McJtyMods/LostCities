@@ -1,38 +1,36 @@
 package mcjty.lostcities.network;
 
+import mcjty.lostcities.LostCities;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
+public record PacketReturnProfileToClient(ResourceKey<Level> dimension, String profile) implements CustomPacketPayload {
 
-public class PacketReturnProfileToClient {
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(LostCities.MODID, "returnprofile");
+    public static final CustomPacketPayload.Type<PacketReturnProfileToClient> TYPE = new Type<>(ID);
 
-    private final ResourceKey<Level> dimension;
-    private final String profile;
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketReturnProfileToClient> CODEC = StreamCodec.composite(
+            ResourceKey.streamCodec(Registries.DIMENSION), PacketReturnProfileToClient::dimension,
+            ByteBufCodecs.STRING_UTF8, PacketReturnProfileToClient::profile,
+            PacketReturnProfileToClient::new);
 
-    public PacketReturnProfileToClient(FriendlyByteBuf buf) {
-        dimension = ResourceKey.create(Registries.DIMENSION, buf.readResourceLocation());
-        profile = buf.readUtf(32767);
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeResourceLocation(dimension.location());
-        buf.writeUtf(profile);
-    }
 
-    public PacketReturnProfileToClient(ResourceKey<Level> dimension, String profileName) {
-        this.dimension = dimension;
-        this.profile = profileName;
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
+    public void handle(IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
             // @todo 1.14
 //            WorldTypeTools.setProfileFromServer(dimension, profile);
         });
-        ctx.get().setPacketHandled(true);
     }
 }

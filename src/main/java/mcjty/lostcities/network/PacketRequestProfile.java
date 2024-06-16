@@ -1,36 +1,36 @@
 package mcjty.lostcities.network;
 
+import mcjty.lostcities.LostCities;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
+public record PacketRequestProfile(ResourceKey<Level> dimension) implements CustomPacketPayload {
 
-public class PacketRequestProfile {
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(LostCities.MODID, "requestproofile");
+    public static final CustomPacketPayload.Type<PacketRequestProfile> TYPE = new Type<>(ID);
 
-    private final ResourceKey<Level> dimension;
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketRequestProfile> CODEC = StreamCodec.composite(
+            ResourceKey.streamCodec(Registries.DIMENSION), PacketRequestProfile::dimension,
+            PacketRequestProfile::new);
 
-    public PacketRequestProfile(FriendlyByteBuf buf) {
-        dimension = ResourceKey.create(Registries.DIMENSION, buf.readResourceLocation());
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeResourceLocation(dimension.location());
-    }
-
-    public PacketRequestProfile(ResourceKey<Level> dimension) {
-        this.dimension = dimension;
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
+    public void handle(IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
             // @todo 1.14
 //            ServerPlayerEntity player = ctx.get().getSender();
 //            LostCityProfile profile = WorldTypeTools.getProfile(WorldTools.getWorld(dimension));
-//            PacketHandler.INSTANCE.sendTo(new PacketReturnProfileToClient(dimension, profile.getName()), player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+//            PacketHandler.INSTANCE.sendTo(new PacketRequestProfile(dimension, profile.getName()), player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
         });
-        ctx.get().setPacketHandled(true);
     }
 }

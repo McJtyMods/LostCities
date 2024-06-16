@@ -2,17 +2,20 @@ package mcjty.lostcities;
 
 import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.ILostCitiesPre;
+import mcjty.lostcities.datagen.DataGenerators;
+import mcjty.lostcities.network.PacketRequestProfile;
+import mcjty.lostcities.network.PacketReturnProfileToClient;
 import mcjty.lostcities.setup.*;
-import net.neoforged.neoforge.api.distmarker.Dist;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.fml.ModLoadingContext;
-import net.neoforged.neoforge.fml.common.Mod;
-import net.neoforged.neoforge.fml.config.ModConfig;
-import net.neoforged.neoforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.neoforged.neoforge.fml.event.lifecycle.InterModProcessEvent;
-import net.neoforged.neoforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.neoforged.neoforge.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.fml.loading.FMLPaths;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLConstructModEvent;
+import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +25,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Mod(LostCities.MODID)
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class LostCities {
     public static final String MODID = "lostcities";
 
@@ -32,10 +34,7 @@ public class LostCities {
     public static LostCities instance;
     public static final LostCitiesImp lostCitiesImp = new LostCitiesImp();
 
-    public LostCities() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        Dist dist = FMLEnvironment.dist;
-
+    public LostCities(ModContainer container, IEventBus bus, Dist dist) {
         instance = this;
 
         Registration.init(bus);
@@ -45,14 +44,16 @@ public class LostCities {
         File dir = new File(configPath + File.separator + "lostcities");
         dir.mkdirs();
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG, "lostcities/client.toml");
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG, "lostcities/common.toml");
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
+        container.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG, "lostcities/client.toml");
+        container.registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG, "lostcities/common.toml");
+        container.registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
 
         bus.addListener(setup::init);
+        bus.addListener(this::onRegisterPayloadHandler);
         bus.addListener(this::processIMC);
         bus.addListener(this::onConstructModEvent);
         bus.addListener(CustomRegistries::onDataPackRegistry);
+        bus.addListener(DataGenerators::gatherData);
 
         if (dist.isClient()) {
             bus.addListener(ClientSetup::init);
@@ -61,6 +62,14 @@ public class LostCities {
 
     public static Logger getLogger() {
         return LOGGER;
+    }
+
+    private void onRegisterPayloadHandler(RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar(MODID)
+                .versioned("1.0")
+                .optional();
+        registrar.playToClient(PacketReturnProfileToClient.TYPE, PacketReturnProfileToClient.CODEC, PacketReturnProfileToClient::handle);
+        registrar.playToServer(PacketRequestProfile.TYPE, PacketRequestProfile.CODEC, PacketRequestProfile::handle);
     }
 
     private void onConstructModEvent(FMLConstructModEvent event) {

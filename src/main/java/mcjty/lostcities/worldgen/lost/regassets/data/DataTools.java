@@ -29,7 +29,7 @@ public class DataTools {
 
     public static ResourceLocation fromName(String name) {
         if (name.contains(":")) {
-            return new ResourceLocation(name);
+            return ResourceLocation.parse(name);
         } else {
             return ResourceLocation.fromNamespaceAndPath(LostCities.MODID, name);
         }

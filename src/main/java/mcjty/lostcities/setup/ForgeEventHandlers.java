@@ -3,8 +3,6 @@ package mcjty.lostcities.setup;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.commands.ModCommands;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.playerdata.PlayerProperties;
-import mcjty.lostcities.playerdata.PropertiesDispatcher;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.varia.CustomTeleporter;
@@ -18,11 +16,11 @@ import mcjty.lostcities.worldgen.lost.cityassets.PredefinedSphere;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -35,9 +33,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.CanPlayerSleepEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -56,47 +56,25 @@ public class ForgeEventHandlers {
         ModCommands.register(event.getDispatcher());
     }
 
-    @SubscribeEvent
-    public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
-        if (event.getObject() instanceof Player) {
-            if (!event.getObject().getCapability(PlayerProperties.PLAYER_SPAWN_SET).isPresent()) {
-                event.addCapability(ResourceLocation.fromNamespaceAndPath(LostCities.MODID, "spawnset"), new PropertiesDispatcher());
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onPlayerCloned(PlayerEvent.Clone event) {
-        if (event.isWasDeath()) {
-            // We need to copyFrom the capabilities
-            event.getOriginal().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(oldStore -> {
-                event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(newStore -> {
-                    newStore.copyFrom(oldStore);
-                });
-            });
-        }
-    }
 
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(note -> {
-            if (!note.isPlayerSpawnSet()) {
-                note.setPlayerSpawnSet(true);
-                for (Map.Entry<ResourceKey<Level>, BlockPos> entry : spawnPositions.entrySet()) {
-                    if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-                        serverPlayer.setRespawnPosition(entry.getKey(), entry.getValue(), 0.0f, true, true);
-                        serverPlayer.teleportTo(entry.getValue().getX(), entry.getValue().getY(), entry.getValue().getZ());
-                    }
+        Player player = event.getEntity();
+        if (!player.getData(Registration.ATTACHMENT_TYPE_SPAWNSET)) {
+            player.setData(Registration.ATTACHMENT_TYPE_SPAWNSET, true);
+            for (Map.Entry<ResourceKey<Level>, BlockPos> entry : spawnPositions.entrySet()) {
+                if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.setRespawnPosition(entry.getKey(), entry.getValue(), 0.0f, true, true);
+                    serverPlayer.teleportTo(entry.getValue().getX(), entry.getValue().getY(), entry.getValue().getZ());
                 }
             }
-        });
+        }
     }
 
 
-
     @SubscribeEvent
-    public void onWorldTick(TickEvent.LevelTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
+    public void onWorldTick(LevelTickEvent.Post event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel) {
             GlobalTodo.getData(serverLevel).executeAndClearTodo(serverLevel);
         }
     }
@@ -125,7 +103,7 @@ public class ForgeEventHandlers {
             boolean needsCheck = false;
 
             if (!profile.SPAWN_BIOME.isEmpty()) {
-                final Biome spawnBiome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(profile.SPAWN_BIOME));
+                final Biome spawnBiome = serverLevel.registryAccess().registryOrThrow(Registries.BIOME).get(ResourceLocation.parse(profile.SPAWN_BIOME));
                 if (spawnBiome == null) {
                     ModSetup.getLogger().error("Cannot find biome '{}' for the player to spawn in !", profile.SPAWN_BIOME);
                 } else {
@@ -362,7 +340,7 @@ public class ForgeEventHandlers {
     }
 
     @SubscribeEvent
-    public void onPlayerSleepInBedEvent(PlayerSleepInBedEvent event) {
+    public void onPlayerSleepInBedEvent(CanPlayerSleepEvent event) {
 //        if (LostCityConfiguration.DIMENSION_ID == null) {
 //            return;
 //        }
@@ -377,12 +355,12 @@ public class ForgeEventHandlers {
         }
 
         if (world.dimension() == Registration.DIMENSION) {
-            event.setResult(Player.BedSleepingProblem.OTHER_PROBLEM);
+            event.setProblem(Player.BedSleepingProblem.OTHER_PROBLEM);
             ServerLevel destWorld = WorldTools.getOverworld(world);
             BlockPos location = findLocation(bedLocation, destWorld);
             CustomTeleporter.teleportToDimension(event.getEntity(), destWorld, location);
         } else {
-            event.setResult(Player.BedSleepingProblem.OTHER_PROBLEM);
+            event.setProblem(Player.BedSleepingProblem.OTHER_PROBLEM);
             ServerLevel destWorld = event.getEntity().getCommandSenderWorld().getServer().getLevel(Registration.DIMENSION);
             if (destWorld == null) {
                 event.getEntity().sendSystemMessage(ComponentFactory.literal("Error finding Lost City dimension: " + LOSTCITY + "!").withStyle(ChatFormatting.RED));
