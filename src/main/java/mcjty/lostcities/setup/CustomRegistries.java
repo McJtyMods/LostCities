@@ -48,7 +48,7 @@ public class CustomRegistries {
     public static final ResourceKey<Registry<ScatteredRE>> SCATTERED_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(LostCities.MODID, "scattered"));
     public static final DeferredRegister<ScatteredRE> SCATTERED_DEFERRED_REGISTER = DeferredRegister.create(SCATTERED_REGISTRY_KEY, LostCities.MODID);
 
-    public static final ResourceKey<Registry<StuffSettingsRE>> STUFF_REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(LostCities.MODID, "stuff"));
+    public static final ResourceKey<Registry<StuffSettingsRE>> STUFF_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(LostCities.MODID, "stuff"));
     public static final DeferredRegister<StuffSettingsRE> STUFF_DEFERRED_REGISTER = DeferredRegister.create(STUFF_REGISTRY_KEY, LostCities.MODID);
 
     public static void init(IEventBus bus) {

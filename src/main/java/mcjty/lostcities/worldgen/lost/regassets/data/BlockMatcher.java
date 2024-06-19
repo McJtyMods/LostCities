@@ -2,14 +2,12 @@ package mcjty.lostcities.worldgen.lost.regassets.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import mcjty.lostcities.varia.Tools;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.level.PistonEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,10 +29,10 @@ public class BlockMatcher implements Predicate<BlockState> {
 
     private Predicate<BlockState> getStatePredicate(String matcher) {
         if (matcher.startsWith("#")) {
-            TagKey<Block> tagKey = TagKey.create(Registries.BLOCK, new ResourceLocation(matcher.substring(1)));
+            TagKey<Block> tagKey = TagKey.create(Registries.BLOCK, ResourceLocation.parse(matcher.substring(1)));
             return state -> state.is(tagKey);
         } else {
-            Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(matcher));
+            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(matcher));
             return state -> state.getBlock() == b;
         }
     }
@@ -45,10 +43,10 @@ public class BlockMatcher implements Predicate<BlockState> {
 
     private Predicate<BlockState> getNotStatePredicate(String matcher) {
         if (matcher.startsWith("#")) {
-            TagKey<Block> tagKey = TagKey.create(Registries.BLOCK, new ResourceLocation(matcher.substring(1)));
+            TagKey<Block> tagKey = TagKey.create(Registries.BLOCK, ResourceLocation.parse(matcher.substring(1)));
             return state -> !state.is(tagKey);
         } else {
-            Block b = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(matcher));
+            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(matcher));
             return state -> state.getBlock() != b;
         }
     }
