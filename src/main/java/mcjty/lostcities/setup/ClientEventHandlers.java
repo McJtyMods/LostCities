@@ -49,7 +49,7 @@ public class ClientEventHandlers {
     private final static ResourceLocation txt = ResourceLocation.fromNamespaceAndPath(LostCities.MODID, "textures/gui/configicon.png");
 
     @SubscribeEvent
-    public void onGuiDraw(ScreenEvent.Render event) {
+    public void onGuiDraw(ScreenEvent.Render.Post event) {
         if (event.getScreen() instanceof CreateWorldScreen screen && lostCitiesButton != null) {
             lostCitiesButton.visible = screen.tabManager.getCurrentTab() instanceof CreateWorldScreen.MoreTab;
             if (lostCitiesButton.visible) {

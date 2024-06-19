@@ -19,8 +19,7 @@ public class WorldStyleRE implements IAsset<WorldStyleRE> {
                     ScatteredSettings.CODEC.optionalFieldOf("scattered").forGetter(l -> Optional.ofNullable(l.scatteredSettings)),
                     PartSelector.CODEC.optionalFieldOf("parts").forGetter(l -> l.partSelector.get()),
                     Codec.list(CityStyleSelector.CODEC).fieldOf("citystyles").forGetter(l -> l.cityStyleSelectors),
-                    Codec.list(CityBiomeMultiplier.CODEC).optionalFieldOf("citybiomemultipliers").forGetter(l -> Optional.ofNullable(l.cityBiomeMultipliers)),
-                    Codec.list(ScatteredReference.CODEC).optionalFieldOf("scattered").forGetter(l -> Optional.ofNullable(l.scatteredReferences))
+                    Codec.list(CityBiomeMultiplier.CODEC).optionalFieldOf("citybiomemultipliers").forGetter(l -> Optional.ofNullable(l.cityBiomeMultipliers))
             ).apply(instance, WorldStyleRE::new));
 
     private ResourceLocation name;
@@ -30,22 +29,19 @@ public class WorldStyleRE implements IAsset<WorldStyleRE> {
     @Nonnull private final PartSelector partSelector;
     private final List<CityStyleSelector> cityStyleSelectors;
     private final List<CityBiomeMultiplier> cityBiomeMultipliers;
-    private final List<ScatteredReference> scatteredReferences;
 
     public WorldStyleRE(String outsideStyle,
                         Optional<CitySphereSettings> citysphereSettings,
                         Optional<ScatteredSettings> scatteredSettings,
                         Optional<PartSelector> partSelector,
                         List<CityStyleSelector> cityStyleSelector,
-                        Optional<List<CityBiomeMultiplier>> cityBiomeMultipliers,
-                        Optional<List<ScatteredReference>> scatteredReferences) {
+                        Optional<List<CityBiomeMultiplier>> cityBiomeMultipliers) {
         this.outsideStyle = outsideStyle;
         this.citysphereSettings = citysphereSettings.orElse(null);
         this.scatteredSettings = scatteredSettings.orElse(null);
         this.partSelector = partSelector.orElse(PartSelector.DEFAULT);
         this.cityStyleSelectors = cityStyleSelector;
         this.cityBiomeMultipliers = cityBiomeMultipliers.orElse(null);
-        this.scatteredReferences = scatteredReferences.orElse(null);
     }
 
     public String getOutsideStyle() {
@@ -72,10 +68,6 @@ public class WorldStyleRE implements IAsset<WorldStyleRE> {
 
     public List<CityBiomeMultiplier> getCityBiomeMultipliers() {
         return cityBiomeMultipliers;
-    }
-
-    public List<ScatteredReference> getScatteredReferences() {
-        return scatteredReferences;
     }
 
     @Override

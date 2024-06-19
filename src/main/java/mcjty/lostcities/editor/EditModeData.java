@@ -2,6 +2,7 @@ package mcjty.lostcities.editor;
 
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.WorldTools;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -30,7 +31,7 @@ public class EditModeData extends SavedData {
     public static EditModeData getData() {
         ServerLevel overworld = WorldTools.getOverworld();
         DimensionDataStorage storage = overworld.getDataStorage();
-        return storage.computeIfAbsent(EditModeData::new, EditModeData::new, NAME);
+        return storage.computeIfAbsent(new Factory<>(EditModeData::new, (compoundTag, provider) -> new EditModeData(compoundTag)), NAME);
     }
 
     public EditModeData() {
@@ -40,7 +41,7 @@ public class EditModeData extends SavedData {
         ListTag data = nbt.getList("data", Tag.TAG_COMPOUND);
         for (Tag t : data) {
             CompoundTag pdTag = (CompoundTag) t;
-            ResourceKey<Level> level = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(pdTag.getString("level")));
+            ResourceKey<Level> level = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(pdTag.getString("level")));
             int chunkX = pdTag.getInt("x");
             int chunkZ = pdTag.getInt("z");
             ChunkCoord pos = new ChunkCoord(level, chunkX, chunkZ);
@@ -59,7 +60,7 @@ public class EditModeData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
         ListTag data = new ListTag();
         partData.forEach((pos, list) -> {
             for (PartData pd : list) {

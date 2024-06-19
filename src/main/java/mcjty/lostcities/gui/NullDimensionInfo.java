@@ -105,7 +105,6 @@ public class NullDimensionInfo implements IDimensionInfo {
                 Optional.empty(),
                 Optional.empty(),
                 Collections.emptyList(),
-                Optional.empty(),
                 Optional.empty()
         ));
         this.seed = seed;

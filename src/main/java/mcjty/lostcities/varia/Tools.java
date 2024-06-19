@@ -66,7 +66,7 @@ public class Tools {
         }
 
         String converted = BlockStateData.upgradeBlock(s);
-        Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(converted));
+        Block value = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(converted));
         if (value == null) {
             throw new RuntimeException("Cannot find block: '" + s + "'!");
         }

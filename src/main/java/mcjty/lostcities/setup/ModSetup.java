@@ -28,8 +28,6 @@ public class ModSetup {
 
         ProfileSetup.setupProfiles();
 
-        PacketHandler.registerMessages("lostcities");
-
         NeoForge.EVENT_BUS.register(new ForgeEventHandlers());
         // @todo 1.14
 //        MinecraftForge.TERRAIN_GEN_BUS.register(new TerrainEventHandlers());
