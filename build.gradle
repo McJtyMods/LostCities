@@ -53,6 +53,10 @@ task apiJar(type: Jar) {
     }
 }
 
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}
+
 artifacts {
     archives apiJar
 }
