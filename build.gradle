@@ -40,12 +40,14 @@ dependencies {
 cfdeps(['the-one-probe'], [], [])
 modrinth(['the-one-probe'], [], [])
 
+
 subsystems {
     parchment {
-        minecraftVersion = "1.20.6"
-        mappingsVersion = "2024.06.02"
+        minecraftVersion = "1.21"
+        mappingsVersion = "2024.06.23"
     }
 }
+
 
 task apiJar(type: Jar) {
     archiveClassifier = "api"
