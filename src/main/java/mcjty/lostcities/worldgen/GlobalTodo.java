@@ -25,7 +25,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
-public class GlobalTodo extends SavedData {
+public class GlobalTodo extends SavedData implements IGlobalTodo {
 
     public static final String NAME = "LostCityTodo";
     // Todo is not persisted. It's currently only for saplings
@@ -38,12 +38,13 @@ public class GlobalTodo extends SavedData {
     private TodoQueue<BlockState> todoPoi = new TodoQueue<>();
 
     @Nonnull
-    public static GlobalTodo getData(Level world) {
+    public static IGlobalTodo getData(Level world) {
         if (world.isClientSide) {
             throw new RuntimeException("Don't access this client-side!");
         }
         DimensionDataStorage storage = ((ServerLevel) world).getDataStorage();
-        return storage.computeIfAbsent(GlobalTodo::new, GlobalTodo::new, NAME);
+//        return storage.computeIfAbsent(GlobalTodo::new, GlobalTodo::new, NAME);
+        return storage.computeIfAbsent(GlobalTodoV2::new, GlobalTodoV2::new, NAME);
     }
 
     public GlobalTodo() {
@@ -112,26 +113,31 @@ public class GlobalTodo extends SavedData {
         return tag;
     }
 
+    @Override
     public void addTodo(BlockPos pos, Consumer<ServerLevel> code) {
         todo.add(pos, code);
         setDirty();
     }
 
+    @Override
     public void addSpawnerTodo(BlockPos pos, BlockState spawnerState, ResourceLocation randomEntity) {
         todoSpawners.add(pos, Pair.of(spawnerState, randomEntity));
         setDirty();
     }
 
+    @Override
     public void addBlockEntityTodo(BlockPos pos, BlockState state, CompoundTag tag) {
         todoBlockEntities.add(pos, Pair.of(state, tag));
         setDirty();
     }
 
+    @Override
     public void addPoi(BlockPos pos, BlockState state) {
         todoPoi.add(pos, state);
         setDirty();
     }
 
+    @Override
     public void executeAndClearTodo(ServerLevel level) {
         int todoSize = Config.TODO_QUEUE_SIZE.get();
 
