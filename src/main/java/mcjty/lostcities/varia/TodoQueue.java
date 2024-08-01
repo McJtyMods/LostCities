@@ -26,6 +26,10 @@ public class TodoQueue<T> {
         return queue.isEmpty();
     }
 
+    public int getSize() {
+        return queue.size();
+    }
+
     public void forEach(BiConsumer<BlockPos, T> consumer) {
         queue.forEach(todo -> consumer.accept(todo.pos, todo.data));
     }
