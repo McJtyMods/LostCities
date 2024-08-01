@@ -39,6 +39,15 @@ public class GlobalTodoV2 extends SavedData implements IGlobalTodo {
         public boolean isEmpty() {
             return todo.isEmpty() && todoSpawners.isEmpty() && todoBlockEntities.isEmpty() && todoPoi.isEmpty();
         }
+
+        // Dump size information for the queues to stdout
+        public void dumpSizes() {
+            System.out.println("----------------");
+            System.out.println("todo = " + todo.getSize());
+            System.out.println("todoSpawners = " + todoSpawners.getSize());
+            System.out.println("todoBlockEntities = " + todoBlockEntities.getSize());
+            System.out.println("todoPoi = " + todoPoi.getSize());
+        }
     }
 
     private Map<ChunkPos, TodoQueues> todoQueues = new HashMap<>();
@@ -151,10 +160,14 @@ public class GlobalTodoV2 extends SavedData implements IGlobalTodo {
     public void executeAndClearTodo(ServerLevel level) {
         int todoSize = Config.TODO_QUEUE_SIZE.get();
 
+        System.out.println("###################### " + todoQueues.size() + " ######################");
+
         // @todo process chunks based on their distance to the player
         Set<ChunkPos> todoToRemove = new HashSet<>();
-        for (Map.Entry<ChunkPos, TodoQueues> entry : todoQueues.entrySet()) {
+        Map<ChunkPos, TodoQueues> copy = new HashMap<>(this.todoQueues);
+        for (Map.Entry<ChunkPos, TodoQueues> entry : copy.entrySet()) {
             TodoQueues queues = entry.getValue();
+            queues.dumpSizes();
             todoSize -= queues.todo.forEach(todoSize, (pos, code) -> code.accept(level));
             todoSize -= queues.todoSpawners.forEach(todoSize, (pos, pair) -> {
                 BlockState spawnerState = pair.getLeft();
@@ -189,6 +202,7 @@ public class GlobalTodoV2 extends SavedData implements IGlobalTodo {
 
         // Remove all empty todo queues
         todoToRemove.forEach(todoQueues::remove);
+        System.out.println("*****************" + todoQueues.size() + " *****************");
 
         setDirty();
     }
