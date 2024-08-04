@@ -2653,22 +2653,16 @@ public class LostCityTerrainFeature {
 
     private BlockState handleBlockEntity(BuildingInfo info, int oy, int rx, int rz, int y, BlockState b, Palette.Info inf) {
         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
-        if (b.getBlock() instanceof EntityBlock) {
-            CompoundTag tag = inf.tag().copy();
-            tag.putInt("x", pos.getX());
-            tag.putInt("y", pos.getY());
-            tag.putInt("z", pos.getZ());
-            BlockEntityType type = getTypeForBlock(b);
-            if (type == null) {
-                ModSetup.getLogger().warn("Error getting type for block: " + b.getBlock());
-                return b;
-            }
-            tag.putString("id", BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(type).toString());
-//        GlobalTodo.getData(world.getLevel()).addBlockEntityTodo(pos, b, inf.tag());
-        } else {
-            // Warning
-            ModSetup.getLogger().warn("Unknown block entity for block: " + b.getBlock());
+        BlockEntityType type = getTypeForBlock(b);
+        if (type == null) {
+            ModSetup.getLogger().warn("Error getting type for block: " + b.getBlock());
+            return b;
         }
+        CompoundTag tag = inf.tag().copy();
+        tag.putInt("x", pos.getX());
+        tag.putInt("y", pos.getY());
+        tag.putInt("z", pos.getZ());
+        tag.putString("id", BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(type).toString());
         return b;
     }
 
