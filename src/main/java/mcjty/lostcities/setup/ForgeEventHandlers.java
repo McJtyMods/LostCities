@@ -40,7 +40,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -104,7 +103,7 @@ public class ForgeEventHandlers {
     public void onWorldTick(TickEvent.LevelTickEvent event) {
         if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
             AssetRegistries.load(serverLevel);
-            GlobalTodo.getData(serverLevel).executeAndClearTodo(serverLevel);
+            GlobalTodo.get(event.level).executeAndClearTodo(serverLevel);
         }
     }
 

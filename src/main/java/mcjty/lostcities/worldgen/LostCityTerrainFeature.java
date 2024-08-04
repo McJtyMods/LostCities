@@ -6,7 +6,6 @@ import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.editor.EditModeData;
-import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.*;
 import mcjty.lostcities.worldgen.lost.*;
@@ -16,6 +15,8 @@ import mcjty.lostcities.worldgen.lost.regassets.data.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
@@ -24,15 +25,12 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.StructureTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BaseSpawner;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
-import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -92,6 +90,7 @@ public class LostCityTerrainFeature {
 
     private final Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
     private final Statistics statistics = new Statistics();
+    private final Map<Block, BlockEntityType> typeCache = new HashMap<>();
 
     public LostCityTerrainFeature(IDimensionInfo provider, LostCityProfile profile, RandomSource rand) {
         this.provider = provider;
@@ -2537,11 +2536,13 @@ public class LostCityTerrainFeature {
                                 } else if (inf.mobId() != null && !inf.mobId().isEmpty()) {
                                     b = handleSpawner(info, part, oy, provider.getWorld(), rx, rz, y, b, inf);
                                 } else if (inf.tag() != null) {
-                                    b = handleBlockEntity(info, part, oy, provider.getWorld(), rx, rz, y, b, inf);
+                                    b = handleBlockEntity(info, oy, rx, rz, y, b);
                                 }
                             } else if (getStatesNeedingPoiUpdate().contains(b)) {
                                 // If this block has POI data we need to delay setting it
-                                GlobalTodo.getData(provider.getWorld().getLevel()).addPoi(driver.getCurrentCopy(), b);
+                                BlockState finalB = b;
+                                BlockPos p = driver.getCurrentCopy();
+                                info.addPostTodo(p, () -> provider.getWorld().setBlock(p, finalB, Block.UPDATE_NONE));
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
                                 updateNeeded(info, driver.getCurrentCopy());
                             } else if (getStatesNeedingTodo().contains(b)) {
@@ -2568,20 +2569,55 @@ public class LostCityTerrainFeature {
         return compiledPalette;
     }
 
-    private BlockState handleBlockEntity(BuildingInfo info, IBuildingPart part, int oy, WorldGenLevel world, int rx, int rz, int y, BlockState b, Palette.Info inf) {
+    private BlockEntityType getTypeForBlock(BlockState state) {
+        return typeCache.computeIfAbsent(state.getBlock(), block -> {
+            for (BlockEntityType<?> type : ForgeRegistries.BLOCK_ENTITY_TYPES.getValues()) {
+                if (type.isValid(state)) {
+                    return type;
+                }
+            }
+            return null;
+        });
+    }
+
+    private BlockState handleBlockEntity(BuildingInfo info, int oy, int rx, int rz, int y, BlockState b) {
         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
-        GlobalTodo.getData(world.getLevel()).addBlockEntityTodo(pos, b, inf.tag());
+        if (b.getBlock() instanceof EntityBlock) {
+            CompoundTag tag = new CompoundTag();
+            tag.putInt("x", pos.getX());
+            tag.putInt("y", pos.getY());
+            tag.putInt("z", pos.getZ());
+            BlockEntityType type = getTypeForBlock(b);
+            if (type == null) {
+                ModSetup.getLogger().warn("Error getting type for block: " + b.getBlock());
+                return b;
+            }
+            tag.putString("id", ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(type).toString());
+//        GlobalTodo.getData(world.getLevel()).addBlockEntityTodo(pos, b, inf.tag());
+        } else {
+            // Warning
+            ModSetup.getLogger().warn("Unknown block entity for block: " + b.getBlock());
+        }
         return b;
     }
 
     private BlockState handleSpawner(BuildingInfo info, IBuildingPart part, int oy, WorldGenLevel world, int rx, int rz, int y, BlockState b, Palette.Info inf) {
         if (info.profile.GENERATE_SPAWNERS && !info.noLoot) {
             String mobid = inf.mobId();
-
             BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
+            CompoundTag tag = new CompoundTag();
+            tag.putInt("x", pos.getX());
+            tag.putInt("y", pos.getY());
+            tag.putInt("z", pos.getZ());
+            tag.putString("id", "minecraft:mob_spawner");
             ResourceLocation randomValue = getRandomSpawnerMob(world.getLevel(), rand, provider, info,
                     new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
-            GlobalTodo.getData(world.getLevel()).addSpawnerTodo(pos, b, randomValue);
+            CompoundTag sd = new CompoundTag();
+            sd.putString("id", randomValue.toString());
+            SpawnData data = new SpawnData(sd, Optional.empty());
+            tag.put("SpawnData", SpawnData.CODEC.encodeStart(NbtOps.INSTANCE, data).result().orElseThrow(() -> new IllegalStateException("Invalid SpawnData")));
+
+            world.getChunk(pos).setBlockEntityNbt(tag);
         } else {
             b = air;
         }
@@ -2609,7 +2645,7 @@ public class LostCityTerrainFeature {
                 BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
                 if (block instanceof SaplingBlock saplingBlock) {
                     BlockState finalB = b;
-                    GlobalTodo.getData(world.getLevel()).addTodo(pos, (level) -> {
+                    GlobalTodo.get(world.getLevel()).addTodo(pos, (level) -> {
                         BlockState state = finalB.setValue(SaplingBlock.STAGE, 1);
                         if (level.isAreaLoaded(pos, 1)) {
                             level.setBlock(pos, state, Block.UPDATE_CLIENTS);
@@ -2641,21 +2677,6 @@ public class LostCityTerrainFeature {
         return b;
     }
 
-    public static void createSpawner(Level world, BlockPos pos, ResourceLocation randomEntity) {
-        BlockEntity tileentity = world.getBlockEntity(pos);
-        if (tileentity instanceof SpawnerBlockEntity spawner) {
-            BaseSpawner logic = spawner.getSpawner();
-            logic.setEntityId(ForgeRegistries.ENTITY_TYPES.getValue(randomEntity));
-            spawner.setChanged();
-            if (Config.DEBUG) {
-                ModSetup.getLogger().debug("generateLootSpawners: mob={} pos={}", randomEntity.toString(), pos);
-            }
-        } else if (tileentity != null) {
-            ModSetup.getLogger().error("The mob spawner at ({}, {}, {}) has a TileEntity of incorrect type {}!", pos.getX(), pos.getY(), pos.getZ(), tileentity.getClass().getName());
-        } else {
-            ModSetup.getLogger().error("The mob spawner at ({}, {}, {}) is missing its TileEntity!", pos.getX(), pos.getY(), pos.getZ());
-        }
-    }
 
     public static ResourceLocation getRandomSpawnerMob(Level world, RandomSource random, IDimensionInfo diminfo, BuildingInfo info, BuildingInfo.ConditionTodo todo, BlockPos pos) {
         String condition = todo.getCondition();
