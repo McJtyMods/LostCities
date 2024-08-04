@@ -2607,7 +2607,7 @@ public class LostCityTerrainFeature {
                                 } else if (inf.mobId() != null && !inf.mobId().isEmpty()) {
                                     b = handleSpawner(info, part, oy, provider.getWorld(), rx, rz, y, b, inf);
                                 } else if (inf.tag() != null) {
-                                    b = handleBlockEntity(info, oy, rx, rz, y, b, inf);
+                                    b = handleBlockEntity(info, oy, provider.getWorld(), rx, rz, y, b, inf);
                                 }
                             } else if (getStatesNeedingPoiUpdate().contains(b)) {
                                 // If this block has POI data we need to delay setting it
@@ -2651,7 +2651,7 @@ public class LostCityTerrainFeature {
         });
     }
 
-    private BlockState handleBlockEntity(BuildingInfo info, int oy, int rx, int rz, int y, BlockState b, Palette.Info inf) {
+    private BlockState handleBlockEntity(BuildingInfo info, int oy, WorldGenLevel world, int rx, int rz, int y, BlockState b, Palette.Info inf) {
         BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
         BlockEntityType type = getTypeForBlock(b);
         if (type == null) {
@@ -2663,6 +2663,7 @@ public class LostCityTerrainFeature {
         tag.putInt("y", pos.getY());
         tag.putInt("z", pos.getZ());
         tag.putString("id", BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(type).toString());
+        world.getChunk(pos).setBlockEntityNbt(tag);
         return b;
     }
 
