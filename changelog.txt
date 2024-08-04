@@ -1,3 +1,6 @@
+Upcoming:
+- Big optimization during worldgen. WIP
+
 1.21-8.0.0:
 - Port to 1.21
 

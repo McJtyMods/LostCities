@@ -78,7 +78,7 @@ public class ForgeEventHandlers {
     public void onWorldTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel serverLevel) {
             AssetRegistries.load(serverLevel);
-            GlobalTodo.getData(serverLevel).executeAndClearTodo(serverLevel);
+            GlobalTodo.get(event.getLevel()).executeAndClearTodo(serverLevel);
         }
     }
 
