@@ -7,6 +7,7 @@ import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.editor.EditModeData;
+import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.*;
 import mcjty.lostcities.worldgen.lost.*;
@@ -607,7 +608,7 @@ public class LostCityTerrainFeature {
             } else if (z < 15 && driver.getBlockSouth() != air) {
                 driver.block(torchState.setValue(WallTorchBlock.FACING, net.minecraft.core.Direction.NORTH));
             }
-            updateNeeded(info, pos);
+            updateNeeded(info, pos, Block.UPDATE_CLIENTS);
         }
         info.clearTorchTodo();
     }
@@ -2322,7 +2323,7 @@ public class LostCityTerrainFeature {
                         Character glowstoneChar = info.getCityStyle().getGlowstoneBlock();
                         BlockState glowstone = glowstoneChar == null ? Blocks.GLOWSTONE.defaultBlockState() : palette.get(glowstoneChar);
                         driver.add(glowstone);
-                        updateNeeded(info, pos);
+                        updateNeeded(info, pos, Block.UPDATE_CLIENTS);
                     } else {
                         BlockState roof = palette.get(corridorRoofBlock);
                         driver.add(roof).add(roof);
@@ -2613,7 +2614,7 @@ public class LostCityTerrainFeature {
                                 BlockPos p = driver.getCurrentCopy();
                                 info.addPostTodo(p, () -> provider.getWorld().setBlock(p, finalB, Block.UPDATE_NONE));
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
-                                updateNeeded(info, driver.getCurrentCopy());
+                                updateNeeded(info, driver.getCurrentCopy(), Block.UPDATE_CLIENTS);
                             } else if (getStatesNeedingTodo().contains(b)) {
                                 b = handleTodo(info, oy, provider.getWorld(), rx, rz, y, b);
                             }
@@ -2662,6 +2663,12 @@ public class LostCityTerrainFeature {
         tag.putInt("z", pos.getZ());
         tag.putString("id", ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(type).toString());
         world.getChunk(pos).setBlockEntityNbt(tag);
+        if (b.getBlock() == Blocks.COMMAND_BLOCK) {
+            info.addPostTodo(pos, () -> {
+                ((ServerChunkCache)world.getChunkSource()).blockChanged(pos);
+                world.scheduleTick(pos, b.getBlock(), 1);
+            });
+        }
         return b;
     }
 
@@ -2709,14 +2716,21 @@ public class LostCityTerrainFeature {
                 BlockPos pos = new BlockPos(info.chunkX * 16 + rx, oy + y, info.chunkZ * 16 + rz);
                 if (block instanceof SaplingBlock saplingBlock) {
                     BlockState finalB = b;
-                    GlobalTodo.get(world.getLevel()).addTodo(pos, (level) -> {
-                        BlockState state = finalB.setValue(SaplingBlock.STAGE, 1);
-                        if (level.isAreaLoaded(pos, 1)) {
-                            level.setBlock(pos, state, Block.UPDATE_CLIENTS);
-                            // We do rand.fork() to avoid accessing LegacyRandomSource from multiple threads
-                            saplingBlock.advanceTree(level, pos, state, rand.fork());
-                        }
-                    });
+                    if (Config.FORCE_SAPLING_GROWTH.get()) {
+                        GlobalTodo.get(world.getLevel()).addTodo(pos, (level) -> {
+                            BlockState state = finalB.setValue(SaplingBlock.STAGE, 1);
+                            if (level.isAreaLoaded(pos, 1)) {
+                                level.setBlock(pos, state, Block.UPDATE_CLIENTS);
+                                // We do rand.fork() to avoid accessing LegacyRandomSource from multiple threads
+                                saplingBlock.advanceTree(level, pos, state, rand.fork());
+                            }
+                        });
+                    } else {
+                        info.addPostTodo(pos, () -> {
+                            BlockState state = finalB.setValue(SaplingBlock.STAGE, 1);
+                            world.setBlock(pos, state, Block.UPDATE_ALL_IMMEDIATE);
+                        });
+                    }
                 }
             }
         }
@@ -3274,13 +3288,13 @@ public class LostCityTerrainFeature {
         return x <= streetBorder || x >= (15 - streetBorder) || z <= streetBorder || z >= (15 - streetBorder);
     }
 
-    private void updateNeeded(BuildingInfo info, BlockPos pos) {
+    private void updateNeeded(BuildingInfo info, BlockPos pos, int flags) {
         info.addPostTodo(pos, () -> {
             WorldGenLevel world = provider.getWorld();
             BlockState state = world.getBlockState(pos);
             if (!state.isAir()) {
-                world.setBlock(pos, air, Block.UPDATE_CLIENTS);
-                world.setBlock(pos, state, Block.UPDATE_CLIENTS);
+                world.setBlock(pos, air, flags);
+                world.setBlock(pos, state, flags);
             }
         });
     }
