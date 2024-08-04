@@ -1,5 +1,6 @@
 Upcoming:
 - Big optimization during worldgen. WIP
+- New forceSaplingGrowth server config option to disable the expensive auto sapling grow
 
 1.19-6.0.29:
 - Fixed a crash with the new 'stuff' feature
