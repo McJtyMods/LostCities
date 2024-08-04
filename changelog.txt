@@ -1,5 +1,6 @@
 Upcoming:
 - Big optimization during worldgen. WIP
+- New forceSaplingGrowth server config option to disable the expensive auto sapling grow
 
 1.21-8.0.0:
 - Port to 1.21

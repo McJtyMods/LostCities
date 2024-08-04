@@ -34,6 +34,7 @@ public class Config {
     public static final ModConfigSpec.ConfigValue<String> SELECTED_PROFILE;
     public static final ModConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
     public static final ModConfigSpec.IntValue TODO_QUEUE_SIZE;
+    public static final ModConfigSpec.BooleanValue FORCE_SAPLING_GROWTH;
 
     public static void reset() {
         profileFromClient = null;
@@ -128,6 +129,7 @@ public class Config {
         SELECTED_PROFILE = SERVER_BUILDER.define("selectedProfile", "<CHECK>"); // Default is dummy value that tells the system to check in profileFromClient
         SELECTED_CUSTOM_JSON = SERVER_BUILDER.define("selectedCustomJson", "");
         TODO_QUEUE_SIZE = SERVER_BUILDER.comment("The size of the todo queues for the lost city generator").defineInRange("todoQueueSize", 20, 1, 100000);
+        FORCE_SAPLING_GROWTH = SERVER_BUILDER.comment("If this is true then saplings will grow into trees during generation. This is more expensive").define("forceSaplingGrowth", true);
 
         SERVER_BUILDER.pop();
         COMMON_BUILDER.pop();
