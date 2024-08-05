@@ -293,7 +293,7 @@ public class LostCityTerrainFeature {
 
         // Check if there is no village here
         ChunkAccess ch = region.getChunk(chunkX, chunkZ);
-        doCity = doCity && !hasVillage(ch);
+        doCity = doCity && !hasBlacklistedStructure(ch);
 
         // If this chunk has a building or street but we're in a floating profile and
         // we happen to have a void chunk we detect that here and go back to normal chunk generation
@@ -407,7 +407,7 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private boolean hasVillage(ChunkAccess ch) {
+    private boolean hasBlacklistedStructure(ChunkAccess ch) {
         if (ch.hasAnyStructureReferences()) {
             var structures = provider.getWorld().registryAccess().registryOrThrow(Registries.STRUCTURE);
             var references = ch.getAllReferences();
@@ -416,6 +416,9 @@ public class LostCityTerrainFeature {
                 if (!entry.getValue().isEmpty()) {
                     Optional<ResourceKey<Structure>> key = structures.getResourceKey(entry.getKey());
                     if (key.map(k -> structures.getHolderOrThrow(k).is(StructureTags.VILLAGE)).orElse(false)) {
+                        return true;
+                    }
+                    if (Config.isAvoidedStructure(key.get().location())) {
                         return true;
                     }
                 }
@@ -619,7 +622,7 @@ public class LostCityTerrainFeature {
         // do not attempt to generate scattered building as they'll float in midair since it uses heightmap.
         boolean trimmed = false;
         if (profile.isDefault() || profile.isSpheres()) {
-            trimmed = correctTerrainShape(info.coord, heightmap);
+            trimmed = correctTerrainShape(provider.getWorld(), info.coord, heightmap);
 //            flattenChunkToCityBorder(chunkX, chunkZ);
         }
 
@@ -1226,14 +1229,15 @@ public class LostCityTerrainFeature {
      * or up the top layer (6 thick) of the terrain. In a chunk these heights are interpolated
      * (bilinear interpolation).
      */
-    private boolean correctTerrainShape(ChunkCoord coord, ChunkHeightmap heightmap) {
+    private boolean correctTerrainShape(WorldGenLevel level, ChunkCoord coord, ChunkHeightmap heightmap) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
         BuildingInfo.MinMax mm00 = info.getDesiredMaxHeightL2();
         BuildingInfo.MinMax mm10 = info.getXmax().getDesiredMaxHeightL2();
         BuildingInfo.MinMax mm01 = info.getZmax().getDesiredMaxHeightL2();
         BuildingInfo.MinMax mm11 = info.getXmax().getZmax().getDesiredMaxHeightL2();
 
-        // @todo correct for build height change
+        int max = level.getMaxBuildHeight();
+
         float min00 = mm00.min;
         float min10 = mm10.min;
         float min01 = mm01.min;
@@ -1243,33 +1247,33 @@ public class LostCityTerrainFeature {
         float max01 = mm01.max;
         float max11 = mm11.max;
         boolean trimmed = false;
-        if (max00 < 256 || max10 < 256 || max01 < 256 || max11 < 256 ||
-                min00 < 256 || min10 < 256 || min01 < 256 || min11 < 256) {
+        if (max00 < max || max10 < max || max01 < max || max11 < max ||
+                min00 < max || min10 < max || min01 < max || min11 < max) {
             // We need to fit the terrain between the upper and lower mesh here
             int maxHeightP = heightmap.getHeight() + 10;
             int minHeightP = heightmap.getHeight() - 10;
-            if (max00 >= 256) {
+            if (max00 >= max) {
                 max00 = maxHeightP;
             }
-            if (max10 >= 256) {
+            if (max10 >= max) {
                 max10 = maxHeightP;
             }
-            if (max01 >= 256) {
+            if (max01 >= max) {
                 max01 = maxHeightP;
             }
-            if (max11 >= 256) {
+            if (max11 >= max) {
                 max11 = maxHeightP;
             }
-            if (min00 >= 256) {
+            if (min00 >= max) {
                 min00 = minHeightP;
             }
-            if (min10 >= 256) {
+            if (min10 >= max) {
                 min10 = minHeightP;
             }
-            if (min01 >= 256) {
+            if (min01 >= max) {
                 min01 = minHeightP;
             }
-            if (min11 >= 256) {
+            if (min11 >= max) {
                 min11 = minHeightP;
             }
 
@@ -1282,7 +1286,7 @@ public class LostCityTerrainFeature {
                 float minh1 = min10 + (min00 - min10) * factor;
                 for (int z = 0; z < 16; z++) {
                     float maxheight = maxh0 + (maxh1 - maxh0) * (15.0f - z) / 15.0f;
-                    boolean moved = moveDown(x, z, (int) maxheight, info.waterLevel > info.groundLevel);
+                    boolean moved = moveDown(x, z, (int) maxheight, max);
 
                     if (!moved) {
                         float minheight = minh0 + (minh1 - minh0) * (15.0f - z) / 15.0f;
@@ -1346,8 +1350,8 @@ public class LostCityTerrainFeature {
 
     private final BlockState[] buffer = new BlockState[6];
 
-    private boolean moveDown(int x, int z, int height, boolean dowater) {
-        int y = 255;
+    private boolean moveDown(int x, int z, int height, int maxBuildLimit) {
+        int y = maxBuildLimit-1;
         driver.current(x, y, z);
         // We assume here we are not in a void chunk
         while (isEmpty(driver.getBlock()) && driver.getY() > height) {
@@ -1485,7 +1489,7 @@ public class LostCityTerrainFeature {
             int ground = info.getCityGroundLevel();
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    boolean moved = moveDown(x, z, ground + 1, info.waterLevel > info.groundLevel);
+                    boolean moved = moveDown(x, z, ground + 1, provider.getWorld().getMaxBuildHeight());
 
                     if (!moved) {
                         moveUp(x, z, ground, info.waterLevel > info.groundLevel);
@@ -2612,7 +2616,12 @@ public class LostCityTerrainFeature {
                                 // If this block has POI data we need to delay setting it
                                 BlockState finalB = b;
                                 BlockPos p = driver.getCurrentCopy();
-                                info.addPostTodo(p, () -> provider.getWorld().setBlock(p, finalB, Block.UPDATE_NONE));
+                                info.addPostTodo(p, () -> {
+                                    if (provider.getWorld().getBlockState(p).getBlock() == Blocks.DIRT) {
+                                        provider.getWorld().setBlock(p, finalB, Block.UPDATE_NONE);
+                                    }
+                                });
+                                b = Blocks.DIRT.defaultBlockState();
                             } else if (getStatesNeedingLightingUpdate().contains(b)) {
                                 updateNeeded(info, driver.getCurrentCopy(), Block.UPDATE_CLIENTS);
                             } else if (getStatesNeedingTodo().contains(b)) {

@@ -11,9 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Config {
 
@@ -36,6 +34,16 @@ public class Config {
     public static final ForgeConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
     public static final ForgeConfigSpec.IntValue TODO_QUEUE_SIZE;
     public static final ForgeConfigSpec.BooleanValue FORCE_SAPLING_GROWTH;
+
+    private static final String[] DEF_AVOID_STRUCTURES = new String[] {
+            "minecraft:mansion",
+            "minecraft:jungle_pyramid",
+            "minecraft:desert_pyramid",
+            "minecraft:igloo",
+            "minecraft:swamp_huts"
+    };
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> AVOID_STRUCTURES;
+    private static final Set<ResourceLocation> AVOID_STRUCTURES_SET = new HashSet<>();
 
     public static void reset() {
         profileFromClient = null;
@@ -110,6 +118,15 @@ public class Config {
         return dimensionProfileCache.get(type);
     }
 
+    public static boolean isAvoidedStructure(ResourceLocation id) {
+        if (AVOID_STRUCTURES_SET.isEmpty()) {
+            for (String s : AVOID_STRUCTURES.get()) {
+                AVOID_STRUCTURES_SET.add(new ResourceLocation(s));
+            }
+        }
+        return AVOID_STRUCTURES_SET.contains(id);
+    }
+
     private static final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
     private static final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
     private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
@@ -131,6 +148,9 @@ public class Config {
         SELECTED_CUSTOM_JSON = SERVER_BUILDER.define("selectedCustomJson", "");
         TODO_QUEUE_SIZE = SERVER_BUILDER.comment("The size of the todo queues for the lost city generator").defineInRange("todoQueueSize", 20, 1, 100000);
         FORCE_SAPLING_GROWTH = SERVER_BUILDER.comment("If this is true then saplings will grow into trees during generation. This is more expensive").define("forceSaplingGrowth", true);
+        AVOID_STRUCTURES = SERVER_BUILDER
+                .comment("List of structures to avoid when generating cities (for example to avoid generating a city in a woodland mansion)")
+                .defineList("avoidStructures", Lists.newArrayList(DEF_AVOID_STRUCTURES), s -> s instanceof String);
 
         SERVER_BUILDER.pop();
         COMMON_BUILDER.pop();
