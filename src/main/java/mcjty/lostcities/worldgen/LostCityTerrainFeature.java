@@ -2729,11 +2729,10 @@ public class LostCityTerrainFeature {
                     BlockState finalB = b;
                     if (Config.FORCE_SAPLING_GROWTH.get()) {
                         GlobalTodo.get(world.getLevel()).addTodo(pos, (level) -> {
-                            BlockState state = finalB.setValue(SaplingBlock.STAGE, 1);
-                            if (level.isAreaLoaded(pos, 1)) {
-                                level.setBlock(pos, state, Block.UPDATE_CLIENTS);
+                            if (level.isAreaLoaded(pos, 1) && level.getBlockState(pos).getBlock() instanceof SaplingBlock) {
+                                level.setBlock(pos, finalB, Block.UPDATE_CLIENTS);
                                 // We do rand.fork() to avoid accessing LegacyRandomSource from multiple threads
-                                saplingBlock.advanceTree(level, pos, state, rand.fork());
+                                saplingBlock.advanceTree(level, pos, finalB, rand.fork());
                             }
                         });
                     } else {
