@@ -3,6 +3,7 @@ Upcoming:
 - New forceSaplingGrowth server config option to disable the expensive auto sapling grow
 - Flattening/interpolation of the heightmap now goes to build limit
 - New avoidStructures server config option to avoid generating Lost Cities in chunks that have structures. By default the following structures are avoided (besides villages): mansions, igloos, swamp huts, and temples
+- Fixed a problem where sometimes you could have floating trees
 
 1.19-6.0.29:
 - Fixed a crash with the new 'stuff' feature
