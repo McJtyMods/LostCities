@@ -86,7 +86,17 @@ public class CommandExportPart implements Command<CommandSourceStack> {
 
         List<List<String>> slices = new ArrayList<>();
         Set<Character> usedCharacters = new HashSet<>(palette.getCharacters());
-        String possibleChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:'<>,.?/`~";
+        StringBuilder chars = new StringBuilder("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:'<>,.?/`~");
+
+        // Add various unicode characters
+        for (int i = 0x0370; i < 0x0400; i++) {
+            chars.append((char) i);
+        }
+        for (int i = 0x0400; i < 0x0500; i++) {
+            chars.append((char) i);
+        }
+        String possibleChars = chars.toString();
+        System.out.println("possibleChars = " + possibleChars);
 
         for (int y = 0 ; y < part.getSliceCount() ; y++) {
             List<String> yslice = new ArrayList<>();
