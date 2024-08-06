@@ -1,7 +1,7 @@
 Upcoming:
-- Big optimization during worldgen. WIP
-- New forceSaplingGrowth server config option to disable the expensive auto sapling grow
+- Big optimization during worldgen. Most of the todo queues are now avoided
 - Flattening/interpolation of the heightmap now goes to build limit
+- New forceSaplingGrowth server config option to disable the expensive auto sapling grow
 - New avoidStructures server config option to avoid generating Lost Cities in chunks that have structures. By default the following structures are avoided (besides villages): mansions, igloos, swamp huts, and temples
 - Fixed a problem where sometimes you could have floating trees
 - Greatly extended the palette that can be exported by the exportpart command. It now includes a lot of unicode characters as well
