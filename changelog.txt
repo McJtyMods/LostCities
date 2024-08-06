@@ -1,4 +1,4 @@
-Upcoming:
+1.20-7.2.0:
 - Big optimization during worldgen. Most of the todo queues are now avoided
 - Flattening/interpolation of the heightmap now goes to build limit
 - New forceSaplingGrowth server config option to disable the expensive auto sapling grow
