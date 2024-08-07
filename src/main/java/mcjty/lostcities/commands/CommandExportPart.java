@@ -35,6 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class CommandExportPart implements Command<CommandSourceStack> {
@@ -96,7 +97,6 @@ public class CommandExportPart implements Command<CommandSourceStack> {
             chars.append((char) i);
         }
         String possibleChars = chars.toString();
-        System.out.println("possibleChars = " + possibleChars);
 
         for (int y = 0 ; y < part.getSliceCount() ; y++) {
             List<String> yslice = new ArrayList<>();
@@ -112,7 +112,6 @@ public class CommandExportPart implements Command<CommandSourceStack> {
                     if (c == null) {
                         // New state!
                         // Find a character that is not yet used
-                        // @todo this is not very efficient
                         for (int i = 0 ; i < possibleChars.length() ; i++) {
                             char cc = possibleChars.charAt(i);
                             if (!usedCharacters.contains(cc)) {
@@ -121,8 +120,6 @@ public class CommandExportPart implements Command<CommandSourceStack> {
                             }
                         }
 
-
-//                        c = (char) possibleChars.chars().filter(value -> !usedCharacters.contains((char)value)).findFirst().getAsInt();
                         unknowns.put(state, c);
                         usedCharacters.add(c);
                     }
@@ -160,7 +157,7 @@ public class CommandExportPart implements Command<CommandSourceStack> {
         String json = gson.toJson(root);
 
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename, StandardCharsets.UTF_8));
             writer.write(json);
             writer.close();
             context.getSource().sendSuccess(ComponentFactory.literal("Exported part to '" + filename + "'!"), false);
