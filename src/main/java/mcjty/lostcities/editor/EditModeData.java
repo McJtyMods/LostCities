@@ -53,6 +53,7 @@ public class EditModeData extends SavedData {
 
     public void addPartData(ChunkCoord pos, int y, String partName) {
         partData.computeIfAbsent(pos, p -> new ArrayList<>()).add(new PartData(partName, y));
+        setDirty();
     }
 
     public List<PartData> getPartData(ChunkCoord pos) {
@@ -67,7 +68,7 @@ public class EditModeData extends SavedData {
                 CompoundTag pdTag = new CompoundTag();
                 pdTag.putString("level", pos.dimension().location().toString());
                 pdTag.putInt("x", pos.chunkX());
-                pdTag.putInt("z", pos.chunkX());
+                pdTag.putInt("z", pos.chunkZ());
                 pdTag.putString("part", pd.partName());
                 pdTag.putInt("y", pd.y());
                 data.add(pdTag);
