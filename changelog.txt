@@ -1,3 +1,7 @@
+Upcoming:
+- Fixed a problem with the exportpart command
+- Fixed a problem with editmode. It didn't properly remember the editing data when reloading a world
+
 1.19-6.1.0:
 - Big optimization during worldgen. Most of the todo queues are now avoided
 - Flattening/interpolation of the heightmap now goes to build limit

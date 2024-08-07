@@ -111,7 +111,18 @@ public class CommandExportPart implements Command<CommandSourceStack> {
                     }
                     if (c == null) {
                         // New state!
-                        c = (char) possibleChars.chars().filter(value -> !usedCharacters.contains((char)value)).findFirst().getAsInt();
+                        // Find a character that is not yet used
+                        // @todo this is not very efficient
+                        for (int i = 0 ; i < possibleChars.length() ; i++) {
+                            char cc = possibleChars.charAt(i);
+                            if (!usedCharacters.contains(cc)) {
+                                c = cc;
+                                break;
+                            }
+                        }
+
+
+//                        c = (char) possibleChars.chars().filter(value -> !usedCharacters.contains((char)value)).findFirst().getAsInt();
                         unknowns.put(state, c);
                         usedCharacters.add(c);
                     }
