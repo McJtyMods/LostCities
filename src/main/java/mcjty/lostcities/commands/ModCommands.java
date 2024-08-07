@@ -31,6 +31,7 @@ public class ModCommands {
                         .then(CommandEditPart.register(dispatcher))
                         .then(CommandListParts.register(dispatcher))
                         .then(CommandExportPart.register(dispatcher))
+                        .then(CommandTestFill.register(dispatcher))
         );
 
         dispatcher.register(Commands.literal("lost").redirect(commands));
