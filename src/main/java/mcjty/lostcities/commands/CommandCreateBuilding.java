@@ -3,7 +3,6 @@ package mcjty.lostcities.commands;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -115,7 +114,6 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
                     int rx = cp.getBlockX(x);
                     int rz = cp.getBlockZ(z);
                     current.set(rx, oy, rz);
-                    int len = vs.length;
                     for (char c : vs) {
                         BlockState b = compiledPalette.get(c);
                         if (b == null) {

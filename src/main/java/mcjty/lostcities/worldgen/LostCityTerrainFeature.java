@@ -934,6 +934,14 @@ public class LostCityTerrainFeature {
         return !st.is(BlockTags.LEAVES) && !st.is(BlockTags.LOGS);
     }
 
+    private String getRandomPart(List<String> parts) {
+        if (parts.size() == 1) {
+            return parts.get(0);
+        } else {
+            return parts.get(rand.nextInt(parts.size()));
+        }
+    }
+
     private void generateHighwayPart(BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, boolean bidirectional) {
         int highwayGroundLevel = info.groundLevel + level * FLOORHEIGHT;
         HighwayParts highwayParts = provider.getWorldStyle().getPartSelector().highwayParts();
@@ -941,11 +949,11 @@ public class LostCityTerrainFeature {
         BuildingPart part;
         if (info.isTunnel(level)) {
             // We know we need a tunnel
-            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), highwayParts.tunnel(bidirectional));
+            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(highwayParts.tunnel(bidirectional)));
             generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
-            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), highwayParts.open(bidirectional));
+            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(highwayParts.open(bidirectional)));
             int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
             // Clear a bit more above the highway
             if (!info.profile.isCavern()) {
@@ -958,7 +966,7 @@ public class LostCityTerrainFeature {
                 }
             }
         } else {
-            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), highwayParts.bridge(bidirectional));
+            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(highwayParts.bridge(bidirectional)));
             int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
             // Clear a bit more above the highway
             if (!info.profile.isCavern()) {
@@ -975,6 +983,9 @@ public class LostCityTerrainFeature {
         Character support = part.getMetaChar(ILostCities.META_SUPPORT);
         if (info.profile.HIGHWAY_SUPPORTS && support != null) {
             BlockState sup = info.getCompiledPalette().get(support);
+            if (sup == null) {
+                throw new RuntimeException("Cannot find support block '" + support + "' for highway part '" + part.getName() + "'!");
+            }
             int x1 = transform.rotateX(0, 15);
             int z1 = transform.rotateZ(0, 15);
             driver.current(x1, highwayGroundLevel - 1, z1);
@@ -1668,6 +1679,9 @@ public class LostCityTerrainFeature {
 
         Character railMainBlock = info.getCityStyle().getRailMainBlock();
         BlockState rail = info.getCompiledPalette().get(railMainBlock);
+        if (rail == null) {
+            throw new RuntimeException("Cannot find rail block '" + railMainBlock + "' for type '" + type + "'!");
+        }
 
         if (type == RailChunkType.HORIZONTAL) {
             // If there is a rail dungeon north or south we must make a connection here
