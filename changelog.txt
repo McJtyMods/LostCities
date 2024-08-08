@@ -1,3 +1,7 @@
+Upcoming:
+- Better error reporting in some situations
+- Highway parts can now be randomized
+
 1.21-8.1.1:
 - Fixed a problem with the exportpart command
 - Fixed a problem with editmode. It didn't properly remember the editing data when reloading a world
