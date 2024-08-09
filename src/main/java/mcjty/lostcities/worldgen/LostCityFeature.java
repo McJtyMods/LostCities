@@ -62,6 +62,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
                     diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
                 } catch (Exception e) {
                     LostCities.getLogger().error("Error generating chunk {},{}: {}", chunkX, chunkZ, e.getMessage(), e);
+                    e.printStackTrace();
                     ErrorLogger.logChunkInfo(chunkX, chunkZ, diminfo);
                     ErrorLogger.report("There was an error generating a chunk. See log for details!");
                 }

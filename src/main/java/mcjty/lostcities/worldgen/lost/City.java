@@ -5,10 +5,7 @@ import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
-import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
-import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
-import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
-import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import mcjty.lostcities.worldgen.lost.cityassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
 import net.minecraft.resources.ResourceKey;
@@ -23,6 +20,8 @@ import java.util.*;
  */
 public class City {
 
+    record PreDefBuildingOffset(PredefinedBuilding building, int offsetX, int offsetZ) {}
+
     private static Map<ChunkCoord, PredefinedCity> predefinedCityMap = null;
     private static Map<ChunkCoord, PredefinedBuilding> predefinedBuildingMap = null;
     private static Map<ChunkCoord, PredefinedStreet> predefinedStreetMap = null;
@@ -30,6 +29,8 @@ public class City {
     // If cityChance == -1 then this is used to control where cities are
     private static final Map<ResourceKey<Level>, CityRarityMap> CITY_RARITY_MAP = new HashMap<>();
     private static final Map<ChunkCoord, CityStyle> CITY_STYLE_MAP = new HashMap<>();
+    private static Map<ChunkCoord, PreDefBuildingOffset> OCCUPIED_CHUNKS_BUILDING = null;
+    private static Map<ChunkCoord, PredefinedStreet> OCCUPIED_CHUNKS_STREET = null;
 
     public static void cleanCache() {
         predefinedCityMap = null;
@@ -37,6 +38,8 @@ public class City {
         predefinedStreetMap = null;
         CITY_RARITY_MAP.clear();
         CITY_STYLE_MAP.clear();
+        OCCUPIED_CHUNKS_BUILDING = null;
+        OCCUPIED_CHUNKS_STREET = null;
     }
 
     public static CityRarityMap getCityRarityMap(ResourceKey<Level> level, long seed, double scale, double offset, double innerScale) {
@@ -56,7 +59,59 @@ public class City {
         return predefinedCityMap.get(coord);
     }
 
-    public static PredefinedBuilding getPredefinedBuilding(ChunkCoord coord) {
+    public static PredefinedBuilding getPredefinedBuildingAtTopLeft(ChunkCoord coord) {
+        calculateMap();
+        return predefinedBuildingMap.get(coord);
+    }
+
+    public static PreDefBuildingOffset getPredefinedBuilding(IDimensionInfo provider, ChunkCoord coord) {
+        calculateOccupied(provider);
+        return OCCUPIED_CHUNKS_BUILDING.get(coord);
+    }
+
+    public static PredefinedStreet getPredefinedStreet(IDimensionInfo provider, ChunkCoord coord) {
+        calculateOccupied(provider);
+        return OCCUPIED_CHUNKS_STREET.get(coord);
+    }
+
+    // Return true if a chunk is occupied (by a predefined building or street)
+    public static boolean isChunkOccupied(IDimensionInfo provider, ChunkCoord coord) {
+        calculateOccupied(provider);
+        return OCCUPIED_CHUNKS_BUILDING.containsKey(coord) || OCCUPIED_CHUNKS_STREET.containsKey(coord);
+    }
+
+    private static void calculateOccupied(IDimensionInfo provider) {
+        if (OCCUPIED_CHUNKS_BUILDING == null) {
+            OCCUPIED_CHUNKS_BUILDING = new HashMap<>();
+            calculateMap();
+            for (Map.Entry<ChunkCoord, PredefinedBuilding> entry : predefinedBuildingMap.entrySet()) {
+                PredefinedBuilding pb = entry.getValue();
+                ChunkCoord root = entry.getKey();
+                if (pb.multi()) {
+                    MultiBuilding building = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), pb.building());
+                    // Add all occupied chunkcoords for the building to the occupied set
+                    for (int x = 0 ; x < building.getDimX() ; x++) {
+                        for (int z = 0 ; z < building.getDimZ() ; z++) {
+                            OCCUPIED_CHUNKS_BUILDING.put(root.offset(x, z), new PreDefBuildingOffset(pb, x, z));
+                        }
+                    }
+                } else {
+                    OCCUPIED_CHUNKS_BUILDING.put(root, new PreDefBuildingOffset(pb, 0, 0));
+                }
+            }
+        }
+        if (OCCUPIED_CHUNKS_STREET == null) {
+            OCCUPIED_CHUNKS_STREET = new HashMap<>();
+            for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
+                for (PredefinedStreet street : city.getPredefinedStreets()) {
+                    OCCUPIED_CHUNKS_STREET.put(new ChunkCoord(city.getDimension(),
+                            city.getChunkX() + street.relChunkX(), city.getChunkZ() + street.relChunkZ()), street);
+                }
+            }
+        }
+    }
+
+    private static void calculateMap() {
         if (predefinedBuildingMap == null) {
             predefinedBuildingMap = new HashMap<>();
             for (PredefinedCity city : AssetRegistries.PREDEFINED_CITIES.getIterable()) {
@@ -66,10 +121,6 @@ public class City {
                 }
             }
         }
-        if (predefinedBuildingMap.isEmpty()) {
-            return null;
-        }
-        return predefinedBuildingMap.get(coord);
     }
 
     public static PredefinedStreet getPredefinedStreet(ChunkCoord coord) {
@@ -217,7 +268,7 @@ public class City {
         ResourceKey<Level> type = provider.getType();
         // If we have a predefined building here we force a high city factor
 
-        PredefinedBuilding predefinedBuilding = getPredefinedBuilding(coord);
+        PredefinedBuilding predefinedBuilding = getPredefinedBuildingAtTopLeft(coord);
         if (predefinedBuilding != null) {
             return 1.0f;
         }
@@ -226,15 +277,15 @@ public class City {
             return 1.0f;
         }
 
-        predefinedBuilding = getPredefinedBuilding(coord.west());
+        predefinedBuilding = getPredefinedBuildingAtTopLeft(coord.west());
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return 1.0f;
         }
-        predefinedBuilding = getPredefinedBuilding(coord.northWest());
+        predefinedBuilding = getPredefinedBuildingAtTopLeft(coord.northWest());
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return 1.0f;
         }
-        predefinedBuilding = getPredefinedBuilding(coord.north());
+        predefinedBuilding = getPredefinedBuildingAtTopLeft(coord.north());
         if (predefinedBuilding != null && predefinedBuilding.multi()) {
             return 1.0f;
         }
