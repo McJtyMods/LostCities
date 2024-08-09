@@ -15,6 +15,7 @@ public class WorldStyleRE implements IAsset<WorldStyleRE> {
     public static final Codec<WorldStyleRE> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.STRING.fieldOf("outsidestyle").forGetter(l -> l.outsideStyle),
+                    MultiSettings.CODEC.optionalFieldOf("multisettings").forGetter(l -> l.multiSettings.get()),
                     CitySphereSettings.CODEC.optionalFieldOf("cityspheres").forGetter(l -> Optional.ofNullable(l.citysphereSettings)),
                     ScatteredSettings.CODEC.optionalFieldOf("scattered").forGetter(l -> Optional.ofNullable(l.scatteredSettings)),
                     PartSelector.CODEC.optionalFieldOf("parts").forGetter(l -> l.partSelector.get()),
@@ -24,6 +25,7 @@ public class WorldStyleRE implements IAsset<WorldStyleRE> {
 
     private ResourceLocation name;
     private final String outsideStyle;
+    private final MultiSettings multiSettings;
     private final ScatteredSettings scatteredSettings;
     private final CitySphereSettings citysphereSettings;
     @Nonnull private final PartSelector partSelector;
@@ -31,12 +33,14 @@ public class WorldStyleRE implements IAsset<WorldStyleRE> {
     private final List<CityBiomeMultiplier> cityBiomeMultipliers;
 
     public WorldStyleRE(String outsideStyle,
+                        Optional<MultiSettings> multiSettings,
                         Optional<CitySphereSettings> citysphereSettings,
                         Optional<ScatteredSettings> scatteredSettings,
                         Optional<PartSelector> partSelector,
                         List<CityStyleSelector> cityStyleSelector,
                         Optional<List<CityBiomeMultiplier>> cityBiomeMultipliers) {
         this.outsideStyle = outsideStyle;
+        this.multiSettings = multiSettings.orElse(MultiSettings.DEFAULT);
         this.citysphereSettings = citysphereSettings.orElse(null);
         this.scatteredSettings = scatteredSettings.orElse(null);
         this.partSelector = partSelector.orElse(PartSelector.DEFAULT);
@@ -68,6 +72,10 @@ public class WorldStyleRE implements IAsset<WorldStyleRE> {
 
     public List<CityBiomeMultiplier> getCityBiomeMultipliers() {
         return cityBiomeMultipliers;
+    }
+
+    public MultiSettings getMultiSettings() {
+        return multiSettings;
     }
 
     @Override

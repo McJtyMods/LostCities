@@ -5,6 +5,7 @@ import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.lost.regassets.CityStyleRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import mcjty.lostcities.worldgen.lost.regassets.data.ObjectSelector;
+import mcjty.lostcities.worldgen.lost.regassets.data.StreetParts;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.CommonLevelAccessor;
@@ -25,6 +26,7 @@ public class CityStyle implements ILostCityCityStyle {
     private final List<ObjectSelector> frontSelector = new ArrayList<>();
     private final List<ObjectSelector> railDungeonSelector = new ArrayList<>();
     private final List<ObjectSelector> multiBuildingSelector = new ArrayList<>();
+    private StreetParts streetParts = StreetParts.DEFAULT;
 
     // Building settings
     private Integer minFloorCount;
@@ -107,6 +109,7 @@ public class CityStyle implements ILostCityCityStyle {
             streetVariantBlock = s.getStreetVariantBlock();
             wallBlock = s.getWallBlock();
             streetWidth = s.getStreetWidth();
+            streetParts = s.getParts();
         });
         object.getGeneralSettings().ifPresent(s -> {
             glowstoneBlock = s.getGlowstoneBlock();
@@ -149,6 +152,10 @@ public class CityStyle implements ILostCityCityStyle {
     @Override
     public int getStreetWidth() {
         return streetWidth;
+    }
+
+    public StreetParts getStreetParts() {
+        return streetParts;
     }
 
     @Override
@@ -280,6 +287,9 @@ public class CityStyle implements ILostCityCityStyle {
                 }
                 if (streetWidth == null) {
                     streetWidth = inheritFrom.streetWidth;
+                }
+                if (streetParts == StreetParts.DEFAULT) {
+                    streetParts = inheritFrom.streetParts;
                 }
                 if (minFloorCount == null) {
                     minFloorCount = inheritFrom.minFloorCount;

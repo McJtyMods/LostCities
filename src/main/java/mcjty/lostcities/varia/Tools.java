@@ -2,6 +2,9 @@ package mcjty.lostcities.varia;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.commands.arguments.blocks.BlockStateParser;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
@@ -131,5 +134,12 @@ public class Tools {
         }
         //noinspection deprecation
         return level.getSeaLevel();
+    }
+
+    public static <T> RecordCodecBuilder<T, List<String>> listOrStringList(String fieldName, String defaultVal, Function<T, List<String>> getter) {
+        return Codec.either(Codec.STRING, Codec.STRING.listOf())
+                .optionalFieldOf(fieldName, Either.left(defaultVal))
+                .xmap(either -> either.map(List::of, Function.identity()), list -> list.size() == 1 ? Either.left(list.get(0)) : Either.right(list))
+                .forGetter(getter);
     }
 }

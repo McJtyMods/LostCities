@@ -29,12 +29,14 @@ public class WorldStyle implements ILostCityAsset {
     @Nonnull private final PartSelector partSelector;
     private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
     private final List<Pair<Predicate<Holder<Biome>>, Float>> cityBiomeMultiplier = new ArrayList<>();
+    private final MultiSettings multiSettings;
 
     public WorldStyle(WorldStyleRE object) {
         name = object.getRegistryName();
         this.citysphereSettings = object.getCitysphereSettings();
         this.scatteredSettings = object.getScatteredSettings();
         this.partSelector = object.getPartSelector();
+        this.multiSettings = object.getMultiSettings();
         outsideStyle = object.getOutsideStyle();
         for (CityStyleSelector selector : object.getCityStyleSelectors()) {
             Predicate<Holder<Biome>> predicate = biomeHolder -> true;
@@ -76,6 +78,10 @@ public class WorldStyle implements ILostCityAsset {
     @Nullable
     public ScatteredSettings getScatteredSettings() {
         return scatteredSettings;
+    }
+
+    public MultiSettings getMultiSettings() {
+        return multiSettings;
     }
 
     public float getCityChanceMultiplier(IDimensionInfo provider, ChunkCoord coord) {

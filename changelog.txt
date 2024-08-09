@@ -1,6 +1,10 @@
 Upcoming:
 - Better error reporting in some situations
 - Highway parts can now be randomized
+- Railway parts can now be randomized
+- Streets are now parts ('street_*.json') and can be customized. Part of the city style. This means that the old settings like streetWidth and the street palette entries are no longer used!
+- Added new 'cityMinHeight' and 'cityMaxHeight' profile options to better control where cities can spawn based on the height of the terrain
+- New command 'resumeedit' to resume editing a part after reloading the world
 
 1.19-6.1.1:
 - Fixed a problem with the exportpart command

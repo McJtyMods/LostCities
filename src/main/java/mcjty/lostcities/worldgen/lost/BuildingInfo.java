@@ -490,7 +490,6 @@ public class BuildingInfo implements ILostChunkInfo {
         MultiBuilding building = null;
         CityStyle cityStyle = City.getCityStyle(coord, provider, profile);
 
-        boolean existingMulti = false;
         boolean isMultiCandidate = false;
         boolean allowCheck = true;
         int candidateX = 0;
@@ -572,19 +571,14 @@ public class BuildingInfo implements ILostChunkInfo {
                         int borderX = root.chunkX() + x + multiMaxSizeX;
                         int borderZ = root.chunkZ() + z + multiMaxSizeZ;
                         if (borderX >= root.chunkX() && borderZ >= root.chunkZ()) {
-                            existingMulti = true;
+                            // there's already a multibuilding blocking the current multibuilding
+                            characteristics.multiPos = MultiPos.SINGLE;
+                            characteristics.multiBuilding = null;
+                            return;
                         }
                     }
                 }
             }
-        }
-
-        // there's already a multibuilding blocking the current multibuilding
-        if (existingMulti)
-        {
-            characteristics.multiPos = MultiPos.SINGLE;
-            characteristics.multiBuilding = null;
-            return;
         }
 
         // There is no other multibuilding candidate topleft of  this one. So we test further
@@ -1100,7 +1094,7 @@ public class BuildingInfo implements ILostChunkInfo {
 
 
     /**
-//     * This function does not use the cache. So safe to use when the cache is building
+     * This function does not use the cache. So safe to use when the cache is building
      * This function uses its own cache.
      */
     public static synchronized int getCityLevel(ChunkCoord key, IDimensionInfo provider) {

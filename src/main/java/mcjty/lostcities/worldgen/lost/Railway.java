@@ -8,6 +8,7 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.regassets.data.RailwayParts;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static mcjty.lostcities.api.RailChunkType.*;
@@ -49,7 +50,7 @@ public class Railway {
         private final RailDirection direction;
         private final int level;
         private final int rails;
-        private final String part;
+        private final List<String> part;
 
         public static final RailChunkInfo NOTHING = new RailChunkInfo(NONE, BI, 0, 0);
 
@@ -57,7 +58,7 @@ public class Railway {
             this(type, direction, level, rails, null);
         }
 
-        public RailChunkInfo(RailChunkType type, RailDirection direction, int level, int rails, String part) {
+        public RailChunkInfo(RailChunkType type, RailDirection direction, int level, int rails, List<String> part) {
             this.type = type;
             this.direction = direction;
             this.level = level;
@@ -81,7 +82,7 @@ public class Railway {
             return rails;
         }
 
-        public String getPart() {
+        public List<String> getPart() {
             return part;
         }
     }
@@ -289,9 +290,7 @@ public class Railway {
         return RailChunkInfo.NOTHING;
     }
 
-    private static RailChunkInfo getStationType(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile, float r, int rails, String part) {
-        int chunkX = coord.chunkX();
-        int chunkZ = coord.chunkZ();
+    private static RailChunkInfo getStationType(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile, float r, int rails, List<String> part) {
         int cityLevel = BuildingInfo.getCityLevel(coord, provider);
         if (cityLevel > 2) {
             // We are too high here. We need an underground station

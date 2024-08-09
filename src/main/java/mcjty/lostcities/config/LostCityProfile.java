@@ -123,6 +123,8 @@ public class LostCityProfile implements ILostCityProfile {
     public int CITY_LEVEL1_HEIGHT = 83;
     public int CITY_LEVEL2_HEIGHT = 91;
     public int CITY_LEVEL3_HEIGHT = 99;
+    public int CITY_MINHEIGHT = 50;
+    public int CITY_MAXHEIGHT = 130;
 
     public int OCEAN_CORRECTION_BORDER = 4;
 
@@ -408,6 +410,10 @@ public class LostCityProfile implements ILostCityProfile {
                 "Below this chunk height cities will be level 2");
         CITY_LEVEL3_HEIGHT = cfg.getInt("cityLevel3Height", LostCityProfile.CATEGORY_CITIES, CITY_LEVEL3_HEIGHT, 1, 255,
                 "Below this chunk height cities will be level 3");
+        CITY_MINHEIGHT = cfg.getInt("cityMinHeight", LostCityProfile.CATEGORY_CITIES, CITY_MINHEIGHT, -1024, 2048,
+                "Below this height cities will not be generated");
+        CITY_MAXHEIGHT = cfg.getInt("cityMaxHeight", LostCityProfile.CATEGORY_CITIES, CITY_MAXHEIGHT, -1024, 2048,
+                "Above this height cities will not be generated");
 
         OCEAN_CORRECTION_BORDER = cfg.getInt("oceanCorrectionBorder", LostCityProfile.CATEGORY_CITIES, OCEAN_CORRECTION_BORDER, -255, 255,
                 "Terrain correction offset that is used for chunks adjacent to city chunks that are in ocean biomes");

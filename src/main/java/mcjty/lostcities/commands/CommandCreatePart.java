@@ -52,7 +52,7 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
             return 0;
         }
 
-        Editor.startEditing( part, player, start, level, dimInfo);
+        Editor.startEditing( part, player, start, level, dimInfo, true);
 
         return 0;
     }

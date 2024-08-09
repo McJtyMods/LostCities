@@ -1,0 +1,24 @@
+{
+  "xsize": 16,
+  "zsize": 16,
+  "slices": [
+    [
+      "bbbbSSSSSSSSbbbb",
+      "bbbbSSSSSSSSbbbb",
+      "bbbbSSSSSSSSbbbb",
+      "bbbbSSSSSSSSbbbb",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "SSSSSSSSSSSSSSSS",
+      "bbbbSSSSSSSSbbbb",
+      "bbbbSSSSSSSSbbbb",
+      "bbbbSSSSSSSSbbbb",
+      "bbbbSSSSSSSSbbbb"
+    ]
+  ]
+}

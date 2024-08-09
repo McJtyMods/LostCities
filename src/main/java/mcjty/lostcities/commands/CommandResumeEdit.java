@@ -20,12 +20,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 
-public class CommandEditPart implements Command<CommandSourceStack> {
+public class CommandResumeEdit implements Command<CommandSourceStack> {
 
-    private static final CommandEditPart CMD = new CommandEditPart();
+    private static final CommandResumeEdit CMD = new CommandResumeEdit();
 
     public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        return Commands.literal("editpart")
+        return Commands.literal("resumeedit")
                 .requires(cs -> cs.hasPermission(1)).executes(CMD);
     }
 
@@ -35,7 +35,7 @@ public class CommandEditPart implements Command<CommandSourceStack> {
         ServerPlayer player = context.getSource().getPlayerOrException();
         BlockPos start = player.blockPosition();
 
-        ServerLevel level = player.getLevel();
+        ServerLevel level = (ServerLevel) player.level;
         IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
         if (dimInfo == null) {
             context.getSource().sendFailure(ComponentFactory.literal("This dimension doesn't support Lost Cities!"));
@@ -55,7 +55,7 @@ public class CommandEditPart implements Command<CommandSourceStack> {
             }
             if (data.y() <= start.getY() && start.getY() < data.y() + part.getSliceCount()) {
                 context.getSource().sendSuccess(ComponentFactory.literal("Start editing part '" + data.partName() + "'!"), false);
-                Editor.startEditing(part, player, new BlockPos(start.getX(), data.y(), start.getZ()), level, dimInfo, true);
+                Editor.startEditing(part, player, new BlockPos(start.getX(), data.y(), start.getZ()), level, dimInfo, false);
                 return 0;
             }
         }

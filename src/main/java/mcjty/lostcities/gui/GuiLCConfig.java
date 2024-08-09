@@ -261,6 +261,7 @@ public class GuiLCConfig extends Screen {
 
     public void refreshPreview() {
         BuildingInfo.cleanCache();
+        MultiChunk.cleanCache();
         Highway.cleanCache();
         Railway.cleanCache();
         City.cleanCache();
