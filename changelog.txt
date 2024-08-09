@@ -5,6 +5,12 @@ Upcoming:
 - Streets are now parts ('street_*.json') and can be customized. Part of the city style. This means that the old settings like streetWidth and the street palette entries are no longer used!
 - Added new 'cityMinHeight' and 'cityMaxHeight' profile options to better control where cities can spawn based on the height of the terrain
 - New command 'resumeedit' to resume editing a part after reloading the world
+- Major refactor of the multi building system:
+    - This system should be much faster
+    - Very large multibuildings have better chances to actually spawn
+    - New 'multisettings' block in the world style. This allows control over how the multibuildings spawn
+- 'multi_max_x' and 'multi_max_z' have now been removed from the profile. They are no longer used
+- 'building2x2Chance' has now been removed from the profile. It is no longer used
 
 1.20-7.2.1:
 - Fixed a problem with the exportpart command
