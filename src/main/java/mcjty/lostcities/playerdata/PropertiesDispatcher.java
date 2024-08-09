@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public class PropertiesDispatcher implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
     private PlayerSpawnSet playerSpawnSet = null;
-    private LazyOptional<PlayerSpawnSet> opt = LazyOptional.of(this::createPlayerSpawnSet);
+    private final LazyOptional<PlayerSpawnSet> opt = LazyOptional.of(this::createPlayerSpawnSet);
 
     @Nonnull
     private PlayerSpawnSet createPlayerSpawnSet() {

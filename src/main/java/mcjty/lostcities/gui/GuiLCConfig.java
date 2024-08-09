@@ -195,7 +195,6 @@ public class GuiLCConfig extends Screen {
     private void initBuildings(int left) {
         start("Buildings");
         addFloat(left,"lostcity.buildingChance").label("Buildings:"); nl();
-        addFloat(left,"lostcity.building2x2Chance").label("Buildings 2x2:"); nl();
         nl();
         addInt(left, "lostcity.buildingMinFloors").label("Floors:");
         addInt(left + 55, "lostcity.buildingMaxFloors");

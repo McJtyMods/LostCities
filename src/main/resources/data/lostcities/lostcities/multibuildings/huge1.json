@@ -1,0 +1,21 @@
+{
+  "dimx": 3,
+  "dimz": 3,
+  "buildings": [
+    [
+      "building4",
+      "building4",
+      "building4"
+    ],
+    [
+      "building4",
+      "building4",
+      "building4"
+    ],
+    [
+      "building4",
+      "building4",
+      "building4"
+    ]
+  ]
+}

@@ -29,7 +29,7 @@ public class GlobalTodo {
         }
     }
 
-    private Map<ChunkPos, TodoQueues> todoQueues = new HashMap<>();
+    private final Map<ChunkPos, TodoQueues> todoQueues = new HashMap<>();
     private final static Map<ResourceKey<Level>, GlobalTodo> instances = new HashMap<>();
 
     public static GlobalTodo get(Level world) {

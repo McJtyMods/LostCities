@@ -98,6 +98,14 @@
       {
         "factor": 0.2,
         "value": "shopping_open"
+      },
+      {
+        "factor": 0.1,
+        "value": "huge1"
+      },
+      {
+        "factor": 0.1,
+        "value": "huge2"
       }
     ],
     "bridges": [

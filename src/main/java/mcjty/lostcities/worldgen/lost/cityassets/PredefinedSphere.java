@@ -10,13 +10,13 @@ import net.minecraft.world.level.Level;
 
 public class PredefinedSphere implements ILostCityAsset {
 
-    private ResourceLocation name;
-    private ResourceKey<Level> dimension;
-    private int chunkX;
-    private int chunkZ;
-    private int centerX;
-    private int centerZ;
-    private int radius;
+    private final ResourceLocation name;
+    private final ResourceKey<Level> dimension;
+    private final int chunkX;
+    private final int chunkZ;
+    private final int centerX;
+    private final int centerZ;
+    private final int radius;
 
     public PredefinedSphere(PredefinedSphereRE object) {
         name = object.getRegistryName();
