@@ -29,12 +29,14 @@ public class City {
 
     // If cityChance == -1 then this is used to control where cities are
     private static final Map<ResourceKey<Level>, CityRarityMap> CITY_RARITY_MAP = new HashMap<>();
+    private static final Map<ChunkCoord, CityStyle> CITY_STYLE_MAP = new HashMap<>();
 
     public static void cleanCache() {
         predefinedCityMap = null;
         predefinedBuildingMap = null;
         predefinedStreetMap = null;
         CITY_RARITY_MAP.clear();
+        CITY_STYLE_MAP.clear();
     }
 
     public static CityRarityMap getCityRarityMap(ResourceKey<Level> level, long seed, double scale, double offset, double innerScale) {
@@ -156,6 +158,10 @@ public class City {
 
     // Calculate the citystyle based on all surrounding cities
     public static CityStyle getCityStyle(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        return CITY_STYLE_MAP.computeIfAbsent(coord, k -> getCityStyleInt(coord, provider, profile));
+    }
+
+    private static CityStyle getCityStyleInt(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
         List<Pair<Float, String>> styles = new ArrayList<>();
         int chunkX = coord.chunkX();
         int chunkZ = coord.chunkZ();
