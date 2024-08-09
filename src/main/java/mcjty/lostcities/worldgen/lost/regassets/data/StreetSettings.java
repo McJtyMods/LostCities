@@ -15,6 +15,7 @@ public class StreetSettings {
     private final Character streetVariantBlock;
     private final Character borderBlock;
     private final Character wallBlock;
+    private final StreetParts parts;
 
     public static final Codec<StreetSettings> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -23,7 +24,8 @@ public class StreetSettings {
                     Codec.STRING.optionalFieldOf("streetbase").forGetter(l -> DataTools.toNullable(l.streetBaseBlock)),
                     Codec.STRING.optionalFieldOf("streetvariant").forGetter(l -> DataTools.toNullable(l.streetVariantBlock)),
                     Codec.STRING.optionalFieldOf("border").forGetter(l -> DataTools.toNullable(l.borderBlock)),
-                    Codec.STRING.optionalFieldOf("wall").forGetter(l -> DataTools.toNullable(l.wallBlock))
+                    Codec.STRING.optionalFieldOf("wall").forGetter(l -> DataTools.toNullable(l.wallBlock)),
+                    StreetParts.CODEC.optionalFieldOf("parts").forGetter(l ->l.parts.get())
             ).apply(instance, StreetSettings::new));
 
     public Integer getStreetWidth() {
@@ -50,17 +52,23 @@ public class StreetSettings {
         return wallBlock;
     }
 
+    public StreetParts getParts() {
+        return parts;
+    }
+
     public StreetSettings(Optional<Integer> streetWidth,
                           Optional<String> streetBlock,
                           Optional<String> streetBaseBlock,
                           Optional<String> streetVariantBlock,
                           Optional<String> borderBlock,
-                          Optional<String> wallBlock) {
+                          Optional<String> wallBlock,
+                          Optional<StreetParts> parts) {
         this.streetWidth = streetWidth.orElse(null);
         this.streetBlock = DataTools.getNullableChar(streetBlock);
         this.streetBaseBlock = DataTools.getNullableChar(streetBaseBlock);
         this.streetVariantBlock = DataTools.getNullableChar(streetVariantBlock);
         this.borderBlock = DataTools.getNullableChar(borderBlock);
         this.wallBlock = DataTools.getNullableChar(wallBlock);
+        this.parts = parts.orElse(StreetParts.DEFAULT);
     }
 }

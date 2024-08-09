@@ -96,6 +96,7 @@ public class ForgeEventHandlers {
     public static void cleanUp() {
         Config.resetProfileCache();
         BuildingInfo.cleanCache();
+        MultiChunk.cleanCache();
         Highway.cleanCache();
         Railway.cleanCache();
         BiomeInfo.cleanCache();

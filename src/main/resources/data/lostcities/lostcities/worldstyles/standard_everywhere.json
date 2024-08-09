@@ -1,5 +1,10 @@
 {
   "outsidestyle": "outside",
+  "multisettings": {
+    "areasize": 10,
+    "minimum": 1,
+    "maximum": 5
+  },
   "scattered": {
     "areasize": 8,
     "chance": 0.1,

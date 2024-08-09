@@ -58,6 +58,9 @@ public class CompiledPalette {
                             }
                         }
                         palette.put(entry.getKey(), randomBlocks);
+                        if (idx < randomBlocks.length) {
+                            throw new RuntimeException("Invalid palette entry for '" + entry.getKey() + "'! Not enough blocks in the random list (factor should go up to 128)");
+                        }
                     } else if (!(pe.blocks() instanceof String)) {
                         if (pe.blocks() == null) {
                             throw new RuntimeException("Invalid palette entry for '" + entry.getKey() + "'!");

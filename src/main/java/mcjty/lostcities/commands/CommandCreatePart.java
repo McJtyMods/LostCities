@@ -60,7 +60,7 @@ public class CommandCreatePart implements Command<CommandSourceStack> {
             return 0;
         }
 
-        Editor.startEditing(part, player, start.getBlockPos(context.getSource()), level, dimInfo);
+        Editor.startEditing(part, player, start.getBlockPos(context.getSource()), level, dimInfo, true);
 
         return 0;
     }

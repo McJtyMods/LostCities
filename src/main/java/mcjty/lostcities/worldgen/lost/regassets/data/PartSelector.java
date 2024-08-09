@@ -20,7 +20,10 @@ public record PartSelector(MonorailParts monoRailParts, HighwayParts highwayPart
                     highways.orElse(HighwayParts.DEFAULT),
                     railways.orElse(RailwayParts.DEFAULT))));
 
-    public static final PartSelector DEFAULT = new PartSelector(MonorailParts.DEFAULT, HighwayParts.DEFAULT, RailwayParts.DEFAULT);
+    public static final PartSelector DEFAULT = new PartSelector(
+            MonorailParts.DEFAULT,
+            HighwayParts.DEFAULT,
+            RailwayParts.DEFAULT);
 
     public Optional<PartSelector> get() {
         if (this == DEFAULT) {
