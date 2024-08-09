@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class Editor {
 
-    public static void startEditing(BuildingPart part, ServerPlayer player, BlockPos start, ServerLevel level, IDimensionInfo dimInfo) {
+    public static void startEditing(BuildingPart part, ServerPlayer player, BlockPos start, ServerLevel level, IDimensionInfo dimInfo, boolean clear) {
         ChunkCoord coord = new ChunkCoord(dimInfo.getType(), start.getX() >> 4, start.getZ() >> 4);
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimInfo);
         CompiledPalette palette = info.getCompiledPalette();
@@ -31,16 +31,18 @@ public class Editor {
         CompiledPalette finalPalette = palette;
 
         player.level().getServer().doRunTask(new TickTask(3, () -> {
-            for (int y = 0; y < part.getSliceCount(); y++) {
-                for (int x = 0; x < part.getXSize(); x++) {
-                    for (int z = 0; z < part.getZSize(); z++) {
-                        BlockPos pos = new BlockPos(info.chunkX * 16 + x, start.getY() + y, info.chunkZ * 16 + z);
-                        Character character = part.getC(x, y, z);
-                        BlockState state = finalPalette.get(character);
-                        if (state != null) {
-                            level.setBlock(pos, state, Block.UPDATE_ALL);
-                        } else {
-                            level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            if (clear) {
+                for (int y = 0; y < part.getSliceCount(); y++) {
+                    for (int x = 0; x < part.getXSize(); x++) {
+                        for (int z = 0; z < part.getZSize(); z++) {
+                            BlockPos pos = new BlockPos(info.chunkX * 16 + x, start.getY() + y, info.chunkZ * 16 + z);
+                            Character character = part.getC(x, y, z);
+                            BlockState state = finalPalette.get(character);
+                            if (state != null) {
+                                level.setBlock(pos, state, Block.UPDATE_ALL);
+                            } else {
+                                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+                            }
                         }
                     }
                 }

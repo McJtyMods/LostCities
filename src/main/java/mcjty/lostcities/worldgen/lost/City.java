@@ -3,6 +3,7 @@ package mcjty.lostcities.worldgen.lost;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Tools;
+import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
@@ -264,6 +265,20 @@ public class City {
             WorldStyle worldStyle = AssetRegistries.WORLDSTYLES.get(provider.getWorld(), profile.getWorldStyle());
             float multiplier = worldStyle.getCityChanceMultiplier(provider, coord);
             factor *= multiplier;
+        }
+
+        if (factor > 0.0001 && provider.getWorld() != null) {
+            // Check if the terrain is not too low or high for building
+            ChunkHeightmap heightmap = provider.getHeightmap(coord);
+            if (heightmap == null) {
+                return 0;
+            }
+            if (heightmap.getHeight() < profile.CITY_MINHEIGHT) {
+                return 0;
+            }
+            if (heightmap.getHeight() > profile.CITY_MAXHEIGHT) {
+                return 0;
+            }
         }
 
         // @todo 1.14: do we need this?
