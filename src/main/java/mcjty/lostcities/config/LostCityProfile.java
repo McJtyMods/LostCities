@@ -151,7 +151,7 @@ public class LostCityProfile implements ILostCityProfile {
     public float CORRIDOR_CHANCE = .7f;
     public float BRIDGE_CHANCE = .7f;
     public float FOUNTAIN_CHANCE = .05f;
-    public float BUILDING2X2_CHANCE = .03f;
+    public float BUILDING2X2_CHANCE = .03f; // No longer used!
     public int MULTI_MAX_X = 2;
     public int MULTI_MAX_Z = 2;
     public boolean BRIDGE_SUPPORTS = true;
