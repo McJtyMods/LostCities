@@ -403,4 +403,8 @@ public class CityStyle implements ILostCityCityStyle {
     public boolean hasMultiBuildings() {
         return !multiBuildingSelector.isEmpty();
     }
+
+    public List<ObjectSelector> getMultiBuildingSelector() {
+        return multiBuildingSelector;
+    }
 }

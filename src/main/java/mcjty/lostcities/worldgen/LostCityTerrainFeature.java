@@ -317,7 +317,7 @@ public class LostCityTerrainFeature {
                         case TOP -> getTopLevel(info);
                     };
                     partY += offset;
-                    generatePart(info, part, Transform.ROTATE_NONE, 0, partY, 0, true);
+                    generatePart(info, part, Transform.ROTATE_NONE, 0, partY, 0, HardAirSetting.WATERLEVEL);
                 }
             }
         }
@@ -534,7 +534,7 @@ public class LostCityTerrainFeature {
         if (horiz && vert) {
             if (!CitySphere.intersectsWithCitySphere(info.coord, provider)) {
                 BuildingPart part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), monoRailParts.both());
-                generatePart(info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true);
+                generatePart(info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, HardAirSetting.WATERLEVEL);
             }
             return;
         } else if (horiz) {
@@ -575,7 +575,7 @@ public class LostCityTerrainFeature {
             part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), monoRailParts.vertical());
         }
 
-        generatePart(info, part, transform, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, true);
+        generatePart(info, part, transform, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, HardAirSetting.WATERLEVEL);
     }
 
     private boolean hasNonStationMonoRail(BuildingInfo info) {
@@ -863,9 +863,9 @@ public class LostCityTerrainFeature {
                 }
             }
 
-            height += generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+            height += generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.AIR);
             if (part2 != null) {
-                generatePart(info, part2, Transform.ROTATE_NONE, 0, height, 0, false);
+                generatePart(info, part2, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.AIR);
             }
         }
     }
@@ -1018,11 +1018,11 @@ public class LostCityTerrainFeature {
         if (info.isTunnel(level)) {
             // We know we need a tunnel
             part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(highwayParts.tunnel(bidirectional)));
-            generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
+            generatePart(info, part, transform, 0, highwayGroundLevel, 0, HardAirSetting.WATERLEVEL);
         } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
             // Simple highway in the city
             part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(highwayParts.open(bidirectional)));
-            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
+            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, HardAirSetting.WATERLEVEL);
             // Clear a bit more above the highway
             if (!info.profile.isCavern()) {
                 int clearheight = 15;
@@ -1035,7 +1035,7 @@ public class LostCityTerrainFeature {
             }
         } else {
             part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(highwayParts.bridge(bidirectional)));
-            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, true);
+            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, HardAirSetting.WATERLEVEL);
             // Clear a bit more above the highway
             if (!info.profile.isCavern()) {
                 int clearheight = 15;
@@ -1629,7 +1629,7 @@ public class LostCityTerrainFeature {
         if (info.getZmin().getRailInfo().getType() == RailChunkType.HORIZONTAL ||
                 info.getZmax().getRailInfo().getType() == RailChunkType.HORIZONTAL) {
             int height = info.groundLevel + Railway.RAILWAY_LEVEL_OFFSET * FLOORHEIGHT;
-            generatePart(info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0, false);
+            generatePart(info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.AIR);
         }
     }
 
@@ -1732,7 +1732,7 @@ public class LostCityTerrainFeature {
                 part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsFlat()));
                 break;
         }
-        int h = generatePart(info, part, transform, 0, height, 0, false);
+        int h = generatePart(info, part, transform, 0, height, 0, HardAirSetting.AIR);
         if (clearUpper) {
             int maxh = heightmap.getHeight() + 4;
             if (h < maxh) {
@@ -1846,11 +1846,11 @@ public class LostCityTerrainFeature {
             part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.stationStaircase()));
             for (int i = railInfo.getLevel() + 1; i < info.cityLevel; i++) {
                 height = info.groundLevel + i * FLOORHEIGHT;
-                generatePart(info, part, transform, 0, height, 0, false);
+                generatePart(info, part, transform, 0, height, 0, HardAirSetting.AIR);
             }
             height = info.groundLevel + info.cityLevel * FLOORHEIGHT;
             part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.stationStaircaseSurface()));
-            generatePart(info, part, transform, 0, height, 0, false);
+            generatePart(info, part, transform, 0, height, 0, HardAirSetting.AIR);
         }
     }
 
@@ -1867,7 +1867,7 @@ public class LostCityTerrainFeature {
                 case ZMAX -> Transform.ROTATE_270;
             };
 
-            generatePart(info, stairs, transform, 0, oy, 0, false);
+            generatePart(info, stairs, transform, 0, oy, 0, HardAirSetting.AIR);
         }
     }
 
@@ -2125,7 +2125,7 @@ public class LostCityTerrainFeature {
                 } else {
                     part = info.fountainType;
                 }
-                generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+                generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.AIR);
             }
 
             generateRandomVegetation(info, height);
@@ -2301,7 +2301,7 @@ public class LostCityTerrainFeature {
 
     private int generateFrontPart(BuildingInfo info, int height, BuildingInfo adj, Transform rot) {
         if (info.hasFrontPartFrom(adj)) {
-            return generatePart(adj, adj.frontType, rot, 0, height, 0, false);
+            return generatePart(adj, adj.frontType, rot, 0, height, 0, HardAirSetting.AIR);
         }
         return height;
     }
@@ -2496,7 +2496,7 @@ public class LostCityTerrainFeature {
     private void generateFullStreetSection(BuildingInfo info, int height) {
         StreetParts parts = info.getCityStyle().getStreetParts();
         BuildingPart part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(parts.full()));
-        generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, true);
+        generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.VOID);
     }
 
     private void generateNormalStreetSection(BuildingInfo info, int height) {
@@ -2560,7 +2560,7 @@ public class LostCityTerrainFeature {
             case 4 -> AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(parts.all()));
             default -> throw new RuntimeException("Not possible!");
         };
-        generatePart(info, part, transform, 0, height, 0, true);
+        generatePart(info, part, transform, 0, height, 0, HardAirSetting.VOID);
     }
 
     private boolean borderNeedsConnectionToAdjacentChunk(BuildingInfo info, int x, int z) {
@@ -2588,13 +2588,17 @@ public class LostCityTerrainFeature {
         return false;
     }
 
+    enum HardAirSetting {
+        AIR, WATERLEVEL, VOID
+    }
+
     /**
      * Generate a part. If 'airWaterLevel' is true then 'hard air' blocks are replaced with water below the waterLevel.
      * Otherwise they are replaced with air.
      */
     private int generatePart(BuildingInfo info, IBuildingPart part,
                              Transform transform,
-                             int ox, int oy, int oz, boolean airWaterLevel) {
+                             int ox, int oy, int oz, HardAirSetting airWaterLevel) {
         if (profile.EDITMODE) {
             EditModeData.getData().addPartData(info.coord, oy, part.getName());
         }
@@ -2630,10 +2634,20 @@ public class LostCityTerrainFeature {
                                     b = air;
                                 }
                             } else if (b == hardAir) {
-                                if (airWaterLevel && !info.profile.AVOID_WATER && !nowater) {
-                                    b = (oy + y) < info.waterLevel ? liquid : air;
-                                } else {
-                                    b = air;
+                                switch (airWaterLevel) {
+                                    case AIR:
+                                        b = air;
+                                        break;
+                                    case WATERLEVEL:
+                                        if (!info.profile.AVOID_FOLIAGE && !nowater && oy + y < info.waterLevel) {
+                                            b = liquid;
+                                        } else {
+                                            b = air;
+                                        }
+                                        break;
+                                    case VOID:
+                                        // hardAir (STRUCTURE_VOID) is replaced by whatever was already there
+                                        break;
                                 }
                             } else if (inf != null) {
                                 if (inf.isTorch()) {
@@ -3015,10 +3029,10 @@ public class LostCityTerrainFeature {
             }
 
             BuildingPart part = info.getFloor(f);
-            generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+            generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.AIR);
             part = info.getFloorPart2(f);
             if (part != null) {
-                generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, false);
+                generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.AIR);
             }
 
             // Check for doors
