@@ -1,10 +1,15 @@
 package mcjty.lostcities.api;
 
+import net.minecraft.resources.ResourceLocation;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 
 public interface ILostChunkInfo {
+
+    record MultiBuildingInfo(ResourceLocation buildingType, int offsetX, int offsetZ, int w, int h) {
+    }
 
     /**
      * Return true if this chunk represents a part of a city (building or street)
@@ -21,9 +26,22 @@ public interface ILostChunkInfo {
     /**
      * Return the name of the building if there is a building here (name from asset registry)
      * Returns null otherwise. If isCity() returns true and this returns null then we have
-     * a 'street' chunk
+     * a 'street' chunk. Note that this will always return an invidiual building name even if
+     * it is part of a multi-building.
      */
     String getBuildingType();
+
+    /**
+     * Return the resource location for the building if there is a building here
+     */
+    ResourceLocation getBuildingId();
+
+    /**
+     * Return a MultiBuildingInfo if this chunk is part of a multi-building. This will return
+     * null if this chunk is not part of a multi-building.
+     */
+    @Nullable
+    MultiBuildingInfo getMultiBuildingInfo();
 
     /**
      * Return the kind of railway type at this spot

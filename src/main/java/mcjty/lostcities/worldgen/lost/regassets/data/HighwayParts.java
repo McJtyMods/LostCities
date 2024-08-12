@@ -1,13 +1,11 @@
 package mcjty.lostcities.worldgen.lost.regassets.data;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lostcities.varia.Tools;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 public record HighwayParts(List<String> tunnel, List<String> open, List<String> bridge, List<String> tunnelBi,
                            List<String> openBi, List<String> bridgeBi) {

@@ -1,3 +1,6 @@
+Upcoming:
+- Better api to get multibuilding information
+
 1.19-6.2.0:
 - Better error reporting in some situations
 - Highway parts can now be randomized
