@@ -1682,6 +1682,20 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     @Override
+    public ResourceLocation getBuildingId() {
+        return hasBuilding ? buildingType.getId() : null;
+    }
+
+    @Nullable
+    @Override
+    public MultiBuildingInfo getMultiBuildingInfo() {
+        if (multiBuilding != null) {
+            return new MultiBuildingInfo(multiBuilding.getId(), multiBuildingPos.x(), multiBuildingPos.z(), multiBuilding.getDimX(), multiBuilding.getDimZ());
+        }
+        return null;
+    }
+
+    @Override
     public int getCityLevel() {
         return cityLevel;
     }
