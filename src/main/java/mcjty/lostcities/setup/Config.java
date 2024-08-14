@@ -44,9 +44,9 @@ public class Config {
     };
     private static final ModConfigSpec.ConfigValue<List<? extends String>> AVOID_STRUCTURES;
     private static final Set<ResourceLocation> AVOID_STRUCTURES_SET = new HashSet<>();
-    public static final ForgeConfigSpec.BooleanValue AVOID_STRUCTURES_ADJACENT;
-    public static final ForgeConfigSpec.BooleanValue AVOID_VILLAGES_ADJACENT;
-    public static final ForgeConfigSpec.BooleanValue AVOID_FLATTENING;
+    public static final ModConfigSpec.BooleanValue AVOID_STRUCTURES_ADJACENT;
+    public static final ModConfigSpec.BooleanValue AVOID_VILLAGES_ADJACENT;
+    public static final ModConfigSpec.BooleanValue AVOID_FLATTENING;
 
     public static void reset() {
         profileFromClient = null;
