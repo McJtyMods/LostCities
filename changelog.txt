@@ -1,4 +1,4 @@
-Upcoming:
+1.19-6.2.2:
 - Now also avoid pillager outposts with the avoidStructures option
 - New server config options 'avoidStructuresAdjacent' and 'avoidVillagesAdjacent' to avoid generating Lost Cities in chunks that have structures or villages adjacent to them. Default on
 - New server config option 'avoidFlattening' to avoid flattening the terrain where structures were avoided. Default on
