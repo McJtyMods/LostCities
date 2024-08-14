@@ -285,8 +285,8 @@ public class LostCityTerrainFeature {
         boolean doCity = info.isCity || (info.outsideChunk && info.hasBuilding);
 
         // Check if there is no village here
-        ChunkAccess ch = region.getChunk(chunkX, chunkZ);
-        doCity = doCity && !hasBlacklistedStructure(ch);
+        boolean avoidChunk = hasBlacklistedStructure(region, chunkX, chunkZ);
+        doCity = doCity && !avoidChunk;
 
         // If this chunk has a building or street but we're in a floating profile and
         // we happen to have a void chunk we detect that here and go back to normal chunk generation
@@ -300,7 +300,7 @@ public class LostCityTerrainFeature {
             doCityChunk(info, heightmap);
         } else {
             // We already have a prefilled core chunk (as generated from doCoreChunk)
-            doNormalChunk(info, heightmap);
+            doNormalChunk(info, heightmap, avoidChunk);
         }
 
         if (profile.isSpace() || profile.isSpheres()) {
@@ -400,7 +400,26 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private boolean hasBlacklistedStructure(ChunkAccess ch) {
+    private boolean hasBlacklistedStructure(WorldGenRegion region, int chunkX, int chunkZ) {
+        boolean doAdjacent = Config.AVOID_VILLAGES_ADJACENT.get() || Config.AVOID_STRUCTURES_ADJACENT.get();
+        if (doAdjacent) {
+            for (int dx = -1 ; dx <= 1 ; dx++) {
+                for (int dz = -1 ; dz <= 1 ; dz++) {
+                    ChunkAccess ch = region.getChunk(chunkX + dx, chunkZ + dx);
+                    if (testBlacklistedStructure(ch, chunkX == 0 && chunkZ == 0)) {
+                        return true;
+                    }
+                }
+
+            }
+        } else {
+            ChunkAccess ch = region.getChunk(chunkX, chunkZ);
+            return testBlacklistedStructure(ch, true);
+        }
+        return false;
+    }
+
+    private boolean testBlacklistedStructure(ChunkAccess ch, boolean center) {
         if (ch.hasAnyStructureReferences()) {
             var structures = provider.getWorld().registryAccess().registryOrThrow(Registries.STRUCTURE);
             var references = ch.getAllReferences();
@@ -408,11 +427,15 @@ public class LostCityTerrainFeature {
             for (var entry : references.entrySet()) {
                 if (!entry.getValue().isEmpty()) {
                     Optional<ResourceKey<Structure>> key = structures.getResourceKey(entry.getKey());
-                    if (key.map(k -> structures.getHolderOrThrow(k).is(StructureTags.VILLAGE)).orElse(false)) {
-                        return true;
+                    if (center || Config.AVOID_VILLAGES_ADJACENT.get()) {
+                        if (key.map(k -> structures.getHolderOrThrow(k).is(StructureTags.VILLAGE)).orElse(false)) {
+                            return true;
+                        }
                     }
-                    if (Config.isAvoidedStructure(key.get().location())) {
-                        return true;
+                    if (center || Config.AVOID_STRUCTURES_ADJACENT.get()) {
+                        if (Config.isAvoidedStructure(key.get().location())) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -609,12 +632,12 @@ public class LostCityTerrainFeature {
         info.clearTorchTodo();
     }
 
-    private void doNormalChunk(BuildingInfo info, ChunkHeightmap heightmap) {
+    private void doNormalChunk(BuildingInfo info, ChunkHeightmap heightmap, boolean avoidChunk) {
 //        debugClearChunk(chunkX, chunkZ, primer);
         // TqLxQuanZ: Used for detect the shape correcting in the normal chunk, if there's a terrain shape correct happening,
         // do not attempt to generate scattered building as they'll float in midair since it uses heightmap.
         boolean trimmed = false;
-        if (profile.isDefault() || profile.isSpheres()) {
+        if ((!avoidChunk || !Config.AVOID_FLATTENING.get()) && (profile.isDefault() || profile.isSpheres())) {
             trimmed = correctTerrainShape(provider.getWorld(), info.coord, heightmap);
 //            flattenChunkToCityBorder(chunkX, chunkZ);
         }
