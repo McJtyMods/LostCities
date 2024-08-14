@@ -39,10 +39,14 @@ public class Config {
             "minecraft:jungle_pyramid",
             "minecraft:desert_pyramid",
             "minecraft:igloo",
-            "minecraft:swamp_huts"
+            "minecraft:swamp_huts",
+            "minecraft:pillager_outpost"
     };
     private static final ForgeConfigSpec.ConfigValue<List<? extends String>> AVOID_STRUCTURES;
     private static final Set<ResourceLocation> AVOID_STRUCTURES_SET = new HashSet<>();
+    public static final ForgeConfigSpec.BooleanValue AVOID_STRUCTURES_ADJACENT;
+    public static final ForgeConfigSpec.BooleanValue AVOID_VILLAGES_ADJACENT;
+    public static final ForgeConfigSpec.BooleanValue AVOID_FLATTENING;
 
     public static void reset() {
         profileFromClient = null;
@@ -150,6 +154,15 @@ public class Config {
         AVOID_STRUCTURES = SERVER_BUILDER
                 .comment("List of structures to avoid when generating cities (for example to avoid generating a city in a woodland mansion)")
                 .defineList("avoidStructures", Lists.newArrayList(DEF_AVOID_STRUCTURES), s -> s instanceof String);
+        AVOID_STRUCTURES_ADJACENT = SERVER_BUILDER
+                .comment("If true then also avoid generating the structures mentioned in 'avoidStructures' in chunks adjacent to the chunk with the structure")
+                .define("avoidStructuresAdjacent", true);
+        AVOID_VILLAGES_ADJACENT = SERVER_BUILDER
+                .comment("If true then also avoid generating cities in chunks adjacent to the chunks with villages")
+                .define("avoidVillagesAdjacent", true);
+        AVOID_FLATTENING = SERVER_BUILDER
+                .comment("If true then avoid flattening the terrain around the city in case there was a structure that was avoided")
+                .define("avoidFlattening", true);
 
         SERVER_BUILDER.pop();
         COMMON_BUILDER.pop();
