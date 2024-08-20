@@ -21,6 +21,16 @@ public enum Transform {
         return mcRotation;
     }
 
+    public static Transform randomRotation() {
+        return switch ((int) (Math.random() * 4)) {
+            case 0 -> ROTATE_NONE;
+            case 1 -> ROTATE_90;
+            case 2 -> ROTATE_180;
+            case 3 -> ROTATE_270;
+            default -> ROTATE_NONE;
+        };
+    }
+
     public Transform getOpposite() {
         return switch (this) {
             case ROTATE_NONE -> ROTATE_NONE;

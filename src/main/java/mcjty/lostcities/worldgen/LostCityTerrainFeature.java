@@ -2,7 +2,6 @@ package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCities;
-import mcjty.lostcities.api.ILostWorldsChunkGenerator;
 import mcjty.lostcities.api.LostCityEvent;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
@@ -10,6 +9,7 @@ import mcjty.lostcities.editor.EditModeData;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ModSetup;
 import mcjty.lostcities.varia.*;
+import mcjty.lostcities.worldgen.gen.*;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
@@ -22,7 +22,6 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
@@ -38,8 +37,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DoorHingeSide;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -49,7 +46,6 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -62,12 +58,11 @@ public class LostCityTerrainFeature {
     public static final int FLOORHEIGHT = 6;
 
     private static int gSeed = 123456789;
-    private final int mainGroundLevel;
     private final BlockState air;
     private final BlockState hardAir;
 
     private BlockState base = null;
-    private BlockState liquid;
+    public BlockState liquid;
 
     private Set<BlockState> railStates = null;
     private Set<BlockState> statesNeedingTodo = null;
@@ -90,10 +85,10 @@ public class LostCityTerrainFeature {
     private BlockState[] randomDirt = null;
     private Set<BlockState> randomDirtSet = null;
 
-    private final ChunkDriver driver;
+    public final ChunkDriver driver;
 
-    private final IDimensionInfo provider;
-    private final LostCityProfile profile;
+    public final IDimensionInfo provider;
+    public final LostCityProfile profile;
     private final RandomSource rand;
 
     private final Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
@@ -105,8 +100,7 @@ public class LostCityTerrainFeature {
         this.profile = profile;
         this.rand = rand;
         driver = new ChunkDriver();
-        this.mainGroundLevel = profile.GROUNDLEVEL;
-        int waterLevel = provider.getWorld() == null ? 65 : Tools.getSeaLevel(provider.getWorld());// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
+//        int waterLevel = provider.getWorld() == null ? 65 : Tools.getSeaLevel(provider.getWorld());// profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
         this.rubbleNoise = new NoiseGeneratorPerlin(rand, 4);
         this.leavesNoise = new NoiseGeneratorPerlin(rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);
@@ -191,7 +185,7 @@ public class LostCityTerrainFeature {
         return randomDirt[fastrand128()];
     }
 
-    private Set<BlockState> getRailStates() {
+    public Set<BlockState> getRailStates() {
         if (railStates == null) {
             railStates = new HashSet<>();
             addStates(Blocks.RAIL, railStates);
@@ -242,11 +236,6 @@ public class LostCityTerrainFeature {
             base = profile.getBaseBlock();
             liquid = profile.getLiquidBlock();
         }
-    }
-
-    private static int fastrand() {
-        gSeed = (214013 * gSeed + 2531011);
-        return (gSeed >> 16) & 0x7FFF;
     }
 
     public static int fastrand128() {
@@ -324,9 +313,9 @@ public class LostCityTerrainFeature {
 
         Railway.RailChunkInfo railInfo = info.getRailInfo();
         if (railInfo.getType() != RailChunkType.NONE) {
-            generateRailways(info, railInfo, heightmap);
+            Railways.generateRailways(this, info, railInfo, heightmap);
         }
-        generateRailwayDungeons(info);
+        Railways.generateRailwayDungeons(this, info);
 
 //        if (profile.isSpace()) {
 //            generateMonorails(info);
@@ -365,38 +354,6 @@ public class LostCityTerrainFeature {
             return info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT;
         } else {
             return info.getCityGroundLevel();
-        }
-    }
-
-    public void generateSpheres(WorldGenRegion region, ChunkAccess chunk) {
-        // Do the city spheres
-        if (profile.isSpace() || profile.isSpheres()) {
-            LevelAccessor oldRegion = driver.getRegion();
-            ChunkAccess oldChunk = driver.getPrimer();
-            driver.setPrimer(region, chunk);
-
-            int chunkX = chunk.getPos().x;
-            int chunkZ = chunk.getPos().z;
-            ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
-
-            CitySphere sphere = CitySphere.getCitySphere(coord, provider);
-            CitySphere.initSphere(sphere, provider);   // Make sure city sphere information is complete
-            if (sphere.isEnabled()) {
-                float radius = sphere.getRadius();
-                BlockPos cc = sphere.getCenterPos();
-                int cx = cc.getX() - chunkX * 16;
-                int cz = cc.getZ() - chunkZ * 16;
-                fillSphere(cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getSideBlock());
-            }
-
-            if (profile.isSpace()) {
-                BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
-                generateMonorails(info);
-            }
-
-            driver.actuallyGenerate(chunk);
-            driver.setPrimer(oldRegion, oldChunk);
-            ChunkFixer.fix(provider, coord);
         }
     }
 
@@ -443,167 +400,6 @@ public class LostCityTerrainFeature {
         return false;
     }
 
-    private void fillSphere(int centerx, int centery, int centerz, int radius,
-                            BlockState glass, BlockState sideBlock) {
-        double sqradius = radius * radius;
-        double sqradiusOffset = (radius - 2) * (radius - 2);
-        double sqradiusOuter = (radius + 2) * (radius + 2);
-
-        int minY = Math.max(provider.getWorld().getMinBuildHeight(), centery - radius - 1);
-        int maxY = Math.min(provider.getWorld().getMaxBuildHeight(), centery + radius + 1);
-        int seaLevel = Tools.getSeaLevel(provider.getWorld());
-        ChunkGenerator generator;
-        if (provider.getWorld() instanceof WorldGenRegion region) {
-            generator = ((ServerChunkCache) region.getChunkSource()).getGenerator();
-        } else {
-            generator = ((ServerLevel) provider.getWorld()).getChunkSource().getGenerator();
-        }
-        int outerSeaLevel = -1000;
-        if (generator instanceof ILostWorldsChunkGenerator lw) {
-            Integer o = lw.getOuterSeaLevel();
-            if (o != null) {
-                outerSeaLevel = o;
-            }
-        }
-
-        for (int x = 0; x < 16; x++) {
-            double dxdx = (x - centerx) * (x - centerx);
-            for (int z = 0; z < 16; z++) {
-                double dzdz = (z - centerz) * (z - centerz);
-                int bottom = Integer.MAX_VALUE;
-                if (dxdx + dzdz <= sqradius) {
-                    driver.current(x, minY, z);
-                    for (int y = minY; y <= centery; y++) {
-                        double dydy = (y - centery) * (y - centery);
-                        double sqdist = dxdx + dydy + dzdz;
-                        if (sqdist <= sqradius && sqdist >= sqradiusOffset) {
-                            if (y < bottom) {
-                                bottom = y - 1;
-                            }
-                            driver.block(sideBlock);
-                        }
-                        driver.incY();
-                    }
-                    for (int y = centery + 1; y < maxY; y++) {
-                        double dydy = (y - centery) * (y - centery);
-                        double sqdist = dxdx + dydy + dzdz;
-                        if (sqdist <= sqradius) {
-                            if (sqdist >= sqradiusOffset) {
-                                driver.block(glass);
-                            }
-                        } else {
-                            // Optionally clear above the sphere
-                            int yy = y;
-                            if (profile.CITYSPHERE_CLEARABOVE > 0) {
-                                int mY = Math.min(provider.getWorld().getMaxBuildHeight(), y + profile.CITYSPHERE_CLEARABOVE);
-                                while (yy <= mY) {
-                                    driver.block(yy <= outerSeaLevel ? liquid : air);
-                                    driver.incY();
-                                    yy++;
-                                }
-                            }
-                            if (profile.CITYSPHERE_CLEARABOVE_UNTIL_AIR) {
-                                // Clear until we hit air
-                                while (driver.getBlock() != air) {
-                                    driver.block(yy <= outerSeaLevel ? liquid : air);
-                                    driver.incY();
-                                    yy++;
-                                }
-                            }
-                            // Optionall clear below the sphere
-                            yy = bottom;
-                            if (profile.CITYSPHERE_CLEARBELOW > 0 && bottom != Integer.MAX_VALUE) {
-                                driver.current(x, yy, z);
-                                int mY = Math.max(provider.getWorld().getMinBuildHeight(), bottom - profile.CITYSPHERE_CLEARBELOW);
-                                while (yy >= mY) {
-                                    driver.block(yy <= outerSeaLevel ? liquid : air);
-                                    driver.decY();
-                                    yy--;
-                                }
-                            }
-                            if (profile.CITYSPHERE_CLEARBELOW_UNTIL_AIR && bottom != Integer.MAX_VALUE) {
-                                // Clear until we hit air or go below build limit
-                                driver.current(x, yy, z);
-                                while (driver.getBlock() != (yy <= seaLevel ? liquid : air) && yy > provider.getWorld().getMinBuildHeight()) {
-                                    driver.block(yy <= outerSeaLevel ? liquid : air);
-                                    driver.decY();
-                                    yy--;
-                                }
-                            }
-                            break;
-                        }
-                        driver.incY();
-                    }
-                } else if (dxdx + dzdz <= sqradiusOuter) {
-                    // If we are in a space profile then we clear the sphere area too
-                    if (profile.isFloating() || profile.isSpace()) {
-                        driver.current(x, minY, z);
-                        for (int y = minY; y < maxY; y++) {
-                            driver.block(y <= outerSeaLevel ? liquid : air);
-                            driver.incY();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-    private void generateMonorails(BuildingInfo info) {
-        MonorailParts monoRailParts = provider.getWorldStyle().getPartSelector().monoRailParts();
-        Transform transform;
-        boolean horiz = info.hasHorizontalMonorail();
-        boolean vert = info.hasVerticalMonorail();
-        if (horiz && vert) {
-            if (!CitySphere.intersectsWithCitySphere(info.coord, provider)) {
-                BuildingPart part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), monoRailParts.both());
-                generatePart(info, part, Transform.ROTATE_NONE, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, HardAirSetting.WATERLEVEL);
-            }
-            return;
-        } else if (horiz) {
-            transform = Transform.ROTATE_90;
-        } else if (vert) {
-            transform = Transform.ROTATE_NONE;
-        } else {
-            return;
-        }
-        BuildingPart part;
-
-        if (CitySphere.fullyInsideCitySpere(info.coord, provider)) {
-            // If there is a non-enclosed monorail nearby we generate a station
-            if (hasNonStationMonoRail(info.getXmin())) {
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), monoRailParts.station());
-                Character borderBlock = info.getCityStyle().getBorderBlock();
-                transform = Transform.MIRROR_90_X; // flip
-                fillToGround(info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
-            } else if (hasNonStationMonoRail(info.getXmax())) {
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), monoRailParts.station());
-                Character borderBlock = info.getCityStyle().getBorderBlock();
-                transform = Transform.ROTATE_90;
-                fillToGround(info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
-            } else if (hasNonStationMonoRail(info.getZmin())) {
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), monoRailParts.station());
-                Character borderBlock = info.getCityStyle().getBorderBlock();
-                transform = Transform.ROTATE_NONE;
-                fillToGround(info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
-            } else if (hasNonStationMonoRail(info.getZmax())) {
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), monoRailParts.station());
-                Character borderBlock = info.getCityStyle().getBorderBlock();
-                transform = Transform.MIRROR_Z; // flip
-                fillToGround(info, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, borderBlock);
-            } else {
-                return;
-            }
-        } else {
-            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), monoRailParts.vertical());
-        }
-
-        generatePart(info, part, transform, 0, mainGroundLevel + info.profile.CITYSPHERE_MONORAIL_HEIGHT_OFFSET, 0, HardAirSetting.WATERLEVEL);
-    }
-
-    private boolean hasNonStationMonoRail(BuildingInfo info) {
-        return info.hasMonorail() && !CitySphere.fullyInsideCitySpere(info.coord, provider);
-    }
 
     private void fixTorches(BuildingInfo info) {
         List<BlockPos> torches = info.getTorchTodo();
@@ -634,11 +430,8 @@ public class LostCityTerrainFeature {
 
     private void doNormalChunk(BuildingInfo info, ChunkHeightmap heightmap, boolean avoidChunk) {
 //        debugClearChunk(chunkX, chunkZ, primer);
-        // TqLxQuanZ: Used for detect the shape correcting in the normal chunk, if there's a terrain shape correct happening,
-        // do not attempt to generate scattered building as they'll float in midair since it uses heightmap.
-        boolean trimmed = false;
         if ((!avoidChunk || !Config.AVOID_FLATTENING.get()) && (profile.isDefault() || profile.isSpheres())) {
-            trimmed = correctTerrainShape(provider.getWorld(), info.coord, heightmap);
+            correctTerrainShape(provider.getWorld(), info.coord, heightmap);
 //            flattenChunkToCityBorder(chunkX, chunkZ);
         }
 
@@ -647,272 +440,15 @@ public class LostCityTerrainFeature {
         LostCityEvent.PostGenOutsideChunkEvent postevent = new LostCityEvent.PostGenOutsideChunkEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, driver.getPrimer());
         MinecraftForge.EVENT_BUS.post(postevent);
 
-        generateBridges(info);
-        generateHighways(info);
+        Bridges.generateBridges(this, info);
+        Highways.generateHighways(this, info);
 
         ScatteredSettings scatteredSettings = provider.getWorldStyle().getScatteredSettings();
         if (scatteredSettings != null) {
-            if (avoidScattered(info) && !trimmed) {
-                generateScattered(info, scatteredSettings, heightmap);
+            if (!mcjty.lostcities.worldgen.gen.Scattered.avoidScattered(this, info)) {
+                mcjty.lostcities.worldgen.gen.Scattered.generateScattered(this, info, scatteredSettings, heightmap);
             }
         }
-    }
-
-    private boolean avoidScattered(BuildingInfo info) {
-        return !(info.isCity || info.hasBridge(provider) || Highway.hasHighway(info.coord, provider, profile));
-    }
-
-    private void generateScattered(BuildingInfo info, ScatteredSettings scatteredSettings, ChunkHeightmap heightmap) {
-        int chunkX = info.chunkX;
-        int chunkZ = info.chunkZ;
-
-        // First normalize the coordinates to scatter area sized coordinates. Add a large amount to make sure the coordinates are positive
-        int ax = (chunkX + 2000000) / scatteredSettings.getAreasize();
-        int az = (chunkZ + 2000000) / scatteredSettings.getAreasize();
-
-        QualityRandom scatteredRandom = new QualityRandom(provider.getSeed() + ax * 5564338337L + az * 25564337621L);
-
-        if (scatteredRandom.nextFloat() < scatteredSettings.getChance()) {
-            // No scattered structure in this area
-            return;
-        }
-
-        // Find the right type of scattered asset for this area
-        ScatteredReference reference = selectRandomScattered(info, scatteredSettings, scatteredRandom);
-        if (reference == null) {
-            // Nothing matches
-            return;
-        }
-        Scattered scattered = AssetRegistries.SCATTERED.getOrThrow(provider.getWorld(), reference.getName());
-
-        // Find the size of the scattered building
-        int w;
-        int h;
-        MultiBuilding multiBuilding;
-        if (scattered.getMultibuilding() != null) {
-            multiBuilding = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), scattered.getMultibuilding());
-            w = multiBuilding.getDimX();
-            h = multiBuilding.getDimZ();
-        } else {
-            w = h = 1;
-            multiBuilding = null;
-        }
-
-        // Find the position of the building in the world
-        int tlChunkX = (ax * scatteredSettings.getAreasize() - 2000000) + scatteredRandom.nextInt(scatteredSettings.getAreasize() - w + 1);
-        int tlChunkZ = (az * scatteredSettings.getAreasize() - 2000000) + scatteredRandom.nextInt(scatteredSettings.getAreasize() - h + 1);
-
-        if (chunkX < tlChunkX || chunkZ < tlChunkZ || chunkX >= (tlChunkX + w) || chunkZ >= (tlChunkZ + h)) {
-            return;
-        }
-
-        // First test the conditions for all the relevant chunks (does this need to be cached?)
-        int minheight = Integer.MAX_VALUE;
-        int maxheight = Integer.MIN_VALUE;
-        int avgheight = 0;
-        for (int x = tlChunkX; x < tlChunkX + w; x++) {
-            for (int z = tlChunkZ; z < tlChunkZ + h; z++) {
-                ChunkCoord coord = new ChunkCoord(provider.getType(), x, z);
-                BuildingInfo tinfo = BuildingInfo.getBuildingInfo(coord, provider);
-                ChunkHeightmap hm = getHeightmap(coord, provider.getWorld());
-                if (!isValidScatterBiome(reference, coord)) {
-                    return;
-                }
-                if (!avoidScattered(tinfo)) {
-                    return;
-                }
-                if (!reference.isAllowVoid()) {
-                    if (!(profile.isDefault() || profile.isCavern())) {
-                        // We are in a world that can have void chunks. Check if this chunk is a void chunk
-                        if (hm.getHeight() <= this.provider.getWorld().getMinBuildHeight() + 3) {
-                            return;
-                        }
-                    }
-                }
-                minheight = Math.min(minheight, hm.getHeight());
-                maxheight = Math.max(maxheight, hm.getHeight());
-                avgheight += hm.getHeight();
-            }
-        }
-        // Check the height difference
-        if (reference.getMaxheightdiff() != null) {
-            int diff = maxheight - minheight;
-            if (diff > reference.getMaxheightdiff()) {
-                return;
-            }
-        }
-
-        avgheight /= w * h;
-
-
-        // We need to generate a part of the building
-        if (multiBuilding == null) {
-            // A single building
-            List<String> buildings = scattered.getBuildings();
-            if (buildings == null) {
-                throw new RuntimeException("Missing buildings for scattered '" + reference.getName() + "'!");
-            }
-            String buildingName;
-            if (buildings.size() == 1) {
-                buildingName = buildings.get(0);
-            } else {
-                buildingName = buildings.get(scatteredRandom.nextInt(buildings.size()));
-            }
-            Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
-            int lowestLevel = handleScatteredTerrain(info, scattered, heightmap);
-            generateScatteredBuilding(info, building, scatteredRandom, lowestLevel, scattered.getTerrainfix());
-        } else {
-            int lowestLevel = handleScatteredTerrainMulti(info, scattered, multiBuilding, minheight, maxheight, avgheight);
-            int relx = chunkX - tlChunkX;
-            int relz = chunkZ - tlChunkZ;
-            String buildingName = multiBuilding.getBuilding(relx, relz);
-            Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
-            generateScatteredBuilding(info, building, scatteredRandom, lowestLevel, scattered.getTerrainfix());
-        }
-    }
-
-    @Nullable
-    private ScatteredReference selectRandomScattered(BuildingInfo info, ScatteredSettings scatteredSettings, Random rand) {
-        List<ScatteredReference> list = scatteredSettings.getList();
-        if (list.isEmpty()) {
-            return null;
-        }
-
-        int totalweight = 0;
-        List<ScatteredReference> filteredList = new ArrayList<>();
-        for (ScatteredReference reference : list) {
-            if (isValidScatterBiome(reference, info.coord)) {
-                totalweight += reference.getWeight();
-                filteredList.add(reference);
-            }
-        }
-        if (filteredList.isEmpty()) {
-            return null;
-        }
-
-        int rndweight = rand.nextInt(totalweight + scatteredSettings.getWeightnone());
-        ScatteredReference reference = null;
-        for (ScatteredReference scatteredReference : filteredList) {
-            int weight = scatteredReference.getWeight();
-            if (rndweight <= weight) {
-                reference = scatteredReference;
-                break;
-            }
-            rndweight -= weight;
-        }
-        return reference;
-    }
-
-    private boolean isValidScatterBiome(ScatteredReference reference, ChunkCoord coord) {
-        if (reference.getBiomeMatcher() != null) {
-            BiomeInfo biome = BiomeInfo.getBiomeInfo(provider, coord);
-            return reference.getBiomeMatcher().test(biome.getMainBiome());
-        }
-        return true;
-    }
-
-    private void generateScatteredBuilding(BuildingInfo info, Building building, Random rand, int lowestLevel, Scattered.TerrainFix terrainFix) {
-        int chunkX = info.chunkX;
-        int chunkZ = info.chunkZ;
-
-        int height = lowestLevel;
-        int floors;
-        int minfloors = building.getMinFloors();
-        if (minfloors <= 0) {
-            minfloors = 1;
-        }
-        int maxfloors = building.getMaxFloors();
-        if (maxfloors <= 0) {
-            maxfloors = 1;
-        }
-        if (minfloors >= maxfloors) {
-            floors = minfloors;
-        } else {
-            floors = minfloors + rand.nextInt(maxfloors - minfloors + 1);
-        }
-        for (int f = 0; f < floors; f++) {
-            ConditionContext conditionContext = new ConditionContext(lowestLevel, f, 0, floors, "<none>", building.getName(),
-                    chunkX, chunkZ) {
-                @Override
-                public boolean isBuilding() {
-                    return true;
-                }
-
-                @Override
-                public boolean isSphere() {
-                    return CitySphere.isInSphere(info.coord, new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8), provider);
-                }
-
-                @Override
-                public ResourceLocation getBiome() {
-                    Holder<Biome> biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8));
-                    return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().registryOrThrow(Registries.BIOME).getKey(b));
-                }
-            };
-            String randomPart = building.getRandomPart(rand, conditionContext);
-            BuildingPart part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), randomPart);
-            randomPart = building.getRandomPart2(rand, conditionContext);
-            BuildingPart part2 = AssetRegistries.PARTS.get(provider.getWorld(), randomPart);    // Null is legal
-
-            if (f == 0) {
-                switch (terrainFix) {
-                    case NONE -> {
-                    }
-                    case CLEAR -> {
-                        for (int x = 0; x < 16; x++) {
-                            for (int z = 0; z < 16; z++) {
-                                clearRange(info, x, z, lowestLevel, lowestLevel + 50, false);
-                            }
-                        }
-                    }
-                    case REPEATSLICE -> {
-                        CompiledPalette compiledPalette = computePalette(info, part);
-                        for (int x = 0; x < 16; x++) {
-                            for (int z = 0; z < 16; z++) {
-                                char c = part.getPaletteChar(x, 0, z);
-                                if (c != ' ') {
-                                    int y = lowestLevel - 1;
-                                    driver.current(x, y, z);
-                                    BlockState b = driver.getBlock();
-                                    while (b == air || b == liquid) {
-                                        driver.block(compiledPalette.get(c));
-                                        driver.decY();
-                                        b = driver.getBlock();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            height += generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.AIR);
-            if (part2 != null) {
-                generatePart(info, part2, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.AIR);
-            }
-        }
-    }
-
-    private int handleScatteredTerrain(BuildingInfo info, Scattered scattered, ChunkHeightmap heightmap) {
-        int lowestLevel = switch (scattered.getTerrainheight()) {
-            case LOWEST -> heightmap.getHeight();
-            case AVERAGE -> heightmap.getHeight();
-            case HIGHEST -> heightmap.getHeight();
-            case OCEAN -> ((ServerChunkCache) provider.getWorld().getChunkSource()).getGenerator().getSeaLevel();
-        };
-        lowestLevel += scattered.getHeightoffset();
-        return lowestLevel;
-    }
-
-    private int handleScatteredTerrainMulti(BuildingInfo info, Scattered scattered, MultiBuilding multiBuilding, int minimum, int maximum, int average) {
-        int lowestLevel = switch (scattered.getTerrainheight()) {
-            case LOWEST -> minimum;
-            case AVERAGE -> maximum;
-            case HIGHEST -> average;
-            case OCEAN -> ((ServerChunkCache) provider.getWorld().getChunkSource()).getGenerator().getSeaLevel();
-        };
-        lowestLevel += scattered.getHeightoffset();
-        return lowestLevel;
     }
 
     private void breakBlocksForDamageNew(int chunkX, int chunkZ, BuildingInfo info) {
@@ -996,36 +532,7 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void generateHighways(BuildingInfo info) {
-        int levelX = Highway.getXHighwayLevel(info.coord, provider, info.profile);
-        int levelZ = Highway.getZHighwayLevel(info.coord, provider, info.profile);
-        if (levelX == levelZ && levelX >= 0) {
-            // Crossing
-            generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getXmax(), info.getZmax(), true);
-        } else if (levelX >= 0 && levelZ >= 0) {
-            // There are two highways on different level. Make sure the lowest one is done first because it
-            // will clear out what is above it
-            if (levelX == 0) {
-                generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), false);
-                generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), false);
-            } else {
-                generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), false);
-                generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), false);
-            }
-        } else {
-            if (levelX >= 0) {
-                generateHighwayPart(info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), false);
-            } else if (levelZ >= 0) {
-                generateHighwayPart(info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), false);
-            }
-        }
-    }
-
-    private static boolean isClearableAboveHighway(BlockState st) {
-        return !st.is(BlockTags.LEAVES) && !st.is(BlockTags.LOGS);
-    }
-
-    private String getRandomPart(List<String> parts) {
+    public String getRandomPart(List<String> parts) {
         if (parts.size() == 1) {
             return parts.get(0);
         } else {
@@ -1033,77 +540,7 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void generateHighwayPart(BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, boolean bidirectional) {
-        int highwayGroundLevel = info.groundLevel + level * FLOORHEIGHT;
-        HighwayParts highwayParts = provider.getWorldStyle().getPartSelector().highwayParts();
-
-        BuildingPart part;
-        if (info.isTunnel(level)) {
-            // We know we need a tunnel
-            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(highwayParts.tunnel(bidirectional)));
-            generatePart(info, part, transform, 0, highwayGroundLevel, 0, HardAirSetting.WATERLEVEL);
-        } else if (info.isCity && level <= adjacent1.cityLevel && level <= adjacent2.cityLevel && adjacent1.isCity && adjacent2.isCity) {
-            // Simple highway in the city
-            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(highwayParts.open(bidirectional)));
-            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, HardAirSetting.WATERLEVEL);
-            // Clear a bit more above the highway
-            if (!info.profile.isCavern()) {
-                int clearheight = 15;
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        clearRange(info, x, z, height, height + clearheight, info.waterLevel > info.groundLevel,
-                                LostCityTerrainFeature::isClearableAboveHighway);
-                    }
-                }
-            }
-        } else {
-            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(highwayParts.bridge(bidirectional)));
-            int height = generatePart(info, part, transform, 0, highwayGroundLevel, 0, HardAirSetting.WATERLEVEL);
-            // Clear a bit more above the highway
-            if (!info.profile.isCavern()) {
-                int clearheight = 15;
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        clearRange(info, x, z, height, height + clearheight, info.waterLevel > info.groundLevel,
-                                LostCityTerrainFeature::isClearableAboveHighway);
-                    }
-                }
-            }
-        }
-
-        Character support = part.getMetaChar(ILostCities.META_SUPPORT);
-        if (info.profile.HIGHWAY_SUPPORTS && support != null) {
-            BlockState sup = info.getCompiledPalette().get(support);
-            if (sup == null) {
-                throw new RuntimeException("Cannot find support block '" + support + "' for highway part '" + part.getName() + "'!");
-            }
-            int x1 = transform.rotateX(0, 15);
-            int z1 = transform.rotateZ(0, 15);
-            driver.current(x1, highwayGroundLevel - 1, z1);
-            for (int y = 0; y < 40; y++) {
-                if (isEmpty(driver.getBlock())) {
-                    driver.block(sup);
-                } else {
-                    break;
-                }
-                driver.decY();
-            }
-
-            int x2 = transform.rotateX(0, 0);
-            int z2 = transform.rotateZ(0, 0);
-            driver.current(x2, highwayGroundLevel - 1, z2);
-            for (int y = 0; y < 40; y++) {
-                if (isEmpty(driver.getBlock())) {
-                    driver.block(sup);
-                } else {
-                    break;
-                }
-                driver.decY();
-            }
-        }
-    }
-
-    private void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater) {
+    public void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater) {
         if (dowater) {
             // Special case for drowned city
             driver.setBlockRange(x, height1, z, info.waterLevel, liquid);
@@ -1113,104 +550,13 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater, Predicate<BlockState> test) {
+    public void clearRange(BuildingInfo info, int x, int z, int height1, int height2, boolean dowater, Predicate<BlockState> test) {
         if (dowater) {
             // Special case for drowned city
             driver.setBlockRange(x, height1, z, info.waterLevel, liquid, test);
             driver.setBlockRangeToAir(x, info.waterLevel + 1, z, height2, test);
         } else {
             driver.setBlockRangeToAir(x, height1, z, height2, test);
-        }
-    }
-
-    private void generateBridges(BuildingInfo info) {
-        if (info.getHighwayXLevel() == 0 || info.getHighwayZLevel() == 0) {
-            // If there is a highway at level 0 we cannot generate bridge parts. If there
-            // is no highway or a highway at level 1 then bridge sections can generate just fine
-            return;
-        }
-        BuildingPart bt = info.hasXBridge(provider);
-        if (bt != null) {
-            generateBridge(info, bt, Orientation.X);
-        } else {
-            bt = info.hasZBridge(provider);
-            if (bt != null) {
-                generateBridge(info, bt, Orientation.Z);
-            }
-        }
-    }
-
-    private void generateBridge(BuildingInfo info, BuildingPart bt, Orientation orientation) {
-        CompiledPalette compiledPalette = computePalette(info, bt);
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                driver.current(x, mainGroundLevel + 1, z);
-                int l = 0;
-                while (l < bt.getSliceCount()) {
-                    Character c = orientation == Orientation.X ? bt.getPaletteChar(x, l, z) : bt.getPaletteChar(z, l, x); // @todo general rotation system?
-                    BlockState b = compiledPalette.get(c);
-                    Palette.Info inf = compiledPalette.getInfo(c);
-                    if (inf != null) {
-                        if (inf.isTorch()) {
-                            if (info.profile.GENERATE_LIGHTING) {
-                                info.addTorchTodo(driver.getCurrentCopy());
-                            } else {
-                                b = air;        // No torch!
-                            }
-                        }
-                    }
-                    driver.add(b);
-                    l++;
-                }
-            }
-        }
-
-        Character support = bt.getMetaChar(ILostCities.META_SUPPORT);
-        if (info.profile.BRIDGE_SUPPORTS && support != null) {
-            BlockState sup = compiledPalette.get(support);
-            BuildingInfo minDir = orientation.getMinDir().get(info);
-            BuildingInfo maxDir = orientation.getMaxDir().get(info);
-            if (minDir.hasBridge(provider, orientation) != null && maxDir.hasBridge(provider, orientation) != null) {
-                // Needs support
-                for (int y = info.waterLevel - 10; y <= info.groundLevel; y++) {
-                    driver.current(7, y, 7).block(sup);
-                    driver.current(7, y, 8).block(sup);
-                    driver.current(8, y, 7).block(sup);
-                    driver.current(8, y, 8).block(sup);
-                }
-            }
-            if (minDir.hasBridge(provider, orientation) == null) {
-                // Connection to the side section
-                if (orientation == Orientation.X) {
-                    int x = 0;
-                    driver.current(x, mainGroundLevel, 6);
-                    for (int z = 6; z <= 9; z++) {
-                        driver.block(sup).incZ();
-                    }
-                } else {
-                    int z = 0;
-                    driver.current(6, mainGroundLevel, z);
-                    for (int x = 6; x <= 9; x++) {
-                        driver.block(sup).incX();
-                    }
-                }
-            }
-            if (maxDir.hasBridge(provider, orientation) == null) {
-                // Connection to the side section
-                if (orientation == Orientation.X) {
-                    int x = 15;
-                    driver.current(x, mainGroundLevel, 6);
-                    for (int z = 6; z <= 9; z++) {
-                        driver.block(sup).incZ();
-                    }
-                } else {
-                    int z = 15;
-                    driver.current(6, mainGroundLevel, z);
-                    for (int x = 6; x <= 9; x++) {
-                        driver.block(sup).incX();
-                    }
-                }
-            }
         }
     }
 
@@ -1256,7 +602,7 @@ public class LostCityTerrainFeature {
      * or up the top layer (6 thick) of the terrain. In a chunk these heights are interpolated
      * (bilinear interpolation).
      */
-    private boolean correctTerrainShape(WorldGenLevel level, ChunkCoord coord, ChunkHeightmap heightmap) {
+    private void correctTerrainShape(WorldGenLevel level, ChunkCoord coord, ChunkHeightmap heightmap) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
         BuildingInfo.MinMax mm00 = info.getDesiredMaxHeightL2();
         BuildingInfo.MinMax mm10 = info.getXmax().getDesiredMaxHeightL2();
@@ -1264,6 +610,7 @@ public class LostCityTerrainFeature {
         BuildingInfo.MinMax mm11 = info.getXmax().getZmax().getDesiredMaxHeightL2();
 
         int max = level.getMaxBuildHeight();
+        int heightmapH = Short.MIN_VALUE;
 
         float min00 = mm00.min;
         float min10 = mm10.min;
@@ -1273,7 +620,6 @@ public class LostCityTerrainFeature {
         float max10 = mm10.max;
         float max01 = mm01.max;
         float max11 = mm11.max;
-        boolean trimmed = false;
         if (max00 < max || max10 < max || max01 < max || max11 < max ||
                 min00 < max || min10 < max || min01 < max || min11 < max) {
             // We need to fit the terrain between the upper and lower mesh here
@@ -1313,21 +659,25 @@ public class LostCityTerrainFeature {
                 float minh1 = min10 + (min00 - min10) * factor;
                 for (int z = 0; z < 16; z++) {
                     float maxheight = maxh0 + (maxh1 - maxh0) * (15.0f - z) / 15.0f;
-                    boolean moved = moveDown(x, z, (int) maxheight, max);
+                    int maxTouchedY = moveDown(x, z, (int) maxheight, max);
 
-                    if (!moved) {
+                    if (maxTouchedY == Short.MIN_VALUE) {
                         float minheight = minh0 + (minh1 - minh0) * (15.0f - z) / 15.0f;
-                        moved = moveUp(x, z, (int) minheight, info.waterLevel > info.groundLevel);
+                        maxTouchedY = moveUp(x, z, (int) minheight, info.waterLevel > info.groundLevel);
                     }
-                    trimmed |= moved;
+                    if (maxTouchedY != Short.MIN_VALUE) {
+                        heightmapH = Math.max(heightmapH, maxTouchedY);
+                    }
                 }
             }
+            if (heightmapH != Short.MIN_VALUE) {
+                heightmap.setHeight(heightmapH);
+            }
         }
-        return trimmed;
     }
 
     // Return true if state is air or liquid
-    private static boolean isEmpty(BlockState state) {
+    public static boolean isEmpty(BlockState state) {
         if (state.isAir()) {
             return true;
         }
@@ -1348,7 +698,9 @@ public class LostCityTerrainFeature {
         return Tools.hasTag(state.getBlock(), LostTags.FOLIAGE_TAG);
     }
 
-    private boolean moveUp(int x, int z, int height, boolean dowater) {
+    // Return the new max height of the chunk in this column. Or Short.MIN_VALUE if nothing was done
+    private int moveUp(int x, int z, int height, boolean dowater) {
+        int maxYTouched = Short.MIN_VALUE;       // Max Y that we touched
         // Find the first non-empty block starting at the given height
         driver.current(x, height, z);
         int minHeight = provider.getWorld().getMinBuildHeight();
@@ -1358,7 +710,7 @@ public class LostCityTerrainFeature {
         }
 
         if (driver.getY() >= height) {
-            return false; // Nothing to do
+            return maxYTouched; // Nothing to do
         }
 
         int idx = driver.getY();    // Points to non-empty block below the empty block
@@ -1368,16 +720,21 @@ public class LostCityTerrainFeature {
             if (blockToMove.isAir() || blockToMove.getBlock() == Blocks.BEDROCK) {
                 break;
             }
+            if (maxYTouched == Short.MIN_VALUE) {
+                maxYTouched = idx;
+            }
             driver.block(blockToMove);
             driver.decY();
             idx--;
         }
-        return true;
+        return maxYTouched;
     }
 
     private final BlockState[] buffer = new BlockState[6];
 
-    private boolean moveDown(int x, int z, int height, int maxBuildLimit) {
+    // Return the new max height of the chunk in this column. Or Short.MIN_VALUE if nothing was done
+    private int moveDown(int x, int z, int height, int maxBuildLimit) {
+        int maxYTouched = Short.MIN_VALUE;       // Max Y that we touched
         int y = maxBuildLimit-1;
         driver.current(x, y, z);
         // We assume here we are not in a void chunk
@@ -1386,7 +743,7 @@ public class LostCityTerrainFeature {
         }
 
         if (driver.getY() <= height) {
-            return false; // Nothing to do
+            return maxYTouched; // Nothing to do
         }
 
         // We arrived at our first non-air block
@@ -1399,6 +756,7 @@ public class LostCityTerrainFeature {
             driver.decY();
         }
 
+        maxYTouched = driver.getY();
         int idx = 0;
         while (idx < bufferIdx && driver.getY() > 0) {
             driver.block(buffer[idx++]);
@@ -1413,7 +771,7 @@ public class LostCityTerrainFeature {
 //        } else {
 //            driver.setBlockRange(x, height1, z, height2, air);
 //        }
-        return true;
+        return maxYTouched;
     }
 
 
@@ -1516,9 +874,8 @@ public class LostCityTerrainFeature {
             int ground = info.getCityGroundLevel();
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    boolean moved = moveDown(x, z, ground + 1, provider.getWorld().getMaxBuildHeight());
-
-                    if (!moved) {
+                    int maxTouchedY = moveDown(x, z, ground + 1, provider.getWorld().getMaxBuildHeight());
+                    if (maxTouchedY == Short.MIN_VALUE) {
                         moveUp(x, z, ground, info.waterLevel > info.groundLevel);
                     }
                 }
@@ -1551,7 +908,7 @@ public class LostCityTerrainFeature {
             }
         }
         if (levelX >= 0 || levelZ >= 0) {
-            generateHighways(info);
+            Highways.generateHighways(this, info);
         }
 
         if (info.profile.RUBBLELAYER) {
@@ -1642,238 +999,6 @@ public class LostCityTerrainFeature {
                     }
                 }
             }
-        }
-    }
-
-    private void generateRailwayDungeons(BuildingInfo info) {
-        if (info.railDungeon == null) {
-            return;
-        }
-        if (info.getZmin().getRailInfo().getType() == RailChunkType.HORIZONTAL ||
-                info.getZmax().getRailInfo().getType() == RailChunkType.HORIZONTAL) {
-            int height = info.groundLevel + Railway.RAILWAY_LEVEL_OFFSET * FLOORHEIGHT;
-            generatePart(info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.AIR);
-        }
-    }
-
-    private void generateRailways(BuildingInfo info, Railway.RailChunkInfo railInfo, ChunkHeightmap heightmap) {
-        RailwayParts railwayParts = provider.getWorldStyle().getPartSelector().railwayParts();
-        int height = info.groundLevel + railInfo.getLevel() * FLOORHEIGHT;
-        RailChunkType type = railInfo.getType();
-        BuildingPart part;
-        Transform transform = Transform.ROTATE_NONE;
-        boolean needsStaircase = false;
-        boolean clearUpper = false;
-        switch (type) {
-            case NONE:
-                return;
-            case STATION_SURFACE:
-            case STATION_EXTENSION_SURFACE:
-                if (railInfo.getLevel() < info.cityLevel) {
-                    // Even for a surface station extension we switch to underground if we are an extension
-                    // that is at a spot where the city is higher then where the station is
-                    part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.stationUnderground()));
-                } else {
-                    if (railInfo.getPart() != null) {
-                        part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railInfo.getPart()));
-                    } else {
-                        part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.stationOpen()));
-                    }
-                }
-                clearUpper = true;
-                break;
-            case STATION_UNDERGROUND:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.stationUndergroundStairs()));
-                needsStaircase = true;
-                break;
-            case STATION_EXTENSION_UNDERGROUND:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.stationUnderground()));
-                break;
-            case RAILS_END_HERE:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsHorizontalEnd()));
-                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
-                    transform = Transform.MIRROR_X;
-                }
-                break;
-            case HORIZONTAL:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsHorizontal()));
-
-                // If the adjacent chunks are also horizontal we take a sample of the blocks around us to see if we are in water
-                RailChunkType type1 = info.getXmin().getRailInfo().getType();
-                RailChunkType type2 = info.getXmax().getRailInfo().getType();
-                if (!type1.isStation() && !type2.isStation()) {
-                    if (driver.getBlock(3, height + 2, 3) == liquid &&
-                            driver.getBlock(12, height + 2, 3) == liquid &&
-                            driver.getBlock(3, height + 2, 12) == liquid &&
-                            driver.getBlock(12, height + 2, 12) == liquid &&
-                            driver.getBlock(3, height + 4, 7) == liquid &&
-                            driver.getBlock(12, height + 4, 8) == liquid) {
-                        part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsHorizontalWater()));
-                    }
-                }
-                break;
-            case VERTICAL:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsVertical()));
-                if (driver.getBlock(3, height + 2, 3) == liquid &&
-                        driver.getBlock(12, height + 2, 3) == liquid &&
-                        driver.getBlock(3, height + 2, 12) == liquid &&
-                        driver.getBlock(12, height + 2, 12) == liquid &&
-                        driver.getBlock(3, height + 4, 7) == liquid &&
-                        driver.getBlock(12, height + 4, 8) == liquid) {
-                    part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsVerticalWater()));
-                }
-                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
-                    transform = Transform.MIRROR_X;
-                }
-                break;
-            case THREE_SPLIT:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.rails3Split()));
-                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
-                    transform = Transform.MIRROR_X;
-                }
-                break;
-            case GOING_DOWN_TWO_FROM_SURFACE:
-            case GOING_DOWN_FURTHER:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsDown2()));
-                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
-                    transform = Transform.MIRROR_X;
-                }
-                break;
-            case GOING_DOWN_ONE_FROM_SURFACE:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsDown1()));
-                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
-                    transform = Transform.MIRROR_X;
-                }
-                break;
-            case DOUBLE_BEND:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsBend()));
-                if (railInfo.getDirection() == Railway.RailDirection.EAST) {
-                    transform = Transform.MIRROR_X;
-                }
-                break;
-            default:
-                part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.railsFlat()));
-                break;
-        }
-        int h = generatePart(info, part, transform, 0, height, 0, HardAirSetting.AIR);
-        if (clearUpper) {
-            int maxh = heightmap.getHeight() + 4;
-            if (h < maxh) {
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        clearRange(info, x, z, h, maxh, false);
-                    }
-                }
-            }
-        }
-
-        Character railMainBlock = info.getCityStyle().getRailMainBlock();
-        BlockState rail = info.getCompiledPalette().get(railMainBlock);
-        if (rail == null) {
-            throw new RuntimeException("Cannot find rail block '" + railMainBlock + "' for type '" + type + "'!");
-        }
-
-        if (type == RailChunkType.HORIZONTAL) {
-            // If there is a rail dungeon north or south we must make a connection here
-            if (info.getZmin().railDungeon != null) {
-                for (int z = 0; z < 4; z++) {
-                    driver.current(6, height + 1, z).add(rail).add(air).add(air);
-                    driver.current(7, height + 1, z).add(rail).add(air).add(air);
-                }
-                for (int z = 0; z < 3; z++) {
-                    driver.current(5, height + 2, z).add(rail).add(rail).add(rail);
-                    driver.current(6, height + 4, z).block(rail);
-                    driver.current(7, height + 4, z).block(rail);
-                    driver.current(8, height + 2, z).add(rail).add(rail).add(rail);
-                }
-            }
-
-            if (info.getZmax().railDungeon != null) {
-                for (int z = 0; z < 5; z++) {
-                    driver.current(6, height + 1, 15 - z).add(rail).add(air).add(air);
-                    driver.current(7, height + 1, 15 - z).add(rail).add(air).add(air);
-                }
-                for (int z = 0; z < 4; z++) {
-                    driver.current(5, height + 2, 15 - z).add(rail).add(rail).add(rail);
-                    driver.current(6, height + 4, 15 - z).block(rail);
-                    driver.current(7, height + 4, 15 - z).block(rail);
-                    driver.current(8, height + 2, 15 - z).add(rail).add(rail).add(rail);
-                }
-            }
-        }
-
-        if (railInfo.getRails() < 3) {
-            // We may have to reduce number of rails
-            int index;
-            switch (railInfo.getType()) {
-                case NONE:
-                    break;
-                case STATION_SURFACE:
-                case STATION_UNDERGROUND:
-                case STATION_EXTENSION_SURFACE:
-                case STATION_EXTENSION_UNDERGROUND:
-                case HORIZONTAL: {
-                    if (railInfo.getRails() == 1) {
-                        driver.current(0, height + 1, 5);
-                        for (int x = 0; x < 16; x++) {
-                            driver.block(rail).incX();
-                        }
-                        driver.current(0, height + 1, 9);
-                        for (int x = 0; x < 16; x++) {
-                            driver.block(rail).incX();
-                        }
-                    } else {
-                        driver.current(0, height + 1, 7);
-                        for (int x = 0; x < 16; x++) {
-                            driver.block(rail).incX();
-                        }
-                    }
-                    break;
-                }
-                case GOING_DOWN_TWO_FROM_SURFACE:
-                case GOING_DOWN_ONE_FROM_SURFACE:
-                case GOING_DOWN_FURTHER:
-                    if (railInfo.getRails() == 1) {
-                        for (int x = 0; x < 16; x++) {
-                            for (int y = height + 1; y < height + part.getSliceCount(); y++) {
-                                driver.current(x, y, 5);
-                                if (getRailStates().contains(driver.getBlock())) {
-                                    driver.block(rail);
-                                }
-                                driver.current(x, y, 9);
-                                if (getRailStates().contains(driver.getBlock())) {
-                                    driver.block(rail);
-                                }
-                            }
-                        }
-                    } else {
-                        for (int x = 0; x < 16; x++) {
-                            for (int y = height + 1; y < height + part.getSliceCount(); y++) {
-                                driver.current(x, y, 7);
-                                if (getRailStates().contains(driver.getBlock())) {
-                                    driver.block(rail);
-                                }
-                            }
-                        }
-                    }
-                    break;
-                case THREE_SPLIT:
-                case VERTICAL:
-                case DOUBLE_BEND:
-                case RAILS_END_HERE:
-                    break;
-            }
-        }
-
-        if (needsStaircase) {
-            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.stationStaircase()));
-            for (int i = railInfo.getLevel() + 1; i < info.cityLevel; i++) {
-                height = info.groundLevel + i * FLOORHEIGHT;
-                generatePart(info, part, transform, 0, height, 0, HardAirSetting.AIR);
-            }
-            height = info.groundLevel + info.cityLevel * FLOORHEIGHT;
-            part = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), getRandomPart(railwayParts.stationStaircaseSurface()));
-            generatePart(info, part, transform, 0, height, 0, HardAirSetting.AIR);
         }
     }
 
@@ -2102,7 +1227,7 @@ public class LostCityTerrainFeature {
         boolean xRail = info.hasXCorridor();
         boolean zRail = info.hasZCorridor();
         if (xRail || zRail) {
-            generateCorridors(info, xRail, zRail);
+            Corridors.generateCorridors(this, info, xRail, zRail);
         }
 
         Railway.RailChunkInfo railInfo = info.getRailInfo();
@@ -2327,46 +1452,6 @@ public class LostCityTerrainFeature {
             return generatePart(adj, adj.frontType, rot, 0, height, 0, HardAirSetting.AIR);
         }
         return height;
-    }
-
-    private void generateCorridors(BuildingInfo info, boolean xRail, boolean zRail) {
-        BlockState railx = Blocks.RAIL.defaultBlockState().setValue(RailBlock.SHAPE, RailShape.EAST_WEST);
-        BlockState railz = Blocks.RAIL.defaultBlockState();
-
-        Character corridorRoofBlock = info.getCityStyle().getCorridorRoofBlock();
-        Character corridorGlassBlock = info.getCityStyle().getCorridorGlassBlock();
-        CompiledPalette palette = info.getCompiledPalette();
-
-        for (int x = 0; x < 16; ++x) {
-            for (int z = 0; z < 16; ++z) {
-                BlockState b;
-                if ((xRail && z >= 7 && z <= 10) || (zRail && x >= 7 && x <= 10)) {
-                    int height = info.groundLevel - 6;
-                    if (xRail && z == 10) {
-                        b = railx;
-                    } else if (zRail && x == 10) {
-                        b = railz;
-                    } else {
-                        b = air;
-                    }
-                    driver.current(x, height, z).add(palette.get(corridorRoofBlock)).add(b).add(air).add(air);
-
-                    if ((xRail && x == 7 && (z == 8 || z == 9)) || (zRail && z == 7 && (x == 8 || x == 9))) {
-                        driver.add(palette.get(corridorGlassBlock));
-                        BlockPos pos = driver.getCurrentCopy();
-                        Character glowstoneChar = info.getCityStyle().getGlowstoneBlock();
-                        BlockState glowstone = glowstoneChar == null ? Blocks.GLOWSTONE.defaultBlockState() : palette.get(glowstoneChar);
-                        driver.add(glowstone);
-                        updateNeeded(info, pos, Block.UPDATE_CLIENTS);
-                    } else {
-                        BlockState roof = palette.get(corridorRoofBlock);
-                        driver.add(roof).add(roof);
-                    }
-                } else {
-                    driver.setBlockRange(x, info.groundLevel - 5, z, info.getCityGroundLevel(), base);
-                }
-            }
-        }
     }
 
     private static final Random VEGETATION_RAND = new Random();
@@ -2611,7 +1696,7 @@ public class LostCityTerrainFeature {
         return false;
     }
 
-    enum HardAirSetting {
+    public enum HardAirSetting {
         AIR, WATERLEVEL, VOID
     }
 
@@ -2619,7 +1704,7 @@ public class LostCityTerrainFeature {
      * Generate a part. If 'airWaterLevel' is true then 'hard air' blocks are replaced with water below the waterLevel.
      * Otherwise they are replaced with air.
      */
-    private int generatePart(BuildingInfo info, IBuildingPart part,
+    public int generatePart(BuildingInfo info, IBuildingPart part,
                              Transform transform,
                              int ox, int oy, int oz, HardAirSetting airWaterLevel) {
         if (profile.EDITMODE) {
@@ -2712,7 +1797,7 @@ public class LostCityTerrainFeature {
         return oy + part.getSliceCount();
     }
 
-    private CompiledPalette computePalette(BuildingInfo info, IBuildingPart part) {
+    public CompiledPalette computePalette(BuildingInfo info, IBuildingPart part) {
         CompiledPalette compiledPalette = info.getCompiledPalette();
         // Cache the combined palette?
         Palette partPalette = part.getLocalPalette(provider.getWorld());
@@ -3062,7 +2147,7 @@ public class LostCityTerrainFeature {
             // Check for doors
             boolean isTop = f == floors;   // The top does not need generated doors
             if (!isTop && info.getAllowDoors()) {
-                generateDoors(info, height + 1, f);
+                Doors.generateDoors(this, info, height + 1, f);
             }
 
             height += FLOORHEIGHT;    // We currently only support 6 here
@@ -3083,7 +2168,7 @@ public class LostCityTerrainFeature {
 
         if (cellars >= 1) {
             // We have to potentially connect to corridors
-            generateCorridorConnections(info);
+            Corridors.generateCorridorConnections(driver, info);
         }
     }
 
@@ -3178,7 +2263,7 @@ public class LostCityTerrainFeature {
     }
 
     // Used for space type worlds: fill underside the building/street until a block is encountered
-    private void fillToGround(BuildingInfo info, int lowestLevel, Character borderBlock) {
+    public void fillToGround(BuildingInfo info, int lowestLevel, Character borderBlock) {
         int deepestY = Math.max(1, lowestLevel - 10);
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -3199,180 +2284,20 @@ public class LostCityTerrainFeature {
         }
     }
 
-    private BlockState getDoor(Block door, boolean upper, boolean left, net.minecraft.core.Direction facing) {
-        return door.defaultBlockState()
-                .setValue(DoorBlock.HALF, upper ? DoubleBlockHalf.UPPER : DoubleBlockHalf.LOWER)
-                .setValue(DoorBlock.HINGE, left ? DoorHingeSide.LEFT : DoorHingeSide.RIGHT)
-                .setValue(DoorBlock.FACING, facing);
-    }
-
-    private void generateDoors(BuildingInfo info, int height, int f) {
-
-        BlockState filler = info.getCompiledPalette().get(info.getBuilding().getFillerBlock());
-
-        height--;       // Start generating doors one below for the filler
-
-        if (info.hasConnectionAtX(f + info.cellars)) {
-            int x = 0;
-            if (hasConnectionWithBuilding(f, info, info.getXmin())) {
-                driver.setBlockRange(x, height, 6, height + 4, filler);
-                driver.setBlockRange(x, height, 9, height + 4, filler);
-
-                driver.current(x, height, 7).add(filler).add(air).add(air).add(filler);
-                driver.current(x, height, 8).add(filler).add(air).add(air).add(filler);
-
-            } else if (hasConnectionToTopOrOutside(f, info, info.getXmin())) {
-                driver.setBlockRange(x, height, 6, height + 4, filler);
-                driver.setBlockRange(x, height, 9, height + 4, filler);
-
-                driver.current(x, height, 7)
-                        .add(filler)
-                        .add(getDoor(info.doorBlock, false, true, net.minecraft.core.Direction.EAST))
-                        .add(getDoor(info.doorBlock, true, true, net.minecraft.core.Direction.EAST))
-                        .add(filler);
-                driver.current(x, height, 8)
-                        .add(filler)
-                        .add(getDoor(info.doorBlock, false, false, net.minecraft.core.Direction.EAST))
-                        .add(getDoor(info.doorBlock, true, false, net.minecraft.core.Direction.EAST))
-                        .add(filler);
-            }
-        }
-        if (hasConnectionWithBuildingMax(f, info, info.getXmax(), Orientation.X)) {
-            int x = 15;
-            driver.setBlockRange(x, height, 6, height + 4, filler);
-            driver.setBlockRange(x, height, 9, height + 4, filler);
-            driver.current(x, height, 7).add(filler).add(air).add(air).add(filler);
-            driver.current(x, height, 8).add(filler).add(air).add(air).add(filler);
-        } else if (hasConnectionToTopOrOutside(f, info, info.getXmax()) && (info.getXmax().hasConnectionAtXFromStreet(f + info.getXmax().cellars))) {
-            int x = 15;
-            driver.setBlockRange(x, height, 6, height + 4, filler);
-            driver.setBlockRange(x, height, 9, height + 4, filler);
-            driver.current(x, height, 7)
-                    .add(filler)
-                    .add(getDoor(info.doorBlock, false, false, net.minecraft.core.Direction.WEST))
-                    .add(getDoor(info.doorBlock, true, false, net.minecraft.core.Direction.WEST))
-                    .add(filler);
-            driver.current(x, height, 8)
-                    .add(filler)
-                    .add(getDoor(info.doorBlock, false, true, net.minecraft.core.Direction.WEST))
-                    .add(getDoor(info.doorBlock, true, true, net.minecraft.core.Direction.WEST))
-                    .add(filler);
-        }
-        if (info.hasConnectionAtZ(f + info.cellars)) {
-            int z = 0;
-            if (hasConnectionWithBuilding(f, info, info.getZmin())) {
-                driver.setBlockRange(6, height, z, height + 4, filler);
-                driver.setBlockRange(9, height, z, height + 4, filler);
-                driver.current(7, height, z).add(filler).add(air).add(air).add(filler);
-                driver.current(8, height, z).add(filler).add(air).add(air).add(filler);
-            } else if (hasConnectionToTopOrOutside(f, info, info.getZmin())) {
-                driver.setBlockRange(6, height, z, height + 4, filler);
-                driver.setBlockRange(9, height, z, height + 4, filler);
-                driver.current(7, height, z)
-                        .add(filler)
-                        .add(getDoor(info.doorBlock, false, true, net.minecraft.core.Direction.NORTH))
-                        .add(getDoor(info.doorBlock, true, true, net.minecraft.core.Direction.NORTH))
-                        .add(filler);
-                driver.current(8, height, z)
-                        .add(filler)
-                        .add(getDoor(info.doorBlock, false, false, net.minecraft.core.Direction.NORTH))
-                        .add(getDoor(info.doorBlock, true, false, net.minecraft.core.Direction.NORTH))
-                        .add(filler);
-            }
-        }
-        if (hasConnectionWithBuildingMax(f, info, info.getZmax(), Orientation.Z)) {
-            int z = 15;
-            driver.setBlockRange(6, height, z, height + 4, filler);
-            driver.setBlockRange(9, height, z, height + 4, filler);
-            driver.current(7, height, z).add(filler).add(air).add(air).add(filler);
-            driver.current(8, height, z).add(filler).add(air).add(air).add(filler);
-        } else if (hasConnectionToTopOrOutside(f, info, info.getZmax()) && (info.getZmax().hasConnectionAtZFromStreet(f + info.getZmax().cellars))) {
-            int z = 15;
-            driver.setBlockRange(6, height, z, height + 4, filler);
-            driver.setBlockRange(9, height, z, height + 4, filler);
-            driver.current(7, height, z)
-                    .add(filler)
-                    .add(getDoor(info.doorBlock, false, false, net.minecraft.core.Direction.SOUTH))
-                    .add(getDoor(info.doorBlock, true, false, net.minecraft.core.Direction.SOUTH))
-                    .add(filler);
-            driver.current(8, height, z)
-                    .add(filler)
-                    .add(getDoor(info.doorBlock, false, true, net.minecraft.core.Direction.SOUTH))
-                    .add(getDoor(info.doorBlock, true, true, net.minecraft.core.Direction.SOUTH))
-                    .add(filler);
-        }
-    }
-
-    private void generateCorridorConnections(BuildingInfo info) {
-        if (info.getXmin().hasXCorridor()) {
-            int x = 0;
-            for (int z = 7; z <= 10; z++) {
-                driver.setBlockRangeToAir(x, info.groundLevel - 5, z, info.groundLevel - 2);
-            }
-        }
-        if (info.getXmax().hasXCorridor()) {
-            int x = 15;
-            for (int z = 7; z <= 10; z++) {
-                driver.setBlockRangeToAir(x, info.groundLevel - 5, z, info.groundLevel - 2);
-            }
-        }
-        if (info.getZmin().hasZCorridor()) {
-            int z = 0;
-            for (int x = 7; x <= 10; x++) {
-                driver.setBlockRangeToAir(x, info.groundLevel - 5, z, info.groundLevel - 2);
-            }
-        }
-        if (info.getZmax().hasZCorridor()) {
-            int z = 15;
-            for (int x = 7; x <= 10; x++) {
-                driver.setBlockRangeToAir(x, info.groundLevel - 5, z, info.groundLevel - 2);
-            }
-        }
-    }
-
-    private boolean hasConnectionWithBuildingMax(int localLevel, BuildingInfo info, BuildingInfo info2, Orientation x) {
-        if (info.isValidFloor(localLevel) && info.getFloor(localLevel).getMetaBoolean(ILostCities.META_DONTCONNECT)) {
-            return false;
-        }
-        int globalLevel = info.localToGlobal(localLevel);
-        int localAdjacent = info2.globalToLocal(globalLevel);
-        if (info2.isValidFloor(localAdjacent) && info2.getFloor(localAdjacent).getMetaBoolean(ILostCities.META_DONTCONNECT)) {
-            return false;
-        }
-        int level = localAdjacent + info2.cellars;
-        return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.cellars)) && info2.hasConnectionAt(level, x);
-    }
-
-    private boolean hasConnectionToTopOrOutside(int localLevel, BuildingInfo info, BuildingInfo info2) {
-        int globalLevel = info.localToGlobal(localLevel);
-        int localAdjacent = info2.globalToLocal(globalLevel);
-        if (info.getFloor(localLevel).getMetaBoolean(ILostCities.META_DONTCONNECT)) {
-            return false;
-        }
-        return (info2.isCity && !info2.hasBuilding && localLevel == 0 && localAdjacent == 0) || (info2.hasBuilding && localAdjacent == info2.getNumFloors());
-//        return (!info2.hasBuilding && localLevel == localAdjacent) || (info2.hasBuilding && localAdjacent == info2.getNumFloors());
-    }
-
-    private boolean hasConnectionWithBuilding(int localLevel, BuildingInfo info, BuildingInfo info2) {
-        int globalLevel = info.localToGlobal(localLevel);
-        int localAdjacent = info2.globalToLocal(globalLevel);
-        return info2.hasBuilding && ((localAdjacent >= 0 && localAdjacent < info2.getNumFloors()) || (localAdjacent < 0 && (-localAdjacent) <= info2.cellars));
-    }
-
-    private boolean isSide(int x, int z) {
+    private static boolean isSide(int x, int z) {
         return x == 0 || x == 15 || z == 0 || z == 15;
     }
 
-    private boolean isCorner(int x, int z) {
+    private static boolean isCorner(int x, int z) {
         return (x == 0 || x == 15) && (z == 0 || z == 15);
     }
 
-    private void updateNeeded(BuildingInfo info, BlockPos pos, int flags) {
+    public static void updateNeeded(BuildingInfo info, BlockPos pos, int flags) {
         info.addPostTodo(pos, () -> {
-            WorldGenLevel world = provider.getWorld();
+            WorldGenLevel world = info.provider.getWorld();
             BlockState state = world.getBlockState(pos);
             if (!state.isAir()) {
-                world.setBlock(pos, air, flags);
+                world.setBlock(pos, Blocks.AIR.defaultBlockState(), flags);
                 world.setBlock(pos, state, flags);
             }
         });

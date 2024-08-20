@@ -1,3 +1,8 @@
+Upcoming:
+- Fixed a bug where scattered multibuildings would sometimes only generate partially
+- Extended the range of the locatepart command (from max 15 chunk distance to 30)
+- New locate command to locate a building. This command also works if edit mode is not enabled
+
 1.20-7.3.2:
 - Now also avoid pillager outposts with the avoidStructures option
 - New server config options 'avoidStructuresAdjacent' and 'avoidVillagesAdjacent' to avoid generating Lost Cities in chunks that have structures or villages adjacent to them. Default on

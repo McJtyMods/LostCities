@@ -12,16 +12,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Scattered implements ILostCityAsset {
+public class ScatteredBuilding implements ILostCityAsset {
 
     private final ResourceLocation name;
     private final List<String> buildings;
     private final String multibuilding;
-    private final Scattered.TerrainHeight terrainheight;
-    private final Scattered.TerrainFix terrainfix;
+    private final ScatteredBuilding.TerrainHeight terrainheight;
+    private final ScatteredBuilding.TerrainFix terrainfix;
     private final int heightoffset;
 
-    public Scattered(ScatteredRE object) {
+    public ScatteredBuilding(ScatteredRE object) {
         name = object.getRegistryName();
         this.buildings = object.getBuildings();
         this.multibuilding = object.getMultibuilding();

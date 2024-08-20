@@ -1,4 +1,6 @@
-Lost Souls on multibuildings
-Loot depending on blocktype
-Scattered blocks in cities
-
+- Fix bug from reddit with wrong config test
+- Scattered near highway
+- Fix scattered multibuilding bug
+- Add command to locate buildings
+- Make supports configurable by having a 'repeatslice' like feature
+- Make doors configurable

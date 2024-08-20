@@ -2,7 +2,7 @@ package mcjty.lostcities.worldgen.lost.regassets;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import mcjty.lostcities.worldgen.lost.cityassets.Scattered;
+import mcjty.lostcities.worldgen.lost.cityassets.ScatteredBuilding;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.Nullable;
@@ -16,25 +16,34 @@ public class ScatteredRE implements IAsset<ScatteredRE> {
             instance.group(
                     Codec.list(Codec.STRING).optionalFieldOf("buildings").forGetter(l -> Optional.ofNullable(l.buildings)),
                     Codec.STRING.optionalFieldOf("multibuilding").forGetter(l -> Optional.ofNullable(l.multibuilding)),
-                    StringRepresentable.fromEnum(Scattered.TerrainHeight::values).fieldOf("terrainheight").forGetter(l -> l.terrainheight),
-                    StringRepresentable.fromEnum(Scattered.TerrainFix::values).fieldOf("terrainfix").forGetter(l -> l.terrainfix),
+                    Codec.BOOL.optionalFieldOf("rotatable").forGetter(l -> Optional.ofNullable(l.rotatable)),
+                    StringRepresentable.fromEnum(ScatteredBuilding.TerrainHeight::values).fieldOf("terrainheight").forGetter(l -> l.terrainheight),
+                    StringRepresentable.fromEnum(ScatteredBuilding.TerrainFix::values).fieldOf("terrainfix").forGetter(l -> l.terrainfix),
                     Codec.INT.optionalFieldOf("heightoffset", 0).forGetter(l -> l.heightoffset)
             ).apply(instance, ScatteredRE::new));
 
     private ResourceLocation name;
-    private final Scattered.TerrainHeight terrainheight;
-    private final Scattered.TerrainFix terrainfix;
+    private final ScatteredBuilding.TerrainHeight terrainheight;
+    private final ScatteredBuilding.TerrainFix terrainfix;
     private final int heightoffset;
+    private final boolean rotatable;
     private final List<String> buildings;
     private final String multibuilding;
 
-    public ScatteredRE(Optional<List<String>> buildings, Optional<String> multibuilding, Scattered.TerrainHeight terrainheight, Scattered.TerrainFix terrainfix,
+    public ScatteredRE(Optional<List<String>> buildings, Optional<String> multibuilding,
+                       Optional<Boolean> rotatable,
+                       ScatteredBuilding.TerrainHeight terrainheight, ScatteredBuilding.TerrainFix terrainfix,
                        int heightoffset) {
         this.buildings = buildings.orElse(null);
         this.multibuilding = multibuilding.orElse(null);
+        this.rotatable = rotatable.orElse(false);
         this.terrainheight = terrainheight;
         this.terrainfix = terrainfix;
         this.heightoffset = heightoffset;
+    }
+
+    public boolean isRotatable() {
+        return rotatable;
     }
 
     @Nullable
@@ -47,11 +56,11 @@ public class ScatteredRE implements IAsset<ScatteredRE> {
         return multibuilding;
     }
 
-    public Scattered.TerrainHeight getTerrainheight() {
+    public ScatteredBuilding.TerrainHeight getTerrainheight() {
         return terrainheight;
     }
 
-    public Scattered.TerrainFix getTerrainfix() {
+    public ScatteredBuilding.TerrainFix getTerrainfix() {
         return terrainfix;
     }
 

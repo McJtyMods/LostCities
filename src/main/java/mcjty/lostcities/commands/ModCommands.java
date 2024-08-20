@@ -28,6 +28,7 @@ public class ModCommands {
                         .then(CommandSaveProfile.register(dispatcher))
                         .then(CommandCreatePart.register(dispatcher))
                         .then(CommandLocatePart.register(dispatcher))
+                        .then(CommandLocate.register(dispatcher))
                         .then(CommandEditPart.register(dispatcher))
                         .then(CommandResumeEdit.register(dispatcher))
                         .then(CommandListParts.register(dispatcher))

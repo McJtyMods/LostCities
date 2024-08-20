@@ -1,6 +1,7 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.setup.Registration;
+import mcjty.lostcities.worldgen.gen.Spheres;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
@@ -33,7 +34,7 @@ public class LostCitySphereFeature extends Feature<NoneFeatureConfiguration> {
                 int chunkX = center.x;
                 int chunkZ = center.z;
                 diminfo.setWorld(level);
-                diminfo.getFeature().generateSpheres(region, region.getChunk(chunkX, chunkZ));
+                Spheres.generateSpheres(diminfo.getFeature(), region, region.getChunk(chunkX, chunkZ));
                 return true;
             }
         }
