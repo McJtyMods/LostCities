@@ -24,9 +24,9 @@ public class AssetRegistries {
     public static final RegistryAssetRegistry<ScatteredBuilding, ScatteredRE> SCATTERED = new RegistryAssetRegistry<>(CustomRegistries.SCATTERED_REGISTRY_KEY, ScatteredBuilding::new);
     public static final RegistryAssetRegistry<PredefinedCity, PredefinedCityRE> PREDEFINED_CITIES = new RegistryAssetRegistry<>(CustomRegistries.PREDEFINEDCITIES_REGISTRY_KEY, PredefinedCity::new);
     public static final RegistryAssetRegistry<PredefinedSphere, PredefinedSphereRE> PREDEFINED_SPHERES = new RegistryAssetRegistry<>(CustomRegistries.PREDEFINEDSPHERES_REGISTRY_KEY, PredefinedSphere::new);
-    public static final RegistryAssetRegistry<Stuff, StuffSettingsRE> STUFF = new RegistryAssetRegistry<>(CustomRegistries.STUFF_REGISTRY_KEY, Stuff::new);
+    public static final RegistryAssetRegistry<StuffObject, StuffSettingsRE> STUFF = new RegistryAssetRegistry<>(CustomRegistries.STUFF_REGISTRY_KEY, StuffObject::new);
 
-    public static final Map<String, List<Stuff>> STUFF_BY_TAG = new HashMap<>();
+    public static final Map<String, List<StuffObject>> STUFF_BY_TAG = new HashMap<>();
 
     private static boolean loaded = false;
 
@@ -57,7 +57,7 @@ public class AssetRegistries {
         PREDEFINED_CITIES.loadAll(level);
         PREDEFINED_SPHERES.loadAll(level);
         STUFF.getIterable().forEach(stuff -> stuff.getSettings().getTags().forEach(tag -> {
-            List<Stuff> list = STUFF_BY_TAG.computeIfAbsent(tag, k -> new ArrayList<>());
+            List<StuffObject> list = STUFF_BY_TAG.computeIfAbsent(tag, k -> new ArrayList<>());
             list.add(stuff);
         }));
         loaded = true;

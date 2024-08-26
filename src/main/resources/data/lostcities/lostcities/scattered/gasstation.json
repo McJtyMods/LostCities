@@ -1,0 +1,6 @@
+{
+  "buildings": [ "gasstation" ],
+  "terrainheight": "highway",
+  "terrainfix": "repeatslice",
+  "heightoffset": 1
+}

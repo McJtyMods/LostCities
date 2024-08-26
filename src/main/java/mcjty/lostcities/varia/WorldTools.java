@@ -1,11 +1,26 @@
 package mcjty.lostcities.varia;
 
+import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
+import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.minecraftforge.server.ServerLifecycleHooks;
+
+import java.util.Map;
+import java.util.Set;
 
 public class WorldTools {
 
@@ -46,4 +61,20 @@ public class WorldTools {
         return server.getLevel(type);
     }
 
+    public static Map<Structure, LongSet> checkStructures(ServerLevel level, ChunkCoord coord) {
+        BlockPos center = new BlockPos(coord.chunkX() << 4 + 8, 60, coord.chunkZ() << 4 + 8);
+        StructureManager structuremanager = level.structureManager();
+//        Map<StructurePlacement, Set<Holder<Structure>>> map = new Object2ObjectArrayMap<>();
+        Map<Structure, LongSet> structures = structuremanager.getAllStructuresAt(center);
+        return structures;
+//        HolderSet<Structure> holderSet = HolderSet.direct(BuiltinStructures.ANCIENT_CITY);
+//        ChunkGeneratorStructureState chunkgeneratorstructurestate = level.getChunkSource().getGeneratorState();
+//
+//        for(Holder<Structure> holder : holderSet) {
+//            for(StructurePlacement structureplacement : chunkgeneratorstructurestate.getPlacementsForStructure(holder)) {
+//                map.computeIfAbsent(structureplacement, (_v) -> new ObjectArraySet<>()).add(holder);
+//            }
+//        }
+
+    }
 }

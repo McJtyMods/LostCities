@@ -1,6 +1,7 @@
 package mcjty.lostcities.varia;
 
 import mcjty.lostcities.worldgen.lost.Orientation;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
@@ -70,5 +71,15 @@ public record ChunkCoord(ResourceKey<Level> dimension, int chunkX, int chunkZ) {
                 ", chunkX=" + chunkX +
                 ", chunkZ=" + chunkZ +
                 '}';
+    }
+
+    public ChunkCoord neighbour(Direction direction) {
+        return switch (direction) {
+            case NORTH -> north();
+            case SOUTH -> south();
+            case WEST -> west();
+            case EAST -> east();
+            default -> this;
+        };
     }
 }

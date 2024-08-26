@@ -60,51 +60,51 @@
     ],
     "multibuildings": [
       {
-        "factor": 0.3,
+        "factor": 0.2,
         "value": "multi1"
       },
       {
-        "factor": 0.3,
+        "factor": 0.2,
         "value": "multi2"
       },
       {
-        "factor": 0.2,
+        "factor": 0.12,
         "value": "multi3"
       },
       {
-        "factor": 0.2,
+        "factor": 0.12,
         "value": "multi4"
       },
       {
-        "factor": 0.1,
+        "factor": 0.05,
         "value": "multi5"
       },
       {
-        "factor": 0.1,
+        "factor": 0.07,
         "value": "library"
       },
       {
-        "factor": 0.1,
+        "factor": 0.07,
         "value": "center"
       },
       {
-        "factor": 0.08,
+        "factor": 0.05,
         "value": "townhall"
       },
       {
-        "factor": 0.25,
+        "factor": 0.15,
         "value": "shopping"
       },
       {
-        "factor": 0.2,
+        "factor": 0.12,
         "value": "shopping_open"
       },
       {
-        "factor": 0.1,
+        "factor": 0.05,
         "value": "huge1"
       },
       {
-        "factor": 0.1,
+        "factor": 0.05,
         "value": "huge2"
       }
     ],

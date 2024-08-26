@@ -11,6 +11,7 @@ import mcjty.lostcities.worldgen.lost.cityassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredReference;
 import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredSettings;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -95,6 +96,14 @@ public class Scattered {
                 if (avoidScattered(feature, tinfo)) {
                     return;
                 }
+                if (reference.isNearHighway()) {
+                    if (!Highway.hasHighway(coord.east(), provider, feature.profile) &&
+                            !Highway.hasHighway(coord.west(), provider, feature.profile) &&
+                            !Highway.hasHighway(coord.north(), provider, feature.profile) &&
+                            !Highway.hasHighway(coord.south(), provider, feature.profile)) {
+                        return;
+                    }
+                }
                 ChunkHeightmap hm = feature.getHeightmap(coord, provider.getWorld());
                 if (!reference.isAllowVoid()) {
                     if (!(feature.profile.isDefault() || feature.profile.isCavern())) {
@@ -133,10 +142,10 @@ public class Scattered {
                 buildingName = buildings.get(scatteredRandom.nextInt(buildings.size()));
             }
             Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
-            int lowestLevel = handleScatteredTerrain(feature, scattered, heightmap);
+            int lowestLevel = handleScatteredTerrain(feature, scattered, info.coord, heightmap);
             generateScatteredBuilding(feature, info, building, scatteredRandom, lowestLevel, scattered.getTerrainfix());
         } else {
-            int lowestLevel = handleScatteredTerrainMulti(feature, scattered, minheight, maxheight, avgheight);
+            int lowestLevel = handleScatteredTerrainMulti(feature, scattered, info.coord, minheight, maxheight, avgheight);
             int relx = chunkX - tlChunkX;
             int relz = chunkZ - tlChunkZ;
             String buildingName = multiBuilding.getBuilding(relx, relz);
@@ -271,23 +280,52 @@ public class Scattered {
         }
     }
 
-    private static int handleScatteredTerrain(LostCityTerrainFeature feature, ScatteredBuilding scattered, ChunkHeightmap heightmap) {
+    private static int getNearbyHighwayLevel(LostCityTerrainFeature feature, ChunkCoord coord) {
+        // Go over all four directions, see if there is a highway there and check at what city level it is. We pick the first one we find
+        Direction[] directions = new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST};
+        for (Direction direction : directions) {
+            ChunkCoord cc = coord.neighbour(direction);
+            if (Highway.hasHighway(cc, feature.provider, feature.profile)) {
+                int xHighwayLevel = Highway.getXHighwayLevel(cc, feature.provider, feature.profile);
+                if (xHighwayLevel >= 0) {
+                    return xHighwayLevel;
+                }
+                int zHighwayLevel = Highway.getZHighwayLevel(cc, feature.provider, feature.profile);
+                if (zHighwayLevel >= 0) {
+                    return zHighwayLevel;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static int getNearbyHighwayHeight(LostCityTerrainFeature feature, ChunkCoord coord) {
+        int level = getNearbyHighwayLevel(feature, coord);
+        if (level == -1) {
+            return feature.profile.GROUNDLEVEL;
+        }
+        return feature.profile.GROUNDLEVEL + level * LostCityTerrainFeature.FLOORHEIGHT;
+    }
+
+    private static int handleScatteredTerrain(LostCityTerrainFeature feature, ScatteredBuilding scattered, ChunkCoord coord, ChunkHeightmap heightmap) {
         int lowestLevel = switch (scattered.getTerrainheight()) {
             case LOWEST -> heightmap.getHeight();
             case AVERAGE -> heightmap.getHeight();
             case HIGHEST -> heightmap.getHeight();
             case OCEAN -> ((ServerChunkCache) feature.provider.getWorld().getChunkSource()).getGenerator().getSeaLevel();
+            case HIGHWAY -> getNearbyHighwayHeight(feature, coord);
         };
         lowestLevel += scattered.getHeightoffset();
         return lowestLevel;
     }
 
-    private static int handleScatteredTerrainMulti(LostCityTerrainFeature feature, ScatteredBuilding scattered, int minimum, int maximum, int average) {
+    private static int handleScatteredTerrainMulti(LostCityTerrainFeature feature, ScatteredBuilding scattered, ChunkCoord coord, int minimum, int maximum, int average) {
         int lowestLevel = switch (scattered.getTerrainheight()) {
             case LOWEST -> minimum;
             case AVERAGE -> maximum;
             case HIGHEST -> average;
             case OCEAN -> ((ServerChunkCache) feature.provider.getWorld().getChunkSource()).getGenerator().getSeaLevel();
+            case HIGHWAY -> getNearbyHighwayHeight(feature, coord);
         };
         lowestLevel += scattered.getHeightoffset();
         return lowestLevel;

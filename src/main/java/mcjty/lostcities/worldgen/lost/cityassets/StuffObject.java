@@ -5,12 +5,12 @@ import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
 import mcjty.lostcities.worldgen.lost.regassets.data.DataTools;
 import net.minecraft.resources.ResourceLocation;
 
-public class Stuff implements ILostCityAsset {
+public class StuffObject implements ILostCityAsset {
 
     private final ResourceLocation name;
     private final StuffSettingsRE settings;
 
-    public Stuff(StuffSettingsRE settings) {
+    public StuffObject(StuffSettingsRE settings) {
         this.settings = settings;
         this.name = settings.getRegistryName();
     }

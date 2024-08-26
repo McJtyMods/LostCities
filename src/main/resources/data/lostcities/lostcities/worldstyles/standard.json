@@ -13,6 +13,12 @@
     "weightnone": 20,
     "list": [
       {
+        "name": "gasstation",
+        "weight": 20,
+        "maxheightdiff": 30,
+        "nearhighway": true
+      },
+      {
         "name": "radiotower",
         "weight": 15,
         "maxheightdiff": 3,
