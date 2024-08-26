@@ -157,10 +157,10 @@ public class Config {
                 .defineList("avoidStructures", Lists.newArrayList(DEF_AVOID_STRUCTURES), s -> s instanceof String);
         AVOID_STRUCTURES_ADJACENT = SERVER_BUILDER
                 .comment("If true then also avoid generating the structures mentioned in 'avoidStructures' in chunks adjacent to the chunk with the structure")
-                .define("avoidStructuresAdjacent", true);
+                .define("avoidStructuresAdjacent", false);
         AVOID_VILLAGES_ADJACENT = SERVER_BUILDER
                 .comment("If true then also avoid generating cities in chunks adjacent to the chunks with villages")
-                .define("avoidVillagesAdjacent", true);
+                .define("avoidVillagesAdjacent", false);
         AVOID_FLATTENING = SERVER_BUILDER
                 .comment("If true then avoid flattening the terrain around the city in case there was a structure that was avoided")
                 .define("avoidFlattening", true);

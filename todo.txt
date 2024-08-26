@@ -4,3 +4,4 @@
 - Add command to locate buildings
 - Make supports configurable by having a 'repeatslice' like feature
 - Make doors configurable
+- Save ChunkCharacteristics data to disk

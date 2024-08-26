@@ -275,14 +275,12 @@ public class LostCityTerrainFeature {
         boolean doCity = info.isCity || (info.outsideChunk && info.hasBuilding);
 
         // Check if there is no village or other structure here
-
-        AvoidChunk avoidChunk = hasBlacklistedStructure(region.getLevel(), chunkX, chunkZ);
-
-        if (chunkX == 48 && chunkZ == -197) {
-            System.out.println("Avoid chunk: " + avoidChunk);
+        AvoidChunk avoidChunk = hasBlacklistedStructure(region, chunkX, chunkZ);
+        if (avoidChunk != AvoidChunk.NO) {
+            doCity = false;
+            info.isCity = false;
+            BuildingInfo.setCityRaw(coord, provider, false);
         }
-
-        doCity = doCity && avoidChunk == AvoidChunk.NO;
 
         // If this chunk has a building or street but we're in a floating profile and
         // we happen to have a void chunk we detect that here and go back to normal chunk generation
@@ -370,30 +368,40 @@ public class LostCityTerrainFeature {
         ADJACENT
     }
 
-    public static AvoidChunk hasBlacklistedStructure(ServerLevel level, int chunkX, int chunkZ) {
+    private static AvoidChunk hasBlacklistedStructure(WorldGenLevel level, int chunkX, int chunkZ) {
         boolean doAdjacent = Config.AVOID_VILLAGES_ADJACENT.get() || Config.AVOID_STRUCTURES_ADJACENT.get();
         if (doAdjacent) {
+            boolean couldBeUnknown = false;
             for (int dx = -1 ; dx <= 1 ; dx++) {
                 for (int dz = -1 ; dz <= 1 ; dz++) {
-                    ChunkAccess ch = level.getChunk(chunkX + dx, chunkZ + dx, ChunkStatus.STRUCTURE_REFERENCES);
-                    if (testBlacklistedStructure(level, ch, chunkX == 0 && chunkZ == 0)) {
-                        return (dx == 0 && dz == 0) ? AvoidChunk.YES : AvoidChunk.ADJACENT;
+                    if (level.hasChunk(chunkX + dx, chunkZ + dz)) {
+                        ChunkAccess ch = level.getChunk(chunkX + dx, chunkZ + dx, ChunkStatus.STRUCTURE_REFERENCES);
+                        if (testBlacklistedStructure(level, ch, chunkX == 0 && chunkZ == 0)) {
+                            return (dx == 0 && dz == 0) ? AvoidChunk.YES : AvoidChunk.ADJACENT;
+                        }
+                    } else {
+                        couldBeUnknown = true;
                     }
                 }
-
+                if (couldBeUnknown) {
+                    return AvoidChunk.NO;  // If we have unknown chunks we assume it is ok
+                }
             }
         } else {
-            ChunkAccess ch = level.getChunk(chunkX, chunkZ, ChunkStatus.STRUCTURE_REFERENCES);
-            return testBlacklistedStructure(level, ch, true) ? AvoidChunk.YES : AvoidChunk.NO;
+            if (level.hasChunk(chunkX, chunkZ)) {
+                ChunkAccess ch = level.getChunk(chunkX, chunkZ, ChunkStatus.STRUCTURE_REFERENCES);
+                return testBlacklistedStructure(level, ch, true) ? AvoidChunk.YES : AvoidChunk.NO;
+            } else {
+                return AvoidChunk.NO; // If we have unknown chunks we assume it is ok
+            }
         }
         return AvoidChunk.NO;
     }
 
-    private static boolean testBlacklistedStructure(ServerLevel level, ChunkAccess ch, boolean center) {
+    private static boolean testBlacklistedStructure(WorldGenLevel level, ChunkAccess ch, boolean center) {
         if (ch.hasAnyStructureReferences()) {
             var structures = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
             var references = ch.getAllReferences();
-            // @todo we can do this more optimally if we first find all configured structures for village
             for (var entry : references.entrySet()) {
                 if (!entry.getValue().isEmpty()) {
                     Optional<ResourceKey<Structure>> key = structures.getResourceKey(entry.getKey());
@@ -458,8 +466,8 @@ public class LostCityTerrainFeature {
 
         ScatteredSettings scatteredSettings = provider.getWorldStyle().getScatteredSettings();
         if (scatteredSettings != null) {
-            if (!mcjty.lostcities.worldgen.gen.Scattered.avoidScattered(this, info)) {
-                mcjty.lostcities.worldgen.gen.Scattered.generateScattered(this, info, scatteredSettings, heightmap);
+            if (!Scattered.avoidScattered(this, info)) {
+                Scattered.generateScattered(this, info, scatteredSettings, heightmap);
             }
         }
     }

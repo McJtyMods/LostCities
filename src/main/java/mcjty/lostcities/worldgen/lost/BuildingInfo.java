@@ -1,10 +1,12 @@
 package mcjty.lostcities.worldgen.lost;
 
-import it.unimi.dsi.fastutil.longs.LongSet;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
-import mcjty.lostcities.varia.*;
+import mcjty.lostcities.varia.ChunkCoord;
+import mcjty.lostcities.varia.Counter;
+import mcjty.lostcities.varia.QualityRandom;
+import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
@@ -23,7 +25,6 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nonnull;
@@ -46,7 +47,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public int groundLevel;
     public final int waterLevel;
 
-    public final boolean isCity;
+    public boolean isCity;
     public boolean hasBuilding;
     public final MultiPos multiBuildingPos;
     public final ILostCityMultiBuilding multiBuilding;
@@ -409,6 +410,12 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
+    // Change city status
+    public static void setCityRaw(ChunkCoord coord, IDimensionInfo provider, boolean isCity) {
+        LostChunkCharacteristics characteristics = getChunkCharacteristics(coord, provider);
+        characteristics.isCity = isCity;
+    }
+
     /**
      * Don't use the cache as we're busy building the cache.
      */
@@ -425,16 +432,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         float cityFactor = City.getCityFactor(coord, provider, profile);
-        boolean isCity = cityFactor > profile.CITY_THRESHOLD;
-        if (isCity) {
-            // @todo
-//            WorldGenLevel world = provider.getWorld();
-//            Map<Structure, LongSet> structures = WorldTools.checkStructures(world.getLevel(), coord);
-//            LostCityTerrainFeature.AvoidChunk avoidChunk = LostCityTerrainFeature.hasBlacklistedStructure(world.getLevel(), coord.chunkX(), coord.chunkZ());
-//            isCity = avoidChunk == LostCityTerrainFeature.AvoidChunk.NO;
-        }
-
-        return isCity;
+        return cityFactor > profile.CITY_THRESHOLD;
     }
 
     public static boolean isCity(ChunkCoord coord, IDimensionInfo provider) {
