@@ -1,8 +1,10 @@
 package mcjty.lostcities.data;
 
-import mcjty.lostcities.api.LostChunkCharacteristics;
+import mcjty.lostcities.api.*;
+import mcjty.lostcities.setup.CustomRegistries;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.WorldTools;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -45,6 +47,33 @@ public class ChunkInfoData extends SavedData {
             int y = pdTag.getInt("y");
             addPartData(pos, y, part);
         }
+    }
+
+    private LostChunkCharacteristics fromNbt(CompoundTag tag) {
+        LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
+        characteristics.isCity = tag.getBoolean("city");
+        characteristics.couldHaveBuilding = tag.getBoolean("couldHaveBuilding");
+        characteristics.multiPos = new MultiPos(tag.getInt("multiX"), tag.getInt("multiZ"), tag.getInt("multiW"), tag.getInt("multiH"));
+        characteristics.cityLevel = tag.getInt("cityLevel");
+        characteristics.cityStyleId = new ResourceLocation(tag.getString("cityStyle"));
+        characteristics.multiBuildingId = new ResourceLocation(tag.getString("multiBuilding"));
+        characteristics.buildingTypeId = new ResourceLocation(tag.getString("buildingType"));
+        return characteristics;
+    }
+
+    private CompoundTag toNbt(LostChunkCharacteristics characteristics) {
+        CompoundTag tag = new CompoundTag();
+        tag.putBoolean("city", characteristics.isCity);
+        tag.putBoolean("couldHaveBuilding", characteristics.couldHaveBuilding);
+        tag.putInt("multiX", characteristics.multiPos.x());
+        tag.putInt("multiZ", characteristics.multiPos.z());
+        tag.putInt("multiW", characteristics.multiPos.w());
+        tag.putInt("multiH", characteristics.multiPos.h());
+        tag.putInt("cityLevel", characteristics.cityLevel);
+        tag.putString("cityStyle", characteristics.cityStyleId.toString());
+        tag.putString("multiBuilding", characteristics.multiBuildingId.toString());
+        tag.putString("buildingType", characteristics.buildingTypeId.toString());
+        return tag;
     }
 
     public void addPartData(ChunkCoord pos, int y, String partName) {
