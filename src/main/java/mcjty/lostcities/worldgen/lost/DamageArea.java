@@ -35,7 +35,7 @@ public class DamageArea {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         this.air = Blocks.AIR.defaultBlockState();
-        chunkBox = new AABB(chunkX * 16, 0, chunkZ * 16, chunkX * 16 + 15, 256, chunkZ * 16 + 15);
+        chunkBox = new AABB(chunkX << 4, 0, chunkZ << 4, (chunkX << 4) + 15, 256, (chunkZ << 4) + 15);
 
         Random damageRandom = new Random(seed + chunkZ * 295075153L + chunkX * 899826547L);
 
@@ -102,9 +102,9 @@ public class DamageArea {
         Random randomExplosion = new Random(seed + coord.chunkZ() * 295075153L + coord.chunkX() * 797003437L);
         if (randomExplosion.nextFloat() < profile.EXPLOSION_CHANCE) {
             return new Explosion(profile.EXPLOSION_MINRADIUS + randomExplosion.nextInt(profile.EXPLOSION_MAXRADIUS - profile.EXPLOSION_MINRADIUS),
-                    new BlockPos(coord.chunkX() * 16 + randomExplosion.nextInt(16),
+                    new BlockPos((coord.chunkX() << 4) + randomExplosion.nextInt(16),
                             BuildingInfo.getBuildingInfo(coord, provider).cityLevel * 6 + profile.EXPLOSION_MINHEIGHT + randomExplosion.nextInt(profile.EXPLOSION_MAXHEIGHT - profile.EXPLOSION_MINHEIGHT),
-                            coord.chunkZ() * 16 + randomExplosion.nextInt(16)));
+                            (coord.chunkZ() << 4) + randomExplosion.nextInt(16)));
         }
         return null;
     }
@@ -113,9 +113,9 @@ public class DamageArea {
         Random randomMiniExplosion = new Random(seed + coord.chunkZ() * 1400305337L + coord.chunkX() * 573259391L);
         if (randomMiniExplosion.nextFloat() < profile.MINI_EXPLOSION_CHANCE) {
             return new Explosion(profile.MINI_EXPLOSION_MINRADIUS + randomMiniExplosion.nextInt(profile.MINI_EXPLOSION_MAXRADIUS - profile.MINI_EXPLOSION_MINRADIUS),
-                    new BlockPos(coord.chunkX() * 16 + randomMiniExplosion.nextInt(16),
+                    new BlockPos((coord.chunkX() << 4) + randomMiniExplosion.nextInt(16),
                             BuildingInfo.getBuildingInfo(coord, provider).cityLevel * 6 + profile.MINI_EXPLOSION_MINHEIGHT + randomMiniExplosion.nextInt(profile.MINI_EXPLOSION_MAXHEIGHT - profile.MINI_EXPLOSION_MINHEIGHT),
-                            coord.chunkZ() * 16 + randomMiniExplosion.nextInt(16)));
+                            (coord.chunkZ() << 4) + randomMiniExplosion.nextInt(16)));
         }
         return null;
     }
@@ -131,7 +131,7 @@ public class DamageArea {
 
     // Return true if this subchunk (every 16 blocks) is affected by explosions
     public boolean hasExplosions(int y) {
-        AABB box = new AABB(chunkX * 16, y * 16, chunkZ * 16, chunkX * 16 + 15, y * 16 + 15, chunkZ * 16 + 15);
+        AABB box = new AABB(chunkX << 4, y << 4, chunkZ << 4, (chunkX << 4) + 15, (y << 4) + 15, (chunkZ << 4) + 15);
         for (Explosion explosion : explosions) {
             double dmin = GeometryTools.squaredDistanceBoxPoint(box, explosion.getCenter());
             if (dmin <= explosion.getRadius() * explosion.getRadius()) {
@@ -143,7 +143,7 @@ public class DamageArea {
 
     // Return true if this subchunk is completely destroyed by an explosion
     public boolean isCompletelyDestroyed(int y) {
-        AABB box = new AABB(chunkX * 16, y * 16, chunkZ * 16, chunkX * 16 + 15, y * 16 + 15, chunkZ * 16 + 15);
+        AABB box = new AABB(chunkX << 4, y * 16, chunkZ << 4, (chunkX << 4) + 15, (y * 16) + 15, (chunkZ << 4) + 15);
         for (Explosion explosion : explosions) {
             double dmax = GeometryTools.maxSquaredDistanceBoxPoint(box, explosion.getCenter());
             int sqdist = explosion.getRadius() * explosion.getRadius();

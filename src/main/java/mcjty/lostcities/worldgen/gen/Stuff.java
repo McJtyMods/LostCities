@@ -80,7 +80,7 @@ public class Stuff {
                 String blocks = settings.getColumn();
                 if (testBlock(driver, settings.getBlockMatcher(), x, y-1, z) && testBlock(driver, settings.getUpperBlockMatcher(), x, y + blocks.length(), z)) {
                     Boolean isSeesky = settings.isSeesky();
-                    if (isSeesky == null || isSeesky == level.canSeeSky(new BlockPos(info.coord.chunkX() * 16 + x, y, info.coord.chunkZ() * 16 + z))) {
+                    if (isSeesky == null || isSeesky == level.canSeeSky(info.getRelativePos(x, y, z))) {
                         // Iterate over all characters of the block
                         boolean ok = true;
                         for (int k = 0; k < blocks.length(); k++) {

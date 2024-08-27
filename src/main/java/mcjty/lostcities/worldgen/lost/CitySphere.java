@@ -447,8 +447,8 @@ public class CitySphere implements ILostSphere {
      * Given a sphere center, return the actual position of the center
      */
     private static BlockPos getSphereCenterPosition(ChunkCoord center, IDimensionInfo provider, Random rand) {
-        int cx = center.chunkX() * 16 + rand.nextInt(16) - 8;
-        int cz = center.chunkZ() * 16 + rand.nextInt(16) - 8;
+        int cx = (center.chunkX() << 4) + rand.nextInt(16) - 8;
+        int cz = (center.chunkZ() << 4) + rand.nextInt(16) - 8;
         return new BlockPos(cx, provider.getProfile().GROUNDLEVEL, cz);
     }
 }

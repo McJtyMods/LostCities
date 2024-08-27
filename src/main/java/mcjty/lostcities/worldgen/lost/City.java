@@ -235,7 +235,7 @@ public class City {
                     ChunkCoord c = new ChunkCoord(provider.getType(), cx, cz);
                     if (isCityCenter(c, provider)) {
                         float radius = getCityRadius(c, provider);
-                        float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
+                        float sqdist = (cx * 16 - (chunkX << 4)) * (cx * 16 - (chunkX << 4)) + (cz * 16 - (chunkZ << 4)) * (cz * 16 - (chunkZ << 4));
                         if (sqdist < radius * radius) {
                             float dist = (float) Math.sqrt(sqdist);
                             float factor = (radius - dist) / radius;
@@ -307,7 +307,7 @@ public class City {
                     if (pro == profile) {
                         if (isCityCenter(c, provider)) {
                             float radius = getCityRadius(c, provider);
-                            float sqdist = (cx * 16 - chunkX * 16) * (cx * 16 - chunkX * 16) + (cz * 16 - chunkZ * 16) * (cz * 16 - chunkZ * 16);
+                            float sqdist = (cx * 16 - (chunkX << 4)) * (cx * 16 - (chunkX << 4)) + (cz * 16 - (chunkZ << 4)) * (cz * 16 - (chunkZ << 4));
                             if (sqdist < radius * radius) {
                                 float dist = (float) Math.sqrt(sqdist);
                                 factor += (radius - dist) / radius;

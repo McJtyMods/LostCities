@@ -53,7 +53,7 @@ public class CommandLocate implements Command<CommandSourceStack> {
         for (BlockPos.MutableBlockPos mpos : BlockPos.spiralAround(new BlockPos(cp.x, 0, cp.z), 30, Direction.EAST, Direction.SOUTH)) {
             BuildingInfo info = BuildingInfo.getBuildingInfo(new ChunkCoord(level.dimension(), mpos.getX(), mpos.getZ()), dimInfo);
             if (info != null && info.hasBuilding && info.getBuilding().getId().equals(name)) {
-                context.getSource().sendSuccess(() -> ComponentFactory.literal("Found at " + (mpos.getX() * 16 + 8) + "," + info.groundLevel + "," + (mpos.getZ() * 16 + 8)), false);
+                context.getSource().sendSuccess(() -> ComponentFactory.literal("Found at " + ((mpos.getX() << 4) + 8) + "," + info.groundLevel + "," + ((mpos.getZ() << 4) + 8)), false);
                 cnt++;
                 if (cnt > 6) {
                     break;

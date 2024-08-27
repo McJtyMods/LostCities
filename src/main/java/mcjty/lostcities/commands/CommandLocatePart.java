@@ -60,7 +60,7 @@ public class CommandLocatePart implements Command<CommandSourceStack> {
             List<EditModeData.PartData> data = EditModeData.getData().getPartData(new ChunkCoord(level.dimension(), mpos.getX(), mpos.getZ()));
             for (EditModeData.PartData pd : data) {
                 if (pd.partName().equals(name.toString())) {
-                    context.getSource().sendSuccess(() -> ComponentFactory.literal("Found at " + (mpos.getX() * 16 + 8) + "," + pd.y() + "," + (mpos.getZ() * 16 + 8)), false);
+                    context.getSource().sendSuccess(() -> ComponentFactory.literal("Found at " + ((mpos.getX() << 4) + 8) + "," + pd.y() + "," + ((mpos.getZ() << 4) + 8)), false);
                     cnt++;
                     if (cnt > 6) {
                         break;

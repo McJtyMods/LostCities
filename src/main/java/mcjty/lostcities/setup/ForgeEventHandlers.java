@@ -190,7 +190,7 @@ public class ForgeEventHandlers {
                     } else {
                         float sqradius = getSqRadius(sphere.getRadius(), 0.8f);
                         isSuitable = blockPos -> sphere.getDimension() == serverLevel.dimension() &&
-                                CitySphere.squaredDistance(sphere.getChunkX() * 16 + 8, sphere.getChunkZ() * 16 + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
+                                CitySphere.squaredDistance((sphere.getChunkX() << 4) + 8, (sphere.getChunkZ() << 4) + 8, blockPos.getX(), blockPos.getZ()) < sqradius;
                         needsCheck = true;
                     }
                 }
@@ -356,7 +356,7 @@ public class ForgeEventHandlers {
             for (int x = 0 ; x < 16 ; x++) {
                 for (int z = 0 ; z < 16 ; z++) {
                     if ((y + dy) < 250) {
-                        BlockPos p = new BlockPos(chunkX * 16 + x, y + dy, chunkZ * 16 + z);
+                        BlockPos p = new BlockPos((chunkX << 4) + x, y + dy, (chunkZ << 4) + z);
                         if (isValidSpawnBed(world, p)) {
                             return p.above();
                         }
@@ -365,7 +365,7 @@ public class ForgeEventHandlers {
                         }
                     }
                     if ((y - dy) > 1) {
-                        BlockPos p = new BlockPos(chunkX * 16 + x, y - dy, chunkZ * 16 + z);
+                        BlockPos p = new BlockPos((chunkX << 4) + x, y - dy, (chunkZ << 4) + z);
                         if (isValidSpawnBed(world, p)) {
                             return p.above();
                         }

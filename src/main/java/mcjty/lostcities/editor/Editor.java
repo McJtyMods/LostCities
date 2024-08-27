@@ -35,7 +35,7 @@ public class Editor {
                 for (int y = 0; y < part.getSliceCount(); y++) {
                     for (int x = 0; x < part.getXSize(); x++) {
                         for (int z = 0; z < part.getZSize(); z++) {
-                            BlockPos pos = new BlockPos(info.chunkX * 16 + x, start.getY() + y, info.chunkZ * 16 + z);
+                            BlockPos pos = info.getRelativePos(x, start.getY() + y, z);
                             Character character = part.getC(x, y, z);
                             BlockState state = finalPalette.get(character);
                             if (state != null) {
@@ -50,7 +50,7 @@ public class Editor {
             for (int y = 0; y < part.getSliceCount(); y++) {
                 for (int x = 0; x < part.getXSize(); x++) {
                     for (int z = 0; z < part.getZSize(); z++) {
-                        BlockPos pos = new BlockPos(info.chunkX * 16 + x, start.getY() + y, info.chunkZ * 16 + z);
+                        BlockPos pos = info.getRelativePos(x, start.getY() + y, z);
                         Character character = part.getC(x, y, z);
                         if (finalPalette.get(character) != null) {
                             BlockState state = level.getBlockState(pos);

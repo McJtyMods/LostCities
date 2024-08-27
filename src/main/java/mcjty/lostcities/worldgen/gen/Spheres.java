@@ -41,8 +41,8 @@ public class Spheres {
             if (sphere.isEnabled()) {
                 float radius = sphere.getRadius();
                 BlockPos cc = sphere.getCenterPos();
-                int cx = cc.getX() - chunkX * 16;
-                int cz = cc.getZ() - chunkZ * 16;
+                int cx = cc.getX() - (chunkX << 4);
+                int cz = cc.getZ() - (chunkZ << 4);
                 fillSphere(feature, cx, profile.GROUNDLEVEL, cz, (int) radius, sphere.getGlassBlock(), sphere.getSideBlock());
             }
 

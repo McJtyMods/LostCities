@@ -76,8 +76,9 @@ public class ChunkInfoData extends SavedData {
         return tag;
     }
 
+    // @todo
     public void addPartData(ChunkCoord pos, int y, String partName) {
-        chunkData.computeIfAbsent(pos, p -> new ArrayList<>()).add(new LostChunkCharacteristics(partName, y));
+        chunkData.computeIfAbsent(pos, p -> new ArrayList<>()).add(new LostChunkCharacteristics());
         setDirty();
     }
 
@@ -94,8 +95,8 @@ public class ChunkInfoData extends SavedData {
                 pdTag.putString("level", pos.dimension().location().toString());
                 pdTag.putInt("x", pos.chunkX());
                 pdTag.putInt("z", pos.chunkZ());
-                pdTag.putString("part", pd.partName());
-                pdTag.putInt("y", pd.y());
+//                pdTag.putString("part", pd.partName());
+//                pdTag.putInt("y", pd.y());
                 data.add(pdTag);
             }
         });

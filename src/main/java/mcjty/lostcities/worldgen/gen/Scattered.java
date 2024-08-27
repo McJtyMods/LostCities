@@ -38,8 +38,8 @@ public class Scattered {
     }
 
     public static void generateScattered(LostCityTerrainFeature feature, BuildingInfo info, ScatteredSettings scatteredSettings, ChunkHeightmap heightmap) {
-        int chunkX = info.chunkX;
-        int chunkZ = info.chunkZ;
+        int chunkX = info.coord.chunkX();
+        int chunkZ = info.coord.chunkZ();
         IDimensionInfo provider = feature.provider;
 
         // First normalize the coordinates to scatter area sized coordinates. Add a large amount to make sure the coordinates are positive
@@ -196,8 +196,6 @@ public class Scattered {
 
     private static void generateScatteredBuilding(LostCityTerrainFeature feature, BuildingInfo info, Building building, Random rand, int lowestLevel, ScatteredBuilding.TerrainFix terrainFix) {
         IDimensionInfo provider = feature.provider;
-        int chunkX = info.chunkX;
-        int chunkZ = info.chunkZ;
 
         int height = lowestLevel;
         int floors;
@@ -215,8 +213,7 @@ public class Scattered {
             floors = minfloors + rand.nextInt(maxfloors - minfloors + 1);
         }
         for (int f = 0; f < floors; f++) {
-            ConditionContext conditionContext = new ConditionContext(lowestLevel, f, 0, floors, "<none>", building.getName(),
-                    chunkX, chunkZ) {
+            ConditionContext conditionContext = new ConditionContext(lowestLevel, f, 0, floors, "<none>", building.getName(), info.coord) {
                 @Override
                 public boolean isBuilding() {
                     return true;
@@ -224,12 +221,12 @@ public class Scattered {
 
                 @Override
                 public boolean isSphere() {
-                    return CitySphere.isInSphere(info.coord, new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8), provider);
+                    return CitySphere.isInSphere(info.coord, info.getCenter(0), provider);
                 }
 
                 @Override
                 public ResourceLocation getBiome() {
-                    Holder<Biome> biome = provider.getWorld().getBiome(new BlockPos(chunkX * 16 + 8, 0, chunkZ * 16 + 8));
+                    Holder<Biome> biome = provider.getWorld().getBiome(info.getCenter(0));
                     return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().registryOrThrow(Registries.BIOME).getKey(b));
                 }
             };

@@ -28,8 +28,8 @@ public class ChunkFixer {
         }
         int chunkX = coord.chunkX();
         int chunkZ = coord.chunkZ();
-        int cx = chunkX * 16;
-        int cz = chunkZ * 16;
+        int cx = chunkX << 4;
+        int cz = chunkZ << 4;
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
 
         int maxHeight = info.getMaxHeight();

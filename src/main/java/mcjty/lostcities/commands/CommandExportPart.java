@@ -103,7 +103,7 @@ public class CommandExportPart implements Command<CommandSourceStack> {
             for (int z = 0; z < part.getZSize(); z++) {
                 StringBuilder b = new StringBuilder();
                 for (int x = 0; x < part.getXSize(); x++) {
-                    BlockPos pos = new BlockPos(info.chunkX*16+x, start.getY()+y, info.chunkZ*16+z);
+                    BlockPos pos = info.getRelativePos(x, start.getY()+y, z);
                     BlockState state = level.getBlockState(pos);
                     Character c = editorInfo.getPaleteEntry(state);
                     if (c == null) {

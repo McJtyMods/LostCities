@@ -46,8 +46,8 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("cityLevel = " + info.cityLevel);
             System.out.println("cityGroundLevel = " + info.getCityGroundLevel());
             System.out.println("isCity = " + info.isCity);
-            System.out.println("chunkX = " + info.chunkX);
-            System.out.println("chunkZ = " + info.chunkZ);
+            System.out.println("chunkX = " + info.coord.chunkX());
+            System.out.println("chunkZ = " + info.coord.chunkZ());
             System.out.println("getCityStyle() = " + BuildingInfo.getChunkCharacteristics(info.coord, info.provider).cityStyle.getName());
             System.out.println("streetType = " + info.streetType);
             System.out.println("ruinHeight = " + info.ruinHeight);

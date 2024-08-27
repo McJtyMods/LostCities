@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost.cityassets;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.lost.regassets.data.ConditionTest;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
@@ -15,18 +16,16 @@ public abstract class ConditionContext {
     private final int floorsAboveGround;    // 1 means 1 floor above ground
     private final String part;
     private final String building;
-    private final int chunkX;
-    private final int chunkZ;
+    private final ChunkCoord coord;
 
-    public ConditionContext(int level, int floor, int floorsBelowGround, int floorsAboveGround, String part, String building, int chunkX, int chunkZ) {
+    public ConditionContext(int level, int floor, int floorsBelowGround, int floorsAboveGround, String part, String building, ChunkCoord coord) {
         this.level = level;
         this.floor = floor;
         this.floorsBelowGround = floorsBelowGround;
         this.floorsAboveGround = floorsAboveGround;
         this.part = part;
         this.building = building;
-        this.chunkX = chunkX;
-        this.chunkZ = chunkZ;
+        this.coord = coord;
     }
 
     private static Predicate<ConditionContext> combine(Predicate<ConditionContext> orig, Predicate<ConditionContext> newTest) {
@@ -256,10 +255,10 @@ public abstract class ConditionContext {
     }
 
     public int getChunkX() {
-        return chunkX;
+        return coord.chunkX();
     }
 
     public int getChunkZ() {
-        return chunkZ;
+        return coord.chunkZ();
     }
 }
