@@ -30,7 +30,7 @@ public class GlobalTodo {
     }
 
     private final Map<ChunkPos, TodoQueues> todoQueues = new HashMap<>();
-    private final static Map<ResourceKey<Level>, GlobalTodo> instances = new HashMap<>();
+    private static final Map<ResourceKey<Level>, GlobalTodo> instances = new HashMap<>();
 
     public static GlobalTodo get(Level world) {
         return instances.computeIfAbsent(world.dimension(), k -> new GlobalTodo());
