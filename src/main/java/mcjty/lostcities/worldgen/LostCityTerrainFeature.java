@@ -2810,7 +2810,7 @@ public class LostCityTerrainFeature {
         BlockEntity tileentity = world.getBlockEntity(pos);
         if (random.nextFloat() < diminfo.getProfile().CHEST_WITHOUT_LOOT_CHANCE) {
             if (tileentity instanceof RandomizableContainerBlockEntity) {
-                tileentity.makeDirty();
+                tileentity.setChanged();
             }
             return;
         }
