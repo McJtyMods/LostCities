@@ -2807,10 +2807,13 @@ public class LostCityTerrainFeature {
     }
 
     public static void createLoot(BuildingInfo info, RandomSource random, LevelAccessor world, BlockPos pos, BuildingInfo.ConditionTodo todo, IDimensionInfo diminfo) {
+        BlockEntity tileentity = world.getBlockEntity(pos);
         if (random.nextFloat() < diminfo.getProfile().CHEST_WITHOUT_LOOT_CHANCE) {
+            if (tileentity instanceof RandomizableContainerBlockEntity) {
+                tileentity.setChanged();
+            }
             return;
         }
-        BlockEntity tileentity = world.getBlockEntity(pos);
         if (tileentity instanceof RandomizableContainerBlockEntity) {
             if (todo != null) {
                 String lootTable = todo.getCondition();
