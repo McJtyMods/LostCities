@@ -234,7 +234,7 @@ public class NullDimensionInfo implements IDimensionInfo {
             case 'd' -> Biomes.DESERT;
             default -> Biomes.PLAINS;
         };
-        return biomeRegistry.getHolderOrThrow(biome);
+        return biomeRegistry.getOrThrow(biome);
     }
 
     @Override

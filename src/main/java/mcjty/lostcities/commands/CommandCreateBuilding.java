@@ -73,7 +73,7 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
         ChunkPos cp = new ChunkPos(bottom);
 
         int height = bottom.getY();
-        for (int y = height ; y < level.getMaxBuildHeight() ; y++) {
+        for (int y = height ; y < level.getMaxY()+1; y++) {
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     level.setBlock(cp.getBlockAt(x, y, z), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);

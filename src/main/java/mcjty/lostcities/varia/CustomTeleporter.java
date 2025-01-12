@@ -3,7 +3,7 @@ package mcjty.lostcities.varia;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 
 public class CustomTeleporter {
@@ -13,7 +13,7 @@ public class CustomTeleporter {
     }
 
     public static void teleportToDimension(Player player, ServerLevel dimension, double x, double y, double z) {
-        player.changeDimension(new DimensionTransition(dimension, new Vec3(x, y, z), Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.PLAY_PORTAL_SOUND));
+        player.teleport(new TeleportTransition(dimension, new Vec3(x, y, z), Vec3.ZERO, 0.0f, 0.0f, TeleportTransition.PLAY_PORTAL_SOUND));
     }
 
 }

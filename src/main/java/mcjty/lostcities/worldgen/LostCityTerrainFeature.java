@@ -1,5 +1,19 @@
 package mcjty.lostcities.worldgen;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import javax.annotation.Nonnull;
+
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.ILostCities;
 import mcjty.lostcities.api.LostCityEvent;
@@ -12,9 +26,28 @@ import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.NoiseGeneratorPerlin;
 import mcjty.lostcities.varia.Statistics;
 import mcjty.lostcities.varia.Tools;
-import mcjty.lostcities.worldgen.gen.*;
-import mcjty.lostcities.worldgen.lost.*;
-import mcjty.lostcities.worldgen.lost.cityassets.*;
+import mcjty.lostcities.worldgen.gen.Bridges;
+import mcjty.lostcities.worldgen.gen.Corridors;
+import mcjty.lostcities.worldgen.gen.Doors;
+import mcjty.lostcities.worldgen.gen.Highways;
+import mcjty.lostcities.worldgen.gen.Railways;
+import mcjty.lostcities.worldgen.gen.Scattered;
+import mcjty.lostcities.worldgen.gen.Stuff;
+import mcjty.lostcities.worldgen.lost.BiomeInfo;
+import mcjty.lostcities.worldgen.lost.BuildingInfo;
+import mcjty.lostcities.worldgen.lost.CitySphere;
+import mcjty.lostcities.worldgen.lost.DamageArea;
+import mcjty.lostcities.worldgen.lost.Direction;
+import mcjty.lostcities.worldgen.lost.Railway;
+import mcjty.lostcities.worldgen.lost.Transform;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
+import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
+import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
+import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
+import mcjty.lostcities.worldgen.lost.cityassets.Condition;
+import mcjty.lostcities.worldgen.lost.cityassets.ConditionContext;
+import mcjty.lostcities.worldgen.lost.cityassets.IBuildingPart;
+import mcjty.lostcities.worldgen.lost.cityassets.Palette;
 import mcjty.lostcities.worldgen.lost.regassets.data.CitySphereSettings;
 import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredSettings;
 import mcjty.lostcities.worldgen.lost.regassets.data.StreetParts;
@@ -37,7 +70,14 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FlowerBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.PoweredRailBlock;
+import net.minecraft.world.level.block.RailBlock;
+import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
@@ -51,12 +91,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.neoforged.neoforge.common.NeoForge;
-
-import javax.annotation.Nonnull;
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class LostCityTerrainFeature {
 
@@ -250,7 +284,7 @@ public class LostCityTerrainFeature {
 
     private boolean isVoid(int x, int z) {
         driver.current(x, 255, z);
-        int minHeight = provider.getWorld().getMinBuildHeight();
+        int minHeight = provider.getWorld().getMinY();
         while (driver.getBlock() == air && driver.getY() > minHeight) {
             driver.decY();
         }
@@ -408,13 +442,13 @@ public class LostCityTerrainFeature {
 
     private static boolean testBlacklistedStructure(WorldGenLevel level, ChunkAccess ch, boolean center) {
         if (ch.hasAnyStructureReferences()) {
-            var structures = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
+            var structures = level.registryAccess().lookupOrThrow(Registries.STRUCTURE);
             var references = ch.getAllReferences();
             for (var entry : references.entrySet()) {
                 if (!entry.getValue().isEmpty()) {
                     Optional<ResourceKey<Structure>> key = structures.getResourceKey(entry.getKey());
                     if (center || Config.AVOID_VILLAGES_ADJACENT.get()) {
-                        if (key.map(k -> structures.getHolderOrThrow(k).is(StructureTags.VILLAGE)).orElse(false)) {
+                        if (key.map(k -> structures.getOrThrow(k).is(StructureTags.VILLAGE)).orElse(false)) {
                             return true;
                         }
                     }
@@ -636,7 +670,7 @@ public class LostCityTerrainFeature {
         BuildingInfo.MinMax mm01 = info.getZmax().getDesiredMaxHeightL2();
         BuildingInfo.MinMax mm11 = info.getXmax().getZmax().getDesiredMaxHeightL2();
 
-        int max = level.getMaxBuildHeight();
+        int max = level.getMaxY()+1;
         int heightmapH = Short.MIN_VALUE;
 
         float min00 = mm00.min;
@@ -730,7 +764,7 @@ public class LostCityTerrainFeature {
         int maxYTouched = Short.MIN_VALUE;       // Max Y that we touched
         // Find the first non-empty block starting at the given height
         driver.current(x, height, z);
-        int minHeight = provider.getWorld().getMinBuildHeight();
+        int minHeight = provider.getWorld().getMinY();
         // We assume here we are not in a void chunk
         while (isFoliageOrEmpty(driver.getBlock()) && driver.getY() > minHeight) {
             driver.decY();
@@ -874,7 +908,7 @@ public class LostCityTerrainFeature {
         boolean building = info.hasBuilding;
 
         if (info.profile.isDefault() || info.profile.isSpheres()) {
-            int minHeight = info.provider.getWorld().getMinBuildHeight();
+            int minHeight = info.provider.getWorld().getMinY();
             BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
@@ -898,7 +932,7 @@ public class LostCityTerrainFeature {
             int ground = info.getCityGroundLevel();
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
-                    int maxTouchedY = moveDown(x, z, ground + 1, provider.getWorld().getMaxBuildHeight());
+                    int maxTouchedY = moveDown(x, z, ground + 1, provider.getWorld().getMaxY()+1);
                     if (maxTouchedY == Short.MIN_VALUE) {
                         moveUp(x, z, ground, info.waterLevel > info.groundLevel);
                     }
@@ -1121,7 +1155,7 @@ public class LostCityTerrainFeature {
         Predicate<BlockState> checkIronbars = infobarsChar == null ? s -> s == ironbarsState : infoBarSet::contains;
         Character rubbleBlock = info.getBuilding().getRubbleBlock();
 
-        int maxBuildHeight = info.provider.getWorld().getMaxBuildHeight();
+        int maxBuildHeight = info.provider.getWorld().getMaxY()+1;
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 double v = ruinBuffer[x + z * 16];
@@ -1273,7 +1307,7 @@ public class LostCityTerrainFeature {
      */
     private void fillToBedrockStreetBlock(BuildingInfo info) {
         // Base blocks below streets
-        int minHeight = info.provider.getWorld().getMinBuildHeight();
+        int minHeight = info.provider.getWorld().getMinY();
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int y = info.getCityGroundLevel() - 1;
@@ -1882,7 +1916,7 @@ public class LostCityTerrainFeature {
 
             @Override
             public ResourceLocation getBiome() {
-                return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome));
+                return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().lookupOrThrow(Registries.BIOME).getKey(biome));
             }
         };
         String randomValue = cnd.getRandomValue(random, conditionContext);
@@ -1923,7 +1957,7 @@ public class LostCityTerrainFeature {
 
                     @Override
                     public ResourceLocation getBiome() {
-                        return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome));
+                        return world.getBiome(pos).unwrap().map(ResourceKey::location, biome -> world.registryAccess().lookupOrThrow(Registries.BIOME).getKey(biome));
                     }
                 };
                 String randomValue = AssetRegistries.CONDITIONS.getOrThrow(world, lootTable).getRandomValue(random, conditionContext);
@@ -1965,9 +1999,9 @@ public class LostCityTerrainFeature {
                 // How many go this direction (approx, based on cardinal directions from building as well as number that simply fall down)
                 destroyedBlocks /= info.profile.DEBRIS_TO_NEARBYCHUNK_FACTOR;
                 int h = adjacentInfo.getMaxHeight() + 10;
-                int maxBuildHeight = info.provider.getWorld().getMaxBuildHeight();
+                int maxBuildHeight = info.provider.getWorld().getMaxY()+1;
                 if (h > maxBuildHeight - 1) {
-                    int minBuildHeight = info.provider.getWorld().getMinBuildHeight();
+                    int minBuildHeight = info.provider.getWorld().getMinY();
                     h = minBuildHeight - 1;
                 }
 
@@ -2046,8 +2080,8 @@ public class LostCityTerrainFeature {
     }
 
     private void generateBuilding(BuildingInfo info, ChunkHeightmap heightmap) {
-        int min = info.provider.getWorld().getMinBuildHeight() + 2;
-        int max = info.provider.getWorld().getMaxBuildHeight() - 2 - FLOORHEIGHT;
+        int min = info.provider.getWorld().getMinY() + 2;
+        int max = info.provider.getWorld().getMaxY()+1 - 2 - FLOORHEIGHT;
 
         int cellars = info.cellars;
         int floors = info.getNumFloors();
@@ -2130,8 +2164,8 @@ public class LostCityTerrainFeature {
             // We also remove all blocks from the inside because we generate buildings on top of
             // generated chunks as opposed to blank chunks with non-floating worlds
             this.bottomLayerBuffer = this.bottomLayerNoise.getRegion(this.bottomLayerBuffer, (info.coord.chunkX() << 4), (info.coord.chunkZ() << 4), 16, 16, 8.0 / 16.0, 8.0 / 16.0, 1.0D);
-            int minBuildHeight = info.provider.getWorld().getMinBuildHeight();
-            int maxBuildHeight = info.provider.getWorld().getMaxBuildHeight();
+            int minBuildHeight = info.provider.getWorld().getMinY();
+            int maxBuildHeight = info.provider.getWorld().getMaxY()+1;
             for (int x = 0; x < 16; ++x) {
                 for (int z = 0; z < 16; ++z) {
                     double vr = bottomLayerBuffer[x + z * 16] / 4.0f;

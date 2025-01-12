@@ -32,7 +32,7 @@ public class BlockMatcher implements Predicate<BlockState> {
             TagKey<Block> tagKey = TagKey.create(Registries.BLOCK, ResourceLocation.parse(matcher.substring(1)));
             return state -> state.is(tagKey);
         } else {
-            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(matcher));
+            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(matcher)).get().value();
             return state -> state.getBlock() == b;
         }
     }
@@ -46,7 +46,7 @@ public class BlockMatcher implements Predicate<BlockState> {
             TagKey<Block> tagKey = TagKey.create(Registries.BLOCK, ResourceLocation.parse(matcher.substring(1)));
             return state -> !state.is(tagKey);
         } else {
-            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(matcher));
+            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(matcher)).get().value();
             return state -> state.getBlock() != b;
         }
     }
