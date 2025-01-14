@@ -1826,7 +1826,7 @@ public class LostCityTerrainFeature {
             tag.putInt("x", pos.getX());
             tag.putInt("y", pos.getY());
             tag.putInt("z", pos.getZ());
-            tag.putString("id", "minecraft:mob_spawner");
+            tag.putString("id", "minecraft:spawner"); // changed name from minecraft:mob_spawner
             ResourceLocation randomValue = getRandomSpawnerMob(world.getLevel(), rand, provider, info,
                     new BuildingInfo.ConditionTodo(mobid, part.getName(), info), pos);
             CompoundTag sd = new CompoundTag();

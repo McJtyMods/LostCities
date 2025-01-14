@@ -377,6 +377,15 @@ public class ProfileSetup {
         profile.BUILDING_MAXFLOORS_CHANCE = 7;
         profile.BUILDING_CHANCE = .4f;
         STANDARD_PROFILES.put(profile.getName(), profile);
+        
+        profile = new LostCityProfile("safeandrare", true);
+        profile.setDescription("Safe mode: no spawners, lighting and rare");
+        profile.setIconFile("textures/gui/icon_safe.png");
+        profile.CITY_CHANCE = 0.005;
+        profile.GENERATE_SPAWNERS = false;
+        profile.GENERATE_LIGHTING = true;
+        STANDARD_PROFILES.put(profile.getName(), profile);
+
     }
 
     public static void setupProfiles() {
@@ -422,6 +431,7 @@ public class ProfileSetup {
                 String[] split = name.split("\\.");
                 LostCityProfile profile = new LostCityProfile(split[0], json);
                 STANDARD_PROFILES.put(split[0], profile);
+                LostCities.getLogger().info("Profile "+split[0]+" from "+name);
             } catch (IOException e) {
                 LostCities.getLogger().error("Couldn't read profile '{}'!", name);
                 return;
