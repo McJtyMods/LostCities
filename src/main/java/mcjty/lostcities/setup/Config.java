@@ -72,13 +72,16 @@ public class Config {
     public static String getProfileForDimension(ServerLevel level, ResourceKey<Level> type) {
         if (dimensionProfileCache == null) {
             dimensionProfileCache = new HashMap<>();
+            LostCities.getLogger().info("Creating profile cache...");
             for (String dp : DIMENSION_PROFILES.get()) {
+              LostCities.getLogger().info("Creating profile cache: "+dp);
                 String[] split = dp.split("=");
                 if (split.length != 2) {
                     LostCities.getLogger().error("Bad format for config value: '{}'!", dp);
                 } else {
                     ResourceKey<Level> dimensionType = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(split[0]));
                     String profileName = split[1];
+                    LostCities.getLogger().info("Looking up : "+profileName);
                     LostCityProfile profile = ProfileSetup.STANDARD_PROFILES.get(profileName);
                     if (profile != null) {
                         dimensionProfileCache.put(dimensionType, profileName);
@@ -87,6 +90,8 @@ public class Config {
                     }
                 }
             }
+
+            LostCities.getLogger().info("Profile cache is: "+dimensionProfileCache);
 
             LostData data = LostData.getData(level);
             String selectedProfile = "";
@@ -104,6 +109,9 @@ public class Config {
                 selectedJson = data.getSelectedJson();
             }
 
+            LostCities.getLogger().info("Selected Profile is: "+selectedProfile);
+            LostCities.getLogger().info("Selected Profile JSON is: "+selectedJson);
+
             if (!selectedProfile.isEmpty()) {
                 dimensionProfileCache.put(Level.OVERWORLD, selectedProfile);
                 if (!selectedJson.isEmpty()) {
@@ -116,6 +124,8 @@ public class Config {
             }
 
             String profile = getProfileForDimension(level, Level.OVERWORLD);
+            LostCities.getLogger().info("Profile for Dimension "+Level.OVERWORLD+" is: "+profile);
+            
             if (profile != null && !profile.isEmpty()) {
                 if (ProfileSetup.STANDARD_PROFILES.get(profile).GENERATE_NETHER) {
                     dimensionProfileCache.put(Level.NETHER, "cavern");

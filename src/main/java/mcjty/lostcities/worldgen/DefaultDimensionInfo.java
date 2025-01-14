@@ -46,7 +46,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         RandomSource randomSource = new LegacyRandomSource(world.getSeed());
         feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
-        biomeRegistry = world.registryAccess().registryOrThrow(Registries.BIOME);
+        biomeRegistry = world.registryAccess().lookupOrThrow(Registries.BIOME);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
             Climate.Sampler sampler = ((ServerChunkCache) chunkProvider).randomState().sampler();
             return biomeProvider.getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2, sampler);
         }
-        return biomeRegistry.getHolderOrThrow(Biomes.PLAINS);
+        return biomeRegistry.getOrThrow(Biomes.PLAINS);
     }
 
     @Nullable

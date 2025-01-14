@@ -80,6 +80,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
         }
         ResourceKey<Level> type = world.getLevel().dimension();
         String profileName = Config.getProfileForDimension(world.getLevel(), type);
+        // LostCities.getLogger().info("Profile name for "+world.getLevel()+" / "+type+" is "+profileName);
         if (profileName != null) {
             if (!dimensionInfo.containsKey(type)) {
                 LostCityProfile profile = ProfileSetup.STANDARD_PROFILES.get(profileName);

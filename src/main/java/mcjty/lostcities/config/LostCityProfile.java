@@ -529,7 +529,7 @@ public class LostCityProfile implements ILostCityProfile {
 
     public BlockState getLiquidBlock() {
         if (liquidBlock == null) {
-            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(LIQUID_BLOCK));
+            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(LIQUID_BLOCK)).get().value();
             if (b == null) {
                 ModSetup.getLogger().error("Bad liquid block: {}!", LIQUID_BLOCK);
                 liquidBlock = Blocks.WATER.defaultBlockState();
@@ -542,7 +542,7 @@ public class LostCityProfile implements ILostCityProfile {
 
     public BlockState getBaseBlock() {
         if (baseBlock == null) {
-            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(BASE_BLOCK));
+            Block b = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(BASE_BLOCK)).get().value();
             if (b == null) {
                 ModSetup.getLogger().error("Bad base block: {}!", BASE_BLOCK);
                 baseBlock = Blocks.STONE.defaultBlockState();

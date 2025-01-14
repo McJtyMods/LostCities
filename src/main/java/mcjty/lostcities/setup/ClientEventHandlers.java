@@ -9,6 +9,7 @@ import mcjty.lostcities.worldgen.LostCityFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -53,7 +54,7 @@ public class ClientEventHandlers {
         if (event.getScreen() instanceof CreateWorldScreen screen && lostCitiesButton != null) {
             lostCitiesButton.visible = screen.tabManager.getCurrentTab() instanceof CreateWorldScreen.MoreTab;
             if (lostCitiesButton.visible) {
-                event.getGuiGraphics().blit(txt, screen.width - 100, 60, 70, 70, 256, 256, 256, 256, 256, 256);
+                event.getGuiGraphics().blit(RenderType::guiTextured, txt, screen.width - 100, 60, 70, 70, 256, 256, 256, 256, 256, 256);
             }
         }
     }

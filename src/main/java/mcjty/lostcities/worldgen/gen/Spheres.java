@@ -67,8 +67,8 @@ public class Spheres {
         double sqradiusOffset = (radius - 2) * (radius - 2);
         double sqradiusOuter = (radius + 2) * (radius + 2);
 
-        int minY = Math.max(provider.getWorld().getMinBuildHeight(), centery - radius - 1);
-        int maxY = Math.min(provider.getWorld().getMaxBuildHeight(), centery + radius + 1);
+        int minY = Math.max(provider.getWorld().getMinY(), centery - radius - 1);
+        int maxY = Math.min(provider.getWorld().getMaxY()+1, centery + radius + 1);
         int seaLevel = Tools.getSeaLevel(provider.getWorld());
         ChunkGenerator generator;
         if (provider.getWorld() instanceof WorldGenRegion region) {
@@ -113,7 +113,7 @@ public class Spheres {
                             // Optionally clear above the sphere
                             int yy = y;
                             if (profile.CITYSPHERE_CLEARABOVE > 0) {
-                                int mY = Math.min(provider.getWorld().getMaxBuildHeight(), y + profile.CITYSPHERE_CLEARABOVE);
+                                int mY = Math.min(provider.getWorld().getMaxY()+1, y + profile.CITYSPHERE_CLEARABOVE);
                                 while (yy <= mY) {
                                     driver.block(yy <= outerSeaLevel ? feature.liquid : air);
                                     driver.incY();
@@ -132,7 +132,7 @@ public class Spheres {
                             yy = bottom;
                             if (profile.CITYSPHERE_CLEARBELOW > 0 && bottom != Integer.MAX_VALUE) {
                                 driver.current(x, yy, z);
-                                int mY = Math.max(provider.getWorld().getMinBuildHeight(), bottom - profile.CITYSPHERE_CLEARBELOW);
+                                int mY = Math.max(provider.getWorld().getMinY(), bottom - profile.CITYSPHERE_CLEARBELOW);
                                 while (yy >= mY) {
                                     driver.block(yy <= outerSeaLevel ? feature.liquid : air);
                                     driver.decY();
@@ -142,7 +142,7 @@ public class Spheres {
                             if (profile.CITYSPHERE_CLEARBELOW_UNTIL_AIR && bottom != Integer.MAX_VALUE) {
                                 // Clear until we hit air or go below build limit
                                 driver.current(x, yy, z);
-                                while (driver.getBlock() != (yy <= seaLevel ? feature.liquid : air) && yy > provider.getWorld().getMinBuildHeight()) {
+                                while (driver.getBlock() != (yy <= seaLevel ? feature.liquid : air) && yy > provider.getWorld().getMinY()) {
                                     driver.block(yy <= outerSeaLevel ? feature.liquid : air);
                                     driver.decY();
                                     yy--;

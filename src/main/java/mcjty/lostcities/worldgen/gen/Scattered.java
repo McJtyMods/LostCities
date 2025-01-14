@@ -106,7 +106,7 @@ public class Scattered {
                 if (!reference.isAllowVoid()) {
                     if (!(feature.profile.isDefault() || feature.profile.isCavern())) {
                         // We are in a world that can have void chunks. Check if this chunk is a void chunk
-                        if (hm.getHeight() <= feature.provider.getWorld().getMinBuildHeight() + 3) {
+                        if (hm.getHeight() <= feature.provider.getWorld().getMinY() + 3) {
                             return;
                         }
                     }
@@ -225,7 +225,7 @@ public class Scattered {
                 @Override
                 public ResourceLocation getBiome() {
                     Holder<Biome> biome = provider.getWorld().getBiome(info.getCenter(0));
-                    return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().registryOrThrow(Registries.BIOME).getKey(b));
+                    return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().lookupOrThrow(Registries.BIOME).getKey(b));
                 }
             };
             ChunkDriver driver = feature.driver;
