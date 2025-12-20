@@ -43,7 +43,10 @@ import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static mcjty.lostcities.setup.Registration.LOSTCITY;
@@ -78,9 +81,6 @@ public class ForgeEventHandlers {
         if (event.getLevel() instanceof ServerLevel serverLevel) {
             AssetRegistries.load(serverLevel);
             GlobalTodo.get(event.getLevel()).executeAndClearTodo(serverLevel);
-            if (event.getLevel().getGameTime() % 1000 == 0) {
-                BuildingInfo.cleanCacheUnloaded(serverLevel);
-            }
         }
     }
 
