@@ -21,6 +21,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
@@ -601,6 +602,36 @@ public class BuildingInfo implements ILostChunkInfo {
         BUILDING_INFO_MAP.clear();
         CITY_INFO_MAP.clear();
         CITY_LEVEL_CACHE.clear();
+    }
+
+    /**
+     * Clean the caches for all chunks that are further away then the given 'distance' (in blocks)
+     * from the given position but only for chunks that are not loaded
+     */
+    public static void cleanCacheUnloaded(ServerLevel level) {
+        ResourceKey<Level> dimension = level.dimension();
+
+        System.out.println("------------------------------------------------");
+        cleanCacheMap(level, dimension, BUILDING_INFO_MAP);
+        cleanCacheMap(level, dimension, CITY_INFO_MAP);
+        cleanCacheMap(level, dimension, CITY_LEVEL_CACHE);
+    }
+
+    private static void cleanCacheMap(ServerLevel level, ResourceKey<Level> dimension, Map<ChunkCoord, ?> cache) {
+        Iterator<ChunkCoord> iterator = cache.keySet().iterator();
+        int cnt = 0;
+        while (iterator.hasNext()) {
+            ChunkCoord key = iterator.next();
+            if (!key.dimension().equals(dimension)) {
+                continue;
+            }
+            if (level.hasChunk(key.chunkX(), key.chunkZ())) {
+                continue;
+            }
+            cnt++;
+            iterator.remove();
+        }
+        System.out.println("cnt = " + cnt);
     }
 
     public static synchronized BuildingInfo getBuildingInfo(ChunkCoord key, IDimensionInfo provider) {

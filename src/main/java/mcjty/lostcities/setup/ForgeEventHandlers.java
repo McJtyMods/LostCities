@@ -78,6 +78,9 @@ public class ForgeEventHandlers {
         if (event.getLevel() instanceof ServerLevel serverLevel) {
             AssetRegistries.load(serverLevel);
             GlobalTodo.get(event.getLevel()).executeAndClearTodo(serverLevel);
+            if (event.getLevel().getGameTime() % 1000 == 0) {
+                BuildingInfo.cleanCacheUnloaded(serverLevel);
+            }
         }
     }
 
