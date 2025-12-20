@@ -46,7 +46,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static mcjty.lostcities.setup.Registration.LOSTCITY;
@@ -103,9 +106,6 @@ public class ForgeEventHandlers {
         if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
             AssetRegistries.load(serverLevel);
             GlobalTodo.get(event.level).executeAndClearTodo(serverLevel);
-            if (event.level.getGameTime() % 1000 == 0) {
-                BuildingInfo.cleanCacheUnloaded(serverLevel);
-            }
         }
     }
 
