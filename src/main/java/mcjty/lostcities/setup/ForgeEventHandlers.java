@@ -103,6 +103,9 @@ public class ForgeEventHandlers {
         if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
             AssetRegistries.load(serverLevel);
             GlobalTodo.get(event.level).executeAndClearTodo(serverLevel);
+            if (event.level.getGameTime() % 1000 == 0) {
+                BuildingInfo.cleanCacheUnloaded(serverLevel);
+            }
         }
     }
 

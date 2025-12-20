@@ -1,3 +1,6 @@
+Upcoming:
+- New feature to clean up the cache for unloaded chunks every now and then. This prevents memory leaks
+
 1.20-7.4.6:
 - New 'grid32' profile option to force spheres to be placed on a 32x32 chunk grid instead of the normal 16x16 grid
 - In the default 16x16 grid Lost Cities will now try to avoid overlapping spheres
