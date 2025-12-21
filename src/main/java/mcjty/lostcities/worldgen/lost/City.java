@@ -212,8 +212,19 @@ public class City {
         return provider.getWorldStyle().getRandomCityStyle(provider, coord, cityStyleForCenterRandom);
     }
 
+    private static void cleanCacheUnloaded(WorldGenLevel level, ResourceKey<Level> dimension) {
+        Tools.cleanCacheMap(level, dimension, CITY_STYLE_MAP);
+    }
+
+    private static int cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
+
     // Calculate the citystyle based on all surrounding cities
     public static CityStyle getCityStyle(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        cleanCacheCounter--;
+        if (cleanCacheCounter < 0) {
+            cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
+            cleanCacheUnloaded(provider.getWorld(), provider.dimension());
+        }
         return CITY_STYLE_MAP.computeIfAbsent(coord, k -> getCityStyleInt(coord, provider, profile));
     }
 

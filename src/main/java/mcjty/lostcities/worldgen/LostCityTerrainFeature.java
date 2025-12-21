@@ -46,7 +46,6 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.neoforged.neoforge.common.NeoForge;
@@ -862,6 +861,11 @@ public class LostCityTerrainFeature {
         return Math.min(height, adjacent);
     }
 
+    private void cleanCacheUnloaded(WorldGenLevel level, ResourceKey<Level> dimension) {
+        Tools.cleanCacheMap(level, dimension, cachedHeightmaps);
+    }
+    private static int cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
+
     public ChunkHeightmap getHeightmap(ChunkCoord chunk, @Nonnull WorldGenLevel world) {
         int heightSampleSize = Config.HEIGHT_SAMPLE_SIZE.get();
         int top, left;
@@ -882,6 +886,12 @@ public class LostCityTerrainFeature {
             left = chunk.chunkZ();
         }
         synchronized (this) {
+            cleanCacheCounter--;
+            if (cleanCacheCounter < 0) {
+                cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
+                cleanCacheUnloaded(provider.getWorld(), provider.dimension());
+            }
+
             if (cachedHeightmaps.containsKey(chunk)) {
                 return cachedHeightmaps.get(chunk);
             } else {
