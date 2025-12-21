@@ -1,6 +1,5 @@
 package mcjty.lostcities.worldgen.lost;
 
-import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -12,6 +11,9 @@ import mcjty.lostcities.worldgen.lost.cityassets.Building;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.MultiBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.MultiSettings;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -49,7 +51,18 @@ public class MultiChunk {
         }
     }
 
+    private static void cleanCacheUnloaded(WorldGenLevel level, ResourceKey<Level> dimension) {
+        Tools.cleanCacheMap(level, dimension, MULTICHUNKS);
+    }
+
+    private static int cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
+
     public static synchronized MultiChunk getOrCreate(IDimensionInfo provider, ChunkCoord coord) {
+        cleanCacheCounter--;
+        if (cleanCacheCounter < 0) {
+            cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
+            cleanCacheUnloaded(provider.getWorld(), provider.dimension());
+        }
         int areasize = provider.getWorldStyle().getMultiSettings().areasize();
         ChunkCoord mc = getMultiCoord(coord, areasize);
         return MULTICHUNKS.computeIfAbsent(mc, k -> new MultiChunk(mc, areasize).calculateBuildings(provider));
