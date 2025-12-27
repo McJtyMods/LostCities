@@ -240,6 +240,7 @@ public class ForgeEventHandlers {
                 case DEFAULT, SPHERES -> {
                     if (needsCheck) {
                         BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                        serverLevel.setDefaultSpawnPos(pos, 0.0f);
                         event.getSettings().setSpawn(pos, 0.0f);
                         spawnPositions.put(serverLevel.dimension(), pos);
                         event.setCanceled(true);
@@ -247,6 +248,7 @@ public class ForgeEventHandlers {
                 }
                 case FLOATING, SPACE, CAVERN, CAVERNSPHERES -> {
                     BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                    serverLevel.setDefaultSpawnPos(pos, 0.0f);
                     event.getSettings().setSpawn(pos, 0.0f);
                     spawnPositions.put(serverLevel.dimension(), pos);
                     event.setCanceled(true);
