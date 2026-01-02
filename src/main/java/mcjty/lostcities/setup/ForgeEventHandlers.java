@@ -56,8 +56,6 @@ import static mcjty.lostcities.setup.Registration.LOSTCITY;
 
 public class ForgeEventHandlers {
 
-    private final Map<ResourceKey<Level>, BlockPos> spawnPositions = new HashMap<>();
-
     @SubscribeEvent
     public void commandRegister(RegisterCommandsEvent event) {
         ModCommands.register(event.getDispatcher());
@@ -71,35 +69,6 @@ public class ForgeEventHandlers {
             }
         }
     }
-
-    @SubscribeEvent
-    public void onPlayerCloned(PlayerEvent.Clone event) {
-        if (event.isWasDeath()) {
-            // We need to copyFrom the capabilities
-            event.getOriginal().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(oldStore -> {
-                event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(newStore -> {
-                    newStore.copyFrom(oldStore);
-                });
-            });
-        }
-    }
-
-    @SubscribeEvent
-    public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(note -> {
-            if (!note.isPlayerSpawnSet()) {
-                note.setPlayerSpawnSet(true);
-                for (Map.Entry<ResourceKey<Level>, BlockPos> entry : spawnPositions.entrySet()) {
-                    if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-                        serverPlayer.setRespawnPosition(entry.getKey(), entry.getValue(), 0.0f, true, true);
-                        serverPlayer.teleportTo(entry.getValue().getX(), entry.getValue().getY(), entry.getValue().getZ());
-                    }
-                }
-            }
-        });
-    }
-
-
 
     @SubscribeEvent
     public void onWorldTick(TickEvent.LevelTickEvent event) {
@@ -241,16 +210,12 @@ public class ForgeEventHandlers {
                     if (needsCheck) {
                         BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
                         serverLevel.setDefaultSpawnPos(pos, 0.0f);
-                        event.getSettings().setSpawn(pos, 0.0f);
-                        spawnPositions.put(serverLevel.dimension(), pos);
                         event.setCanceled(true);
                     }
                 }
                 case FLOATING, SPACE, CAVERN, CAVERNSPHERES -> {
                     BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
                     serverLevel.setDefaultSpawnPos(pos, 0.0f);
-                    event.getSettings().setSpawn(pos, 0.0f);
-                    spawnPositions.put(serverLevel.dimension(), pos);
                     event.setCanceled(true);
                 }
             }
