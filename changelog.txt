@@ -1,6 +1,6 @@
 1.21-8.3.8:
 - TqLxQuanZ fixed an issue where player reconnecting to server might get teleports to the world spawn, despite having a bed setup.
-- TqLxQuanZ fixed spawn point searching function does not set world spawn itself, but only player spawn point.
+- TqLxQuanZ fixed single player forceSpawnParts having race condition not working properly on setting world spawn during single player.
 
 1.21-8.3.7:
 - New feature to clean up the cache for unloaded chunks every now and then. This prevents memory leaks

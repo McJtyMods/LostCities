@@ -23,6 +23,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -60,16 +61,33 @@ public class ForgeEventHandlers {
         ModCommands.register(event.getDispatcher());
     }
 
+//    @SubscribeEvent
+//    public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
+//        if (event.getObject() instanceof Player) {
+//            if (!event.getObject().getCapability(PlayerProperties.PLAYER_SPAWN_SET).isPresent()) {
+//                event.addCapability(new ResourceLocation(LostCities.MODID, "spawnset"), new PropertiesDispatcher());
+//            }
+//        }
+//    }
+
     @SubscribeEvent
-    public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        Player player = event.getEntity();
-        if (!player.getData(Registration.ATTACHMENT_TYPE_SPAWNSET)) {
-            player.setData(Registration.ATTACHMENT_TYPE_SPAWNSET, true);
-            for (Map.Entry<ResourceKey<Level>, BlockPos> entry : spawnPositions.entrySet()) {
-                if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-                    serverPlayer.setRespawnPosition(entry.getKey(), entry.getValue(), 0.0f, true, true);
-                    serverPlayer.teleportTo(entry.getValue().getX(), entry.getValue().getY(), entry.getValue().getZ());
+    public void onPlayerFirstJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
+
+        ServerLevel level = serverPlayer.serverLevel();
+        ResourceKey<Level> dimKey = level.dimension();
+
+        if (spawnPositions.containsKey(dimKey)) {
+            BlockPos correctPos = spawnPositions.get(dimKey);
+            BlockPos currentWorldSpawn = level.getSharedSpawnPos();
+
+            if (!currentWorldSpawn.equals(correctPos)) {
+                level.setDefaultSpawnPos(correctPos, 0.0f);
+
+                if (level.getLevelData() instanceof ServerLevelData data) {
+                    data.setSpawn(correctPos, 0.0f);
                 }
+                serverPlayer.teleportTo(level, correctPos.getX() + 0.5, correctPos.getY(), correctPos.getZ() + 0.5, serverPlayer.getYRot(), serverPlayer.getXRot());
             }
         }
     }
@@ -209,6 +227,9 @@ public class ForgeEventHandlers {
             }
 
             // Potentially set the spawn point
+            // In single player, this is potentially being ignored due to the case that level.dat does not exists yet
+            // thus the world spawn is not set
+            // then we'll store into the spawnPositions first and prepare to set it up again.
             switch (profile.LANDSCAPE_TYPE) {
                 case DEFAULT, SPHERES -> {
                     if (needsCheck) {
