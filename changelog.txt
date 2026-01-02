@@ -1,5 +1,6 @@
 1.21-8.3.8:
 - TqLxQuanZ fixed an issue where player reconnecting to server might get teleports to the world spawn, despite having a bed setup.
+1.20-7.4.8:
 - TqLxQuanZ fixed spawn point searching function does not set world spawn itself, but only player spawn point.
 
 1.21-8.3.7:
