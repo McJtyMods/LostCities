@@ -23,7 +23,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -74,7 +73,6 @@ public class ForgeEventHandlers {
             }
         }
     }
-
 
     @SubscribeEvent
     public void onWorldTick(LevelTickEvent.Post event) {
@@ -216,12 +214,16 @@ public class ForgeEventHandlers {
                     if (needsCheck) {
                         BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
                         serverLevel.setDefaultSpawnPos(pos, 0.0f);
+                        event.getSettings().setSpawn(pos, 0.0f);
+                        spawnPositions.put(serverLevel.dimension(), pos);
                         event.setCanceled(true);
                     }
                 }
                 case FLOATING, SPACE, CAVERN, CAVERNSPHERES -> {
                     BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
                     serverLevel.setDefaultSpawnPos(pos, 0.0f);
+                    event.getSettings().setSpawn(pos, 0.0f);
+                    spawnPositions.put(serverLevel.dimension(), pos);
                     event.setCanceled(true);
                 }
             }
