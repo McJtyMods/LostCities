@@ -73,33 +73,26 @@ public class ForgeEventHandlers {
     }
 
     @SubscribeEvent
-    public void onPlayerCloned(PlayerEvent.Clone event) {
-        if (event.isWasDeath()) {
-            // We need to copyFrom the capabilities
-            event.getOriginal().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(oldStore -> {
-                event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(newStore -> {
-                    newStore.copyFrom(oldStore);
-                });
-            });
+    public void onPlayerFirstJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
+
+        ServerLevel level = serverPlayer.serverLevel();
+        ResourceKey<Level> dimKey = level.dimension();
+
+        if (spawnPositions.containsKey(dimKey)) {
+            BlockPos correctPos = spawnPositions.get(dimKey);
+            BlockPos currentWorldSpawn = level.getSharedSpawnPos();
+
+            if (!currentWorldSpawn.equals(correctPos)) {
+                level.setDefaultSpawnPos(correctPos, 0.0f);
+
+                if (level.getLevelData() instanceof ServerLevelData data) {
+                    data.setSpawn(correctPos, 0.0f);
+                }
+                serverPlayer.teleportTo(level, correctPos.getX() + 0.5, correctPos.getY(), correctPos.getZ() + 0.5, serverPlayer.getYRot(), serverPlayer.getXRot());
+            }
         }
     }
-
-    @SubscribeEvent
-    public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        event.getEntity().getCapability(PlayerProperties.PLAYER_SPAWN_SET).ifPresent(note -> {
-            if (!note.isPlayerSpawnSet()) {
-                note.setPlayerSpawnSet(true);
-                for (Map.Entry<ResourceKey<Level>, BlockPos> entry : spawnPositions.entrySet()) {
-                    if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-                        serverPlayer.setRespawnPosition(entry.getKey(), entry.getValue(), 0.0f, true, true);
-                        serverPlayer.teleportTo(entry.getValue().getX(), entry.getValue().getY(), entry.getValue().getZ());
-                    }
-                }
-            }
-        });
-    }
-
-
 
     @SubscribeEvent
     public void onWorldTick(TickEvent.LevelTickEvent event) {
@@ -236,6 +229,9 @@ public class ForgeEventHandlers {
             }
 
             // Potentially set the spawn point
+            // In single player, this is potentially being ignored due to the case that level.dat does not exists yet
+            // thus the world spawn is not set
+            // then we'll store into the spawnPositions first and prepare to set it up again.
             switch (profile.LANDSCAPE_TYPE) {
                 case DEFAULT, SPHERES -> {
                     if (needsCheck) {
