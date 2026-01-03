@@ -56,6 +56,8 @@ import static mcjty.lostcities.setup.Registration.LOSTCITY;
 
 public class ForgeEventHandlers {
 
+    private final Map<ResourceKey<Level>, BlockPos> spawnPositions = new HashMap<>();
+
     @SubscribeEvent
     public void commandRegister(RegisterCommandsEvent event) {
         ModCommands.register(event.getDispatcher());
@@ -66,6 +68,29 @@ public class ForgeEventHandlers {
         if (event.getObject() instanceof Player) {
             if (!event.getObject().getCapability(PlayerProperties.PLAYER_SPAWN_SET).isPresent()) {
                 event.addCapability(new ResourceLocation(LostCities.MODID, "spawnset"), new PropertiesDispatcher());
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerFirstJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
+
+        ServerLevel level = serverPlayer.serverLevel();
+        ResourceKey<Level> dimKey = level.dimension();
+
+        if (spawnPositions.containsKey(dimKey)) {
+            BlockPos correctPos = spawnPositions.get(dimKey);
+            BlockPos currentWorldSpawn = level.getSharedSpawnPos();
+
+            if (!currentWorldSpawn.equals(correctPos)) {
+                level.setDefaultSpawnPos(correctPos, 0.0f);
+
+                if (level.getLevelData() instanceof ServerLevelData data) {
+                    data.setSpawn(correctPos, 0.0f);
+                }
+                serverPlayer.teleportTo(level, correctPos.getX() + 0.5, correctPos.getY(), correctPos.getZ() + 0.5, serverPlayer.getYRot(), serverPlayer.getXRot());
+                spawnPositions.remove(dimKey);
             }
         }
     }
@@ -205,17 +230,24 @@ public class ForgeEventHandlers {
             }
 
             // Potentially set the spawn point
+            // In single player, this is potentially being ignored due to the case that level.dat does not exists yet
+            // thus the world spawn is not set
+            // then we'll store into the spawnPositions first and prepare to set it up again.
             switch (profile.LANDSCAPE_TYPE) {
                 case DEFAULT, SPHERES -> {
                     if (needsCheck) {
                         BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
                         serverLevel.setDefaultSpawnPos(pos, 0.0f);
+                        event.getSettings().setSpawn(pos, 0.0f);
+                        spawnPositions.put(serverLevel.dimension(), pos);
                         event.setCanceled(true);
                     }
                 }
                 case FLOATING, SPACE, CAVERN, CAVERNSPHERES -> {
                     BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
                     serverLevel.setDefaultSpawnPos(pos, 0.0f);
+                    event.getSettings().setSpawn(pos, 0.0f);
+                    spawnPositions.put(serverLevel.dimension(), pos);
                     event.setCanceled(true);
                 }
             }
