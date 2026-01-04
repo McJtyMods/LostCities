@@ -2,8 +2,10 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
+import mcjty.lostcities.varia.TimedCache;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
@@ -11,9 +13,6 @@ import mcjty.lostcities.worldgen.lost.cityassets.Building;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.MultiBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.MultiSettings;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.WorldGenLevel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -28,7 +27,7 @@ public class MultiChunk {
     record MB(String name, int offsetX, int offsetZ) {}
 
     // Multichunks are indexed by the chunk coordinates divided by the area size
-    private static final Map<ChunkCoord, MultiChunk> MULTICHUNKS = Collections.synchronizedMap(new HashMap<>());
+    private static final TimedCache<ChunkCoord, MultiChunk> MULTICHUNKS = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
     public static void cleanCache() {
         MULTICHUNKS.clear();
     }
@@ -51,18 +50,7 @@ public class MultiChunk {
         }
     }
 
-    private static void cleanCacheUnloaded(WorldGenLevel level, ResourceKey<Level> dimension) {
-        Tools.cleanCacheMap(level, dimension, MULTICHUNKS);
-    }
-
-    private static int cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
-
     public static synchronized MultiChunk getOrCreate(IDimensionInfo provider, ChunkCoord coord) {
-        cleanCacheCounter--;
-        if (cleanCacheCounter < 0) {
-            cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
-            cleanCacheUnloaded(provider.getWorld(), provider.dimension());
-        }
         int areasize = provider.getWorldStyle().getMultiSettings().areasize();
         ChunkCoord mc = getMultiCoord(coord, areasize);
         return MULTICHUNKS.computeIfAbsent(mc, k -> new MultiChunk(mc, areasize).calculateBuildings(provider));

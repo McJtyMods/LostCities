@@ -10,13 +10,11 @@ import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.datafix.fixes.BlockStateData;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
@@ -146,27 +144,4 @@ public class Tools {
                 .forGetter(getter);
     }
 
-    public static final int CACHE_CLEANUP_TIMER = 2000;
-    public static final int CACHE_CLEANUP_SIZE = 2000;
-
-    public static void cleanCacheMap(WorldGenLevel level, ResourceKey<Level> dimension, Map<ChunkCoord, ?> cache) {
-        if (cache.size() < CACHE_CLEANUP_SIZE) {
-            return;
-        }
-//        System.out.print("cache.size() = " + cache.size() + "    ");
-        Iterator<ChunkCoord> iterator = cache.keySet().iterator();
-        int cnt = 0;
-        while (iterator.hasNext()) {
-            ChunkCoord key = iterator.next();
-            if (!key.dimension().equals(dimension)) {
-                continue;
-            }
-            if (level.hasChunk(key.chunkX(), key.chunkZ())) {
-                continue;
-            }
-            cnt++;
-            iterator.remove();
-        }
-//        System.out.println("cnt = " + cnt + "   -> " + cache.size());
-    }
 }

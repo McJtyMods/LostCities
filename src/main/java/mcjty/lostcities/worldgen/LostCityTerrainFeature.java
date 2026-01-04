@@ -90,7 +90,7 @@ public class LostCityTerrainFeature {
     public final LostCityProfile profile;
     public final RandomSource rand;
 
-    private final Map<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new HashMap<>();
+    private final TimedCache<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
     private final Statistics statistics = new Statistics();
     private final Map<Block, BlockEntityType> typeCache = new HashMap<>();
 
@@ -855,11 +855,6 @@ public class LostCityTerrainFeature {
         return Math.min(height, adjacent);
     }
 
-    private void cleanCacheUnloaded(WorldGenLevel level, ResourceKey<Level> dimension) {
-        Tools.cleanCacheMap(level, dimension, cachedHeightmaps);
-    }
-    private static int cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
-
     public ChunkHeightmap getHeightmap(ChunkCoord chunk, @Nonnull WorldGenLevel world) {
         int heightSampleSize = Config.HEIGHT_SAMPLE_SIZE.get();
         int top, left;
@@ -880,29 +875,23 @@ public class LostCityTerrainFeature {
             left = chunk.chunkZ();
         }
         synchronized (this) {
-            cleanCacheCounter--;
-            if (cleanCacheCounter < 0) {
-                cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
-                cleanCacheUnloaded(provider.getWorld(), provider.dimension());
+            ChunkHeightmap cached = cachedHeightmaps.get(chunk);
+            if (cached != null) {
+                return cached;
             }
-
-            if (cachedHeightmaps.containsKey(chunk)) {
-                return cachedHeightmaps.get(chunk);
-            } else {
-                ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL);
-                generateHeightmap(sampler.chunkX(), sampler.chunkZ(), world, heightmap);
-                if (heightSampleSize > 1) {
-                    for (int i = 0; i < heightSampleSize; i++) {
-                        for (int j = 0; j < heightSampleSize; j++) {
-                            ChunkCoord sampleKey = new ChunkCoord(chunk.dimension(), top + (i * constX), left + (j * constZ));
-                            cachedHeightmaps.put(sampleKey, new ChunkHeightmap(heightmap));
-                        }
+            ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL);
+            generateHeightmap(sampler.chunkX(), sampler.chunkZ(), world, heightmap);
+            if (heightSampleSize > 1) {
+                for (int i = 0; i < heightSampleSize; i++) {
+                    for (int j = 0; j < heightSampleSize; j++) {
+                        ChunkCoord sampleKey = new ChunkCoord(chunk.dimension(), top + (i * constX), left + (j * constZ));
+                        cachedHeightmaps.put(sampleKey, new ChunkHeightmap(heightmap));
                     }
-                } else {
-                    cachedHeightmaps.put(chunk, heightmap);
                 }
-                return heightmap;
+            } else {
+                cachedHeightmaps.put(chunk, heightmap);
             }
+            return heightmap;
         }
     }
 
