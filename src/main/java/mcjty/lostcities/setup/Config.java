@@ -37,6 +37,7 @@ public class Config {
     public static final ModConfigSpec.ConfigValue<String> SELECTED_CUSTOM_JSON;
     public static final ModConfigSpec.IntValue TODO_QUEUE_SIZE;
     public static final ModConfigSpec.BooleanValue FORCE_SAPLING_GROWTH;
+    public static final ModConfigSpec.IntValue CACHE_CLEANUP_SECONDS;
 
     private static final String[] DEF_AVOID_STRUCTURES = new String[] {
             "minecraft:mansion",
@@ -176,6 +177,7 @@ public class Config {
         SELECTED_CUSTOM_JSON = SERVER_BUILDER.define("selectedCustomJson", "");
         TODO_QUEUE_SIZE = SERVER_BUILDER.comment("The size of the todo queues for the lost city generator").defineInRange("todoQueueSize", 20, 1, 100000);
         FORCE_SAPLING_GROWTH = SERVER_BUILDER.comment("If this is true then saplings will grow into trees during generation. This is more expensive").define("forceSaplingGrowth", true);
+        CACHE_CLEANUP_SECONDS = SERVER_BUILDER.comment("Time in seconds after which cached chunk data is evicted").defineInRange("cacheCleanupSeconds", 300, 1, 86400);
         AVOID_STRUCTURES = SERVER_BUILDER
                 .comment("List of structures to avoid when generating cities (for example to avoid generating a city in a woodland mansion)")
                 .defineList("avoidStructures", Lists.newArrayList(DEF_AVOID_STRUCTURES), s -> s instanceof String);

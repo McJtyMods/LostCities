@@ -1,7 +1,9 @@
 package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.varia.ChunkCoord;
+import mcjty.lostcities.varia.TimedCache;
 import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
@@ -29,7 +31,7 @@ public class City {
 
     // If cityChance == -1 then this is used to control where cities are
     private static final Map<ResourceKey<Level>, CityRarityMap> CITY_RARITY_MAP = new HashMap<>();
-    private static final Map<ChunkCoord, CityStyle> CITY_STYLE_MAP = new HashMap<>();
+    private static final TimedCache<ChunkCoord, CityStyle> CITY_STYLE_CACHE = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
     private static Map<ChunkCoord, PreDefBuildingOffset> OCCUPIED_CHUNKS_BUILDING = null;
     private static Map<ChunkCoord, PredefinedStreet> OCCUPIED_CHUNKS_STREET = null;
 
@@ -38,7 +40,7 @@ public class City {
         predefinedBuildingMap = null;
         predefinedStreetMap = null;
         CITY_RARITY_MAP.clear();
-        CITY_STYLE_MAP.clear();
+        CITY_STYLE_CACHE.clear();
         OCCUPIED_CHUNKS_BUILDING = null;
         OCCUPIED_CHUNKS_STREET = null;
     }
@@ -212,20 +214,9 @@ public class City {
         return provider.getWorldStyle().getRandomCityStyle(provider, coord, cityStyleForCenterRandom);
     }
 
-    private static void cleanCacheUnloaded(WorldGenLevel level, ResourceKey<Level> dimension) {
-        Tools.cleanCacheMap(level, dimension, CITY_STYLE_MAP);
-    }
-
-    private static int cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
-
     // Calculate the citystyle based on all surrounding cities
     public static CityStyle getCityStyle(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
-        cleanCacheCounter--;
-        if (cleanCacheCounter < 0) {
-            cleanCacheCounter = Tools.CACHE_CLEANUP_TIMER;
-            cleanCacheUnloaded(provider.getWorld(), provider.dimension());
-        }
-        return CITY_STYLE_MAP.computeIfAbsent(coord, k -> getCityStyleInt(coord, provider, profile));
+        return CITY_STYLE_CACHE.computeIfAbsent(coord, k -> getCityStyleInt(coord, provider, profile));
     }
 
     private static CityStyle getCityStyleInt(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
