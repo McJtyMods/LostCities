@@ -293,20 +293,20 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static synchronized LostChunkCharacteristics getChunkCharacteristicsGui(ChunkCoord key, IDimensionInfo provider) {
-        LostChunkCharacteristics cached = CITY_INFO_MAP.get(key);
-        if (cached != null) {
-            return cached;
-        }
+//        LostChunkCharacteristics cached = CITY_INFO_MAP.get(key);
+//        if (cached != null) {
+//            return cached;
+//        }
         int chunkX = key.chunkX();
         int chunkZ = key.chunkZ();
         LostCityProfile profile = getProfile(key, provider);
         LostChunkCharacteristics characteristics = new LostChunkCharacteristics();
 
         characteristics.isCity = isCityRaw(key, provider, profile);
-        characteristics.cityLevel = getCityLevel(key, provider);
+        characteristics.cityLevel = getCityLevelGui(key, provider);
         Random rand = getBuildingRandom(chunkX, chunkZ, provider.getSeed());
         characteristics.couldHaveBuilding = characteristics.isCity && rand.nextFloat() < profile.BUILDING_CHANCE;
-        CITY_INFO_MAP.put(key, characteristics);
+//        CITY_INFO_MAP.put(key, characteristics);
         return characteristics;
     }
 
@@ -1088,6 +1088,20 @@ public class BuildingInfo implements ILostChunkInfo {
             result = getCityLevelNormal(key, provider, provider.getProfile());
         }
         CITY_LEVEL_CACHE.put(key, result);
+        return result;
+    }
+
+    public static synchronized int getCityLevelGui(ChunkCoord key, IDimensionInfo provider) {
+        int result;
+        if ((provider.getProfile().isSpace() || provider.getProfile().isVoidSpheres())) {
+            result = getCityLevelSpace(key, provider);
+        } else if (provider.getProfile().isFloating()) {
+            result = getCityLevelFloating(key, provider);
+        } else if (provider.getProfile().isCavern()) {
+            result =  getCityLevelCavern(key, provider);
+        } else {
+            result = getCityLevelNormal(key, provider, provider.getProfile());
+        }
         return result;
     }
 

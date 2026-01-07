@@ -2,10 +2,10 @@ package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
+import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import mcjty.lostcities.worldgen.lost.regassets.data.WorldSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
@@ -32,14 +32,17 @@ public class ChunkFixer {
 
         int maxHeight = info.getMaxHeight();
 
+        WorldStyle worldStyle = provider.getWorldStyle();
+        WorldSettings worldSettings = worldStyle.getWorldSettings();
         if (info.hasBuilding) {
             if (world.getChunk(coord.chunkX() + 1, coord.chunkZ()).getPersistedStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getXmax();
                 int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
+                BlockState state = worldSettings.vineWest();
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < maxHeight; y++) {
                         if (world.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(world, bottom, VineBlock.WEST, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
+                            createVineStrip(world, bottom, state, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
                         }
                     }
                 }
@@ -49,10 +52,11 @@ public class ChunkFixer {
             if (world.getChunk(chunkX + 1, chunkZ).getPersistedStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getXmax();
                 int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
+                BlockState state = worldSettings.vineEast();
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
                         if (world.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(world, bottom, VineBlock.EAST, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
+                            createVineStrip(world, bottom, state, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
                         }
                     }
                 }
@@ -63,10 +67,11 @@ public class ChunkFixer {
             if (world.getChunk(chunkX, chunkZ + 1).getPersistedStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getZmax();
                 int bottom = Math.max(adjacent.getCityGroundLevel() + 3, adjacent.hasBuilding ? adjacent.getMaxHeight() : (adjacent.getCityGroundLevel() + 3));
+                BlockState state = worldSettings.vineNorth();
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < maxHeight; y++) {
                         if (world.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(world, bottom, VineBlock.NORTH, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
+                            createVineStrip(world, bottom, state, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
                         }
                     }
                 }
@@ -76,10 +81,11 @@ public class ChunkFixer {
             if (world.getChunk(chunkX, chunkZ + 1).getPersistedStatus().isOrAfter(ChunkStatus.FEATURES)) {
                 BuildingInfo adjacent = info.getZmax();
                 int bottom = Math.max(info.getCityGroundLevel() + 3, info.hasBuilding ? maxHeight : (info.getCityGroundLevel() + 3));
+                BlockState state = worldSettings.vineSouth();
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
                         if (world.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(world, bottom, VineBlock.SOUTH, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
+                            createVineStrip(world, bottom, state, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
                         }
                     }
                 }
@@ -87,14 +93,13 @@ public class ChunkFixer {
         }
     }
 
-    private static void createVineStrip(LevelAccessor world, int bottom, BooleanProperty direction, BlockPos pos, BlockPos vineHolderPos) {
+    private static void createVineStrip(LevelAccessor world, int bottom, BlockState state, BlockPos pos, BlockPos vineHolderPos) {
         if (world.isEmptyBlock(vineHolderPos)) {
             return;
         }
         if (!world.isEmptyBlock(pos)) {
             return;
         }
-        BlockState state = Blocks.VINE.defaultBlockState().setValue(direction, true);
         world.setBlock(pos, state, 0);
         pos = pos.below();
         while (pos.getY() >= bottom && world.getRandom().nextFloat() < .8f) {
