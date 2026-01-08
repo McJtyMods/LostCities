@@ -23,7 +23,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -60,15 +59,6 @@ public class ForgeEventHandlers {
     public void commandRegister(RegisterCommandsEvent event) {
         ModCommands.register(event.getDispatcher());
     }
-
-//    @SubscribeEvent
-//    public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
-//        if (event.getObject() instanceof Player) {
-//            if (!event.getObject().getCapability(PlayerProperties.PLAYER_SPAWN_SET).isPresent()) {
-//                event.addCapability(new ResourceLocation(LostCities.MODID, "spawnset"), new PropertiesDispatcher());
-//            }
-//        }
-//    }
 
     @SubscribeEvent
     public void onPlayerFirstJoin(PlayerEvent.PlayerLoggedInEvent event) {
