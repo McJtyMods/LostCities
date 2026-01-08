@@ -1348,7 +1348,8 @@ public class BuildingInfo implements ILostChunkInfo {
         xBridgeType = bt;
         // Here we can automatically mark the rest of the bridge as ok. Saves on calculation
         i = i.getXmin();
-        while (i != minimum) {
+        ChunkCoord minCoord = minimum.coord;
+        while (!i.coord.equals(minCoord)) {
             i.xBridgeType = bt;
             i.xBridgeTypeCalculated = true;
             i.zBridgeType = null;
@@ -1416,7 +1417,8 @@ public class BuildingInfo implements ILostChunkInfo {
         zBridgeType = bt;
         // Here we can automatically mark the rest of the bridge as ok. Saves on calculation
         i = i.getZmin();
-        while (i != minimum) {
+        ChunkCoord minCoord = minimum.coord;
+        while (!i.coord.equals(minCoord)) {
             i.zBridgeType = bt;
             i.zBridgeTypeCalculated = true;
             i.xBridgeType = null;
