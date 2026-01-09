@@ -107,6 +107,15 @@ public class Config {
                 // Check if SavedData has a profile selected
                 selectedProfile = data.getSelectedProfile();
                 selectedJson = data.getSelectedJson();
+                // If this is also empty get from config for the overworld
+                if (level.dimension() == Level.OVERWORLD) {
+                    if (selectedJson.isEmpty()) {
+                        selectedJson = Config.SELECTED_CUSTOM_JSON.get();
+                    }
+                    if (selectedProfile.isEmpty()) {
+                        selectedProfile = Config.SELECTED_PROFILE.get();
+                    }
+                }
             }
 
             if (!selectedProfile.isEmpty()) {
