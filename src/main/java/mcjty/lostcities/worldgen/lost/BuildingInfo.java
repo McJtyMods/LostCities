@@ -4,11 +4,7 @@ import mcjty.lostcities.LostCities;
 import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.setup.Config;
-import mcjty.lostcities.varia.ChunkCoord;
-import mcjty.lostcities.varia.Counter;
-import mcjty.lostcities.varia.QualityRandom;
-import mcjty.lostcities.varia.TimedCache;
-import mcjty.lostcities.varia.Tools;
+import mcjty.lostcities.varia.*;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
@@ -23,7 +19,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -408,12 +403,9 @@ public class BuildingInfo implements ILostChunkInfo {
             }
         }
 
-            LostCityEvent.CharacteristicsEvent event = new LostCityEvent.CharacteristicsEvent(world, LostCities.lostCitiesImp,
-                    chunkX, chunkZ, characteristics);
-            NeoForge.EVENT_BUS.post(event);
         LostCityEvent.CharacteristicsEvent event = new LostCityEvent.CharacteristicsEvent(world, LostCities.lostCitiesImp,
                 chunkX, chunkZ, characteristics);
-        MinecraftForge.EVENT_BUS.post(event);
+        NeoForge.EVENT_BUS.post(event);
 
         CITY_INFO_MAP.put(coord, characteristics);
         return characteristics;
