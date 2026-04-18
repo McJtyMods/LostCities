@@ -46,7 +46,7 @@ public class BuildingPartRE implements IAsset<BuildingPartRE> {
         for (List<String> slice : slices) {
             StringBuilder builder = new StringBuilder();
             for (String s : slice) {
-                builder.append(s.intern());
+                builder.append(s);
             }
             this.slices[idx++] = builder.toString();
         }
