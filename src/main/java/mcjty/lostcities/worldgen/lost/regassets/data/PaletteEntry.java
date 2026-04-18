@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost.regassets.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.nbt.CompoundTag;
 
 import java.util.HashMap;
@@ -29,7 +30,8 @@ public class PaletteEntry {
             ).apply(instance, PaletteEntry::new));
 
     // Used for reducing the memory usage when stored in the game client, we shouldn't even have duplicate pools as they're very expensive - Quan
-    private static final Map<CompoundTag, CompoundTag> TAG_POOL = new HashMap<>();
+    private static final ObjectOpenHashSet<List<BlockEntry>> LIST_POOL = new ObjectOpenHashSet<>(512);
+    private static final ObjectOpenHashSet<CompoundTag> TAG_POOL = new ObjectOpenHashSet<>(512);
 
     private String chr;
     private String block;
@@ -103,13 +105,31 @@ public class PaletteEntry {
         return tag;
     }
 
-    private static CompoundTag deduplicate(CompoundTag incomingTag) {
-        if (incomingTag == null || incomingTag.isEmpty()) {
+    private static List<BlockEntry> deduplicateList(List<BlockEntry> incoming) {
+        if (incoming == null || incoming.isEmpty()) {
             return null;
         }
-        // If the tag exists in the pool, return the existing one.
-        // If not, put this one in and return it.
-        return TAG_POOL.computeIfAbsent(incomingTag, t -> t);
+        List<BlockEntry> immutable = List.copyOf(incoming);
+        List<BlockEntry> existing = LIST_POOL.get(immutable);
+        if (existing != null) {
+            return existing;
+        }
+
+        LIST_POOL.add(immutable);
+        return immutable;
+    }
+
+    private static CompoundTag deduplicateTag(CompoundTag incoming) {
+        if (incoming == null || incoming.isEmpty()) {
+            return null;
+        }
+
+        CompoundTag existing = TAG_POOL.get(incoming);
+        if (existing != null) {
+            return existing;
+        }
+        TAG_POOL.add(incoming);
+        return incoming;
     }
 
     public PaletteEntry(String chr, Optional<String> block, Optional<String> variant, Optional<String> frompalette,
@@ -120,12 +140,12 @@ public class PaletteEntry {
         this.block = block.map(String::intern).orElse(null);
         this.variant = variant.orElse(null);
         this.frompalette = frompalette.map(String::intern).orElse(null);
-        this.blocks = blocks.orElse(null);
+        this.blocks = deduplicateList(blocks.orElse(null));
         this.damaged = damaged.map(String::intern).orElse(null);
         this.mob = mob.map(String::intern).orElse(null);
         this.loot = loot.map(String::intern).orElse(null);
         this.torch = torch.orElse(null);
-        this.tag = deduplicate(tag.orElse(null));
+        this.tag = deduplicateTag(tag.orElse(null));
     }
 
     @Override
