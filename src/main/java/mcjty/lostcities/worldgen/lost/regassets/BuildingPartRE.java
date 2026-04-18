@@ -52,7 +52,7 @@ public class BuildingPartRE implements IAsset<BuildingPartRE> {
         }
         this.xSize = xSize;
         this.zSize = zSize;
-        this.refPaletteName = refpalette.orElse(null);
+        this.refPaletteName = refpalette.map(String::intern).orElse(null);
         this.localPalette = locpalette.orElse(null);
         this.metadata = metadata.orElse(null);
     }
