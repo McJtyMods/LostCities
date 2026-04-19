@@ -53,6 +53,6 @@ public class PartRef extends ConditionTest {
                    Optional<String> range) {
         super(top, ground, cellar, isbuilding, issphere, floor, chunkx, chunkz, convertSetOrString(belowpart), convertSetOrString(inpart),
                 convertSetOrString(inbuilding), convertSetOrString(inbiome), range);
-        this.part = part;
+        this.part = part.intern();
     }
 }

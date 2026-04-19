@@ -53,10 +53,10 @@ public class BuildingRE implements IAsset<BuildingRE> {
                       Optional<Integer> minCellars, Optional<Integer> minFloors, Optional<Integer> maxCellars, Optional<Integer> maxFloors,
                       Optional<Boolean> allowDoors, Optional<Boolean> allowFillers, Optional<Boolean> overrideFloors,
                       Optional<Float> prefersLonely, List<PartRef> partRefs, Optional<List<PartRef>> partRefs2) {
-        this.refPaletteName = refpalette.orElse(null);
+        this.refPaletteName = refpalette.map(String::intern).orElse(null);
         this.localPalette = locpalette.orElse(null);
         this.fillerBlock = filler.charAt(0);
-        this.rubbleBlock = rubble.orElse(null);
+        this.rubbleBlock = rubble.map(String::intern).orElse(null);
         this.minCellars = minCellars.orElse(-1);
         this.maxCellars = maxCellars.orElse(-1);
         this.minFloors = minFloors.orElse(-1);

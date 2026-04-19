@@ -1853,8 +1853,9 @@ public class LostCityTerrainFeature {
         world.getChunk(pos).setBlockEntityNbt(tag);
         if (b.getBlock() == Blocks.COMMAND_BLOCK) {
             info.addPostTodo(pos, () -> {
-                ((ServerChunkCache)world.getChunkSource()).blockChanged(pos);
-                world.scheduleTick(pos, b.getBlock(), 1);
+                WorldGenLevel inWorld = info.provider.getWorld();
+                ((ServerChunkCache)inWorld.getChunkSource()).blockChanged(pos);
+                inWorld.scheduleTick(pos, b.getBlock(), 1);
             });
         }
         return b;
@@ -1887,9 +1888,10 @@ public class LostCityTerrainFeature {
         if (!info.noLoot) {
             BlockPos pos = driver.getCurrentCopy();
             info.addPostTodo(pos, () -> {
-                if (!world.getBlockState(pos).isAir()) {
-                    world.setBlock(pos, b, Block.UPDATE_CLIENTS);
-                    generateLoot(info, world, pos, new BuildingInfo.ConditionTodo(inf.loot(), part.getName(), info));
+                WorldGenLevel inWorld = info.provider.getWorld();
+                if (!inWorld.getBlockState(pos).isAir()) {
+                    inWorld.setBlock(pos, b, Block.UPDATE_CLIENTS);
+                    generateLoot(info, inWorld, pos, new BuildingInfo.ConditionTodo(inf.loot(), part.getName(), info));
                 }
             });
         }
@@ -1920,8 +1922,9 @@ public class LostCityTerrainFeature {
                         });
                     } else {
                         info.addPostTodo(pos, () -> {
+                            WorldGenLevel inWorld = info.provider.getWorld();
                             BlockState state = finalB.setValue(SaplingBlock.STAGE, 1);
-                            world.setBlock(pos, state, Block.UPDATE_ALL_IMMEDIATE);
+                            inWorld.setBlock(pos, state, Block.UPDATE_ALL_IMMEDIATE);
                         });
                     }
                 }

@@ -2,9 +2,12 @@ package mcjty.lostcities.worldgen.lost.regassets.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.nbt.CompoundTag;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -25,6 +28,10 @@ public class PaletteEntry {
                     Codec.BOOL.optionalFieldOf("torch").forGetter(l -> Optional.ofNullable(l.getTorch())),
                     CompoundTag.CODEC.optionalFieldOf("tag").forGetter(l -> Optional.ofNullable(l.getTag()))
             ).apply(instance, PaletteEntry::new));
+
+    // Used for reducing the memory usage when stored in the game client, we shouldn't even have duplicate pools as they're very expensive - Quan
+    private static final ObjectOpenHashSet<List<BlockEntry>> LIST_POOL = new ObjectOpenHashSet<>(512);
+    private static final ObjectOpenHashSet<CompoundTag> TAG_POOL = new ObjectOpenHashSet<>(512);
 
     private String chr;
     private String block;
@@ -49,12 +56,6 @@ public class PaletteEntry {
     public static PaletteEntry variant(String variant) {
         PaletteEntry entry = new PaletteEntry();
         entry.variant = variant;
-        return entry;
-    }
-
-    public static PaletteEntry frompalette(String frompalette) {
-        PaletteEntry entry = new PaletteEntry();
-        entry.frompalette = frompalette;
         return entry;
     }
 
@@ -104,20 +105,47 @@ public class PaletteEntry {
         return tag;
     }
 
+    private static List<BlockEntry> deduplicateList(List<BlockEntry> incoming) {
+        if (incoming == null || incoming.isEmpty()) {
+            return null;
+        }
+        List<BlockEntry> immutable = List.copyOf(incoming);
+        List<BlockEntry> existing = LIST_POOL.get(immutable);
+        if (existing != null) {
+            return existing;
+        }
+
+        LIST_POOL.add(immutable);
+        return immutable;
+    }
+
+    private static CompoundTag deduplicateTag(CompoundTag incoming) {
+        if (incoming == null || incoming.isEmpty()) {
+            return null;
+        }
+
+        CompoundTag existing = TAG_POOL.get(incoming);
+        if (existing != null) {
+            return existing;
+        }
+        TAG_POOL.add(incoming);
+        return incoming;
+    }
+
     public PaletteEntry(String chr, Optional<String> block, Optional<String> variant, Optional<String> frompalette,
                         Optional<List<BlockEntry>> blocks, Optional<String> damaged,
                         Optional<String> mob, Optional<String> loot, Optional<Boolean> torch,
                         Optional<CompoundTag> tag) {
-        this.chr = chr;
-        this.block = block.orElse(null);
+        this.chr = chr.intern();
+        this.block = block.map(String::intern).orElse(null);
         this.variant = variant.orElse(null);
-        this.frompalette = frompalette.orElse(null);
-        this.blocks = blocks.orElse(null);
-        this.damaged = damaged.orElse(null);
-        this.mob = mob.orElse(null);
-        this.loot = loot.orElse(null);
+        this.frompalette = frompalette.map(String::intern).orElse(null);
+        this.blocks = deduplicateList(blocks.orElse(null));
+        this.damaged = damaged.map(String::intern).orElse(null);
+        this.mob = mob.map(String::intern).orElse(null);
+        this.loot = loot.map(String::intern).orElse(null);
         this.torch = torch.orElse(null);
-        this.tag = tag.orElse(null);
+        this.tag = deduplicateTag(tag.orElse(null));
     }
 
     @Override
