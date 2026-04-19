@@ -35,7 +35,7 @@ public class ScatteredRE implements IAsset<ScatteredRE> {
                        ScatteredBuilding.TerrainHeight terrainheight, ScatteredBuilding.TerrainFix terrainfix,
                        int heightoffset) {
         this.buildings = buildings.orElse(null);
-        this.multibuilding = multibuilding.orElse(null);
+        this.multibuilding = multibuilding.map(String::intern).orElse(null);
         this.rotatable = rotatable.orElse(false);
         this.terrainheight = terrainheight;
         this.terrainfix = terrainfix;

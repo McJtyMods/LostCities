@@ -58,6 +58,6 @@ public class ConditionPart extends ConditionTest {
         super(top, ground, cellar, isbuilding, issphere, floor, chunkx, chunkz, convertSetOrString(belowpart), convertSetOrString(inpart),
                 convertSetOrString(inbuilding), convertSetOrString(inbiome), range);
         this.factor = factor;
-        this.value = value;
+        this.value = value.intern();
     }
 }
