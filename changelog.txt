@@ -1,5 +1,6 @@
 1.21-8.3.9:
 - TqLxQuanZ added a memory optimization on crowded city generation from 120MB to 15MB.
+- Fixed a crash in the Lost Cities configuration screen
 
 1.21-8.3.8:
 - Implement a better caching system which keeps track of how long ago something was last accessed. This should improve performance

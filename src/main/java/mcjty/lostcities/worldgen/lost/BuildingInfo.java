@@ -1073,9 +1073,11 @@ public class BuildingInfo implements ILostChunkInfo {
      * This function uses its own cache.
      */
     public static synchronized int getCityLevel(ChunkCoord key, IDimensionInfo provider) {
-        Integer cached = CITY_LEVEL_CACHE.get(key);
-        if (cached != null) {
-            return cached;
+        if (provider.getWorld() != null) {  // In LC preview we don't want to use the cache as the config isn't loaded yet
+            Integer cached = CITY_LEVEL_CACHE.get(key);
+            if (cached != null) {
+                return cached;
+            }
         }
         int result;
         if ((provider.getProfile().isSpace() || provider.getProfile().isVoidSpheres())) {
@@ -1087,7 +1089,9 @@ public class BuildingInfo implements ILostChunkInfo {
         } else {
             result = getCityLevelNormal(key, provider, provider.getProfile());
         }
-        CITY_LEVEL_CACHE.put(key, result);
+        if (provider.getWorld() != null) {
+            CITY_LEVEL_CACHE.put(key, result);
+        }
         return result;
     }
 
