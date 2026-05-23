@@ -13,6 +13,7 @@ import mcjty.lostcities.worldgen.lost.cityassets.Building;
 import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.MultiBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.MultiSettings;
+import mcjty.lostcities.worldgen.lost.regassets.data.WorldSettings;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -189,7 +190,8 @@ public class MultiChunk {
                 if (atSurface || !BuildingInfo.isCityRaw(coord, provider, profile) || BuildingInfo.hasHighway(coord, provider, profile)) {
                     return false;
                 }
-                if (type != RailChunkType.NONE) {
+                WorldSettings.RailwayAvoidance avoidance = provider.getWorldStyle().getWorldSettings().railwayAvoidance();
+                if (type != RailChunkType.NONE && avoidance != WorldSettings.RailwayAvoidance.BLOCK_RAILWAY) {
                     int level = railChunkInfo.getLevel();
                     int max = Math.min(cityLevel - level - partlevel, maxCellars);
                     if (max < maxCellars) {
