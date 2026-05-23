@@ -1,6 +1,8 @@
 1.20-7.4.12:
-- TqLxQuanZ added a memory optimization on crowded city generation from 120MB to 15MB.
+- TqLxQuanZ added a memory optimization on crowded city generation from 150MB~ to 15MB.
+- TqLxQuanZ fixed an issue where multibuilding do not spawn when railway is below.
 - Fixed a crash in the Lost Cities configuration screen
+
 
 1.20-7.4.11:
 - Implement a better caching system which keeps track of how long ago something was last accessed. This should improve performance
