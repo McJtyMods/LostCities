@@ -412,6 +412,13 @@ public class ForgeEventHandlers {
             return;
         }
 
+        // Check if the dimension is enabled in config
+        if (!Config.DIMENSION_ENABLED.get()) {
+            event.getEntity().sendSystemMessage(ComponentFactory.literal("The Lost City dimension is currently disabled!").withStyle(ChatFormatting.RED));
+            event.setProblem(Player.BedSleepingProblem.OTHER_PROBLEM);
+            return;
+        }
+
         if (world.dimension() == Registration.DIMENSION) {
             event.setProblem(Player.BedSleepingProblem.OTHER_PROBLEM);
             ServerLevel destWorld = WorldTools.getOverworld(world);
