@@ -68,6 +68,8 @@ public class Stuff {
                 maxheight = info.getCityGroundLevel() + info.getNumFloors() * LostCityTerrainFeature.FLOORHEIGHT + 10; // 10 margine above highest floor
             }
         }
+        // FIX #3: evita ArrayIndexOutOfBounds en SectionCache cuando el terreno se extiende hasta el limite (p.ej. Tectonic Y=320)
+        maxheight = Math.min(maxheight, level.getMaxBuildHeight() - 1);
         int mincount = settings.getMincount();
         int maxcount = settings.getMaxcount();
         RandomSource rand = feature.rand;
@@ -90,10 +92,13 @@ public class Stuff {
                             }
                         }
                         if (ok) {
-                            driver.current(x, y, z);
                             for (int k = 0; k < blocks.length(); k++) {
                                 BlockState block = palette.get(blocks.charAt(k));
-                                driver.add(block);
+                                // FIX #2: salta bloques null pero fija la Y explicitamente para no descuadrar la columna
+                                if (block != null) {
+                                    driver.current(x, y + k, z);
+                                    driver.add(block);
+                                }
                             }
                             break;
                         }

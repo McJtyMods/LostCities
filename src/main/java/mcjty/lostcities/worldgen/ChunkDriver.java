@@ -240,6 +240,8 @@ public class ChunkDriver {
     }
 
     private BlockState correct(BlockState state) {
+        // FIX #1: null guard - evita NPE cuando palette.get() devuelve null (setBlock ya ignora null)
+        if (state == null) return null;
         int cx = current.getX();
         int cy = current.getY();
         int cz = current.getZ();
