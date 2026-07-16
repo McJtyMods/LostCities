@@ -11,6 +11,8 @@ import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.GlobalTodo;
 import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.LostCityWorldGenData;
+import mcjty.lostcities.worldgen.LostCityFeature;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
@@ -129,6 +131,13 @@ public class ForgeEventHandlers {
     public void onCreateSpawnPoint(LevelEvent.CreateSpawnPosition event) {
         LevelAccessor world = event.getLevel();
         if (world instanceof ServerLevel serverLevel) {
+            // This event is the explicit new-world signal. Existing worlds that
+            // have no LostCityWorldGenData never pass through this initialization
+            // and consequently remain on LEGACY street generation.
+            LostCityWorldGenData.initializeNewWorld(serverLevel);
+            // If any dimension info was requested unusually early, rebuild it now
+            // so it observes the persisted new-world marker instead of LEGACY.
+            LostCityFeature.globalDimensionInfoDirtyCounter++;
             IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(serverLevel);
             if (dimensionInfo == null) {
                 return;

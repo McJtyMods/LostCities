@@ -14,6 +14,13 @@ buildscript {
     }
 }
 
+repositories {
+    flatDir {
+        dir 'libs'
+    }
+}
+
+
 apply plugin: 'com.hypherionmc.modutils.modpublisher'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
@@ -45,6 +52,7 @@ dependencies {
     mc()
     jei()
     top()
+    runtimeOnly fg.deobf('local:xaeroworldmap-forge-1.20.1:1.43.0')
 }
 
 modpublisher(['the-one-probe'], [], ['the-one-probe'], [], [])

@@ -12,6 +12,7 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.CitySphere;
 import mcjty.lostcities.worldgen.lost.Railway;
+import mcjty.lostcities.worldgen.street.PlannedStreetInfo;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,6 +51,28 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("chunkZ = " + info.coord.chunkZ());
             System.out.println("getCityStyle() = " + BuildingInfo.getChunkCharacteristics(info.coord, info.provider).cityStyle.getName());
             System.out.println("streetType = " + info.streetType);
+            PlannedStreetInfo planned = dimInfo.getStreetPlanner().getStreetInfo(info.coord.chunkX(), info.coord.chunkZ());
+            System.out.println("streetGenerationMode = " + dimInfo.getStreetGenerationMode());
+            System.out.println("rawPlannedRoadType = " + planned.roadType());
+            System.out.println("effectivePlannedRoadType = " + info.plannedRoadType);
+            System.out.println("plannedRoadConnections = N:" + planned.north() + " S:" + planned.south()
+                    + " W:" + planned.west() + " E:" + planned.east());
+            System.out.println("primaryBlock = " + planned.primaryBlockX() + "," + planned.primaryBlockZ());
+            System.out.println("primaryBlockOrigin = " + planned.primaryWestX() + "," + planned.primaryNorthZ());
+            System.out.println("secondaryRoadsX = " + planned.secondaryRoadsX());
+            System.out.println("secondaryRoadsZ = " + planned.secondaryRoadsZ());
+            System.out.println("streetDensity = " + planned.density());
+            System.out.println("tertiarySegment = " + planned.tertiarySegment());
+            System.out.println("multiBuildingStreetConflict = " + info.profile.MULTI_BUILDING_STREET_CONFLICT);
+            System.out.println("multiBuildingSuppressedRoad = " + (info.rawPlannedRoadType != info.plannedRoadType
+                    && info.multiBuildingPos.isMulti()));
+            String finalContent = !info.isCity ? "NORMAL_TERRAIN"
+                    : info.hasBuilding ? (info.multiBuildingPos.isMulti() ? "MULTI_BUILDING" : "BUILDING")
+                    : info.isPlannedRoad() ? "PLANNED_ROAD"
+                    : info.isPredefinedStreet() ? "PREDEFINED_STREET"
+                    : info.isHierarchicalOpen() ? (info.parkType == null ? "OPEN_LOT" : "PARK")
+                    : "LEGACY_STREET_OR_PARK";
+            System.out.println("finalCityContent = " + finalContent);
             System.out.println("ruinHeight = " + info.ruinHeight);
             System.out.println("tunnel0 = " + info.isTunnel(0));
             System.out.println("tunnel1 = " + info.isTunnel(1));

@@ -1253,7 +1253,7 @@ public class LostCityTerrainFeature {
                 if (parkElevation) {
                     height++;
                 }
-            } else {
+            } else if (!info.isHierarchicalOpen()) {
                 Random rnd = new Random(info.coord.chunkZ() * 155557723L + info.coord.chunkX() * 45555558379L);
                 info.streetType = BuildingInfo.StreetType.values()[rnd.nextInt(0, BuildingInfo.StreetType.values().length - 2)];
                 streetType = info.streetType;

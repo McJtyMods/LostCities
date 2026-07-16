@@ -1,9 +1,12 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.StreetGenerationMode;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import mcjty.lostcities.worldgen.street.HierarchicalStreetPlanner;
+import mcjty.lostcities.worldgen.street.StreetPlannerSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -31,6 +34,8 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     private final LostCityProfile profile;
     private final LostCityProfile profileOutside;
     private final WorldStyle style;
+    private final StreetGenerationMode streetGenerationMode;
+    private final HierarchicalStreetPlanner streetPlanner;
 
     private final Random random;
 
@@ -42,6 +47,8 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         this.profile = profile;
         this.profileOutside = profileOutside;
         style = AssetRegistries.WORLDSTYLES.get(world, profile.getWorldStyle());
+        streetGenerationMode = LostCityWorldGenData.get(world.getLevel()).getStreetMode(world.getLevel().dimension(), profile.STREET_GENERATION_MODE);
+        streetPlanner = new HierarchicalStreetPlanner(world.getSeed(), world.getLevel().dimension().location().toString(), StreetPlannerSettings.fromProfile(profile));
         random = new Random(world.getSeed());
         RandomSource randomSource = new LegacyRandomSource(world.getSeed());
         feature = new LostCityTerrainFeature(this, profile, randomSource);
@@ -82,6 +89,16 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     @Override
     public WorldStyle getWorldStyle() {
         return style;
+    }
+
+    @Override
+    public StreetGenerationMode getStreetGenerationMode() {
+        return streetGenerationMode;
+    }
+
+    @Override
+    public HierarchicalStreetPlanner getStreetPlanner() {
+        return streetPlanner;
     }
 
     @Override

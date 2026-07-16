@@ -179,6 +179,22 @@ public class LostCityProfile implements ILostCityProfile {
     public boolean PARK_BORDER = true;
     public int PARK_STREET_THRESHOLD = 3;
 
+    // HIERARCHICAL_GRID_V1 is requested for new worlds. The actual mode is
+    // selected once and persisted in LostCityWorldGenData.
+    public StreetGenerationMode STREET_GENERATION_MODE = StreetGenerationMode.HIERARCHICAL_GRID_V1;
+    public int PRIMARY_ROAD_SPACING_X = 16;
+    public int PRIMARY_ROAD_SPACING_Z = 16;
+    public int SECONDARY_ROAD_MIN_COUNT_X = 0;
+    public int SECONDARY_ROAD_MAX_COUNT_X = 2;
+    public int SECONDARY_ROAD_MIN_COUNT_Z = 0;
+    public int SECONDARY_ROAD_MAX_COUNT_Z = 2;
+    public int MINIMUM_ROAD_SEPARATION = 4;
+    public int MINIMUM_ROAD_EDGE_DISTANCE = 3;
+    public float TERTIARY_ROAD_CHANCE = .40f;
+    public int TERTIARY_ROAD_MIN_LENGTH = 2;
+    public int TERTIARY_ROAD_MAX_LENGTH = 5;
+    public MultiBuildingStreetConflict MULTI_BUILDING_STREET_CONFLICT = MultiBuildingStreetConflict.OVERRIDE_MINOR;
+
     public boolean MULTI_USE_CORNER = false;
     public boolean USE_AVG_HEIGHTMAP = false;
 
@@ -377,6 +393,60 @@ public class LostCityProfile implements ILostCityProfile {
                 "If true parks border will use the street block as base.");
         PARK_STREET_THRESHOLD = cfg.getInt("parkStreetThreshold", LostCityProfile.CATEGORY_LOSTCITY, PARK_STREET_THRESHOLD,
                 0, 8, "Determines how many surrounding street it needs to generate a park, based on current chunk's park chance.");
+
+        String streetMode = cfg.getString("streetGenerationMode", LostCityProfile.CATEGORY_LOSTCITY, STREET_GENERATION_MODE.name(),
+                "Street layout requested when a new world is initialized. Existing worlds keep their persisted mode.",
+                new String[] { StreetGenerationMode.LEGACY.name(), StreetGenerationMode.HIERARCHICAL_GRID_V1.name() });
+        STREET_GENERATION_MODE = StreetGenerationMode.byName(streetMode);
+        PRIMARY_ROAD_SPACING_X = cfg.getInt("primaryRoadSpacingX", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_SPACING_X,
+                8, 128, "Horizontal chunk distance between globally aligned north/south primary roads");
+        PRIMARY_ROAD_SPACING_Z = cfg.getInt("primaryRoadSpacingZ", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_SPACING_Z,
+                8, 128, "Vertical chunk distance between globally aligned east/west primary roads");
+        SECONDARY_ROAD_MIN_COUNT_X = cfg.getInt("secondaryRoadMinCountX", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MIN_COUNT_X,
+                0, 8, "Minimum internal north/south secondary roads in a primary block");
+        SECONDARY_ROAD_MAX_COUNT_X = cfg.getInt("secondaryRoadMaxCountX", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MAX_COUNT_X,
+                0, 8, "Maximum internal north/south secondary roads in a primary block");
+        SECONDARY_ROAD_MIN_COUNT_Z = cfg.getInt("secondaryRoadMinCountZ", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MIN_COUNT_Z,
+                0, 8, "Minimum internal east/west secondary roads in a primary block");
+        SECONDARY_ROAD_MAX_COUNT_Z = cfg.getInt("secondaryRoadMaxCountZ", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MAX_COUNT_Z,
+                0, 8, "Maximum internal east/west secondary roads in a primary block");
+        MINIMUM_ROAD_SEPARATION = cfg.getInt("minimumRoadSeparation", LostCityProfile.CATEGORY_LOSTCITY, MINIMUM_ROAD_SEPARATION,
+                2, 32, "Minimum chunk distance between parallel secondary roads");
+        MINIMUM_ROAD_EDGE_DISTANCE = cfg.getInt("minimumRoadEdgeDistance", LostCityProfile.CATEGORY_LOSTCITY, MINIMUM_ROAD_EDGE_DISTANCE,
+                2, 32, "Minimum chunk distance between a secondary road and its bounding primary road");
+        TERTIARY_ROAD_CHANCE = cfg.getFloat("tertiaryRoadChance", LostCityProfile.CATEGORY_LOSTCITY, TERTIARY_ROAD_CHANCE,
+                0.0f, 1.0f, "Chance for a subdivided block to contain one short tertiary access road");
+        TERTIARY_ROAD_MIN_LENGTH = cfg.getInt("tertiaryRoadMinLength", LostCityProfile.CATEGORY_LOSTCITY, TERTIARY_ROAD_MIN_LENGTH,
+                1, 16, "Minimum tertiary access-road length in chunks");
+        TERTIARY_ROAD_MAX_LENGTH = cfg.getInt("tertiaryRoadMaxLength", LostCityProfile.CATEGORY_LOSTCITY, TERTIARY_ROAD_MAX_LENGTH,
+                1, 32, "Maximum tertiary access-road length in chunks");
+        String multiConflict = cfg.getString("multiBuildingStreetConflict", LostCityProfile.CATEGORY_LOSTCITY, MULTI_BUILDING_STREET_CONFLICT.name(),
+                "How random multi-buildings interact with planned roads (ignored by legacy street generation)",
+                new String[] { MultiBuildingStreetConflict.BLOCK_ALL.name(), MultiBuildingStreetConflict.OVERRIDE_MINOR.name(), MultiBuildingStreetConflict.OVERRIDE_ALL.name() });
+        MULTI_BUILDING_STREET_CONFLICT = MultiBuildingStreetConflict.byName(multiConflict);
+
+        if (SECONDARY_ROAD_MIN_COUNT_X > SECONDARY_ROAD_MAX_COUNT_X || SECONDARY_ROAD_MIN_COUNT_Z > SECONDARY_ROAD_MAX_COUNT_Z) {
+            throw new IllegalArgumentException("Secondary road minimum counts cannot exceed maximum counts");
+        }
+        if (TERTIARY_ROAD_MIN_LENGTH > TERTIARY_ROAD_MAX_LENGTH) {
+            throw new IllegalArgumentException("tertiaryRoadMinLength cannot exceed tertiaryRoadMaxLength");
+        }
+        if (PRIMARY_ROAD_SPACING_X < 8 || PRIMARY_ROAD_SPACING_X > 128
+                || PRIMARY_ROAD_SPACING_Z < 8 || PRIMARY_ROAD_SPACING_Z > 128) {
+            throw new IllegalArgumentException("Primary road spacing must be between 8 and 128 chunks");
+        }
+        if (SECONDARY_ROAD_MIN_COUNT_X < 0 || SECONDARY_ROAD_MAX_COUNT_X > 8
+                || SECONDARY_ROAD_MIN_COUNT_Z < 0 || SECONDARY_ROAD_MAX_COUNT_Z > 8) {
+            throw new IllegalArgumentException("Secondary road counts must be between 0 and 8");
+        }
+        if (MINIMUM_ROAD_SEPARATION < 2 || MINIMUM_ROAD_SEPARATION > 32
+                || MINIMUM_ROAD_EDGE_DISTANCE < 2 || MINIMUM_ROAD_EDGE_DISTANCE > 32) {
+            throw new IllegalArgumentException("Road separation and edge distance must be between 2 and 32 chunks");
+        }
+        if (TERTIARY_ROAD_CHANCE < 0 || TERTIARY_ROAD_CHANCE > 1
+                || TERTIARY_ROAD_MIN_LENGTH < 1 || TERTIARY_ROAD_MAX_LENGTH > 32) {
+            throw new IllegalArgumentException("Invalid tertiary road chance or length");
+        }
 
         FOUNTAIN_CHANCE = cfg.getFloat("fountainChance", LostCityProfile.CATEGORY_LOSTCITY, FOUNTAIN_CHANCE, 0.0f, 1.0f, "The chance that a street section contains a fountain");
 
