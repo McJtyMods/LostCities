@@ -1,0 +1,25 @@
+{
+  "xsize": 16,
+  "zsize": 16,
+  "refpalette": "street_large",
+  "slices": [
+    [
+      "bbbbbbbbbbbbbbbb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bllllllqqllllllb",
+      "bllllllqqllllllb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bllllllllllllllb",
+      "bbbbbbbbbbbbbbbb"
+    ]
+  ]
+}

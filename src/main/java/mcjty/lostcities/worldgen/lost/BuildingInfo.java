@@ -1301,6 +1301,10 @@ public class BuildingInfo implements ILostChunkInfo {
         return plannedRoadType != PlannedRoadType.NONE;
     }
 
+    public boolean isPrimaryRoad() {
+        return plannedRoadType == PlannedRoadType.PRIMARY;
+    }
+
     public boolean isHierarchicalOpen() {
         return hierarchicalOpen;
     }

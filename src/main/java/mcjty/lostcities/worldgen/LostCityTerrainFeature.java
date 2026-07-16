@@ -1612,7 +1612,7 @@ public class LostCityTerrainFeature {
     }
 
     private void generateFullStreetSection(BuildingInfo info, int height) {
-        StreetParts parts = info.getCityStyle().getStreetParts();
+        StreetParts parts = getStreetParts(info);
         BuildingPart part = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), getRandomPart(parts.full()));
         if (part != null) {
             generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, HardAirSetting.VOID);
@@ -1620,11 +1620,11 @@ public class LostCityTerrainFeature {
     }
 
     private void generateNormalStreetSection(BuildingInfo info, int height) {
-        StreetParts parts = info.getCityStyle().getStreetParts();
-        boolean xmin = BuildingInfo.hasRoadConnection(info, info.getXmin()) || (info.getXmin().hasXBridge(provider) != null);
-        boolean xmax = BuildingInfo.hasRoadConnection(info, info.getXmax()) || (info.getXmax().hasXBridge(provider) != null);
-        boolean zmin = BuildingInfo.hasRoadConnection(info, info.getZmin()) || (info.getZmin().hasZBridge(provider) != null);
-        boolean zmax = BuildingInfo.hasRoadConnection(info, info.getZmax()) || (info.getZmax().hasZBridge(provider) != null);
+        StreetParts parts = getStreetParts(info);
+        boolean xmin = hasStreetPartConnection(info, info.getXmin(), info.getXmin().hasXBridge(provider) != null);
+        boolean xmax = hasStreetPartConnection(info, info.getXmax(), info.getXmax().hasXBridge(provider) != null);
+        boolean zmin = hasStreetPartConnection(info, info.getZmin(), info.getZmin().hasZBridge(provider) != null);
+        boolean zmax = hasStreetPartConnection(info, info.getZmax(), info.getZmax().hasZBridge(provider) != null);
         int cnt = (xmin ? 1 : 0) + (xmax ? 1 : 0) + (zmin ? 1 : 0) + (zmax ? 1 : 0);
         Transform transform = Transform.ROTATE_NONE;
         BuildingPart part = switch (cnt) {
@@ -1681,8 +1681,45 @@ public class LostCityTerrainFeature {
             default -> throw new RuntimeException("Not possible!");
         };
         if (part != null) {
-        generatePart(info, part, transform, 0, height, 0, HardAirSetting.VOID);
+            generatePart(info, part, transform, 0, height, 0, HardAirSetting.VOID);
+            generateMinorStreetConnectors(info, parts, height);
         }
+    }
+
+    private void generateMinorStreetConnectors(BuildingInfo info, StreetParts parts, int height) {
+        if (!info.isPrimaryRoad() || parts.connector().isEmpty()) {
+            return;
+        }
+        generateMinorStreetConnector(info, info.getXmin(), parts, height, Transform.ROTATE_NONE);
+        generateMinorStreetConnector(info, info.getXmax(), parts, height, Transform.ROTATE_180);
+        generateMinorStreetConnector(info, info.getZmin(), parts, height, Transform.ROTATE_90);
+        generateMinorStreetConnector(info, info.getZmax(), parts, height, Transform.ROTATE_270);
+    }
+
+    private void generateMinorStreetConnector(BuildingInfo info, BuildingInfo adjacent, StreetParts parts,
+                                               int height, Transform transform) {
+        if (BuildingInfo.hasRoadConnection(info, adjacent) && !adjacent.isPrimaryRoad()) {
+            BuildingPart connector = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), getRandomPart(parts.connector()));
+            if (connector != null) {
+                generatePart(info, connector, transform, 0, height, 0, HardAirSetting.VOID);
+            }
+        }
+    }
+
+    private static StreetParts getStreetParts(BuildingInfo info) {
+        return info.isPrimaryRoad()
+                ? info.getCityStyle().getLargeStreetParts()
+                : info.getCityStyle().getStreetParts();
+    }
+
+    private static boolean hasStreetPartConnection(BuildingInfo info, BuildingInfo adjacent, boolean bridgeConnection) {
+        boolean roadConnection = BuildingInfo.hasRoadConnection(info, adjacent);
+        if (info.isPrimaryRoad()) {
+            // Minor streets still meet the primary road surface, but they must
+            // not turn its quartz center line into a bend or junction.
+            return roadConnection && adjacent.isPrimaryRoad();
+        }
+        return roadConnection || bridgeConnection;
     }
 
     private boolean borderNeedsConnectionToAdjacentChunk(BuildingInfo info, int x, int z) {

@@ -28,6 +28,7 @@ public class CityStyle implements ILostCityCityStyle {
     private final List<ObjectSelector> railDungeonSelector = new ArrayList<>();
     private final List<ObjectSelector> multiBuildingSelector = new ArrayList<>();
     private StreetParts streetParts = StreetParts.DEFAULT;
+    private StreetParts largeStreetParts = StreetParts.DEFAULT;
 
     // Building settings
     private Integer minFloorCount;
@@ -127,6 +128,7 @@ public class CityStyle implements ILostCityCityStyle {
             wallBlock = s.getWallBlock();
             streetWidth = s.getStreetWidth();
             streetParts = s.getParts();
+            largeStreetParts = s.getLargeParts();
         });
         object.getGeneralSettings().ifPresent(s -> {
             glowstoneBlock = s.getGlowstoneBlock();
@@ -173,6 +175,10 @@ public class CityStyle implements ILostCityCityStyle {
 
     public StreetParts getStreetParts() {
         return streetParts;
+    }
+
+    public StreetParts getLargeStreetParts() {
+        return largeStreetParts;
     }
 
     @Override
@@ -337,6 +343,9 @@ public class CityStyle implements ILostCityCityStyle {
                 }
                 if (streetParts == StreetParts.DEFAULT) {
                     streetParts = inheritFrom.streetParts;
+                }
+                if (largeStreetParts == StreetParts.DEFAULT) {
+                    largeStreetParts = inheritFrom.largeStreetParts;
                 }
                 if (minFloorCount == null) {
                     minFloorCount = inheritFrom.minFloorCount;

@@ -6,7 +6,17 @@
     "wall": "w",
     "street": "S",
     "streetbase": "b",
-    "streetvariant": "B"
+    "streetvariant": "B",
+    "largeparts": {
+      "full": "street_large_full",
+      "straight": "street_large_straight",
+      "end": "street_large_end",
+      "bend": "street_large_bend",
+      "t": "street_large_t",
+      "none": "street_large_none",
+      "all": "street_large_all",
+      "connector": "street_large_connector"
+    }
   },
   "parkblocks": {
     "elevation": "x"

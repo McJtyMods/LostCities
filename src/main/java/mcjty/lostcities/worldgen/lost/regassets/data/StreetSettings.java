@@ -18,6 +18,7 @@ public class StreetSettings {
     private final Character borderBlock;
     private final Character wallBlock;
     private final StreetParts parts;
+    private final StreetParts largeParts;
 
     public static final Codec<StreetSettings> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -29,7 +30,8 @@ public class StreetSettings {
                     Codec.STRING.optionalFieldOf("streetvariant").forGetter(l -> DataTools.toNullable(l.streetVariantBlock)),
                     Codec.STRING.optionalFieldOf("border").forGetter(l -> DataTools.toNullable(l.borderBlock)),
                     Codec.STRING.optionalFieldOf("wall").forGetter(l -> DataTools.toNullable(l.wallBlock)),
-                    StreetParts.CODEC.optionalFieldOf("parts").forGetter(l ->l.parts.get())
+                    StreetParts.CODEC.optionalFieldOf("parts").forGetter(l -> l.parts.get()),
+                    StreetParts.CODEC.optionalFieldOf("largeparts").forGetter(l -> l.largeParts.get())
             ).apply(instance, StreetSettings::new));
 
     public Float getFountainChance() {
@@ -68,6 +70,10 @@ public class StreetSettings {
         return parts;
     }
 
+    public StreetParts getLargeParts() {
+        return largeParts;
+    }
+
     public StreetSettings(Optional<Float> fountainChance,
                           Optional<Float> frontChance,
                           Optional<Integer> streetWidth,
@@ -76,7 +82,8 @@ public class StreetSettings {
                           Optional<String> streetVariantBlock,
                           Optional<String> borderBlock,
                           Optional<String> wallBlock,
-                          Optional<StreetParts> parts) {
+                          Optional<StreetParts> parts,
+                          Optional<StreetParts> largeParts) {
         this.fountainChance = fountainChance.orElse(null);
         this.frontChance = frontChance.orElse(null);
         this.streetWidth = streetWidth.orElse(null);
@@ -86,5 +93,6 @@ public class StreetSettings {
         this.borderBlock = DataTools.getNullableChar(borderBlock);
         this.wallBlock = DataTools.getNullableChar(wallBlock);
         this.parts = parts.orElse(StreetParts.DEFAULT);
+        this.largeParts = largeParts.orElse(StreetParts.DEFAULT);
     }
 }
