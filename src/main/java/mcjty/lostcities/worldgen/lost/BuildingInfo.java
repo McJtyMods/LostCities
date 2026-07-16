@@ -22,6 +22,8 @@ import mcjty.lostcities.worldgen.street.PlannedRoadType;
 import mcjty.lostcities.worldgen.street.PlannedStreetInfo;
 import mcjty.lostcities.worldgen.street.RoadDirection;
 import mcjty.lostcities.worldgen.street.EffectiveStreetResolver;
+import mcjty.lostcities.worldgen.street.HierarchicalBridgePlanner;
+import mcjty.lostcities.worldgen.street.PlannedBridgeInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -64,6 +66,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public final BuildingPart fountainType;
     public final BuildingPart parkType;
     public final BuildingPart bridgeType;
+    public final BuildingPart largeBridgeType;
     public final BuildingPart stairType;
     public final BuildingPart frontType;
     private final float stairPriority;      // A random number that indicates if this chunk should get a stair if there are competing stairs around it. The highest wins
@@ -817,6 +820,7 @@ public class BuildingInfo implements ILostChunkInfo {
             cellars = topleft.cellars;
             doorBlock = topleft.doorBlock;
             bridgeType = topleft.bridgeType;
+            largeBridgeType = topleft.largeBridgeType;
             stairType = topleft.stairType;
             stairPriority = topleft.stairPriority;
             palette = topleft.palette;
@@ -919,6 +923,15 @@ public class BuildingInfo implements ILostChunkInfo {
 
             doorBlock = getRandomDoor(rand);
             bridgeType = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), cs.getRandomBridge(rand, this.coord));
+            if (provider.getStreetGenerationMode() == StreetGenerationMode.HIERARCHICAL_GRID_V1) {
+                Random bridgeRandom = new QualityRandom(provider.getSeed() ^ 0x4c41524745425247L
+                        ^ (long) coord.chunkX() * 341873128712L ^ (long) coord.chunkZ() * 132897987541L);
+                String largeBridge = cs.getRandomLargeBridge(bridgeRandom, this.coord);
+                largeBridgeType = largeBridge == null ? null
+                        : AssetRegistries.PARTS.getOrWarn(provider.getWorld(), largeBridge);
+            } else {
+                largeBridgeType = null;
+            }
             stairType = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), cs.getRandomStair(rand, this.coord));
             stairPriority = rand.nextFloat();
             createPalette(rand);
@@ -1402,6 +1415,15 @@ public class BuildingInfo implements ILostChunkInfo {
         xBridgeTypeCalculated = true;
         xBridgeType = null;
 
+        if (provider.getStreetGenerationMode() == StreetGenerationMode.HIERARCHICAL_GRID_V1) {
+            PlannedBridgeInfo planned = HierarchicalBridgePlanner.getBridgeInfo(this, Orientation.X);
+            if (planned != null) {
+                BuildingInfo endpoint = getBuildingInfo(planned.minimumEndpoint(), provider);
+                xBridgeType = endpoint.largeBridgeType != null ? endpoint.largeBridgeType : endpoint.bridgeType;
+            }
+            return xBridgeType;
+        }
+
         if (!xBridge) {
             return null;
         }
@@ -1458,6 +1480,15 @@ public class BuildingInfo implements ILostChunkInfo {
         }
         zBridgeTypeCalculated = true;
         zBridgeType = null;
+
+        if (provider.getStreetGenerationMode() == StreetGenerationMode.HIERARCHICAL_GRID_V1) {
+            PlannedBridgeInfo planned = HierarchicalBridgePlanner.getBridgeInfo(this, Orientation.Z);
+            if (planned != null) {
+                BuildingInfo endpoint = getBuildingInfo(planned.minimumEndpoint(), provider);
+                zBridgeType = endpoint.largeBridgeType != null ? endpoint.largeBridgeType : endpoint.bridgeType;
+            }
+            return zBridgeType;
+        }
 
         if (!zBridge) {
             return null;

@@ -1717,7 +1717,9 @@ public class LostCityTerrainFeature {
         if (info.isPrimaryRoad()) {
             // Minor streets still meet the primary road surface, but they must
             // not turn its quartz center line into a bend or junction.
-            return roadConnection && adjacent.isPrimaryRoad();
+            // A planned primary bridge is also a continuation of the primary
+            // road, so its endpoint keeps the straight large-road part.
+            return (roadConnection && adjacent.isPrimaryRoad()) || bridgeConnection;
         }
         return roadConnection || bridgeConnection;
     }

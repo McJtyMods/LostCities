@@ -128,6 +128,12 @@
         "value": "bridge_covered"
       }
     ],
+    "largebridges": [
+      {
+        "factor": 1.0,
+        "value": "bridge_large_open"
+      }
+    ],
     "fronts": [
       {
         "factor": 1.0,

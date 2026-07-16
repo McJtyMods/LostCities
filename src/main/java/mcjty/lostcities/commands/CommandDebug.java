@@ -12,6 +12,9 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.CitySphere;
 import mcjty.lostcities.worldgen.lost.Railway;
+import mcjty.lostcities.worldgen.lost.Orientation;
+import mcjty.lostcities.worldgen.street.HierarchicalBridgePlanner;
+import mcjty.lostcities.worldgen.street.PlannedBridgeInfo;
 import mcjty.lostcities.worldgen.street.PlannedStreetInfo;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -67,6 +70,10 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("multiBuildingStreetConflict = " + info.profile.MULTI_BUILDING_STREET_CONFLICT);
             System.out.println("multiBuildingSuppressedRoad = " + (info.rawPlannedRoadType != info.plannedRoadType
                     && info.multiBuildingPos.isMulti()));
+            PlannedBridgeInfo plannedBridgeX = HierarchicalBridgePlanner.getBridgeInfo(info, Orientation.X);
+            PlannedBridgeInfo plannedBridgeZ = HierarchicalBridgePlanner.getBridgeInfo(info, Orientation.Z);
+            System.out.println("plannedPrimaryBridgeX = " + plannedBridgeX);
+            System.out.println("plannedPrimaryBridgeZ = " + plannedBridgeZ);
             String finalContent = !info.isCity ? "NORMAL_TERRAIN"
                     : info.hasBuilding ? (info.multiBuildingPos.isMulti() ? "MULTI_BUILDING" : "BUILDING")
                     : info.isPlannedRoad() ? "PLANNED_ROAD"

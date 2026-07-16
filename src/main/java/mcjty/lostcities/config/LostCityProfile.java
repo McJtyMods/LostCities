@@ -172,6 +172,8 @@ public class LostCityProfile implements ILostCityProfile {
     public float PARK_CHANCE = .2f;
     public float CORRIDOR_CHANCE = .7f;
     public float BRIDGE_CHANCE = .7f;
+    public float PLANNED_PRIMARY_BRIDGE_CHANCE = 1.0f;
+    public int PLANNED_PRIMARY_BRIDGE_MAX_LENGTH = 12;
     public float FOUNTAIN_CHANCE = .05f;
 
     public boolean BRIDGE_SUPPORTS = true;
@@ -387,6 +389,10 @@ public class LostCityProfile implements ILostCityProfile {
                 "There actually being a corridor also depends on the presence of adjacent corridors");
         BRIDGE_CHANCE = cfg.getFloat("bridgeChance", LostCityProfile.CATEGORY_LOSTCITY, BRIDGE_CHANCE, 0.0f, 1.0f, "The chance that a chunk can possibly contain a bridge. " +
                 "There actually being a bridge also depends on the presence of adjacent bridges and other conditions");
+        PLANNED_PRIMARY_BRIDGE_CHANCE = cfg.getFloat("plannedPrimaryBridgeChance", LostCityProfile.CATEGORY_LOSTCITY, PLANNED_PRIMARY_BRIDGE_CHANCE,
+                0.0f, 1.0f, "Chance for an entire eligible hierarchical primary-road water crossing to become a bridge");
+        PLANNED_PRIMARY_BRIDGE_MAX_LENGTH = cfg.getInt("plannedPrimaryBridgeMaxLength", LostCityProfile.CATEGORY_LOSTCITY, PLANNED_PRIMARY_BRIDGE_MAX_LENGTH,
+                1, 64, "Maximum water-gap length in chunks for a hierarchical primary-road bridge");
         BRIDGE_SUPPORTS = cfg.getBoolean("bridgeSupports", LostCityProfile.CATEGORY_LOSTCITY, BRIDGE_SUPPORTS,
                 "If true bridges get supports when needed. You can disable this if you have bridges that span void chunks");
         PARK_ELEVATION = cfg.getBoolean("parkElevation", LostCityProfile.CATEGORY_LOSTCITY, PARK_ELEVATION,
@@ -444,6 +450,10 @@ public class LostCityProfile implements ILostCityProfile {
         if (PRIMARY_ROAD_OPTIONAL_CHANCE < 0 || PRIMARY_ROAD_OPTIONAL_CHANCE > 1
                 || PRIMARY_ROAD_FORCE_EVERY < 1 || PRIMARY_ROAD_FORCE_EVERY > 16) {
             throw new IllegalArgumentException("Invalid primary road activation chance or forced interval");
+        }
+        if (PLANNED_PRIMARY_BRIDGE_CHANCE < 0 || PLANNED_PRIMARY_BRIDGE_CHANCE > 1
+                || PLANNED_PRIMARY_BRIDGE_MAX_LENGTH < 1 || PLANNED_PRIMARY_BRIDGE_MAX_LENGTH > 64) {
+            throw new IllegalArgumentException("Invalid planned primary bridge chance or maximum length");
         }
         if (SECONDARY_ROAD_MIN_COUNT_X < 0 || SECONDARY_ROAD_MAX_COUNT_X > 8
                 || SECONDARY_ROAD_MIN_COUNT_Z < 0 || SECONDARY_ROAD_MAX_COUNT_Z > 8) {
