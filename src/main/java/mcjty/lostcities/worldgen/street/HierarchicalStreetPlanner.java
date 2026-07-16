@@ -16,6 +16,8 @@ public final class HierarchicalStreetPlanner {
     private static final long VERSION_SALT = 0x4847524944563101L; // "HGRIDV1" + version byte
     private static final long PRIMARY_X_SALT = 0x5f6c1d8a29e34b71L;
     private static final long PRIMARY_Z_SALT = 0x731ab9654ce20f8dL;
+    private static final long PRIMARY_X_ACTIVATION_SALT = 0x2c64f8a10d735be9L;
+    private static final long PRIMARY_Z_ACTIVATION_SALT = 0x58e307c4b92a6df1L;
     private static final long DENSITY_SALT = 0x26f40b9157acde31L;
     private static final long SECONDARY_X_COUNT_SALT = 0x18d2ca7645bf903eL;
     private static final long SECONDARY_Z_COUNT_SALT = 0x47a90edb1c6352f8L;
@@ -64,14 +66,14 @@ public final class HierarchicalStreetPlanner {
         boolean west = raw.roadType != PlannedRoadType.NONE && getRoadType(chunkX - 1, chunkZ) != PlannedRoadType.NONE;
         boolean east = raw.roadType != PlannedRoadType.NONE && getRoadType(chunkX + 1, chunkZ) != PlannedRoadType.NONE;
         return new PlannedStreetInfo(raw.roadType, north, south, west, east,
-                block.blockX, block.blockZ, block.westX, block.northZ, block.density,
+                block.blockX, block.blockZ, block.westX, block.northZ, block.eastX, block.southZ, block.density,
                 block.secondaryX, block.secondaryZ, raw.tertiary);
     }
 
     private RawRoad rawAt(int chunkX, int chunkZ) {
         BlockLayout block = getBlockLayout(chunkX, chunkZ);
-        boolean verticalPrimary = Math.floorMod((long) chunkX - primaryOffsetX, settings.primarySpacingX()) == 0;
-        boolean horizontalPrimary = Math.floorMod((long) chunkZ - primaryOffsetZ, settings.primarySpacingZ()) == 0;
+        boolean verticalPrimary = isVerticalPrimary(chunkX);
+        boolean horizontalPrimary = isHorizontalPrimary(chunkZ);
         if (verticalPrimary || horizontalPrimary) {
             return new RawRoad(PlannedRoadType.PRIMARY, block, null);
         }
@@ -87,21 +89,82 @@ public final class HierarchicalStreetPlanner {
 
     public BlockLayout getBlockLayout(int chunkX, int chunkZ) {
         // floorDiv is essential here: truncating division would create a seam at
-        // negative coordinates. Primary lines are the inclusive west/north bounds.
-        int blockX = Math.toIntExact(Math.floorDiv((long) chunkX - primaryOffsetX, settings.primarySpacingX()));
-        int blockZ = Math.toIntExact(Math.floorDiv((long) chunkZ - primaryOffsetZ, settings.primarySpacingZ()));
-        int westX = Math.toIntExact((long) primaryOffsetX + (long) blockX * settings.primarySpacingX());
-        int northZ = Math.toIntExact((long) primaryOffsetZ + (long) blockZ * settings.primarySpacingZ());
+        // negative coordinates. Candidate indices identify blocks even though
+        // optional candidates may be absent. The active west/north line is the
+        // inclusive bound; forced candidates cap each search at primaryForceEvery.
+        int candidateX = Math.toIntExact(Math.floorDiv((long) chunkX - primaryOffsetX, settings.primarySpacingX()));
+        int candidateZ = Math.toIntExact(Math.floorDiv((long) chunkZ - primaryOffsetZ, settings.primarySpacingZ()));
+        int blockX = findActiveAtOrBefore(candidateX, true);
+        int blockZ = findActiveAtOrBefore(candidateZ, false);
+        int nextBlockX = findActiveAfter(blockX, true);
+        int nextBlockZ = findActiveAfter(blockZ, false);
+        int westX = candidateCoordinate(primaryOffsetX, blockX, settings.primarySpacingX());
+        int northZ = candidateCoordinate(primaryOffsetZ, blockZ, settings.primarySpacingZ());
+        int eastX = candidateCoordinate(primaryOffsetX, nextBlockX, settings.primarySpacingX());
+        int southZ = candidateCoordinate(primaryOffsetZ, nextBlockZ, settings.primarySpacingZ());
+        int spacingX = eastX - westX;
+        int spacingZ = southZ - northZ;
         double density = unitDouble(hash(DENSITY_SALT, blockX, blockZ, 0));
         int countX = selectCount(settings.secondaryMinCountX(), settings.secondaryMaxCountX(), density,
                 hash(SECONDARY_X_COUNT_SALT, blockX, blockZ, 0));
         int countZ = selectCount(settings.secondaryMinCountZ(), settings.secondaryMaxCountZ(), density,
                 hash(SECONDARY_Z_COUNT_SALT, blockX, blockZ, 0));
-        List<Integer> secondaryX = selectSecondaryPositions(blockX, blockZ, westX, settings.primarySpacingX(), countX,
+        List<Integer> secondaryX = selectSecondaryPositions(blockX, blockZ, westX, spacingX, countX,
                 SECONDARY_X_POSITION_SALT);
-        List<Integer> secondaryZ = selectSecondaryPositions(blockX, blockZ, northZ, settings.primarySpacingZ(), countZ,
+        List<Integer> secondaryZ = selectSecondaryPositions(blockX, blockZ, northZ, spacingZ, countZ,
                 SECONDARY_Z_POSITION_SALT);
-        return new BlockLayout(blockX, blockZ, westX, northZ, density, secondaryX, secondaryZ);
+        return new BlockLayout(blockX, blockZ, westX, northZ, eastX, southZ, density, secondaryX, secondaryZ);
+    }
+
+    public boolean isVerticalPrimary(int chunkX) {
+        long relative = (long) chunkX - primaryOffsetX;
+        if (Math.floorMod(relative, settings.primarySpacingX()) != 0) {
+            return false;
+        }
+        int candidate = Math.toIntExact(Math.floorDiv(relative, settings.primarySpacingX()));
+        return isActivePrimaryCandidate(candidate, true);
+    }
+
+    public boolean isHorizontalPrimary(int chunkZ) {
+        long relative = (long) chunkZ - primaryOffsetZ;
+        if (Math.floorMod(relative, settings.primarySpacingZ()) != 0) {
+            return false;
+        }
+        int candidate = Math.toIntExact(Math.floorDiv(relative, settings.primarySpacingZ()));
+        return isActivePrimaryCandidate(candidate, false);
+    }
+
+    private boolean isActivePrimaryCandidate(int candidate, boolean xAxis) {
+        if (Math.floorMod(candidate, settings.primaryForceEvery()) == 0) {
+            return true;
+        }
+        long salt = xAxis ? PRIMARY_X_ACTIVATION_SALT : PRIMARY_Z_ACTIVATION_SALT;
+        return unitDouble(hash(salt, xAxis ? candidate : 0, xAxis ? 0 : candidate, 0))
+                < settings.primaryOptionalChance();
+    }
+
+    private int findActiveAtOrBefore(int candidate, boolean xAxis) {
+        for (int distance = 0; distance < settings.primaryForceEvery(); distance++) {
+            int current = Math.subtractExact(candidate, distance);
+            if (isActivePrimaryCandidate(current, xAxis)) {
+                return current;
+            }
+        }
+        throw new IllegalStateException("No forced primary candidate found");
+    }
+
+    private int findActiveAfter(int candidate, boolean xAxis) {
+        for (int distance = 1; distance <= settings.primaryForceEvery(); distance++) {
+            int current = Math.addExact(candidate, distance);
+            if (isActivePrimaryCandidate(current, xAxis)) {
+                return current;
+            }
+        }
+        throw new IllegalStateException("No forced primary candidate found");
+    }
+
+    private static int candidateCoordinate(int offset, int candidate, int spacing) {
+        return Math.toIntExact((long) offset + (long) candidate * spacing);
     }
 
     private int selectCount(int minimum, int maximum, double density, long variationHash) {
@@ -156,11 +219,11 @@ public final class HierarchicalStreetPlanner {
         List<Integer> xRoads = new ArrayList<>(block.secondaryX.size() + 2);
         xRoads.add(block.westX);
         xRoads.addAll(block.secondaryX);
-        xRoads.add(block.westX + settings.primarySpacingX());
+        xRoads.add(block.eastX);
         List<Integer> zRoads = new ArrayList<>(block.secondaryZ.size() + 2);
         zRoads.add(block.northZ);
         zRoads.addAll(block.secondaryZ);
-        zRoads.add(block.northZ + settings.primarySpacingZ());
+        zRoads.add(block.southZ);
 
         int cellX = findCell(xRoads, chunkX);
         int cellZ = findCell(zRoads, chunkZ);
@@ -282,6 +345,8 @@ public final class HierarchicalStreetPlanner {
             int blockZ,
             int westX,
             int northZ,
+            int eastX,
+            int southZ,
             double density,
             List<Integer> secondaryX,
             List<Integer> secondaryZ

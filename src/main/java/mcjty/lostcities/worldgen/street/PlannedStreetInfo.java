@@ -12,6 +12,8 @@ public record PlannedStreetInfo(
         int primaryBlockZ,
         int primaryWestX,
         int primaryNorthZ,
+        int primaryEastX,
+        int primarySouthZ,
         double density,
         List<Integer> secondaryRoadsX,
         List<Integer> secondaryRoadsZ,

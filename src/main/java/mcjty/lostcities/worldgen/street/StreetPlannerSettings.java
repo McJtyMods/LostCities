@@ -5,6 +5,8 @@ import mcjty.lostcities.config.LostCityProfile;
 public record StreetPlannerSettings(
         int primarySpacingX,
         int primarySpacingZ,
+        float primaryOptionalChance,
+        int primaryForceEvery,
         int secondaryMinCountX,
         int secondaryMaxCountX,
         int secondaryMinCountZ,
@@ -17,7 +19,11 @@ public record StreetPlannerSettings(
 ) {
     public StreetPlannerSettings {
         if (primarySpacingX < 8 || primarySpacingZ < 8) {
-            throw new IllegalArgumentException("Primary road spacing must be at least 8 chunks");
+            throw new IllegalArgumentException("Primary road candidate spacing must be at least 8 chunks");
+        }
+        if (primaryOptionalChance < 0 || primaryOptionalChance > 1
+                || primaryForceEvery < 1 || primaryForceEvery > 16) {
+            throw new IllegalArgumentException("Invalid primary road activation settings");
         }
         if (secondaryMinCountX < 0 || secondaryMinCountZ < 0
                 || secondaryMinCountX > secondaryMaxCountX || secondaryMinCountZ > secondaryMaxCountZ) {
@@ -35,6 +41,8 @@ public record StreetPlannerSettings(
         return new StreetPlannerSettings(
                 profile.PRIMARY_ROAD_SPACING_X,
                 profile.PRIMARY_ROAD_SPACING_Z,
+                profile.PRIMARY_ROAD_OPTIONAL_CHANCE,
+                profile.PRIMARY_ROAD_FORCE_EVERY,
                 profile.SECONDARY_ROAD_MIN_COUNT_X,
                 profile.SECONDARY_ROAD_MAX_COUNT_X,
                 profile.SECONDARY_ROAD_MIN_COUNT_Z,

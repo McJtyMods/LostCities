@@ -58,7 +58,8 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("plannedRoadConnections = N:" + planned.north() + " S:" + planned.south()
                     + " W:" + planned.west() + " E:" + planned.east());
             System.out.println("primaryBlock = " + planned.primaryBlockX() + "," + planned.primaryBlockZ());
-            System.out.println("primaryBlockOrigin = " + planned.primaryWestX() + "," + planned.primaryNorthZ());
+            System.out.println("primaryBlockBounds = " + planned.primaryWestX() + "," + planned.primaryNorthZ()
+                    + " -> " + planned.primaryEastX() + "," + planned.primarySouthZ());
             System.out.println("secondaryRoadsX = " + planned.secondaryRoadsX());
             System.out.println("secondaryRoadsZ = " + planned.secondaryRoadsZ());
             System.out.println("streetDensity = " + planned.density());

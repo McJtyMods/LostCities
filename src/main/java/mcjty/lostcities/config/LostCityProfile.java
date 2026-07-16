@@ -182,8 +182,10 @@ public class LostCityProfile implements ILostCityProfile {
     // HIERARCHICAL_GRID_V1 is requested for new worlds. The actual mode is
     // selected once and persisted in LostCityWorldGenData.
     public StreetGenerationMode STREET_GENERATION_MODE = StreetGenerationMode.HIERARCHICAL_GRID_V1;
-    public int PRIMARY_ROAD_SPACING_X = 16;
-    public int PRIMARY_ROAD_SPACING_Z = 16;
+    public int PRIMARY_ROAD_SPACING_X = 8;
+    public int PRIMARY_ROAD_SPACING_Z = 8;
+    public float PRIMARY_ROAD_OPTIONAL_CHANCE = .45f;
+    public int PRIMARY_ROAD_FORCE_EVERY = 4;
     public int SECONDARY_ROAD_MIN_COUNT_X = 0;
     public int SECONDARY_ROAD_MAX_COUNT_X = 2;
     public int SECONDARY_ROAD_MIN_COUNT_Z = 0;
@@ -399,9 +401,13 @@ public class LostCityProfile implements ILostCityProfile {
                 new String[] { StreetGenerationMode.LEGACY.name(), StreetGenerationMode.HIERARCHICAL_GRID_V1.name() });
         STREET_GENERATION_MODE = StreetGenerationMode.byName(streetMode);
         PRIMARY_ROAD_SPACING_X = cfg.getInt("primaryRoadSpacingX", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_SPACING_X,
-                8, 128, "Horizontal chunk distance between globally aligned north/south primary roads");
+                8, 128, "Horizontal chunk spacing of candidate north/south primary-road corridors");
         PRIMARY_ROAD_SPACING_Z = cfg.getInt("primaryRoadSpacingZ", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_SPACING_Z,
-                8, 128, "Vertical chunk distance between globally aligned east/west primary roads");
+                8, 128, "Vertical chunk spacing of candidate east/west primary-road corridors");
+        PRIMARY_ROAD_OPTIONAL_CHANCE = cfg.getFloat("primaryRoadOptionalChance", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_OPTIONAL_CHANCE,
+                0.0f, 1.0f, "Chance that a non-forced candidate primary-road corridor is enabled");
+        PRIMARY_ROAD_FORCE_EVERY = cfg.getInt("primaryRoadForceEvery", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_FORCE_EVERY,
+                1, 16, "Force every Nth candidate primary-road corridor to cap the maximum gap");
         SECONDARY_ROAD_MIN_COUNT_X = cfg.getInt("secondaryRoadMinCountX", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MIN_COUNT_X,
                 0, 8, "Minimum internal north/south secondary roads in a primary block");
         SECONDARY_ROAD_MAX_COUNT_X = cfg.getInt("secondaryRoadMaxCountX", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MAX_COUNT_X,
@@ -433,7 +439,11 @@ public class LostCityProfile implements ILostCityProfile {
         }
         if (PRIMARY_ROAD_SPACING_X < 8 || PRIMARY_ROAD_SPACING_X > 128
                 || PRIMARY_ROAD_SPACING_Z < 8 || PRIMARY_ROAD_SPACING_Z > 128) {
-            throw new IllegalArgumentException("Primary road spacing must be between 8 and 128 chunks");
+            throw new IllegalArgumentException("Primary road candidate spacing must be between 8 and 128 chunks");
+        }
+        if (PRIMARY_ROAD_OPTIONAL_CHANCE < 0 || PRIMARY_ROAD_OPTIONAL_CHANCE > 1
+                || PRIMARY_ROAD_FORCE_EVERY < 1 || PRIMARY_ROAD_FORCE_EVERY > 16) {
+            throw new IllegalArgumentException("Invalid primary road activation chance or forced interval");
         }
         if (SECONDARY_ROAD_MIN_COUNT_X < 0 || SECONDARY_ROAD_MAX_COUNT_X > 8
                 || SECONDARY_ROAD_MIN_COUNT_Z < 0 || SECONDARY_ROAD_MAX_COUNT_Z > 8) {
