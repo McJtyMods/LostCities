@@ -1,9 +1,11 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.HighwayGenerationMode;
 import mcjty.lostcities.config.StreetGenerationMode;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
+import mcjty.lostcities.worldgen.highway.IntercityHighwayPlanner;
 import mcjty.lostcities.worldgen.street.HierarchicalStreetPlanner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -31,6 +33,10 @@ public interface IDimensionInfo {
     WorldStyle getWorldStyle();
 
     StreetGenerationMode getStreetGenerationMode();
+
+    HighwayGenerationMode getHighwayGenerationMode();
+
+    IntercityHighwayPlanner getHighwayPlanner();
 
     HierarchicalStreetPlanner getStreetPlanner();
 

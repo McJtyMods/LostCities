@@ -13,30 +13,45 @@ There are two explicitly versioned street-generation modes:
 - `HIERARCHICAL_GRID_V1` supplies a deterministic global primary, secondary and
   tertiary road field. It is the requested default for newly created worlds.
 
+Highway generation is versioned independently:
+
+- `LEGACY` preserves the Perlin-run placement described in section 6.
+- `INTERCITY_NETWORK_V1` creates sparse deterministic routes between approximate
+  city-region hubs. It is the requested default for newly created worlds.
+
+A world can therefore use any street/highway mode combination. Hierarchical
+streets do not implicitly enable the inter-city highway planner.
+
 ## Persisted mode selection and old-world compatibility
 
 The actual mode is stored per dimension in the overworld's existing Minecraft
 `SavedData` system by `LostCityWorldGenData`. Its data name is
-`LostCityWorldGenData`; it contains a new-world marker and a map from dimension
-resource-location strings to mode enum names.
+`LostCityWorldGenData`; it contains independent street/highway new-world markers
+and independent maps from dimension resource-location strings to mode names.
+The NBT keys are `newWorldStreetModes`, `newWorldHighwayModes`, `streetModes`
+and `highwayModes`.
 
 Old and new worlds are distinguished as follows:
 
 1. A default-constructed `LostCityWorldGenData` means no saved file was found.
-   It has no new-world marker, so any missing dimension mode resolves to
+   It has no new-world markers, so any missing dimension mode resolves to
    `LEGACY`. Merely loading an old world does not opt it into new generation.
 2. `LevelEvent.CreateSpawnPosition` is the explicit new-world lifecycle signal.
    At the beginning of that event Lost Cities writes the new-world marker.
 3. The first `DefaultDimensionInfo` for a dimension then persists that profile's
-   requested `streetGenerationMode`. The default profile value is
-   `HIERARCHICAL_GRID_V1`, while a profile can request `LEGACY`.
-4. On reload, the persisted dimension value wins. Later profile edits cannot
-   silently switch the selected mode.
+   requested `streetGenerationMode` and `highwayGenerationMode` separately.
+   Their new-world defaults are `HIERARCHICAL_GRID_V1` and
+   `INTERCITY_NETWORK_V1`; a profile can request `LEGACY` for either.
+4. On reload, each persisted dimension value wins independently. Later profile
+   edits cannot silently switch either selected mode.
 
 No generated-chunk test is used. An old world with no Lost Cities generation
-data remains legacy even if its current profile requests the hierarchical mode.
-If dimension info was requested unusually early during new-world startup, the
-create-spawn handler invalidates that cached info before resolving it again.
+data remains legacy even if its current profile requests a new mode. The
+highway marker has its own NBT key, so a world which already persisted a street
+mode before highway versioning was added still resolves a missing highway mode
+to `LEGACY`. If dimension info was requested unusually early during new-world
+startup, the create-spawn handler invalidates that cached info before resolving
+it again.
 
 ## `HIERARCHICAL_GRID_V1` mathematical street field
 
@@ -305,6 +320,234 @@ that decision. By the time it is called, `BuildingInfo` already contains the
 decision. `doCityChunk()` is mainly the renderer that turns those characteristics
 into blocks.
 
+## `INTERCITY_NETWORK_V1` highway network
+
+`IntercityHighwayPlanner` replaces only highway occupancy and level selection.
+It is a pure planner constructed per dimension from the world seed, stable
+dimension resource-location string, validated `HighwayPlannerSettings`, and a
+lower-level `CityPotential` function. The existing `lost.Highway` class remains
+the mode-aware facade, and `gen.Highways` remains the asset renderer.
+
+The planner uses a fixed V1 salt, a stable FNV-derived dimension hash, SplitMix
+64-bit mixing, and dedicated salts for sample positions, hub ranking,
+connection ranking/acceptance, and route shape. Every decision hashes its full
+coordinates directly. It does not use Java object hash codes, unordered-map
+iteration, shared random state, generated chunks, `BuildingInfo`, or query
+history.
+
+### Approximate city potential
+
+`ApproximateCityPotential` deliberately answers a lower-level question than
+`BuildingInfo.isCityRaw()`: how strongly does this coordinate resemble the
+center area of a substantial city region using data safe for remote planning?
+
+For `CITY_CHANCE >= 0`, V1 reproduces the coordinate-seeded center and radius
+math from `City` without calling `BuildingInfo`:
+
+```text
+searchRadiusInChunks = ceil(CITY_MAXRADIUS / 16)
+
+for every coordinate-seeded city center in that range:
+    radius = coordinate-seeded value in [CITY_MINRADIUS, CITY_MAXRADIUS)
+    if distanceInBlocks < radius:
+        potential += (radius - distanceInBlocks) / radius
+```
+
+For `CITY_CHANCE < 0`, it uses `CityRarityMap` with the world seed and the
+profile's Perlin scale, inner scale and offset. The existing spawn-distance
+multiplier is then applied and the result is clamped to `[0,1]`.
+
+This approximation intentionally omits generated heightmaps, biome-dependent
+world-style multipliers, final profile switching, generated structures,
+city-sphere geometry and predefined assets. Those inputs either require world
+state or pass through higher-level code which already depends on highways.
+Consequently a hub means "likely substantial city area", not "this exact chunk
+will be a final city chunk". Existing city-sphere intersection exclusion is
+still applied later by the mode-aware `Highway` facade as a hard rendering
+constraint; it is not allowed to alter the canonical planned route.
+
+### Planning cells and hubs
+
+The world is indexed by 128x128-chunk planning cells by default:
+
+```text
+planningCellX = floorDiv(chunkX, highwayPlanningCellSize)
+planningCellZ = floorDiv(chunkZ, highwayPlanningCellSize)
+```
+
+`Math.floorDiv` is required for negative coordinates. A `HubKey` consists only
+of these two cell coordinates and is the canonical hub identity. Each cell has
+zero or one `HighwayHub`.
+
+Within a cell, V1 derives independent X/Z sample-grid offsets from the world,
+dimension, version, cell coordinates and hub-position salt. It samples every
+`highwayHubSampleSpacing` chunks from those offsets; the default spacing is 16,
+so a normal cell evaluates at most 8x8 points. Potentials are quantized to an
+integer millionth before comparison. The highest score wins; equal scores use
+an unsigned stable sample hash and then the fixed scan order. No hub is created
+unless the winning score is at least `highwayHubMinimumPotential` (default
+0.35). The chosen coordinate is always inside its planning cell.
+
+### Candidate connections, sectors and symmetric acceptance
+
+A hub considers the bounded square of cells within
+`highwayHubSearchRadiusCells` (default two, or 5x5 cells). Candidate hubs must:
+
+- exist and be distinct;
+- be at least `highwayMinimumHubDistance` chunks away (default 64);
+- be no farther than `highwayMaximumHubDistance` (default 320); and
+- produce a Manhattan route of at least `highwayMinimumRouteLength` chunks
+  (default 40).
+
+The min/max hub checks use squared Euclidean distance, avoiding floating-point
+ordering. Candidate ranking is the following explicit lexicographic order:
+
+1. smaller squared geometric distance;
+2. greater quantized target-hub potential;
+3. unsigned canonical-pair rank hash;
+4. unsigned canonical-pair acceptance tie hash;
+5. target `HubKey`.
+
+The direction to a candidate is classified as north, south, east or west using
+the dominant absolute coordinate delta; exact diagonal ties prefer the X
+sector. A hub first selects at most one ranked candidate per sector. Only if its
+configured degree is larger than the available sectors does it fill remaining
+slots from the overall ranked list. The default maximum degree is two.
+
+An edge is accepted only by **mutual selection**: A must select B and B must
+select A. This is the symmetric acceptance rule. It guarantees undirected
+agreement and bounds accepted degree without a global graph pass. The canonical
+`HighwayConnectionKey` sorts the two `HubKey` values, eliminating A-to-B versus
+B-to-A duplicates. Sector preference plus the hard degree bound are the V1
+parallel-cluster suppression mechanism; geometric parallel-route suppression
+and shared trunks are deferred.
+
+### Canonical route geometry and ownership
+
+The lexicographically smaller hub key owns every accepted connection. Ownership
+controls caching and enumeration only; all intersected chunks can reconstruct
+the route.
+
+Aligned hubs produce one straight inclusive `HighwaySegment`. Non-aligned hubs
+have two candidates:
+
+```text
+horizontal then vertical: (Ax,Az) -> (Bx,Az) -> (Bx,Bz)
+vertical then horizontal: (Ax,Az) -> (Ax,Bz) -> (Bx,Bz)
+```
+
+Both have the same Manhattan length. V1 samples approximate city potential
+every eight chunks along both alternatives, ignoring samples within sixteen
+Manhattan chunks of either endpoint. The sum, multiplied by
+`highwayRouteCityPenalty`, is the route score; the lower score wins. An unsigned
+canonical-pair route-shape hash breaks equal scores. A zero penalty therefore
+selects entirely by this stable hash.
+
+Both segments include the bend chunk. The route itself is enumerated once by
+its canonical key, while its bend membership reports both X and Z axes. With
+the current unmodified asset set, that bend is rendered using the existing
+same-level bidirectional highway part, which is the closest available V1 asset
+and can visually resemble a full crossing. A dedicated bend asset is future
+work.
+
+Every connection uses the fixed `highwayNetworkLevel` (default zero) for its
+entire length. This is intentionally less exact than consulting endpoint
+`BuildingInfo`, but it prevents a dependency cycle and guarantees that remote
+chunks reconstruct the same elevation.
+
+### Bounded per-chunk reconstruction and caching
+
+For a queried chunk, the planner calculates its planning cell and enumerates
+route owners within the same configured cell radius used for hub search. This
+is sufficient because each connection's endpoint cells differ by at most that
+radius and every point on an axis-aligned Manhattan route lies inside the
+endpoint cell-coordinate bounds. Thus an owner farther away cannot have a V1
+route crossing the query cell.
+
+Owned routes are tested for inclusive segment membership and deduplicated in a
+sorted map by canonical key. The result records route hits, segment axes, bend
+membership and the route level, then classifies the chunk as `NONE`,
+`X_HIGHWAY`, `Z_HIGHWAY`, `SAME_LEVEL_INTERSECTION`, or
+`MULTI_LEVEL_INTERSECTION`. V1's fixed level normally makes an X/Z meeting a
+same-level intersection; the multi-level result remains available to the
+shared facade and future planners.
+
+Per-planner hub, candidate, selection, owned-route and final-chunk caches are
+synchronized access-order LRU maps with fixed maximum sizes (4096, 2048, 2048,
+2048 and 8192 entries respectively). Settings, seed and dimension do not need
+to appear in individual cache keys because each immutable planner instance is
+scoped to exactly that tuple. Cache eviction or clearing can only recompute the
+same pure value. There is no recursive connection acceptance: neighbour
+selection reads only hubs and ranked candidates, so all work remains bounded.
+
+### Integration with existing highways
+
+`Highway.getHighwayInfo()` is the mode-aware boundary. In `LEGACY`, existing
+X/Z calls enter the original Perlin algorithm and its original static caches.
+In `INTERCITY_NETWORK_V1`, they read the planner result. The public
+`getXHighwayLevel()`, `getZHighwayLevel()` and `hasHighway()` methods retain
+their signatures, so all existing consumers use one occupancy decision:
+
+- `MultiChunk` rejects random multi-building footprints on network routes;
+- ordinary buildings require the existing full-level vertical clearance;
+- cellar counts are capped above the network level;
+- same-level street and park surfaces and street decorations are suppressed;
+- railway avoidance and scattered-content proximity see the same route;
+- normal and city chunks both call the existing `gen.Highways` renderer; and
+- tunnel/open/bridge selection, rotation, crossing assets, clearing, palette
+  validation and supports remain shared and unchanged.
+
+The planner never truncates an accepted route based on later city membership.
+Routes run hub-to-hub even when exact endpoint chunks are weaker than the hub
+approximation expected.
+
+### Highway profile settings and compatibility categories
+
+| Network-only setting | Default |
+| --- | ---: |
+| `highwayGenerationMode` | `INTERCITY_NETWORK_V1` for new worlds |
+| `highwayPlanningCellSize` | 128 chunks |
+| `highwayHubSampleSpacing` | 16 chunks |
+| `highwayHubMinimumPotential` | 0.35 |
+| `highwayHubSearchRadiusCells` | 2 cells |
+| `highwayMinimumHubDistance` | 64 chunks |
+| `highwayMaximumHubDistance` | 320 chunks |
+| `highwayMaximumConnectionsPerHub` | 2 |
+| `highwayMinimumRouteLength` | 40 chunks |
+| `highwayRouteCityPenalty` | 1.0 |
+| `highwayNetworkLevel` | 0 |
+
+`HIGHWAY_DISTANCE_MASK`, `HIGHWAY_MAINPERLIN_SCALE`,
+`HIGHWAY_SECONDARYPERLIN_SCALE`, `HIGHWAY_PERLIN_FACTOR`,
+`HIGHWAY_REQUIRES_TWO_CITIES`, and `HIGHWAY_LEVEL_FROM_CITIES_MODE` are
+legacy-only. `HIGHWAY_SUPPORTS` and the world style's `HighwayParts` selectors
+are shared rendering settings. Profiles missing new JSON fields receive the
+defaults above, but missing persisted world data always selects legacy.
+
+`/lost debug` reports the persisted highway mode, cell, current/nearby hubs and
+strengths, ranked candidates and sectors, selected neighbours, mutual accepted
+keys, owners, route shapes/segments/lengths/levels/penalties, chunk membership,
+X/Z classification and cache statistics. Legacy mode reports its X/Z result.
+Nothing is logged during normal generation.
+
+### V1 limitations and phase-2 boundary
+
+- Hubs approximate city regions rather than exact final cities.
+- Routes connect hub positions, not city-edge gateways, and may cross endpoint
+  cities.
+- Routes have at most one bend; the existing crossing part renders that bend.
+- Terrain-aware routing is absent; only approximate city-interior penalty is
+  considered.
+- Routes do not merge into shared trunks and have no detailed parallel-route
+  suppression beyond degree and sector limits.
+- Elevation is fixed for the entire connection.
+- Gateways are not aligned to hierarchical primary streets.
+- Exact biome, height, water and unrelated-city avoidance is deferred.
+
+Phase 2 should move endpoints to city-edge gateways aligned with hierarchical
+primary streets, strengthen city-interior penalties, score terrain and water,
+and suppress or merge close parallel routes.
+
 ## Shared and legacy city-generation flow
 
 ```text
@@ -558,18 +801,17 @@ separately.
 After `doCityChunk()` returns, `generate()` still adds railways, explosion
 damage, debris, torch fixes and final chunk fixes.
 
-## 6. How highways are generated
+## 6. Legacy Perlin highways and shared rendering
 
-Highways are separate from both the legacy street choice and the hierarchical
-street field. They can cross city and non-city chunks and are generated in both
-street modes. Their implementation is split between two similarly named
-classes:
+Legacy highways are separate from both street modes. They can cross city and
+non-city chunks. Their implementation is split between two similarly named
+classes, with the first now also acting as the mode-aware facade:
 
-- `lost.Highway` decides whether an X- or Z-directed highway occupies a chunk
-  and chooses its vertical city level.
+- `lost.Highway` delegates to the original Perlin decision below in `LEGACY` or
+  to `IntercityHighwayPlanner` in `INTERCITY_NETWORK_V1`.
 - `gen.Highways` chooses the appropriate highway asset and places its blocks.
 
-The complete flow is:
+The complete legacy flow is:
 
 ```text
 Highway.getXHighwayLevel() / getZHighwayLevel()

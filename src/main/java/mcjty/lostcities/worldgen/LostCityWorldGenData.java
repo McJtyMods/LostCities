@@ -1,6 +1,7 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.config.HighwayGenerationMode;
 import mcjty.lostcities.config.StreetGenerationMode;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -25,19 +26,25 @@ public class LostCityWorldGenData extends SavedData {
 
     public static final String NAME = "LostCityWorldGenData";
     private static final String NEW_WORLD_KEY = "newWorldStreetModes";
+    private static final String NEW_WORLD_HIGHWAY_KEY = "newWorldHighwayModes";
     private static final String STREET_MODES_KEY = "streetModes";
+    private static final String HIGHWAY_MODES_KEY = "highwayModes";
 
     private boolean newWorldStreetModes;
+    private boolean newWorldHighwayModes;
     private final Map<String, StreetGenerationMode> streetModes = new HashMap<>();
+    private final Map<String, HighwayGenerationMode> highwayModes = new HashMap<>();
 
     public LostCityWorldGenData() {
         // A default-constructed instance means no SavedData existed on disk. It
         // must behave as an old world until the new-world lifecycle event marks it.
         newWorldStreetModes = false;
+        newWorldHighwayModes = false;
     }
 
     public LostCityWorldGenData(CompoundTag tag) {
         newWorldStreetModes = tag.getBoolean(NEW_WORLD_KEY);
+        newWorldHighwayModes = tag.getBoolean(NEW_WORLD_HIGHWAY_KEY);
         CompoundTag modes = tag.getCompound(STREET_MODES_KEY);
         for (String dimension : modes.getAllKeys()) {
             if (modes.contains(dimension, Tag.TAG_STRING)) {
@@ -47,6 +54,18 @@ public class LostCityWorldGenData extends SavedData {
                 } catch (IllegalArgumentException e) {
                     LostCities.getLogger().error("Unknown persisted street mode '{}' for {}; using LEGACY", value, dimension);
                     streetModes.put(dimension, StreetGenerationMode.LEGACY);
+                }
+            }
+        }
+        CompoundTag highwayModeTag = tag.getCompound(HIGHWAY_MODES_KEY);
+        for (String dimension : highwayModeTag.getAllKeys()) {
+            if (highwayModeTag.contains(dimension, Tag.TAG_STRING)) {
+                String value = highwayModeTag.getString(dimension);
+                try {
+                    highwayModes.put(dimension, HighwayGenerationMode.byName(value));
+                } catch (IllegalArgumentException e) {
+                    LostCities.getLogger().error("Unknown persisted highway mode '{}' for {}; using LEGACY", value, dimension);
+                    highwayModes.put(dimension, HighwayGenerationMode.LEGACY);
                 }
             }
         }
@@ -68,8 +87,9 @@ public class LostCityWorldGenData extends SavedData {
     }
 
     void markNewWorld() {
-        if (!newWorldStreetModes) {
+        if (!newWorldStreetModes || !newWorldHighwayModes) {
             newWorldStreetModes = true;
+            newWorldHighwayModes = true;
             setDirty();
         }
     }
@@ -98,12 +118,40 @@ public class LostCityWorldGenData extends SavedData {
         return initializedAsNewWorld ? requestedMode : StreetGenerationMode.LEGACY;
     }
 
+    public synchronized HighwayGenerationMode getHighwayMode(ResourceKey<Level> dimension,
+                                                               HighwayGenerationMode requestedMode) {
+        return getHighwayMode(dimension.location().toString(), requestedMode);
+    }
+
+    synchronized HighwayGenerationMode getHighwayMode(String dimensionId, HighwayGenerationMode requestedMode) {
+        HighwayGenerationMode persisted = highwayModes.get(dimensionId);
+        if (persisted != null) {
+            return persisted;
+        }
+        HighwayGenerationMode selected = resolveUnpersistedHighwayMode(newWorldHighwayModes, requestedMode);
+        if (newWorldHighwayModes) {
+            highwayModes.put(dimensionId, selected);
+            setDirty();
+        }
+        return selected;
+    }
+
+    /** Pure highway compatibility rule, exposed for focused tests. */
+    public static HighwayGenerationMode resolveUnpersistedHighwayMode(boolean initializedAsNewWorld,
+                                                                       HighwayGenerationMode requestedMode) {
+        return initializedAsNewWorld ? requestedMode : HighwayGenerationMode.LEGACY;
+    }
+
     @Override
     public CompoundTag save(CompoundTag tag) {
         tag.putBoolean(NEW_WORLD_KEY, newWorldStreetModes);
+        tag.putBoolean(NEW_WORLD_HIGHWAY_KEY, newWorldHighwayModes);
         CompoundTag modes = new CompoundTag();
         streetModes.forEach((dimension, mode) -> modes.putString(dimension, mode.name()));
         tag.put(STREET_MODES_KEY, modes);
+        CompoundTag highwayModeTag = new CompoundTag();
+        highwayModes.forEach((dimension, mode) -> highwayModeTag.putString(dimension, mode.name()));
+        tag.put(HIGHWAY_MODES_KEY, highwayModeTag);
         return tag;
     }
 }

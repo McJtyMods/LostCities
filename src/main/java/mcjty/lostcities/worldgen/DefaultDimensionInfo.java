@@ -1,12 +1,16 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.HighwayGenerationMode;
 import mcjty.lostcities.config.StreetGenerationMode;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import mcjty.lostcities.worldgen.street.HierarchicalStreetPlanner;
 import mcjty.lostcities.worldgen.street.StreetPlannerSettings;
+import mcjty.lostcities.worldgen.highway.ApproximateCityPotential;
+import mcjty.lostcities.worldgen.highway.HighwayPlannerSettings;
+import mcjty.lostcities.worldgen.highway.IntercityHighwayPlanner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -36,6 +40,8 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     private final WorldStyle style;
     private final StreetGenerationMode streetGenerationMode;
     private final HierarchicalStreetPlanner streetPlanner;
+    private final HighwayGenerationMode highwayGenerationMode;
+    private final IntercityHighwayPlanner highwayPlanner;
 
     private final Random random;
 
@@ -49,6 +55,11 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         style = AssetRegistries.WORLDSTYLES.get(world, profile.getWorldStyle());
         streetGenerationMode = LostCityWorldGenData.get(world.getLevel()).getStreetMode(world.getLevel().dimension(), profile.STREET_GENERATION_MODE);
         streetPlanner = new HierarchicalStreetPlanner(world.getSeed(), world.getLevel().dimension().location().toString(), StreetPlannerSettings.fromProfile(profile));
+        highwayGenerationMode = LostCityWorldGenData.get(world.getLevel()).getHighwayMode(world.getLevel().dimension(), profile.HIGHWAY_GENERATION_MODE);
+        highwayPlanner = highwayGenerationMode == HighwayGenerationMode.INTERCITY_NETWORK_V1
+                ? new IntercityHighwayPlanner(world.getSeed(), world.getLevel().dimension().location().toString(),
+                    HighwayPlannerSettings.fromProfile(profile), new ApproximateCityPotential(world.getSeed(), profile))
+                : null;
         random = new Random(world.getSeed());
         RandomSource randomSource = new LegacyRandomSource(world.getSeed());
         feature = new LostCityTerrainFeature(this, profile, randomSource);
@@ -99,6 +110,19 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     @Override
     public HierarchicalStreetPlanner getStreetPlanner() {
         return streetPlanner;
+    }
+
+    @Override
+    public HighwayGenerationMode getHighwayGenerationMode() {
+        return highwayGenerationMode;
+    }
+
+    @Override
+    public IntercityHighwayPlanner getHighwayPlanner() {
+        if (highwayPlanner == null) {
+            throw new IllegalStateException("The inter-city highway planner is unavailable in LEGACY mode");
+        }
+        return highwayPlanner;
     }
 
     @Override

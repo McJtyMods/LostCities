@@ -1,6 +1,7 @@
 package mcjty.lostcities.gui;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.HighwayGenerationMode;
 import mcjty.lostcities.config.StreetGenerationMode;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
@@ -10,6 +11,9 @@ import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import mcjty.lostcities.worldgen.lost.regassets.WorldStyleRE;
 import mcjty.lostcities.worldgen.street.HierarchicalStreetPlanner;
 import mcjty.lostcities.worldgen.street.StreetPlannerSettings;
+import mcjty.lostcities.worldgen.highway.ApproximateCityPotential;
+import mcjty.lostcities.worldgen.highway.HighwayPlannerSettings;
+import mcjty.lostcities.worldgen.highway.IntercityHighwayPlanner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -95,6 +99,7 @@ public class NullDimensionInfo implements IDimensionInfo {
     private final LostCityProfile profile;
     private final WorldStyle style;
     private final HierarchicalStreetPlanner streetPlanner;
+    private final IntercityHighwayPlanner highwayPlanner;
     private final Random random;
     private final long seed;
 
@@ -115,6 +120,10 @@ public class NullDimensionInfo implements IDimensionInfo {
         ));
         this.seed = seed;
         streetPlanner = new HierarchicalStreetPlanner(seed, Level.OVERWORLD.location().toString(), StreetPlannerSettings.fromProfile(profile));
+        highwayPlanner = profile.HIGHWAY_GENERATION_MODE == HighwayGenerationMode.INTERCITY_NETWORK_V1
+                ? new IntercityHighwayPlanner(seed, Level.OVERWORLD.location().toString(),
+                    HighwayPlannerSettings.fromProfile(profile), new ApproximateCityPotential(seed, profile))
+                : null;
         random = new Random(seed);
         RandomSource randomSource = new LegacyRandomSource(seed);
         feature = new LostCityTerrainFeature(this, profile, randomSource);
@@ -167,6 +176,19 @@ public class NullDimensionInfo implements IDimensionInfo {
     @Override
     public HierarchicalStreetPlanner getStreetPlanner() {
         return streetPlanner;
+    }
+
+    @Override
+    public HighwayGenerationMode getHighwayGenerationMode() {
+        return profile.HIGHWAY_GENERATION_MODE;
+    }
+
+    @Override
+    public IntercityHighwayPlanner getHighwayPlanner() {
+        if (highwayPlanner == null) {
+            throw new IllegalStateException("The inter-city highway planner is unavailable in LEGACY mode");
+        }
+        return highwayPlanner;
     }
 
     @Override

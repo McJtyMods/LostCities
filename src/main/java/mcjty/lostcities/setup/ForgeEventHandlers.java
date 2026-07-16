@@ -133,7 +133,7 @@ public class ForgeEventHandlers {
         if (world instanceof ServerLevel serverLevel) {
             // This event is the explicit new-world signal. Existing worlds that
             // have no LostCityWorldGenData never pass through this initialization
-            // and consequently remain on LEGACY street generation.
+            // and consequently remain on LEGACY street and highway generation.
             LostCityWorldGenData.initializeNewWorld(serverLevel);
             // If any dimension info was requested unusually early, rebuild it now
             // so it observes the persisted new-world marker instead of LEGACY.

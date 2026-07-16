@@ -1,9 +1,11 @@
 package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.HighwayGenerationMode;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.PerlinNoiseGenerator14;
 import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.highway.HighwayInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +36,9 @@ public class Highway {
     }
 
     public static boolean hasHighway(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
+            return getHighwayInfo(coord, provider, profile).hasHighway();
+        }
         if (getXHighwayLevel(coord, provider, profile) >= 0) {
             return true;
         }
@@ -48,6 +53,9 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getXHighwayLevel(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
+            return getHighwayInfo(coord, provider, profile).xLevel();
+        }
         return getHighwayLevel(provider, profile, Highway.X_HIGHWAY_LEVEL_CACHE, cp -> hasXHighway(cp, profile), Orientation.X, coord);
     }
 
@@ -56,7 +64,43 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getZHighwayLevel(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
+            return getHighwayInfo(coord, provider, profile).zLevel();
+        }
         return getHighwayLevel(provider, profile, Highway.Z_HIGHWAY_LEVEL_CACHE, cp -> hasZHighway(cp, profile), Orientation.Z, coord);
+    }
+
+    /**
+     * Mode-aware facade used by diagnostics and by the legacy-compatible X/Z
+     * level methods. Rendering and all clearance consumers continue to query
+     * this class rather than depending directly on a planner implementation.
+     */
+    public static HighwayInfo getHighwayInfo(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
+            // Preserve the existing hard city-sphere exclusion without making
+            // it part of canonical hub/route planning.
+            if (provider.getWorld() != null && (profile.isSpace() || profile.isSpheres())
+                    && CitySphere.intersectsWithCitySphere(coord, provider)) {
+                return HighwayInfo.NONE;
+            }
+            return provider.getHighwayPlanner().getHighwayInfo(coord.chunkX(), coord.chunkZ());
+        }
+        int xLevel = getHighwayLevel(provider, profile, Highway.X_HIGHWAY_LEVEL_CACHE,
+                cp -> hasXHighway(cp, profile), Orientation.X, coord);
+        int zLevel = getHighwayLevel(provider, profile, Highway.Z_HIGHWAY_LEVEL_CACHE,
+                cp -> hasZHighway(cp, profile), Orientation.Z, coord);
+        HighwayInfo.Classification classification;
+        if (xLevel >= 0 && zLevel >= 0) {
+            classification = xLevel == zLevel ? HighwayInfo.Classification.SAME_LEVEL_INTERSECTION
+                    : HighwayInfo.Classification.MULTI_LEVEL_INTERSECTION;
+        } else if (xLevel >= 0) {
+            classification = HighwayInfo.Classification.X_HIGHWAY;
+        } else if (zLevel >= 0) {
+            classification = HighwayInfo.Classification.Z_HIGHWAY;
+        } else {
+            classification = HighwayInfo.Classification.NONE;
+        }
+        return new HighwayInfo(xLevel, zLevel, classification, java.util.List.of());
     }
 
     private static int getHighwayLevel(IDimensionInfo provider, LostCityProfile profile, Map<ChunkCoord, Integer> cache, Function<ChunkCoord, Boolean> hasHighway, Orientation orientation, ChunkCoord cp) {

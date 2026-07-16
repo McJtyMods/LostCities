@@ -11,8 +11,13 @@ import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.CitySphere;
+import mcjty.lostcities.worldgen.lost.Highway;
 import mcjty.lostcities.worldgen.lost.Railway;
 import mcjty.lostcities.worldgen.lost.Orientation;
+import mcjty.lostcities.worldgen.highway.HighwayInfo;
+import mcjty.lostcities.worldgen.highway.HighwayRoute;
+import mcjty.lostcities.worldgen.highway.HubKey;
+import mcjty.lostcities.worldgen.highway.IntercityHighwayPlanner;
 import mcjty.lostcities.worldgen.street.HierarchicalBridgePlanner;
 import mcjty.lostcities.worldgen.street.PlannedBridgeInfo;
 import mcjty.lostcities.worldgen.street.PlannedStreetInfo;
@@ -86,6 +91,14 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("tunnel1 = " + info.isTunnel(1));
             System.out.println("getHighwayXLevel() = " + info.getHighwayXLevel());
             System.out.println("getHighwayZLevel() = " + info.getHighwayZLevel());
+            System.out.println("highwayGenerationMode = " + dimInfo.getHighwayGenerationMode());
+            HighwayInfo highwayInfo = Highway.getHighwayInfo(info.coord, dimInfo, info.profile);
+            System.out.println("highwayClassification = " + highwayInfo.classification());
+            System.out.println("highwayRouteHits = " + highwayInfo.routeHits());
+            switch (dimInfo.getHighwayGenerationMode()) {
+                case LEGACY -> System.out.println("legacyHighwayResult = X:" + highwayInfo.xLevel() + " Z:" + highwayInfo.zLevel());
+                case INTERCITY_NETWORK_V1 -> dumpHighwayNetworkDebug(dimInfo, info, highwayInfo);
+            }
 
             float reldist = CitySphere.getRelativeDistanceToCityCenter(info.coord, dimInfo);
             System.out.println("reldist = " + reldist);
@@ -113,5 +126,30 @@ public class CommandDebug implements Command<CommandSourceStack> {
             System.out.println("info.isOcean() = " + info.isOcean());
         }
         return 0;
+    }
+
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
+    private static void dumpHighwayNetworkDebug(IDimensionInfo dimInfo, BuildingInfo info, HighwayInfo highwayInfo) {
+        IntercityHighwayPlanner planner = dimInfo.getHighwayPlanner();
+        HubKey cell = planner.getPlanningCell(info.coord.chunkX(), info.coord.chunkZ());
+        System.out.println("highwayPlanningCell = " + cell);
+        System.out.println("highwayPlannerSettings = " + planner.settings());
+        System.out.println("highwayCurrentCellHub = " + planner.getHub(cell).orElse(null));
+        System.out.println("highwayNearbyHubs = " + planner.getNearbyHubs(info.coord.chunkX(), info.coord.chunkZ()));
+        if (planner.getHub(cell).isPresent()) {
+            System.out.println("highwayCandidateConnections = " + planner.getConnectionCandidates(cell));
+            System.out.println("highwaySelectedNeighbours = " + planner.getSelectedNeighbours(cell));
+            System.out.println("highwayAcceptedConnections = " + planner.getAcceptedConnections(cell));
+            System.out.println("highwayMaximumDegree = " + planner.settings().maximumConnectionsPerHub());
+            for (var connection : planner.getAcceptedConnections(cell)) {
+                HighwayRoute route = planner.getRoute(connection).orElseThrow();
+                System.out.println("highwayAcceptedRoute = owner:" + route.key().owner()
+                        + " shape:" + route.shape() + " length:" + route.routeLength()
+                        + " level:" + route.highwayLevel() + " penalty:" + route.cityPenalty()
+                        + " segments:" + route.segments());
+            }
+        }
+        System.out.println("highwayCurrentChunkOnRoute = " + highwayInfo.hasHighway());
+        System.out.println("highwayPlannerCacheStats = " + planner.getCacheStats());
     }
 }

@@ -65,6 +65,20 @@ public class LostCityProfile implements ILostCityProfile {
     public int HIGHWAY_DISTANCE_MASK = 7;
     public boolean HIGHWAY_SUPPORTS = true;
 
+    // INTERCITY_NETWORK_V1 is requested for new worlds. The actual mode is
+    // selected once and persisted independently from the street mode.
+    public HighwayGenerationMode HIGHWAY_GENERATION_MODE = HighwayGenerationMode.INTERCITY_NETWORK_V1;
+    public int HIGHWAY_PLANNING_CELL_SIZE = 128;
+    public int HIGHWAY_HUB_SAMPLE_SPACING = 16;
+    public float HIGHWAY_HUB_MINIMUM_POTENTIAL = .35f;
+    public int HIGHWAY_HUB_SEARCH_RADIUS_CELLS = 2;
+    public int HIGHWAY_MINIMUM_HUB_DISTANCE = 64;
+    public int HIGHWAY_MAXIMUM_HUB_DISTANCE = 320;
+    public int HIGHWAY_MAXIMUM_CONNECTIONS_PER_HUB = 2;
+    public int HIGHWAY_MINIMUM_ROUTE_LENGTH = 40;
+    public float HIGHWAY_ROUTE_CITY_PENALTY = 1.0f;
+    public int HIGHWAY_NETWORK_LEVEL = 0;
+
     public float RAILWAY_DUNGEON_CHANCE = .01f;
     public boolean RAILWAYS_CAN_END = false;
     public boolean RAILWAYS_ENABLED = true;
@@ -500,6 +514,38 @@ public class LostCityProfile implements ILostCityProfile {
                 "The highway perlin noise is compared to this value. Setting this to 0 would give 50% chance of a highway being at a spot. Note that highways only generate on chunks a multiple of 8. Setting this very high will prevent highways from generating");
         HIGHWAY_SUPPORTS = cfg.getBoolean("highwaySupports", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_SUPPORTS,
                 "If true highways get supports when needed. You can disable this if you have highways that span void chunks");
+
+        String highwayMode = cfg.getString("highwayGenerationMode", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_GENERATION_MODE.name(),
+                "Highway layout requested when a new world is initialized. Existing worlds keep their independently persisted mode.",
+                new String[] { HighwayGenerationMode.LEGACY.name(), HighwayGenerationMode.INTERCITY_NETWORK_V1.name() });
+        HIGHWAY_GENERATION_MODE = HighwayGenerationMode.byName(highwayMode);
+        HIGHWAY_PLANNING_CELL_SIZE = cfg.getInt("highwayPlanningCellSize", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_PLANNING_CELL_SIZE,
+                32, 512, "Size in chunks of one INTERCITY_NETWORK_V1 hub-planning cell");
+        HIGHWAY_HUB_SAMPLE_SPACING = cfg.getInt("highwayHubSampleSpacing", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_HUB_SAMPLE_SPACING,
+                1, 512, "Chunk spacing of deterministic approximate-city samples inside a highway planning cell");
+        HIGHWAY_HUB_MINIMUM_POTENTIAL = cfg.getFloat("highwayHubMinimumPotential", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_HUB_MINIMUM_POTENTIAL,
+                0.0f, 1.0f, "Minimum approximate city-potential score required to create a highway hub");
+        HIGHWAY_HUB_SEARCH_RADIUS_CELLS = cfg.getInt("highwayHubSearchRadiusCells", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_HUB_SEARCH_RADIUS_CELLS,
+                0, 8, "Bounded planning-cell radius in which a highway hub considers other hubs");
+        HIGHWAY_MINIMUM_HUB_DISTANCE = cfg.getInt("highwayMinimumHubDistance", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MINIMUM_HUB_DISTANCE,
+                0, 4096, "Minimum Euclidean chunk distance between connected highway hubs");
+        HIGHWAY_MAXIMUM_HUB_DISTANCE = cfg.getInt("highwayMaximumHubDistance", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MAXIMUM_HUB_DISTANCE,
+                0, 4096, "Maximum Euclidean chunk distance between connected highway hubs");
+        HIGHWAY_MAXIMUM_CONNECTIONS_PER_HUB = cfg.getInt("highwayMaximumConnectionsPerHub", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MAXIMUM_CONNECTIONS_PER_HUB,
+                1, 8, "Maximum accepted INTERCITY_NETWORK_V1 connections incident to one hub");
+        HIGHWAY_MINIMUM_ROUTE_LENGTH = cfg.getInt("highwayMinimumRouteLength", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MINIMUM_ROUTE_LENGTH,
+                0, 4096, "Minimum Manhattan length in chunks of an inter-city highway route");
+        HIGHWAY_ROUTE_CITY_PENALTY = cfg.getFloat("highwayRouteCityPenalty", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_ROUTE_CITY_PENALTY,
+                0.0f, 1000.0f, "Weight applied to approximate city-potential samples when choosing an L-route bend");
+        HIGHWAY_NETWORK_LEVEL = cfg.getInt("highwayNetworkLevel", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_NETWORK_LEVEL,
+                0, 32, "Fixed city level used by every complete INTERCITY_NETWORK_V1 connection");
+
+        if (HIGHWAY_HUB_SAMPLE_SPACING > HIGHWAY_PLANNING_CELL_SIZE) {
+            throw new IllegalArgumentException("highwayHubSampleSpacing cannot exceed highwayPlanningCellSize");
+        }
+        if (HIGHWAY_MINIMUM_HUB_DISTANCE > HIGHWAY_MAXIMUM_HUB_DISTANCE) {
+            throw new IllegalArgumentException("highwayMinimumHubDistance cannot exceed highwayMaximumHubDistance");
+        }
 
         BEDROCK_LAYER = cfg.getInt("bedrockLayer", LostCityProfile.CATEGORY_LOSTCITY, BEDROCK_LAYER, 0, 10,
                 "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");
