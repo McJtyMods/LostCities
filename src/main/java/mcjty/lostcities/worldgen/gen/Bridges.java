@@ -33,7 +33,7 @@ public class Bridges {
 
     private static void generateBridge(LostCityTerrainFeature feature, BuildingInfo info, BuildingPart bt, Orientation orientation) {
         CompiledPalette compiledPalette = feature.computePalette(info, bt);
-        ChunkDriver driver = feature.driver;
+        ChunkDriver driver = feature.getDriver();
         // Legacy bridge parts were authored one block above the old street
         // surface. Wide planned bridges share the large-street surface level.
         int bridgeLevel = info.provider.getStreetGenerationMode() == StreetGenerationMode.HIERARCHICAL_GRID_V1

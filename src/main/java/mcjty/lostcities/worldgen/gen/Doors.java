@@ -24,7 +24,7 @@ public class Doors
     public static void generateDoors(LostCityTerrainFeature feature, BuildingInfo info, int height, int f) {
         BlockState air = Blocks.AIR.defaultBlockState();
         BlockState filler = info.getCompiledPalette().get(info.getBuilding().getFillerBlock());
-        ChunkDriver driver = feature.driver;
+        ChunkDriver driver = feature.getDriver();
 
         height--;       // Start generating doors one below for the filler
 

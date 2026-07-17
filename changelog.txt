@@ -1,3 +1,11 @@
+1.20-7.5.0:
+- Added versioned hierarchical street generation with primary, secondary, and tertiary roads, wider primary-road parts, connectors, and deterministic large bridges
+- Added a versioned inter-city highway network which creates deterministic routes between likely city regions. Existing worlds keep their legacy street and highway generation modes
+- Fixed scattered multibuildings sometimes generating only partially. Their complete placement and validity are now decided once for the entire scattered area
+- Reworked world generation for safe multithreading. Non-overlapping chunks and different dimensions can generate concurrently while nearby chunks and lifecycle cleanup remain protected
+- Made world-generation caches, random sources, asset lookup, todo processing, and per-chunk scratch state concurrency-safe
+- Added developer documentation for city generation and world-generation thread safety
+
 1.20-7.4.13:
 - TqLxQuanZ fixed an issue where multibuilding do not spawn when railway is below.
 

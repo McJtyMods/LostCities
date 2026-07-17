@@ -34,7 +34,9 @@ import java.util.Random;
 
 public class DefaultDimensionInfo implements IDimensionInfo {
 
-    private WorldGenLevel world;
+    private volatile WorldGenLevel world;
+    private final long seed;
+    private final ResourceKey<Level> type;
     private final LostCityProfile profile;
     private final LostCityProfile profileOutside;
     private final WorldStyle style;
@@ -43,13 +45,15 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     private final HighwayGenerationMode highwayGenerationMode;
     private final IntercityHighwayPlanner highwayPlanner;
 
-    private final Random random;
+    private final ThreadLocal<Random> random;
 
     private final Registry<Biome> biomeRegistry;
     private final LostCityTerrainFeature feature;
 
     public DefaultDimensionInfo(WorldGenLevel world, LostCityProfile profile, LostCityProfile profileOutside) {
         this.world = world;
+        this.seed = world.getSeed();
+        this.type = world.getLevel().dimension();
         this.profile = profile;
         this.profileOutside = profileOutside;
         style = AssetRegistries.WORLDSTYLES.get(world, profile.getWorldStyle());
@@ -60,7 +64,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
                 ? new IntercityHighwayPlanner(world.getSeed(), world.getLevel().dimension().location().toString(),
                     HighwayPlannerSettings.fromProfile(profile), new ApproximateCityPotential(world.getSeed(), profile))
                 : null;
-        random = new Random(world.getSeed());
+        random = ThreadLocal.withInitial(() -> new Random(seed));
         RandomSource randomSource = new LegacyRandomSource(world.getSeed());
         feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
@@ -74,17 +78,18 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 
     @Override
     public long getSeed() {
-        return world.getSeed();
+        return seed;
     }
 
     @Override
     public WorldGenLevel getWorld() {
-        return world;
+        WorldGenLevel activeWorld = GenerationContext.currentWorld();
+        return activeWorld == null ? world : activeWorld;
     }
 
     @Override
     public ResourceKey<Level> getType() {
-        return world.getLevel().dimension();
+        return type;
     }
 
     @Override
@@ -127,7 +132,7 @@ public class DefaultDimensionInfo implements IDimensionInfo {
 
     @Override
     public Random getRandom() {
-        return random;
+        return random.get();
     }
 
     @Override
@@ -170,6 +175,6 @@ public class DefaultDimensionInfo implements IDimensionInfo {
     @Nullable
     @Override
     public ResourceKey<Level> dimension() {
-        return world.getLevel().dimension();
+        return type;
     }
 }

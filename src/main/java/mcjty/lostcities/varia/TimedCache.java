@@ -1,8 +1,8 @@
 package mcjty.lostcities.varia;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 
@@ -10,7 +10,7 @@ public class TimedCache<K, V> {
 
     private static class Entry<V> {
         private final V value;
-        private long lastAccess;
+        private volatile long lastAccess;
 
         private Entry(V value, long lastAccess) {
             this.value = value;
@@ -18,13 +18,13 @@ public class TimedCache<K, V> {
         }
     }
 
-    private final Map<K, Entry<V>> cache = new HashMap<>();
+    private final ConcurrentMap<K, Entry<V>> cache = new ConcurrentHashMap<>();
     private final IntSupplier ttlSecondsSupplier;
-    private long nextCleanupAt;
+    private final AtomicLong nextCleanupAt;
 
     public TimedCache(IntSupplier ttlSecondsSupplier) {
         this.ttlSecondsSupplier = ttlSecondsSupplier;
-        this.nextCleanupAt = System.currentTimeMillis();
+        this.nextCleanupAt = new AtomicLong(System.currentTimeMillis());
     }
 
     public void clear() {
@@ -39,7 +39,7 @@ public class TimedCache<K, V> {
             return null;
         }
         if (isExpired(entry, now)) {
-            cache.remove(key);
+            cache.remove(key, entry);
             maybeCleanup(now);
             return null;
         }
@@ -56,22 +56,22 @@ public class TimedCache<K, V> {
 
     public V computeIfAbsent(K key, Function<K, V> supplier) {
         long now = System.currentTimeMillis();
-        Entry<V> entry = cache.get(key);
-        if (entry != null) {
-            if (isExpired(entry, now)) {
-                cache.remove(key);
-            } else {
-                entry.lastAccess = now;
-                maybeCleanup(now);
-                return entry.value;
+        Entry<V> cached = cache.get(key);
+        if (cached != null && !isExpired(cached, now)) {
+            cached.lastAccess = now;
+            maybeCleanup(now);
+            return cached.value;
+        }
+        Entry<V> entry = cache.compute(key, (k, current) -> {
+            if (current != null && !isExpired(current, now)) {
+                current.lastAccess = now;
+                return current;
             }
-        }
-        V value = supplier.apply(key);
-        if (value != null) {
-            cache.put(key, new Entry<>(value, now));
-        }
+            V value = supplier.apply(k);
+            return value == null ? null : new Entry<>(value, now);
+        });
         maybeCleanup(now);
-        return value;
+        return entry == null ? null : entry.value;
     }
 
     private boolean isExpired(Entry<V> entry, long now) {
@@ -79,11 +79,11 @@ public class TimedCache<K, V> {
     }
 
     private void maybeCleanup(long now) {
-        if (now < nextCleanupAt) {
+        long scheduledAt = nextCleanupAt.get();
+        if (now < scheduledAt || !nextCleanupAt.compareAndSet(scheduledAt, now + getCleanupIntervalMillis())) {
             return;
         }
         cleanup(now);
-        nextCleanupAt = now + getCleanupIntervalMillis();
     }
 
     private void cleanup(long now) {
@@ -92,13 +92,11 @@ public class TimedCache<K, V> {
             cache.clear();
             return;
         }
-        Iterator<Map.Entry<K, Entry<V>>> iterator = cache.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<K, Entry<V>> entry = iterator.next();
-            if (now - entry.getValue().lastAccess >= ttlMillis) {
-                iterator.remove();
+        cache.forEach((key, entry) -> {
+            if (now - entry.lastAccess >= ttlMillis) {
+                cache.remove(key, entry);
             }
-        }
+        });
     }
 
     private long getCleanupIntervalMillis() {

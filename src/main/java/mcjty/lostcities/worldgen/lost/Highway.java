@@ -6,31 +6,27 @@ import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.PerlinNoiseGenerator14;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.highway.HighwayInfo;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class Highway {
 
-    private static PerlinNoiseGenerator14 perlinX = null;
-    private static PerlinNoiseGenerator14 perlinZ = null;
-    private static final Map<ChunkCoord, Integer> X_HIGHWAY_LEVEL_CACHE = new HashMap<>();
-    private static final Map<ChunkCoord, Integer> Z_HIGHWAY_LEVEL_CACHE = new HashMap<>();
+    private static final Map<ResourceKey<Level>, HighwayNoise> HIGHWAY_NOISE = new ConcurrentHashMap<>();
+    private static final Map<ChunkCoord, Integer> X_HIGHWAY_LEVEL_CACHE = new ConcurrentHashMap<>();
+    private static final Map<ChunkCoord, Integer> Z_HIGHWAY_LEVEL_CACHE = new ConcurrentHashMap<>();
 
-
-    private static void makePerlin(long seed) {
-        if (perlinX == null) {
-            perlinX = new PerlinNoiseGenerator14(seed, 4);
-        }
-        if (perlinZ == null) {
-            perlinZ = new PerlinNoiseGenerator14(seed, 4);
-        }
+    private static HighwayNoise getNoise(IDimensionInfo provider) {
+        return HIGHWAY_NOISE.computeIfAbsent(provider.getType(),
+                key -> new HighwayNoise(new PerlinNoiseGenerator14(provider.getSeed(), 4),
+                        new PerlinNoiseGenerator14(provider.getSeed(), 4)));
     }
 
     public static void cleanCache() {
-        perlinX = null;
-        perlinZ = null;
+        HIGHWAY_NOISE.clear();
         X_HIGHWAY_LEVEL_CACHE.clear();
         Z_HIGHWAY_LEVEL_CACHE.clear();
     }
@@ -56,7 +52,9 @@ public class Highway {
         if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
             return getHighwayInfo(coord, provider, profile).xLevel();
         }
-        return getHighwayLevel(provider, profile, Highway.X_HIGHWAY_LEVEL_CACHE, cp -> hasXHighway(cp, profile), Orientation.X, coord);
+        HighwayNoise noise = getNoise(provider);
+        return getHighwayLevel(provider, profile, Highway.X_HIGHWAY_LEVEL_CACHE,
+                cp -> hasXHighway(cp, profile, noise.x()), Orientation.X, coord);
     }
 
     /**
@@ -67,7 +65,9 @@ public class Highway {
         if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
             return getHighwayInfo(coord, provider, profile).zLevel();
         }
-        return getHighwayLevel(provider, profile, Highway.Z_HIGHWAY_LEVEL_CACHE, cp -> hasZHighway(cp, profile), Orientation.Z, coord);
+        HighwayNoise noise = getNoise(provider);
+        return getHighwayLevel(provider, profile, Highway.Z_HIGHWAY_LEVEL_CACHE,
+                cp -> hasZHighway(cp, profile, noise.z()), Orientation.Z, coord);
     }
 
     /**
@@ -85,10 +85,11 @@ public class Highway {
             }
             return provider.getHighwayPlanner().getHighwayInfo(coord.chunkX(), coord.chunkZ());
         }
+        HighwayNoise noise = getNoise(provider);
         int xLevel = getHighwayLevel(provider, profile, Highway.X_HIGHWAY_LEVEL_CACHE,
-                cp -> hasXHighway(cp, profile), Orientation.X, coord);
+                cp -> hasXHighway(cp, profile, noise.x()), Orientation.X, coord);
         int zLevel = getHighwayLevel(provider, profile, Highway.Z_HIGHWAY_LEVEL_CACHE,
-                cp -> hasZHighway(cp, profile), Orientation.Z, coord);
+                cp -> hasZHighway(cp, profile, noise.z()), Orientation.Z, coord);
         HighwayInfo.Classification classification;
         if (xLevel >= 0 && zLevel >= 0) {
             classification = xLevel == zLevel ? HighwayInfo.Classification.SAME_LEVEL_INTERSECTION
@@ -104,8 +105,9 @@ public class Highway {
     }
 
     private static int getHighwayLevel(IDimensionInfo provider, LostCityProfile profile, Map<ChunkCoord, Integer> cache, Function<ChunkCoord, Boolean> hasHighway, Orientation orientation, ChunkCoord cp) {
-        if (cache.containsKey(cp)) {
-            return cache.get(cp);
+        Integer cached = cache.get(cp);
+        if (cached != null) {
+            return cached;
         }
 
         // Highways can only occur at chunkZ that is a multiple of 8
@@ -126,7 +128,6 @@ public class Highway {
             return -1;
         }
 
-        makePerlin(provider.getSeed());
         if (hasHighway.apply(cp)) {
             // This is part of a highway. Find the left-most chunk that is still part of this highway
             ChunkCoord lower = cp.lower(orientation);
@@ -175,14 +176,17 @@ public class Highway {
         return -1;
     }
 
-    private static boolean hasXHighway(ChunkCoord cp, LostCityProfile profile) {
-        return perlinX.getValue(cp.chunkX() / profile.HIGHWAY_MAINPERLIN_SCALE, cp.chunkZ() / profile.HIGHWAY_SECONDARYPERLIN_SCALE)
+    private static boolean hasXHighway(ChunkCoord cp, LostCityProfile profile, PerlinNoiseGenerator14 noise) {
+        return noise.getValue(cp.chunkX() / profile.HIGHWAY_MAINPERLIN_SCALE, cp.chunkZ() / profile.HIGHWAY_SECONDARYPERLIN_SCALE)
                 > profile.HIGHWAY_PERLIN_FACTOR;
     }
 
-    private static boolean hasZHighway(ChunkCoord cp, LostCityProfile profile) {
-        return perlinZ.getValue(cp.chunkX() / profile.HIGHWAY_SECONDARYPERLIN_SCALE, cp.chunkZ() / profile.HIGHWAY_MAINPERLIN_SCALE)
+    private static boolean hasZHighway(ChunkCoord cp, LostCityProfile profile, PerlinNoiseGenerator14 noise) {
+        return noise.getValue(cp.chunkX() / profile.HIGHWAY_SECONDARYPERLIN_SCALE, cp.chunkZ() / profile.HIGHWAY_MAINPERLIN_SCALE)
                 > profile.HIGHWAY_PERLIN_FACTOR;
+    }
+
+    private record HighwayNoise(PerlinNoiseGenerator14 x, PerlinNoiseGenerator14 z) {
     }
 
 }

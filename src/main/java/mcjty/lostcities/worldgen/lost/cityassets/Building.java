@@ -29,7 +29,7 @@ public class Building implements ILostCityBuilding {
     private final Character rubbleBlock;      // Block used for destroyed building rubble
     private float prefersLonely = 0.0f; // The chance this this building is alone. If 1.0f this building wants to be alone all the time
 
-    private Palette localPalette = null;
+    private volatile Palette localPalette;
     private String refPaletteName;
 
     private final List<Pair<Predicate<ConditionContext>, String>> parts = new ArrayList<>();
@@ -70,10 +70,17 @@ public class Building implements ILostCityBuilding {
 
     @Override
     public Palette getLocalPalette(CommonLevelAccessor level) {
-        if (localPalette == null && refPaletteName != null) {
-            localPalette = AssetRegistries.PALETTES.getOrThrow(level, refPaletteName);
+        Palette result = localPalette;
+        if (result == null && refPaletteName != null) {
+            synchronized (this) {
+                result = localPalette;
+                if (result == null) {
+                    result = AssetRegistries.PALETTES.getOrThrow(level, refPaletteName);
+                    localPalette = result;
+                }
+            }
         }
-        return localPalette;
+        return result;
     }
 
     public void readParts(List<Pair<Predicate<ConditionContext>, String>> p, List<PartRef> partRefs) {

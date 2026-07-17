@@ -13,6 +13,7 @@ import mcjty.lostcities.worldgen.GlobalTodo;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityWorldGenData;
 import mcjty.lostcities.worldgen.LostCityFeature;
+import mcjty.lostcities.worldgen.gen.Scattered;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
@@ -125,6 +126,7 @@ public class ForgeEventHandlers {
         BiomeInfo.cleanCache();
         City.cleanCache();
         CitySphere.cleanCache();
+        Scattered.cleanCache();
     }
 
     @SubscribeEvent

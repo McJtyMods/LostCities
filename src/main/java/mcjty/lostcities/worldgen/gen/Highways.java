@@ -43,7 +43,7 @@ public class Highways {
     }
 
     private static void generateHighwayPart(LostCityTerrainFeature feature, BuildingInfo info, int level, Transform transform, BuildingInfo adjacent1, BuildingInfo adjacent2, boolean bidirectional) {
-        ChunkDriver driver = feature.driver;
+        ChunkDriver driver = feature.getDriver();
         int highwayGroundLevel = info.groundLevel + level * LostCityTerrainFeature.FLOORHEIGHT;
         HighwayParts highwayParts = info.provider.getWorldStyle().getPartSelector().highwayParts();
 

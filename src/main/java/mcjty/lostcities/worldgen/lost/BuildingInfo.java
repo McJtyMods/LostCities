@@ -40,6 +40,7 @@ import net.minecraftforge.common.MinecraftForge;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static mcjty.lostcities.worldgen.LostCityTerrainFeature.FLOORHEIGHT;
 
@@ -96,14 +97,14 @@ public class BuildingInfo implements ILostChunkInfo {
     public final Block doorBlock;
 
     // Transient info that is calculated on demand
-    private BuildingInfo xmin = null;   // @todo remove
-    private BuildingInfo xmax = null;   // @todo remove
-    private BuildingInfo zmin = null;   // @todo remove
-    private BuildingInfo zmax = null;   // @todo remove
-    private DamageArea damageArea = null;
+    private volatile BuildingInfo xmin;   // @todo remove
+    private volatile BuildingInfo xmax;   // @todo remove
+    private volatile BuildingInfo zmin;   // @todo remove
+    private volatile BuildingInfo zmax;   // @todo remove
+    private volatile DamageArea damageArea;
     private Palette palette = null;
-    private CompiledPalette compiledPalette = null;
-    private Boolean isOcean = null;
+    private volatile CompiledPalette compiledPalette;
+    private volatile Boolean isOcean;
 
     private boolean xBridgeTypeCalculated = false;
     private boolean zBridgeTypeCalculated = false;
@@ -115,11 +116,11 @@ public class BuildingInfo implements ILostChunkInfo {
     private boolean actualStairsCalculated = false;
     private Direction actualStairDirection;
 
-    private Boolean horizontalMonorail = null;
-    private Boolean verticalMonorail = null;
+    private volatile Boolean horizontalMonorail;
+    private volatile Boolean verticalMonorail;
 
-    private MinMax desiredTerrainCorrectionHeights = null;
-    private MinMax desiredMaxHeight1 = null;
+    private volatile MinMax desiredTerrainCorrectionHeights;
+    private volatile MinMax desiredMaxHeight1;
 
     // A list of todo's
     private final List<BlockPos> torchTodo = new ArrayList<>();
@@ -157,6 +158,9 @@ public class BuildingInfo implements ILostChunkInfo {
     private static final TimedCache<ChunkCoord, BuildingInfo> BUILDING_INFO_MAP = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
     private static final TimedCache<ChunkCoord, LostChunkCharacteristics> CITY_INFO_MAP = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
     private static final TimedCache<ChunkCoord, Integer> CITY_LEVEL_CACHE = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
+    private static final Map<ResourceKey<Level>, Object> MEMOIZATION_LOCKS = new ConcurrentHashMap<>();
+
+    private final Object memoizationLock;
 
     public void addTorchTodo(BlockPos index) {
         torchTodo.add(index);
@@ -191,23 +195,37 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public CompiledPalette getCompiledPalette() {
-        if (compiledPalette == null) {
-            compiledPalette = new CompiledPalette(palette);
-            if (hasBuilding) {
-                Palette buildingPalette = buildingType.getLocalPalette(provider.getWorld());
-                if (buildingPalette != null) {
-                    compiledPalette = new CompiledPalette(compiledPalette, buildingPalette);
+        CompiledPalette result = compiledPalette;
+        if (result == null) {
+            synchronized (memoizationLock) {
+                result = compiledPalette;
+                if (result == null) {
+                    result = new CompiledPalette(palette);
+                    if (hasBuilding) {
+                        Palette buildingPalette = buildingType.getLocalPalette(provider.getWorld());
+                        if (buildingPalette != null) {
+                            result = new CompiledPalette(result, buildingPalette);
+                        }
+                    }
+                    compiledPalette = result;
                 }
             }
         }
-        return compiledPalette;
+        return result;
     }
 
     public DamageArea getDamageArea() {
-        if (damageArea == null) {
-            damageArea = new DamageArea(coord.chunkX(), coord.chunkZ(), provider, this);
+        DamageArea result = damageArea;
+        if (result == null) {
+            synchronized (memoizationLock) {
+                result = damageArea;
+                if (result == null) {
+                    result = new DamageArea(coord.chunkX(), coord.chunkZ(), provider, this);
+                    damageArea = result;
+                }
+            }
         }
-        return damageArea;
+        return result;
     }
 
     public Style getOutsideStyle() {
@@ -226,31 +244,39 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public BuildingInfo getXmin() {
-        if (xmin == null) {
-            xmin = getBuildingInfo(coord.west(), provider);
+        BuildingInfo info = xmin;
+        if (info == null) {
+            info = getBuildingInfo(coord.west(), provider);
+            xmin = info;
         }
-        return xmin;
+        return info;
     }
 
     public BuildingInfo getXmax() {
-        if (xmax == null) {
-            xmax = getBuildingInfo(coord.east(), provider);
+        BuildingInfo info = xmax;
+        if (info == null) {
+            info = getBuildingInfo(coord.east(), provider);
+            xmax = info;
         }
-        return xmax;
+        return info;
     }
 
     public BuildingInfo getZmin() {
-        if (zmin == null) {
-            zmin = getBuildingInfo(coord.north(), provider);
+        BuildingInfo info = zmin;
+        if (info == null) {
+            info = getBuildingInfo(coord.north(), provider);
+            zmin = info;
         }
-        return zmin;
+        return info;
     }
 
     public BuildingInfo getZmax() {
-        if (zmax == null) {
-            zmax = getBuildingInfo(coord.south(), provider);
+        BuildingInfo info = zmax;
+        if (info == null) {
+            info = getBuildingInfo(coord.south(), provider);
+            zmax = info;
         }
-        return zmax;
+        return info;
     }
 
     public int getMaxHeight() {
@@ -309,7 +335,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return characteristics.couldHaveBuilding;
     }
 
-    public static synchronized LostChunkCharacteristics getChunkCharacteristicsGui(ChunkCoord key, IDimensionInfo provider) {
+    public static LostChunkCharacteristics getChunkCharacteristicsGui(ChunkCoord key, IDimensionInfo provider) {
 //        LostChunkCharacteristics cached = CITY_INFO_MAP.get(key);
 //        if (cached != null) {
 //            return cached;
@@ -327,7 +353,13 @@ public class BuildingInfo implements ILostChunkInfo {
         return characteristics;
     }
 
-    public static synchronized LostChunkCharacteristics getChunkCharacteristics(ChunkCoord coord, IDimensionInfo provider) {
+    public static LostChunkCharacteristics getChunkCharacteristics(ChunkCoord coord, IDimensionInfo provider) {
+        synchronized (getDimensionLock(coord.dimension())) {
+            return getChunkCharacteristicsLocked(coord, provider);
+        }
+    }
+
+    private static LostChunkCharacteristics getChunkCharacteristicsLocked(ChunkCoord coord, IDimensionInfo provider) {
         LostChunkCharacteristics cached = CITY_INFO_MAP.get(coord);
         if (cached != null) {
             return cached;
@@ -650,14 +682,20 @@ public class BuildingInfo implements ILostChunkInfo {
         CITY_LEVEL_CACHE.clear();
     }
 
-    public static synchronized BuildingInfo getBuildingInfo(ChunkCoord key, IDimensionInfo provider) {
-        BuildingInfo info = BUILDING_INFO_MAP.get(key);
-        if (info != null) {
+    public static BuildingInfo getBuildingInfo(ChunkCoord key, IDimensionInfo provider) {
+        synchronized (getDimensionLock(key.dimension())) {
+            BuildingInfo info = BUILDING_INFO_MAP.get(key);
+            if (info != null) {
+                return info;
+            }
+            info = new BuildingInfo(key, provider);
+            BUILDING_INFO_MAP.put(key, info);
             return info;
         }
-        info = new BuildingInfo(key, provider);
-        BUILDING_INFO_MAP.put(key, info);
-        return info;
+    }
+
+    private static Object getDimensionLock(ResourceKey<Level> dimension) {
+        return MEMOIZATION_LOCKS.computeIfAbsent(dimension, key -> new Object());
     }
 
     /**
@@ -736,6 +774,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private BuildingInfo(ChunkCoord key, IDimensionInfo provider) {
         this.provider = provider;
         this.coord = key;
+        this.memoizationLock = getDimensionLock(key.dimension());
 
         outsideChunk = (provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && !CitySphere.intersectsWithCitySphere(key, provider);
         profile = getProfile(key, provider);
@@ -1049,17 +1088,21 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public boolean hasHorizontalMonorail() {
-        if (horizontalMonorail == null) {
-            horizontalMonorail = CitySphere.hasHorizontalMonorail(coord, provider);
+        Boolean result = horizontalMonorail;
+        if (result == null) {
+            result = CitySphere.hasHorizontalMonorail(coord, provider);
+            horizontalMonorail = result;
         }
-        return horizontalMonorail;
+        return result;
     }
 
     public boolean hasVerticalMonorail() {
-        if (verticalMonorail == null) {
-            verticalMonorail = CitySphere.hasVerticalMonorail(coord, provider);
+        Boolean result = verticalMonorail;
+        if (result == null) {
+            result = CitySphere.hasVerticalMonorail(coord, provider);
+            verticalMonorail = result;
         }
-        return verticalMonorail;
+        return result;
     }
 
     public boolean hasMonorail() {
@@ -1161,7 +1204,13 @@ public class BuildingInfo implements ILostChunkInfo {
      * This function does not use the cache. So safe to use when the cache is building
      * This function uses its own cache.
      */
-    public static synchronized int getCityLevel(ChunkCoord key, IDimensionInfo provider) {
+    public static int getCityLevel(ChunkCoord key, IDimensionInfo provider) {
+        synchronized (getDimensionLock(key.dimension())) {
+            return getCityLevelLocked(key, provider);
+        }
+    }
+
+    private static int getCityLevelLocked(ChunkCoord key, IDimensionInfo provider) {
         if (provider.getWorld() != null) {  // In LC preview we don't want to use the cache as the config isn't loaded yet
             Integer cached = CITY_LEVEL_CACHE.get(key);
             if (cached != null) {
@@ -1184,7 +1233,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return result;
     }
 
-    public static synchronized int getCityLevelGui(ChunkCoord key, IDimensionInfo provider) {
+    public static int getCityLevelGui(ChunkCoord key, IDimensionInfo provider) {
         int result;
         if ((provider.getProfile().isSpace() || provider.getProfile().isVoidSpheres())) {
             result = getCityLevelSpace(key, provider);
@@ -1344,6 +1393,12 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     private Direction getStairDirection() {
+        synchronized (memoizationLock) {
+            return calculateStairDirection();
+        }
+    }
+
+    private Direction calculateStairDirection() {
         if (!stairsCalculated) {
             stairsCalculated = true;
             if (streetType != StreetType.PARK && !hasBuilding && isCity) {
@@ -1368,6 +1423,12 @@ public class BuildingInfo implements ILostChunkInfo {
     // This returns the actual stair direction. It keeps track if there are stair chunks around
     // it those have higher stair priority
     public Direction getActualStairDirection() {
+        synchronized (memoizationLock) {
+            return calculateActualStairDirection();
+        }
+    }
+
+    private Direction calculateActualStairDirection() {
         if (!actualStairsCalculated) {
             actualStairsCalculated = true;
             actualStairDirection = getStairDirection();
@@ -1409,6 +1470,12 @@ public class BuildingInfo implements ILostChunkInfo {
 
     // To prevent adjacent bridges of the same direction we give the bridges at even chunk Z coordinates higher priority
     public BuildingPart hasXBridge(IDimensionInfo provider) {
+        synchronized (memoizationLock) {
+            return calculateXBridge(provider);
+        }
+    }
+
+    private BuildingPart calculateXBridge(IDimensionInfo provider) {
         if (xBridgeTypeCalculated) {
             return xBridgeType;
         }
@@ -1475,6 +1542,12 @@ public class BuildingInfo implements ILostChunkInfo {
 
     // To prevent adjacent bridges of the same direction we give the bridges at even chunk X coordinates higher priority
     public BuildingPart hasZBridge(IDimensionInfo provider) {
+        synchronized (memoizationLock) {
+            return calculateZBridge(provider);
+        }
+    }
+
+    private BuildingPart calculateZBridge(IDimensionInfo provider) {
         if (zBridgeTypeCalculated) {
             return zBridgeType;
         }
@@ -1552,12 +1625,13 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public boolean isOcean() {
-        if (isOcean != null) {
-            return isOcean;
+        Boolean result = isOcean;
+        if (result == null) {
+            Holder<Biome> mainBiome = BiomeInfo.getBiomeInfo(provider, coord).getMainBiome();
+            result = mainBiome.is(BiomeTags.IS_OCEAN) || mainBiome.is(BiomeTags.IS_DEEP_OCEAN);
+            isOcean = result;
         }
-        Holder<Biome> mainBiome = BiomeInfo.getBiomeInfo(provider, coord).getMainBiome();
-        isOcean = mainBiome.is(BiomeTags.IS_OCEAN) || mainBiome.is(BiomeTags.IS_DEEP_OCEAN);
-        return isOcean;
+        return result;
     }
 
 
@@ -1876,6 +1950,12 @@ public class BuildingInfo implements ILostChunkInfo {
      * This is the level 1 version which looks at adjacent heights only
      */
     private MinMax getDesiredMaxHeightL1() {
+        synchronized (memoizationLock) {
+            return getDesiredMaxHeightL1Locked();
+        }
+    }
+
+    private MinMax getDesiredMaxHeightL1Locked() {
         if (desiredMaxHeight1 == null) {
             int h = getLowestCityHeightAtChunkCorner();
 
@@ -1934,6 +2014,12 @@ public class BuildingInfo implements ILostChunkInfo {
      * This is the level 2 version which looks at L1 heights of adjacent chunks
      */
     public MinMax getDesiredMaxHeightL2() {
+        synchronized (memoizationLock) {
+            return getDesiredMaxHeightL2Locked();
+        }
+    }
+
+    private MinMax getDesiredMaxHeightL2Locked() {
         if (desiredTerrainCorrectionHeights == null) {
             MinMax mm = getDesiredMaxHeightL1();
             // @todo build limit

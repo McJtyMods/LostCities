@@ -53,7 +53,7 @@ public class MultiChunk {
         }
     }
 
-    public static synchronized MultiChunk getOrCreate(IDimensionInfo provider, ChunkCoord coord) {
+    public static MultiChunk getOrCreate(IDimensionInfo provider, ChunkCoord coord) {
         int areasize = provider.getWorldStyle().getMultiSettings().areasize();
         ChunkCoord mc = getMultiCoord(coord, areasize);
         return MULTICHUNKS.computeIfAbsent(mc, k -> new MultiChunk(mc, areasize).calculateBuildings(provider));

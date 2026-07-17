@@ -27,9 +27,9 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
     private final int zSize;
 
     // Optimized version of this part which is organized in xSize*ySize vertical strings
-    private char[][] vslices = null;
+    private volatile char[][] vslices;
 
-    private Palette localPalette = null;
+    private volatile Palette localPalette;
     private String refPaletteName;
 
     private final Map<String, Object> metadata = new HashMap<>();
@@ -106,28 +106,33 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
      */
     @Override
     public char[][] getVslices() {
-        if (vslices == null) {
-            vslices = new char[xSize * zSize][];
-            for (int x = 0 ; x < xSize ; x++) {
-                for (int z = 0 ; z < zSize ; z++) {
-                    StringBuilder vs = new StringBuilder();
-                    boolean empty = true;
-                    for (int y = 0; y < slices.length; y++) {
-                        Character c = getC(x, y, z);
-                        vs.append(c);
-                        if (c != ' ') {
-                            empty = false;
+        char[][] result = vslices;
+        if (result == null) {
+            synchronized (this) {
+                result = vslices;
+                if (result == null) {
+                    result = new char[xSize * zSize][];
+                    for (int x = 0 ; x < xSize ; x++) {
+                        for (int z = 0 ; z < zSize ; z++) {
+                            StringBuilder vs = new StringBuilder();
+                            boolean empty = true;
+                            for (int y = 0; y < slices.length; y++) {
+                                Character c = getC(x, y, z);
+                                vs.append(c);
+                                if (c != ' ') {
+                                    empty = false;
+                                }
+                            }
+                            if (!empty) {
+                                result[z*xSize+x] = vs.toString().toCharArray();
+                            }
                         }
                     }
-                    if (empty) {
-                        vslices[z*xSize+x] = null;
-                    } else {
-                        vslices[z*xSize+x] = vs.toString().toCharArray();
-                    }
+                    vslices = result;
                 }
             }
         }
-        return vslices;
+        return result;
     }
 
     @Override
@@ -137,10 +142,17 @@ public class BuildingPart implements IBuildingPart, ILostCityAsset {
 
     @Override
     public Palette getLocalPalette(CommonLevelAccessor level) {
-        if (localPalette == null && refPaletteName != null) {
-            localPalette = AssetRegistries.PALETTES.getOrThrow(level, refPaletteName);
+        Palette result = localPalette;
+        if (result == null && refPaletteName != null) {
+            synchronized (this) {
+                result = localPalette;
+                if (result == null) {
+                    result = AssetRegistries.PALETTES.getOrThrow(level, refPaletteName);
+                    localPalette = result;
+                }
+            }
         }
-        return localPalette;
+        return result;
     }
 
     @Override

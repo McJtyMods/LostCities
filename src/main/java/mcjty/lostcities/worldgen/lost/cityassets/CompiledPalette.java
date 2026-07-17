@@ -1,7 +1,7 @@
 package mcjty.lostcities.worldgen.lost.cityassets;
 
 import mcjty.lostcities.LostCities;
-import mcjty.lostcities.worldgen.LostCityTerrainFeature;
+import mcjty.lostcities.worldgen.GenerationContext;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
@@ -174,7 +174,7 @@ public class CompiledPalette {
                 return null;
             } else {
                 BlockState[] randomBlocks = (BlockState[]) o;
-                return randomBlocks[LostCityTerrainFeature.fastrand128()];
+                return randomBlocks[GenerationContext.nextPaletteIndex()];
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

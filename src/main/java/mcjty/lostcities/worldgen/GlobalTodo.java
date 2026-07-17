@@ -8,10 +8,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class GlobalTodo {
@@ -29,8 +29,8 @@ public class GlobalTodo {
         }
     }
 
-    private final Map<ChunkPos, TodoQueues> todoQueues = new HashMap<>();
-    private final static Map<ResourceKey<Level>, GlobalTodo> instances = new HashMap<>();
+    private final Map<ChunkPos, TodoQueues> todoQueues = new ConcurrentHashMap<>();
+    private final static Map<ResourceKey<Level>, GlobalTodo> instances = new ConcurrentHashMap<>();
 
     public static GlobalTodo get(Level world) {
         return instances.computeIfAbsent(world.dimension(), k -> new GlobalTodo());
@@ -38,8 +38,11 @@ public class GlobalTodo {
 
     public void addTodo(BlockPos pos, Consumer<ServerLevel> code) {
         ChunkPos chunkPos = new ChunkPos(pos);
-        TodoQueues queues = todoQueues.computeIfAbsent(chunkPos, k -> new TodoQueues(new TodoQueue<>()));
-        queues.todo.add(pos, code);
+        todoQueues.compute(chunkPos, (key, queues) -> {
+            TodoQueues result = queues == null ? new TodoQueues(new TodoQueue<>()) : queues;
+            result.todo.add(pos, code);
+            return result;
+        });
     }
 
     public void executeAndClearTodo(ServerLevel level) {
@@ -47,7 +50,7 @@ public class GlobalTodo {
 
         // @todo process chunks based on their distance to the player
         Set<ChunkPos> todoToRemove = new HashSet<>();
-        Map<ChunkPos, TodoQueues> copy = new HashMap<>(this.todoQueues);
+        Map<ChunkPos, TodoQueues> copy = Map.copyOf(this.todoQueues);
         for (Map.Entry<ChunkPos, TodoQueues> entry : copy.entrySet()) {
             TodoQueues queues = entry.getValue();
             ChunkPos cp = entry.getKey();
@@ -61,6 +64,7 @@ public class GlobalTodo {
         }
 
         // Remove all empty todo queues
-        todoToRemove.forEach(todoQueues::remove);
+        todoToRemove.forEach(chunkPos -> todoQueues.computeIfPresent(chunkPos,
+                (key, queues) -> queues.isEmpty() ? null : queues));
     }
 }

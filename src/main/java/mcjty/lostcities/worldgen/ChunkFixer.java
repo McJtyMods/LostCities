@@ -5,6 +5,7 @@ import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import mcjty.lostcities.worldgen.lost.regassets.data.WorldSettings;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -18,7 +19,7 @@ public class ChunkFixer {
         info.clearPostTodo();
     }
 
-    private static void generateVines(ChunkCoord coord, LevelAccessor world, IDimensionInfo provider) {
+    private static void generateVines(ChunkCoord coord, LevelAccessor world, IDimensionInfo provider, RandomSource random) {
         float vineChance = provider.getProfile().VINE_CHANCE;
         if (vineChance < 0.000001) {
             return;
@@ -40,8 +41,8 @@ public class ChunkFixer {
                 BlockState state = worldSettings.vineWest();
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < maxHeight; y++) {
-                        if (world.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(world, bottom, state, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
+                        if (random.nextFloat() < vineChance) {
+                            createVineStrip(world, random, bottom, state, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
                         }
                     }
                 }
@@ -54,8 +55,8 @@ public class ChunkFixer {
                 BlockState state = worldSettings.vineEast();
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
-                        if (world.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(world, bottom, state, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
+                        if (random.nextFloat() < vineChance) {
+                            createVineStrip(world, random, bottom, state, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
                         }
                     }
                 }
@@ -69,8 +70,8 @@ public class ChunkFixer {
                 BlockState state = worldSettings.vineNorth();
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < maxHeight; y++) {
-                        if (world.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(world, bottom, state, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
+                        if (random.nextFloat() < vineChance) {
+                            createVineStrip(world, random, bottom, state, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
                         }
                     }
                 }
@@ -83,8 +84,8 @@ public class ChunkFixer {
                 BlockState state = worldSettings.vineSouth();
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
-                        if (world.getRandom().nextFloat() < vineChance) {
-                            createVineStrip(world, bottom, state, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
+                        if (random.nextFloat() < vineChance) {
+                            createVineStrip(world, random, bottom, state, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
                         }
                     }
                 }
@@ -92,7 +93,7 @@ public class ChunkFixer {
         }
     }
 
-    private static void createVineStrip(LevelAccessor world, int bottom, BlockState state, BlockPos pos, BlockPos vineHolderPos) {
+    private static void createVineStrip(LevelAccessor world, RandomSource random, int bottom, BlockState state, BlockPos pos, BlockPos vineHolderPos) {
         if (world.isEmptyBlock(vineHolderPos)) {
             return;
         }
@@ -101,7 +102,7 @@ public class ChunkFixer {
         }
         world.setBlock(pos, state, 0);
         pos = pos.below();
-        while (pos.getY() >= bottom && world.getRandom().nextFloat() < .8f) {
+        while (pos.getY() >= bottom && random.nextFloat() < .8f) {
             if (!world.isEmptyBlock(pos)) {
                 return;
             }
@@ -112,7 +113,9 @@ public class ChunkFixer {
 
 
     public static void fix(IDimensionInfo info, ChunkCoord coord) {
-        generateVines(coord, info.getWorld(), info);
+        RandomSource random = GenerationContext.current().random();
+        random.setSeed(info.getSeed() ^ (long) coord.chunkX() * 341873128712L ^ (long) coord.chunkZ() * 132897987541L);
+        generateVines(coord, info.getWorld(), info, random);
         executePostTodo(coord, info);
     }
 }

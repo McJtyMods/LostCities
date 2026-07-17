@@ -1,4 +1,4 @@
-# Lost Cities city-generation algorithm
+# Lost Cities city generation
 
 This document describes the city-generation path that starts at
 `LostCityTerrainFeature.generate()`. That method is called once for every 16x16
@@ -21,6 +21,9 @@ Highway generation is versioned independently:
 
 A world can therefore use any street/highway mode combination. Hierarchical
 streets do not implicitly enable the inter-city highway planner.
+
+World-generation concurrency and cache invariants are documented separately in
+[`thread_safety.md`](thread_safety.md).
 
 ## Persisted mode selection and old-world compatibility
 
@@ -548,6 +551,34 @@ Phase 2 should move endpoints to city-edge gateways aligned with hierarchical
 primary streets, strengthen city-interior penalties, score terrain and water,
 and suppress or merge close parallel routes.
 
+## Deterministic scattered-area generation
+
+Scattered structures are planned per scattered area rather than independently
+by every footprint chunk. `Scattered` caches an immutable plan keyed by
+dimension, world seed, and area coordinates. The plan contains the selected
+asset, top-left position, dimensions, complete-footprint validity, common
+generation height, and single-building choice where applicable.
+
+The entire footprint is checked for biome, city, bridge, highway, void, and
+height-difference constraints before the plan is accepted. Every participating
+chunk then reads the same plan and generates only its own building piece. The
+area random sequence is reconstructed independently for each piece; no mutable
+random object or first-generated chunk can change the decision. Other chunks
+are never generated eagerly.
+
+## Generation concurrency boundary
+
+Normal and sphere generation enter through
+`LostCityFeature.runWithDimensionInfo()`. Lifecycle cleanup is excluded while
+generation callbacks are active. Non-overlapping chunks in one dimension may
+generate concurrently, while ordered striped locks protect each active 3x3
+chunk neighbourhood because vine post-processing can cross a chunk edge.
+
+Mutable per-call data, including the active world, `ChunkDriver`, random source,
+street character, and noise buffers, belongs to the worker-local
+`GenerationContext`. See [`thread_safety.md`](thread_safety.md) before adding
+new generation caches, random sources, or cross-chunk writes.
+
 ## Shared and legacy city-generation flow
 
 ```text
@@ -575,14 +606,13 @@ LostCityTerrainFeature.generate(chunk)
 
 Relevant entry points:
 
-- `LostCityTerrainFeature.generate()` at
-  `src/main/java/mcjty/lostcities/worldgen/LostCityTerrainFeature.java:254`
-- `BuildingInfo.getChunkCharacteristics()` at
-  `src/main/java/mcjty/lostcities/worldgen/lost/BuildingInfo.java:318`
-- `BuildingInfo` construction at
-  `src/main/java/mcjty/lostcities/worldgen/lost/BuildingInfo.java:690`
-- `LostCityTerrainFeature.doCityChunk()` at
-  `src/main/java/mcjty/lostcities/worldgen/LostCityTerrainFeature.java:920`
+- `LostCityTerrainFeature.generate()` and
+  `LostCityTerrainFeature.doCityChunk()` in
+  `src/main/java/mcjty/lostcities/worldgen/LostCityTerrainFeature.java`
+- `BuildingInfo.getChunkCharacteristics()` and `BuildingInfo` construction in
+  `src/main/java/mcjty/lostcities/worldgen/lost/BuildingInfo.java`
+- `Scattered.calculatePlan()` in
+  `src/main/java/mcjty/lostcities/worldgen/gen/Scattered.java`
 
 ## 1. Deciding whether a chunk belongs to a city
 

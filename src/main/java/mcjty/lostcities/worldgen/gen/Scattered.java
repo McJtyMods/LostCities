@@ -16,6 +16,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,8 +25,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class Scattered {
+
+    private static final ConcurrentMap<ScatteredPlanKey, ScatteredPlan> PLANS = new ConcurrentHashMap<>();
+
+    public static void cleanCache() {
+        PLANS.clear();
+    }
+
     public static boolean avoidScattered(LostCityTerrainFeature feature, BuildingInfo info) {
         if (BuildingInfo.isCityRaw(info.coord, feature.provider, info.profile)) {
             return true;
@@ -36,7 +46,7 @@ public class Scattered {
         return Highway.hasHighway(info.coord, feature.provider, feature.profile);
     }
 
-    public static void generateScattered(LostCityTerrainFeature feature, BuildingInfo info, ScatteredSettings scatteredSettings, ChunkHeightmap heightmap) {
+    public static void generateScattered(LostCityTerrainFeature feature, BuildingInfo info, ScatteredSettings scatteredSettings) {
         int chunkX = info.coord.chunkX();
         int chunkZ = info.coord.chunkZ();
         IDimensionInfo provider = feature.provider;
@@ -44,73 +54,89 @@ public class Scattered {
         // First normalize the coordinates to scatter area sized coordinates. Add a large amount to make sure the coordinates are positive
         int ax = (chunkX + 2000000) / scatteredSettings.getAreasize();
         int az = (chunkZ + 2000000) / scatteredSettings.getAreasize();
+        ScatteredPlanKey key = new ScatteredPlanKey(provider.getType(), provider.getSeed(), ax, az);
+        ScatteredPlan plan = PLANS.computeIfAbsent(key, ignored -> calculatePlan(feature, scatteredSettings, ax, az));
 
-        QualityRandom scatteredRandom = new QualityRandom(provider.getSeed() + ax * 5564338337L + az * 25564337621L);
-
-        if (scatteredRandom.nextFloat() >= (scatteredSettings.getChance() * provider.getProfile().SCATTERED_CHANCE_MULTIPLIER)) {
-            // No scattered structure in this area
+        if (!plan.valid() || chunkX < plan.tlChunkX() || chunkZ < plan.tlChunkZ()
+                || chunkX >= plan.tlChunkX() + plan.width() || chunkZ >= plan.tlChunkZ() + plan.depth()) {
             return;
         }
 
-        // Find the right type of scattered asset for this area
-        ScatteredReference reference = selectRandomScattered(feature, info, scatteredSettings, scatteredRandom);
-        if (reference == null) {
-            // Nothing matches
-            return;
-        }
-        ScatteredBuilding scattered = AssetRegistries.SCATTERED.getOrThrow(provider.getWorld(), reference.getName());
-
-        // Find the size of the scattered building
-        int w;
-        int h;
-        MultiBuilding multiBuilding;
-        if (scattered.getMultibuilding() != null) {
-            multiBuilding = AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), scattered.getMultibuilding());
-            w = multiBuilding.getDimX();
-            h = multiBuilding.getDimZ();
+        QualityRandom scatteredRandom = plan.createGenerationRandom();
+        Building building;
+        if (plan.multiBuilding() == null) {
+            building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), plan.singleBuildingName());
         } else {
-            w = h = 1;
-            multiBuilding = null;
+            int relx = chunkX - plan.tlChunkX();
+            int relz = chunkZ - plan.tlChunkZ();
+            String buildingName = plan.multiBuilding().getBuilding(relx, relz);
+            building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
+        }
+        generateScatteredBuilding(feature, info, building, scatteredRandom, plan.lowestLevel(), plan.scattered().getTerrainfix());
+    }
+
+    private static ScatteredPlan calculatePlan(LostCityTerrainFeature feature, ScatteredSettings scatteredSettings, int ax, int az) {
+        IDimensionInfo provider = feature.provider;
+        int areaSize = scatteredSettings.getAreasize();
+        long randomSeed = provider.getSeed() + ax * 5564338337L + az * 25564337621L;
+        QualityRandom scatteredRandom = new QualityRandom(randomSeed);
+        if (scatteredRandom.nextFloat() >= scatteredSettings.getChance() * provider.getProfile().SCATTERED_CHANCE_MULTIPLIER) {
+            return ScatteredPlan.INVALID;
         }
 
-        // Find the position of the building in the world
-        int tlChunkX = (ax * scatteredSettings.getAreasize() - 2000000) + scatteredRandom.nextInt(scatteredSettings.getAreasize() - w + 1);
-        int tlChunkZ = (az * scatteredSettings.getAreasize() - 2000000) + scatteredRandom.nextInt(scatteredSettings.getAreasize() - h + 1);
-
-        if (chunkX < tlChunkX || chunkZ < tlChunkZ || chunkX >= (tlChunkX + w) || chunkZ >= (tlChunkZ + h)) {
-            return;
+        int areaOriginX = ax * areaSize - 2000000;
+        int areaOriginZ = az * areaSize - 2000000;
+        ChunkCoord selectionCoord = new ChunkCoord(provider.getType(), areaOriginX, areaOriginZ);
+        ScatteredSelection selection = selectRandomScattered(feature, selectionCoord, scatteredSettings, scatteredRandom);
+        if (selection == null || selection.reference() == null) {
+            return ScatteredPlan.INVALID;
         }
 
-        // First test the conditions for all the relevant chunks (does this need to be cached?)
+        ScatteredReference reference = selection.reference();
+        ScatteredBuilding scattered = AssetRegistries.SCATTERED.getOrThrow(provider.getWorld(), reference.getName());
+        MultiBuilding multiBuilding = scattered.getMultibuilding() == null ? null
+                : AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), scattered.getMultibuilding());
+        int width = multiBuilding == null ? 1 : multiBuilding.getDimX();
+        int depth = multiBuilding == null ? 1 : multiBuilding.getDimZ();
+        if (width > areaSize || depth > areaSize) {
+            return ScatteredPlan.INVALID;
+        }
+
+        int tlChunkX = areaOriginX + scatteredRandom.nextInt(areaSize - width + 1);
+        int tlChunkZ = areaOriginZ + scatteredRandom.nextInt(areaSize - depth + 1);
         int minheight = Integer.MAX_VALUE;
         int maxheight = Integer.MIN_VALUE;
         int avgheight = 0;
-        for (int x = tlChunkX; x < tlChunkX + w; x++) {
-            for (int z = tlChunkZ; z < tlChunkZ + h; z++) {
+        ChunkHeightmap singleHeightmap = null;
+        for (int x = tlChunkX; x < tlChunkX + width; x++) {
+            for (int z = tlChunkZ; z < tlChunkZ + depth; z++) {
                 ChunkCoord coord = new ChunkCoord(provider.getType(), x, z);
                 if (!isValidScatterBiome(feature, reference, coord)) {
-                    return;
+                    return ScatteredPlan.INVALID;
                 }
                 BuildingInfo tinfo = BuildingInfo.getBuildingInfo(coord, provider);
                 if (avoidScattered(feature, tinfo)) {
-                    return;
+                    return ScatteredPlan.INVALID;
                 }
                 if (reference.isNearHighway()) {
                     if (!Highway.hasHighway(coord.east(), provider, feature.profile) &&
                             !Highway.hasHighway(coord.west(), provider, feature.profile) &&
                             !Highway.hasHighway(coord.north(), provider, feature.profile) &&
                             !Highway.hasHighway(coord.south(), provider, feature.profile)) {
-                        return;
+                        return ScatteredPlan.INVALID;
                     }
                 }
                 ChunkHeightmap hm = feature.getHeightmap(coord, provider.getWorld());
+                if (width == 1 && depth == 1) {
+                    singleHeightmap = hm;
+                }
                 int height = hm.getHeight();
                 hm.calculateAccurateHeight(provider.getWorld(), x, z);
                 if (!reference.isAllowVoid()) {
                     if (!(feature.profile.isDefault() || feature.profile.isCavern())) {
                         // We are in a world that can have void chunks. Check if this chunk is a void chunk
                         if (height <= feature.provider.getWorld().getMinBuildHeight() + 3) {
-                            return;
+                            return ScatteredPlan.INVALID;
                         }
                     }
                 }
@@ -123,27 +149,29 @@ public class Scattered {
         if (reference.getMaxheightdiff() != null) {
             int diff = maxheight - minheight;
             if (diff > reference.getMaxheightdiff()) {
-                return;
+                return ScatteredPlan.INVALID;
             }
         }
 
-        avgheight /= w * h;
-
-        // We need to generate a part of the building
+        avgheight /= width * depth;
+        String singleBuildingName = null;
+        int singleBuildingCount = 0;
         if (multiBuilding == null) {
-            // A single building
             List<String> buildings = scattered.getBuildings();
             if (buildings == null) {
                 throw new RuntimeException("Missing buildings for scattered '" + reference.getName() + "'!");
             }
-            String buildingName;
+            singleBuildingCount = buildings.size();
             if (buildings.size() == 1) {
-                buildingName = buildings.get(0);
+                singleBuildingName = buildings.get(0);
             } else {
-                buildingName = buildings.get(scatteredRandom.nextInt(buildings.size()));
+                singleBuildingName = buildings.get(scatteredRandom.nextInt(buildings.size()));
             }
-            Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
-            int lowestLevel = handleScatteredTerrain(feature, scattered, info.coord, heightmap);
+        }
+
+        int lowestLevel;
+        if (multiBuilding == null) {
+            lowestLevel = handleScatteredTerrain(feature, scattered, selectionCoord, singleHeightmap);
             if (lowestLevel < -4000) {
                 LostCityProfile profile = feature.provider.getProfile();
                 if (profile.isCavern()) {
@@ -152,19 +180,15 @@ public class Scattered {
                     lowestLevel = provider.getWorld().getMinBuildHeight() + 2;  // @todo is this right?
                 }
             }
-            generateScatteredBuilding(feature, info, building, scatteredRandom, lowestLevel, scattered.getTerrainfix());
         } else {
-            int lowestLevel = handleScatteredTerrainMulti(feature, scattered, info.coord, minheight, maxheight, avgheight);
-            int relx = chunkX - tlChunkX;
-            int relz = chunkZ - tlChunkZ;
-            String buildingName = multiBuilding.getBuilding(relx, relz);
-            Building building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
-            generateScatteredBuilding(feature, info, building, scatteredRandom, lowestLevel, scattered.getTerrainfix());
+            lowestLevel = handleScatteredTerrainMulti(feature, scattered, selectionCoord, minheight, maxheight, avgheight);
         }
+        return new ScatteredPlan(true, randomSeed, selection.randomBound(), areaSize, width, depth, tlChunkX, tlChunkZ,
+                lowestLevel, singleBuildingCount, singleBuildingName, scattered, multiBuilding);
     }
 
     @Nullable
-    private static ScatteredReference selectRandomScattered(LostCityTerrainFeature feature, BuildingInfo info, ScatteredSettings scatteredSettings, Random rand) {
+    private static ScatteredSelection selectRandomScattered(LostCityTerrainFeature feature, ChunkCoord selectionCoord, ScatteredSettings scatteredSettings, Random rand) {
         List<ScatteredReference> list = scatteredSettings.getList();
         if (list.isEmpty()) {
             return null;
@@ -173,7 +197,7 @@ public class Scattered {
         int totalweight = 0;
         List<ScatteredReference> filteredList = new ArrayList<>();
         for (ScatteredReference reference : list) {
-            if (isValidScatterBiome(feature, reference, info.coord)) {
+            if (isValidScatterBiome(feature, reference, selectionCoord)) {
                 totalweight += reference.getWeight();
                 filteredList.add(reference);
             }
@@ -182,7 +206,8 @@ public class Scattered {
             return null;
         }
 
-        int rndweight = rand.nextInt(totalweight + scatteredSettings.getWeightnone());
+        int randomBound = totalweight + scatteredSettings.getWeightnone();
+        int rndweight = rand.nextInt(randomBound);
         ScatteredReference reference = null;
         for (ScatteredReference scatteredReference : filteredList) {
             int weight = scatteredReference.getWeight();
@@ -192,7 +217,7 @@ public class Scattered {
             }
             rndweight -= weight;
         }
-        return reference;
+        return new ScatteredSelection(reference, randomBound);
     }
 
     private static boolean isValidScatterBiome(LostCityTerrainFeature feature, ScatteredReference reference, ChunkCoord coord) {
@@ -241,7 +266,7 @@ public class Scattered {
                     return biome.unwrap().map(ResourceKey::location, b -> provider.getWorld().registryAccess().registryOrThrow(Registries.BIOME).getKey(b));
                 }
             };
-            ChunkDriver driver = feature.driver;
+            ChunkDriver driver = feature.getDriver();
             BlockState air = Blocks.AIR.defaultBlockState();
             BlockState liquid = feature.liquid;
             String randomPart = building.getRandomPart(rand, conditionContext);
@@ -309,5 +334,32 @@ public class Scattered {
         };
         lowestLevel += scattered.getHeightoffset();
         return lowestLevel;
+    }
+
+    private record ScatteredPlanKey(ResourceKey<Level> dimension, long seed, int areaX, int areaZ) {
+    }
+
+    private record ScatteredSelection(@Nullable ScatteredReference reference, int randomBound) {
+    }
+
+    private record ScatteredPlan(boolean valid, long randomSeed, int selectionBound, int areaSize,
+                                 int width, int depth, int tlChunkX, int tlChunkZ, int lowestLevel,
+                                 int singleBuildingCount, @Nullable String singleBuildingName,
+                                 @Nullable ScatteredBuilding scattered, @Nullable MultiBuilding multiBuilding) {
+
+        private static final ScatteredPlan INVALID = new ScatteredPlan(false, 0L, 0, 0,
+                0, 0, 0, 0, 0, 0, null, null, null);
+
+        private QualityRandom createGenerationRandom() {
+            QualityRandom random = new QualityRandom(randomSeed);
+            random.nextFloat();
+            random.nextInt(selectionBound);
+            random.nextInt(areaSize - width + 1);
+            random.nextInt(areaSize - depth + 1);
+            if (singleBuildingCount > 1) {
+                random.nextInt(singleBuildingCount);
+            }
+            return random;
+        }
     }
 }

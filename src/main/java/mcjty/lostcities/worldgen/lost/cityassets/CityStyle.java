@@ -80,6 +80,7 @@ public class CityStyle implements ILostCityCityStyle {
     private String style;
     private final String inherit;
     private boolean resolveInherit = false;
+    private volatile boolean initialized = false;
 
     public CityStyle(CityStyleRE object) {
         name = object.getRegistryName();
@@ -321,7 +322,13 @@ public class CityStyle implements ILostCityCityStyle {
 
     @Override
     public void init(CommonLevelAccessor level) {
-        if (!resolveInherit) {
+        if (initialized) {
+            return;
+        }
+        synchronized (this) {
+            if (initialized || resolveInherit) {
+                return;
+            }
             resolveInherit = true;
             if (inherit != null) {
                 CityStyle inheritFrom = AssetRegistries.CITYSTYLES.getOrThrow(level, inherit);
@@ -426,6 +433,7 @@ public class CityStyle implements ILostCityCityStyle {
                     sphereGlassBlock = inheritFrom.sphereGlassBlock;
                 }
             }
+            initialized = true;
         }
     }
 

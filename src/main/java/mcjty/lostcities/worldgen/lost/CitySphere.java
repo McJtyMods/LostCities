@@ -9,19 +9,21 @@ import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedCity;
 import mcjty.lostcities.worldgen.lost.cityassets.PredefinedSphere;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CitySphere implements ILostSphere {
 
-    private static final Map<ChunkCoord, CitySphere> CITY_SPHERE_CACHE = new HashMap<>();
+    private static final Map<ChunkCoord, CitySphere> CITY_SPHERE_CACHE = new ConcurrentHashMap<>();
+    private static final Map<ResourceKey<Level>, Object> DIMENSION_LOCKS = new ConcurrentHashMap<>();
 
     public static final CitySphere EMPTY = new CitySphere(new ChunkCoord(Level.OVERWORLD, 0, 0), 0.0f, new BlockPos(0, 0, 0), false);
 
@@ -445,33 +447,36 @@ public class CitySphere implements ILostSphere {
      * spheres that are disabled so always test for that! If this returns EMPTY there is no sphere at all
      */
     @Nonnull
-    public static synchronized CitySphere getCitySphere(ChunkCoord coord, IDimensionInfo provider) {
-        AssetRegistries.loadPredefinedStuff(provider.getWorld());
-        if (!CITY_SPHERE_CACHE.containsKey(coord)) {
-            for (PredefinedSphere predef : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
-                if (predef.getDimension() == provider.getType()) {
-                    if (intersectChunkWithSphere(coord.chunkX(), coord.chunkZ(), predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
-                        ChunkCoord center = new ChunkCoord(provider.getType(), predef.getChunkX(), predef.getChunkZ());
-                        CitySphere sphere = getSphereAtCenter(center, provider, predef);
-                        updateCache(coord, sphere);
-                        return sphere;
+    public static CitySphere getCitySphere(ChunkCoord coord, IDimensionInfo provider) {
+        Object dimensionLock = DIMENSION_LOCKS.computeIfAbsent(coord.dimension(), key -> new Object());
+        synchronized (dimensionLock) {
+            AssetRegistries.loadPredefinedStuff(provider.getWorld());
+            if (!CITY_SPHERE_CACHE.containsKey(coord)) {
+                for (PredefinedSphere predef : AssetRegistries.PREDEFINED_SPHERES.getIterable()) {
+                    if (predef.getDimension() == provider.getType()) {
+                        if (intersectChunkWithSphere(coord.chunkX(), coord.chunkZ(), predef.getRadius(), new BlockPos(predef.getCenterX(), 0, predef.getCenterZ()))) {
+                            ChunkCoord center = new ChunkCoord(provider.getType(), predef.getChunkX(), predef.getChunkZ());
+                            CitySphere sphere = getSphereAtCenter(center, provider, predef);
+                            updateCache(coord, sphere);
+                            return sphere;
+                        }
                     }
                 }
-            }
 
-            CitySphere sphere;
-            if (provider.getProfile().CITYSPHERE_ONLY_PREDEFINED) {
-                sphere = EMPTY;
+                CitySphere sphere;
+                if (provider.getProfile().CITYSPHERE_ONLY_PREDEFINED) {
+                    sphere = EMPTY;
+                } else {
+                    int cx = (coord.chunkX() & ~0xf) + 8;
+                    int cz = (coord.chunkZ() & ~0xf) + 8;
+                    ChunkCoord center = new ChunkCoord(provider.getType(), cx, cz);
+                    sphere = getSphereAtCenter(center, provider, null);
+                }
+                updateCache(coord, sphere);
+                return sphere;
             } else {
-                int cx = (coord.chunkX() & ~0xf) + 8;
-                int cz = (coord.chunkZ() & ~0xf) + 8;
-                ChunkCoord center = new ChunkCoord(provider.getType(), cx, cz);
-                sphere = getSphereAtCenter(center, provider, null);
+                return CITY_SPHERE_CACHE.get(coord);
             }
-            updateCache(coord, sphere);
-            return sphere;
-        } else {
-            return CITY_SPHERE_CACHE.get(coord);
         }
     }
 
