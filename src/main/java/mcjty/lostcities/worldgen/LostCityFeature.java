@@ -32,7 +32,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
      * the player exits the world. That is then used to help clear this cache
      */
     private final Map<ResourceKey<Level>, IDimensionInfo> dimensionInfo = new HashMap<>();
-    public static int globalDimensionInfoDirtyCounter = 0;
+    public static volatile int globalDimensionInfoDirtyCounter = 0;
     private int dimensionInfoDirtyCounter = -1;
 
     public LostCityFeature() {
@@ -43,7 +43,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     private static long totalCnt = 0;
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
+    public synchronized boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
         WorldGenLevel level = context.level();
         if (level instanceof WorldGenRegion) {
             IDimensionInfo diminfo = getDimensionInfo(level);
@@ -73,7 +73,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     }
 
     @Nullable
-    public IDimensionInfo getDimensionInfo(WorldGenLevel world) {
+    public synchronized IDimensionInfo getDimensionInfo(WorldGenLevel world) {
         if (globalDimensionInfoDirtyCounter != dimensionInfoDirtyCounter) {
             // Force clear of cache
             cleanUp();
@@ -95,7 +95,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
         return null;
     }
 
-    public void cleanUp() {
+    public synchronized void cleanUp() {
         LostCities.lostCitiesImp.cleanUp();
         ForgeEventHandlers.cleanUp();
         AssetRegistries.reset();
