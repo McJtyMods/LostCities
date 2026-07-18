@@ -5,7 +5,7 @@
 - Reworked world generation for safe multithreading. Non-overlapping chunks and different dimensions can generate concurrently while nearby chunks and lifecycle cleanup remain protected
 - Made world-generation caches, random sources, asset lookup, todo processing, and per-chunk scratch state concurrency-safe
 - Added developer documentation for city generation and world-generation thread safety
-- Fixed a bug in the code to check if a chunk has a blacklisted structure. It would sometimes fail to detect a structure
+- Fixed bugs in blacklisted-structure checks that could miss structures or fail on structure references without registry keys
 
 1.20-7.4.13:
 - TqLxQuanZ fixed an issue where multibuilding do not spawn when railway is below.

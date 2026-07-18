@@ -444,7 +444,7 @@ public class LostCityTerrainFeature {
                         }
                     }
                     if (center || Config.AVOID_STRUCTURES_ADJACENT.get()) {
-                        if (Config.isAvoidedStructure(key.get().location())) {
+                        if (key.map(k -> Config.isAvoidedStructure(k.location())).orElse(false)) {
                             return true;
                         }
                     }
