@@ -7,7 +7,7 @@
 - Fixed scattered multibuildings sometimes generating only partially. Their complete placement and validity are now decided once for the entire scattered area
 - Reworked world generation for safe multithreading. Non-overlapping chunks and different dimensions can generate concurrently while nearby chunks and lifecycle cleanup remain protected
 - Made world-generation caches, random sources, asset lookup, todo processing, and per-chunk scratch state concurrency-safe
-- Added developer documentation for city generation and world-generation thread safety
+- Added developer documentation for custom asset expansions, city generation, and world-generation thread safety
 - Fixed bugs in blacklisted-structure checks that could miss structures or fail on structure references without registry keys
 
 1.20-7.4.13:
