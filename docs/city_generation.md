@@ -593,12 +593,13 @@ LostCityTerrainFeature.generate(chunk)
     |
     +-- BuildingInfo.getBuildingInfo(chunk)
     |      |
-    |      +-- decide whether this is a city chunk
+    |      +-- decide raw city membership
     |      +-- reserve predefined/random multi-buildings
+    |      +-- reject chunks or whole multibuilding footprints covered by structure/village avoidance
     |      +-- decide building versus street/park
     |      +-- select city style, building asset, levels and details
     |
-    +-- reject city generation for some structures or floating void chunks
+    +-- reject floating void chunks when configured
     |
     +-- city? ---- yes ---> doCityChunk()
     |                         +-- hasBuilding -> generateBuilding()
@@ -618,6 +619,19 @@ Relevant entry points:
   `src/main/java/mcjty/lostcities/worldgen/lost/BuildingInfo.java`
 - `Scattered.calculatePlan()` in
   `src/main/java/mcjty/lostcities/worldgen/gen/Scattered.java`
+
+Structure and village avoidance is resolved while chunk characteristics are
+being built, before `BuildingInfo.isCity`, building/street selection, and other
+derived city state are finalized. The resolver only reads
+`STRUCTURE_REFERENCES` from the active `WorldGenRegion`; it never asks the
+server chunk cache to load or generate another chunk. A characteristics or
+building-info request can also happen speculatively for a coordinate whose
+required references are outside that region. Such an unknown result is not
+cached, so generation can calculate the final avoidance decision once that
+coordinate has the required references. Multibuildings are checked atomically
+across their complete footprint and the configured adjacent margin. They are
+generated only when that entire area is known to be clear, so avoidance cannot
+cut off only part of a random or predefined multibuilding.
 
 ## 1. Deciding whether a chunk belongs to a city
 

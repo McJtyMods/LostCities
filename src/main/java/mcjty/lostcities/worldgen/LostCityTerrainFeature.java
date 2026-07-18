@@ -24,7 +24,6 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.StructureTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
@@ -37,11 +36,9 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
-import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
@@ -287,17 +284,6 @@ public class LostCityTerrainFeature {
 
         boolean doCity = info.isCity || (info.outsideChunk && info.hasBuilding);
 
-        // Check if there is no village or other structure here. We don't do this for multibuildings because otherwise part of the multibuilding might be cut off
-        AvoidChunk avoidChunk = AvoidChunk.NO;
-        if (!info.multiBuildingPos.isMulti()) {
-            avoidChunk = hasBlacklistedStructure(region, chunkX, chunkZ);
-            if (avoidChunk != AvoidChunk.NO) {
-                doCity = false;
-                info.isCity = false;
-                BuildingInfo.setCityRaw(coord, provider, false);
-            }
-        }
-
         // If this chunk has a building or street but we're in a floating profile and
         // we happen to have a void chunk we detect that here and go back to normal chunk generation
         // anyway
@@ -310,7 +296,7 @@ public class LostCityTerrainFeature {
             doCityChunk(info, heightmap, chunk);
         } else {
             // We already have a prefilled core chunk (as generated from doCoreChunk)
-            doNormalChunk(info, heightmap, avoidChunk);
+            doNormalChunk(info, heightmap);
         }
 
         if (profile.isSpace() || profile.isSpheres()) {
@@ -391,70 +377,6 @@ public class LostCityTerrainFeature {
         }
     }
 
-    public enum AvoidChunk {
-        NO,
-        YES,
-        ADJACENT
-    }
-
-    private static AvoidChunk hasBlacklistedStructure(WorldGenLevel level, int chunkX, int chunkZ) {
-        boolean doAdjacent = Config.AVOID_VILLAGES_ADJACENT.get() || Config.AVOID_STRUCTURES_ADJACENT.get();
-        if (doAdjacent || Config.AVOID_VILLAGES.get() || Config.hasAvoidedStructures()) {
-            if (doAdjacent) {
-                boolean couldBeUnknown = false;
-                for (int dx = -1; dx <= 1; dx++) {
-                    for (int dz = -1; dz <= 1; dz++) {
-                        if (level.hasChunk(chunkX + dx, chunkZ + dz)) {
-                            ChunkAccess ch = level.getChunk(chunkX + dx, chunkZ + dz, ChunkStatus.STRUCTURE_REFERENCES);
-                            if (testBlacklistedStructure(level, ch, chunkX == 0 && chunkZ == 0)) {
-                                return (dx == 0 && dz == 0) ? AvoidChunk.YES : AvoidChunk.ADJACENT;
-                            }
-                        } else {
-                            couldBeUnknown = true;
-                        }
-                    }
-                    if (couldBeUnknown) {
-                        return AvoidChunk.NO;  // If we have unknown chunks we assume it is ok
-                    }
-                }
-            } else {
-                if (level.hasChunk(chunkX, chunkZ)) {
-                    ChunkAccess ch = level.getChunk(chunkX, chunkZ, ChunkStatus.STRUCTURE_REFERENCES);
-                    return testBlacklistedStructure(level, ch, true) ? AvoidChunk.YES : AvoidChunk.NO;
-                } else {
-                    return AvoidChunk.NO; // If we have unknown chunks we assume it is ok
-                }
-            }
-        }
-        return AvoidChunk.NO;
-    }
-
-    private static boolean testBlacklistedStructure(WorldGenLevel level, ChunkAccess ch, boolean center) {
-        if (ch.hasAnyStructureReferences()) {
-            var structures = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
-            var references = ch.getAllReferences();
-            for (var entry : references.entrySet()) {
-                if (!entry.getValue().isEmpty()) {
-                    Optional<ResourceKey<Structure>> key = structures.getResourceKey(entry.getKey());
-                    if (Config.AVOID_VILLAGES.get()) {
-                        if (center || Config.AVOID_VILLAGES_ADJACENT.get()) {
-                            if (key.map(k -> structures.getHolderOrThrow(k).is(StructureTags.VILLAGE)).orElse(false)) {
-                                return true;
-                            }
-                        }
-                    }
-                    if (center || Config.AVOID_STRUCTURES_ADJACENT.get()) {
-                        if (key.map(k -> Config.isAvoidedStructure(k.location())).orElse(false)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-
     private void fixTorches(BuildingInfo info) {
         List<BlockPos> torches = info.getTorchTodo();
         if (torches.isEmpty()) {
@@ -482,9 +404,9 @@ public class LostCityTerrainFeature {
         info.clearTorchTodo();
     }
 
-    private void doNormalChunk(BuildingInfo info, ChunkHeightmap heightmap, AvoidChunk avoidChunk) {
+    private void doNormalChunk(BuildingInfo info, ChunkHeightmap heightmap) {
 //        debugClearChunk(chunkX, chunkZ, primer);
-        if ((avoidChunk != AvoidChunk.YES || !Config.AVOID_FLATTENING.get()) && (profile.isDefault() || profile.isVoidSpheres())) {
+        if ((!info.hasDirectStructureAvoidance() || !Config.AVOID_FLATTENING.get()) && (profile.isDefault() || profile.isVoidSpheres())) {
             correctTerrainShape(provider.getWorld(), info.coord, heightmap);
 //            flattenChunkToCityBorder(chunkX, chunkZ);
         }

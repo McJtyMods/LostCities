@@ -29,6 +29,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
@@ -161,6 +162,7 @@ public class BuildingInfo implements ILostChunkInfo {
     private static final Map<ResourceKey<Level>, Object> MEMOIZATION_LOCKS = new ConcurrentHashMap<>();
 
     private final Object memoizationLock;
+    private final StructureAvoidance.Result structureAvoidance;
 
     public void addTorchTodo(BlockPos index) {
         torchTodo.add(index);
@@ -311,6 +313,10 @@ public class BuildingInfo implements ILostChunkInfo {
         return (l + cellars) >= 0 && (l + cellars) < floorTypes.length;
     }
 
+    public boolean hasDirectStructureAvoidance() {
+        return structureAvoidance == StructureAvoidance.Result.DIRECT;
+    }
+
     public BuildingPart getFloor(int l) {
         return floorTypes[l + cellars];
     }
@@ -377,6 +383,13 @@ public class BuildingInfo implements ILostChunkInfo {
             characteristics.multiBuilding = null;
         } else {
             initMultiBuildingSection(characteristics, coord, provider, profile);
+        }
+
+        StructureAvoidance.Result structureAvoidance = StructureAvoidance.check(coord, characteristics.multiPos, world);
+        boolean avoidCity = structureAvoidance.avoidsCity()
+                || (characteristics.multiPos.isMulti() && world instanceof WorldGenRegion && !structureAvoidance.isKnown());
+        if (avoidCity) {
+            characteristics.isCity = false;
         }
 
         if (characteristics.multiPos.isSingle()) {
@@ -461,15 +474,20 @@ public class BuildingInfo implements ILostChunkInfo {
         LostCityEvent.CharacteristicsEvent event = new LostCityEvent.CharacteristicsEvent(world, LostCities.lostCitiesImp,
                 chunkX, chunkZ, characteristics);
         MinecraftForge.EVENT_BUS.post(event);
+        // Structure avoidance used to run after the complete BuildingInfo (and therefore after
+        // this event) had been created. Keep it authoritative while moving the decision earlier.
+        if (avoidCity) {
+            characteristics.isCity = false;
+            characteristics.couldHaveBuilding = false;
+        }
 
-        CITY_INFO_MAP.put(coord, characteristics);
+        // Building information is sometimes requested speculatively for chunks outside the part
+        // of the active WorldGenRegion that has structure references. Do not let such a provisional
+        // city decision become the permanent cached result for that chunk.
+        if (structureAvoidance.isKnown()) {
+            CITY_INFO_MAP.put(coord, characteristics);
+        }
         return characteristics;
-    }
-
-    // Change city status
-    public static void setCityRaw(ChunkCoord coord, IDimensionInfo provider, boolean isCity) {
-        LostChunkCharacteristics characteristics = getChunkCharacteristics(coord, provider);
-        characteristics.isCity = isCity;
     }
 
     /**
@@ -689,7 +707,9 @@ public class BuildingInfo implements ILostChunkInfo {
                 return info;
             }
             info = new BuildingInfo(key, provider);
-            BUILDING_INFO_MAP.put(key, info);
+            if (info.structureAvoidance.isKnown()) {
+                BUILDING_INFO_MAP.put(key, info);
+            }
             return info;
         }
     }
@@ -781,6 +801,8 @@ public class BuildingInfo implements ILostChunkInfo {
 
         LostChunkCharacteristics characteristics = getChunkCharacteristics(key, provider);
 
+        structureAvoidance = StructureAvoidance.check(coord, characteristics.multiPos, provider.getWorld());
+
         cityLevel = characteristics.cityLevel;
         buildingType = characteristics.buildingType;
         multiBuilding = characteristics.multiBuilding;
@@ -804,7 +826,11 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         boolean c = characteristics.isCity;
-        if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.isCitySphereCenter(coord, provider)) {
+        if (!structureAvoidance.avoidsCity()
+                && (characteristics.multiPos.isSingle() || structureAvoidance.isKnown()
+                    || !(provider.getWorld() instanceof WorldGenRegion))
+                && (provider.getProfile().isSpace() || provider.getProfile().isSpheres())
+                && CitySphere.isCitySphereCenter(coord, provider)) {
             CitySphereSettings settings = provider.getWorldStyle().getCitysphereSettings();
             if (settings != null) {
                 CitySphereSettings.CitySphereCenterType centertype = settings.getCenterType();
