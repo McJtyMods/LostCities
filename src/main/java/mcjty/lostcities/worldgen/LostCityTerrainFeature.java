@@ -405,7 +405,7 @@ public class LostCityTerrainFeature {
                 for (int dx = -1; dx <= 1; dx++) {
                     for (int dz = -1; dz <= 1; dz++) {
                         if (level.hasChunk(chunkX + dx, chunkZ + dz)) {
-                            ChunkAccess ch = level.getChunk(chunkX + dx, chunkZ + dx, ChunkStatus.STRUCTURE_REFERENCES);
+                            ChunkAccess ch = level.getChunk(chunkX + dx, chunkZ + dz, ChunkStatus.STRUCTURE_REFERENCES);
                             if (testBlacklistedStructure(level, ch, chunkX == 0 && chunkZ == 0)) {
                                 return (dx == 0 && dz == 0) ? AvoidChunk.YES : AvoidChunk.ADJACENT;
                             }
