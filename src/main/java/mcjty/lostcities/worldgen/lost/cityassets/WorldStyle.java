@@ -94,6 +94,10 @@ public class WorldStyle implements ILostCityAsset {
 
     public float getCityChanceMultiplier(IDimensionInfo provider, ChunkCoord coord) {
         Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, coord).getMainBiome();
+        return getCityChanceMultiplier(biome);
+    }
+
+    public float getCityChanceMultiplier(Holder<Biome> biome) {
         for (Pair<Predicate<Holder<Biome>>, Float> pair : cityBiomeMultiplier) {
             if (pair.getLeft().test(biome)) {
                 return pair.getRight();

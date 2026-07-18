@@ -8,12 +8,18 @@ import java.util.Random;
 /**
  * Remote, deterministic city-potential approximation for highway planning.
  *
- * This deliberately omits terrain heights, biomes, structures, city spheres,
- * predefined assets and final BuildingInfo decisions. For ordinary profiles it
- * reproduces the coordinate-based city-center/radius overlap and spawn-distance
- * multiplier. Noise-city profiles use the same CityRarityMap calculation.
+ * For ordinary profiles this reproduces the coordinate-based city-center/radius
+ * overlap and spawn-distance multiplier. Noise-city profiles use the same
+ * CityRarityMap calculation. An optional modifier can apply deterministic
+ * generator-aware constraints such as terrain height and biome multipliers
+ * without introducing dependencies on BuildingInfo or final city decisions.
  */
 public final class ApproximateCityPotential implements CityPotential {
+
+    @FunctionalInterface
+    public interface Modifier {
+        float modify(int chunkX, int chunkZ, float potential);
+    }
 
     private final double cityChance;
     private final int cityMinRadius;
@@ -23,8 +29,13 @@ public final class ApproximateCityPotential implements CityPotential {
     private final double spawnMultiplier1;
     private final double spawnMultiplier2;
     private final CityRarityMap rarityMap;
+    private final Modifier modifier;
 
     public ApproximateCityPotential(long seed, LostCityProfile profile) {
+        this(seed, profile, (chunkX, chunkZ, potential) -> potential);
+    }
+
+    public ApproximateCityPotential(long seed, LostCityProfile profile, Modifier modifier) {
         cityChance = profile.CITY_CHANCE;
         cityMinRadius = profile.CITY_MINRADIUS;
         cityMaxRadius = profile.CITY_MAXRADIUS;
@@ -35,6 +46,7 @@ public final class ApproximateCityPotential implements CityPotential {
         rarityMap = cityChance < 0
                 ? new CityRarityMap(seed, profile.CITY_PERLIN_SCALE, profile.CITY_PERLIN_OFFSET, profile.CITY_PERLIN_INNERSCALE)
                 : null;
+        this.modifier = modifier;
     }
 
     @Override
@@ -55,6 +67,7 @@ public final class ApproximateCityPotential implements CityPotential {
             }
             factor *= (float) multiplier;
         }
+        factor = modifier.modify(chunkX, chunkZ, factor);
         return Math.min(Math.max(factor, 0.0f), 1.0f);
     }
 

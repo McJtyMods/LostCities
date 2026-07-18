@@ -59,16 +59,30 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         style = AssetRegistries.WORLDSTYLES.get(world, profile.getWorldStyle());
         streetGenerationMode = LostCityWorldGenData.get(world.getLevel()).getStreetMode(world.getLevel().dimension(), profile.STREET_GENERATION_MODE);
         streetPlanner = new HierarchicalStreetPlanner(world.getSeed(), world.getLevel().dimension().location().toString(), StreetPlannerSettings.fromProfile(profile));
-        highwayGenerationMode = LostCityWorldGenData.get(world.getLevel()).getHighwayMode(world.getLevel().dimension(), profile.HIGHWAY_GENERATION_MODE);
-        highwayPlanner = highwayGenerationMode == HighwayGenerationMode.INTERCITY_NETWORK_V1
-                ? new IntercityHighwayPlanner(world.getSeed(), world.getLevel().dimension().location().toString(),
-                    HighwayPlannerSettings.fromProfile(profile), new ApproximateCityPotential(world.getSeed(), profile))
-                : null;
         random = ThreadLocal.withInitial(() -> new Random(seed));
         RandomSource randomSource = new LegacyRandomSource(world.getSeed());
         feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
+        highwayGenerationMode = LostCityWorldGenData.get(world.getLevel()).getHighwayMode(world.getLevel().dimension(), profile.HIGHWAY_GENERATION_MODE);
+        highwayPlanner = highwayGenerationMode == HighwayGenerationMode.INTERCITY_NETWORK_V1
+                ? new IntercityHighwayPlanner(world.getSeed(), world.getLevel().dimension().location().toString(),
+                    HighwayPlannerSettings.fromProfile(profile),
+                    new ApproximateCityPotential(world.getSeed(), profile, this::applyHighwayCityConstraints))
+                : null;
         biomeRegistry = world.registryAccess().registryOrThrow(Registries.BIOME);
+    }
+
+    private float applyHighwayCityConstraints(int chunkX, int chunkZ, float potential) {
+        if (potential <= 0.0001f) {
+            return potential;
+        }
+        ChunkCoord coord = new ChunkCoord(type, chunkX, chunkZ);
+        int height = getHeightmap(coord).getHeight();
+        if (height < profile.CITY_MINHEIGHT || height > profile.CITY_MAXHEIGHT) {
+            return 0.0f;
+        }
+        Holder<Biome> biome = getBiome(new BlockPos((chunkX << 4) + 8, height, (chunkZ << 4) + 8));
+        return potential * style.getCityChanceMultiplier(biome);
     }
 
     @Override

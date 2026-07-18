@@ -522,9 +522,9 @@ public class LostCityProfile implements ILostCityProfile {
         HIGHWAY_PLANNING_CELL_SIZE = cfg.getInt("highwayPlanningCellSize", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_PLANNING_CELL_SIZE,
                 32, 512, "Size in chunks of one INTERCITY_NETWORK_V1 hub-planning cell");
         HIGHWAY_HUB_SAMPLE_SPACING = cfg.getInt("highwayHubSampleSpacing", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_HUB_SAMPLE_SPACING,
-                1, 512, "Chunk spacing of deterministic approximate-city samples inside a highway planning cell");
+                1, 512, "Chunk spacing of deterministic city-potential samples inside a highway planning cell");
         HIGHWAY_HUB_MINIMUM_POTENTIAL = cfg.getFloat("highwayHubMinimumPotential", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_HUB_MINIMUM_POTENTIAL,
-                0.0f, 1.0f, "Minimum approximate city-potential score required to create a highway hub");
+                0.0f, 1.0f, "Minimum height- and biome-adjusted city-potential score required to create a highway hub");
         HIGHWAY_HUB_SEARCH_RADIUS_CELLS = cfg.getInt("highwayHubSearchRadiusCells", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_HUB_SEARCH_RADIUS_CELLS,
                 0, 8, "Bounded planning-cell radius in which a highway hub considers other hubs");
         HIGHWAY_MINIMUM_HUB_DISTANCE = cfg.getInt("highwayMinimumHubDistance", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MINIMUM_HUB_DISTANCE,

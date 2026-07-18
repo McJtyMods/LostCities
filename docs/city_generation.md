@@ -358,16 +358,20 @@ for every coordinate-seeded city center in that range:
 
 For `CITY_CHANCE < 0`, it uses `CityRarityMap` with the world seed and the
 profile's Perlin scale, inner scale and offset. The existing spawn-distance
-multiplier is then applied and the result is clamped to `[0,1]`.
+multiplier is then applied. Server-side planning next calculates the terrain
+height at the sample's chunk center without loading or generating the chunk.
+Samples outside `CITY_MINHEIGHT` through `CITY_MAXHEIGHT` are rejected. The
+generator's noise biome is sampled at that center height and the matching world
+style `citybiomemultipliers` value is applied. The result is finally clamped to
+`[0,1]`.
 
-This approximation intentionally omits generated heightmaps, biome-dependent
-world-style multipliers, final profile switching, generated structures,
-city-sphere geometry and predefined assets. Those inputs either require world
-state or pass through higher-level code which already depends on highways.
-Consequently a hub means "likely substantial city area", not "this exact chunk
-will be a final city chunk". Existing city-sphere intersection exclusion is
-still applied later by the mode-aware `Highway` facade as a hard rendering
-constraint; it is not allowed to alter the canonical planned route.
+The approximation still intentionally omits final profile switching, generated
+structures, city-sphere geometry, predefined assets and final `BuildingInfo`
+decisions. Those inputs either require generated world state or pass through
+higher-level code which already depends on highways. Existing city-sphere
+intersection exclusion is still applied later by the mode-aware `Highway`
+facade as a hard rendering constraint; it is not allowed to alter the canonical
+planned route.
 
 ### Planning cells and hubs
 
@@ -501,8 +505,8 @@ their signatures, so all existing consumers use one occupancy decision:
   validation and supports remain shared and unchanged.
 
 The planner never truncates an accepted route based on later city membership.
-Routes run hub-to-hub even when exact endpoint chunks are weaker than the hub
-approximation expected.
+Routes run hub-to-hub; the endpoint height and biome checks prevent ordinary
+terrain exclusions from leaving a route without its expected city.
 
 ### Highway profile settings and compatibility categories
 
@@ -535,21 +539,22 @@ Nothing is logged during normal generation.
 
 ### V1 limitations and phase-2 boundary
 
-- Hubs approximate city regions rather than exact final cities.
+- Hubs approximate city regions rather than exact final cities, but their
+  terrain height and biome multiplier are validated.
 - Routes connect hub positions, not city-edge gateways, and may cross endpoint
   cities.
 - Routes have at most one bend; the existing crossing part renders that bend.
-- Terrain-aware routing is absent; only approximate city-interior penalty is
-  considered.
+- Terrain-aware route-path scoring is absent; only endpoint city constraints
+  and approximate city-interior penalty are considered.
 - Routes do not merge into shared trunks and have no detailed parallel-route
   suppression beyond degree and sector limits.
 - Elevation is fixed for the entire connection.
 - Gateways are not aligned to hierarchical primary streets.
-- Exact biome, height, water and unrelated-city avoidance is deferred.
+- Route-interior water and unrelated-city avoidance is deferred.
 
 Phase 2 should move endpoints to city-edge gateways aligned with hierarchical
-primary streets, strengthen city-interior penalties, score terrain and water,
-and suppress or merge close parallel routes.
+primary streets, strengthen city-interior penalties, score route terrain and
+water, and suppress or merge close parallel routes.
 
 ## Deterministic scattered-area generation
 
