@@ -184,6 +184,7 @@ public class LostCityProfile implements ILostCityProfile {
     public float BUILDING_FRONTCHANCE = .2f;
 
     public float PARK_CHANCE = .2f;
+    public float OPEN_LOT_PARK_CHANCE = .8f;
     public float CORRIDOR_CHANCE = .7f;
     public float BRIDGE_CHANCE = .7f;
     public float PLANNED_PRIMARY_BRIDGE_CHANCE = 1.0f;
@@ -398,6 +399,8 @@ public class LostCityProfile implements ILostCityProfile {
         BUILDING_DOORWAYCHANCE = cfg.getFloat("buildingDoorwayChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_DOORWAYCHANCE, 0.0f, 1.0f, "The chance that a doorway will be generated at a side of a building (on any level). Only when possible");
         BUILDING_FRONTCHANCE = cfg.getFloat("buildingFrontChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_FRONTCHANCE, 0.0f, 1.0f, "The chance that a building will have a 'front' part if this is possible (i.e. adjacent street)");
         PARK_CHANCE = cfg.getFloat("parkChance", LostCityProfile.CATEGORY_LOSTCITY, PARK_CHANCE, 0.0f, 1.0f, "The chance that a non-building section can be a park section");
+        OPEN_LOT_PARK_CHANCE = cfg.getFloat("openLotParkChance", LostCityProfile.CATEGORY_LOSTCITY, OPEN_LOT_PARK_CHANCE, 0.0f, 1.0f,
+                "The chance that a hierarchical open lot gets a park part");
 
         CORRIDOR_CHANCE = cfg.getFloat("corridorChance", LostCityProfile.CATEGORY_LOSTCITY, CORRIDOR_CHANCE, 0.0f, 1.0f, "The chance that a chunk can possibly contain a corridor. " +
                 "There actually being a corridor also depends on the presence of adjacent corridors");

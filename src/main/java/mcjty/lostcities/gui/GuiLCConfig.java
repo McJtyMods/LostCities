@@ -236,6 +236,7 @@ public class GuiLCConfig extends Screen {
         nl();
 
         addFloat(left,"lostcity.parkChance").label("Parks:"); nl();
+        addFloat(left,"lostcity.openLotParkChance").label("Open lot parks:"); nl();
         addFloat(left,"lostcity.fountainChance").label("Fountains:"); nl();
     }
 

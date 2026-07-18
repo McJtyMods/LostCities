@@ -915,11 +915,11 @@ public class BuildingInfo implements ILostChunkInfo {
                 parkType = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), cs.getRandomPark(rand, this.coord));
             } else if (hierarchicalOpen) {
                 // Failed building rolls become bounded grass open lots, not an
-                // implicit dense road network. PARK_CHANCE only adds a park asset.
+                // implicit dense road network. The hierarchical-specific chance
+                // only decides whether the lot receives a park asset.
                 streetType = StreetType.PARK;
                 fountainType = null;
-                float parkChance = cs.getParkChance() != null ? cs.getParkChance() : profile.PARK_CHANCE;
-                parkType = rand.nextDouble() < parkChance
+                parkType = rand.nextDouble() < profile.OPEN_LOT_PARK_CHANCE
                         ? AssetRegistries.PARTS.getOrWarn(provider.getWorld(), cs.getRandomPark(rand, this.coord))
                         : null;
             } else {

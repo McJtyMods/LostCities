@@ -262,9 +262,12 @@ use an empty list to disable connector overlays for a city style.
 
 When a non-road city chunk fails its ordinary building roll or a later building
 veto, it becomes a grass open lot rendered through the existing park surface.
-The existing `PARK_CHANCE` only decides whether a park part is placed in that
-lot. It does not turn the lot into a road. This prevents failed building rolls
-from recreating the old dense random street network.
+The hierarchical `OPEN_LOT_PARK_CHANCE`, which defaults to `0.8`, decides
+whether a weighted park part is placed in that lot. It does not turn the lot
+into a road. This prevents failed building rolls from recreating the old dense
+random street network while keeping most open areas visually varied. The
+legacy `PARK_CHANCE` and city-style `parkchance` override do not affect
+hierarchical open lots.
 
 Predefined streets remain normal streets. Same-level highways and surface
 stations can still suppress ordinary street surface rendering through the
@@ -781,10 +784,12 @@ See `src/main/java/mcjty/lostcities/worldgen/lost/MultiChunk.java` and
 
 ## 4. Streets versus parks
 
-Only a city chunk without a building reaches the street renderer. Park selection
-has two stages, which is easy to miss when reading only the initial random test.
+Only a city chunk without a building reaches the street renderer. Legacy park
+selection has two stages, which is easy to miss when reading only the initial
+random test. Hierarchical generation handles planned roads and open lots
+separately as described below.
 
-### Stage A: nominate a park
+### Legacy stage A: nominate a park
 
 While constructing the top-left or single chunk's `BuildingInfo`, the code uses
 the city style's `parkChance`, falling back to `profile.PARK_CHANCE`:
@@ -797,7 +802,7 @@ otherwise            -> NORMAL (with the current enum bound)
 The style also supplies a weighted park part asset. Fountain selection is an
 independent chance and can decorate a non-park street.
 
-### Stage B: require a sufficiently open neighborhood
+### Legacy stage B: require a sufficiently open neighborhood
 
 `generateStreet()` calls `isElevatedParkSection()`. A nominated park is accepted
 only when at least `parkStreetThreshold` of the eight surrounding chunks are
@@ -819,6 +824,17 @@ path as currently written.
 Thus `PARK_CHANCE` is a nomination probability, not by itself the final
 probability of seeing a park. Parks are biased toward larger open regions rather
 than isolated holes between buildings.
+
+### Hierarchical open lots
+
+In `HIERARCHICAL_GRID_V1`, planned and predefined streets remain normal streets.
+Other non-building city chunks become grass open lots and retain the `PARK`
+street type so that they use the park surface rather than reconstructing the
+legacy road network. `OPEN_LOT_PARK_CHANCE` independently controls whether an
+open lot receives a weighted park part; its default is `0.8`. It is a profile
+setting and is intentionally not overridden by a city style's legacy
+`parkchance` value. A style with no eligible park parts still produces a plain
+grass lot.
 
 The three final street types mean:
 

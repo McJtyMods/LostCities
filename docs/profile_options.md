@@ -82,7 +82,7 @@ Options are grouped into five objects. Properties may be omitted, in which case 
 | `buildingMaxCellars` | `3` (0–20) | Maximum cellar count. |
 | `buildingDoorwayChance` | `0.6` (0–1) | Chance per possible building side and level to create a doorway. |
 | `buildingFrontChance` | `0.2` (0–1) | Chance to use a building's front part when it can face an adjacent street. |
-| `parkChance` | `0.2` (0–1) | Chance that an eligible non-building city section is a park. |
+| `parkChance` | `0.2` (0–1) | Chance that an eligible non-building city section is a park in legacy street generation. |
 | `parkElevation` | `true` | Adds an elevation layer to parks. |
 | `parkBorder` | `true` | Uses the street block as the base of a park border. |
 | `parkStreetThreshold` | `3` (0–8) | Required surrounding-street count for park generation, in addition to `parkChance`. |
@@ -115,6 +115,7 @@ These options other than `streetGenerationMode` apply to `HIERARCHICAL_GRID_V1`.
 | Option | Default / values | Meaning |
 | --- | --- | --- |
 | `streetGenerationMode` | `HIERARCHICAL_GRID_V1` | `LEGACY` or `HIERARCHICAL_GRID_V1`. |
+| `openLotParkChance` | `0.8` (0–1) | Chance that a hierarchical grass open lot receives a weighted park part. City-style `parkchance` does not override this value. |
 | `primaryRoadSpacingX` | `8` (8–128) | Chunk spacing between candidate north/south primary corridors. |
 | `primaryRoadSpacingZ` | `8` (8–128) | Chunk spacing between candidate east/west primary corridors. |
 | `primaryRoadOptionalChance` | `0.45` (0–1) | Chance to enable a candidate primary corridor that is not forced. |
