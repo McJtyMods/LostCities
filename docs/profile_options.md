@@ -116,20 +116,22 @@ These options other than `streetGenerationMode` apply to `HIERARCHICAL_GRID_V1`.
 | --- | --- | --- |
 | `streetGenerationMode` | `HIERARCHICAL_GRID_V1` | `LEGACY` or `HIERARCHICAL_GRID_V1`. |
 | `openLotParkChance` | `0.8` (0–1) | Chance that a hierarchical grass open lot receives a weighted park part. City-style `parkchance` does not override this value. |
-| `primaryRoadSpacingX` | `8` (8–128) | Chunk spacing between candidate north/south primary corridors. |
-| `primaryRoadSpacingZ` | `8` (8–128) | Chunk spacing between candidate east/west primary corridors. |
-| `primaryRoadOptionalChance` | `0.45` (0–1) | Chance to enable a candidate primary corridor that is not forced. |
-| `primaryRoadForceEvery` | `4` (1–16) | Forces every Nth candidate primary corridor to limit gaps. |
+| `primaryRoadSpacingX` | `8` (8–128) | Number of chunks between candidate north/south primary corridors (lines at fixed X coordinates). A candidate is not necessarily enabled. |
+| `primaryRoadSpacingZ` | `8` (8–128) | Number of chunks between candidate east/west primary corridors (lines at fixed Z coordinates). A candidate is not necessarily enabled. |
+| `primaryRoadOptionalChance` | `0.45` (0–1) | Independent chance that each non-forced candidate becomes an actual primary corridor. `0` omits all non-forced candidates; `1` enables every candidate. |
+| `primaryRoadForceEvery` | `4` (1–16) | Enables every Nth candidate on both axes regardless of `primaryRoadOptionalChance`. Thus the maximum separation between enabled primary corridors is N × the corresponding spacing. A value of `1` enables every candidate. |
 | `secondaryRoadMinCountX` | `0` (0–8) | Minimum internal north/south secondary roads in each primary block. |
 | `secondaryRoadMaxCountX` | `2` (0–8) | Maximum internal north/south secondary roads. Must be at least the minimum. |
 | `secondaryRoadMinCountZ` | `0` (0–8) | Minimum internal east/west secondary roads. |
 | `secondaryRoadMaxCountZ` | `2` (0–8) | Maximum internal east/west secondary roads. Must be at least the minimum. |
-| `minimumRoadSeparation` | `4` (2–32) | Minimum chunk distance between parallel secondary roads. |
+| `minimumRoadSeparation` | `4` (2–32) | Minimum chunk distance between parallel secondary roads selected within the same primary block. It does not constrain tertiary roads. |
 | `minimumRoadEdgeDistance` | `3` (2–32) | Minimum chunk distance from a secondary road to its bounding primary road. |
 | `tertiaryRoadChance` | `0.4` (0–1) | Chance that a subdivided block gets one short tertiary access road. |
 | `tertiaryRoadMinLength` | `2` (1–16) | Minimum tertiary-road length in chunks. |
 | `tertiaryRoadMaxLength` | `5` (1–32) | Maximum tertiary-road length; must be at least the minimum. |
 | `multiBuildingStreetConflict` | `OVERRIDE_MINOR` | Planned-road policy for random multi-buildings: `BLOCK_ALL` lets every road block them; `OVERRIDE_MINOR` lets only primary roads block them; `OVERRIDE_ALL` lets multi-buildings replace any road. Ignored in legacy mode. |
+
+Primary-road spacing first creates a regular set of *candidate* corridors. `primaryRoadOptionalChance` randomly but deterministically enables non-forced candidates, while `primaryRoadForceEvery` guarantees that the gaps cannot grow indefinitely. For example, with both spacing values set to `12` and `primaryRoadForceEvery` also set to `12`, candidates occur every 12 chunks, but only every twelfth candidate is guaranteed: forced corridors are 144 chunks apart. Optional candidates between them may become corridors according to `primaryRoadOptionalChance`. The spacing and force values would describe the same interval only when `primaryRoadForceEvery` is `1`.
 
 ### Highways
 
