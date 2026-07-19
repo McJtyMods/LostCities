@@ -920,7 +920,8 @@ public class LostCityTerrainFeature {
         int levelZ = info.getHighwayZLevel();
         if (!building) {
             Railway.RailChunkInfo railInfo = info.getRailInfo();
-            if (levelX < 0 && levelZ < 0 && !railInfo.getType().isSurface()) {
+            if (levelX < 0 && levelZ < 0 && !railInfo.getType().isSurface()
+                    && info.getStreetSlopeDirection() == null) {
                 generateStreetDecorations(info);
             }
         }
@@ -1184,6 +1185,7 @@ public class LostCityTerrainFeature {
 
         if (canDoStreetOrPark) {
             int height = info.getCityGroundLevel();
+            Direction streetSlopeDirection = info.getStreetSlopeDirection();
             // In default landscape type we clear the landscape on top of the building
 //            if (profile.isDefault()) {
 //                clearToMax(info, heightmap, height);
@@ -1214,13 +1216,19 @@ public class LostCityTerrainFeature {
             }
 
             switch (streetType) {
-                case NORMAL -> generateNormalStreetSection(info, height);
+                case NORMAL -> {
+                    if (streetSlopeDirection == null) {
+                        generateNormalStreetSection(info, height);
+                    } else {
+                        generateStreetSlopeSection(info, height, streetSlopeDirection);
+                    }
+                }
                 case FULL -> generateFullStreetSection(info, height);
                 case PARK -> generateParkSection(info, height, elevated);
             }
             height++;
 
-            if (streetType == BuildingInfo.StreetType.PARK || info.fountainType != null) {
+            if (streetSlopeDirection == null && (streetType == BuildingInfo.StreetType.PARK || info.fountainType != null)) {
                 BuildingPart part;
                 if (streetType == BuildingInfo.StreetType.PARK) {
                     part = info.parkType;
@@ -1232,12 +1240,14 @@ public class LostCityTerrainFeature {
                 }
             }
 
-            generateRandomVegetation(info, height);
+            if (streetSlopeDirection == null) {
+                generateRandomVegetation(info, height);
 
-            generateFrontPart(info, height, info.getXmin(), Transform.ROTATE_NONE);
-            generateFrontPart(info, height, info.getZmin(), Transform.ROTATE_90);
-            generateFrontPart(info, height, info.getXmax(), Transform.ROTATE_180);
-            generateFrontPart(info, height, info.getZmax(), Transform.ROTATE_270);
+                generateFrontPart(info, height, info.getXmin(), Transform.ROTATE_NONE);
+                generateFrontPart(info, height, info.getZmin(), Transform.ROTATE_90);
+                generateFrontPart(info, height, info.getXmax(), Transform.ROTATE_180);
+                generateFrontPart(info, height, info.getZmax(), Transform.ROTATE_270);
+            }
         }
 
         generateBorders(info, canDoStreetOrPark, heightmap);
@@ -1575,6 +1585,14 @@ public class LostCityTerrainFeature {
         }
     }
 
+    private void generateStreetSlopeSection(BuildingInfo info, int height, Direction slopeDirection) {
+        StreetParts parts = getStreetParts(info);
+        BuildingPart part = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), getRandomPart(parts.stair()));
+        if (part != null) {
+            generatePart(info, part, slopeDirection.getRotation(), 0, height, 0, HardAirSetting.VOID);
+        }
+    }
+
     private void generateNormalStreetSection(BuildingInfo info, int height) {
         StreetParts parts = getStreetParts(info);
         boolean xmin = hasStreetPartConnection(info, info.getXmin(), info.getXmin().hasXBridge(provider) != null);
@@ -1684,6 +1702,27 @@ public class LostCityTerrainFeature {
         for (Direction direction : Direction.VALUES) {
             if (direction.atSide(x, z)) {
                 BuildingInfo adjacent = direction.get(info);
+                if (adjacent.getStreetSlopeDirection() == direction.getOpposite()) {
+                    StreetParts slopeParts = getStreetParts(adjacent);
+                    if (!slopeParts.stair().isEmpty()) {
+                        BuildingPart slope = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), slopeParts.stair().get(0));
+                        if (slope != null) {
+                            Integer z1 = slope.getMetaInteger(ILostCities.META_Z_1);
+                            Integer z2 = slope.getMetaInteger(ILostCities.META_Z_2);
+                            if (z1 != null && z2 != null) {
+                                Transform transform = direction.getOpposite().getRotation();
+                                int xx1 = transform.rotateX(15, z1);
+                                int zz1 = transform.rotateZ(15, z1);
+                                int xx2 = transform.rotateX(15, z2);
+                                int zz2 = transform.rotateZ(15, z2);
+                                if (x >= Math.min(xx1, xx2) && x <= Math.max(xx1, xx2)
+                                        && z >= Math.min(zz1, zz2) && z <= Math.max(zz1, zz2)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
                 if (adjacent.getActualStairDirection() == direction.getOpposite()) {
                     BuildingPart stairType = adjacent.stairType;
                     if (stairType != null) {

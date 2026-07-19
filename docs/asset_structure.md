@@ -528,7 +528,9 @@ Nested setting fields:
 - `sphereblocks`: `inner`, `border`, `glass` (palette characters).
 - `streetblocks`: `fountainchance`, `frontchance` (floats), `width` (integer), `street`, `streetbase`, `streetvariant`, `border`, `wall` (palette characters), plus `parts` and `largeparts`.
 
-Modern streets are part-driven. `streetblocks.parts` and `largeparts` each accept `full`, `straight`, `end`, `bend`, `t`, `none`, `all`, and `connector`. Every field accepts either one part ID or a list of part IDs; a list gives deterministic visual variants. Omitted fields use the built-in names (`street_full`, `street_straight`, and so on). `largeparts` is used by hierarchical wide roads.
+Modern streets are part-driven. `streetblocks.parts` and `largeparts` each accept `full`, `straight`, `end`, `bend`, `t`, `none`, `all`, `connector`, and `stair`. Every field accepts either one part ID or a list of part IDs; a list gives deterministic visual variants. Omitted fields use the built-in names (`street_full`, `street_straight`, and so on). `largeparts` is used by hierarchical wide roads.
+
+`stair` is the full-chunk sloped minor-road part used only by hierarchical street generation when two eligible road levels differ by one building floor. Its unrotated form rises toward X-min. Set the part's `z1` and `z2` metadata to the inclusive road-width bounds at its high edge; the renderer uses those bounds to open the retaining wall in the neighboring upper chunk. All alternatives in a `stair` list should use the same bounds. The built-in `street_stair` rises six blocks across the chunk with alternating full-block and slab steps.
 
 `selectors` accepts these optional lists:
 

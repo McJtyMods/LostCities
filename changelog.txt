@@ -1,4 +1,5 @@
 1.20-7.5.0:
+- Added full-chunk sloped streets that connect eligible hierarchical minor roads across a one-level height difference without placing obstructing street features
 - Applied village and configured-structure avoidance before city chunk details are derived, including atomic whole-footprint avoidance for multibuildings
 - Added versioned hierarchical street generation with primary, secondary, and tertiary roads, wider primary-road parts, connectors, and deterministic large bridges
 - Added a separate openLotParkChance profile option, defaulting to 0.8, so hierarchical open lots use varied park parts more often without changing legacy park frequency

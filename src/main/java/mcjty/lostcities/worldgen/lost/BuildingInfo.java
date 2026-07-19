@@ -1401,6 +1401,58 @@ public class BuildingInfo implements ILostChunkInfo {
         return predefinedStreet;
     }
 
+    /**
+     * Return the higher edge of a full-chunk street slope, or {@code null} when
+     * this chunk should retain its ordinary flat street part. Slopes are kept
+     * deliberately narrow in scope: only hierarchical minor roads with a
+     * straight, same-level approach and departure can use them.
+     */
+    public Direction getStreetSlopeDirection() {
+        if (provider.getStreetGenerationMode() != StreetGenerationMode.HIERARCHICAL_GRID_V1
+                || !doesRoadExtendTo() || isPrimaryRoad()) {
+            return null;
+        }
+
+        Direction slopeDirection = null;
+        for (Direction direction : Direction.VALUES) {
+            BuildingInfo adjacent = direction.get(this);
+            if (adjacent.doesRoadExtendTo() && !adjacent.isPrimaryRoad()
+                    && adjacent.cityLevel == cityLevel + 1) {
+                if (slopeDirection != null) {
+                    return null;
+                }
+                slopeDirection = direction;
+            }
+        }
+        if (slopeDirection == null) {
+            return null;
+        }
+
+        BuildingInfo upper = slopeDirection.get(this);
+        BuildingInfo approach = slopeDirection.getOpposite().get(this);
+        if (!approach.doesRoadExtendTo() || approach.isPrimaryRoad() || approach.cityLevel != cityLevel) {
+            return null;
+        }
+        BuildingInfo departure = slopeDirection.get(upper);
+        if (!departure.doesRoadExtendTo() || departure.isPrimaryRoad() || departure.cityLevel != upper.cityLevel) {
+            return null;
+        }
+
+        for (Direction direction : Direction.VALUES) {
+            if (direction != slopeDirection && direction != slopeDirection.getOpposite()) {
+                BuildingInfo side = direction.get(this);
+                if (side.doesRoadExtendTo() && side.cityLevel == cityLevel) {
+                    return null;
+                }
+                BuildingInfo upperSide = direction.get(upper);
+                if (upperSide.doesRoadExtendTo() && upperSide.cityLevel == upper.cityLevel) {
+                    return null;
+                }
+            }
+        }
+        return slopeDirection;
+    }
+
     public boolean isElevatedParkSection() {
         if (!isStreetOrParkSection() || (streetType != StreetType.PARK)) {
             return false;
@@ -1427,7 +1479,9 @@ public class BuildingInfo implements ILostChunkInfo {
     private Direction calculateStairDirection() {
         if (!stairsCalculated) {
             stairsCalculated = true;
-            if (streetType != StreetType.PARK && !hasBuilding && isCity) {
+            if (getStreetSlopeDirection() != null) {
+                stairDirection = null;
+            } else if (streetType != StreetType.PARK && !hasBuilding && isCity) {
                 if (cityLevel == getXmin().cityLevel - 1 && !getXmin().hasBuilding && getXmin().isCity) {
                     stairDirection = Direction.XMIN;
                 } else if (cityLevel == getXmax().cityLevel - 1 && !getXmax().hasBuilding && getXmax().isCity) {
@@ -1753,11 +1807,13 @@ public class BuildingInfo implements ILostChunkInfo {
         if (!i2.doesRoadExtendTo()) {
             return false;
         }
-        if (Math.abs(i1.cityLevel - i2.cityLevel) <= 0 /* @todo temporary, should be <= 1 */) {
-            // We allow a road difference of 1 maximum
+        if (i1.cityLevel == i2.cityLevel) {
             return true;
         }
-        return false;
+        Direction slope1 = i1.getStreetSlopeDirection();
+        Direction slope2 = i2.getStreetSlopeDirection();
+        return slope1 != null && slope1.get(i1).coord.equals(i2.coord)
+                || slope2 != null && slope2.get(i2).coord.equals(i1.coord);
     }
 
     public static Random getBuildingRandom(int chunkX, int chunkZ, long seed) {

@@ -260,6 +260,19 @@ road's otherwise untouched outer row, closing the verge gap without adding a
 quartz marking. A datapack can replace it, provide a list of alternatives, or
 use an empty list to disable connector overlays for a city style.
 
+Hierarchical minor roads can also bridge a one-level city-height difference
+with the full-chunk `stair` street part. The lower road chunk becomes a slope
+only when it has exactly one minor road one level higher, same-level minor roads
+continuing directly behind and beyond the transition, and no same-level side-road
+branches at either end. This keeps bends and intersections flat and avoids
+ambiguous slopes. The upper road includes the slope in its topology, so it
+continues to the chunk edge instead of ending. Its retaining wall is opened
+only across the stair part's `z1`/`z2` bounds.
+Primary roads and legacy street generation do not use this rule. Fountain and
+park parts, random vegetation, building-front overlays, and the older narrow
+stair decoration are suppressed on a sloped street chunk so that its route
+remains clear.
+
 When a non-road city chunk fails its ordinary building roll or a later building
 veto, it becomes a grass open lot rendered through the existing park surface.
 The hierarchical `OPEN_LOT_PARK_CHANCE`, which defaults to `0.8`, decides
