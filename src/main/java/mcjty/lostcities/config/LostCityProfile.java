@@ -432,13 +432,13 @@ public class LostCityProfile implements ILostCityProfile {
         PRIMARY_ROAD_FORCE_EVERY = cfg.getInt("primaryRoadForceEvery", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_FORCE_EVERY,
                 1, 16, "Force every Nth candidate primary-road corridor to cap the maximum gap");
         SECONDARY_ROAD_MIN_COUNT_X = cfg.getInt("secondaryRoadMinCountX", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MIN_COUNT_X,
-                0, 8, "Minimum internal north/south secondary roads in a primary block");
+                0, 128, "Minimum internal north/south secondary roads in a primary block");
         SECONDARY_ROAD_MAX_COUNT_X = cfg.getInt("secondaryRoadMaxCountX", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MAX_COUNT_X,
-                0, 8, "Maximum internal north/south secondary roads in a primary block");
+                0, 128, "Maximum internal north/south secondary roads in a primary block");
         SECONDARY_ROAD_MIN_COUNT_Z = cfg.getInt("secondaryRoadMinCountZ", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MIN_COUNT_Z,
-                0, 8, "Minimum internal east/west secondary roads in a primary block");
+                0, 128, "Minimum internal east/west secondary roads in a primary block");
         SECONDARY_ROAD_MAX_COUNT_Z = cfg.getInt("secondaryRoadMaxCountZ", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MAX_COUNT_Z,
-                0, 8, "Maximum internal east/west secondary roads in a primary block");
+                0, 128, "Maximum internal east/west secondary roads in a primary block");
         MINIMUM_ROAD_SEPARATION = cfg.getInt("minimumRoadSeparation", LostCityProfile.CATEGORY_LOSTCITY, MINIMUM_ROAD_SEPARATION,
                 2, 32, "Minimum chunk distance between parallel secondary roads");
         MINIMUM_ROAD_EDGE_DISTANCE = cfg.getInt("minimumRoadEdgeDistance", LostCityProfile.CATEGORY_LOSTCITY, MINIMUM_ROAD_EDGE_DISTANCE,
@@ -472,9 +472,9 @@ public class LostCityProfile implements ILostCityProfile {
                 || PLANNED_PRIMARY_BRIDGE_MAX_LENGTH < 1 || PLANNED_PRIMARY_BRIDGE_MAX_LENGTH > 64) {
             throw new IllegalArgumentException("Invalid planned primary bridge chance or maximum length");
         }
-        if (SECONDARY_ROAD_MIN_COUNT_X < 0 || SECONDARY_ROAD_MAX_COUNT_X > 8
-                || SECONDARY_ROAD_MIN_COUNT_Z < 0 || SECONDARY_ROAD_MAX_COUNT_Z > 8) {
-            throw new IllegalArgumentException("Secondary road counts must be between 0 and 8");
+        if (SECONDARY_ROAD_MIN_COUNT_X < 0 || SECONDARY_ROAD_MAX_COUNT_X > 128
+                || SECONDARY_ROAD_MIN_COUNT_Z < 0 || SECONDARY_ROAD_MAX_COUNT_Z > 128) {
+            throw new IllegalArgumentException("Secondary road counts must be between 0 and 128");
         }
         if (MINIMUM_ROAD_SEPARATION < 2 || MINIMUM_ROAD_SEPARATION > 32
                 || MINIMUM_ROAD_EDGE_DISTANCE < 2 || MINIMUM_ROAD_EDGE_DISTANCE > 32) {
