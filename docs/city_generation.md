@@ -643,11 +643,14 @@ derived city state are finalized. The resolver only reads
 server chunk cache to load or generate another chunk. A characteristics or
 building-info request can also happen speculatively for a coordinate whose
 required references are outside that region. Such an unknown result is not
-cached, so generation can calculate the final avoidance decision once that
-coordinate has the required references. Multibuildings are checked atomically
-across their complete footprint and the configured adjacent margin. They are
-generated only when that entire area is known to be clear, so avoidance cannot
-cut off only part of a random or predefined multibuilding.
+cached for an ordinary chunk, so generation can calculate the final avoidance
+decision once that coordinate has the required references. Multibuildings
+instead commit one shared immutable decision for their complete footprint and
+configured adjacent margin. A visible avoided structure rejects the complete
+footprint. If no avoided structure is visible, the footprint is allowed even
+when some references are unavailable, preserving the earlier fail-open
+behavior without cutting off individual chunks of a random or predefined
+multibuilding.
 
 ## 1. Deciding whether a chunk belongs to a city
 

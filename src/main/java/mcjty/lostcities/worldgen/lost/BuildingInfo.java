@@ -698,6 +698,7 @@ public class BuildingInfo implements ILostChunkInfo {
         BUILDING_INFO_MAP.clear();
         CITY_INFO_MAP.clear();
         CITY_LEVEL_CACHE.clear();
+        StructureAvoidance.cleanCache();
     }
 
     public static BuildingInfo getBuildingInfo(ChunkCoord key, IDimensionInfo provider) {

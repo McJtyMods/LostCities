@@ -819,6 +819,7 @@ Lost Cities includes operator commands that can shorten the part-design loop:
 
 - `/lostcities createpart <part-id> <x y z>` materializes an already loaded part at a position and starts an editing session.
 - `/lostcities createbuilding <building-id> <floors> <cellars> <x y z>` previews an already loaded building. It clears the target chunk from the supplied Y coordinate upward, so use it only in a disposable test world.
+- `/lostcities debug` writes the current chunk's generation details to the server console, including both its individual building type and containing multibuilding name when applicable.
 - `/lostcities editpart`, `resumeedit`, `listparts`, and `locatepart` help work with parts generated in a profile whose `editMode` is enabled.
 - `/lostcities exportpart <filename>` writes the current edit to the server working directory. Its output is an aid, not a directly loadable asset: copy the `exportedpart` object into the part's JSON file and merge any entries under `missingpalette` into a palette.
 

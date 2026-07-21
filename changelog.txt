@@ -1,4 +1,6 @@
 1.20-7.5.0:
+- Fixed large multibuildings being cut off when their complete structure-avoidance footprint was not available during chunk generation
+- The `/lostcities debug` command now reports the containing multibuilding name
 - Increased the configurable secondary-road count limit from 8 to 128 for large hierarchical primary blocks
 - Added full-chunk sloped streets that connect eligible hierarchical minor roads across a one-level height difference without placing obstructing street features
 - Applied village and configured-structure avoidance before city chunk details are derived, including atomic whole-footprint avoidance for multibuildings
