@@ -192,7 +192,8 @@ public final class IntercityHighwayPlanner {
                 long distanceSquared = deltaX * deltaX + deltaZ * deltaZ;
                 int routeLength = Math.toIntExact(Math.abs(deltaX) + Math.abs(deltaZ));
                 if (distanceSquared < minimumSquared || distanceSquared > maximumSquared
-                        || routeLength < settings.minimumRouteLength()) {
+                        || routeLength < settings.minimumRouteLength()
+                        || !hasRailwayClearRoute(source, target)) {
                     continue;
                 }
                 HighwayConnectionKey key = HighwayConnectionKey.of(sourceKey, targetKey);
@@ -274,10 +275,14 @@ public final class IntercityHighwayPlanner {
         List<HighwaySegment> verticalFirst = List.of(
                 new HighwaySegment(first.chunkX(), first.chunkZ(), first.chunkX(), second.chunkZ(), HighwayAxis.Z),
                 new HighwaySegment(first.chunkX(), second.chunkZ(), second.chunkX(), second.chunkZ(), HighwayAxis.X));
+        boolean horizontalClear = isRailwayClear(horizontalFirst);
+        boolean verticalClear = isRailwayClear(verticalFirst);
         long horizontalPenalty = routePenalty(horizontalFirst, first, second);
         long verticalPenalty = routePenalty(verticalFirst, first, second);
         boolean chooseHorizontal;
-        if (horizontalPenalty != verticalPenalty) {
+        if (horizontalClear != verticalClear) {
+            chooseHorizontal = horizontalClear;
+        } else if (horizontalPenalty != verticalPenalty) {
             chooseHorizontal = horizontalPenalty < verticalPenalty;
         } else {
             chooseHorizontal = (hash(ROUTE_SHAPE_SALT, key.first().planningCellX(), key.first().planningCellZ(),
@@ -289,6 +294,41 @@ public final class IntercityHighwayPlanner {
                 chooseHorizontal ? HighwayRoute.RouteShape.HORIZONTAL_THEN_VERTICAL : HighwayRoute.RouteShape.VERTICAL_THEN_HORIZONTAL,
                 length,
                 chooseHorizontal ? horizontalPenalty : verticalPenalty);
+    }
+
+    private boolean hasRailwayClearRoute(HighwayHub first, HighwayHub second) {
+        if (first.chunkZ() == second.chunkZ()) {
+            return isRailwayClear(List.of(new HighwaySegment(first.chunkX(), first.chunkZ(),
+                    second.chunkX(), second.chunkZ(), HighwayAxis.X)));
+        }
+        if (first.chunkX() == second.chunkX()) {
+            return isRailwayClear(List.of(new HighwaySegment(first.chunkX(), first.chunkZ(),
+                    second.chunkX(), second.chunkZ(), HighwayAxis.Z)));
+        }
+        List<HighwaySegment> horizontalFirst = List.of(
+                new HighwaySegment(first.chunkX(), first.chunkZ(), second.chunkX(), first.chunkZ(), HighwayAxis.X),
+                new HighwaySegment(second.chunkX(), first.chunkZ(), second.chunkX(), second.chunkZ(), HighwayAxis.Z));
+        List<HighwaySegment> verticalFirst = List.of(
+                new HighwaySegment(first.chunkX(), first.chunkZ(), first.chunkX(), second.chunkZ(), HighwayAxis.Z),
+                new HighwaySegment(first.chunkX(), second.chunkZ(), second.chunkX(), second.chunkZ(), HighwayAxis.X));
+        return isRailwayClear(horizontalFirst) || isRailwayClear(verticalFirst);
+    }
+
+    /**
+     * Subways occupy a fixed ten-chunk grid. Crossing one of those lines is safe because the
+     * railway is underground, but sharing its chunk line can make a station or descent replace
+     * the highway. Keep parallel highway segments off the corresponding railway corridors.
+     */
+    private static boolean isRailwayClear(List<HighwaySegment> segments) {
+        for (HighwaySegment segment : segments) {
+            if (segment.axis() == HighwayAxis.X && Math.floorMod(segment.startZ() + 1, 10) == 0) {
+                return false;
+            }
+            if (segment.axis() == HighwayAxis.Z && Math.floorMod(segment.startX() + 1, 10) == 5) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** Builds canonical V1 geometry for an already accepted hub pair. */

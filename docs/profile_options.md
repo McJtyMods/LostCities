@@ -151,7 +151,7 @@ Secondary-road counts are requests rather than guarantees. If a primary block ca
 | `highwaySupports` | `true` | Generates supports where needed; disable for highways spanning void. |
 | `highwayPlanningCellSize` | `128` (32–512) | Planning-cell size in chunks for the intercity network. |
 | `highwayHubSampleSpacing` | `16` (1–512) | Chunk spacing between deterministic city-potential samples in a cell; cannot exceed planning-cell size. Samples include terrain-height and biome-multiplier checks. |
-| `highwayHubMinimumPotential` | `0.35` (0–1) | Minimum height- and biome-adjusted city-potential score needed to create a hub. |
+| `highwayHubMinimumPotential` | `0.25` (0–1) | Minimum height- and biome-adjusted city-potential score needed to create a hub. |
 | `highwayHubSearchRadiusCells` | `2` (0–8) | Planning-cell radius in which a hub considers other hubs. |
 | `highwayMinimumHubDistance` | `64` (0–4096) | Minimum Euclidean distance in chunks between connected hubs. |
 | `highwayMaximumHubDistance` | `320` (0–4096) | Maximum connected-hub distance; cannot be below the minimum. |

@@ -70,7 +70,7 @@ public class LostCityProfile implements ILostCityProfile {
     public HighwayGenerationMode HIGHWAY_GENERATION_MODE = HighwayGenerationMode.INTERCITY_NETWORK_V1;
     public int HIGHWAY_PLANNING_CELL_SIZE = 128;
     public int HIGHWAY_HUB_SAMPLE_SPACING = 16;
-    public float HIGHWAY_HUB_MINIMUM_POTENTIAL = .35f;
+    public float HIGHWAY_HUB_MINIMUM_POTENTIAL = .25f;
     public int HIGHWAY_HUB_SEARCH_RADIUS_CELLS = 2;
     public int HIGHWAY_MINIMUM_HUB_DISTANCE = 64;
     public int HIGHWAY_MAXIMUM_HUB_DISTANCE = 320;

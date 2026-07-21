@@ -409,7 +409,7 @@ so a normal cell evaluates at most 8x8 points. Potentials are quantized to an
 integer millionth before comparison. The highest score wins; equal scores use
 an unsigned stable sample hash and then the fixed scan order. No hub is created
 unless the winning score is at least `highwayHubMinimumPotential` (default
-0.35). The chosen coordinate is always inside its planning cell.
+0.25). The chosen coordinate is always inside its planning cell.
 
 ### Candidate connections, sectors and symmetric acceptance
 
@@ -473,6 +473,14 @@ same-level bidirectional highway part, which is the closest available V1 asset
 and can visually resemble a full crossing. A dedicated bend asset is future
 work.
 
+The regular subway grid reserves its parallel chunk lines during route
+selection. Horizontal highway segments cannot use the subway's repeating
+horizontal line, and vertical segments cannot use its repeating vertical line.
+Crossing a subway line remains valid because the underground track has vertical
+clearance. For a non-aligned hub pair, an otherwise valid canonical L-shape
+wins automatically when the other shape would share a subway line. If both
+shapes would do so, that hub pair is excluded from connection candidates.
+
 Every connection uses the fixed `highwayNetworkLevel` (default zero) for its
 entire length. This is intentionally less exact than consulting endpoint
 `BuildingInfo`, but it prevents a dependency cycle and guarantees that remote
@@ -531,7 +539,7 @@ terrain exclusions from leaving a route without its expected city.
 | `highwayGenerationMode` | `INTERCITY_NETWORK_V1` for new worlds |
 | `highwayPlanningCellSize` | 128 chunks |
 | `highwayHubSampleSpacing` | 16 chunks |
-| `highwayHubMinimumPotential` | 0.35 |
+| `highwayHubMinimumPotential` | 0.25 |
 | `highwayHubSearchRadiusCells` | 2 cells |
 | `highwayMinimumHubDistance` | 64 chunks |
 | `highwayMaximumHubDistance` | 320 chunks |
@@ -566,7 +574,8 @@ Nothing is logged during normal generation.
   suppression beyond degree and sector limits.
 - Elevation is fixed for the entire connection.
 - Gateways are not aligned to hierarchical primary streets.
-- Route-interior water and unrelated-city avoidance is deferred.
+- Route-interior water and unrelated-city avoidance is deferred. Parallel
+  subway-line avoidance is a hard route constraint.
 
 Phase 2 should move endpoints to city-edge gateways aligned with hierarchical
 primary streets, strengthen city-interior penalties, score route terrain and

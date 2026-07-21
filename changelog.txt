@@ -1,4 +1,6 @@
 1.20-7.5.0:
+- Made inter-city highways more common by allowing lower-potential city regions to form network hubs
+- Prevented inter-city highways from sharing subway lines where stations and descents could block them
 - Fixed large multibuildings being cut off when their complete structure-avoidance footprint was not available during chunk generation
 - The `/lostcities debug` command now reports the containing multibuilding name
 - Increased the configurable secondary-road count limit from 8 to 128 for large hierarchical primary blocks
