@@ -1681,9 +1681,11 @@ public class LostCityTerrainFeature {
     }
 
     private static StreetParts getStreetParts(BuildingInfo info) {
-        return info.isPrimaryRoad()
-                ? info.getCityStyle().getLargeStreetParts()
-                : info.getCityStyle().getStreetParts();
+        return switch (info.plannedRoadType) {
+            case PRIMARY -> info.getCityStyle().getLargeStreetParts();
+            case TERTIARY -> info.getCityStyle().getTertiaryStreetParts();
+            default -> info.getCityStyle().getStreetParts();
+        };
     }
 
     private static boolean hasStreetPartConnection(BuildingInfo info, BuildingInfo adjacent, boolean bridgeConnection) {

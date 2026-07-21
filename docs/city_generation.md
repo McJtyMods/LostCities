@@ -243,8 +243,9 @@ The effective order in hierarchical mode is:
 An effective planned road forces `couldHaveBuilding`/`hasBuilding` false and is
 always assigned `StreetType.NORMAL`; it cannot be nominated as a park. The
 existing street renderer selects its topology from final neighboring road
-classifications. Primary roads use the city style's `largeparts` set; secondary
-and tertiary roads use its existing `parts` set. The built-in large pieces form
+classifications. Primary roads use the city style's `largeparts` set, secondary
+roads use `parts`, and tertiary roads use optional `tertiaryparts`. When
+`tertiaryparts` is omitted it falls back to `parts`. The built-in large pieces form
 a fourteen-block-wide full-height smooth-stone-slab surface, retain the normal
 outermost block on each side, and use two centered rows of smooth quartz. The
 set includes straight, end, bend, T, four-way, isolated and full pieces. Because

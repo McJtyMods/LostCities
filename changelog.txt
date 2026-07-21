@@ -1,4 +1,5 @@
 1.20-7.5.0:
+- Added an optional city-style `tertiaryparts` street asset family, defaulting to the secondary-road `parts` family
 - Made inter-city highways more common by allowing lower-potential city regions to form network hubs
 - Prevented inter-city highways from sharing subway lines where stations and descents could block them
 - Fixed large multibuildings being cut off when their complete structure-avoidance footprint was not available during chunk generation
