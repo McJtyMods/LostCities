@@ -64,11 +64,16 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         feature = new LostCityTerrainFeature(this, profile, randomSource);
         feature.setupStates(profile);
         highwayGenerationMode = LostCityWorldGenData.get(world.getLevel()).getHighwayMode(world.getLevel().dimension(), profile.HIGHWAY_GENERATION_MODE);
-        highwayPlanner = highwayGenerationMode == HighwayGenerationMode.INTERCITY_NETWORK_V1
-                ? new IntercityHighwayPlanner(world.getSeed(), world.getLevel().dimension().location().toString(),
-                    HighwayPlannerSettings.fromProfile(profile),
-                    new ApproximateCityPotential(world.getSeed(), profile, this::applyHighwayCityConstraints))
-                : null;
+        if (highwayGenerationMode == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
+            HighwayPlannerSettings highwaySettings = HighwayPlannerSettings.fromProfile(profile);
+            long cacheSignature = LostCityHighwayData.createCacheSignature(world.getSeed(), profile, highwaySettings, style.getId());
+            highwayPlanner = new IntercityHighwayPlanner(world.getSeed(), world.getLevel().dimension().location().toString(),
+                    highwaySettings,
+                    new ApproximateCityPotential(world.getSeed(), profile, this::applyHighwayCityConstraints),
+                    LostCityHighwayData.get(world.getLevel()).forDimension(world.getLevel().dimension(), cacheSignature));
+        } else {
+            highwayPlanner = null;
+        }
         biomeRegistry = world.registryAccess().registryOrThrow(Registries.BIOME);
     }
 

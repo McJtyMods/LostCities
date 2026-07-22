@@ -37,6 +37,7 @@ public final class IntercityHighwayPlanner {
     private final long dimensionSalt;
     private final HighwayPlannerSettings settings;
     private final CityPotential cityPotential;
+    private final HighwayHubPersistence hubPersistence;
     private final BoundedCache<HubKey, Optional<HighwayHub>> hubCache = new BoundedCache<>(4096);
     private final BoundedCache<HubKey, List<ConnectionCandidate>> candidateCache = new BoundedCache<>(2048);
     private final BoundedCache<HubKey, List<HubKey>> selectionCache = new BoundedCache<>(2048);
@@ -46,10 +47,16 @@ public final class IntercityHighwayPlanner {
 
     public IntercityHighwayPlanner(long seed, String dimensionId, HighwayPlannerSettings settings,
                                    CityPotential cityPotential) {
+        this(seed, dimensionId, settings, cityPotential, HighwayHubPersistence.NONE);
+    }
+
+    public IntercityHighwayPlanner(long seed, String dimensionId, HighwayPlannerSettings settings,
+                                   CityPotential cityPotential, HighwayHubPersistence hubPersistence) {
         this.seed = seed;
         this.dimensionSalt = stableStringHash(dimensionId);
         this.settings = settings;
         this.cityPotential = cityPotential;
+        this.hubPersistence = hubPersistence;
     }
 
     public HighwayPlannerSettings settings() {
@@ -63,11 +70,21 @@ public final class IntercityHighwayPlanner {
 
     public Optional<HighwayHub> getHub(int planningCellX, int planningCellZ) {
         HubKey key = new HubKey(planningCellX, planningCellZ);
-        return hubCache.computeIfAbsent(key, this::calculateHub);
+        return getHub(key);
     }
 
     public Optional<HighwayHub> getHub(HubKey key) {
-        return hubCache.computeIfAbsent(key, this::calculateHub);
+        return hubCache.computeIfAbsent(key, this::loadOrCalculateHub);
+    }
+
+    private Optional<HighwayHub> loadOrCalculateHub(HubKey key) {
+        HighwayHubPersistence.Lookup persisted = hubPersistence.get(key);
+        if (persisted.known()) {
+            return persisted.hub();
+        }
+        Optional<HighwayHub> calculated = calculateHub(key);
+        hubPersistence.put(key, calculated);
+        return calculated;
     }
 
     public List<HighwayHub> getNearbyHubs(int chunkX, int chunkZ) {

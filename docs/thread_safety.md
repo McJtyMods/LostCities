@@ -50,6 +50,13 @@ dimensions. Lazy asset data is constructed completely before volatile
 publication. Cleanup never replaces stable calculation locks while older
 cached objects may still reference them.
 
+Inter-city highway hub decisions also have an overworld `SavedData` backing
+cache. Its dimension maps and dirty-state transitions are synchronized, while
+the expensive terrain and biome calculation happens outside that monitor. The
+planner publishes only the resulting immutable `HighwayHub` or empty-cell
+decision. Never hold the persistence monitor while calculating a hub: one cold
+planning query can sample thousands of remote terrain columns.
+
 Scattered generation has an additional immutable area plan keyed by dimension,
 world seed, and scattered-area coordinates. The plan contains the chosen
 asset, footprint, complete-footprint validity, common height, and building

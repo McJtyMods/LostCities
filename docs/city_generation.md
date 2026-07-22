@@ -56,6 +56,15 @@ to `LEGACY`. If dimension info was requested unusually early during new-world
 startup, the create-spawn handler invalidates that cached info before resolving
 it again.
 
+Inter-city hub results use a separate overworld `SavedData` named
+`LostCityHighwayData`. This is a performance cache rather than mode-selection
+state: it stores the zero-or-one hub result, including an empty result, for each
+evaluated planning cell and dimension. Routes and per-chunk highway occupancy
+remain derived data. A versioned signature covers the world seed, hub settings,
+city-potential profile inputs, terrain-height limits and selected world-style
+ID. A mismatch drops only that dimension's hub cache and lets the planner
+recalculate it.
+
 ## `HIERARCHICAL_GRID_V1` mathematical street field
 
 `HierarchicalStreetPlanner` is a pure global function of world seed, stable
@@ -410,7 +419,9 @@ so a normal cell evaluates at most 8x8 points. Potentials are quantized to an
 integer millionth before comparison. The highest score wins; equal scores use
 an unsigned stable sample hash and then the fixed scan order. No hub is created
 unless the winning score is at least `highwayHubMinimumPotential` (default
-0.25). The chosen coordinate is always inside its planning cell.
+0.25). The chosen coordinate is always inside its planning cell. Both present
+and absent hub decisions are persisted after their first calculation, avoiding
+the terrain-height and biome sampling cost when the world is opened again.
 
 ### Candidate connections, sectors and symmetric acceptance
 
@@ -506,11 +517,14 @@ shared facade and future planners.
 
 Per-planner hub, candidate, selection, owned-route and final-chunk caches are
 synchronized access-order LRU maps with fixed maximum sizes (4096, 2048, 2048,
-2048 and 8192 entries respectively). Settings, seed and dimension do not need
-to appear in individual cache keys because each immutable planner instance is
-scoped to exactly that tuple. Cache eviction or clearing can only recompute the
-same pure value. There is no recursive connection acceptance: neighbour
-selection reads only hubs and ranked candidates, so all work remains bounded.
+2048 and 8192 entries respectively). A hub-cache miss first checks the
+dimension's persistent planning-cell result before performing city-potential,
+height and biome sampling. Settings, seed and dimension do not need to appear
+in individual in-memory cache keys because each immutable planner instance is
+scoped to exactly that tuple. Cache eviction or clearing can only reload or
+recompute the same pure value. There is no recursive connection acceptance:
+neighbour selection reads only hubs and ranked candidates, so all work remains
+bounded.
 
 ### Integration with existing highways
 
