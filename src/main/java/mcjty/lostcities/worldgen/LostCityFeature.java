@@ -57,14 +57,22 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
 
                 int chunkX = center.x;
                 int chunkZ = center.z;
-                diminfo.setWorld(level);
-                try {
-                    diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
-                } catch (Exception e) {
-                    LostCities.getLogger().error("Error generating chunk {},{}: {}", chunkX, chunkZ, e.getMessage(), e);
-                    e.printStackTrace();
-                    ErrorLogger.logChunkInfo(chunkX, chunkZ, diminfo);
-                    ErrorLogger.report("There was an error generating a chunk. See log for details!");
+                // The terrain feature (and its ChunkDriver) is shared per dimension while the
+                // feature step can run concurrently for different chunks. Serialize the world
+                // swap + generation on the shared feature instance so one thread can never tear
+                // down the driver or swap the region out from under another.
+                // LostCitySphereFeature locks the same monitor
+                LostCityTerrainFeature feature = diminfo.getFeature();
+                synchronized (feature) {
+                    diminfo.setWorld(level);
+                    try {
+                        feature.generate(region, region.getChunk(chunkX, chunkZ));
+                    } catch (Exception e) {
+                        LostCities.getLogger().error("Error generating chunk {},{}: {}", chunkX, chunkZ, e.getMessage(), e);
+                        e.printStackTrace();
+                        ErrorLogger.logChunkInfo(chunkX, chunkZ, diminfo);
+                        ErrorLogger.report("There was an error generating a chunk. See log for details!");
+                    }
                 }
                 return true;
             }

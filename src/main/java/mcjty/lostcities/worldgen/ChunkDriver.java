@@ -68,7 +68,21 @@ public class ChunkDriver {
 
     // This version of getBlock() is less optimal but it will work for different chunks
     private BlockState getBlockSafe(BlockPos p) {
-        return isThisChunk(p) ? getBlock(p) : region.getBlockState(p);
+        if (isThisChunk(p)) {
+            return getBlock(p);
+        }
+        // During parallel world generation a neighbouring chunk may not be part of (or ready in)
+        // the current WorldGenRegion. Reading it would throw "Requested chunk unavailable during
+        // world generation" and kill chunk generation. Treat unavailable neighbours as air:
+        // only cosmetic connection states (fences, walls, stairs) depend on these reads
+        if (!region.hasChunk(p.getX() >> 4, p.getZ() >> 4)) {
+            return Blocks.AIR.defaultBlockState();
+        }
+        try {
+            return region.getBlockState(p);
+        } catch (RuntimeException e) {
+            return Blocks.AIR.defaultBlockState();
+        }
     }
 
     private BlockState getBlock(BlockPos p) {
@@ -174,7 +188,17 @@ public class ChunkDriver {
             return adjacent;
         }
         if (newAdjacent != adjacent) {
-            ChunkAccess chunk = region.getChunk(pos);
+            // The adjacent position may be outside the available region during parallel world
+            // generation. In that case just skip the (cosmetic) update
+            if (!region.hasChunk(pos.getX() >> 4, pos.getZ() >> 4)) {
+                return adjacent;
+            }
+            ChunkAccess chunk;
+            try {
+                chunk = region.getChunk(pos);
+            } catch (RuntimeException e) {
+                return adjacent;
+            }
             if (chunk == thisChunk) {
                 setBlock(pos, newAdjacent);
             } else if (chunk.getPersistedStatus().isOrAfter(ChunkStatus.FULL)) {
