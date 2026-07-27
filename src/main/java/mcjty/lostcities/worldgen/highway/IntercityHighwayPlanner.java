@@ -167,8 +167,8 @@ public final class IntercityHighwayPlanner {
         long bestTie = 0L;
         for (int localX = offsetX; localX < size; localX += spacing) {
             for (int localZ = offsetZ; localZ < size; localZ += spacing) {
-                int chunkX = Math.addExact(startX, localX);
-                int chunkZ = Math.addExact(startZ, localZ);
+                int chunkX = moveHubXOffRailwayCorridor(Math.addExact(startX, localX), localX, size);
+                int chunkZ = moveHubZOffRailwayCorridor(Math.addExact(startZ, localZ), localZ, size);
                 int potentialScore = potentialScore(chunkX, chunkZ);
                 long tie = hash(HUB_SAMPLE_SALT, chunkX, chunkZ,
                         floorModHash(hash(HUB_STRENGTH_SALT, cell.planningCellX(), cell.planningCellZ(), 0), Integer.MAX_VALUE));
@@ -333,19 +333,43 @@ public final class IntercityHighwayPlanner {
 
     /**
      * Subways occupy a fixed ten-chunk grid. Crossing one of those lines is safe because the
-     * railway is underground, but sharing its chunk line can make a station or descent replace
-     * the highway. Keep parallel highway segments off the corresponding railway corridors.
+     * railway is underground, but sharing its chunk line or crossing a surface-access station
+     * can make railway parts replace the highway. Keep parallel highway segments off railway
+     * corridors and vertical highways off the columns containing stations.
      */
     private static boolean isRailwayClear(List<HighwaySegment> segments) {
         for (HighwaySegment segment : segments) {
-            if (segment.axis() == HighwayAxis.X && Math.floorMod(segment.startZ() + 1, 10) == 0) {
+            if (segment.axis() == HighwayAxis.X && isHorizontalRailwayCorridor(segment.startZ())) {
                 return false;
             }
-            if (segment.axis() == HighwayAxis.Z && Math.floorMod(segment.startX() + 1, 10) == 5) {
+            if (segment.axis() == HighwayAxis.Z && isVerticalRailwayOrStationCorridor(segment.startX())) {
                 return false;
             }
         }
         return true;
+    }
+
+    private static int moveHubXOffRailwayCorridor(int chunkX, int localX, int cellSize) {
+        if (!isVerticalRailwayOrStationCorridor(chunkX)) {
+            return chunkX;
+        }
+        return localX + 1 < cellSize ? Math.addExact(chunkX, 1) : Math.subtractExact(chunkX, 1);
+    }
+
+    private static int moveHubZOffRailwayCorridor(int chunkZ, int localZ, int cellSize) {
+        if (!isHorizontalRailwayCorridor(chunkZ)) {
+            return chunkZ;
+        }
+        return localZ + 1 < cellSize ? Math.addExact(chunkZ, 1) : Math.subtractExact(chunkZ, 1);
+    }
+
+    private static boolean isHorizontalRailwayCorridor(int chunkZ) {
+        return Math.floorMod(chunkZ + 1, 10) == 0;
+    }
+
+    private static boolean isVerticalRailwayOrStationCorridor(int chunkX) {
+        int gridX = Math.floorMod(chunkX + 1, 10);
+        return gridX == 5 || gridX == 0;
     }
 
     /** Builds canonical V1 geometry for an already accepted hub pair. */

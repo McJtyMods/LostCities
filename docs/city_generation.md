@@ -419,9 +419,13 @@ so a normal cell evaluates at most 8x8 points. Potentials are quantized to an
 integer millionth before comparison. The highest score wins; equal scores use
 an unsigned stable sample hash and then the fixed scan order. No hub is created
 unless the winning score is at least `highwayHubMinimumPotential` (default
-0.25). The chosen coordinate is always inside its planning cell. Both present
-and absent hub decisions are persisted after their first calculation, avoiding
-the terrain-height and biome sampling cost when the world is opened again.
+0.25). A sample on a reserved subway or station corridor moves one chunk within
+the same planning cell before its potential is evaluated. This guarantees that
+normal hub endpoints can form both canonical route shapes without losing
+connections to railway avoidance. The chosen coordinate is always inside its
+planning cell. Both present and absent hub decisions are persisted after their
+first calculation, avoiding the terrain-height and biome sampling cost when the
+world is opened again.
 
 ### Candidate connections, sectors and symmetric acceptance
 
@@ -487,11 +491,13 @@ work.
 
 The regular subway grid reserves its parallel chunk lines during route
 selection. Horizontal highway segments cannot use the subway's repeating
-horizontal line, and vertical segments cannot use its repeating vertical line.
-Crossing a subway line remains valid because the underground track has vertical
-clearance. For a non-aligned hub pair, an otherwise valid canonical L-shape
-wins automatically when the other shape would share a subway line. If both
-shapes would do so, that hub pair is excluded from connection candidates.
+horizontal line, while vertical segments cannot use either its repeating
+vertical line or the repeating columns that contain surface-access stations.
+Crossing an ordinary subway line remains valid because the underground track
+has vertical clearance. Hub samples are moved off all these corridors during
+discovery, so this constraint does not normally remove hub connections. The
+route-level check remains as a defensive constraint and excludes a hub pair
+only if neither canonical L-shape is clear.
 
 Every connection uses the fixed `highwayNetworkLevel` (default zero) for its
 entire length. This is intentionally less exact than consulting endpoint
@@ -590,7 +596,7 @@ Nothing is logged during normal generation.
 - Elevation is fixed for the entire connection.
 - Gateways are not aligned to hierarchical primary streets.
 - Route-interior water and unrelated-city avoidance is deferred. Parallel
-  subway-line avoidance is a hard route constraint.
+  subway-line and surface-access-station avoidance are hard route constraints.
 
 Phase 2 should move endpoints to city-edge gateways aligned with hierarchical
 primary streets, strengthen city-interior penalties, score route terrain and

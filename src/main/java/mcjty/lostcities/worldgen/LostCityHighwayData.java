@@ -29,7 +29,7 @@ public class LostCityHighwayData extends SavedData {
 
     public static final String NAME = "LostCityHighwayData";
     private static final int FORMAT_VERSION = 1;
-    private static final long HUB_ALGORITHM_VERSION = 1L;
+    private static final long HUB_ALGORITHM_VERSION = 2L;
 
     private static final String VERSION_KEY = "version";
     private static final String DIMENSIONS_KEY = "dimensions";
