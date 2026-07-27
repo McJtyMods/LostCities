@@ -59,8 +59,10 @@ planning query can sample thousands of remote terrain columns.
 
 Scattered generation has an additional immutable area plan keyed by dimension,
 world seed, and scattered-area coordinates. The plan contains the chosen
-asset, footprint, complete-footprint validity, common height, and building
-choice. Individual chunks only read it and generate their own piece. Never
+asset, footprint, complete-footprint validity, common height, highway-facing
+rotation, and building choice. Highway-aligned candidate enumeration is
+deterministic and is completed before the plan is published. Individual chunks
+only read it and generate their own piece. Never
 replace this with a decision based on whichever chunk happens to generate
 first, and never eagerly generate the other chunks in a footprint.
 

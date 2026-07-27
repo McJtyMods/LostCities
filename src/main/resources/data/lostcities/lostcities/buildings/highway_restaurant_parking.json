@@ -1,0 +1,11 @@
+{
+  "filler": "S",
+  "rubble": "B",
+  "minfloors": 1,
+  "maxfloors": 1,
+  "parts": [
+    {
+      "part": "highway_restaurant_parking"
+    }
+  ]
+}

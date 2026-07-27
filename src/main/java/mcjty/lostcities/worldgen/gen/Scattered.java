@@ -7,10 +7,12 @@ import mcjty.lostcities.worldgen.ChunkDriver;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
+import mcjty.lostcities.worldgen.highway.HighwayInfo;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredReference;
 import mcjty.lostcities.worldgen.lost.regassets.data.ScatteredSettings;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -69,10 +71,12 @@ public class Scattered {
         } else {
             int relx = chunkX - plan.tlChunkX();
             int relz = chunkZ - plan.tlChunkZ();
-            String buildingName = plan.multiBuilding().getBuilding(relx, relz);
+            MultiBuildingCoordinate original = toOriginalCoordinate(relx, relz, plan.multiBuilding(), plan.transform());
+            String buildingName = plan.multiBuilding().getBuilding(original.x(), original.z());
             building = AssetRegistries.BUILDINGS.getOrThrow(provider.getWorld(), buildingName);
         }
-        generateScatteredBuilding(feature, info, building, scatteredRandom, plan.lowestLevel(), plan.scattered().getTerrainfix());
+        generateScatteredBuilding(feature, info, building, scatteredRandom, plan.lowestLevel(),
+                plan.scattered().getTerrainfix(), plan.scattered().getSupportpart(), plan.transform());
     }
 
     private static ScatteredPlan calculatePlan(LostCityTerrainFeature feature, ScatteredSettings scatteredSettings, int ax, int az) {
@@ -96,64 +100,38 @@ public class Scattered {
         ScatteredBuilding scattered = AssetRegistries.SCATTERED.getOrThrow(provider.getWorld(), reference.getName());
         MultiBuilding multiBuilding = scattered.getMultibuilding() == null ? null
                 : AssetRegistries.MULTI_BUILDINGS.getOrThrow(provider.getWorld(), scattered.getMultibuilding());
-        int width = multiBuilding == null ? 1 : multiBuilding.getDimX();
-        int depth = multiBuilding == null ? 1 : multiBuilding.getDimZ();
-        if (width > areaSize || depth > areaSize) {
+        int originalWidth = multiBuilding == null ? 1 : multiBuilding.getDimX();
+        int originalDepth = multiBuilding == null ? 1 : multiBuilding.getDimZ();
+        if (originalWidth > areaSize || originalDepth > areaSize) {
             return ScatteredPlan.INVALID;
         }
 
-        int tlChunkX = areaOriginX + scatteredRandom.nextInt(areaSize - width + 1);
-        int tlChunkZ = areaOriginZ + scatteredRandom.nextInt(areaSize - depth + 1);
-        int minheight = Integer.MAX_VALUE;
-        int maxheight = Integer.MIN_VALUE;
-        int avgheight = 0;
-        ChunkHeightmap singleHeightmap = null;
-        for (int x = tlChunkX; x < tlChunkX + width; x++) {
-            for (int z = tlChunkZ; z < tlChunkZ + depth; z++) {
-                ChunkCoord coord = new ChunkCoord(provider.getType(), x, z);
-                if (!isValidScatterBiome(feature, reference, coord)) {
-                    return ScatteredPlan.INVALID;
-                }
-                BuildingInfo tinfo = BuildingInfo.getBuildingInfo(coord, provider);
-                if (avoidScattered(feature, tinfo)) {
-                    return ScatteredPlan.INVALID;
-                }
-                if (reference.isNearHighway()) {
-                    if (!Highway.hasHighway(coord.east(), provider, feature.profile) &&
-                            !Highway.hasHighway(coord.west(), provider, feature.profile) &&
-                            !Highway.hasHighway(coord.north(), provider, feature.profile) &&
-                            !Highway.hasHighway(coord.south(), provider, feature.profile)) {
-                        return ScatteredPlan.INVALID;
-                    }
-                }
-                ChunkHeightmap hm = feature.getHeightmap(coord, provider.getWorld());
-                if (width == 1 && depth == 1) {
-                    singleHeightmap = hm;
-                }
-                int height = hm.getHeight();
-                hm.calculateAccurateHeight(provider.getWorld(), x, z);
-                if (!reference.isAllowVoid()) {
-                    if (!(feature.profile.isDefault() || feature.profile.isCavern())) {
-                        // We are in a world that can have void chunks. Check if this chunk is a void chunk
-                        if (height <= feature.provider.getWorld().getMinBuildHeight() + 3) {
-                            return ScatteredPlan.INVALID;
-                        }
-                    }
-                }
-                minheight = Math.min(minheight, hm.getMinHeight());
-                maxheight = Math.max(maxheight, hm.getMaxHeight());
-                avgheight += height;
-            }
-        }
-        // Check the height difference
-        if (reference.getMaxheightdiff() != null) {
-            int diff = maxheight - minheight;
-            if (diff > reference.getMaxheightdiff()) {
+        PlacementCandidate placement;
+        int positionXBound = 0;
+        int positionZBound = 0;
+        int highwayCandidateCount = 0;
+        if (reference.isNearHighway()) {
+            List<PlacementCandidate> candidates = findHighwayPlacements(feature, reference, scattered,
+                    areaOriginX, areaOriginZ, areaSize, originalWidth, originalDepth);
+            if (candidates.isEmpty()) {
                 return ScatteredPlan.INVALID;
             }
+            highwayCandidateCount = candidates.size();
+            placement = candidates.get(scatteredRandom.nextInt(highwayCandidateCount));
+        } else {
+            positionXBound = areaSize - originalWidth + 1;
+            positionZBound = areaSize - originalDepth + 1;
+            int tlChunkX = areaOriginX + scatteredRandom.nextInt(positionXBound);
+            int tlChunkZ = areaOriginZ + scatteredRandom.nextInt(positionZBound);
+            TerrainStats terrain = calculateTerrainStats(feature, reference, tlChunkX, tlChunkZ,
+                    originalWidth, originalDepth);
+            if (terrain == null) {
+                return ScatteredPlan.INVALID;
+            }
+            placement = new PlacementCandidate(tlChunkX, tlChunkZ, originalWidth, originalDepth,
+                    Transform.ROTATE_NONE, null, terrain);
         }
 
-        avgheight /= width * depth;
         String singleBuildingName = null;
         int singleBuildingCount = 0;
         if (multiBuilding == null) {
@@ -170,8 +148,10 @@ public class Scattered {
         }
 
         int lowestLevel;
-        if (multiBuilding == null) {
-            lowestLevel = handleScatteredTerrain(feature, scattered, selectionCoord, singleHeightmap);
+        if (placement.highwayHeight() != null) {
+            lowestLevel = placement.highwayHeight() + scattered.getHeightoffset();
+        } else if (multiBuilding == null) {
+            lowestLevel = handleScatteredTerrain(feature, scattered, placement.terrain().singleHeightmap());
             if (lowestLevel < -4000) {
                 LostCityProfile profile = feature.provider.getProfile();
                 if (profile.isCavern()) {
@@ -181,10 +161,136 @@ public class Scattered {
                 }
             }
         } else {
-            lowestLevel = handleScatteredTerrainMulti(feature, scattered, selectionCoord, minheight, maxheight, avgheight);
+            lowestLevel = handleScatteredTerrainMulti(feature, scattered, placement.terrain().minimum(),
+                    placement.terrain().maximum(), placement.terrain().average());
         }
-        return new ScatteredPlan(true, randomSeed, selection.randomBound(), areaSize, width, depth, tlChunkX, tlChunkZ,
-                lowestLevel, singleBuildingCount, singleBuildingName, scattered, multiBuilding);
+        return new ScatteredPlan(true, randomSeed, selection.randomBound(), positionXBound, positionZBound,
+                highwayCandidateCount, placement.width(), placement.depth(), placement.tlChunkX(), placement.tlChunkZ(),
+                lowestLevel, placement.transform(), singleBuildingCount, singleBuildingName, scattered, multiBuilding);
+    }
+
+    private static List<PlacementCandidate> findHighwayPlacements(LostCityTerrainFeature feature,
+                                                                   ScatteredReference reference,
+                                                                   ScatteredBuilding scattered,
+                                                                   int areaOriginX, int areaOriginZ, int areaSize,
+                                                                   int originalWidth, int originalDepth) {
+        List<PlacementCandidate> candidates = new ArrayList<>();
+        Transform[] transforms = scattered.isRotatable()
+                ? new Transform[]{Transform.ROTATE_NONE, Transform.ROTATE_90, Transform.ROTATE_180, Transform.ROTATE_270}
+                : new Transform[]{Transform.ROTATE_NONE};
+        for (Transform transform : transforms) {
+            int width = rotatesDimensions(transform) ? originalDepth : originalWidth;
+            int depth = rotatesDimensions(transform) ? originalWidth : originalDepth;
+            for (int x = areaOriginX; x <= areaOriginX + areaSize - width; x++) {
+                for (int z = areaOriginZ; z <= areaOriginZ + areaSize - depth; z++) {
+                    Integer highwayHeight = getConnectedHighwayHeight(feature, x, z, width, depth,
+                            connectionDirection(transform));
+                    if (highwayHeight == null) {
+                        continue;
+                    }
+                    TerrainStats terrain = calculateTerrainStats(feature, reference, x, z, width, depth);
+                    if (terrain != null) {
+                        candidates.add(new PlacementCandidate(x, z, width, depth, transform, highwayHeight, terrain));
+                    }
+                }
+            }
+        }
+        return candidates;
+    }
+
+    @Nullable
+    private static Integer getConnectedHighwayHeight(LostCityTerrainFeature feature, int x, int z,
+                                                     int width, int depth, Direction connection) {
+        Integer commonHeight = null;
+        int edgeLength = connection.getAxis() == Direction.Axis.Z ? width : depth;
+        for (int i = 0; i < edgeLength; i++) {
+            ChunkCoord highwayCoord = switch (connection) {
+                case NORTH -> new ChunkCoord(feature.provider.getType(), x + i, z - 1);
+                case SOUTH -> new ChunkCoord(feature.provider.getType(), x + i, z + depth);
+                case WEST -> new ChunkCoord(feature.provider.getType(), x - 1, z + i);
+                case EAST -> new ChunkCoord(feature.provider.getType(), x + width, z + i);
+                default -> throw new IllegalStateException("Unsupported horizontal direction " + connection);
+            };
+            HighwayInfo highwayInfo = Highway.getHighwayInfo(highwayCoord, feature.provider, feature.profile);
+            int level = connection.getAxis() == Direction.Axis.Z ? highwayInfo.xLevel() : highwayInfo.zLevel();
+            if (level < 0) {
+                return null;
+            }
+            BuildingInfo highwayBuildingInfo = BuildingInfo.getBuildingInfo(highwayCoord, feature.provider);
+            if (highwayBuildingInfo.isTunnel(level)) {
+                return null;
+            }
+            int height = highwayBuildingInfo.groundLevel + level * LostCityTerrainFeature.FLOORHEIGHT;
+            if (commonHeight != null && commonHeight != height) {
+                return null;
+            }
+            commonHeight = height;
+        }
+        return commonHeight;
+    }
+
+    @Nullable
+    private static TerrainStats calculateTerrainStats(LostCityTerrainFeature feature, ScatteredReference reference,
+                                                       int tlChunkX, int tlChunkZ, int width, int depth) {
+        int minheight = Integer.MAX_VALUE;
+        int maxheight = Integer.MIN_VALUE;
+        int avgheight = 0;
+        ChunkHeightmap singleHeightmap = null;
+        for (int x = tlChunkX; x < tlChunkX + width; x++) {
+            for (int z = tlChunkZ; z < tlChunkZ + depth; z++) {
+                ChunkCoord coord = new ChunkCoord(feature.provider.getType(), x, z);
+                if (!isValidScatterBiome(feature, reference, coord)) {
+                    return null;
+                }
+                BuildingInfo tinfo = BuildingInfo.getBuildingInfo(coord, feature.provider);
+                if (avoidScattered(feature, tinfo)) {
+                    return null;
+                }
+                ChunkHeightmap heightmap = feature.getHeightmap(coord, feature.provider.getWorld());
+                if (width == 1 && depth == 1) {
+                    singleHeightmap = heightmap;
+                }
+                int height = heightmap.getHeight();
+                heightmap.calculateAccurateHeight(feature.provider.getWorld(), x, z);
+                if (!reference.isAllowVoid() && !(feature.profile.isDefault() || feature.profile.isCavern())
+                        && height <= feature.provider.getWorld().getMinBuildHeight() + 3) {
+                    return null;
+                }
+                minheight = Math.min(minheight, heightmap.getMinHeight());
+                maxheight = Math.max(maxheight, heightmap.getMaxHeight());
+                avgheight += height;
+            }
+        }
+        if (reference.getMaxheightdiff() != null && maxheight - minheight > reference.getMaxheightdiff()) {
+            return null;
+        }
+        return new TerrainStats(minheight, maxheight, avgheight / (width * depth), singleHeightmap);
+    }
+
+    private static boolean rotatesDimensions(Transform transform) {
+        return transform == Transform.ROTATE_90 || transform == Transform.ROTATE_270;
+    }
+
+    private static Direction connectionDirection(Transform transform) {
+        return switch (transform) {
+            case ROTATE_NONE -> Direction.NORTH;
+            case ROTATE_90 -> Direction.EAST;
+            case ROTATE_180 -> Direction.SOUTH;
+            case ROTATE_270 -> Direction.WEST;
+            default -> throw new IllegalArgumentException("Scattered buildings only support rotations");
+        };
+    }
+
+    private static MultiBuildingCoordinate toOriginalCoordinate(int x, int z, MultiBuilding multiBuilding,
+                                                                Transform transform) {
+        return switch (transform) {
+            case ROTATE_NONE -> new MultiBuildingCoordinate(x, z);
+            case ROTATE_90 -> new MultiBuildingCoordinate(z, multiBuilding.getDimZ() - 1 - x);
+            case ROTATE_180 -> new MultiBuildingCoordinate(multiBuilding.getDimX() - 1 - x,
+                    multiBuilding.getDimZ() - 1 - z);
+            case ROTATE_270 -> new MultiBuildingCoordinate(multiBuilding.getDimX() - 1 - z, x);
+            default -> throw new IllegalArgumentException("Scattered buildings only support rotations");
+        };
     }
 
     @Nullable
@@ -228,7 +334,10 @@ public class Scattered {
         return true;
     }
 
-    private static void generateScatteredBuilding(LostCityTerrainFeature feature, BuildingInfo info, Building building, Random rand, int lowestLevel, ScatteredBuilding.TerrainFix terrainFix) {
+    private static void generateScatteredBuilding(LostCityTerrainFeature feature, BuildingInfo info, Building building,
+                                                  Random rand, int lowestLevel,
+                                                  ScatteredBuilding.TerrainFix terrainFix,
+                                                  @Nullable String supportPartName, Transform transform) {
         IDimensionInfo provider = feature.provider;
 
         int height = lowestLevel;
@@ -287,13 +396,17 @@ public class Scattered {
                         }
                     }
                     case REPEATSLICE -> {
-                        CompiledPalette compiledPalette = feature.computePalette(info, part);
-                        for (int x = 0; x < 16; x++) {
-                            for (int z = 0; z < 16; z++) {
-                                char c = part.getPaletteChar(x, 0, z);
+                        BuildingPart supportPart = supportPartName == null ? part
+                                : AssetRegistries.PARTS.getOrThrow(provider.getWorld(), supportPartName);
+                        CompiledPalette compiledPalette = feature.computePalette(info, supportPart);
+                        for (int x = 0; x < supportPart.getXSize(); x++) {
+                            for (int z = 0; z < supportPart.getZSize(); z++) {
+                                char c = supportPart.getPaletteChar(x, 0, z);
                                 if (c != ' ') {
+                                    int rx = transform.rotateX(x, z);
+                                    int rz = transform.rotateZ(x, z);
                                     int y = lowestLevel - 1;
-                                    driver.current(x, y, z);
+                                    driver.current(rx, y, rz);
                                     BlockState b = driver.getBlock();
                                     while (b == air || b == liquid) {
                                         driver.block(compiledPalette.get(c));
@@ -307,14 +420,14 @@ public class Scattered {
                 }
             }
 
-            height = feature.generatePart(info, part, Transform.ROTATE_NONE, 0, height, 0, LostCityTerrainFeature.HardAirSetting.AIR);
+            height = feature.generatePart(info, part, transform, 0, height, 0, LostCityTerrainFeature.HardAirSetting.AIR);
             if (part2 != null) {
-                feature.generatePart(info, part2, Transform.ROTATE_NONE, 0, height, 0, LostCityTerrainFeature.HardAirSetting.AIR);
+                feature.generatePart(info, part2, transform, 0, height, 0, LostCityTerrainFeature.HardAirSetting.AIR);
             }
         }
     }
 
-    private static int handleScatteredTerrain(LostCityTerrainFeature feature, ScatteredBuilding scattered, ChunkCoord coord, ChunkHeightmap heightmap) {
+    private static int handleScatteredTerrain(LostCityTerrainFeature feature, ScatteredBuilding scattered, ChunkHeightmap heightmap) {
         int lowestLevel = switch (scattered.getTerrainheight()) {
             case LOWEST -> heightmap.getHeight();
             case AVERAGE -> heightmap.getHeight();
@@ -325,7 +438,8 @@ public class Scattered {
         return lowestLevel;
     }
 
-    private static int handleScatteredTerrainMulti(LostCityTerrainFeature feature, ScatteredBuilding scattered, ChunkCoord coord, int minimum, int maximum, int average) {
+    private static int handleScatteredTerrainMulti(LostCityTerrainFeature feature, ScatteredBuilding scattered,
+                                                   int minimum, int maximum, int average) {
         int lowestLevel = switch (scattered.getTerrainheight()) {
             case LOWEST -> minimum;
             case AVERAGE -> average;
@@ -342,20 +456,38 @@ public class Scattered {
     private record ScatteredSelection(@Nullable ScatteredReference reference, int randomBound) {
     }
 
-    private record ScatteredPlan(boolean valid, long randomSeed, int selectionBound, int areaSize,
+    private record TerrainStats(int minimum, int maximum, int average,
+                                @Nullable ChunkHeightmap singleHeightmap) {
+    }
+
+    private record PlacementCandidate(int tlChunkX, int tlChunkZ, int width, int depth, Transform transform,
+                                      @Nullable Integer highwayHeight, TerrainStats terrain) {
+    }
+
+    private record MultiBuildingCoordinate(int x, int z) {
+    }
+
+    private record ScatteredPlan(boolean valid, long randomSeed, int selectionBound,
+                                 int positionXBound, int positionZBound, int highwayCandidateCount,
                                  int width, int depth, int tlChunkX, int tlChunkZ, int lowestLevel,
+                                 Transform transform,
                                  int singleBuildingCount, @Nullable String singleBuildingName,
                                  @Nullable ScatteredBuilding scattered, @Nullable MultiBuilding multiBuilding) {
 
-        private static final ScatteredPlan INVALID = new ScatteredPlan(false, 0L, 0, 0,
-                0, 0, 0, 0, 0, 0, null, null, null);
+        private static final ScatteredPlan INVALID = new ScatteredPlan(false, 0L, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, Transform.ROTATE_NONE,
+                0, null, null, null);
 
         private QualityRandom createGenerationRandom() {
             QualityRandom random = new QualityRandom(randomSeed);
             random.nextFloat();
             random.nextInt(selectionBound);
-            random.nextInt(areaSize - width + 1);
-            random.nextInt(areaSize - depth + 1);
+            if (highwayCandidateCount > 0) {
+                random.nextInt(highwayCandidateCount);
+            } else {
+                random.nextInt(positionXBound);
+                random.nextInt(positionZBound);
+            }
             if (singleBuildingCount > 1) {
                 random.nextInt(singleBuildingCount);
             }

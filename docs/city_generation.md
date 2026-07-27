@@ -624,11 +624,17 @@ asset, top-left position, dimensions, complete-footprint validity, common
 generation height, and single-building choice where applicable.
 
 The entire footprint is checked for biome, city, bridge, highway, void, and
-height-difference constraints before the plan is accepted. Every participating
-chunk then reads the same plan and generates only its own building piece. The
-area random sequence is reconstructed independently for each piece; no mutable
-random object or first-generated chunk can change the decision. Other chunks
-are never generated eagerly.
+height-difference constraints before the plan is accepted. A `nearhighway`
+asset searches deterministic candidates whose complete connection edge borders
+a parallel, non-tunnel highway at one deck height. Its base height is taken
+from that highway, and a rotatable asset turns its footprint, multibuilding
+piece lookup, blocks, and optional repeating support part toward the connected
+edge. The unrotated connection edge is north.
+
+Every participating chunk then reads the same plan and generates only its own
+building piece. The area random sequence is reconstructed independently for
+each piece; no mutable random object or first-generated chunk can change the
+decision. Other chunks are never generated eagerly.
 
 ## Generation concurrency boundary
 

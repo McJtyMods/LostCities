@@ -20,6 +20,8 @@ public class ScatteredBuilding implements ILostCityAsset {
     private final ScatteredBuilding.TerrainHeight terrainheight;
     private final ScatteredBuilding.TerrainFix terrainfix;
     private final int heightoffset;
+    private final boolean rotatable;
+    private final String supportpart;
 
     public ScatteredBuilding(ScatteredRE object) {
         name = object.getRegistryName();
@@ -28,6 +30,8 @@ public class ScatteredBuilding implements ILostCityAsset {
         this.terrainheight = object.getTerrainheight();
         this.terrainfix = object.getTerrainfix();
         this.heightoffset = object.getHeightoffset();
+        this.rotatable = object.isRotatable();
+        this.supportpart = object.getSupportpart();
     }
 
     @Nullable
@@ -50,6 +54,15 @@ public class ScatteredBuilding implements ILostCityAsset {
 
     public int getHeightoffset() {
         return heightoffset;
+    }
+
+    public boolean isRotatable() {
+        return rotatable;
+    }
+
+    @Nullable
+    public String getSupportpart() {
+        return supportpart;
     }
 
     @Override

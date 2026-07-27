@@ -598,6 +598,7 @@ A scattered asset says what structure to place and how it interacts with terrain
 {
   "buildings": ["myexpansion:cabin"],
   "rotatable": true,
+  "supportpart": "myexpansion:foundation_columns",
   "terrainheight": "highest",
   "terrainfix": "repeatslice",
   "heightoffset": -1
@@ -608,12 +609,13 @@ A scattered asset says what structure to place and how it interacts with terrain
 |---|---|---|
 | `buildings` | list | One or more building IDs from which one is selected |
 | `multibuilding` | string | A multibuilding ID instead of `buildings` |
-| `rotatable` | boolean | Accepted by the codec, default `false`; currently not consumed by the 1.20.1 scattered generator, which places with no rotation |
+| `rotatable` | boolean | Whether a `nearhighway` placement may rotate in 90-degree steps so its connection edge faces the highway; default `false` |
+| `supportpart` | string | Optional part whose bottom slice is repeated downward by `repeatslice` instead of repeating the generated building part |
 | `terrainheight` | enum, **required** | `lowest`, `average`, `highest`, or `ocean` |
 | `terrainfix` | enum, **required** | `none`, `clear`, or `repeatslice` |
 | `heightoffset` | integer | Final Y offset, default `0` |
 
-Supply `buildings` or `multibuilding`, not both. `clear` clears above the placement level. `repeatslice` extends the bottom slice downward until it reaches solid terrain.
+Supply `buildings` or `multibuilding`, not both. `clear` clears above the placement level. `repeatslice` extends non-space blocks in a bottom slice downward until each column reaches solid terrain. It uses `supportpart` when supplied and otherwise preserves the older behavior of using the generated part. A support part is useful for defining sparse pillars independently of the building or parking-lot floor.
 
 For a multibuilding, `lowest`, `average`, and `highest` use the corresponding measurement across its complete footprint. For a single-chunk scattered building, the current implementation uses the chunk heightmap's representative height for all three values; `ocean` uses sea level in both cases.
 
@@ -639,7 +641,9 @@ The asset does not spawn until the active world style references it in `scattere
 }
 ```
 
-`areasize`, `chance`, `weightnone`, and `list` are required. `chance`, multiplied by the profile's scattered-chance multiplier, is the initial chance that a planning region attempts a placement. Each list entry requires `name` and integer `weight`, and optionally accepts `nearhighway`, `allowvoid`, a `biomes` matcher, and `maxheightdiff`. `weightnone` is added as a no-structure outcome after that chance check. `maxheightdiff` limits the height difference across the complete footprint. `nearhighway` restricts the candidate based on highway proximity; `allowvoid` permits placement where the sampled terrain is effectively void.
+`areasize`, `chance`, `weightnone`, and `list` are required. `chance`, multiplied by the profile's scattered-chance multiplier, is the initial chance that a planning region attempts a placement. Each list entry requires `name` and integer `weight`, and optionally accepts `nearhighway`, `allowvoid`, a `biomes` matcher, and `maxheightdiff`. `weightnone` is added as a no-structure outcome after that chance check. `maxheightdiff` limits the height difference across the complete footprint. `allowvoid` permits placement where the sampled terrain is effectively void.
+
+`nearhighway: true` is a connection constraint rather than a loose distance check. The planner searches the area for a complete footprint whose connection edge directly borders a surface or bridge highway running parallel to that edge. Every highway chunk along that edge must have the same deck height; tunnels are rejected. The scattered structure is generated at that deck height plus `heightoffset`. The unrotated connection edge is north. With `rotatable: true`, the complete footprint, its multibuilding layout, its individual parts, and its optional support part rotate together to face a qualifying highway on any side.
 
 ### Stuff assets
 

@@ -1,4 +1,5 @@
 1.20-7.5.0:
+- Added highway-side gas stations and two-chunk restaurants with parking lots, automatic highway-facing rotation, matching deck heights, and configurable foundation supports
 - Added dedicated highway bend and T-junction parts so inter-city routes no longer render those connections as four-way crossings
 - Prevented buildings from generating obstructed doors facing sloped streets
 - Added sloped primary streets with the same wide surface and white center marking as other primary-road sections

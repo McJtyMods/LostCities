@@ -1,0 +1,11 @@
+{
+  "filler": "Q",
+  "rubble": "B",
+  "minfloors": 1,
+  "maxfloors": 1,
+  "parts": [
+    {
+      "part": "highway_gas_station"
+    }
+  ]
+}
