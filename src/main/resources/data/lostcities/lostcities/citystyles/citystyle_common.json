@@ -15,7 +15,8 @@
       "t": "street_large_t",
       "none": "street_large_none",
       "all": "street_large_all",
-      "connector": "street_large_connector"
+      "connector": "street_large_connector",
+      "stair": "street_large_stair"
     }
   },
   "parkblocks": {

@@ -271,18 +271,24 @@ road's otherwise untouched outer row, closing the verge gap without adding a
 quartz marking. A datapack can replace it, provide a list of alternatives, or
 use an empty list to disable connector overlays for a city style.
 
-Hierarchical minor roads can also bridge a one-level city-height difference
-with the full-chunk `stair` street part. The lower road chunk becomes a slope
-only when it has exactly one minor road one level higher, same-level minor roads
-continuing directly behind and beyond the transition, and no same-level side-road
-branches at either end. This keeps bends and intersections flat and avoids
-ambiguous slopes. The upper road includes the slope in its topology, so it
-continues to the chunk edge instead of ending. Its retaining wall is opened
-only across the stair part's `z1`/`z2` bounds.
-Primary roads and legacy street generation do not use this rule. Fountain and
-park parts, random vegetation, building-front overlays, and the older narrow
-stair decoration are suppressed on a sloped street chunk so that its route
-remains clear.
+Hierarchical roads can also bridge a one-level city-height difference with the
+full-chunk `stair` street part. The lower road chunk becomes a slope only when
+it has exactly one same-class road one level higher, same-level roads of that
+class continuing directly behind and beyond the transition, and no same-level
+same-class side-road branches at either end. Primary roads form one class;
+secondary and tertiary roads form the minor-road class. This keeps bends and
+intersections flat and avoids ambiguous slopes without allowing a connected
+minor road to block an otherwise straight primary slope. The upper road
+includes the slope in its topology, so it continues to the chunk edge instead
+of ending. Its retaining wall is opened only across the stair part's `z1`/`z2`
+bounds. The default primary-road slope is `street_large_stair`, with the same
+fourteen-block surface and centered quartz marking as the other large street
+parts. Legacy street generation does not use this rule. Fountain and park
+parts, random vegetation, building-front overlays, and the older narrow stair
+decoration are suppressed on a sloped street chunk so that its route remains
+clear. Buildings alongside a sloped primary, secondary, or tertiary street do
+not generate doors facing that slope, because the changing street surface would
+partially or completely obstruct the doorway.
 
 When a non-road city chunk fails its ordinary building roll or a later building
 veto, it becomes a grass open lot rendered through the existing park surface.

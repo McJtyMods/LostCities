@@ -138,6 +138,9 @@ public class Doors
         if (info.getFloor(localLevel).getMetaBoolean(ILostCities.META_DONTCONNECT)) {
             return false;
         }
+        if (info2.getStreetSlopeDirection() != null) {
+            return false;
+        }
         return (info2.isCity && !info2.hasBuilding && localLevel == 0 && localAdjacent == 0) || (info2.hasBuilding && localAdjacent == info2.getNumFloors());
 //        return (!info2.hasBuilding && localLevel == localAdjacent) || (info2.hasBuilding && localAdjacent == info2.getNumFloors());
     }

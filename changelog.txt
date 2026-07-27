@@ -1,4 +1,6 @@
 1.20-7.5.0:
+- Prevented buildings from generating obstructed doors facing sloped streets
+- Added sloped primary streets with the same wide surface and white center marking as other primary-road sections
 - Fixed inter-city highway initialization crashing for profiles without an outside city-sphere profile
 - Added endpoint-based inter-city highway levels, defaulting to the average city level, with a configurable fixed-level mode
 - Persisted inter-city highway hubs so reopening a world no longer repeats expensive remote terrain sampling
