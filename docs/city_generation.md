@@ -492,11 +492,12 @@ canonical-pair route-shape hash breaks equal scores. A zero penalty therefore
 selects entirely by this stable hash.
 
 Both segments include the bend chunk. The route itself is enumerated once by
-its canonical key, while its bend membership reports both X and Z axes. With
-the current unmodified asset set, that bend is rendered using the existing
-same-level bidirectional highway part, which is the closest available V1 asset
-and can visually resemble a full crossing. A dedicated bend asset is future
-work.
+its canonical key, while its bend membership reports both X and Z axes. The
+renderer reconstructs the same-level connections contributed by every route
+through that chunk. Two perpendicular connections select and rotate a dedicated
+bend part. Three connections select and rotate a T-junction part, which can
+occur when independently planned connections terminate on or overlap another
+route. Four connections continue to use the bidirectional crossing part.
 
 The regular subway grid reserves its parallel chunk lines during route
 selection. Horizontal highway segments cannot use the subway's repeating
@@ -1026,18 +1027,21 @@ levels and is not clamped to that range here.
 
 - One X highway is placed without rotation; one Z highway uses a 90-degree
   rotation of the same assets.
-- If X and Z have the same non-negative level, one bidirectional crossing part
-  is placed instead of two straight parts.
+- If X and Z have the same non-negative level, inter-city route geometry is
+  inspected to distinguish a bend, T-junction, or four-way crossing. The
+  matching part is rotated to its connected sides. Legacy highways, which do
+  not retain route geometry, continue to use the bidirectional crossing part.
 - If both exist at different levels, two ordinary parts are placed. The code is
   written around the expected level-zero/level-one case and places the
   level-zero highway first, because generating the lower part clears space
   above itself.
 
-The world style's `HighwayParts` selector supplies six asset lists: tunnel,
-open and bridge variants for an ordinary straight highway, plus `tunnel_bi`,
-`open_bi` and `bridge_bi` for a same-level crossing. One name is selected from
-the applicable list and resolved as a `BuildingPart`. The default names are
-`highway_tunnel`, `highway_open`, `highway_bridge`, and their `_bi` variants.
+The world style's `HighwayParts` selector supplies tunnel, open and bridge
+asset lists for four shapes: ordinary straight highways, `_bi` four-way
+crossings, `_bend` bends, and `_t` T-junctions. One name is selected from the
+applicable list and resolved as a `BuildingPart`. The default names follow the
+`highway_<environment>[_<shape>]` pattern, such as `highway_open`,
+`highway_bridge_bend`, and `highway_tunnel_t`.
 
 ### 6.4 Tunnel, open and bridge selection
 

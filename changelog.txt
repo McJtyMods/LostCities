@@ -1,4 +1,5 @@
 1.20-7.5.0:
+- Added dedicated highway bend and T-junction parts so inter-city routes no longer render those connections as four-way crossings
 - Prevented buildings from generating obstructed doors facing sloped streets
 - Added sloped primary streets with the same wide surface and white center marking as other primary-road sections
 - Fixed inter-city highway initialization crashing for profiles without an outside city-sphere profile
