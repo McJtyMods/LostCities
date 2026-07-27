@@ -58,7 +58,7 @@ public class LostCityProfile implements ILostCityProfile {
     public int SEALEVEL = -1;   // If -1 just use default
 
     public boolean HIGHWAY_REQUIRES_TWO_CITIES = true;
-    public int HIGHWAY_LEVEL_FROM_CITIES_MODE = 0;
+    public int HIGHWAY_LEVEL_FROM_CITIES_MODE = 3;
     public float HIGHWAY_MAINPERLIN_SCALE = 50.0f;
     public float HIGHWAY_SECONDARYPERLIN_SCALE = 10.0f;
     public float HIGHWAY_PERLIN_FACTOR = 2.0f;
@@ -506,7 +506,7 @@ public class LostCityProfile implements ILostCityProfile {
         HIGHWAY_REQUIRES_TWO_CITIES = cfg.getBoolean("highwayRequiresTwoCities", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_REQUIRES_TWO_CITIES,
                 "If true then a highway will only generate if both sides have a valid city. If false then one city is sufficient");
         HIGHWAY_LEVEL_FROM_CITIES_MODE = cfg.getInt("highwayLevelFromCities", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_LEVEL_FROM_CITIES_MODE,
-                0, 3, "0 (take height from top-left city), 1 (take minimum height from both cities), 2 (take maximum height from both cities), 3 (take average height)");
+                0, 4, "0 (take height from the first endpoint city), 1 (take minimum height from both cities), 2 (take maximum height from both cities), 3 (take average height), 4 (use highwayNetworkLevel)");
         HIGHWAY_DISTANCE_MASK = cfg.getInt("highwayDistanceMask", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_DISTANCE_MASK,
                 0, Integer.MAX_VALUE, "Mask to control how far highways can generate. Must be a power of 2 (minus 1). If 0 there are no highways at all");
         HIGHWAY_MAINPERLIN_SCALE = cfg.getFloat("highwayMainPerlinScale", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MAINPERLIN_SCALE, 1.0f, 1000.0f,
@@ -541,7 +541,7 @@ public class LostCityProfile implements ILostCityProfile {
         HIGHWAY_ROUTE_CITY_PENALTY = cfg.getFloat("highwayRouteCityPenalty", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_ROUTE_CITY_PENALTY,
                 0.0f, 1000.0f, "Weight applied to approximate city-potential samples when choosing an L-route bend");
         HIGHWAY_NETWORK_LEVEL = cfg.getInt("highwayNetworkLevel", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_NETWORK_LEVEL,
-                0, 32, "Fixed city level used by every complete INTERCITY_NETWORK_V1 connection");
+                0, 32, "Fixed highway level used when highwayLevelFromCities is 4");
 
         if (HIGHWAY_HUB_SAMPLE_SPACING > HIGHWAY_PLANNING_CELL_SIZE) {
             throw new IllegalArgumentException("highwayHubSampleSpacing cannot exceed highwayPlanningCellSize");

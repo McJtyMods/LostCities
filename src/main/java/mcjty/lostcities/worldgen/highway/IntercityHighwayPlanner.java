@@ -37,6 +37,7 @@ public final class IntercityHighwayPlanner {
     private final long dimensionSalt;
     private final HighwayPlannerSettings settings;
     private final CityPotential cityPotential;
+    private final HighwayLevelSource highwayLevelSource;
     private final HighwayHubPersistence hubPersistence;
     private final BoundedCache<HubKey, Optional<HighwayHub>> hubCache = new BoundedCache<>(4096);
     private final BoundedCache<HubKey, List<ConnectionCandidate>> candidateCache = new BoundedCache<>(2048);
@@ -47,15 +48,24 @@ public final class IntercityHighwayPlanner {
 
     public IntercityHighwayPlanner(long seed, String dimensionId, HighwayPlannerSettings settings,
                                    CityPotential cityPotential) {
-        this(seed, dimensionId, settings, cityPotential, HighwayHubPersistence.NONE);
+        this(seed, dimensionId, settings, cityPotential,
+                (chunkX, chunkZ) -> settings.networkLevel(), HighwayHubPersistence.NONE);
     }
 
     public IntercityHighwayPlanner(long seed, String dimensionId, HighwayPlannerSettings settings,
                                    CityPotential cityPotential, HighwayHubPersistence hubPersistence) {
+        this(seed, dimensionId, settings, cityPotential,
+                (chunkX, chunkZ) -> settings.networkLevel(), hubPersistence);
+    }
+
+    public IntercityHighwayPlanner(long seed, String dimensionId, HighwayPlannerSettings settings,
+                                   CityPotential cityPotential, HighwayLevelSource highwayLevelSource,
+                                   HighwayHubPersistence hubPersistence) {
         this.seed = seed;
         this.dimensionSalt = stableStringHash(dimensionId);
         this.settings = settings;
         this.cityPotential = cityPotential;
+        this.highwayLevelSource = highwayLevelSource;
         this.hubPersistence = hubPersistence;
     }
 
@@ -174,13 +184,17 @@ public final class IntercityHighwayPlanner {
                         floorModHash(hash(HUB_STRENGTH_SALT, cell.planningCellX(), cell.planningCellZ(), 0), Integer.MAX_VALUE));
                 if (best == null || potentialScore > best.potentialScore()
                         || potentialScore == best.potentialScore() && Long.compareUnsigned(tie, bestTie) < 0) {
-                    best = new HighwayHub(cell, chunkX, chunkZ, potentialScore);
+                    best = new HighwayHub(cell, chunkX, chunkZ, potentialScore, 0);
                     bestTie = tie;
                 }
             }
         }
         int minimum = Math.round(settings.hubMinimumPotential() * POTENTIAL_SCALE);
-        return best != null && best.potentialScore() >= minimum ? Optional.of(best) : Optional.empty();
+        if (best == null || best.potentialScore() < minimum) {
+            return Optional.empty();
+        }
+        return Optional.of(new HighwayHub(best.key(), best.chunkX(), best.chunkZ(), best.potentialScore(),
+                highwayLevelSource.getCityLevel(best.chunkX(), best.chunkZ())));
     }
 
     private List<ConnectionCandidate> calculateCandidates(HubKey sourceKey) {
@@ -276,7 +290,7 @@ public final class IntercityHighwayPlanner {
         HighwayHub first = a.key().equals(key.first()) ? a : b;
         HighwayHub second = a.key().equals(key.second()) ? a : b;
         int length = Math.abs(second.chunkX() - first.chunkX()) + Math.abs(second.chunkZ() - first.chunkZ());
-        int level = settings.networkLevel();
+        int level = selectHighwayLevel(first, second);
         if (first.chunkZ() == second.chunkZ()) {
             HighwaySegment segment = new HighwaySegment(first.chunkX(), first.chunkZ(), second.chunkX(), second.chunkZ(), HighwayAxis.X);
             return new HighwayRoute(key, first, second, List.of(segment), level, HighwayRoute.RouteShape.STRAIGHT, length, 0);
@@ -311,6 +325,18 @@ public final class IntercityHighwayPlanner {
                 chooseHorizontal ? HighwayRoute.RouteShape.HORIZONTAL_THEN_VERTICAL : HighwayRoute.RouteShape.VERTICAL_THEN_HORIZONTAL,
                 length,
                 chooseHorizontal ? horizontalPenalty : verticalPenalty);
+    }
+
+    private int selectHighwayLevel(HighwayHub first, HighwayHub second) {
+        return switch (settings.levelFromCitiesMode()) {
+            case 0 -> first.cityLevel();
+            case 1 -> Math.min(first.cityLevel(), second.cityLevel());
+            case 2 -> Math.max(first.cityLevel(), second.cityLevel());
+            case 3 -> (first.cityLevel() + second.cityLevel()) / 2;
+            case 4 -> settings.networkLevel();
+            default -> throw new IllegalStateException("Unsupported highway level mode "
+                    + settings.levelFromCitiesMode());
+        };
     }
 
     private boolean hasRailwayClearRoute(HighwayHub first, HighwayHub second) {

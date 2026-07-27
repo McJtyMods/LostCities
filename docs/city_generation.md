@@ -59,9 +59,10 @@ it again.
 Inter-city hub results use a separate overworld `SavedData` named
 `LostCityHighwayData`. This is a performance cache rather than mode-selection
 state: it stores the zero-or-one hub result, including an empty result, for each
-evaluated planning cell and dimension. Routes and per-chunk highway occupancy
-remain derived data. A versioned signature covers the world seed, hub settings,
-city-potential profile inputs, terrain-height limits and selected world-style
+evaluated planning cell and dimension. A present hub includes its city level;
+routes and per-chunk highway occupancy remain derived data. A versioned
+signature covers the world seed, hub settings, city-potential profile inputs,
+terrain-height limits, city-level height thresholds and selected world-style
 ID. A mismatch drops only that dimension's hub cache and lets the planner
 recalculate it.
 
@@ -361,8 +362,9 @@ The planner uses a fixed V1 salt, a stable FNV-derived dimension hash, SplitMix
 64-bit mixing, and dedicated salts for sample positions, hub ranking,
 connection ranking/acceptance, and route shape. Every decision hashes its full
 coordinates directly. It does not use Java object hash codes, unordered-map
-iteration, shared random state, generated chunks, `BuildingInfo`, or query
-history.
+iteration, shared random state, generated chunks, final `BuildingInfo` state,
+or query history. Once a hub wins, a separate deterministic level source reads
+the terrain-derived city level at that coordinate.
 
 ### Approximate city potential
 
@@ -424,8 +426,9 @@ the same planning cell before its potential is evaluated. This guarantees that
 normal hub endpoints can form both canonical route shapes without losing
 connections to railway avoidance. The chosen coordinate is always inside its
 planning cell. Both present and absent hub decisions are persisted after their
-first calculation, avoiding the terrain-height and biome sampling cost when the
-world is opened again.
+first calculation. Present hubs include their endpoint city level, avoiding the
+terrain-height, biome and city-level sampling cost when the world is opened
+again.
 
 ### Candidate connections, sectors and symmetric acceptance
 
@@ -499,10 +502,12 @@ discovery, so this constraint does not normally remove hub connections. The
 route-level check remains as a defensive constraint and excludes a hub pair
 only if neither canonical L-shape is clear.
 
-Every connection uses the fixed `highwayNetworkLevel` (default zero) for its
-entire length. This is intentionally less exact than consulting endpoint
-`BuildingInfo`, but it prevents a dependency cycle and guarantees that remote
-chunks reconstruct the same elevation.
+Every connection uses one level for its entire length. The shared
+`highwayLevelFromCities` setting selects the first endpoint, lower endpoint,
+higher endpoint, integer endpoint average, or fixed `highwayNetworkLevel`.
+Endpoint city levels are stored in the persisted hub records, so remote chunks
+reconstruct the same elevation without consulting final city or highway state.
+The default mode is the integer average of both endpoint city levels.
 
 ### Bounded per-chunk reconstruction and caching
 
@@ -517,9 +522,8 @@ Owned routes are tested for inclusive segment membership and deduplicated in a
 sorted map by canonical key. The result records route hits, segment axes, bend
 membership and the route level, then classifies the chunk as `NONE`,
 `X_HIGHWAY`, `Z_HIGHWAY`, `SAME_LEVEL_INTERSECTION`, or
-`MULTI_LEVEL_INTERSECTION`. V1's fixed level normally makes an X/Z meeting a
-same-level intersection; the multi-level result remains available to the
-shared facade and future planners.
+`MULTI_LEVEL_INTERSECTION`. Connections derived from different endpoint pairs
+can use different levels, so both intersection classifications can occur.
 
 Per-planner hub, candidate, selection, owned-route and final-chunk caches are
 synchronized access-order LRU maps with fixed maximum sizes (4096, 2048, 2048,
@@ -542,7 +546,7 @@ their signatures, so all existing consumers use one occupancy decision:
 
 - `MultiChunk` rejects random multi-building footprints on network routes;
 - ordinary buildings require the existing full-level vertical clearance;
-- cellar counts are capped above the network level;
+- cellar counts are capped above the route's selected level;
 - same-level street and park surfaces and street decorations are suppressed;
 - railway avoidance and scattered-content proximity see the same route;
 - normal and city chunks both call the existing `gen.Highways` renderer; and
@@ -555,7 +559,7 @@ terrain exclusions from leaving a route without its expected city.
 
 ### Highway profile settings and compatibility categories
 
-| Network-only setting | Default |
+| Network and shared level setting | Default |
 | --- | ---: |
 | `highwayGenerationMode` | `INTERCITY_NETWORK_V1` for new worlds |
 | `highwayPlanningCellSize` | 128 chunks |
@@ -567,14 +571,16 @@ terrain exclusions from leaving a route without its expected city.
 | `highwayMaximumConnectionsPerHub` | 2 |
 | `highwayMinimumRouteLength` | 40 chunks |
 | `highwayRouteCityPenalty` | 1.0 |
-| `highwayNetworkLevel` | 0 |
+| `highwayLevelFromCities` | 3 (endpoint average) |
+| `highwayNetworkLevel` | 0 (used by mode 4) |
 
 `HIGHWAY_DISTANCE_MASK`, `HIGHWAY_MAINPERLIN_SCALE`,
 `HIGHWAY_SECONDARYPERLIN_SCALE`, `HIGHWAY_PERLIN_FACTOR`,
-`HIGHWAY_REQUIRES_TWO_CITIES`, and `HIGHWAY_LEVEL_FROM_CITIES_MODE` are
-legacy-only. `HIGHWAY_SUPPORTS` and the world style's `HighwayParts` selectors
-are shared rendering settings. Profiles missing new JSON fields receive the
-defaults above, but missing persisted world data always selects legacy.
+and `HIGHWAY_REQUIRES_TWO_CITIES` are legacy-only.
+`HIGHWAY_LEVEL_FROM_CITIES_MODE`, `HIGHWAY_NETWORK_LEVEL`,
+`HIGHWAY_SUPPORTS`, and the world style's `HighwayParts` selectors are shared.
+Profiles missing new JSON fields receive the defaults above, but missing
+persisted world data always selects legacy.
 
 `/lost debug` reports the persisted highway mode, cell, current/nearby hubs and
 strengths, ranked candidates and sectors, selected neighbours, mutual accepted
@@ -994,6 +1000,7 @@ levels at the lower and higher endpoints:
 | `1` | Minimum of both endpoint levels |
 | `2` | Maximum of both endpoint levels |
 | `3` | Integer average of both endpoint levels |
+| `4` | Fixed `HIGHWAY_NETWORK_LEVEL` |
 
 The resulting value is written to the X- or Z-highway cache for every chunk in
 the run. `-1` means no highway. The block-space base of a highway at level `L`

@@ -12,6 +12,7 @@ public record HighwayPlannerSettings(
         int maximumConnectionsPerHub,
         int minimumRouteLength,
         float routeCityPenalty,
+        int levelFromCitiesMode,
         int networkLevel
 ) {
     public HighwayPlannerSettings {
@@ -39,8 +40,8 @@ public record HighwayPlannerSettings(
         if (minimumRouteLength < 0 || routeCityPenalty < 0.0f || routeCityPenalty > 1000.0f) {
             throw new IllegalArgumentException("Invalid highway route length or city penalty");
         }
-        if (networkLevel < 0 || networkLevel > 32) {
-            throw new IllegalArgumentException("Highway network level must be between 0 and 32");
+        if (levelFromCitiesMode < 0 || levelFromCitiesMode > 4 || networkLevel < 0 || networkLevel > 32) {
+            throw new IllegalArgumentException("Invalid highway level mode or fixed network level");
         }
     }
 
@@ -55,6 +56,7 @@ public record HighwayPlannerSettings(
                 profile.HIGHWAY_MAXIMUM_CONNECTIONS_PER_HUB,
                 profile.HIGHWAY_MINIMUM_ROUTE_LENGTH,
                 profile.HIGHWAY_ROUTE_CITY_PENALTY,
+                profile.HIGHWAY_LEVEL_FROM_CITIES_MODE,
                 profile.HIGHWAY_NETWORK_LEVEL);
     }
 }

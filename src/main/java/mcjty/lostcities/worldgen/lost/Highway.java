@@ -161,6 +161,7 @@ public class Highway {
                                 BuildingInfo.getCityLevel(higher, provider));
                         case 3 -> (BuildingInfo.getCityLevel(lower, provider) +
                                 BuildingInfo.getCityLevel(higher, provider)) / 2;
+                        case 4 -> profile.HIGHWAY_NETWORK_LEVEL;
                         default -> throw new RuntimeException("Bad value for 'highwayLevelFromCities'!");
                     };
                     for (ChunkCoord cc = lower; cc.getCoord(orientation) <= higher.getCoord(orientation); cc = cc.higher(orientation)) {

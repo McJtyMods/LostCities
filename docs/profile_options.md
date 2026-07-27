@@ -143,7 +143,7 @@ Secondary-road counts are requests rather than guarantees. If a primary block ca
 | --- | --- | --- |
 | `highwayGenerationMode` | `INTERCITY_NETWORK_V1` | `LEGACY` or `INTERCITY_NETWORK_V1`. |
 | `highwayRequiresTwoCities` | `true` | Legacy highways require a valid city at both ends; `false` requires only one. |
-| `highwayLevelFromCities` | `0` (0–3) | Legacy height rule: `0` top-left city, `1` lower endpoint, `2` higher endpoint, `3` endpoint average. |
+| `highwayLevelFromCities` | `3` (0–4) | Shared height rule: `0` first endpoint, `1` lower endpoint, `2` higher endpoint, `3` integer endpoint average, `4` fixed `highwayNetworkLevel`. |
 | `highwayDistanceMask` | `7` (≥0) | Legacy highway spacing mask. Use a power of two minus one; `0` disables legacy highways. |
 | `highwayMainPerlinScale` | `50.0` (1–1000) | Legacy main-axis noise scale. Higher values produce more frequent, shorter highways. |
 | `highwaySecondaryPerlinScale` | `10.0` (1–1000) | Legacy secondary-axis noise scale controlling variation among nearby highways. |
@@ -158,7 +158,7 @@ Secondary-road counts are requests rather than guarantees. If a primary block ca
 | `highwayMaximumConnectionsPerHub` | `2` (1–8) | Maximum intercity connections incident to one hub. |
 | `highwayMinimumRouteLength` | `40` (0–4096) | Minimum Manhattan route length in chunks. |
 | `highwayRouteCityPenalty` | `1.0` (0–1000) | Weight of approximate city potential when selecting an L-shaped route's bend. |
-| `highwayNetworkLevel` | `0` (0–32) | Fixed city level used by every complete intercity connection. |
+| `highwayNetworkLevel` | `0` (0–32) | Fixed highway level used when `highwayLevelFromCities` is `4`. |
 
 ### Railways, loot, and generation details
 

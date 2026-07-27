@@ -1,6 +1,7 @@
 package mcjty.lostcities.worldgen;
 
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.worldgen.highway.HighwayHub;
 import mcjty.lostcities.worldgen.highway.HighwayHubPersistence;
 import mcjty.lostcities.worldgen.highway.HighwayPlannerSettings;
@@ -28,8 +29,8 @@ import java.util.TreeMap;
 public class LostCityHighwayData extends SavedData {
 
     public static final String NAME = "LostCityHighwayData";
-    private static final int FORMAT_VERSION = 1;
-    private static final long HUB_ALGORITHM_VERSION = 2L;
+    private static final int FORMAT_VERSION = 2;
+    private static final long HUB_ALGORITHM_VERSION = 3L;
 
     private static final String VERSION_KEY = "version";
     private static final String DIMENSIONS_KEY = "dimensions";
@@ -41,6 +42,7 @@ public class LostCityHighwayData extends SavedData {
     private static final String CHUNK_X_KEY = "chunkX";
     private static final String CHUNK_Z_KEY = "chunkZ";
     private static final String POTENTIAL_KEY = "potential";
+    private static final String CITY_LEVEL_KEY = "cityLevel";
 
     private final Map<String, DimensionHubData> dimensions = new HashMap<>();
 
@@ -64,7 +66,7 @@ public class LostCityHighwayData extends SavedData {
                 HubKey key = new HubKey(hubTag.getInt(CELL_X_KEY), hubTag.getInt(CELL_Z_KEY));
                 Optional<HighwayHub> hub = hubTag.getBoolean(HAS_HUB_KEY)
                         ? Optional.of(new HighwayHub(key, hubTag.getInt(CHUNK_X_KEY), hubTag.getInt(CHUNK_Z_KEY),
-                        hubTag.getInt(POTENTIAL_KEY)))
+                        hubTag.getInt(POTENTIAL_KEY), hubTag.getInt(CITY_LEVEL_KEY)))
                         : Optional.empty();
                 dimension.hubs.put(key, hub);
             }
@@ -130,8 +132,8 @@ public class LostCityHighwayData extends SavedData {
      * covers selection of the biome-multiplier asset; format/algorithm revisions
      * cover code changes to the calculation itself.
      */
-    public static long createCacheSignature(long seed, LostCityProfile profile, HighwayPlannerSettings settings,
-                                            ResourceLocation worldStyleId) {
+    public static long createCacheSignature(long seed, LostCityProfile profile, LostCityProfile outsideProfile,
+                                            HighwayPlannerSettings settings, ResourceLocation worldStyleId) {
         long hash = 0xcbf29ce484222325L;
         hash = hash(hash, FORMAT_VERSION);
         hash = hash(hash, HUB_ALGORITHM_VERSION);
@@ -151,7 +153,27 @@ public class LostCityHighwayData extends SavedData {
         hash = hash(hash, Double.doubleToLongBits(profile.CITY_PERLIN_INNERSCALE));
         hash = hash(hash, profile.CITY_MINHEIGHT);
         hash = hash(hash, profile.CITY_MAXHEIGHT);
+        hash = hashCityLevelSettings(hash, profile);
+        hash = hashCityLevelSettings(hash, outsideProfile);
+        hash = hash(hash, Config.HEIGHT_SAMPLE_SIZE.get());
         return hashString(hash, worldStyleId.toString());
+    }
+
+    private static long hashCityLevelSettings(long hash, LostCityProfile profile) {
+        if (profile == null) {
+            return hash(hash, 0);
+        }
+        hash = hash(hash, 1);
+        hash = hash(hash, profile.LANDSCAPE_TYPE.ordinal());
+        hash = hash(hash, profile.USE_AVG_HEIGHTMAP ? 1 : 0);
+        hash = hash(hash, profile.CITY_LEVEL0_HEIGHT);
+        hash = hash(hash, profile.CITY_LEVEL1_HEIGHT);
+        hash = hash(hash, profile.CITY_LEVEL2_HEIGHT);
+        hash = hash(hash, profile.CITY_LEVEL3_HEIGHT);
+        hash = hash(hash, profile.CITY_LEVEL4_HEIGHT);
+        hash = hash(hash, profile.CITY_LEVEL5_HEIGHT);
+        hash = hash(hash, profile.CITY_LEVEL6_HEIGHT);
+        return hash(hash, profile.CITY_LEVEL7_HEIGHT);
     }
 
     private static long hash(long current, long value) {
@@ -183,6 +205,7 @@ public class LostCityHighwayData extends SavedData {
                     hubTag.putInt(CHUNK_X_KEY, value.chunkX());
                     hubTag.putInt(CHUNK_Z_KEY, value.chunkZ());
                     hubTag.putInt(POTENTIAL_KEY, value.potentialScore());
+                    hubTag.putInt(CITY_LEVEL_KEY, value.cityLevel());
                 });
                 hubs.add(hubTag);
             });

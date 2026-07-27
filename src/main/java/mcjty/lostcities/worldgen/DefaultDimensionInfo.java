@@ -11,6 +11,7 @@ import mcjty.lostcities.worldgen.street.StreetPlannerSettings;
 import mcjty.lostcities.worldgen.highway.ApproximateCityPotential;
 import mcjty.lostcities.worldgen.highway.HighwayPlannerSettings;
 import mcjty.lostcities.worldgen.highway.IntercityHighwayPlanner;
+import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -66,10 +67,12 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         highwayGenerationMode = LostCityWorldGenData.get(world.getLevel()).getHighwayMode(world.getLevel().dimension(), profile.HIGHWAY_GENERATION_MODE);
         if (highwayGenerationMode == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
             HighwayPlannerSettings highwaySettings = HighwayPlannerSettings.fromProfile(profile);
-            long cacheSignature = LostCityHighwayData.createCacheSignature(world.getSeed(), profile, highwaySettings, style.getId());
+            long cacheSignature = LostCityHighwayData.createCacheSignature(world.getSeed(), profile, profileOutside,
+                    highwaySettings, style.getId());
             highwayPlanner = new IntercityHighwayPlanner(world.getSeed(), world.getLevel().dimension().location().toString(),
                     highwaySettings,
                     new ApproximateCityPotential(world.getSeed(), profile, this::applyHighwayCityConstraints),
+                    (chunkX, chunkZ) -> BuildingInfo.getCityLevel(new ChunkCoord(type, chunkX, chunkZ), this),
                     LostCityHighwayData.get(world.getLevel()).forDimension(world.getLevel().dimension(), cacheSignature));
         } else {
             highwayPlanner = null;

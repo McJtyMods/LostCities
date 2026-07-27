@@ -22,7 +22,7 @@ public class Highways {
         } else if (levelX >= 0 && levelZ >= 0) {
             // There are two highways on different level. Make sure the lowest one is done first because it
             // will clear out what is above it
-            if (levelX == 0) {
+            if (levelX < levelZ) {
                 generateHighwayPart(feature, info, levelX, Transform.ROTATE_NONE, info.getZmin(), info.getZmax(), false);
                 generateHighwayPart(feature, info, levelZ, Transform.ROTATE_90, info.getXmax(), info.getXmax(), false);
             } else {
