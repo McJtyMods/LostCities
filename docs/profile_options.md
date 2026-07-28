@@ -151,7 +151,7 @@ Secondary-road counts are requests rather than guarantees. If a primary block ca
 | `highwaySupports` | `true` | Generates supports where needed; disable for highways spanning void. |
 | `highwayPlanningCellSize` | `128` (32–512) | Planning-cell size in chunks for the intercity network. |
 | `highwayHubSampleSpacing` | `16` (1–512) | Chunk spacing between deterministic city-potential samples in a cell; cannot exceed planning-cell size. Samples include terrain-height and biome-multiplier checks. |
-| `highwayHubMinimumPotential` | `0.25` (0–1) | Minimum height- and biome-adjusted city-potential score needed to create a hub. |
+| `highwayHubMinimumPotential` | `0.20` (0–1) | Minimum height- and biome-adjusted city-potential score needed to create a hub. Lower values make inter-city highway hubs more common. |
 | `highwayHubSearchRadiusCells` | `2` (0–8) | Planning-cell radius in which a hub considers other hubs. |
 | `highwayMinimumHubDistance` | `64` (0–4096) | Minimum Euclidean distance in chunks between connected hubs. |
 | `highwayMaximumHubDistance` | `320` (0–4096) | Maximum connected-hub distance; cannot be below the minimum. |
@@ -263,3 +263,97 @@ These options have an effect only when the client has Lost Cities installed. `-1
 - `highwayHubSampleSpacing` cannot exceed `highwayPlanningCellSize`.
 - Mode names and conflict-policy names are case-insensitive when read, but the generated profiles use the uppercase enum names shown above.
 - Profile defaults and available options can change between mod versions. Keep custom profiles under version control and compare them with a newly generated default profile after upgrading.
+
+## Common profile recipes
+
+The snippets below contain only the relevant sections. Merge them into a copy of a generated profile rather than using them as complete profile files. Try changes in a new world first: generated chunks are not rebuilt, and an existing world's persisted street and highway generation modes do not change when the corresponding mode option is edited.
+
+### Make cities rarer but larger
+
+Lower `cityChance` to create fewer city centers, then raise both radius bounds to make each resulting city cover more ground:
+
+```json
+{
+  "cities": {
+    "cityChance": 0.003,
+    "cityMinRadius": 100,
+    "cityMaxRadius": 240
+  }
+}
+```
+
+These values are a starting point, not an equivalent exchange: larger cities can overlap, so inspect several seeds and tune `cityChance` first. Keep `cityMinRadius` below `cityMaxRadius`.
+
+### Increase or decrease inter-city highways
+
+For `INTERCITY_NETWORK_V1`, `highwayHubMinimumPotential` is the closest control to highway frequency. Lower it to let weaker city regions become hubs; raise it to require stronger city regions. Adjust it in steps of about `0.05`. `highwayMaximumConnectionsPerHub` separately controls how many routes a hub can have.
+
+For example, this makes a denser network:
+
+```json
+{
+  "lostcity": {
+    "highwayGenerationMode": "INTERCITY_NETWORK_V1",
+    "highwayHubMinimumPotential": 0.15,
+    "highwayMaximumConnectionsPerHub": 3
+  }
+}
+```
+
+For fewer highways, try a threshold of `0.30` and leave the connection limit at `2`, or set it to `1` for a very sparse network. A value of `0` for `highwayHubSearchRadiusCells` prevents hubs from finding neighbors and therefore disables inter-city routes.
+
+### Increase or decrease legacy highways
+
+For `LEGACY`, lower `highwayPerlinFactor` to make candidates more common and raise it to make them rarer. `highwayDistanceMask` controls the candidate-line spacing and must be a power of two minus one; `7`, `15`, and `31` produce progressively wider spacing, while `0` disables legacy highways.
+
+```json
+{
+  "lostcity": {
+    "highwayGenerationMode": "LEGACY",
+    "highwayPerlinFactor": 1.5,
+    "highwayDistanceMask": 7,
+    "highwayRequiresTwoCities": false
+  }
+}
+```
+
+Allowing one city endpoint with `highwayRequiresTwoCities: false` is especially useful in rare-city profiles.
+
+### Make the city street grid denser
+
+These settings enable every primary-road candidate, request more secondary roads inside each primary block, and make tertiary access roads more likely:
+
+```json
+{
+  "lostcity": {
+    "streetGenerationMode": "HIERARCHICAL_GRID_V1",
+    "primaryRoadSpacingX": 8,
+    "primaryRoadSpacingZ": 8,
+    "primaryRoadOptionalChance": 1.0,
+    "primaryRoadForceEvery": 1,
+    "secondaryRoadMinCountX": 2,
+    "secondaryRoadMaxCountX": 3,
+    "secondaryRoadMinCountZ": 2,
+    "secondaryRoadMaxCountZ": 3,
+    "tertiaryRoadChance": 0.8
+  }
+}
+```
+
+Dense road settings leave fewer building lots. To make a sparser grid, increase both primary spacing values, lower `primaryRoadOptionalChance`, request fewer secondary roads, and lower `tertiaryRoadChance`.
+
+### Make taller, more building-heavy cities
+
+Raise `buildingChance` for fewer street or open-lot chunks, then increase the floor bounds. Taller buildings cost more generation and rendering time.
+
+```json
+{
+  "lostcity": {
+    "buildingChance": 0.6,
+    "buildingMinFloors": 3,
+    "buildingMinFloorsChance": 6,
+    "buildingMaxFloorsChance": 12,
+    "buildingMaxFloors": 16
+  }
+}
+```

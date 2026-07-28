@@ -52,7 +52,7 @@
       },
       {
         "name": "highway_gas_station",
-        "weight": 6,
+        "weight": 12,
         "nearhighway": true,
         "maxheightdiff": 12,
         "biomes": {
@@ -65,7 +65,7 @@
       },
       {
         "name": "highway_restaurant",
-        "weight": 4,
+        "weight": 9,
         "nearhighway": true,
         "maxheightdiff": 12,
         "biomes": {
