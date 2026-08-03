@@ -1765,6 +1765,7 @@ public class LostCityTerrainFeature {
         CompiledPalette compiledPalette = computePalette(info, part);
 
         boolean nowater = part.getMetaBoolean(ILostCities.META_NOWATER);
+        boolean forcedAir = part.getMetaBoolean(ILostCities.META_FORCEDAIR);
 
         for (int x = 0; x < part.getXSize(); x++) {
             for (int z = 0; z < part.getZSize(); z++) {
@@ -1794,20 +1795,24 @@ public class LostCityTerrainFeature {
                                     b = air;
                                 }
                             } else if (b == hardAir) {
-                                switch (airWaterLevel) {
-                                    case AIR:
-                                        b = air;
-                                        break;
-                                    case WATERLEVEL:
-                                        if (!info.profile.AVOID_FOLIAGE && !nowater && oy + y < info.waterLevel) {
-                                            b = liquid;
-                                        } else {
+                                if (forcedAir) {
+                                    b = air;
+                                } else {
+                                    switch (airWaterLevel) {
+                                        case AIR:
                                             b = air;
-                                        }
-                                        break;
-                                    case VOID:
-                                        // hardAir (STRUCTURE_VOID) is replaced by whatever was already there
-                                        break;
+                                            break;
+                                        case WATERLEVEL:
+                                            if (!info.profile.AVOID_FOLIAGE && !nowater && oy + y < info.waterLevel) {
+                                                b = liquid;
+                                            } else {
+                                                b = air;
+                                            }
+                                            break;
+                                        case VOID:
+                                            // hardAir (STRUCTURE_VOID) is replaced by whatever was already there
+                                            break;
+                                    }
                                 }
                             } else if (inf != null) {
                                 if (inf.isTorch()) {

@@ -1,4 +1,5 @@
 1.20-7.5.0:
+- Added `forcedair` part metadata for hard-air cells and fixed large-street connectors overwriting the surrounding road
 - Made inter-city highways somewhat more common and added practical profile customization examples
 - Added highway-side gas stations and two-chunk restaurants with parking lots, automatic highway-facing rotation, matching deck heights, and configurable foundation supports
 - Added dedicated highway bend and T-junction parts so inter-city routes no longer render those connections as four-way crossings

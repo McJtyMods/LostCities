@@ -425,6 +425,7 @@ Each metadata entry has a `key` and one typed value: `boolean`, `char`, `string`
 | `support` char | Palette character used for downward bridge or highway supports |
 | `z1`, `z2` integer | Z bounds used when clearing/generating stair access |
 | `nowater` boolean | Prevents hard-air cells in this part from becoming water below water level |
+| `forcedair` boolean | Makes hard-air (`minecraft:structure_void`) cells overwrite existing blocks with air in every placement context |
 
 Parts are used for much more than floors: parks, fountains, bridges, building fronts, street patterns, railways, rail dungeons, highway sections, monorails, stairs, sphere centers, and scattered structures are all parts or buildings assembled from parts.
 

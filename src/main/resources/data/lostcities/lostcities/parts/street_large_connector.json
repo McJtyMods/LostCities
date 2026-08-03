@@ -4,22 +4,22 @@
   "refpalette": "street_large",
   "slices": [
     [
-      "bbbbbbbbbbbbbbbb",
-      "bbbbbbbbbbbbbbbb",
-      "bbbbbbbbbbbbbbbb",
-      "bbbbbbbbbbbbbbbb",
-      "lbbbbbbbbbbbbbbb",
-      "lbbbbbbbbbbbbbbb",
-      "lbbbbbbbbbbbbbbb",
-      "lbbbbbbbbbbbbbbb",
-      "lbbbbbbbbbbbbbbb",
-      "lbbbbbbbbbbbbbbb",
-      "lbbbbbbbbbbbbbbb",
-      "lbbbbbbbbbbbbbbb",
-      "bbbbbbbbbbbbbbbb",
-      "bbbbbbbbbbbbbbbb",
-      "bbbbbbbbbbbbbbbb",
-      "bbbbbbbbbbbbbbbb"
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "l               ",
+      "l               ",
+      "l               ",
+      "l               ",
+      "l               ",
+      "l               ",
+      "l               ",
+      "l               ",
+      "                ",
+      "                ",
+      "                ",
+      "                "
     ]
   ]
 }
