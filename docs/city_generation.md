@@ -1047,7 +1047,9 @@ asset lists for four shapes: ordinary straight highways, `_bi` four-way
 crossings, `_bend` bends, and `_t` T-junctions. One name is selected from the
 applicable list and resolved as a `BuildingPart`. The default names follow the
 `highway_<environment>[_<shape>]` pattern, such as `highway_open`,
-`highway_bridge_bend`, and `highway_tunnel_t`.
+`highway_bridge_bend`, and `highway_tunnel_t`. Built-in bridge junctions leave
+their connected chunk edges open and place guard and upper-frame walls along
+exposed edges.
 
 ### 6.4 Tunnel, open and bridge selection
 
@@ -1072,10 +1074,12 @@ own asset carving and do not perform this extra pass.
 
 Finally, if `HIGHWAY_SUPPORTS` is enabled and the selected part declares a
 support palette character through its `META_SUPPORT` metadata, the renderer
-builds two transformed corner supports. Each support descends from one block
-below the highway for at most forty blocks, filling empty blocks until it meets
-solid terrain. A missing palette mapping for the declared support character is
-treated as a configuration error.
+builds transformed corner supports. Straight and four-way parts use the two
+corners of the unrotated highway frame. Bend and T-junction parts add the third
+corner contributed by the rotated highway frame. Each support descends from
+one block below the highway for at most forty blocks, filling empty blocks
+until it meets solid terrain. A missing palette mapping for the declared
+support character is treated as a configuration error.
 
 ### 6.5 Interaction with city content
 

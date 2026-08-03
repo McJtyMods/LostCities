@@ -18,6 +18,7 @@
     - Prevented inter-city highways from targeting cities that terrain height or biome restrictions would suppress
     - Prevented inter-city highways from sharing subway lines or crossing surface-access subway stations
     - Fixed inter-city highway initialization crashing for profiles without an outside city-sphere profile
+    - Fixed missing guard walls, upper-frame walls, and support pillars on highway bends and T-junctions
 - Buildings and structure avoidance:
     - Applied village and configured-structure avoidance before city chunk details are derived, including atomic whole-footprint avoidance for multibuildings
     - Fixed large multibuildings being cut off when their complete structure-avoidance footprint was not available during chunk generation

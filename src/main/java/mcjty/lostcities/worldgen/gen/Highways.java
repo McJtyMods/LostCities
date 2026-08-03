@@ -98,29 +98,24 @@ public class Highways {
             if (sup == null) {
                 throw new RuntimeException("Cannot find support block '" + support + "' for highway part '" + part.getName() + "'!");
             }
-            int x1 = transform.rotateX(0, 15);
-            int z1 = transform.rotateZ(0, 15);
-            driver.current(x1, highwayGroundLevel - 1, z1);
-            for (int y = 0; y < 40; y++) {
-                if (LostCityTerrainFeature.isEmpty(driver.getBlock())) {
-                    driver.block(sup);
-                } else {
-                    break;
-                }
-                driver.decY();
+            generateSupport(driver, sup, transform, highwayGroundLevel, 0, 15);
+            generateSupport(driver, sup, transform, highwayGroundLevel, 0, 0);
+            if (partType == PartType.BEND || partType == PartType.T_JUNCTION) {
+                generateSupport(driver, sup, transform, highwayGroundLevel, 15, 0);
             }
+        }
+    }
 
-            int x2 = transform.rotateX(0, 0);
-            int z2 = transform.rotateZ(0, 0);
-            driver.current(x2, highwayGroundLevel - 1, z2);
-            for (int y = 0; y < 40; y++) {
-                if (LostCityTerrainFeature.isEmpty(driver.getBlock())) {
-                    driver.block(sup);
-                } else {
-                    break;
-                }
-                driver.decY();
+    private static void generateSupport(ChunkDriver driver, BlockState support, Transform transform,
+                                        int highwayGroundLevel, int x, int z) {
+        driver.current(transform.rotateX(x, z), highwayGroundLevel - 1, transform.rotateZ(x, z));
+        for (int y = 0; y < 40; y++) {
+            if (LostCityTerrainFeature.isEmpty(driver.getBlock())) {
+                driver.block(support);
+            } else {
+                break;
             }
+            driver.decY();
         }
     }
 
