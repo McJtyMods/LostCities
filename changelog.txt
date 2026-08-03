@@ -25,7 +25,7 @@
     - Fixed scattered multibuildings sometimes generating only partially. Their complete placement and validity are now decided once for the entire scattered area
     - Fixed bugs in blacklisted-structure checks that could miss structures or fail on structure references without registry keys
 - Performance and stability:
-    - Improved forced-building spawn searches by avoiding full city and highway calculations for unsuitable chunks
+    - Improved forced-building spawn searches by using a deterministic chunk spiral and avoiding full city and highway calculations for unsuitable chunks
     - Reworked world generation for safe multithreading. Non-overlapping chunks and different dimensions can generate concurrently while nearby chunks and lifecycle cleanup remain protected
     - Made world-generation caches, random sources, asset lookup, todo processing, and per-chunk scratch state concurrency-safe
 - Assets, tools, and documentation:

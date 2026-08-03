@@ -65,9 +65,9 @@ Options are grouped into five objects. Properties may be omitted, in which case 
 | `forceSpawnInBuilding` | `false` | Requires a building spawn. Do not enable together with `spawnNotInBuilding`. |
 | `forceSpawnBuildings` | `[]` | Allowed building IDs when `forceSpawnInBuilding` is enabled; empty allows any building. Combined with `forceSpawnParts`. |
 | `forceSpawnParts` | `[]` | Allowed part IDs when forcing a building spawn; empty allows any part. |
-| `spawnCheckRadius` | `200` (1–100000) | Initial radius, in blocks, searched for a valid spawn. |
+| `spawnCheckRadius` | `200` (1–100000) | Initial radius, in blocks, searched for a valid spawn. The search spirals outward from world center. |
 | `spawnRadiusIncrease` | `100` (1–100000) | Amount added to the search radius after an unsuccessful pass. |
-| `spawnCheckAttempts` | `20000` (1–1000000) | Maximum attempts before spawn selection fails. |
+| `spawnCheckAttempts` | `20000` (1–1000000) | Maximum chunks checked before spawn selection fails. |
 
 ### Buildings, streets, parks, and decay
 
