@@ -1,6 +1,7 @@
 package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.commands.ModCommands;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.playerdata.PlayerProperties;
@@ -209,17 +210,26 @@ public class ForgeEventHandlers {
             } else if (profile.FORCE_SPAWN_BUILDINGS.length > 0 || profile.FORCE_SPAWN_PARTS.length > 0) {
                 Set<String> buildings = Set.of(profile.FORCE_SPAWN_BUILDINGS);
                 Set<String> parts = Set.of(profile.FORCE_SPAWN_PARTS);
+                Map<ChunkCoord, Boolean> suitableBuildingChunks = new HashMap<>();
                 isSuitable = isSuitable.and(blockPos -> {
                     ChunkCoord coord = new ChunkCoord(dimensionInfo.getType(), blockPos.getX() >> 4, blockPos.getZ() >> 4);
-                    BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimensionInfo);
-                    if (info == null) {
-                        return false;
-                    }
-                    if (info.isCity() && info.hasBuilding) {
-                        if (!buildings.isEmpty()) {
-                            if (!buildings.contains(info.buildingType.getId().toString())) {
-                                return false;
-                            }
+                    return suitableBuildingChunks.computeIfAbsent(coord, ignored -> {
+                        LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(coord, dimensionInfo);
+                        if (!buildings.isEmpty() && (characteristics.buildingType == null
+                                || !buildings.contains(characteristics.buildingType.getId().toString()))) {
+                            return false;
+                        }
+
+                        // Sphere-center settings can turn a non-building characteristic into a building.
+                        boolean sphereCenter = (profile.isSpace() || profile.isSpheres())
+                                && CitySphere.isCitySphereCenter(coord, dimensionInfo);
+                        if (!characteristics.couldHaveBuilding && !sphereCenter) {
+                            return false;
+                        }
+
+                        BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimensionInfo);
+                        if (!info.isCity() || !info.hasBuilding) {
+                            return false;
                         }
                         if (!parts.isEmpty()) {
                             int lowestLevel = info.getBuildingBottomHeight();
@@ -231,8 +241,7 @@ public class ForgeEventHandlers {
                             }
                         }
                         return true;
-                    }
-                    return false;
+                    });
                 });
                 needsCheck = true;
             } else if (profile.FORCE_SPAWN_IN_BUILDING) {
