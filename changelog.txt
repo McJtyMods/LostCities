@@ -1,38 +1,23 @@
 1.20-7.5.0:
 - Hierarchical streets:
-    - Added versioned hierarchical street generation with primary, secondary, and tertiary roads, wider primary-road parts, connectors, and deterministic large bridges
-    - Added sloped primary streets with the same wide surface and white center marking as other primary-road sections
-    - Added full-chunk sloped streets that connect eligible hierarchical minor roads across a one-level height difference without placing obstructing street features
+    - Added versioned hierarchical street generation with primary, secondary, and tertiary roads, wider primary roads, slopes, connectors, and deterministic large bridges. Existing worlds keep legacy street generation
     - Added an optional city-style `tertiaryparts` street asset family, defaulting to the secondary-road `parts` family
-    - Increased the configurable secondary-road count limit from 8 to 128 for large hierarchical primary blocks
-    - Added a separate openLotParkChance profile option, defaulting to 0.8, so hierarchical open lots use varied park parts more often without changing legacy park frequency
-    - Fixed large-street connectors overwriting the surrounding road
-    - Prevented buildings from generating obstructed doors facing sloped streets
+    - Added a separate `openLotParkChance` profile option, defaulting to 0.8, so hierarchical open lots use varied park parts more often without changing legacy park frequency
 - Inter-city highways:
-    - Added a versioned inter-city highway network which creates deterministic routes between likely city regions. Existing worlds keep their legacy street and highway generation modes
-    - Made inter-city highways more common by allowing lower-potential city regions to form network hubs
-    - Added endpoint-based inter-city highway levels, defaulting to the average city level, with a configurable fixed-level mode
-    - Added dedicated highway bend and T-junction parts so inter-city routes no longer render those connections as four-way crossings
+    - Added a versioned inter-city highway network which creates deterministic routes between likely city regions, with endpoint-based or fixed highway levels. Existing worlds keep legacy highway generation
+    - Added dedicated highway bend and T-junction parts
     - Added highway-side gas stations and two-chunk restaurants with parking lots, automatic highway-facing rotation, matching deck heights, and configurable foundation supports
-    - Persisted inter-city highway hubs so reopening a world no longer repeats expensive remote terrain sampling
-    - Prevented inter-city highways from targeting cities that terrain height or biome restrictions would suppress
-    - Prevented inter-city highways from sharing subway lines or crossing surface-access subway stations
-    - Fixed inter-city highway initialization crashing for profiles without an outside city-sphere profile
-    - Fixed missing guard walls, upper-frame walls, and support pillars on highway bends and T-junctions
 - Buildings and structure avoidance:
-    - Applied village and configured-structure avoidance before city chunk details are derived, including atomic whole-footprint avoidance for multibuildings
-    - Fixed large multibuildings being cut off when their complete structure-avoidance footprint was not available during chunk generation
+    - Structure avoidance now treats each multibuilding as a single footprint, so it is either generated completely or avoided completely
     - Fixed scattered multibuildings sometimes generating only partially. Their complete placement and validity are now decided once for the entire scattered area
     - Fixed bugs in blacklisted-structure checks that could miss structures or fail on structure references without registry keys
 - Performance and stability:
-    - Improved forced-building spawn searches by using a deterministic chunk spiral and avoiding full city and highway calculations for unsuitable chunks
+    - Improved performance when searching for forced building spawn locations
     - Reworked world generation for safe multithreading. Non-overlapping chunks and different dimensions can generate concurrently while nearby chunks and lifecycle cleanup remain protected
-    - Made world-generation caches, random sources, asset lookup, todo processing, and per-chunk scratch state concurrency-safe
 - Assets, tools, and documentation:
     - Added `forcedair` part metadata for hard-air cells
     - The `/lostcities debug` command now reports the containing multibuilding name
-    - Added practical profile customization examples
-    - Added developer documentation for custom asset expansions, city generation, and world-generation thread safety
+    - Added practical profile customization examples and developer documentation for custom assets, city generation, and world-generation thread safety
 
 1.20-7.4.13:
 - TqLxQuanZ fixed an issue where multibuilding do not spawn when railway is below.
