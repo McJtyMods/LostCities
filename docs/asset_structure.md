@@ -583,7 +583,7 @@ If `settings` is omitted, Lost Cities uses `ignore`, a rail-part height of `1`, 
 - `centerpart`: part asset placed at a sphere center.
 - `centertype`: `default`, `street`, `building`, or `normal`.
 - `centerpartorigin`: `fixed`, `center`, `firstfloor`, `ground`, or `top`; default `top`.
-- `centerpartoffset`: integer Y offset, default `0`.
+- `centerpartoffset`: vertical offset in blocks, default `0`.
 
 `parts.monorails` accepts `both`, `vertical`, and `station`, each a single part ID. `parts.highways` accepts `tunnel`, `open`, and `bridge` for straight sections; `tunnel_bi`, `open_bi`, and `bridge_bi` for four-way crossings; `tunnel_bend`, `open_bend`, and `bridge_bend` for bends; and `tunnel_t`, `open_t`, and `bridge_t` for T-junctions. Each highway field accepts either one ID or a list. The unrotated bend connects west and south; the unrotated T-junction connects west, east, and south. The generator rotates these parts to match the planned connections. `parts.railways` accepts `stationunderground`, `stationopen`, `stationopenroof`, `stationundergroundstairs`, `stationstaircase`, `stationstaircasesurface`, `railshorizontal`, `railshorizontalend`, `railshorizontalwater`, `railsvertical`, `railsverticalwater`, `rails3split`, `railsbend`, `railsflat`, `railsdown1`, and `railsdown2`, again as one ID or a list. Omitted values use the corresponding built-in part names.
 
@@ -614,7 +614,7 @@ A scattered asset says what structure to place and how it interacts with terrain
 | `supportpart` | string | Optional part whose bottom slice is repeated downward by `repeatslice` instead of repeating the generated building part |
 | `terrainheight` | enum, **required** | `lowest`, `average`, `highest`, or `ocean` |
 | `terrainfix` | enum, **required** | `none`, `clear`, or `repeatslice` |
-| `heightoffset` | integer | Final Y offset, default `0` |
+| `heightoffset` | integer | Final vertical offset in blocks, default `0` |
 
 Supply `buildings` or `multibuilding`, not both. `clear` clears above the placement level. `repeatslice` extends non-space blocks in a bottom slice downward until each column reaches solid terrain. It uses `supportpart` when supplied and otherwise preserves the older behavior of using the generated part. A support part is useful for defining sparse pillars independently of the building or parking-lot floor.
 
@@ -642,7 +642,7 @@ The asset does not spawn until the active world style references it in `scattere
 }
 ```
 
-`areasize`, `chance`, `weightnone`, and `list` are required. `chance`, multiplied by the profile's scattered-chance multiplier, is the initial chance that a planning region attempts a placement. Each list entry requires `name` and integer `weight`, and optionally accepts `nearhighway`, `allowvoid`, a `biomes` matcher, and `maxheightdiff`. `weightnone` is added as a no-structure outcome after that chance check. `maxheightdiff` limits the height difference across the complete footprint. `allowvoid` permits placement where the sampled terrain is effectively void.
+`areasize`, `chance`, `weightnone`, and `list` are required. `areasize` is measured in chunks on both horizontal axes. `chance`, multiplied by the profile's scattered-chance multiplier, is the initial chance that a planning region attempts a placement. Each list entry requires `name` and integer `weight`, and optionally accepts `nearhighway`, `allowvoid`, a `biomes` matcher, and `maxheightdiff`. `weightnone` is added as a no-structure outcome after that chance check. `maxheightdiff` limits the terrain-height difference in blocks across the complete footprint. `allowvoid` permits placement where the sampled terrain is effectively void.
 
 `nearhighway: true` is a connection constraint rather than a loose distance check. The planner searches the area for a complete footprint whose connection edge directly borders a surface or bridge highway running parallel to that edge. Every highway chunk along that edge must have the same deck height; tunnels are rejected. The scattered structure is generated at that deck height plus `heightoffset`. The unrotated connection edge is north. With `rotatable: true`, the complete footprint, its multibuilding layout, its individual parts, and its optional support part rotate together to face a qualifying highway on any side.
 
