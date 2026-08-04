@@ -15,6 +15,7 @@
     - Improved performance when searching for forced building spawn locations
     - Reworked world generation for safe multithreading. Non-overlapping chunks and different dimensions can generate concurrently while nearby chunks and lifecycle cleanup remain protected
 - Assets, tools, and documentation:
+    - City styles can now override hierarchical open-lot park frequency with `profile_overrides.openLotParkChance`, independently from legacy park chance
     - Added `forcedair` part metadata for hard-air cells
     - The `/lostcities debug` command now reports the containing multibuilding name
     - Added practical profile customization examples and developer documentation for custom assets, city generation, and world-generation thread safety

@@ -508,6 +508,7 @@ Top-level fields:
 | `style` | Palette-style asset used for chunks in this city style |
 | `explosionchance` | Additional explosion chance factor for the style |
 | `stuff_tags` | Stuff categories enabled here. The tag `all` is always present |
+| `profile_overrides` | Optional city-local profile overrides; absent values fall back to the selected profile |
 | `generalblocks` | Palette characters for generator-wide materials |
 | `buildingsettings` | Building count/chance overrides |
 | `corridorblocks` | Corridor chance/materials |
@@ -517,7 +518,7 @@ Top-level fields:
 | `streetblocks` | Street chances/materials and street-part families |
 | `selectors` | Weighted buildings, multibuildings, and detail parts |
 
-Inheritance is additive for selector lists. If a child adds one building to a parent, both the parent's buildings and the child's building remain eligible. Replacing a selector list requires replacing the parent asset or defining a city style that does not inherit that list. In the current implementation the `generalblocks` characters and `parkblocks.grass` are not copied from a parent; repeat those fields in a child that needs them instead of relying on inheritance.
+Inheritance is additive for selector lists. If a child adds one building to a parent, both the parent's buildings and the child's building remain eligible. Replacing a selector list requires replacing the parent asset or defining a city style that does not inherit that list. Nullable `profile_overrides` values use ordinary scalar inheritance: an omitted child value inherits the resolved parent value, while an explicit value such as `0` is retained. Only after inheritance does an absent value fall back to the profile. In the current implementation the `generalblocks` characters and `parkblocks.grass` are not copied from a parent; repeat those fields in a child that needs them instead of relying on inheritance.
 
 Nested setting fields:
 
@@ -528,6 +529,19 @@ Nested setting fields:
 - `railblocks`: `railmain` (palette character).
 - `sphereblocks`: `inner`, `border`, `glass` (palette characters).
 - `streetblocks`: `fountainchance`, `frontchance` (floats), `width` (integer), `street`, `streetbase`, `streetvariant`, `border`, `wall` (palette characters), plus `parts`, `largeparts`, and `tertiaryparts`.
+
+The first supported `profile_overrides` field is `openLotParkChance`, a float from `0` to `1`. It controls whether a non-road hierarchical open lot receives a weighted park part. It is deliberately independent from the legacy `parkblocks.parkchance` value:
+
+```json
+{
+  "inherit": "lostcities:citystyle_common",
+  "profile_overrides": {
+    "openLotParkChance": 0.25
+  }
+}
+```
+
+With no `profile_overrides` object, or with `openLotParkChance` omitted, generation uses the profile's `openLotParkChance`. Existing city-style settings that already override profile behavior (`buildingsettings.buildingchance` and floor/cellar constraints, `parkblocks` behavior, `streetblocks` chances, and `corridorblocks.corridorchance`) are resolved through the same effective city-settings layer. Their existing JSON names and constraint semantics are unchanged. Field capitalization is significant.
 
 Modern streets are part-driven. `streetblocks.parts`, `largeparts`, and `tertiaryparts` each accept `full`, `straight`, `end`, `bend`, `t`, `none`, `all`, `connector`, and `stair`. Every field accepts either one part ID or a list of part IDs; a list gives deterministic visual variants. Omitted fields inside a family use the built-in names (`street_full`, `street_straight`, and so on). `largeparts` is used by hierarchical primary roads. Optional `tertiaryparts` is used by hierarchical tertiary roads and defaults to the resolved `parts` family when omitted, so existing city styles continue to use the same assets for secondary and tertiary roads.
 

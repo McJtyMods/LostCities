@@ -110,6 +110,8 @@ Options are grouped into five objects. Properties may be omitted, in which case 
 
 The random floor bound is based on `buildingMinFloorsChance + (cityFactor + 0.1) × (buildingMaxFloorsChance - buildingMinFloorsChance)`, added to `buildingMinFloors` as a random amount and capped by `buildingMaxFloors`.
 
+Several city-local profile values have long-standing city-style overrides. After city-style inheritance, `buildingsettings.buildingchance`, its floor/cellar limits, `parkblocks.parkchance`, `avoidfoliage`, `parkborder`, `parkelevation`, `parkstreetthreshold`, `streetblocks.fountainchance`, `frontchance`, and `corridorblocks.corridorchance` override their corresponding profile fallbacks. Floor and cellar values remain additional constraints rather than simple replacements. The effective settings resolver does not mutate the selected profile.
+
 ### Hierarchical street generation
 
 These options other than `streetGenerationMode` apply to `HIERARCHICAL_GRID_V1`. The selected mode is copied into persistent world data when a world is initialized; changing the profile later does not change an existing world's mode.
@@ -117,7 +119,7 @@ These options other than `streetGenerationMode` apply to `HIERARCHICAL_GRID_V1`.
 | Option | Default / values | Meaning |
 | --- | --- | --- |
 | `streetGenerationMode` | `HIERARCHICAL_GRID_V1` | `LEGACY` or `HIERARCHICAL_GRID_V1`. |
-| `openLotParkChance` | `0.8` (0–1) | Chance that a hierarchical grass open lot receives a weighted park part. City-style `parkchance` does not override this value. |
+| `openLotParkChance` | `0.8` (0–1) | Chance that a hierarchical grass open lot receives a weighted park part. City-style `profile_overrides.openLotParkChance` overrides it after inheritance; legacy `parkblocks.parkchance` remains independent. |
 | `primaryRoadSpacingX` | `8` (8–128) | Number of chunks between candidate north/south primary corridors (lines at fixed X coordinates). A candidate is not necessarily enabled. |
 | `primaryRoadSpacingZ` | `8` (8–128) | Number of chunks between candidate east/west primary corridors (lines at fixed Z coordinates). A candidate is not necessarily enabled. |
 | `primaryRoadOptionalChance` | `0.45` (0–1) | Independent chance that each non-forced candidate becomes an actual primary corridor. `0` omits all non-forced candidates; `1` enables every candidate. |

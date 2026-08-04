@@ -51,6 +51,7 @@ public class CityStyle implements ILostCityCityStyle {
 
     // Park settings
     private Float parkChance;
+    private Float openLotParkChance;
     private Boolean avoidFoliage;
     private Boolean parkBorder;
     private Boolean parkElevation;
@@ -92,6 +93,7 @@ public class CityStyle implements ILostCityCityStyle {
             stuffTags.addAll(object.getStuffTags());
         }
         explosionChance = object.getExplosionChance();
+        object.getProfileOverrides().ifPresent(overrides -> openLotParkChance = overrides.openLotParkChance());
         object.getBuildingSettings().ifPresent(s -> {
             buildingChance = s.getBuildingChance();
             maxCellarCount = s.getMaxCellarCount();
@@ -217,6 +219,8 @@ public class CityStyle implements ILostCityCityStyle {
 
     @Override
     public Float getParkChance() { return parkChance; }
+
+    public Float getOpenLotParkChance() { return openLotParkChance; }
 
     @Override
     public Float getFrontChance() { return frontChance; }
@@ -383,6 +387,9 @@ public class CityStyle implements ILostCityCityStyle {
                 }
                 if (parkChance == null) {
                     parkChance = inheritFrom.parkChance;
+                }
+                if (openLotParkChance == null) {
+                    openLotParkChance = inheritFrom.openLotParkChance;
                 }
                 if (fountainChance == null) {
                     fountainChance = inheritFrom.fountainChance;

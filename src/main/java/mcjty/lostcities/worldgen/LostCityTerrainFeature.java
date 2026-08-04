@@ -1202,11 +1202,7 @@ public class LostCityTerrainFeature {
                         getDriver().block(elevation).incZ();
                     }
                 }
-                boolean parkElevation = info.profile.PARK_ELEVATION;
-                if (info.getCityStyle().getParkElevation() != null) {
-                    parkElevation = info.getCityStyle().getParkElevation();
-                }
-                if (parkElevation) {
+                if (info.getEffectiveCitySettings().parkElevation()) {
                     height++;
                 }
             } else if (!info.isHierarchicalOpen()) {
@@ -1523,7 +1519,7 @@ public class LostCityTerrainFeature {
         BlockState grassBlock = Blocks.GRASS_BLOCK.defaultBlockState();
         Supplier<BlockState> grass = (grassChar == null) ? () -> grassBlock : () -> compiledPalette.get(grassChar);
 
-        boolean parkBorder = info.getCityStyle().getParkBorder() != null ? info.getCityStyle().getParkBorder() : info.profile.PARK_BORDER;
+        boolean parkBorder = info.getEffectiveCitySettings().parkBorder();
         char street = GenerationContext.current().street();
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
@@ -1936,11 +1932,7 @@ public class LostCityTerrainFeature {
 
     private BlockState handleTodo(BuildingInfo info, int oy, WorldGenLevel world, int rx, int rz, int y, BlockState b) {
         Block block = b.getBlock();
-        CityStyle cs = info.getCityStyle();
-        boolean avoidFoliage = info.profile.AVOID_FOLIAGE;
-        if (cs.getAvoidFoliage() != null) {
-            avoidFoliage = cs.getAvoidFoliage();
-        }
+        boolean avoidFoliage = info.getEffectiveCitySettings().avoidFoliage();
         if (block instanceof SaplingBlock || block instanceof FlowerBlock) {
             if (avoidFoliage) {
                 b = air;

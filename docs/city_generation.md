@@ -856,8 +856,9 @@ separately as described below.
 
 ### Legacy stage A: nominate a park
 
-While constructing the top-left or single chunk's `BuildingInfo`, the code uses
-the city style's `parkChance`, falling back to `profile.PARK_CHANCE`:
+While constructing the top-left or single chunk's `BuildingInfo`, the effective
+city settings use the inherited city style's `parkChance`, falling back to
+`profile.PARK_CHANCE`:
 
 ```text
 random < parkChance  -> PARK
@@ -896,10 +897,20 @@ In `HIERARCHICAL_GRID_V1`, planned and predefined streets remain normal streets.
 Other non-building city chunks become grass open lots and retain the `PARK`
 street type so that they use the park surface rather than reconstructing the
 legacy road network. `OPEN_LOT_PARK_CHANCE` independently controls whether an
-open lot receives a weighted park part; its default is `0.8`. It is a profile
-setting and is intentionally not overridden by a city style's legacy
-`parkchance` value. A style with no eligible park parts still produces a plain
-grass lot.
+open lot receives a weighted park part; its default is `0.8`. An inherited city
+style can override it with `profile_overrides.openLotParkChance`. Absence falls
+back to the profile, and an explicit `0` remains an override. The legacy
+`parkblocks.parkchance` value remains independent and affects only legacy park
+nomination. The selected chunk's city style is the canonical owner of the open
+lot decision; style selection happens before the chance roll and does not
+depend on its result. A style with no eligible park parts still produces a
+plain grass lot.
+
+The same immutable effective-city resolver owns the existing local fallbacks
+for building chance and floor/cellar constraints, legacy parks, fountains,
+fronts, corridors, foliage, park borders/elevation, and park street thresholds.
+This centralizes precedence without changing those existing asset keys or
+their random-number consumption.
 
 The three final street types mean:
 
