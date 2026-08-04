@@ -14,12 +14,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class LostCitiesImp implements ILostCities {
 
-    private final Map<ResourceKey<Level>, LostCityInformation> info = new HashMap<>();
+    private final Map<ResourceKey<Level>, LostCityInformation> info = new ConcurrentHashMap<>();
 
     public void cleanUp() {
         info.clear();
@@ -30,11 +30,7 @@ public class LostCitiesImp implements ILostCities {
     public ILostCityInformation getLostInfo(Level world) {
         IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo((WorldGenLevel) world);
         if (dimensionInfo != null) {
-            if (!info.containsKey(world.dimension())) {
-                LostCityInformation gen = new LostCityInformation(dimensionInfo);
-                info.put(world.dimension(), gen);
-            }
-            return info.get(world.dimension());
+            return info.computeIfAbsent(world.dimension(), key -> new LostCityInformation(dimensionInfo));
         }
         return null;
     }

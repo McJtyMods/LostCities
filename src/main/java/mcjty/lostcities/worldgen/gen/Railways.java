@@ -28,7 +28,7 @@ public class Railways {
 
     public static void generateRailways(LostCityTerrainFeature feature, BuildingInfo info, Railway.RailChunkInfo railInfo, ChunkHeightmap heightmap) {
         IDimensionInfo provider = feature.provider;
-        ChunkDriver driver = feature.driver;
+        ChunkDriver driver = feature.getDriver();
         BlockState liquid = feature.liquid;
         BlockState air = Blocks.AIR.defaultBlockState();
         RailwayParts railwayParts = provider.getWorldStyle().getPartSelector().railwayParts();

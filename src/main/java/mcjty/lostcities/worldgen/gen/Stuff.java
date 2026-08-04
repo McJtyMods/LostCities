@@ -20,7 +20,7 @@ import java.util.List;
 public class Stuff {
 
     public static void generateStuff(LostCityTerrainFeature feature, BuildingInfo info) {
-        feature.rand.setSeed(info.coord.chunkX() * 2570174657L + info.coord.chunkZ() * 101754695981L);
+        feature.getRandom().setSeed(info.coord.chunkX() * 2570174657L + info.coord.chunkZ() * 101754695981L);
         BiomeInfo biome = BiomeInfo.getBiomeInfo(feature.provider, info.coord);
         CompiledPalette palette = info.getCompiledPalette();
         for (String tag : info.getCityStyle().getStuffTags()) {
@@ -50,7 +50,7 @@ public class Stuff {
     }
 
     private static void actuallyGenerateStuff(LostCityTerrainFeature feature, BuildingInfo info, StuffSettingsRE settings, CompiledPalette palette, boolean inBuilding) {
-        ChunkDriver driver = feature.driver;
+        ChunkDriver driver = feature.getDriver();
         WorldGenLevel level = info.provider.getWorld();
         int attempts = settings.getAttempts();
         Integer minheight = settings.getMinheight();
@@ -70,7 +70,7 @@ public class Stuff {
         }
         int mincount = settings.getMincount();
         int maxcount = settings.getMaxcount();
-        RandomSource rand = feature.rand;
+        RandomSource rand = feature.getRandom();
         int count = rand.nextInt(maxcount - mincount) + mincount;
         for (int j = 0; j < count; j++) {
             for (int i = 0; i < attempts; i++) {

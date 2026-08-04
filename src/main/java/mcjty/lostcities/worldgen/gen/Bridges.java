@@ -1,6 +1,7 @@
 package mcjty.lostcities.worldgen.gen;
 
 import mcjty.lostcities.api.ILostCities;
+import mcjty.lostcities.config.StreetGenerationMode;
 import mcjty.lostcities.worldgen.ChunkDriver;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
@@ -32,10 +33,15 @@ public class Bridges {
 
     private static void generateBridge(LostCityTerrainFeature feature, BuildingInfo info, BuildingPart bt, Orientation orientation) {
         CompiledPalette compiledPalette = feature.computePalette(info, bt);
-        ChunkDriver driver = feature.driver;
+        ChunkDriver driver = feature.getDriver();
+        // Legacy bridge parts were authored one block above the old street
+        // surface. Wide planned bridges share the large-street surface level.
+        int bridgeLevel = info.provider.getStreetGenerationMode() == StreetGenerationMode.HIERARCHICAL_GRID_V1
+                ? info.profile.GROUNDLEVEL
+                : info.profile.GROUNDLEVEL + 1;
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                driver.current(x, info.profile.GROUNDLEVEL + 1, z);
+                driver.current(x, bridgeLevel, z);
                 int l = 0;
                 while (l < bt.getSliceCount()) {
                     Character c = orientation == Orientation.X ? bt.getPaletteChar(x, l, z) : bt.getPaletteChar(z, l, x); // @todo general rotation system?

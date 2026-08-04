@@ -1,0 +1,8 @@
+{
+  "multibuilding": "highway_restaurant",
+  "rotatable": true,
+  "clearhighwayrailing": true,
+  "supportpart": "roadside_supports",
+  "terrainheight": "highest",
+  "terrainfix": "repeatslice"
+}

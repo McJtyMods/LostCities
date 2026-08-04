@@ -17,6 +17,7 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
                     Codec.STRING.optionalFieldOf("style").forGetter(l -> Optional.ofNullable(l.style)),
                     Codec.STRING.optionalFieldOf("inherit").forGetter(l -> Optional.ofNullable(l.inherit)),
                     Codec.STRING.listOf().optionalFieldOf("stuff_tags").forGetter(l -> Optional.ofNullable(l.stuffTags)),
+                    CityProfileOverrides.CODEC.optionalFieldOf("profile_overrides").forGetter(l -> Optional.ofNullable(l.profileOverrides)),
                     GeneralSettings.CODEC.optionalFieldOf("generalblocks").forGetter(l -> Optional.ofNullable(l.generalSettings)),
                     BuildingSettings.CODEC.optionalFieldOf("buildingsettings").forGetter(l -> Optional.ofNullable(l.buildingSettings)),
                     CorridorSettings.CODEC.optionalFieldOf("corridorblocks").forGetter(l -> Optional.ofNullable(l.corridorSettings)),
@@ -34,6 +35,7 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
     private final String inherit;
 
     private final List<String> stuffTags;
+    private final CityProfileOverrides profileOverrides;
 
     private final GeneralSettings generalSettings;
     private final BuildingSettings buildingSettings;
@@ -50,6 +52,7 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
             Optional<String> style,
             Optional<String> inherit,
             Optional<List<String>> stuffTags,
+            Optional<CityProfileOverrides> profileOverrides,
             Optional<GeneralSettings> generalSettings,
             Optional<BuildingSettings> buildingSettings,
             Optional<CorridorSettings> corridorSettings,
@@ -62,6 +65,7 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
         this.style = style.orElse(null);
         this.inherit = inherit.orElse(null);
         this.stuffTags = stuffTags.orElse(null);
+        this.profileOverrides = profileOverrides.orElse(null);
         this.generalSettings = generalSettings.orElse(null);
         this.buildingSettings = buildingSettings.orElse(null);
         this.corridorSettings = corridorSettings.orElse(null);
@@ -91,6 +95,10 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
 
     public Optional<GeneralSettings> getGeneralSettings() {
         return Optional.ofNullable(generalSettings);
+    }
+
+    public Optional<CityProfileOverrides> getProfileOverrides() {
+        return Optional.ofNullable(profileOverrides);
     }
 
     public Optional<BuildingSettings> getBuildingSettings() {

@@ -7,10 +7,9 @@ import mcjty.lostcities.varia.QualityRandom;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.lost.regassets.data.RailwayParts;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static mcjty.lostcities.api.RailChunkType.*;
 import static mcjty.lostcities.worldgen.lost.Railway.RailDirection.*;
@@ -88,7 +87,7 @@ public class Railway {
         }
     }
 
-    private static final Map<ChunkCoord, RailChunkInfo> RAIL_INFO = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<ChunkCoord, RailChunkInfo> RAIL_INFO = new ConcurrentHashMap<>();
 
     public static void cleanCache() {
         RAIL_INFO.clear();
@@ -320,8 +319,9 @@ public class Railway {
     }
 
     public static RailChunkInfo getRailChunkType(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
-        if (RAIL_INFO.containsKey(coord)) {
-            return RAIL_INFO.get(coord);
+        RailChunkInfo cached = RAIL_INFO.get(coord);
+        if (cached != null) {
+            return cached;
         }
         RailChunkInfo info = getRailChunkTypeInternal(coord, provider);
         if ((provider.getProfile().isSpace() || provider.getProfile().isSpheres()) && CitySphere.onCitySphereBorder(coord, provider)) {
@@ -335,8 +335,8 @@ public class Railway {
                 info = RailChunkInfo.NOTHING;
             }
         }
-        RAIL_INFO.put(coord, info);
-        return info;
+        RailChunkInfo existing = RAIL_INFO.putIfAbsent(coord, info);
+        return existing == null ? info : existing;
     }
 
     public static void removeRailChunkType(ChunkCoord coord) {

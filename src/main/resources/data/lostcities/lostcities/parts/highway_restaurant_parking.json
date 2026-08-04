@@ -1,0 +1,102 @@
+{
+  "xsize": 16,
+  "zsize": 16,
+  "palette": {
+    "palette": [
+      {
+        "char": "p",
+        "block": "minecraft:gray_concrete"
+      },
+      {
+        "char": "m",
+        "block": "minecraft:yellow_concrete"
+      },
+      {
+        "char": "i",
+        "block": "minecraft:iron_block"
+      },
+      {
+        "char": "e",
+        "block": "minecraft:sea_lantern"
+      },
+      {
+        "char": "b",
+        "block": "minecraft:iron_bars"
+      }
+    ]
+  },
+  "slices": [
+    [
+      "pppppppppppppppp",
+      "pppppppppppppppp",
+      "pmpppmpppmpppmpp",
+      "pmpppmpppmpppmpp",
+      "pmpppmpppmpppmpp",
+      "pmpppmpppmpppmpp",
+      "pmpppmpppmpppmpp",
+      "pmpppmpppmpppmpp",
+      "pmpppmpppmpppmpp",
+      "pmpppmpppmpppmpp",
+      "pmpppmpppmpppmpp",
+      "pmpppmpppmpppmpp",
+      "pppppppppppppppp",
+      "pppppppppppppppp",
+      "pppppppppppppppp",
+      "pppppppppppppppp"
+    ],
+    [
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      " i            ib",
+      "bbbbbbbbbbbbbbbb"
+    ],
+    [
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      "               b",
+      " i            ib",
+      "bbbbbbbbbbbbbbbb"
+    ],
+    [
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      "                ",
+      " e            e ",
+      "                "
+    ]
+  ]
+}

@@ -8,6 +8,7 @@ import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostTags;
 import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -69,7 +70,7 @@ public class DamageArea {
         }
     }
 
-    public BlockState damageBlock(BlockState b, IDimensionInfo provider, int y, float damage, CompiledPalette palette, BlockState liquidChar) {
+    public BlockState damageBlock(BlockState b, IDimensionInfo provider, RandomSource random, int y, float damage, CompiledPalette palette, BlockState liquidChar) {
         if (Tools.hasTag(b.getBlock(), LostTags.NOT_BREAKABLE_TAG)) {
             return b;
         }
@@ -77,11 +78,11 @@ public class DamageArea {
         if (Tools.hasTag(b.getBlock(), LostTags.EASY_BREAKABLE_TAG)) {
             damage *= 2.5f;    // As if this block gets double the damage
         }
-        if (provider.getRandom().nextFloat() <= damage) {
+        if (random.nextFloat() <= damage) {
             BlockState damaged = palette.canBeDamagedToIronBars(b);
             int waterlevel = Tools.getSeaLevel(provider.getWorld());//profile.GROUNDLEVEL - profile.WATERLEVEL_OFFSET;
             if (damage < BLOCK_DAMAGE_CHANCE && damaged != null) {
-                if (provider.getRandom().nextFloat() < .7f) {
+                if (random.nextFloat() < .7f) {
                     b = damaged;
                 } else {
                     b = y <= waterlevel ? liquidChar : air;

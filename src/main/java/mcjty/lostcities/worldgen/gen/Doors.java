@@ -24,7 +24,7 @@ public class Doors
     public static void generateDoors(LostCityTerrainFeature feature, BuildingInfo info, int height, int f) {
         BlockState air = Blocks.AIR.defaultBlockState();
         BlockState filler = info.getCompiledPalette().get(info.getBuilding().getFillerBlock());
-        ChunkDriver driver = feature.driver;
+        ChunkDriver driver = feature.getDriver();
 
         height--;       // Start generating doors one below for the filler
 
@@ -136,6 +136,9 @@ public class Doors
         int globalLevel = info.localToGlobal(localLevel);
         int localAdjacent = info2.globalToLocal(globalLevel);
         if (info.getFloor(localLevel).getMetaBoolean(ILostCities.META_DONTCONNECT)) {
+            return false;
+        }
+        if (info2.getStreetSlopeDirection() != null) {
             return false;
         }
         return (info2.isCity && !info2.hasBuilding && localLevel == 0 && localAdjacent == 0) || (info2.hasBuilding && localAdjacent == info2.getNumFloors());

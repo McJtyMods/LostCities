@@ -4,12 +4,11 @@ import mcjty.lostcities.setup.CustomRegistries;
 import mcjty.lostcities.worldgen.lost.regassets.*;
 import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
 import net.minecraft.world.level.CommonLevelAccessor;
-import org.checkerframework.checker.units.qual.C;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AssetRegistries {
 
@@ -27,12 +26,12 @@ public class AssetRegistries {
     public static final RegistryAssetRegistry<PredefinedSphere, PredefinedSphereRE> PREDEFINED_SPHERES = new RegistryAssetRegistry<>(CustomRegistries.PREDEFINEDSPHERES_REGISTRY_KEY, PredefinedSphere::new);
     public static final RegistryAssetRegistry<StuffObject, StuffSettingsRE> STUFF = new RegistryAssetRegistry<>(CustomRegistries.STUFF_REGISTRY_KEY, StuffObject::new);
 
-    public static final Map<String, List<StuffObject>> STUFF_BY_TAG = new HashMap<>();
+    public static final Map<String, List<StuffObject>> STUFF_BY_TAG = new ConcurrentHashMap<>();
 
-    private static boolean loaded = false;
-    private static boolean loadedPredefined = false;
+    private static volatile boolean loaded = false;
+    private static volatile boolean loadedPredefined = false;
 
-    public static void reset() {
+    public static synchronized void reset() {
         VARIANTS.reset();
         CONDITIONS.reset();
         WORLDSTYLES.reset();
@@ -44,6 +43,7 @@ public class AssetRegistries {
         PALETTES.reset();
         PREDEFINED_CITIES.reset();
         PREDEFINED_SPHERES.reset();
+        SCATTERED.reset();
         STUFF.reset();
         STUFF_BY_TAG.clear();
         loaded = false;
@@ -54,22 +54,34 @@ public class AssetRegistries {
         if (loaded) {
             return;
         }
-        PARTS.loadAll(level);
-        BUILDINGS.loadAll(level);
-        STUFF.loadAll(level);
-        STUFF.getIterable().forEach(stuff -> stuff.getSettings().getTags().forEach(tag -> {
-            List<StuffObject> list = STUFF_BY_TAG.computeIfAbsent(tag, k -> new ArrayList<>());
-            list.add(stuff);
-        }));
-        loaded = true;
+        synchronized (AssetRegistries.class) {
+            if (loaded) {
+                return;
+            }
+            PARTS.loadAll(level);
+            BUILDINGS.loadAll(level);
+            STUFF.loadAll(level);
+            Map<String, List<StuffObject>> stuffByTag = new HashMap<>();
+            STUFF.getIterable().forEach(stuff -> stuff.getSettings().getTags().forEach(tag -> {
+                List<StuffObject> list = stuffByTag.computeIfAbsent(tag, k -> new ArrayList<>());
+                list.add(stuff);
+            }));
+            stuffByTag.forEach((tag, stuff) -> STUFF_BY_TAG.put(tag, List.copyOf(stuff)));
+            loaded = true;
+        }
     }
 
     public static void loadPredefinedStuff(CommonLevelAccessor level) {
         if (loadedPredefined) {
             return;
         }
-        PREDEFINED_CITIES.loadAll(level);
-        PREDEFINED_SPHERES.loadAll(level);
-        loadedPredefined = true;
+        synchronized (AssetRegistries.class) {
+            if (loadedPredefined) {
+                return;
+            }
+            PREDEFINED_CITIES.loadAll(level);
+            PREDEFINED_SPHERES.loadAll(level);
+            loadedPredefined = true;
+        }
     }
 }

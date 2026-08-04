@@ -9,6 +9,7 @@ import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.ComponentFactory;
 import mcjty.lostcities.worldgen.LostCityFeature;
+import mcjty.lostcities.worldgen.gen.Scattered;
 import mcjty.lostcities.worldgen.lost.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -235,6 +236,7 @@ public class GuiLCConfig extends Screen {
         nl();
 
         addFloat(left,"lostcity.parkChance").label("Parks:"); nl();
+        addFloat(left,"lostcity.openLotParkChance").label("Open lot parks:"); nl();
         addFloat(left,"lostcity.fountainChance").label("Fountains:"); nl();
     }
 
@@ -269,6 +271,7 @@ public class GuiLCConfig extends Screen {
         Railway.cleanCache();
         City.cleanCache();
         CitySphere.cleanCache();
+        Scattered.cleanCache();
     }
 
     private void renderExtra(GuiGraphics graphics) {

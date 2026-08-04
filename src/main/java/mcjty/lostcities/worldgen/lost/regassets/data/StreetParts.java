@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public record StreetParts(List<String> full, List<String> straight, List<String> end, List<String> bend,
-                          List<String> t, List<String> none, List<String> all) {
+                          List<String> t, List<String> none, List<String> all, List<String> connector,
+                          List<String> stair) {
 
     public static final Codec<StreetParts> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Tools.listOrStringList("full", "street_full", StreetParts::full),
@@ -17,7 +18,9 @@ public record StreetParts(List<String> full, List<String> straight, List<String>
             Tools.listOrStringList("bend", "street_bend", StreetParts::bend),
             Tools.listOrStringList("t", "street_t", StreetParts::t),
             Tools.listOrStringList("none", "street_none", StreetParts::none),
-            Tools.listOrStringList("all", "street_all", StreetParts::all))
+            Tools.listOrStringList("all", "street_all", StreetParts::all),
+            Tools.listOrStringList("connector", "street_large_connector", StreetParts::connector),
+            Tools.listOrStringList("stair", "street_stair", StreetParts::stair))
             .apply(instance, StreetParts::new)
     );
 
@@ -28,7 +31,9 @@ public record StreetParts(List<String> full, List<String> straight, List<String>
             List.of("street_bend"),
             List.of("street_t"),
             List.of("street_none"),
-            List.of("street_all"));
+            List.of("street_all"),
+            List.of("street_large_connector"),
+            List.of("street_stair"));
 
     public Optional<StreetParts> get() {
         if (this == DEFAULT) {

@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen.lost;
 
 import mcjty.lostcities.api.RailChunkType;
 import mcjty.lostcities.config.LostCityProfile;
+import mcjty.lostcities.config.StreetGenerationMode;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.Counter;
@@ -14,6 +15,7 @@ import mcjty.lostcities.worldgen.lost.cityassets.CityStyle;
 import mcjty.lostcities.worldgen.lost.cityassets.MultiBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.MultiSettings;
 import mcjty.lostcities.worldgen.lost.regassets.data.WorldSettings;
+import mcjty.lostcities.worldgen.street.PlannedRoadType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -51,7 +53,7 @@ public class MultiChunk {
         }
     }
 
-    public static synchronized MultiChunk getOrCreate(IDimensionInfo provider, ChunkCoord coord) {
+    public static MultiChunk getOrCreate(IDimensionInfo provider, ChunkCoord coord) {
         int areasize = provider.getWorldStyle().getMultiSettings().areasize();
         ChunkCoord mc = getMultiCoord(coord, areasize);
         return MULTICHUNKS.computeIfAbsent(mc, k -> new MultiChunk(mc, areasize).calculateBuildings(provider));
@@ -182,6 +184,12 @@ public class MultiChunk {
                 ChunkCoord coord = topleft.offset(x + xx, z + zz);
                 if (City.isChunkOccupied(provider, coord)) {
                     return false;
+                }
+                if (provider.getStreetGenerationMode() == StreetGenerationMode.HIERARCHICAL_GRID_V1) {
+                    PlannedRoadType roadType = provider.getStreetPlanner().getRoadType(coord.chunkX(), coord.chunkZ());
+                    if (profile.MULTI_BUILDING_STREET_CONFLICT.roadBlocks(roadType)) {
+                        return false;
+                    }
                 }
                 Railway.RailChunkInfo railChunkInfo = Railway.getRailChunkType(coord, provider, profile);
                 RailChunkType type = railChunkInfo.getType();

@@ -13,7 +13,7 @@ public class Statistics {
     private long minTime = Long.MAX_VALUE;
     private long maxTime = Long.MIN_VALUE;
 
-    public void addTime(long time) {
+    public synchronized void addTime(long time) {
         times[(int) (totalCnt % times.length)] = time;
         totalCnt++;
         if (time < minTime) {
@@ -24,7 +24,7 @@ public class Statistics {
         }
     }
 
-    public float getAverageTime() {
+    public synchronized float getAverageTime() {
         // Calculate the average time starting at totalCnt - times.length and counting 100 items.
         // Use modulo
         long total = 0;
@@ -34,11 +34,11 @@ public class Statistics {
         return (float)(total / times.length);
     }
 
-    public long getMinTime() {
+    public synchronized long getMinTime() {
         return minTime;
     }
 
-    public long getMaxTime() {
+    public synchronized long getMaxTime() {
         return maxTime;
     }
 }

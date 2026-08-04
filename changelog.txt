@@ -1,3 +1,26 @@
+1.21-8.4.0:
+- Hierarchical streets:
+    - Added versioned hierarchical street generation with primary, secondary, and tertiary roads, wider primary roads, slopes, connectors, and deterministic large bridges. Existing worlds keep legacy street generation
+    - Added an optional city-style `tertiaryparts` street asset family, defaulting to the secondary-road `parts` family
+    - Added a separate `openLotParkChance` profile option, defaulting to 0.8, so hierarchical open lots use varied park parts more often without changing legacy park frequency
+- Inter-city highways:
+    - Added a versioned inter-city highway network which creates deterministic routes between likely city regions, with endpoint-based or fixed highway levels. Existing worlds keep legacy highway generation
+    - Added dedicated highway bend and T-junction parts
+    - Added highway-side gas stations and two-chunk restaurants with parking lots, automatic highway-facing rotation, matching deck heights, and configurable foundation supports
+    - Fixed rotated restaurant doors, opened highway railing for restaurant and gas-station access, and added two-high restaurant perimeter railings
+- Buildings and structure avoidance:
+    - Structure avoidance now treats each multibuilding as a single footprint, so it is either generated completely or avoided completely
+    - Fixed scattered multibuildings sometimes generating only partially. Their complete placement and validity are now decided once for the entire scattered area
+    - Fixed bugs in blacklisted-structure checks that could miss structures or fail on structure references without registry keys
+- Performance and stability:
+    - Improved performance when searching for forced building spawn locations
+    - Reworked world generation for safe multithreading. Non-overlapping chunks and different dimensions can generate concurrently while nearby chunks and lifecycle cleanup remain protected
+- Assets, tools, and documentation:
+    - City styles can now override hierarchical open-lot park frequency with `profile_overrides.openLotParkChance`, independently from legacy park chance
+    - Added `forcedair` part metadata for hard-air cells
+    - The `/lostcities debug` command now reports the containing multibuilding name
+    - Added practical profile customization examples and developer documentation for custom assets, city generation, and world-generation thread safety
+
 1.21-8.3.10:
 - TqLxQuanZ fixed an issue where multibuilding do not spawn when railway is below.
 

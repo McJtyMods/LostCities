@@ -21,10 +21,9 @@ public class LostCitySphereFeature extends Feature<NoneFeatureConfiguration> {
     @Override
     public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
         WorldGenLevel level = context.level();
-        if (level instanceof WorldGenRegion) {
-            IDimensionInfo diminfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
-            if (diminfo != null) {
-                WorldGenRegion region = (WorldGenRegion) level;
+        if (level instanceof WorldGenRegion region) {
+            LostCityFeature lostCityFeature = Registration.LOSTCITY_FEATURE.get();
+            return lostCityFeature.runWithDimensionInfo(level, diminfo -> {
                 ChunkPos center = region.getCenter();
                 Holder<Biome> biome = region.getBiome(center.getMiddleBlockPosition(60));
                 if (biome.is(Tags.Biomes.IS_VOID)) {
@@ -33,10 +32,11 @@ public class LostCitySphereFeature extends Feature<NoneFeatureConfiguration> {
 
                 int chunkX = center.x;
                 int chunkZ = center.z;
-                diminfo.setWorld(level);
-                Spheres.generateSpheres(diminfo.getFeature(), region, region.getChunk(chunkX, chunkZ));
+                try (GenerationContext.Scope ignored = GenerationContext.open(level, diminfo.getSeed(), diminfo.getType(), chunkX, chunkZ)) {
+                    Spheres.generateSpheres(diminfo.getFeature(), region, region.getChunk(chunkX, chunkZ));
+                }
                 return true;
-            }
+            });
         }
         return false;
     }

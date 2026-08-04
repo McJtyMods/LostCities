@@ -17,7 +17,7 @@ public class Corridors {
         BlockState base = info.profile.getBaseBlock();
         BlockState railx = Blocks.RAIL.defaultBlockState().setValue(RailBlock.SHAPE, RailShape.EAST_WEST);
         BlockState railz = Blocks.RAIL.defaultBlockState();
-        ChunkDriver driver = feature.driver;
+        ChunkDriver driver = feature.getDriver();
 
         Character corridorRoofBlock = info.getCityStyle().getCorridorRoofBlock();
         Character corridorGlassBlock = info.getCityStyle().getCorridorGlassBlock();

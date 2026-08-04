@@ -58,12 +58,26 @@ public class LostCityProfile implements ILostCityProfile {
     public int SEALEVEL = -1;   // If -1 just use default
 
     public boolean HIGHWAY_REQUIRES_TWO_CITIES = true;
-    public int HIGHWAY_LEVEL_FROM_CITIES_MODE = 0;
+    public int HIGHWAY_LEVEL_FROM_CITIES_MODE = 3;
     public float HIGHWAY_MAINPERLIN_SCALE = 50.0f;
     public float HIGHWAY_SECONDARYPERLIN_SCALE = 10.0f;
     public float HIGHWAY_PERLIN_FACTOR = 2.0f;
     public int HIGHWAY_DISTANCE_MASK = 7;
     public boolean HIGHWAY_SUPPORTS = true;
+
+    // INTERCITY_NETWORK_V1 is requested for new worlds. The actual mode is
+    // selected once and persisted independently from the street mode.
+    public HighwayGenerationMode HIGHWAY_GENERATION_MODE = HighwayGenerationMode.INTERCITY_NETWORK_V1;
+    public int HIGHWAY_PLANNING_CELL_SIZE = 128;
+    public int HIGHWAY_HUB_SAMPLE_SPACING = 16;
+    public float HIGHWAY_HUB_MINIMUM_POTENTIAL = .20f;
+    public int HIGHWAY_HUB_SEARCH_RADIUS_CELLS = 2;
+    public int HIGHWAY_MINIMUM_HUB_DISTANCE = 64;
+    public int HIGHWAY_MAXIMUM_HUB_DISTANCE = 320;
+    public int HIGHWAY_MAXIMUM_CONNECTIONS_PER_HUB = 2;
+    public int HIGHWAY_MINIMUM_ROUTE_LENGTH = 40;
+    public float HIGHWAY_ROUTE_CITY_PENALTY = 1.0f;
+    public int HIGHWAY_NETWORK_LEVEL = 0;
 
     public float RAILWAY_DUNGEON_CHANCE = .01f;
     public boolean RAILWAYS_CAN_END = false;
@@ -170,14 +184,35 @@ public class LostCityProfile implements ILostCityProfile {
     public float BUILDING_FRONTCHANCE = .2f;
 
     public float PARK_CHANCE = .2f;
+    public float OPEN_LOT_PARK_CHANCE = .8f;
     public float CORRIDOR_CHANCE = .7f;
     public float BRIDGE_CHANCE = .7f;
+    public float PLANNED_PRIMARY_BRIDGE_CHANCE = 1.0f;
+    public int PLANNED_PRIMARY_BRIDGE_MAX_LENGTH = 12;
     public float FOUNTAIN_CHANCE = .05f;
 
     public boolean BRIDGE_SUPPORTS = true;
     public boolean PARK_ELEVATION = true;
     public boolean PARK_BORDER = true;
     public int PARK_STREET_THRESHOLD = 3;
+
+    // HIERARCHICAL_GRID_V1 is requested for new worlds. The actual mode is
+    // selected once and persisted in LostCityWorldGenData.
+    public StreetGenerationMode STREET_GENERATION_MODE = StreetGenerationMode.HIERARCHICAL_GRID_V1;
+    public int PRIMARY_ROAD_SPACING_X = 8;
+    public int PRIMARY_ROAD_SPACING_Z = 8;
+    public float PRIMARY_ROAD_OPTIONAL_CHANCE = .45f;
+    public int PRIMARY_ROAD_FORCE_EVERY = 4;
+    public int SECONDARY_ROAD_MIN_COUNT_X = 0;
+    public int SECONDARY_ROAD_MAX_COUNT_X = 2;
+    public int SECONDARY_ROAD_MIN_COUNT_Z = 0;
+    public int SECONDARY_ROAD_MAX_COUNT_Z = 2;
+    public int MINIMUM_ROAD_SEPARATION = 4;
+    public int MINIMUM_ROAD_EDGE_DISTANCE = 3;
+    public float TERTIARY_ROAD_CHANCE = .40f;
+    public int TERTIARY_ROAD_MIN_LENGTH = 2;
+    public int TERTIARY_ROAD_MAX_LENGTH = 5;
+    public MultiBuildingStreetConflict MULTI_BUILDING_STREET_CONFLICT = MultiBuildingStreetConflict.OVERRIDE_MINOR;
 
     public boolean MULTI_USE_CORNER = false;
     public boolean USE_AVG_HEIGHTMAP = false;
@@ -302,9 +337,9 @@ public class LostCityProfile implements ILostCityProfile {
         FORCE_SPAWN_IN_BUILDING = cfg.getBoolean("forceSpawnInBuilding", LostCityProfile.CATEGORY_LOSTCITY, FORCE_SPAWN_IN_BUILDING, "If this is true the player will spawn in a building. This can be used in combination with the other spawn settings");
         FORCE_SPAWN_BUILDINGS = cfg.getStringList("forceSpawnBuildings", LostCityProfile.CATEGORY_LOSTCITY, FORCE_SPAWN_BUILDINGS, "A list of buildings that the player will spawn in if FORCE_SPAWN_IN_BUILDING is true. If this is empty then any building will do. This can be used in combination with 'forceSpawnParts'");
         FORCE_SPAWN_PARTS = cfg.getStringList("forceSpawnParts", LostCityProfile.CATEGORY_LOSTCITY, FORCE_SPAWN_PARTS, "A list of parts that the player will spawn in if FORCE_SPAWN_IN_BUILDING is true. If this is empty then any part will do. This can be used in combination with 'forceSpawnBuildings'");
-        SPAWN_CHECK_RADIUS = cfg.getInt("spawnCheckRadius", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_CHECK_RADIUS, 1, 100000, "The start radius to check for a valid spawn location. This value will be increased with 100 if it couldn't find a valid spot");
+        SPAWN_CHECK_RADIUS = cfg.getInt("spawnCheckRadius", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_CHECK_RADIUS, 1, 100000, "The start radius to check for a valid spawn location. The search spirals outward from world center and expands by spawnRadiusIncrease if it couldn't find a valid spot");
         SPAWN_RADIUS_INCREASE = cfg.getInt("spawnRadiusIncrease", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_RADIUS_INCREASE, 1, 100000, "The radius increase to use if the spawn check radius is not large enough to find a valid spawn location");
-        SPAWN_CHECK_ATTEMPTS = cfg.getInt("spawnCheckAttempts", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_CHECK_ATTEMPTS, 1, 1000000, "The number of attempts to find a valid spawn location. If this is not enough then this will error");
+        SPAWN_CHECK_ATTEMPTS = cfg.getInt("spawnCheckAttempts", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_CHECK_ATTEMPTS, 1, 1000000, "The number of chunks to check while looking for a valid spawn location. If this is not enough then this will error");
 
         SCATTERED_CHANCE_MULTIPLIER = cfg.getFloat("scatteredChanceMultiplier", LostCityProfile.CATEGORY_LOSTCITY, SCATTERED_CHANCE_MULTIPLIER, 0.0f, 100.0f, "Multiplier for the chance a scattered building will generate. With 0 all scattered buildings are disabled");
 
@@ -364,11 +399,17 @@ public class LostCityProfile implements ILostCityProfile {
         BUILDING_DOORWAYCHANCE = cfg.getFloat("buildingDoorwayChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_DOORWAYCHANCE, 0.0f, 1.0f, "The chance that a doorway will be generated at a side of a building (on any level). Only when possible");
         BUILDING_FRONTCHANCE = cfg.getFloat("buildingFrontChance", LostCityProfile.CATEGORY_LOSTCITY, BUILDING_FRONTCHANCE, 0.0f, 1.0f, "The chance that a building will have a 'front' part if this is possible (i.e. adjacent street)");
         PARK_CHANCE = cfg.getFloat("parkChance", LostCityProfile.CATEGORY_LOSTCITY, PARK_CHANCE, 0.0f, 1.0f, "The chance that a non-building section can be a park section");
+        OPEN_LOT_PARK_CHANCE = cfg.getFloat("openLotParkChance", LostCityProfile.CATEGORY_LOSTCITY, OPEN_LOT_PARK_CHANCE, 0.0f, 1.0f,
+                "The chance that a hierarchical open lot gets a park part");
 
         CORRIDOR_CHANCE = cfg.getFloat("corridorChance", LostCityProfile.CATEGORY_LOSTCITY, CORRIDOR_CHANCE, 0.0f, 1.0f, "The chance that a chunk can possibly contain a corridor. " +
                 "There actually being a corridor also depends on the presence of adjacent corridors");
         BRIDGE_CHANCE = cfg.getFloat("bridgeChance", LostCityProfile.CATEGORY_LOSTCITY, BRIDGE_CHANCE, 0.0f, 1.0f, "The chance that a chunk can possibly contain a bridge. " +
                 "There actually being a bridge also depends on the presence of adjacent bridges and other conditions");
+        PLANNED_PRIMARY_BRIDGE_CHANCE = cfg.getFloat("plannedPrimaryBridgeChance", LostCityProfile.CATEGORY_LOSTCITY, PLANNED_PRIMARY_BRIDGE_CHANCE,
+                0.0f, 1.0f, "Chance for an entire eligible hierarchical primary-road water crossing to become a bridge");
+        PLANNED_PRIMARY_BRIDGE_MAX_LENGTH = cfg.getInt("plannedPrimaryBridgeMaxLength", LostCityProfile.CATEGORY_LOSTCITY, PLANNED_PRIMARY_BRIDGE_MAX_LENGTH,
+                1, 64, "Maximum water-gap length in chunks for a hierarchical primary-road bridge");
         BRIDGE_SUPPORTS = cfg.getBoolean("bridgeSupports", LostCityProfile.CATEGORY_LOSTCITY, BRIDGE_SUPPORTS,
                 "If true bridges get supports when needed. You can disable this if you have bridges that span void chunks");
         PARK_ELEVATION = cfg.getBoolean("parkElevation", LostCityProfile.CATEGORY_LOSTCITY, PARK_ELEVATION,
@@ -377,6 +418,72 @@ public class LostCityProfile implements ILostCityProfile {
                 "If true parks border will use the street block as base.");
         PARK_STREET_THRESHOLD = cfg.getInt("parkStreetThreshold", LostCityProfile.CATEGORY_LOSTCITY, PARK_STREET_THRESHOLD,
                 0, 8, "Determines how many surrounding street it needs to generate a park, based on current chunk's park chance.");
+
+        String streetMode = cfg.getString("streetGenerationMode", LostCityProfile.CATEGORY_LOSTCITY, STREET_GENERATION_MODE.name(),
+                "Street layout requested when a new world is initialized. Existing worlds keep their persisted mode.",
+                new String[] { StreetGenerationMode.LEGACY.name(), StreetGenerationMode.HIERARCHICAL_GRID_V1.name() });
+        STREET_GENERATION_MODE = StreetGenerationMode.byName(streetMode);
+        PRIMARY_ROAD_SPACING_X = cfg.getInt("primaryRoadSpacingX", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_SPACING_X,
+                8, 128, "Horizontal chunk spacing of candidate north/south primary-road corridors");
+        PRIMARY_ROAD_SPACING_Z = cfg.getInt("primaryRoadSpacingZ", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_SPACING_Z,
+                8, 128, "Vertical chunk spacing of candidate east/west primary-road corridors");
+        PRIMARY_ROAD_OPTIONAL_CHANCE = cfg.getFloat("primaryRoadOptionalChance", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_OPTIONAL_CHANCE,
+                0.0f, 1.0f, "Chance that a non-forced candidate primary-road corridor is enabled");
+        PRIMARY_ROAD_FORCE_EVERY = cfg.getInt("primaryRoadForceEvery", LostCityProfile.CATEGORY_LOSTCITY, PRIMARY_ROAD_FORCE_EVERY,
+                1, 16, "Force every Nth candidate primary-road corridor to cap the maximum gap");
+        SECONDARY_ROAD_MIN_COUNT_X = cfg.getInt("secondaryRoadMinCountX", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MIN_COUNT_X,
+                0, 128, "Minimum internal north/south secondary roads in a primary block");
+        SECONDARY_ROAD_MAX_COUNT_X = cfg.getInt("secondaryRoadMaxCountX", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MAX_COUNT_X,
+                0, 128, "Maximum internal north/south secondary roads in a primary block");
+        SECONDARY_ROAD_MIN_COUNT_Z = cfg.getInt("secondaryRoadMinCountZ", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MIN_COUNT_Z,
+                0, 128, "Minimum internal east/west secondary roads in a primary block");
+        SECONDARY_ROAD_MAX_COUNT_Z = cfg.getInt("secondaryRoadMaxCountZ", LostCityProfile.CATEGORY_LOSTCITY, SECONDARY_ROAD_MAX_COUNT_Z,
+                0, 128, "Maximum internal east/west secondary roads in a primary block");
+        MINIMUM_ROAD_SEPARATION = cfg.getInt("minimumRoadSeparation", LostCityProfile.CATEGORY_LOSTCITY, MINIMUM_ROAD_SEPARATION,
+                2, 32, "Minimum chunk distance between parallel secondary roads");
+        MINIMUM_ROAD_EDGE_DISTANCE = cfg.getInt("minimumRoadEdgeDistance", LostCityProfile.CATEGORY_LOSTCITY, MINIMUM_ROAD_EDGE_DISTANCE,
+                2, 32, "Minimum chunk distance between a secondary road and its bounding primary road");
+        TERTIARY_ROAD_CHANCE = cfg.getFloat("tertiaryRoadChance", LostCityProfile.CATEGORY_LOSTCITY, TERTIARY_ROAD_CHANCE,
+                0.0f, 1.0f, "Chance for a subdivided block to contain one short tertiary access road");
+        TERTIARY_ROAD_MIN_LENGTH = cfg.getInt("tertiaryRoadMinLength", LostCityProfile.CATEGORY_LOSTCITY, TERTIARY_ROAD_MIN_LENGTH,
+                1, 16, "Minimum tertiary access-road length in chunks");
+        TERTIARY_ROAD_MAX_LENGTH = cfg.getInt("tertiaryRoadMaxLength", LostCityProfile.CATEGORY_LOSTCITY, TERTIARY_ROAD_MAX_LENGTH,
+                1, 32, "Maximum tertiary access-road length in chunks");
+        String multiConflict = cfg.getString("multiBuildingStreetConflict", LostCityProfile.CATEGORY_LOSTCITY, MULTI_BUILDING_STREET_CONFLICT.name(),
+                "How random multi-buildings interact with planned roads (ignored by legacy street generation)",
+                new String[] { MultiBuildingStreetConflict.BLOCK_ALL.name(), MultiBuildingStreetConflict.OVERRIDE_MINOR.name(), MultiBuildingStreetConflict.OVERRIDE_ALL.name() });
+        MULTI_BUILDING_STREET_CONFLICT = MultiBuildingStreetConflict.byName(multiConflict);
+
+        if (SECONDARY_ROAD_MIN_COUNT_X > SECONDARY_ROAD_MAX_COUNT_X || SECONDARY_ROAD_MIN_COUNT_Z > SECONDARY_ROAD_MAX_COUNT_Z) {
+            throw new IllegalArgumentException("Secondary road minimum counts cannot exceed maximum counts");
+        }
+        if (TERTIARY_ROAD_MIN_LENGTH > TERTIARY_ROAD_MAX_LENGTH) {
+            throw new IllegalArgumentException("tertiaryRoadMinLength cannot exceed tertiaryRoadMaxLength");
+        }
+        if (PRIMARY_ROAD_SPACING_X < 8 || PRIMARY_ROAD_SPACING_X > 128
+                || PRIMARY_ROAD_SPACING_Z < 8 || PRIMARY_ROAD_SPACING_Z > 128) {
+            throw new IllegalArgumentException("Primary road candidate spacing must be between 8 and 128 chunks");
+        }
+        if (PRIMARY_ROAD_OPTIONAL_CHANCE < 0 || PRIMARY_ROAD_OPTIONAL_CHANCE > 1
+                || PRIMARY_ROAD_FORCE_EVERY < 1 || PRIMARY_ROAD_FORCE_EVERY > 16) {
+            throw new IllegalArgumentException("Invalid primary road activation chance or forced interval");
+        }
+        if (PLANNED_PRIMARY_BRIDGE_CHANCE < 0 || PLANNED_PRIMARY_BRIDGE_CHANCE > 1
+                || PLANNED_PRIMARY_BRIDGE_MAX_LENGTH < 1 || PLANNED_PRIMARY_BRIDGE_MAX_LENGTH > 64) {
+            throw new IllegalArgumentException("Invalid planned primary bridge chance or maximum length");
+        }
+        if (SECONDARY_ROAD_MIN_COUNT_X < 0 || SECONDARY_ROAD_MAX_COUNT_X > 128
+                || SECONDARY_ROAD_MIN_COUNT_Z < 0 || SECONDARY_ROAD_MAX_COUNT_Z > 128) {
+            throw new IllegalArgumentException("Secondary road counts must be between 0 and 128");
+        }
+        if (MINIMUM_ROAD_SEPARATION < 2 || MINIMUM_ROAD_SEPARATION > 32
+                || MINIMUM_ROAD_EDGE_DISTANCE < 2 || MINIMUM_ROAD_EDGE_DISTANCE > 32) {
+            throw new IllegalArgumentException("Road separation and edge distance must be between 2 and 32 chunks");
+        }
+        if (TERTIARY_ROAD_CHANCE < 0 || TERTIARY_ROAD_CHANCE > 1
+                || TERTIARY_ROAD_MIN_LENGTH < 1 || TERTIARY_ROAD_MAX_LENGTH > 32) {
+            throw new IllegalArgumentException("Invalid tertiary road chance or length");
+        }
 
         FOUNTAIN_CHANCE = cfg.getFloat("fountainChance", LostCityProfile.CATEGORY_LOSTCITY, FOUNTAIN_CHANCE, 0.0f, 1.0f, "The chance that a street section contains a fountain");
 
@@ -399,7 +506,7 @@ public class LostCityProfile implements ILostCityProfile {
         HIGHWAY_REQUIRES_TWO_CITIES = cfg.getBoolean("highwayRequiresTwoCities", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_REQUIRES_TWO_CITIES,
                 "If true then a highway will only generate if both sides have a valid city. If false then one city is sufficient");
         HIGHWAY_LEVEL_FROM_CITIES_MODE = cfg.getInt("highwayLevelFromCities", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_LEVEL_FROM_CITIES_MODE,
-                0, 3, "0 (take height from top-left city), 1 (take minimum height from both cities), 2 (take maximum height from both cities), 3 (take average height)");
+                0, 4, "0 (take height from the first endpoint city), 1 (take minimum height from both cities), 2 (take maximum height from both cities), 3 (take average height), 4 (use highwayNetworkLevel)");
         HIGHWAY_DISTANCE_MASK = cfg.getInt("highwayDistanceMask", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_DISTANCE_MASK,
                 0, Integer.MAX_VALUE, "Mask to control how far highways can generate. Must be a power of 2 (minus 1). If 0 there are no highways at all");
         HIGHWAY_MAINPERLIN_SCALE = cfg.getFloat("highwayMainPerlinScale", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MAINPERLIN_SCALE, 1.0f, 1000.0f,
@@ -410,6 +517,38 @@ public class LostCityProfile implements ILostCityProfile {
                 "The highway perlin noise is compared to this value. Setting this to 0 would give 50% chance of a highway being at a spot. Note that highways only generate on chunks a multiple of 8. Setting this very high will prevent highways from generating");
         HIGHWAY_SUPPORTS = cfg.getBoolean("highwaySupports", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_SUPPORTS,
                 "If true highways get supports when needed. You can disable this if you have highways that span void chunks");
+
+        String highwayMode = cfg.getString("highwayGenerationMode", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_GENERATION_MODE.name(),
+                "Highway layout requested when a new world is initialized. Existing worlds keep their independently persisted mode.",
+                new String[] { HighwayGenerationMode.LEGACY.name(), HighwayGenerationMode.INTERCITY_NETWORK_V1.name() });
+        HIGHWAY_GENERATION_MODE = HighwayGenerationMode.byName(highwayMode);
+        HIGHWAY_PLANNING_CELL_SIZE = cfg.getInt("highwayPlanningCellSize", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_PLANNING_CELL_SIZE,
+                32, 512, "Size in chunks of one INTERCITY_NETWORK_V1 hub-planning cell");
+        HIGHWAY_HUB_SAMPLE_SPACING = cfg.getInt("highwayHubSampleSpacing", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_HUB_SAMPLE_SPACING,
+                1, 512, "Chunk spacing of deterministic city-potential samples inside a highway planning cell");
+        HIGHWAY_HUB_MINIMUM_POTENTIAL = cfg.getFloat("highwayHubMinimumPotential", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_HUB_MINIMUM_POTENTIAL,
+                0.0f, 1.0f, "Minimum height- and biome-adjusted city-potential score required to create a highway hub");
+        HIGHWAY_HUB_SEARCH_RADIUS_CELLS = cfg.getInt("highwayHubSearchRadiusCells", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_HUB_SEARCH_RADIUS_CELLS,
+                0, 8, "Bounded planning-cell radius in which a highway hub considers other hubs");
+        HIGHWAY_MINIMUM_HUB_DISTANCE = cfg.getInt("highwayMinimumHubDistance", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MINIMUM_HUB_DISTANCE,
+                0, 4096, "Minimum Euclidean chunk distance between connected highway hubs");
+        HIGHWAY_MAXIMUM_HUB_DISTANCE = cfg.getInt("highwayMaximumHubDistance", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MAXIMUM_HUB_DISTANCE,
+                0, 4096, "Maximum Euclidean chunk distance between connected highway hubs");
+        HIGHWAY_MAXIMUM_CONNECTIONS_PER_HUB = cfg.getInt("highwayMaximumConnectionsPerHub", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MAXIMUM_CONNECTIONS_PER_HUB,
+                1, 8, "Maximum accepted INTERCITY_NETWORK_V1 connections incident to one hub");
+        HIGHWAY_MINIMUM_ROUTE_LENGTH = cfg.getInt("highwayMinimumRouteLength", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_MINIMUM_ROUTE_LENGTH,
+                0, 4096, "Minimum Manhattan length in chunks of an inter-city highway route");
+        HIGHWAY_ROUTE_CITY_PENALTY = cfg.getFloat("highwayRouteCityPenalty", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_ROUTE_CITY_PENALTY,
+                0.0f, 1000.0f, "Weight applied to approximate city-potential samples when choosing an L-route bend");
+        HIGHWAY_NETWORK_LEVEL = cfg.getInt("highwayNetworkLevel", LostCityProfile.CATEGORY_LOSTCITY, HIGHWAY_NETWORK_LEVEL,
+                0, 32, "Fixed highway level used when highwayLevelFromCities is 4");
+
+        if (HIGHWAY_HUB_SAMPLE_SPACING > HIGHWAY_PLANNING_CELL_SIZE) {
+            throw new IllegalArgumentException("highwayHubSampleSpacing cannot exceed highwayPlanningCellSize");
+        }
+        if (HIGHWAY_MINIMUM_HUB_DISTANCE > HIGHWAY_MAXIMUM_HUB_DISTANCE) {
+            throw new IllegalArgumentException("highwayMinimumHubDistance cannot exceed highwayMaximumHubDistance");
+        }
 
         BEDROCK_LAYER = cfg.getInt("bedrockLayer", LostCityProfile.CATEGORY_LOSTCITY, BEDROCK_LAYER, 0, 10,
                 "The height of the bedrock layer that is generated at the bottom of some world types. Set to 0 to disable this and get default bedrock generation");

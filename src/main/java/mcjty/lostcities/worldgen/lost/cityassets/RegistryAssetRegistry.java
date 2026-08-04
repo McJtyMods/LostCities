@@ -12,13 +12,13 @@ import net.minecraft.world.level.CommonLevelAccessor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class RegistryAssetRegistry<T extends ILostCityAsset, R> implements ILostCityAssetRegistry<T>  {
 
-    private final Map<ResourceLocation, T> assets = new HashMap<>();
+    private final Map<ResourceLocation, T> assets = new ConcurrentHashMap<>();
     private final ResourceKey<Registry<R>> registryKey;
     private final Function<R, T> assetConstructor;
 
@@ -81,7 +81,12 @@ public class RegistryAssetRegistry<T extends ILostCityAsset, R> implements ILost
             } catch (Exception e) {
                 throw new RuntimeException("Error getting resource " + name + "!", e);
             }
-            assets.put(name, t);
+            if (t != null) {
+                T existing = assets.putIfAbsent(name, t);
+                if (existing != null) {
+                    t = existing;
+                }
+            }
         }
         if (t != null) {
             t.init(level);
@@ -101,7 +106,9 @@ public class RegistryAssetRegistry<T extends ILostCityAsset, R> implements ILost
                     asset.setRegistryName(name);
                 }
                 T t = assetConstructor.apply(r);
-                assets.put(name, t);
+                if (t != null) {
+                    assets.putIfAbsent(name, t);
+                }
             }
         }
     }

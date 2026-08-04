@@ -1,4 +1,10 @@
 # Gradle/NeoForge generated output
+/.gradle/
+/.idea/
+/.build/
+/build/
+/run/
+/logs/
 .gradle/
 build/
 out/

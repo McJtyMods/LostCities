@@ -105,7 +105,7 @@ public class PaletteEntry {
         return tag;
     }
 
-    private static List<BlockEntry> deduplicateList(List<BlockEntry> incoming) {
+    private static synchronized List<BlockEntry> deduplicateList(List<BlockEntry> incoming) {
         if (incoming == null || incoming.isEmpty()) {
             return null;
         }
@@ -119,7 +119,7 @@ public class PaletteEntry {
         return immutable;
     }
 
-    private static CompoundTag deduplicateTag(CompoundTag incoming) {
+    private static synchronized CompoundTag deduplicateTag(CompoundTag incoming) {
         if (incoming == null || incoming.isEmpty()) {
             return null;
         }

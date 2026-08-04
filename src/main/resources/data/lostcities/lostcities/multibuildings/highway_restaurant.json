@@ -1,0 +1,8 @@
+{
+  "dimx": 2,
+  "dimz": 1,
+  "buildings": [
+    [ "highway_restaurant" ],
+    [ "highway_restaurant_parking" ]
+  ]
+}

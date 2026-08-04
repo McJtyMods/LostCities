@@ -1,6 +1,7 @@
 package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
+import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.commands.ModCommands;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.varia.ChunkCoord;
@@ -9,6 +10,9 @@ import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.GlobalTodo;
 import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.LostCityWorldGenData;
+import mcjty.lostcities.worldgen.LostCityFeature;
+import mcjty.lostcities.worldgen.gen.Scattered;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
@@ -45,7 +49,6 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -111,12 +114,20 @@ public class ForgeEventHandlers {
         BiomeInfo.cleanCache();
         City.cleanCache();
         CitySphere.cleanCache();
+        Scattered.cleanCache();
     }
 
     @SubscribeEvent
     public void onCreateSpawnPoint(LevelEvent.CreateSpawnPosition event) {
         LevelAccessor world = event.getLevel();
         if (world instanceof ServerLevel serverLevel) {
+            // This event is the explicit new-world signal. Existing worlds that
+            // have no LostCityWorldGenData never pass through this initialization
+            // and consequently remain on LEGACY street and highway generation.
+            LostCityWorldGenData.initializeNewWorld(serverLevel);
+            // If any dimension info was requested unusually early, rebuild it now
+            // so it observes the persisted new-world marker instead of LEGACY.
+            LostCityFeature.globalDimensionInfoDirtyCounter++;
             IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(serverLevel);
             if (dimensionInfo == null) {
                 return;
@@ -124,6 +135,7 @@ public class ForgeEventHandlers {
             LostCityProfile profile = dimensionInfo.getProfile();
 
             Predicate<BlockPos> isSuitable = pos -> true;
+            Predicate<ChunkCoord> isSuitableChunk = coord -> true;
             boolean needsCheck = false;
 
             if (!profile.SPAWN_BIOME.isEmpty()) {
@@ -181,39 +193,16 @@ public class ForgeEventHandlers {
             }
 
             if (profile.SPAWN_NOT_IN_BUILDING) {
-                isSuitable = isSuitable.and(blockPos -> isOutsideBuilding(dimensionInfo, blockPos));
+                isSuitableChunk = isSuitableChunk.and(coord -> isOutsideBuilding(dimensionInfo, coord));
                 needsCheck = true;
             } else if (profile.FORCE_SPAWN_BUILDINGS.length > 0 || profile.FORCE_SPAWN_PARTS.length > 0) {
                 Set<String> buildings = Set.of(profile.FORCE_SPAWN_BUILDINGS);
                 Set<String> parts = Set.of(profile.FORCE_SPAWN_PARTS);
-                isSuitable = isSuitable.and(blockPos -> {
-                    ChunkCoord coord = new ChunkCoord(dimensionInfo.getType(), blockPos.getX() >> 4, blockPos.getZ() >> 4);
-                    BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimensionInfo);
-                    if (info == null) {
-                        return false;
-                    }
-                    if (info.isCity() && info.hasBuilding) {
-                        if (!buildings.isEmpty()) {
-                            if (!buildings.contains(info.buildingType.getId().toString())) {
-                                return false;
-                            }
-                        }
-                        if (!parts.isEmpty()) {
-                            int lowestLevel = info.getBuildingBottomHeight();
-                            if (lowestLevel != Integer.MIN_VALUE) {
-                                BuildingPart part = info.getFloorAtY(lowestLevel, blockPos.getY());
-                                if (part == null || !parts.contains(part.getId().toString())) {
-                                    return false;
-                                }
-                            }
-                        }
-                        return true;
-                    }
-                    return false;
-                });
+                isSuitableChunk = isSuitableChunk.and(coord -> isForcedBuildingSpawnChunk(dimensionInfo, profile, buildings, parts, coord));
                 needsCheck = true;
             } else if (profile.FORCE_SPAWN_IN_BUILDING) {
-                isSuitable = isSuitable.and(blockPos -> !isOutsideBuilding(dimensionInfo, blockPos));
+                Set<String> empty = Set.of();
+                isSuitableChunk = isSuitableChunk.and(coord -> isForcedBuildingSpawnChunk(dimensionInfo, profile, empty, empty, coord));
                 needsCheck = true;
             }
 
@@ -224,7 +213,7 @@ public class ForgeEventHandlers {
             switch (profile.LANDSCAPE_TYPE) {
                 case DEFAULT, SPHERES -> {
                     if (needsCheck) {
-                        BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                        BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
                         serverLevel.setDefaultSpawnPos(pos, 0.0f);
                         event.getSettings().setSpawn(pos, 0.0f);
                         spawnPositions.put(serverLevel.dimension(), pos);
@@ -232,7 +221,7 @@ public class ForgeEventHandlers {
                     }
                 }
                 case FLOATING, SPACE, CAVERN, CAVERNSPHERES -> {
-                    BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, event.getSettings());
+                    BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
                     serverLevel.setDefaultSpawnPos(pos, 0.0f);
                     event.getSettings().setSpawn(pos, 0.0f);
                     spawnPositions.put(serverLevel.dimension(), pos);
@@ -242,10 +231,39 @@ public class ForgeEventHandlers {
         }
     }
 
-    private boolean isOutsideBuilding(IDimensionInfo provider, BlockPos pos) {
-        ChunkCoord coord = new ChunkCoord(provider.getType(), pos.getX() >> 4, pos.getZ() >> 4);
+    private boolean isOutsideBuilding(IDimensionInfo provider, ChunkCoord coord) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
         return !(info.isCity() && info.hasBuilding);
+    }
+
+    private boolean isForcedBuildingSpawnChunk(IDimensionInfo dimensionInfo, LostCityProfile profile, Set<String> buildings, Set<String> parts, ChunkCoord coord) {
+        LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(coord, dimensionInfo);
+        if (!buildings.isEmpty() && (characteristics.buildingType == null
+                || !buildings.contains(characteristics.buildingType.getId().toString()))) {
+            return false;
+        }
+
+        // Sphere-center settings can turn a non-building characteristic into a building.
+        boolean sphereCenter = (profile.isSpace() || profile.isSpheres())
+                && CitySphere.isCitySphereCenter(coord, dimensionInfo);
+        if (!characteristics.couldHaveBuilding && !sphereCenter) {
+            return false;
+        }
+
+        BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimensionInfo);
+        if (!info.isCity() || !info.hasBuilding) {
+            return false;
+        }
+        if (!parts.isEmpty()) {
+            int lowestLevel = info.getBuildingBottomHeight();
+            if (lowestLevel != Integer.MIN_VALUE) {
+                BuildingPart part = info.getFloorAtY(lowestLevel, 128);
+                if (part == null || !parts.contains(part.getId().toString())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private int getSqRadius(int radius, float pct) {
@@ -253,38 +271,119 @@ public class ForgeEventHandlers {
     }
 
     private BlockPos findSafeSpawnPoint(Level world, IDimensionInfo provider, @Nonnull Predicate<BlockPos> isSuitable,
-                                    @Nonnull ServerLevelData serverLevelData) {
-        Random rand = new Random(provider.getSeed());
-        int radius = provider.getProfile().SPAWN_CHECK_RADIUS;
-        int attempts = 0;
+                                    @Nonnull Predicate<ChunkCoord> isSuitableChunk) {
+        LostCityProfile profile = provider.getProfile();
+        int radius = profile.SPAWN_CHECK_RADIUS;
+        int checkedChunks = 0;
+        int currentChunkRadius = 0;
 //        int bottom = world.getWorldType().getMinimumSpawnHeight(world);
         while (true) {
-            for (int i = 0 ; i < 200 ; i++) {
-                int x = rand.nextInt(radius * 2) - radius;
-                int z = rand.nextInt(radius * 2) - radius;
-                attempts++;
-
-                if (!isSuitable.test(new BlockPos(x, 128, z))) {
-                    continue;
-                }
-
-                ChunkCoord coord = new ChunkCoord(provider.getType(), x >> 4, z >> 4);
-                LostCityProfile profile = BuildingInfo.getProfile(coord, provider);
-
-                for (int y = profile.GROUNDLEVEL-5 ; y < 125 ; y++) {
-                    BlockPos pos = new BlockPos(x, y, z);
-                    if (isValidStandingPosition(world, pos)) {
-//                        serverLevelData.setSpawn(pos.above(), 0.0f);
-                        return pos.above();
+            int targetChunkRadius = Math.max(0, (radius + 15) >> 4);
+            while (currentChunkRadius <= targetChunkRadius) {
+                if (currentChunkRadius == 0) {
+                    checkedChunks++;
+                    BlockPos pos = findSafeSpawnPointInChunk(world, provider, isSuitable, isSuitableChunk, 0, 0);
+                    if (pos != null) {
+                        return pos;
+                    }
+                    if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
+                        LostCities.setup.getLogger().error("Can't find a valid spawn position!");
+                        throw new RuntimeException("Can't find a valid spawn position!");
+                    }
+                } else {
+                    for (int x = -currentChunkRadius ; x <= currentChunkRadius ; x++) {
+                        checkedChunks++;
+                        BlockPos pos = findSafeSpawnPointInChunk(world, provider, isSuitable, isSuitableChunk, x, -currentChunkRadius);
+                        if (pos != null) {
+                            return pos;
+                        }
+                        if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
+                            LostCities.setup.getLogger().error("Can't find a valid spawn position!");
+                            throw new RuntimeException("Can't find a valid spawn position!");
+                        }
+                    }
+                    for (int z = -currentChunkRadius + 1 ; z <= currentChunkRadius ; z++) {
+                        checkedChunks++;
+                        BlockPos pos = findSafeSpawnPointInChunk(world, provider, isSuitable, isSuitableChunk, currentChunkRadius, z);
+                        if (pos != null) {
+                            return pos;
+                        }
+                        if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
+                            LostCities.setup.getLogger().error("Can't find a valid spawn position!");
+                            throw new RuntimeException("Can't find a valid spawn position!");
+                        }
+                    }
+                    for (int x = currentChunkRadius - 1 ; x >= -currentChunkRadius ; x--) {
+                        checkedChunks++;
+                        BlockPos pos = findSafeSpawnPointInChunk(world, provider, isSuitable, isSuitableChunk, x, currentChunkRadius);
+                        if (pos != null) {
+                            return pos;
+                        }
+                        if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
+                            LostCities.setup.getLogger().error("Can't find a valid spawn position!");
+                            throw new RuntimeException("Can't find a valid spawn position!");
+                        }
+                    }
+                    for (int z = currentChunkRadius - 1 ; z > -currentChunkRadius ; z--) {
+                        checkedChunks++;
+                        BlockPos pos = findSafeSpawnPointInChunk(world, provider, isSuitable, isSuitableChunk, -currentChunkRadius, z);
+                        if (pos != null) {
+                            return pos;
+                        }
+                        if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
+                            LostCities.setup.getLogger().error("Can't find a valid spawn position!");
+                            throw new RuntimeException("Can't find a valid spawn position!");
+                        }
                     }
                 }
+                currentChunkRadius++;
             }
-            radius += provider.getProfile().SPAWN_RADIUS_INCREASE;
-            if (attempts > provider.getProfile().SPAWN_CHECK_ATTEMPTS) {
-                LostCities.setup.getLogger().error("Can't find a valid spawn position!");
-                throw new RuntimeException("Can't find a valid spawn position!");
+            radius += profile.SPAWN_RADIUS_INCREASE;
+        }
+    }
+
+    private BlockPos findSafeSpawnPointInChunk(Level world, IDimensionInfo provider, @Nonnull Predicate<BlockPos> isSuitable,
+                                               @Nonnull Predicate<ChunkCoord> isSuitableChunk, int chunkX, int chunkZ) {
+        ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
+        if (!isSuitableChunk.test(coord)) {
+            return null;
+        }
+
+        int baseX = chunkX << 4;
+        int baseZ = chunkZ << 4;
+        BlockPos pos = findSafeSpawnPointAtColumn(world, provider, isSuitable, baseX + 8, baseZ + 8);
+        if (pos != null) {
+            return pos;
+        }
+
+        for (int x = 0 ; x < 16 ; x++) {
+            for (int z = 0 ; z < 16 ; z++) {
+                if (x == 8 && z == 8) {
+                    continue;
+                }
+                pos = findSafeSpawnPointAtColumn(world, provider, isSuitable, baseX + x, baseZ + z);
+                if (pos != null) {
+                    return pos;
+                }
             }
         }
+        return null;
+    }
+
+    private BlockPos findSafeSpawnPointAtColumn(Level world, IDimensionInfo provider, @Nonnull Predicate<BlockPos> isSuitable, int x, int z) {
+        if (!isSuitable.test(new BlockPos(x, 128, z))) {
+            return null;
+        }
+
+        ChunkCoord coord = new ChunkCoord(provider.getType(), x >> 4, z >> 4);
+        LostCityProfile profile = BuildingInfo.getProfile(coord, provider);
+        for (int y = profile.GROUNDLEVEL-5 ; y < 125 ; y++) {
+            BlockPos pos = new BlockPos(x, y, z);
+            if (isValidStandingPosition(world, pos)) {
+                return pos.above();
+            }
+        }
+        return null;
     }
 
     private boolean isValidStandingPosition(Level world, BlockPos pos) {

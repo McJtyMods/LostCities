@@ -27,6 +27,7 @@ public interface ILostCities {
     String META_Z_1 = "z1";
     String META_Z_2 = "z2";
     String META_NOWATER = "nowater";
+    String META_FORCEDAIR = "forcedair";
 
     /**
      * Get Lost City information for a given dimension. Returns null if the dimension doesn't support Lost Cities

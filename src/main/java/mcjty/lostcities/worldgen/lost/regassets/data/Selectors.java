@@ -12,6 +12,7 @@ import java.util.Optional;
 public class Selectors {
     private final List<ObjectSelector> buildingSelector;
     private final List<ObjectSelector> bridgeSelector;
+    private final List<ObjectSelector> largeBridgeSelector;
     private final List<ObjectSelector> parkSelector;
     private final List<ObjectSelector> fountainSelector;
     private final List<ObjectSelector> stairSelector;
@@ -23,6 +24,7 @@ public class Selectors {
             instance.group(
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("buildings").forGetter(l -> Optional.ofNullable(l.buildingSelector)),
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("bridges").forGetter(l -> Optional.ofNullable(l.bridgeSelector)),
+                    Codec.list(ObjectSelector.CODEC).optionalFieldOf("largebridges").forGetter(l -> Optional.ofNullable(l.largeBridgeSelector)),
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("parks").forGetter(l -> Optional.ofNullable(l.parkSelector)),
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("fountains").forGetter(l -> Optional.ofNullable(l.fountainSelector)),
                     Codec.list(ObjectSelector.CODEC).optionalFieldOf("stairs").forGetter(l -> Optional.ofNullable(l.stairSelector)),
@@ -36,6 +38,8 @@ public class Selectors {
     }
 
     public Optional<List<ObjectSelector>> getBridgeSelector() { return Optional.ofNullable(bridgeSelector); }
+
+    public Optional<List<ObjectSelector>> getLargeBridgeSelector() { return Optional.ofNullable(largeBridgeSelector); }
 
     public Optional<List<ObjectSelector>> getParkSelector() {
         return Optional.ofNullable(parkSelector);
@@ -63,6 +67,7 @@ public class Selectors {
 
     public Selectors(Optional<List<ObjectSelector>> buildingSelector,
                      Optional<List<ObjectSelector>> bridgeSelector,
+                     Optional<List<ObjectSelector>> largeBridgeSelector,
                      Optional<List<ObjectSelector>> parkSelector,
                      Optional<List<ObjectSelector>> fountainSelector,
                      Optional<List<ObjectSelector>> stairSelector,
@@ -71,6 +76,7 @@ public class Selectors {
                      Optional<List<ObjectSelector>> multiBuildingSelector) {
         this.buildingSelector = buildingSelector.orElse(null);
         this.bridgeSelector = bridgeSelector.orElse(null);
+        this.largeBridgeSelector = largeBridgeSelector.orElse(null);
         this.parkSelector = parkSelector.orElse(null);
         this.fountainSelector = fountainSelector.orElse(null);
         this.stairSelector = stairSelector.orElse(null);

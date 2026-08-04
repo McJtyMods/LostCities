@@ -21,6 +21,7 @@ public class CityStyle implements ILostCityCityStyle {
 
     private final List<ObjectSelector> buildingSelector = new ArrayList<>();
     private final List<ObjectSelector> bridgeSelector = new ArrayList<>();
+    private final List<ObjectSelector> largeBridgeSelector = new ArrayList<>();
     private final List<ObjectSelector> parkSelector = new ArrayList<>();
     private final List<ObjectSelector> fountainSelector = new ArrayList<>();
     private final List<ObjectSelector> stairSelector = new ArrayList<>();
@@ -28,6 +29,8 @@ public class CityStyle implements ILostCityCityStyle {
     private final List<ObjectSelector> railDungeonSelector = new ArrayList<>();
     private final List<ObjectSelector> multiBuildingSelector = new ArrayList<>();
     private StreetParts streetParts = StreetParts.DEFAULT;
+    private StreetParts largeStreetParts = StreetParts.DEFAULT;
+    private StreetParts tertiaryStreetParts = StreetParts.DEFAULT;
 
     // Building settings
     private Integer minFloorCount;
@@ -48,6 +51,7 @@ public class CityStyle implements ILostCityCityStyle {
 
     // Park settings
     private Float parkChance;
+    private Float openLotParkChance;
     private Boolean avoidFoliage;
     private Boolean parkBorder;
     private Boolean parkElevation;
@@ -78,6 +82,7 @@ public class CityStyle implements ILostCityCityStyle {
     private String style;
     private final String inherit;
     private boolean resolveInherit = false;
+    private volatile boolean initialized = false;
 
     public CityStyle(CityStyleRE object) {
         name = object.getRegistryName();
@@ -88,6 +93,7 @@ public class CityStyle implements ILostCityCityStyle {
             stuffTags.addAll(object.getStuffTags());
         }
         explosionChance = object.getExplosionChance();
+        object.getProfileOverrides().ifPresent(overrides -> openLotParkChance = overrides.openLotParkChance());
         object.getBuildingSettings().ifPresent(s -> {
             buildingChance = s.getBuildingChance();
             maxCellarCount = s.getMaxCellarCount();
@@ -127,6 +133,8 @@ public class CityStyle implements ILostCityCityStyle {
             wallBlock = s.getWallBlock();
             streetWidth = s.getStreetWidth();
             streetParts = s.getParts();
+            largeStreetParts = s.getLargeParts();
+            tertiaryStreetParts = s.getTertiaryParts();
         });
         object.getGeneralSettings().ifPresent(s -> {
             glowstoneBlock = s.getGlowstoneBlock();
@@ -136,6 +144,7 @@ public class CityStyle implements ILostCityCityStyle {
         });
         object.getSelectors().ifPresent(s -> {
             s.getBridgeSelector().ifPresent(bridgeSelector::addAll);
+            s.getLargeBridgeSelector().ifPresent(largeBridgeSelector::addAll);
             s.getBuildingSelector().ifPresent(buildingSelector::addAll);
             s.getFountainSelector().ifPresent(fountainSelector::addAll);
             s.getFrontSelector().ifPresent(frontSelector::addAll);
@@ -175,6 +184,14 @@ public class CityStyle implements ILostCityCityStyle {
         return streetParts;
     }
 
+    public StreetParts getLargeStreetParts() {
+        return largeStreetParts;
+    }
+
+    public StreetParts getTertiaryStreetParts() {
+        return tertiaryStreetParts == StreetParts.DEFAULT ? streetParts : tertiaryStreetParts;
+    }
+
     @Override
     public Integer getMinFloorCount() {
         return minFloorCount;
@@ -202,6 +219,8 @@ public class CityStyle implements ILostCityCityStyle {
 
     @Override
     public Float getParkChance() { return parkChance; }
+
+    public Float getOpenLotParkChance() { return openLotParkChance; }
 
     @Override
     public Float getFrontChance() { return frontChance; }
@@ -313,7 +332,13 @@ public class CityStyle implements ILostCityCityStyle {
 
     @Override
     public void init(CommonLevelAccessor level) {
-        if (!resolveInherit) {
+        if (initialized) {
+            return;
+        }
+        synchronized (this) {
+            if (initialized || resolveInherit) {
+                return;
+            }
             resolveInherit = true;
             if (inherit != null) {
                 CityStyle inheritFrom = AssetRegistries.CITYSTYLES.getOrThrow(level, inherit);
@@ -323,6 +348,7 @@ public class CityStyle implements ILostCityCityStyle {
                 stuffTags.addAll(inheritFrom.stuffTags);
                 buildingSelector.addAll(inheritFrom.buildingSelector);
                 bridgeSelector.addAll(inheritFrom.bridgeSelector);
+                largeBridgeSelector.addAll(inheritFrom.largeBridgeSelector);
                 parkSelector.addAll(inheritFrom.parkSelector);
                 fountainSelector.addAll(inheritFrom.fountainSelector);
                 stairSelector.addAll(inheritFrom.stairSelector);
@@ -337,6 +363,12 @@ public class CityStyle implements ILostCityCityStyle {
                 }
                 if (streetParts == StreetParts.DEFAULT) {
                     streetParts = inheritFrom.streetParts;
+                }
+                if (largeStreetParts == StreetParts.DEFAULT) {
+                    largeStreetParts = inheritFrom.largeStreetParts;
+                }
+                if (tertiaryStreetParts == StreetParts.DEFAULT) {
+                    tertiaryStreetParts = inheritFrom.tertiaryStreetParts;
                 }
                 if (minFloorCount == null) {
                     minFloorCount = inheritFrom.minFloorCount;
@@ -355,6 +387,9 @@ public class CityStyle implements ILostCityCityStyle {
                 }
                 if (parkChance == null) {
                     parkChance = inheritFrom.parkChance;
+                }
+                if (openLotParkChance == null) {
+                    openLotParkChance = inheritFrom.openLotParkChance;
                 }
                 if (fountainChance == null) {
                     fountainChance = inheritFrom.fountainChance;
@@ -414,6 +449,7 @@ public class CityStyle implements ILostCityCityStyle {
                     sphereGlassBlock = inheritFrom.sphereGlassBlock;
                 }
             }
+            initialized = true;
         }
     }
 
@@ -483,6 +519,10 @@ public class CityStyle implements ILostCityCityStyle {
 
     public String getRandomBridge(Random random, ChunkCoord pos) {
         return getRandomFromList(random, bridgeSelector, pos);
+    }
+
+    public String getRandomLargeBridge(Random random, ChunkCoord pos) {
+        return getRandomFromList(random, largeBridgeSelector, pos);
     }
 
     public String getRandomFountain(Random random, ChunkCoord pos) {
