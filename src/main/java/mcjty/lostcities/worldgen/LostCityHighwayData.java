@@ -6,6 +6,7 @@ import mcjty.lostcities.worldgen.highway.HighwayHub;
 import mcjty.lostcities.worldgen.highway.HighwayHubPersistence;
 import mcjty.lostcities.worldgen.highway.HighwayPlannerSettings;
 import mcjty.lostcities.worldgen.highway.HubKey;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -49,7 +50,7 @@ public class LostCityHighwayData extends SavedData {
     public LostCityHighwayData() {
     }
 
-    public LostCityHighwayData(CompoundTag tag) {
+    public LostCityHighwayData(CompoundTag tag, HolderLookup.Provider provider) {
         if (tag.getInt(VERSION_KEY) != FORMAT_VERSION) {
             return;
         }
@@ -81,7 +82,7 @@ public class LostCityHighwayData extends SavedData {
             throw new IllegalStateException("Cannot access Lost Cities highway data without an overworld");
         }
         DimensionDataStorage storage = overworld.getDataStorage();
-        return storage.computeIfAbsent(LostCityHighwayData::new, LostCityHighwayData::new, NAME);
+        return storage.computeIfAbsent(new Factory<>(LostCityHighwayData::new, LostCityHighwayData::new), NAME);
     }
 
     /**
@@ -189,7 +190,7 @@ public class LostCityHighwayData extends SavedData {
     }
 
     @Override
-    public synchronized CompoundTag save(CompoundTag tag) {
+    public synchronized CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
         tag.putInt(VERSION_KEY, FORMAT_VERSION);
         CompoundTag dimensionTags = new CompoundTag();
         new TreeMap<>(dimensions).forEach((dimensionId, dimension) -> {

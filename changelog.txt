@@ -10,6 +10,7 @@
     - Fixed rotated restaurant doors, opened highway railing for restaurant and gas-station access, and added two-high restaurant perimeter railings
 - Buildings and structure avoidance:
     - Structure avoidance now treats each multibuilding as a single footprint, so it is either generated completely or avoided completely
+    - Fixed chunk-generation crashes while checking villages and avoided structures outside the active 1.21 structure-reference area
     - Fixed scattered multibuildings sometimes generating only partially. Their complete placement and validity are now decided once for the entire scattered area
     - Fixed bugs in blacklisted-structure checks that could miss structures or fail on structure references without registry keys
 - Performance and stability:

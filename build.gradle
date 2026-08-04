@@ -46,7 +46,7 @@ dependencies {
     mc()
 //    jei()
     top()
-    runtimeOnly fg.deobf('local:xaeroworldmap-forge-1.20.1:1.43.0')
+//    runtimeOnly fg.deobf('local:xaeroworldmap-forge-1.20.1:1.43.0')
 }
 
 modpublisher(['the-one-probe'], [], ['the-one-probe'], [], [])

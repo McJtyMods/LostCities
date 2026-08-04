@@ -3,6 +3,7 @@ package mcjty.lostcities.worldgen;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.HighwayGenerationMode;
 import mcjty.lostcities.config.StreetGenerationMode;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
@@ -42,7 +43,7 @@ public class LostCityWorldGenData extends SavedData {
         newWorldHighwayModes = false;
     }
 
-    public LostCityWorldGenData(CompoundTag tag) {
+    public LostCityWorldGenData(CompoundTag tag, HolderLookup.Provider provider) {
         newWorldStreetModes = tag.getBoolean(NEW_WORLD_KEY);
         newWorldHighwayModes = tag.getBoolean(NEW_WORLD_HIGHWAY_KEY);
         CompoundTag modes = tag.getCompound(STREET_MODES_KEY);
@@ -78,7 +79,7 @@ public class LostCityWorldGenData extends SavedData {
             throw new IllegalStateException("Cannot access Lost Cities world generation data without an overworld");
         }
         DimensionDataStorage storage = overworld.getDataStorage();
-        return storage.computeIfAbsent(LostCityWorldGenData::new, LostCityWorldGenData::new, NAME);
+        return storage.computeIfAbsent(new Factory<>(LostCityWorldGenData::new, LostCityWorldGenData::new), NAME);
     }
 
     public static void initializeNewWorld(ServerLevel level) {
@@ -143,7 +144,7 @@ public class LostCityWorldGenData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
         tag.putBoolean(NEW_WORLD_KEY, newWorldStreetModes);
         tag.putBoolean(NEW_WORLD_HIGHWAY_KEY, newWorldHighwayModes);
         CompoundTag modes = new CompoundTag();

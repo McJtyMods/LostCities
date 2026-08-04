@@ -703,6 +703,14 @@ when some references are unavailable, preserving the earlier fail-open
 behavior without cutting off individual chunks of a random or predefined
 multibuilding.
 
+In Minecraft 1.21, a feature-generation `WorldGenRegion` contains chunks out to
+the structure-start dependency radius, but only the center chunk and its
+immediate neighbours are guaranteed to have reached `STRUCTURE_REFERENCES`.
+Calling `WorldGenRegion.getChunk()` for that status outside this one-chunk
+radius throws even when `hasChunk()` is true and `requireChunk` is false.
+Structure avoidance must use its status-aware lookup helper and treat chunks
+outside that radius as unavailable.
+
 ## 1. Deciding whether a chunk belongs to a city
 
 `BuildingInfo.isCityRaw()` computes a `cityFactor` through

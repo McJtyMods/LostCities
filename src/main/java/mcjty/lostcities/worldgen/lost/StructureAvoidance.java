@@ -10,7 +10,7 @@ import net.minecraft.tags.StructureTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
 import java.util.Optional;
@@ -22,6 +22,10 @@ import java.util.concurrent.ConcurrentMap;
  * in the active world-generation region. No chunk loads or generation are initiated here.
  */
 public final class StructureAvoidance {
+
+    // At FEATURES, Minecraft 1.21 only guarantees STRUCTURE_REFERENCES for the center chunk and
+    // its immediate neighbours. WorldGenRegion#getChunk throws outside that status-specific area.
+    private static final int STRUCTURE_REFERENCE_RADIUS = 1;
 
     private record FootprintKey(ResourceKey<Level> dimension,
                                 int minX, int minZ, int maxX, int maxZ, int margin) {
@@ -90,8 +94,7 @@ public final class StructureAvoidance {
             }
             // The shared decision controls city avoidance. Resolve DIRECT locally so terrain
             // flattening is still suppressed if this chunk's references became available later.
-            ChunkAccess current = region.getChunk(coord.chunkX(), coord.chunkZ(),
-                    ChunkStatus.STRUCTURE_REFERENCES, false);
+            ChunkAccess current = getChunkWithStructureReferences(region, coord.chunkX(), coord.chunkZ());
             return current != null && hasAvoidedStructure(region, current, true)
                     ? Result.DIRECT
                     : Result.ADJACENT;
@@ -101,8 +104,7 @@ public final class StructureAvoidance {
         boolean missingReferences = false;
         for (int chunkX = minX - margin; chunkX <= maxX + margin; chunkX++) {
             for (int chunkZ = minZ - margin; chunkZ <= maxZ + margin; chunkZ++) {
-                ChunkAccess chunk = region.getChunk(chunkX, chunkZ,
-                        ChunkStatus.STRUCTURE_REFERENCES, false);
+                ChunkAccess chunk = getChunkWithStructureReferences(region, chunkX, chunkZ);
                 if (chunk == null) {
                     missingReferences = true;
                     continue;
@@ -135,8 +137,7 @@ public final class StructureAvoidance {
                                                        int maxX, int maxZ, int margin) {
         for (int chunkX = minX - margin; chunkX <= maxX + margin; chunkX++) {
             for (int chunkZ = minZ - margin; chunkZ <= maxZ + margin; chunkZ++) {
-                ChunkAccess chunk = region.getChunk(chunkX, chunkZ,
-                        ChunkStatus.STRUCTURE_REFERENCES, false);
+                ChunkAccess chunk = getChunkWithStructureReferences(region, chunkX, chunkZ);
                 if (chunk == null) {
                     continue;
                 }
@@ -148,6 +149,13 @@ public final class StructureAvoidance {
             }
         }
         return FootprintDecision.ALLOW;
+    }
+
+    private static ChunkAccess getChunkWithStructureReferences(WorldGenRegion region, int chunkX, int chunkZ) {
+        if (region.getCenter().getChessboardDistance(chunkX, chunkZ) > STRUCTURE_REFERENCE_RADIUS) {
+            return null;
+        }
+        return region.getChunk(chunkX, chunkZ, ChunkStatus.STRUCTURE_REFERENCES, false);
     }
 
     private static boolean hasAvoidedStructure(WorldGenRegion region, ChunkAccess chunk, boolean insideFootprint) {
