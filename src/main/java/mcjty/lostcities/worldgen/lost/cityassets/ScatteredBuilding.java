@@ -21,6 +21,7 @@ public class ScatteredBuilding implements ILostCityAsset {
     private final ScatteredBuilding.TerrainFix terrainfix;
     private final int heightoffset;
     private final boolean rotatable;
+    private final boolean clearHighwayRailing;
     private final String supportpart;
 
     public ScatteredBuilding(ScatteredRE object) {
@@ -31,6 +32,7 @@ public class ScatteredBuilding implements ILostCityAsset {
         this.terrainfix = object.getTerrainfix();
         this.heightoffset = object.getHeightoffset();
         this.rotatable = object.isRotatable();
+        this.clearHighwayRailing = object.isClearHighwayRailing();
         this.supportpart = object.getSupportpart();
     }
 
@@ -58,6 +60,10 @@ public class ScatteredBuilding implements ILostCityAsset {
 
     public boolean isRotatable() {
         return rotatable;
+    }
+
+    public boolean isClearHighwayRailing() {
+        return clearHighwayRailing;
     }
 
     @Nullable

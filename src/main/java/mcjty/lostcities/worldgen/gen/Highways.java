@@ -12,7 +12,9 @@ import mcjty.lostcities.worldgen.lost.Transform;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
 import mcjty.lostcities.worldgen.lost.regassets.data.HighwayParts;
+import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.EnumSet;
@@ -103,6 +105,24 @@ public class Highways {
             if (partType == PartType.BEND || partType == PartType.T_JUNCTION) {
                 generateSupport(driver, sup, transform, highwayGroundLevel, 15, 0);
             }
+        }
+
+        if (info.provider.getWorldStyle().getScatteredSettings() != null) {
+            Set<Direction> openings = Scattered.getHighwayRailingOpenings(feature, info.coord,
+                    info.provider.getWorldStyle().getScatteredSettings(), highwayGroundLevel);
+            for (Direction opening : openings) {
+                clearRailing(feature, info, opening, highwayGroundLevel, part.getSliceCount());
+            }
+        }
+    }
+
+    private static void clearRailing(LostCityTerrainFeature feature, BuildingInfo info, Direction opening,
+                                     int highwayGroundLevel, int partHeight) {
+        for (int i = 0; i < 16; i++) {
+            int x = opening == Direction.WEST ? 0 : opening == Direction.EAST ? 15 : i;
+            int z = opening == Direction.NORTH ? 0 : opening == Direction.SOUTH ? 15 : i;
+            feature.clearRange(info, x, z, highwayGroundLevel + 1, highwayGroundLevel + partHeight,
+                    false, state -> state.is(Blocks.IRON_BARS));
         }
     }
 

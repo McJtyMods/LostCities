@@ -25,8 +25,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -77,6 +79,43 @@ public class Scattered {
         }
         generateScatteredBuilding(feature, info, building, scatteredRandom, plan.lowestLevel(),
                 plan.scattered().getTerrainfix(), plan.scattered().getSupportpart(), plan.transform());
+    }
+
+    public static Set<Direction> getHighwayRailingOpenings(LostCityTerrainFeature feature, ChunkCoord highwayCoord,
+                                                            ScatteredSettings scatteredSettings, int highwayHeight) {
+        Set<Direction> openings = EnumSet.noneOf(Direction.class);
+        for (Direction direction : Direction.Plane.HORIZONTAL) {
+            int adjacentX = highwayCoord.chunkX() + direction.getStepX();
+            int adjacentZ = highwayCoord.chunkZ() + direction.getStepZ();
+            int ax = (adjacentX + 2000000) / scatteredSettings.getAreasize();
+            int az = (adjacentZ + 2000000) / scatteredSettings.getAreasize();
+            ScatteredPlanKey key = new ScatteredPlanKey(feature.provider.getType(), feature.provider.getSeed(), ax, az);
+            ScatteredPlan plan = PLANS.computeIfAbsent(key,
+                    ignored -> calculatePlan(feature, scatteredSettings, ax, az));
+            if (plan.valid() && plan.scattered().isClearHighwayRailing()
+                    && plan.connectedHighwayHeight() != null && plan.connectedHighwayHeight() == highwayHeight
+                    && adjacentX >= plan.tlChunkX() && adjacentX < plan.tlChunkX() + plan.width()
+                    && adjacentZ >= plan.tlChunkZ() && adjacentZ < plan.tlChunkZ() + plan.depth()
+                    && isConnectedHighwayChunk(plan, highwayCoord.chunkX(), highwayCoord.chunkZ())) {
+                openings.add(direction);
+            }
+        }
+        return openings;
+    }
+
+    private static boolean isConnectedHighwayChunk(ScatteredPlan plan, int highwayX, int highwayZ) {
+        Direction connection = connectionDirection(plan.transform());
+        return switch (connection) {
+            case NORTH -> highwayZ == plan.tlChunkZ() - 1
+                    && highwayX >= plan.tlChunkX() && highwayX < plan.tlChunkX() + plan.width();
+            case SOUTH -> highwayZ == plan.tlChunkZ() + plan.depth()
+                    && highwayX >= plan.tlChunkX() && highwayX < plan.tlChunkX() + plan.width();
+            case WEST -> highwayX == plan.tlChunkX() - 1
+                    && highwayZ >= plan.tlChunkZ() && highwayZ < plan.tlChunkZ() + plan.depth();
+            case EAST -> highwayX == plan.tlChunkX() + plan.width()
+                    && highwayZ >= plan.tlChunkZ() && highwayZ < plan.tlChunkZ() + plan.depth();
+            default -> false;
+        };
     }
 
     private static ScatteredPlan calculatePlan(LostCityTerrainFeature feature, ScatteredSettings scatteredSettings, int ax, int az) {
@@ -166,7 +205,8 @@ public class Scattered {
         }
         return new ScatteredPlan(true, randomSeed, selection.randomBound(), positionXBound, positionZBound,
                 highwayCandidateCount, placement.width(), placement.depth(), placement.tlChunkX(), placement.tlChunkZ(),
-                lowestLevel, placement.transform(), singleBuildingCount, singleBuildingName, scattered, multiBuilding);
+                lowestLevel, placement.highwayHeight(), placement.transform(), singleBuildingCount, singleBuildingName,
+                scattered, multiBuilding);
     }
 
     private static List<PlacementCandidate> findHighwayPlacements(LostCityTerrainFeature feature,
@@ -470,12 +510,12 @@ public class Scattered {
     private record ScatteredPlan(boolean valid, long randomSeed, int selectionBound,
                                  int positionXBound, int positionZBound, int highwayCandidateCount,
                                  int width, int depth, int tlChunkX, int tlChunkZ, int lowestLevel,
-                                 Transform transform,
+                                 @Nullable Integer connectedHighwayHeight, Transform transform,
                                  int singleBuildingCount, @Nullable String singleBuildingName,
                                  @Nullable ScatteredBuilding scattered, @Nullable MultiBuilding multiBuilding) {
 
         private static final ScatteredPlan INVALID = new ScatteredPlan(false, 0L, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, Transform.ROTATE_NONE,
+                0, 0, 0, 0, 0, 0, 0, 0, null, Transform.ROTATE_NONE,
                 0, null, null, null);
 
         private QualityRandom createGenerationRandom() {

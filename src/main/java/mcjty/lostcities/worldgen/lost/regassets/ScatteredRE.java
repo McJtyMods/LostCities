@@ -17,6 +17,7 @@ public class ScatteredRE implements IAsset<ScatteredRE> {
                     Codec.list(Codec.STRING).optionalFieldOf("buildings").forGetter(l -> Optional.ofNullable(l.buildings)),
                     Codec.STRING.optionalFieldOf("multibuilding").forGetter(l -> Optional.ofNullable(l.multibuilding)),
                     Codec.BOOL.optionalFieldOf("rotatable").forGetter(l -> Optional.ofNullable(l.rotatable)),
+                    Codec.BOOL.optionalFieldOf("clearhighwayrailing", false).forGetter(l -> l.clearHighwayRailing),
                     Codec.STRING.optionalFieldOf("supportpart").forGetter(l -> Optional.ofNullable(l.supportpart)),
                     StringRepresentable.fromEnum(ScatteredBuilding.TerrainHeight::values).fieldOf("terrainheight").forGetter(l -> l.terrainheight),
                     StringRepresentable.fromEnum(ScatteredBuilding.TerrainFix::values).fieldOf("terrainfix").forGetter(l -> l.terrainfix),
@@ -28,17 +29,19 @@ public class ScatteredRE implements IAsset<ScatteredRE> {
     private final ScatteredBuilding.TerrainFix terrainfix;
     private final int heightoffset;
     private final boolean rotatable;
+    private final boolean clearHighwayRailing;
     private final List<String> buildings;
     private final String multibuilding;
     private final String supportpart;
 
     public ScatteredRE(Optional<List<String>> buildings, Optional<String> multibuilding,
-                       Optional<Boolean> rotatable, Optional<String> supportpart,
+                       Optional<Boolean> rotatable, boolean clearHighwayRailing, Optional<String> supportpart,
                        ScatteredBuilding.TerrainHeight terrainheight, ScatteredBuilding.TerrainFix terrainfix,
                        int heightoffset) {
         this.buildings = buildings.orElse(null);
         this.multibuilding = multibuilding.map(String::intern).orElse(null);
         this.rotatable = rotatable.orElse(false);
+        this.clearHighwayRailing = clearHighwayRailing;
         this.supportpart = supportpart.map(String::intern).orElse(null);
         this.terrainheight = terrainheight;
         this.terrainfix = terrainfix;
@@ -47,6 +50,10 @@ public class ScatteredRE implements IAsset<ScatteredRE> {
 
     public boolean isRotatable() {
         return rotatable;
+    }
+
+    public boolean isClearHighwayRailing() {
+        return clearHighwayRailing;
     }
 
     @Nullable

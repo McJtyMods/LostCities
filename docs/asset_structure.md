@@ -613,6 +613,7 @@ A scattered asset says what structure to place and how it interacts with terrain
 {
   "buildings": ["myexpansion:cabin"],
   "rotatable": true,
+  "clearhighwayrailing": false,
   "supportpart": "myexpansion:foundation_columns",
   "terrainheight": "highest",
   "terrainfix": "repeatslice",
@@ -625,6 +626,7 @@ A scattered asset says what structure to place and how it interacts with terrain
 | `buildings` | list | One or more building IDs from which one is selected |
 | `multibuilding` | string | A multibuilding ID instead of `buildings` |
 | `rotatable` | boolean | Whether a `nearhighway` placement may rotate in 90-degree steps so its connection edge faces the highway; default `false` |
+| `clearhighwayrailing` | boolean | Removes iron-bar railing from the connected highway edge for access; default `false` |
 | `supportpart` | string | Optional part whose bottom slice is repeated downward by `repeatslice` instead of repeating the generated building part |
 | `terrainheight` | enum, **required** | `lowest`, `average`, `highest`, or `ocean` |
 | `terrainfix` | enum, **required** | `none`, `clear`, or `repeatslice` |
@@ -658,7 +660,7 @@ The asset does not spawn until the active world style references it in `scattere
 
 `areasize`, `chance`, `weightnone`, and `list` are required. `areasize` is measured in chunks on both horizontal axes. `chance`, multiplied by the profile's scattered-chance multiplier, is the initial chance that a planning region attempts a placement. Each list entry requires `name` and integer `weight`, and optionally accepts `nearhighway`, `allowvoid`, a `biomes` matcher, and `maxheightdiff`. `weightnone` is added as a no-structure outcome after that chance check. `maxheightdiff` limits the terrain-height difference in blocks across the complete footprint. `allowvoid` permits placement where the sampled terrain is effectively void.
 
-`nearhighway: true` is a connection constraint rather than a loose distance check. The planner searches the area for a complete footprint whose connection edge directly borders a surface or bridge highway running parallel to that edge. Every highway chunk along that edge must have the same deck height; tunnels are rejected. The scattered structure is generated at that deck height plus `heightoffset`. The unrotated connection edge is north. With `rotatable: true`, the complete footprint, its multibuilding layout, its individual parts, and its optional support part rotate together to face a qualifying highway on any side.
+`nearhighway: true` is a connection constraint rather than a loose distance check. The planner searches the area for a complete footprint whose connection edge directly borders a surface or bridge highway running parallel to that edge. Every highway chunk along that edge must have the same deck height; tunnels are rejected. The scattered structure is generated at that deck height plus `heightoffset`. The unrotated connection edge is north. With `rotatable: true`, the complete footprint, its multibuilding layout, its individual parts, and its optional support part rotate together to face a qualifying highway on any side. Set `clearhighwayrailing: true` when that connection must also remove iron-bar railing along the bordering highway chunks.
 
 ### Stuff assets
 

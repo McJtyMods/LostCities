@@ -7,6 +7,7 @@
     - Added a versioned inter-city highway network which creates deterministic routes between likely city regions, with endpoint-based or fixed highway levels. Existing worlds keep legacy highway generation
     - Added dedicated highway bend and T-junction parts
     - Added highway-side gas stations and two-chunk restaurants with parking lots, automatic highway-facing rotation, matching deck heights, and configurable foundation supports
+    - Fixed rotated restaurant doors, opened highway railing for restaurant and gas-station access, and added two-high restaurant perimeter railings
 - Buildings and structure avoidance:
     - Structure avoidance now treats each multibuilding as a single footprint, so it is either generated completely or avoided completely
     - Fixed scattered multibuildings sometimes generating only partially. Their complete placement and validity are now decided once for the entire scattered area

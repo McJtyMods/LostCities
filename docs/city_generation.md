@@ -630,6 +630,8 @@ a parallel, non-tunnel highway at one deck height. Its base height is taken
 from that highway, and a rotatable asset turns its footprint, multibuilding
 piece lookup, blocks, and optional repeating support part toward the connected
 edge. The unrotated connection edge is north.
+An asset with `clearhighwayrailing` removes iron-bar railing only from that
+connected highway edge, providing access without changing other highway sides.
 
 Every participating chunk then reads the same plan and generates only its own
 building piece. The area random sequence is reconstructed independently for

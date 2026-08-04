@@ -1,6 +1,7 @@
 {
   "buildings": [ "highway_gas_station" ],
   "rotatable": true,
+  "clearhighwayrailing": true,
   "supportpart": "roadside_supports",
   "terrainheight": "highest",
   "terrainfix": "repeatslice"
