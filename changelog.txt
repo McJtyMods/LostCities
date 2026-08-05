@@ -1,5 +1,6 @@
 26.1.2-10.0.0:
 - Ported Lost Cities to Minecraft 26.1.2 on NeoForge and Java 25
+- Fixed clean command-line builds sometimes receiving an incomplete Minecraft compilation classpath from NeoGradle's shared execution cache
 - Hierarchical streets:
     - Added versioned hierarchical street generation with primary, secondary, and tertiary roads, wider primary roads, slopes, connectors, and deterministic large bridges. Existing worlds keep legacy street generation
     - Added an optional city-style `tertiaryparts` street asset family, defaulting to the secondary-road `parts` family
