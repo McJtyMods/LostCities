@@ -2,6 +2,7 @@
 
 Developer documentation:
 
+- [Development setup](docs/development.md)
 - [Asset system and custom expansions](docs/asset_structure.md)
 - [City generation](docs/city_generation.md)
 - [Profile options](docs/profile_options.md)

@@ -1,6 +1,6 @@
 package mcjty.lostcities.gui.elements;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class GuiElement {
 
@@ -19,7 +19,7 @@ public class GuiElement {
 
     }
 
-    public void render(GuiGraphics graphics) {
+    public void render(GuiGraphicsExtractor graphics) {
 
     }
 

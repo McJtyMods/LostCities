@@ -2,12 +2,12 @@ package mcjty.lostcities.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.SavedDataStorage;
 
 import javax.annotation.Nonnull;
 
@@ -21,7 +21,7 @@ public class LostData extends SavedData {
             ).apply(instance, LostData::new));
 
     private static final SavedDataType<LostData> TYPE = new SavedDataType<>(
-            NAME,
+            Identifier.fromNamespaceAndPath("lostcities", NAME),
             LostData::new,
             CODEC
     );
@@ -35,8 +35,7 @@ public class LostData extends SavedData {
             throw new RuntimeException("Don't access this client-side!");
         }
         MinecraftServer server = level.getServer();
-        ServerLevel overworld = server.getLevel(Level.OVERWORLD);
-        DimensionDataStorage storage = overworld.getDataStorage();
+        SavedDataStorage storage = server.getDataStorage();
         return storage.computeIfAbsent(TYPE);
     }
 

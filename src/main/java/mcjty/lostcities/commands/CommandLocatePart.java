@@ -53,10 +53,10 @@ public class CommandLocatePart implements Command<CommandSourceStack> {
             return 0;
         }
 
-        ChunkPos cp = new ChunkPos(start);
+        ChunkPos cp = ChunkPos.containing(start);
         // Abuse BlockPos as ChunkPos
         int cnt = 0;
-        for (BlockPos.MutableBlockPos mpos : BlockPos.spiralAround(new BlockPos(cp.x, 0, cp.z), 30, Direction.EAST, Direction.SOUTH)) {
+        for (BlockPos.MutableBlockPos mpos : BlockPos.spiralAround(new BlockPos(cp.x(), 0, cp.z()), 30, Direction.EAST, Direction.SOUTH)) {
             List<EditModeData.PartData> data = EditModeData.getData().getPartData(new ChunkCoord(level.dimension(), mpos.getX(), mpos.getZ()));
             for (EditModeData.PartData pd : data) {
                 if (pd.partName().equals(name.toString())) {

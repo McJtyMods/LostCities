@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,28 +29,12 @@ public class Tools {
 
     private static final Set<String> DONE = new HashSet<>();
 
-    private static final Function<Map.Entry<Property<?>, Comparable<?>>, String> PROPERTY_MAPPER = new Function<Map.Entry<Property<?>, Comparable<?>>, String>() {
-        @Override
-        public String apply(@Nullable Map.Entry<Property<?>, Comparable<?>> entry) {
-            if (entry == null) {
-                return "<NULL>";
-            } else {
-                Property<?> property = entry.getKey();
-                return property.getName() + "=" + this.getName(property, entry.getValue());
-            }
-        }
-
-        private <T extends Comparable<T>> String getName(Property<T> property, Comparable<?> comparable) {
-            return property.getName((T)comparable);
-        }
-    };
-
     public static String stateToString(BlockState state) {
         StringBuilder stringbuilder = new StringBuilder();
         stringbuilder.append(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
-        if (!state.getValues().isEmpty()) {
+        if (!state.isSingletonState()) {
             stringbuilder.append('[');
-            stringbuilder.append(state.getValues().entrySet().stream().map(PROPERTY_MAPPER).collect(Collectors.joining(",")));
+            stringbuilder.append(state.getValues().map(Property.Value::toString).collect(Collectors.joining(",")));
             stringbuilder.append(']');
         }
 

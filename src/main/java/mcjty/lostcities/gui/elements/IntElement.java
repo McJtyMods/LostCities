@@ -3,7 +3,7 @@ package mcjty.lostcities.gui.elements;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
 import mcjty.lostcities.varia.ComponentFactory;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 
 public class IntElement extends GuiElement {
@@ -66,13 +66,13 @@ public class IntElement extends GuiElement {
     }
 
     @Override
-    public void render(GuiGraphics graphics) {
+    public void render(GuiGraphicsExtractor graphics) {
         if (field.visible) {
             if (label != null) {
-                graphics.drawString(gui.getFont(), label, 10, y + 5, 0xffffffff);
+                graphics.text(gui.getFont(), label, 10, y + 5, 0xffffffff);
             }
             if (prefix != null) {
-                graphics.drawString(gui.getFont(), prefix, x - 8, y + 5, 0xffffffff);
+                graphics.text(gui.getFont(), prefix, x - 8, y + 5, 0xffffffff);
             }
         }
     }

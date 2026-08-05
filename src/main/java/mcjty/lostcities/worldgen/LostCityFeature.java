@@ -56,8 +56,8 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
                     return false;
                 }
 
-                int chunkX = center.x;
-                int chunkZ = center.z;
+                int chunkX = center.x();
+                int chunkZ = center.z();
                 try {
                     diminfo.getFeature().generate(region, region.getChunk(chunkX, chunkZ));
                 } catch (Exception e) {
@@ -90,7 +90,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
             }
             if (world instanceof WorldGenRegion region) {
                 ChunkPos center = region.getCenter();
-                return runWithChunkNeighborhoodLocks(world.getLevel().dimension(), center.x, center.z, () -> action.generate(diminfo));
+                return runWithChunkNeighborhoodLocks(world.getLevel().dimension(), center.x(), center.z(), () -> action.generate(diminfo));
             }
             return action.generate(diminfo);
         } finally {

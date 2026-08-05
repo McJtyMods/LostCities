@@ -342,7 +342,7 @@ public class NoiseChunkOpt implements DensityFunction.ContextProvider, DensityFu
         public double compute(FunctionContext pContext) {
             int i = pContext.blockX();
             int j = pContext.blockZ();
-            long k = ChunkPos.asLong(i, j);
+            long k = ChunkPos.pack(i, j);
             if (this.lastPos2D == k) {
                 return this.lastValue;
             } else {
@@ -959,4 +959,3 @@ public class NoiseChunkOpt implements DensityFunction.ContextProvider, DensityFu
 
     }
 }
-

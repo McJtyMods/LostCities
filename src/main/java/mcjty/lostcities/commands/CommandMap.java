@@ -33,10 +33,10 @@ public class CommandMap implements Command<CommandSourceStack> {
         BlockPos position = player.blockPosition();
         IDimensionInfo dimInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo((WorldGenLevel) player.level());
         if (dimInfo != null) {
-            ChunkPos pos = new ChunkPos(position);
-            for (int z = pos.z - 20 ; z <= pos.z + 20 ; z++) {
+            ChunkPos pos = ChunkPos.containing(position);
+            for (int z = pos.z() - 20 ; z <= pos.z() + 20 ; z++) {
                 StringBuilder buf = new StringBuilder();
-                for (int x = pos.x - 20 ; x <= pos.x + 20 ; x++) {
+                for (int x = pos.x() - 20 ; x <= pos.x() + 20 ; x++) {
                     ChunkCoord coord = new ChunkCoord(dimInfo.getType(), x, z);
                     BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimInfo);
                     if (info.isCity && info.hasBuilding) {

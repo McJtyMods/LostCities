@@ -4,12 +4,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lostcities.config.HighwayGenerationMode;
 import mcjty.lostcities.config.StreetGenerationMode;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.SavedDataStorage;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class LostCityWorldGenData extends SavedData {
                     .forGetter(LostCityWorldGenData::highwayModesSnapshot)
     ).apply(instance, LostCityWorldGenData::new));
     private static final SavedDataType<LostCityWorldGenData> TYPE = new SavedDataType<>(
-            NAME,
+            Identifier.fromNamespaceAndPath("lostcities", "lostcity_worldgen_data"),
             LostCityWorldGenData::new,
             CODEC
     );
@@ -76,7 +77,7 @@ public class LostCityWorldGenData extends SavedData {
         if (overworld == null) {
             throw new IllegalStateException("Cannot access Lost Cities world generation data without an overworld");
         }
-        DimensionDataStorage storage = overworld.getDataStorage();
+        SavedDataStorage storage = level.getServer().getDataStorage();
         return storage.computeIfAbsent(TYPE);
     }
 

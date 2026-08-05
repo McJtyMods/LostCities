@@ -269,8 +269,8 @@ public class LostCityTerrainFeature {
 
     public void generate(WorldGenRegion region, ChunkAccess chunk) {
         long start = System.currentTimeMillis();
-        int chunkX = chunk.getPos().x;
-        int chunkZ = chunk.getPos().z;
+        int chunkX = chunk.getPos().x();
+        int chunkZ = chunk.getPos().z();
 
         try (GenerationContext.Scope ignored = GenerationContext.open(region, provider.getSeed(), provider.getType(), chunkX, chunkZ)) {
             LevelAccessor oldRegion = getDriver().getRegion();

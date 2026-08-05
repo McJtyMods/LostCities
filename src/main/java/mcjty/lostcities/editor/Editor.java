@@ -7,7 +7,6 @@ import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
 import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.worldgen.lost.cityassets.Palette;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
@@ -30,7 +29,7 @@ public class Editor {
 
         CompiledPalette finalPalette = palette;
 
-        player.level().getServer().doRunTask(new TickTask(3, () -> {
+        player.level().getServer().execute(() -> {
             if (clear) {
                 for (int y = 0; y < part.getSliceCount(); y++) {
                     for (int x = 0; x < part.getXSize(); x++) {
@@ -59,6 +58,6 @@ public class Editor {
                     }
                 }
             }
-        }));
+        });
     }
 }

@@ -37,9 +37,9 @@ public class ChunkDriver {
         this.region = region;
         this.primer = primer;
         if (primer != null) {
-            cache = new SectionCache(region, primer.getPos().x << 4, primer.getPos().z << 4);
-            this.cx = primer.getPos().x;
-            this.cz = primer.getPos().z;
+            cache = new SectionCache(region, primer.getPos().x() << 4, primer.getPos().z() << 4);
+            this.cx = primer.getPos().x();
+            this.cz = primer.getPos().z();
         }
     }
 
@@ -114,7 +114,7 @@ public class ChunkDriver {
     }
 
     public ChunkDriver current(int x, int y, int z) {
-        current.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4));
+        current.set(x + (primer.getPos().x() << 4), y, z + (primer.getPos().z() << 4));
         return this;
     }
 
@@ -165,19 +165,19 @@ public class ChunkDriver {
     }
 
     public void setBlockRange(int x, int y, int z, int y2, BlockState state) {
-        cache.putRange(x + (primer.getPos().x << 4), z + (primer.getPos().z << 4), y, y2-1, state);
+        cache.putRange(x + (primer.getPos().x() << 4), z + (primer.getPos().z() << 4), y, y2-1, state);
     }
 
     public void setBlockRange(int x, int y, int z, int y2, BlockState state, Predicate<BlockState> test) {
-        cache.putRange(x + (primer.getPos().x << 4), z + (primer.getPos().z << 4), y, y2-1, state, test);
+        cache.putRange(x + (primer.getPos().x() << 4), z + (primer.getPos().z() << 4), y, y2-1, state, test);
     }
 
     public void setBlockRangeToAir(int x, int y, int z, int y2) {
-        cache.putRange(x + (primer.getPos().x << 4), z + (primer.getPos().z << 4), y, y2-1, Blocks.AIR.defaultBlockState());
+        cache.putRange(x + (primer.getPos().x() << 4), z + (primer.getPos().z() << 4), y, y2-1, Blocks.AIR.defaultBlockState());
     }
 
     public void setBlockRangeToAir(int x, int y, int z, int y2, Predicate<BlockState> test) {
-        cache.putRange(x + (primer.getPos().x << 4), z + (primer.getPos().z << 4), y, y2-1, Blocks.AIR.defaultBlockState(), test);
+        cache.putRange(x + (primer.getPos().x() << 4), z + (primer.getPos().z() << 4), y, y2-1, Blocks.AIR.defaultBlockState(), test);
     }
 
     private boolean isThisChunk(BlockPos pos) {
@@ -342,7 +342,7 @@ public class ChunkDriver {
 
 
     public BlockState getBlock(int x, int y, int z) {
-        return getBlock(pos.set(x + (primer.getPos().x << 4), y, z + (primer.getPos().z << 4)));
+        return getBlock(pos.set(x + (primer.getPos().x() << 4), y, z + (primer.getPos().z() << 4)));
     }
 
     private static class S {

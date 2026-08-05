@@ -70,7 +70,7 @@ public class CommandCreateBuilding implements Command<CommandSourceStack> {
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, dimInfo);
         info.setBuildingType(building, cellars, floors, bottom.getY());
 
-        ChunkPos cp = new ChunkPos(bottom);
+        ChunkPos cp = ChunkPos.containing(bottom);
 
         int height = bottom.getY();
         for (int y = height ; y < level.getMaxY() + 1 ; y++) {

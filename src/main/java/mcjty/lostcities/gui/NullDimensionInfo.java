@@ -261,8 +261,8 @@ public class NullDimensionInfo implements IDimensionInfo {
 
     @Override
     public Holder<Biome> getBiome(BlockPos pos) {
-        ChunkPos cp = new ChunkPos(pos);
-        char b = getBiomeChar(cp.x, cp.z);
+        ChunkPos cp = ChunkPos.containing(pos);
+        char b = getBiomeChar(cp.x(), cp.z());
         ResourceKey<Biome> biome = switch (b) {
             case 'p' -> Biomes.PLAINS;
             case '-' -> Biomes.OCEAN;

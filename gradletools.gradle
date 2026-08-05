@@ -1,11 +1,9 @@
 project.ext.set("mod_group_id", 'com.github.mcjty')
 project.ext.set("mod_authors", 'McJty')
-project.ext.set("minecraft_version", '1.21.11')
-project.ext.set("minecraft_version_range", '[1.21,1.22)')
-project.ext.set("parchment_version", '2024.12.07')
-project.ext.set("parchment_minecraft_version", '1.21.3')
-project.ext.set("neo_version", '21.11.38-beta')
-project.ext.set("neo_version_range", '[21.1,)')
+project.ext.set("minecraft_version", '26.1.2')
+project.ext.set("minecraft_version_range", '[26.1.2,26.2)')
+project.ext.set("neo_version", '26.1.2.0-beta')
+project.ext.set("neo_version_range", '[26.1.2.0-beta,)')
 project.ext.set("loader_version_range", '[4,)')
 project.ext.set("jei_version", '19.25.0.325')
 project.ext.set("jei_minecraft_version", '1.21.1')
@@ -58,17 +56,6 @@ ext.repos = {
         maven { url 'https://maven.minecraftforge.net/' } // Serene Seasons
         maven { url "https://maven.theillusivec4.top/" } // Curios
         maven { url "https://cursemaven.com" }
-    }
-}
-
-ext.parch = {
-    dependencies {
-        subsystems {
-            parchment {
-                minecraftVersion = ${parchment_minecraft_version}
-                mappingsVersion = ${parchment_version}
-            }
-        }
     }
 }
 
@@ -197,7 +184,7 @@ ext.modpublisher = { curseOptional, curseRequired, modrinthOptional, modrinthReq
         gameVersions.set(allVersions)
         loaders.set(['neoforge'])
         curseEnvironment.set('both')
-        javaVersions.add(JavaVersion.VERSION_21)
+        javaVersions.add(JavaVersion.VERSION_25)
         artifact.set(jar)
 
         curseDepends {

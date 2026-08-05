@@ -14,7 +14,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.1.4'
+    id 'net.neoforged.gradle.userdev' version '7.1.21'
 }
 
 apply plugin: 'com.hypherionmc.modutils.modpublisher'
@@ -28,7 +28,7 @@ if (project.file('../gradletools.gradle').exists()) {
 }
 
 group = "com.github.mcjty"
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 if (System.getenv('BUILD_NUMBER') != null) {
     version += "-${System.getenv('BUILD_NUMBER')}"
@@ -50,15 +50,6 @@ dependencies {
 }
 
 modpublisher(['the-one-probe'], [], ['the-one-probe'], [], [])
-
-
-subsystems {
-    parchment {
-        minecraftVersion = "${parchment_minecraft_version}"
-        mappingsVersion = "${parchment_version}"
-    }
-}
-
 
 task apiJar(type: Jar) {
     archiveClassifier = "api"

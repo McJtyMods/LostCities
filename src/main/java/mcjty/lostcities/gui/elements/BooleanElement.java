@@ -3,7 +3,7 @@ package mcjty.lostcities.gui.elements;
 import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
 import mcjty.lostcities.varia.ComponentFactory;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 
 public class BooleanElement extends GuiElement {
@@ -49,10 +49,10 @@ public class BooleanElement extends GuiElement {
     }
 
     @Override
-    public void render(GuiGraphics graphics) {
+    public void render(GuiGraphicsExtractor graphics) {
         if (label != null) {
             if (field.visible) {
-                graphics.drawString(gui.getFont(), label, 10, y + 5, 0xffffffff);
+                graphics.text(gui.getFont(), label, 10, y + 5, 0xffffffff);
             }
         }
     }

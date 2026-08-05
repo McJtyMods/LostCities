@@ -2,7 +2,7 @@
 
 ## Project overview
 
-Lost Cities is a Minecraft Forge 1.20.1 mod built with Java 17 and Gradle. Most behavior is split between Java world-generation code and data-driven JSON assets that describe buildings, city styles, palettes, parts, and related content.
+Lost Cities is a Minecraft NeoForge 26.1.2 mod built with Java 25 and Gradle. Most behavior is split between Java world-generation code and data-driven JSON assets that describe buildings, city styles, palettes, parts, and related content.
 
 ## Repository structure
 
@@ -25,7 +25,7 @@ Lost Cities is a Minecraft Forge 1.20.1 mod built with Java 17 and Gradle. Most 
 - Keep changes focused and consistent with the existing package and data-asset organization.
 - Preserve deterministic world generation. Be especially careful with random-number usage, chunk ordering, caches, shared mutable state, and compatibility of existing worlds.
 - Treat identifiers and JSON formats in the built-in assets as public, data-pack-facing interfaces unless a migration is intentional.
-- Use Java 17-compatible code. `./gradlew compileJava` is the basic compilation check when one is useful.
+- Use Java 25-compatible code. `./gradlew compileJava` is the basic compilation check when one is useful.
 - Do not edit generated or build output when the corresponding source or generator should be changed instead.
 
 ## Testing

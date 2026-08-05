@@ -14,7 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.SavedDataStorage;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -73,7 +73,7 @@ public class LostCityHighwayData extends SavedData {
             PersistedDimension.CODEC.listOf().fieldOf("dimensions").forGetter(LostCityHighwayData::snapshot)
     ).apply(instance, LostCityHighwayData::new));
     private static final SavedDataType<LostCityHighwayData> TYPE = new SavedDataType<>(
-            NAME,
+            Identifier.fromNamespaceAndPath("lostcities", "lostcity_highway_data"),
             LostCityHighwayData::new,
             CODEC
     );
@@ -97,7 +97,7 @@ public class LostCityHighwayData extends SavedData {
         if (overworld == null) {
             throw new IllegalStateException("Cannot access Lost Cities highway data without an overworld");
         }
-        DimensionDataStorage storage = overworld.getDataStorage();
+        SavedDataStorage storage = level.getServer().getDataStorage();
         return storage.computeIfAbsent(TYPE);
     }
 

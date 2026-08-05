@@ -47,8 +47,8 @@ public class CommandEditPart implements Command<CommandSourceStack> {
             return 0;
         }
 
-        ChunkPos cp = new ChunkPos(start);
-        for (EditModeData.PartData data : EditModeData.getData().getPartData(new ChunkCoord(level.dimension(), cp.x, cp.z))) {
+        ChunkPos cp = ChunkPos.containing(start);
+        for (EditModeData.PartData data : EditModeData.getData().getPartData(new ChunkCoord(level.dimension(), cp.x(), cp.z()))) {
             BuildingPart part = AssetRegistries.PARTS.get(level, data.partName());
             if (part == null) {
                 context.getSource().sendFailure(ComponentFactory.literal("Unknown part '" + data.partName() + "' in this chunk!"));

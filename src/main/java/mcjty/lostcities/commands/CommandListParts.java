@@ -46,8 +46,8 @@ public class CommandListParts implements Command<CommandSourceStack> {
             return 0;
         }
 
-        ChunkPos cp = new ChunkPos(start);
-        List<EditModeData.PartData> data = EditModeData.getData().getPartData(new ChunkCoord(level.dimension(), cp.x, cp.z));
+        ChunkPos cp = ChunkPos.containing(start);
+        List<EditModeData.PartData> data = EditModeData.getData().getPartData(new ChunkCoord(level.dimension(), cp.x(), cp.z()));
         for (EditModeData.PartData pd : data) {
             context.getSource().sendSuccess(() -> ComponentFactory.literal("Found '" + pd.partName() + "' at " + pd.y()), false);
         }

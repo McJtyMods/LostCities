@@ -5,11 +5,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.WorldTools;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.SavedDataStorage;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -42,7 +43,7 @@ public class EditModeData extends SavedData {
     ).apply(instance, EditModeData::new));
 
     private static final SavedDataType<EditModeData> TYPE = new SavedDataType<>(
-            NAME,
+            Identifier.fromNamespaceAndPath("lostcities", NAME),
             EditModeData::new,
             CODEC
     );
@@ -50,7 +51,7 @@ public class EditModeData extends SavedData {
     @Nonnull
     public static EditModeData getData() {
         ServerLevel overworld = WorldTools.getOverworld();
-        DimensionDataStorage storage = overworld.getDataStorage();
+        SavedDataStorage storage = overworld.getServer().getDataStorage();
         return storage.computeIfAbsent(TYPE);
     }
 

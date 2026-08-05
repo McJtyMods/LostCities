@@ -27,9 +27,9 @@ World-generation concurrency and cache invariants are documented separately in
 
 ## Persisted mode selection and old-world compatibility
 
-The actual mode is stored per dimension in the overworld's existing Minecraft
-`SavedData` system by `LostCityWorldGenData`. Its data name is
-`LostCityWorldGenData`; it contains independent street/highway new-world markers
+The actual mode is stored per dimension in Minecraft's global
+`SavedDataStorage` by `LostCityWorldGenData`. Its namespaced data identifier is
+`lostcities:lostcity_worldgen_data`; it contains independent street/highway new-world markers
 and independent maps from dimension resource-location strings to mode names.
 The data is serialized through a Minecraft `Codec`; its fields are
 `newWorldStreetModes`, `newWorldHighwayModes`, `streetModes` and `highwayModes`.
@@ -56,8 +56,8 @@ to `LEGACY`. If dimension info was requested unusually early during new-world
 startup, the create-spawn handler invalidates that cached info before resolving
 it again.
 
-Inter-city hub results use a separate overworld `SavedData` named
-`LostCityHighwayData`. This is a performance cache rather than mode-selection
+Inter-city hub results use separate global saved data identified as
+`lostcities:lostcity_highway_data`. This is a performance cache rather than mode-selection
 state: it stores the zero-or-one hub result, including an empty result, for each
 evaluated planning cell and dimension. A present hub includes its city level;
 routes and per-chunk highway occupancy remain derived data. A versioned
