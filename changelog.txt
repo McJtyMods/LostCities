@@ -1,3 +1,6 @@
+26.1.2-10.0.1:
+- Fixed a crash when switching to a space or spheres profile in the world customization screen before creating the world
+
 26.1.2-10.0.0:
 - Ported Lost Cities to Minecraft 26.1.2 on NeoForge and Java 25
 - Fixed clean command-line builds sometimes receiving an incomplete Minecraft compilation classpath from NeoGradle's shared execution cache
