@@ -280,6 +280,6 @@ public class NullDimensionInfo implements IDimensionInfo {
 
     @Override
     public ResourceKey<Level> dimension() {
-        return null;
+        return getType();
     }
 }
