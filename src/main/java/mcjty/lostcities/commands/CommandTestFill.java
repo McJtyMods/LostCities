@@ -23,7 +23,7 @@ public class CommandTestFill implements Command<CommandSourceStack> {
 
     public static ArgumentBuilder<CommandSourceStack, ?> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         return Commands.literal("testfill")
-                .requires(cs -> cs.hasPermission(0))
+                .requires(cs -> cs.hasPermission(1))
                 .executes(CMD);
     }
 
