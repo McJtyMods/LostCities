@@ -1349,16 +1349,20 @@ public class LostCityTerrainFeature {
         Character borderBlock = info.getCityStyle().getBorderBlock();
         Character wallBlock = info.getCityStyle().getWallBlock();
         BlockState wall = info.getCompiledPalette().get(wallBlock);
+        boolean connectsToAdjacentChunk = canDoParks && borderNeedsConnectionToAdjacentChunk(info, x, z);
+        // setBlocksFromPalette() uses an exclusive upper bound. Keep the street
+        // surface generated at ground level when this column is an opening.
+        int borderTop = info.getCityGroundLevel() + (connectsToAdjacentChunk ? 0 : 1);
 
         switch (info.profile.LANDSCAPE_TYPE) {
             case DEFAULT, SPHERES -> {
                 int y = getMinHeightAt(info, x, z, heightmap);
                 if (y < info.getCityGroundLevel() + 1) {
                     // We are above heightmap level. Generated a border from that level to our ground level
-                    setBlocksFromPalette(x, y - 1, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                    setBlocksFromPalette(x, y - 1, z, borderTop, info.getCompiledPalette(), borderBlock);
                 } else {
                     // We are below heightmap level. Generate a thin border anyway
-                    setBlocksFromPalette(x, info.getCityGroundLevel() - 3, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                    setBlocksFromPalette(x, info.getCityGroundLevel() - 3, z, borderTop, info.getCompiledPalette(), borderBlock);
                 }
             }
             case SPACE -> {
@@ -1372,30 +1376,30 @@ public class LostCityTerrainFeature {
                 }
 
                 if (adjacentY > 5) {
-                    setBlocksFromPalette(x, adjacentY, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                    setBlocksFromPalette(x, adjacentY, z, borderTop, info.getCompiledPalette(), borderBlock);
                 }
             }
             case FLOATING -> {
-                setBlocksFromPalette(x, info.getCityGroundLevel() - 3, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                setBlocksFromPalette(x, info.getCityGroundLevel() - 3, z, borderTop, info.getCompiledPalette(), borderBlock);
                 if (isCorner(x, z)) {
                     generateBorderSupport(info, wall, x, z, 3, heightmap);
                 }
             }
             case CAVERN -> {
-                setBlocksFromPalette(x, info.getCityGroundLevel() - 2, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                setBlocksFromPalette(x, info.getCityGroundLevel() - 2, z, borderTop, info.getCompiledPalette(), borderBlock);
                 if (isCorner(x, z)) {
                     generateBorderSupport(info, wall, x, z, 2, heightmap);
                 }
             }
             case CAVERNSPHERES -> {
-                setBlocksFromPalette(x, info.getCityGroundLevel() - 2, z, info.getCityGroundLevel() + 1, info.getCompiledPalette(), borderBlock);
+                setBlocksFromPalette(x, info.getCityGroundLevel() - 2, z, borderTop, info.getCompiledPalette(), borderBlock);
                 if (isCorner(x, z)) {
                     generateBorderSupport(info, wall, x, z, 2, heightmap);
                 }
             }
         }
         if (canDoParks) {
-            if (!borderNeedsConnectionToAdjacentChunk(info, x, z)) {
+            if (!connectsToAdjacentChunk) {
                 getDriver().current(x, info.getCityGroundLevel() + 1, z).block(wall);
             } else {
                 getDriver().current(x, info.getCityGroundLevel() + 1, z).block(air);
