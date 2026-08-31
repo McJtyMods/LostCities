@@ -918,12 +918,15 @@ public class BuildingInfo implements ILostChunkInfo {
                         ? AssetRegistries.PARTS.getOrWarn(provider.getWorld(), cs.getRandomPark(rand, this.coord))
                         : null;
             } else {
-                // Planned and predefined streets are never parks.
+                // Planned streets need an unobstructed road surface. Resolve a
+                // potential fountain anyway to preserve deterministic random
+                // consumption for the rest of the chunk.
                 streetType = StreetType.NORMAL;
                 parkType = null;
-                fountainType = rand.nextFloat() < citySettings.fountainChance()
+                BuildingPart selectedFountain = rand.nextFloat() < citySettings.fountainChance()
                         ? AssetRegistries.PARTS.getOrWarn(provider.getWorld(), cs.getRandomFountain(rand, this.coord))
                         : null;
+                fountainType = isPlannedRoad() ? null : selectedFountain;
             }
             float cityFactor = City.getCityFactor(coord, provider, profile);
 

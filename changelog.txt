@@ -1,3 +1,6 @@
+1.21-8.4.2:
+- Fixed fountains appearing on planned streets and street borders blocking connections to adjacent stairs
+
 1.21-8.4.1:
 - Fixed a crash when switching to a space or spheres profile in the world customization screen before creating the world
 
