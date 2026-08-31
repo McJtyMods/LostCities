@@ -1,3 +1,6 @@
+1.20-7.5.3:
+- Fixed fountains appearing on planned streets and street borders blocking connections to adjacent stairs
+
 1.20-7.5.2:
 - Testfill didn't require op to use
 
