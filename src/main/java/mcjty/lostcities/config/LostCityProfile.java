@@ -770,7 +770,7 @@ public class LostCityProfile implements ILostCityProfile {
     public void copyFrom(LostCityProfile other) {
         Configuration config = new Configuration();
         other.init(config);
-        init(config);
+        copyFromConfiguration(config);
     }
 
     public JsonObject toJson(boolean readonly) {
@@ -794,5 +794,8 @@ public class LostCityProfile implements ILostCityProfile {
 
     public void copyFromConfiguration(Configuration config) {
         init(config);
+        icon = null;
+        liquidBlock = null;
+        baseBlock = null;
     }
 }
