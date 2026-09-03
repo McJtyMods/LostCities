@@ -1,3 +1,7 @@
+1.21-8.4.3:
+- Added a new railwayLevelOffset profile option to allow railways to be raised or lowered in 6-block increments, with stations and building cellars respecting the configured level
+- Add a new page to the world customization screen for editing every profile setting, with range and allowed-value validation
+
 1.21-8.4.2:
 - Added an advanced world-customization page for editing every profile setting, with range and allowed-value validation
 - Fixed fountains appearing on planned streets and street borders blocking connections to adjacent stairs
