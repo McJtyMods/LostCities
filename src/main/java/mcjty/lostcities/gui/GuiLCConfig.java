@@ -2,6 +2,7 @@ package mcjty.lostcities.gui;
 
 import mcjty.lostcities.api.LostChunkCharacteristics;
 import mcjty.lostcities.api.RailChunkType;
+import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.gui.elements.*;
@@ -22,7 +23,6 @@ import net.minecraft.client.gui.screens.Screen;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -39,7 +39,7 @@ public class GuiLCConfig extends Screen {
     private String curpage;
     private int y;
 
-    private static final List<String> MODES = Arrays.asList("Cities", "Buildings", "Damage", "Transport", "Various");
+    private static final List<String> MODES = List.of("Cities", "Buildings", "Damage", "Transport", "Various", "All");
     private String mode = MODES.get(0);
 
     private long seed = 3439249320423L;
@@ -49,6 +49,7 @@ public class GuiLCConfig extends Screen {
     private DoubleElement perlinScaleElement;
     private DoubleElement perlinOffsetElement;
     private DoubleElement perlinInnerScaleElement;
+    private ProfileConfigElement profileConfigElement;
 
     private final LostCitySetup localSetup = new LostCitySetup(this::refreshPreview);
 
@@ -117,6 +118,8 @@ public class GuiLCConfig extends Screen {
         initDamage(70);
         initTransport(110);
         initVarious(110);
+        profileConfigElement = new ProfileConfigElement(this, "All", this.width, this.height);
+        add(profileConfigElement);
 
         updateValues();
     }
@@ -273,6 +276,38 @@ public class GuiLCConfig extends Screen {
         City.cleanCache();
         CitySphere.cleanCache();
         Scattered.cleanCache();
+    }
+
+    public record ConfigUpdateResult(boolean applied, Object value, String error) {
+    }
+
+    /**
+     * Apply a value through a temporary profile first. Some profile options have relationships
+     * which cannot be expressed as a simple min/max range, so this prevents a rejected edit from
+     * leaving the customized profile partially updated.
+     */
+    @SuppressWarnings("unchecked")
+    public ConfigUpdateResult updateProfileValue(String attribute, Object value) {
+        LostCityProfile profile = localSetup.get().orElse(null);
+        if (profile == null) {
+            return new ConfigUpdateResult(false, null, "No profile is selected");
+        }
+
+        Configuration configuration = profile.toConfiguration();
+        Configuration.Value<Object> definition = configuration.getValue(attribute);
+        definition.set(value);
+        definition.constrain();
+
+        LostCityProfile candidate = new LostCityProfile("gui_validation", false);
+        try {
+            candidate.copyFromConfiguration(configuration);
+        } catch (RuntimeException e) {
+            return new ConfigUpdateResult(false, profile.toConfiguration().get(attribute), e.getMessage());
+        }
+
+        profile.copyFromConfiguration(configuration);
+        refreshPreview();
+        return new ConfigUpdateResult(true, definition.get(), null);
     }
 
     private void renderExtra(GuiGraphics graphics) {
@@ -450,6 +485,14 @@ public class GuiLCConfig extends Screen {
         elements.forEach(GuiElement::update);
         refreshPreview();
         profileButton.setTooltip(Tooltip.create(getLocalSetup().getProfileInfo()));
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        if ("All".equals(mode) && profileConfigElement != null && profileConfigElement.scroll(delta)) {
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, delta);
     }
 
     private void refreshButtons() {
