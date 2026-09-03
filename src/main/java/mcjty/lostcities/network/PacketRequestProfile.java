@@ -9,7 +9,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record PacketRequestProfile(ResourceKey<Level> dimension) implements CustomPacketPayload {
 
@@ -25,12 +24,10 @@ public record PacketRequestProfile(ResourceKey<Level> dimension) implements Cust
         return TYPE;
     }
 
-    public void handle(IPayloadContext ctx) {
-        ctx.enqueueWork(() -> {
-            // @todo 1.14
+    public void handle() {
+        // @todo 1.14
 //            ServerPlayerEntity player = ctx.get().getSender();
 //            LostCityProfile profile = WorldTypeTools.getProfile(WorldTools.getWorld(dimension));
 //            PacketHandler.INSTANCE.sendTo(new PacketRequestProfile(dimension, profile.getName()), player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-        });
     }
 }

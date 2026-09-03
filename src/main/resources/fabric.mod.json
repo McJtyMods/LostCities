@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "Generate cities all over the world",
+  "authors": ["McJty"],
+  "contact": {
+    "homepage": "http://github.com/McJtyMods/LostCities/",
+    "issues": "http://github.com/McJtyMods/LostCities/issues",
+    "sources": "https://github.com/McJtyMods/LostCities"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "accessWidener": "META-INF/${mod_id}.accesswidener",
+  "entrypoints": {
+    "main": ["mcjty.lostcities.LostCities"],
+    "client": ["mcjty.lostcities.setup.ClientSetup"],
+    "fabric-datagen": ["mcjty.lostcities.datagen.DataGenerators"]
+  },
+  "mixins": ["${mod_id}.mixins.json"],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "forgeconfigapiport": "*",
+    "minecraft": "${minecraft_version}",
+    "java": ">=${java_version}"
+  }
+}

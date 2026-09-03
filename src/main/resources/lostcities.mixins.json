@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "package": "mcjty.lostcities.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": ["MinecraftServerMixin"],
+  "client": ["CreateWorldScreenMixin"],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

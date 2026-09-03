@@ -11,6 +11,7 @@ import mcjty.lostcities.worldgen.highway.HubKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
@@ -75,7 +76,8 @@ public class LostCityHighwayData extends SavedData {
     private static final SavedDataType<LostCityHighwayData> TYPE = new SavedDataType<>(
             Identifier.fromNamespaceAndPath("lostcities", "lostcity_highway_data"),
             LostCityHighwayData::new,
-            CODEC
+            CODEC,
+            DataFixTypes.SAVED_DATA_COMMAND_STORAGE
     );
 
     private final Map<String, DimensionHubData> dimensions = new HashMap<>();

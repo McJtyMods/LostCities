@@ -1,6 +1,9 @@
 {
   "values": [
-    "#c:glass_blocks",
+    {
+      "id": "#c:glass_blocks",
+      "required": false
+    },
     "minecraft:air",
     "minecraft:dirt",
     "minecraft:coarse_dirt",

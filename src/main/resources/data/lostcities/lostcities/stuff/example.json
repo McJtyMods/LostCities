@@ -15,7 +15,7 @@
   },
   "blocks": {
     "if_any": [
-      "#forge:stone",
+      "#c:stones",
       "minecraft:andesite"
     ]
   },

@@ -7,6 +7,7 @@ import mcjty.lostcities.config.StreetGenerationMode;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
@@ -47,7 +48,8 @@ public class LostCityWorldGenData extends SavedData {
     private static final SavedDataType<LostCityWorldGenData> TYPE = new SavedDataType<>(
             Identifier.fromNamespaceAndPath("lostcities", "lostcity_worldgen_data"),
             LostCityWorldGenData::new,
-            CODEC
+            CODEC,
+            DataFixTypes.SAVED_DATA_COMMAND_STORAGE
     );
 
     private boolean newWorldStreetModes;

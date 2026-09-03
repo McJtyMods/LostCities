@@ -2,84 +2,44 @@ package mcjty.lostcities.setup;
 
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.worldgen.lost.regassets.*;
-import mcjty.lostcities.worldgen.lost.regassets.StuffSettingsRE;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraft.resources.ResourceKey;
 
 public class CustomRegistries {
 
-    public static final ResourceKey<Registry<BuildingRE>> BUILDING_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "buildings"));
-    public static final DeferredRegister<BuildingRE> BUILDING_DEFERRED_REGISTER = DeferredRegister.create(BUILDING_REGISTRY_KEY, LostCities.MODID);
+    public static final ResourceKey<Registry<BuildingRE>> BUILDING_REGISTRY_KEY = key("buildings");
+    public static final ResourceKey<Registry<PaletteRE>> PALETTE_REGISTRY_KEY = key("palettes");
+    public static final ResourceKey<Registry<BuildingPartRE>> PART_REGISTRY_KEY = key("parts");
+    public static final ResourceKey<Registry<StyleRE>> STYLE_REGISTRY_KEY = key("styles");
+    public static final ResourceKey<Registry<ConditionRE>> CONDITIONS_REGISTRY_KEY = key("conditions");
+    public static final ResourceKey<Registry<CityStyleRE>> CITYSTYLES_REGISTRY_KEY = key("citystyles");
+    public static final ResourceKey<Registry<MultiBuildingRE>> MULTIBUILDINGS_REGISTRY_KEY = key("multibuildings");
+    public static final ResourceKey<Registry<VariantRE>> VARIANTS_REGISTRY_KEY = key("variants");
+    public static final ResourceKey<Registry<WorldStyleRE>> WORLDSTYLES_REGISTRY_KEY = key("worldstyles");
+    public static final ResourceKey<Registry<PredefinedCityRE>> PREDEFINEDCITIES_REGISTRY_KEY = key("predefinedcities");
+    public static final ResourceKey<Registry<PredefinedSphereRE>> PREDEFINEDSPHERES_REGISTRY_KEY = key("predefinedspheres");
+    public static final ResourceKey<Registry<ScatteredRE>> SCATTERED_REGISTRY_KEY = key("scattered");
+    public static final ResourceKey<Registry<StuffSettingsRE>> STUFF_REGISTRY_KEY = key("stuff");
 
-    public static final ResourceKey<Registry<PaletteRE>> PALETTE_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "palettes"));
-    public static final DeferredRegister<PaletteRE> PALETTE_DEFERRED_REGISTER = DeferredRegister.create(PALETTE_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<BuildingPartRE>> PART_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "parts"));
-    public static final DeferredRegister<BuildingPartRE> PART_DEFERRED_REGISTER = DeferredRegister.create(PART_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<StyleRE>> STYLE_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "styles"));
-    public static final DeferredRegister<StyleRE> STYLE_DEFERRED_REGISTER = DeferredRegister.create(STYLE_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<ConditionRE>> CONDITIONS_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "conditions"));
-    public static final DeferredRegister<ConditionRE> CONDITIONS_DEFERRED_REGISTER = DeferredRegister.create(CONDITIONS_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<CityStyleRE>> CITYSTYLES_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "citystyles"));
-    public static final DeferredRegister<CityStyleRE> CITYSTYLES_DEFERRED_REGISTER = DeferredRegister.create(CITYSTYLES_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<MultiBuildingRE>> MULTIBUILDINGS_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "multibuildings"));
-    public static final DeferredRegister<MultiBuildingRE> MULTIBUILDINGS_DEFERRED_REGISTER = DeferredRegister.create(MULTIBUILDINGS_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<VariantRE>> VARIANTS_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "variants"));
-    public static final DeferredRegister<VariantRE> VARIANTS_DEFERRED_REGISTER = DeferredRegister.create(VARIANTS_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<WorldStyleRE>> WORLDSTYLES_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "worldstyles"));
-    public static final DeferredRegister<WorldStyleRE> WORLDSTYLES_DEFERRED_REGISTER = DeferredRegister.create(WORLDSTYLES_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<PredefinedCityRE>> PREDEFINEDCITIES_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "predefinedcities"));
-    public static final DeferredRegister<PredefinedCityRE> PREDEFINEDCITIES_DEFERRED_REGISTER = DeferredRegister.create(PREDEFINEDCITIES_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<PredefinedSphereRE>> PREDEFINEDSPHERES_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "predefinedspheres"));
-    public static final DeferredRegister<PredefinedSphereRE> PREDEFINEDSPHERES_DEFERRED_REGISTER = DeferredRegister.create(PREDEFINEDSPHERES_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<ScatteredRE>> SCATTERED_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "scattered"));
-    public static final DeferredRegister<ScatteredRE> SCATTERED_DEFERRED_REGISTER = DeferredRegister.create(SCATTERED_REGISTRY_KEY, LostCities.MODID);
-
-    public static final ResourceKey<Registry<StuffSettingsRE>> STUFF_REGISTRY_KEY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, "stuff"));
-    public static final DeferredRegister<StuffSettingsRE> STUFF_DEFERRED_REGISTER = DeferredRegister.create(STUFF_REGISTRY_KEY, LostCities.MODID);
-
-    public static void init(IEventBus bus) {
-        BUILDING_DEFERRED_REGISTER.register(bus);
-        PALETTE_DEFERRED_REGISTER.register(bus);
-        PART_DEFERRED_REGISTER.register(bus);
-        STYLE_DEFERRED_REGISTER.register(bus);
-        CONDITIONS_DEFERRED_REGISTER.register(bus);
-        CITYSTYLES_DEFERRED_REGISTER.register(bus);
-        MULTIBUILDINGS_DEFERRED_REGISTER.register(bus);
-        VARIANTS_DEFERRED_REGISTER.register(bus);
-        WORLDSTYLES_DEFERRED_REGISTER.register(bus);
-        PREDEFINEDCITIES_DEFERRED_REGISTER.register(bus);
-        PREDEFINEDSPHERES_DEFERRED_REGISTER.register(bus);
-        SCATTERED_DEFERRED_REGISTER.register(bus);
-        STUFF_DEFERRED_REGISTER.register(bus);
+    private static <T> ResourceKey<Registry<T>> key(String name) {
+        return ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(LostCities.MODID, name));
     }
 
-    public static void onDataPackRegistry(DataPackRegistryEvent.NewRegistry event) {
-        event.dataPackRegistry(BUILDING_REGISTRY_KEY, BuildingRE.CODEC);
-        event.dataPackRegistry(PALETTE_REGISTRY_KEY, PaletteRE.CODEC);
-        event.dataPackRegistry(PART_REGISTRY_KEY, BuildingPartRE.CODEC);
-        event.dataPackRegistry(STYLE_REGISTRY_KEY, StyleRE.CODEC);
-        event.dataPackRegistry(CONDITIONS_REGISTRY_KEY, ConditionRE.CODEC);
-        event.dataPackRegistry(CITYSTYLES_REGISTRY_KEY, CityStyleRE.CODEC);
-        event.dataPackRegistry(MULTIBUILDINGS_REGISTRY_KEY, MultiBuildingRE.CODEC);
-        event.dataPackRegistry(VARIANTS_REGISTRY_KEY, VariantRE.CODEC);
-        event.dataPackRegistry(WORLDSTYLES_REGISTRY_KEY, WorldStyleRE.CODEC);
-        event.dataPackRegistry(PREDEFINEDCITIES_REGISTRY_KEY, PredefinedCityRE.CODEC);
-        event.dataPackRegistry(PREDEFINEDSPHERES_REGISTRY_KEY, PredefinedSphereRE.CODEC);
-        event.dataPackRegistry(SCATTERED_REGISTRY_KEY, ScatteredRE.CODEC);
-        event.dataPackRegistry(STUFF_REGISTRY_KEY, StuffSettingsRE.CODEC);
+    public static void init() {
+        DynamicRegistries.register(BUILDING_REGISTRY_KEY, BuildingRE.CODEC);
+        DynamicRegistries.register(PALETTE_REGISTRY_KEY, PaletteRE.CODEC);
+        DynamicRegistries.register(PART_REGISTRY_KEY, BuildingPartRE.CODEC);
+        DynamicRegistries.register(STYLE_REGISTRY_KEY, StyleRE.CODEC);
+        DynamicRegistries.register(CONDITIONS_REGISTRY_KEY, ConditionRE.CODEC);
+        DynamicRegistries.register(CITYSTYLES_REGISTRY_KEY, CityStyleRE.CODEC);
+        DynamicRegistries.register(MULTIBUILDINGS_REGISTRY_KEY, MultiBuildingRE.CODEC);
+        DynamicRegistries.register(VARIANTS_REGISTRY_KEY, VariantRE.CODEC);
+        DynamicRegistries.register(WORLDSTYLES_REGISTRY_KEY, WorldStyleRE.CODEC);
+        DynamicRegistries.register(PREDEFINEDCITIES_REGISTRY_KEY, PredefinedCityRE.CODEC);
+        DynamicRegistries.register(PREDEFINEDSPHERES_REGISTRY_KEY, PredefinedSphereRE.CODEC);
+        DynamicRegistries.register(SCATTERED_REGISTRY_KEY, ScatteredRE.CODEC);
+        DynamicRegistries.register(STUFF_REGISTRY_KEY, StuffSettingsRE.CODEC);
     }
 }

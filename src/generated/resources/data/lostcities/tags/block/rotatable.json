@@ -1,6 +1,12 @@
 {
   "values": [
-    "#minecraft:stairs",
-    "#minecraft:doors"
+    {
+      "id": "#minecraft:stairs",
+      "required": false
+    },
+    {
+      "id": "#minecraft:doors",
+      "required": false
+    }
   ]
 }

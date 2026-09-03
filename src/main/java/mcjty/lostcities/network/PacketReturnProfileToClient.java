@@ -9,7 +9,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record PacketReturnProfileToClient(ResourceKey<Level> dimension, String profile) implements CustomPacketPayload {
 
@@ -27,10 +26,8 @@ public record PacketReturnProfileToClient(ResourceKey<Level> dimension, String p
     }
 
 
-    public void handle(IPayloadContext ctx) {
-        ctx.enqueueWork(() -> {
-            // @todo 1.14
+    public void handle() {
+        // @todo 1.14
 //            WorldTypeTools.setProfileFromServer(dimension, profile);
-        });
     }
 }

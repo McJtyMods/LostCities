@@ -1,10 +1,28 @@
 {
   "values": [
-    "#minecraft:flowers",
-    "#minecraft:saplings",
-    "#minecraft:leaves",
-    "#minecraft:logs",
-    "#minecraft:coral_plants",
-    "#minecraft:bamboo_blocks"
+    {
+      "id": "#minecraft:coral_plants",
+      "required": false
+    },
+    {
+      "id": "#minecraft:saplings",
+      "required": false
+    },
+    {
+      "id": "#minecraft:leaves",
+      "required": false
+    },
+    {
+      "id": "#minecraft:flowers",
+      "required": false
+    },
+    {
+      "id": "#minecraft:bamboo_blocks",
+      "required": false
+    },
+    {
+      "id": "#minecraft:logs",
+      "required": false
+    }
   ]
 }

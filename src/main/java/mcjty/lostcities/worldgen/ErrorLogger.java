@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import mcjty.lostcities.varia.ServerAccess;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class ErrorLogger {
         if (lastReportTime == -1 || lastReportTime < (time-10000)) {
             // Not reported before or too long ago
             lastReportTime = time;
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            MinecraftServer server = ServerAccess.getServer();
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.RED));
             }

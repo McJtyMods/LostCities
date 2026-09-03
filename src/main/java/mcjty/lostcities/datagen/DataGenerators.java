@@ -1,13 +1,12 @@
 package mcjty.lostcities.datagen;
 
-import net.minecraft.data.DataGenerator;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
-public class DataGenerators {
+public class DataGenerators implements DataGeneratorEntrypoint {
 
-    public static void gatherData(GatherDataEvent.Server event) {
-        DataGenerator generator = event.getGenerator();
-        LCBlockTags blockTags = new LCBlockTags(generator, event.getLookupProvider());
-        generator.addProvider(true, blockTags);
+    @Override
+    public void onInitializeDataGenerator(FabricDataGenerator generator) {
+        generator.createPack().addProvider(LCBlockTags::new);
     }
 }

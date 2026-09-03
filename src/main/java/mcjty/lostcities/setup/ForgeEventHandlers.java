@@ -39,14 +39,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.storage.ServerLevelData;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.entity.player.CanPlayerSleepEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -59,17 +56,23 @@ import static mcjty.lostcities.setup.Registration.LOSTCITY;
 
 public class ForgeEventHandlers {
 
+    public static final ForgeEventHandlers INSTANCE = new ForgeEventHandlers();
+
     private final Map<ResourceKey<Level>, BlockPos> spawnPositions = new HashMap<>();
 
-    @SubscribeEvent
-    public void commandRegister(RegisterCommandsEvent event) {
-        ModCommands.register(event.getDispatcher());
+    public static void register() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> ModCommands.register(dispatcher));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> INSTANCE.onPlayerFirstJoin(handler.player));
+        ServerTickEvents.END_LEVEL_TICK.register(INSTANCE::onWorldTick);
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> cleanUp());
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+            cleanUp();
+            Config.reset();
+        });
+        EntitySleepEvents.ALLOW_SLEEPING.register(INSTANCE::onPlayerSleepInBed);
     }
 
-    @SubscribeEvent
-    public void onPlayerFirstJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
-
+    public void onPlayerFirstJoin(ServerPlayer serverPlayer) {
         ServerLevel level = serverPlayer.level();
         ResourceKey<Level> dimKey = level.dimension();
 
@@ -91,23 +94,9 @@ public class ForgeEventHandlers {
         }
     }
 
-    @SubscribeEvent
-    public void onWorldTick(LevelTickEvent.Post event) {
-        if (event.getLevel() instanceof ServerLevel serverLevel) {
-            AssetRegistries.load(serverLevel);
-            GlobalTodo.get(event.getLevel()).executeAndClearTodo(serverLevel);
-        }
-    }
-
-    @SubscribeEvent
-    public void onServerStarting(ServerAboutToStartEvent event) {
-        cleanUp();
-    }
-
-    @SubscribeEvent
-    public void onServerStopping(ServerStoppingEvent event) {
-        cleanUp();
-        Config.reset();
+    public void onWorldTick(ServerLevel serverLevel) {
+        AssetRegistries.load(serverLevel);
+        GlobalTodo.get(serverLevel).executeAndClearTodo(serverLevel);
     }
 
     public static void cleanUp() {
@@ -122,10 +111,8 @@ public class ForgeEventHandlers {
         Scattered.cleanCache();
     }
 
-    @SubscribeEvent
-    public void onCreateSpawnPoint(LevelEvent.CreateSpawnPosition event) {
-        LevelAccessor world = event.getLevel();
-        if (world instanceof ServerLevel serverLevel) {
+    public boolean onCreateSpawnPoint(ServerLevel serverLevel, ServerLevelData settings) {
+        LevelAccessor world = serverLevel;
             // This event is the explicit new-world signal. Existing worlds that
             // have no LostCityWorldGenData never pass through this initialization
             // and consequently remain on LEGACY street and highway generation.
@@ -135,7 +122,7 @@ public class ForgeEventHandlers {
             LostCityFeature.globalDimensionInfoDirtyCounter++;
             IDimensionInfo dimensionInfo = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(serverLevel);
             if (dimensionInfo == null) {
-                return;
+                return false;
             }
             LostCityProfile profile = dimensionInfo.getProfile();
 
@@ -221,21 +208,21 @@ public class ForgeEventHandlers {
                         BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
                         LevelData.RespawnData data = new LevelData.RespawnData(new GlobalPos(serverLevel.dimension(), pos), 0.0f, 0.0f);
                         serverLevel.setRespawnData(data);
-                        event.getSettings().setSpawn(data);
+                        settings.setSpawn(data);
                         spawnPositions.put(serverLevel.dimension(), pos);
-                        event.setCanceled(true);
+                        return true;
                     }
                 }
                 case FLOATING, SPACE, CAVERN, CAVERNSPHERES -> {
                     BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
                     LevelData.RespawnData data = new LevelData.RespawnData(new GlobalPos(serverLevel.dimension(), pos), 0.0f, 0.0f);
                     serverLevel.setRespawnData(data);
-                    event.getSettings().setSpawn(data);
+                    settings.setSpawn(data);
                     spawnPositions.put(serverLevel.dimension(), pos);
-                    event.setCanceled(true);
+                    return true;
                 }
             }
-        }
+        return false;
     }
 
     private boolean isOutsideBuilding(IDimensionInfo provider, ChunkCoord coord) {
@@ -414,7 +401,7 @@ public class ForgeEventHandlers {
         if (!(state.getBlock() instanceof BedBlock)) {
             return false;
         }
-        Direction direction = state.getBedDirection(world, pos);
+        Direction direction = state.getValue(BedBlock.FACING);
         Block b1 = world.getBlockState(pos.below()).getBlock();
         Block b2 = world.getBlockState(pos.relative(direction.getOpposite()).below()).getBlock();
         Block b = BuiltInRegistries.BLOCK.getValue(Identifier.parse(Config.SPECIAL_BED_BLOCK.get()));
@@ -503,35 +490,33 @@ public class ForgeEventHandlers {
         return bestSpot;
     }
 
-    @SubscribeEvent
-    public void onPlayerSleepInBedEvent(CanPlayerSleepEvent event) {
+    public Player.BedSleepingProblem onPlayerSleepInBed(Player player, BlockPos bedLocation) {
 //        if (LostCityConfiguration.DIMENSION_ID == null) {
 //            return;
 //        }
 
-        Level world = event.getEntity().level();
+        Level world = player.level();
         if (world.isClientSide()) {
-            return;
+            return null;
         }
-        BlockPos bedLocation = event.getPos();
         if (bedLocation == null || !isValidSpawnBed(world, bedLocation)) {
-            return;
+            return null;
         }
 
         if (world.dimension() == Registration.DIMENSION) {
-            event.setProblem(Player.BedSleepingProblem.OTHER_PROBLEM);
             ServerLevel destWorld = WorldTools.getOverworld(world);
             BlockPos location = findLocation(bedLocation, destWorld);
-            CustomTeleporter.teleportToDimension(event.getEntity(), destWorld, location);
+            CustomTeleporter.teleportToDimension(player, destWorld, location);
+            return Player.BedSleepingProblem.OTHER_PROBLEM;
         } else {
-            event.setProblem(Player.BedSleepingProblem.OTHER_PROBLEM);
-            ServerLevel destWorld = event.getEntity().level().getServer().getLevel(Registration.DIMENSION);
+            ServerLevel destWorld = player.level().getServer().getLevel(Registration.DIMENSION);
             if (destWorld == null) {
-                event.getEntity().sendSystemMessage(ComponentFactory.literal("Error finding Lost City dimension: " + LOSTCITY + "!").withStyle(ChatFormatting.RED));
+                player.sendSystemMessage(ComponentFactory.literal("Error finding Lost City dimension: " + LOSTCITY + "!").withStyle(ChatFormatting.RED));
             } else {
                 BlockPos location = findLocation(bedLocation, destWorld);
-                CustomTeleporter.teleportToDimension(event.getEntity(), destWorld, location);
+                CustomTeleporter.teleportToDimension(player, destWorld, location);
             }
+            return Player.BedSleepingProblem.OTHER_PROBLEM;
         }
     }
 

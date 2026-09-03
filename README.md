@@ -3,6 +3,7 @@
 Developer documentation:
 
 - [Development setup](docs/development.md)
+- [Fabric integration](docs/fabric.md)
 - [Asset system and custom expansions](https://mcjty.eu/docs/mods/lost-cities/asset_structure)
 - [City generation](https://mcjty.eu/docs/mods/lost-cities/city_generation)
 - [Profile options](https://mcjty.eu/docs/mods/lost-cities/profile_options)

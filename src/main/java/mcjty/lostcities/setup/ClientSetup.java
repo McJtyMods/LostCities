@@ -1,11 +1,15 @@
 package mcjty.lostcities.setup;
 
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import mcjty.lostcities.network.PacketReturnProfileToClient;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
-public class ClientSetup {
+public class ClientSetup implements ClientModInitializer {
 
-    public static void init(FMLClientSetupEvent event) {
-        NeoForge.EVENT_BUS.register(new ClientEventHandlers());
+    @Override
+    public void onInitializeClient() {
+        ClientEventHandlers.register();
+        ClientPlayNetworking.registerGlobalReceiver(PacketReturnProfileToClient.TYPE,
+                (payload, context) -> payload.handle());
     }
 }

@@ -4,6 +4,7 @@ import mcjty.lostcities.LostCities;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 
 public class LostTags {
@@ -25,4 +26,6 @@ public class LostTags {
 
     public static final Identifier NEEDSPOI = Identifier.fromNamespaceAndPath(LostCities.MODID, "needspoi");
     public static final TagKey<Block> NEEDSPOI_TAG = TagKey.create(Registries.BLOCK, NEEDSPOI);
+
+    public static final TagKey<Biome> IS_VOID = TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("c", "is_void"));
 }

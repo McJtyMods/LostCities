@@ -2,17 +2,14 @@ package mcjty.lostcities.api;
 
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.neoforged.bus.api.Event;
-import net.neoforged.bus.api.ICancellableEvent;
 
 /**
- * LostCityEvent is fired whenever an event involving a Lost City chunk generation occurs. <br>
- * If a method utilizes this {@link Event} as its parameter, the method will
- * receive every child event of this class.<br>
- * <br>
- * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
+ * Base value passed to the Fabric callbacks in {@link LostCityEvents} whenever
+ * an event involving Lost Cities chunk generation occurs.
  **/
-public class LostCityEvent extends Event {
+public class LostCityEvent {
+
+    private boolean canceled;
 
     private final WorldGenLevel world;
     private final ILostCities lostCities;
@@ -42,8 +39,16 @@ public class LostCityEvent extends Event {
         return chunkZ;
     }
 
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
     /**
-     * CharacteristicsEvent is fired when Lost Cities tries to determine chunk chracteristics.<br>
+     * CharacteristicsEvent is fired when Lost Cities tries to determine chunk characteristics.<br>
      * This event is fired right when The Lost Cities tries to decide if a chunk should contain
      * a building and what type of building. All fields in the given characteristic object can be modified.
      * Note that you can get access to the asset registries for buildings, multi buildings, and city styles
@@ -54,11 +59,7 @@ public class LostCityEvent extends Event {
      * <br>
      * {@link #characteristics} contains the {@link LostChunkCharacteristics} that was generated for this chunk. <br>
      * <br>
-     * This event is not {@link Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+     * This event is not cancellable.
      **/
     public static class CharacteristicsEvent extends LostCityEvent {
         private final LostChunkCharacteristics characteristics;
@@ -81,15 +82,11 @@ public class LostCityEvent extends Event {
      * but keep in mind that the street or building will be generated after this and might overwrite what you did.<br>
      * NOTE! This will only be called for city chunks (buildings or street). <br>
      * <br>
-     * {@link #primer} contains the {@link ChunkPrimer} for this chunk. This primer will already be filled with stone up to city level. <br>
+     * {@link #primer} contains the {@link ChunkAccess} for this chunk. It will already be filled with stone up to city level. <br>
      * <br>
-     * This event is {@link Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+     * Cancel this event with {@link #setCanceled(boolean)}.
      **/
-    public static class PreGenCityChunkEvent extends LostCityEvent implements ICancellableEvent {
+    public static class PreGenCityChunkEvent extends LostCityEvent {
         private final ChunkAccess primer;
 
         public PreGenCityChunkEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
@@ -108,13 +105,9 @@ public class LostCityEvent extends Event {
      * This is mostly useful in case you want to modify the standard Lost City building/street after it has been generated.<br>
      * NOTE! This will only be called for city chunks (buildings or street). <br>
      * <br>
-     * {@link #primer} contains the {@link ChunkPrimer} for this chunk. This primer will already have the building and street stuff in it. <br>
+     * {@link #primer} contains the {@link ChunkAccess} for this chunk. It will already have the building and street content in it. <br>
      * <br>
-     * This event is not {@link Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+     * This event is not cancellable.
      **/
     public static class PostGenCityChunkEvent extends LostCityEvent {
         private final ChunkAccess primer;
@@ -134,13 +127,9 @@ public class LostCityEvent extends Event {
      * This is fired right after generation of the chunk but before highways, subways and other stuff like that.
      * NOTE! This will NOT be called for city chunks (buildings or street). <br>
      * <br>
-     * {@link #primer} contains the {@link ChunkPrimer} for this chunk. <br>
+     * {@link #primer} contains the {@link ChunkAccess} for this chunk. <br>
      * <br>
-     * This event is not {@link Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+     * This event is not cancellable.
      **/
     public static class PostGenOutsideChunkEvent extends LostCityEvent {
         private final ChunkAccess primer;
@@ -161,15 +150,11 @@ public class LostCityEvent extends Event {
      * to modify the chunk before explosion damage is calculated.
      * NOTE! This will be called for every chunk (city or normal). <br>
      * <br>
-     * {@link #primer} contains the {@link ChunkPrimer} for this chunk. <br>
+     * {@link #primer} contains the {@link ChunkAccess} for this chunk. <br>
      * <br>
-     * This event is {@link Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+     * Cancel this event with {@link #setCanceled(boolean)}.
      **/
-    public static class PreExplosionEvent extends LostCityEvent implements ICancellableEvent {
+    public static class PreExplosionEvent extends LostCityEvent {
         private final ChunkAccess primer;
 
         public PreExplosionEvent(WorldGenLevel world, ILostCities lostCities, int chunkX, int chunkZ, ChunkAccess primer) {
