@@ -1,4 +1,5 @@
 26.1.2-10.0.2:
+- Added an advanced world-customization page for editing every profile setting, with range and allowed-value validation
 - Fixed fountains appearing on planned streets and street borders blocking connections to adjacent stairs
 - Added a profile option for raising or lowering railways in 6-block increments; stations and building cellars now respect the configured level
 
