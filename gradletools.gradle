@@ -127,6 +127,11 @@ ext.modpublisher = { curseOptional, curseRequired, modrinthOptional, modrinthReq
     def curseKey = (project.findProperty('curseforge_key') ?: System.getenv('CURSEFORGE_TOKEN') ?: System.getenv('CURSE_TOKEN') ?: '').toString()
     def modrinthKey = (project.findProperty('modrinth_token') ?: System.getenv('MODRINTH_TOKEN') ?: '').toString()
     def allVersions = ([project.minecraft_version] + versions).collect { it.toString() }.unique()
+    def publishLoaders = (project.findProperty('publish_loaders') ?: 'neoforge')
+            .toString()
+            .split(',')
+            .collect { it.trim() }
+            .findAll { !it.isEmpty() }
     def publishArtifactTask = tasks.findByName('reobfJar') ?: tasks.findByName('jar')
     def modrinthProjectIds = [
             'curios'          : 'vvuO3ImH',
@@ -182,7 +187,7 @@ ext.modpublisher = { curseOptional, curseRequired, modrinthOptional, modrinthReq
         projectVersion.set(project.version.toString())
         displayName.set("${mod_name} - ${project.version}")
         gameVersions.set(allVersions)
-        loaders.set(['neoforge'])
+        loaders.set(publishLoaders)
         curseEnvironment.set('both')
         javaVersions.add(JavaVersion.VERSION_25)
         artifact.set(jar)

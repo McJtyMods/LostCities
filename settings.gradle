@@ -2,6 +2,10 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
+        maven {
+            name = 'First Dark Development'
+            url = uri('https://maven.firstdark.dev/releases')
+        }
         exclusiveContent {
             forRepository {
                 maven {

@@ -41,6 +41,22 @@ Config API Port. The latter keeps the existing `ModConfigSpec` definitions and
 the `config/lostcities/*.toml` file format compatible. NeoForge access
 transformers are represented by `META-INF/lostcities.accesswidener`.
 
+## Publishing
+
+The Mod Publisher integration retains the release workflow used by the
+NeoForge project:
+
+```bash
+./gradlew publishMod
+```
+
+It publishes the Fabric `jar` artifact to the configured CurseForge and
+Modrinth projects, labels it for the Fabric loader, and declares Fabric API and
+Forge Config API Port as required dependencies. Supply `CURSEFORGE_TOKEN` (or
+`CURSE_TOKEN`) and/or `MODRINTH_TOKEN` for the destinations to enable. Do not
+invoke the task merely to verify configuration; use `./gradlew help --task
+publishMod` instead.
+
 Lost Cities' world-level caches use Minecraft's global `SavedDataStorage` with
 namespaced `SavedDataType` identifiers. New saved data is written below the
 world data directory in the `lostcities` namespace.

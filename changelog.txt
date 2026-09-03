@@ -2,6 +2,7 @@
 - Ported the complete Lost Cities feature set to Fabric for Minecraft 26.2
 - Added Fabric API hooks for Lost Cities generation events and retained Forge Config API Port configuration compatibility
 - Fixed Fabric builds launched from Java 17 by making Gradle select or provision the required Java 25 daemon
+- Restored the `publishMod` release task with Fabric loader and dependency metadata
 
 26.1.2-10.0.3:
 - Fixed buttons on the Lost Cities world-customization screen rendering without backgrounds on Minecraft 26.1.2

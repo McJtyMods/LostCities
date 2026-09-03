@@ -4,7 +4,10 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    id 'com.hypherionmc.modutils.modpublisher' version '2.2.1'
 }
+
+apply from: 'gradletools.gradle'
 
 group = "com.github.mcjty"
 version = project.version
@@ -75,6 +78,8 @@ dependencies {
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forge_config_api_port_version}"
 }
+
+modpublisher([], ['fabric-api', 'forge-config-api-port'], [], ['fabric-api', 'forge-config-api-port'], [])
 
 processResources {
     def expandProps = [
