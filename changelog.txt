@@ -1,5 +1,6 @@
 26.1.2-10.0.2:
 - Fixed fountains appearing on planned streets and street borders blocking connections to adjacent stairs
+- Added a profile option for raising or lowering railways in 6-block increments; stations and building cellars now respect the configured level
 
 26.1.2-10.0.1:
 - Fixed a crash when switching to a space or spheres profile in the world customization screen before creating the world
