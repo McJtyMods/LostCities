@@ -1,13 +1,22 @@
 # Development setup
 
 Lost Cities targets Minecraft 26.2 with Fabric Loader and Java 25. The Gradle
-wrapper uses Gradle 9.5.1 and resolves a matching compiler toolchain through the
-Foojay resolver when toolchain downloads are available.
+wrapper uses Gradle 9.5.1. Its checked-in
+`gradle/gradle-daemon-jvm.properties` requires Java 25 for the Gradle daemon,
+even when the wrapper is launched from a Java 17 shell. Gradle detects a local
+Java 25 installation or provisions one through the Foojay resolver, then uses
+the same Java version for the compiler toolchain.
 
-IntelliJ run configurations must also use Java 25; the Gradle compiler
-toolchain does not override the runtime selected by the IDE. Set both the
-Project SDK and Gradle JVM to Java 25 before regenerating or launching a run
-configuration.
+IntelliJ game run configurations must also use Java 25. Set the Project SDK to
+Java 25 before launching a generated run configuration. The Gradle JVM itself
+is selected by the daemon criteria file when the IDE delegates to Gradle.
+
+When changing the project's `java_version`, regenerate and commit the daemon
+criteria file with:
+
+```bash
+./gradlew updateDaemonJvm
+```
 
 Use the wrapper for normal checks:
 

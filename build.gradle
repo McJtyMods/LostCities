@@ -15,6 +15,10 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(Integer.parseInt(java_version))
 
+tasks.named('updateDaemonJvm') {
+    languageVersion = JavaLanguageVersion.of(Integer.parseInt(java_version))
+}
+
 if (System.getenv('BUILD_NUMBER') != null) {
     version += "-${System.getenv('BUILD_NUMBER')}"
 }
