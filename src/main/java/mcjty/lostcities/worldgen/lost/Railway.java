@@ -18,6 +18,10 @@ public class Railway {
 
     public static final int RAILWAY_LEVEL_OFFSET = -3;
 
+    public static int getRailwayLevel(LostCityProfile profile) {
+        return RAILWAY_LEVEL_OFFSET + profile.RAILWAY_LEVEL_OFFSET;
+    }
+
     /*
     Railway grid:
 
@@ -102,6 +106,7 @@ public class Railway {
         QualityRandom randomRailChunkType = new QualityRandom(provider.getSeed() + chunkZ * 2600003897L + chunkX * 43600002517L);
 
         LostCityProfile profile = BuildingInfo.getProfile(key, provider);
+        int railwayLevel = getRailwayLevel(profile);
         RailwayParts railwayParts = provider.getWorldStyle().getPartSelector().railwayParts();
 
         // @todo make all settings based on rand below configurable
@@ -125,13 +130,13 @@ public class Railway {
                         return RailChunkInfo.NOTHING;
                     }
                     if (!cityEast) {
-                        return new RailChunkInfo(RAILS_END_HERE, WEST, -3, 3);
+                        return new RailChunkInfo(RAILS_END_HERE, WEST, railwayLevel, 3);
                     }
                     if (!cityWest) {
-                        return new RailChunkInfo(RAILS_END_HERE, EAST, -3, 3);
+                        return new RailChunkInfo(RAILS_END_HERE, EAST, railwayLevel, 3);
                     }
                 }
-                return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 3);
+                return new RailChunkInfo(HORIZONTAL, BI, railwayLevel, 3);
             }
             return getStationType(key, provider, profile, r, 3,
                     randomRailChunkType.nextFloat() < .5f ? railwayParts.stationOpen() : railwayParts.stationOpenRoof());
@@ -150,13 +155,13 @@ public class Railway {
                         return RailChunkInfo.NOTHING;
                     }
                     if (!cityEast) {
-                        return new RailChunkInfo(RAILS_END_HERE, WEST, -3, 2);
+                        return new RailChunkInfo(RAILS_END_HERE, WEST, railwayLevel, 2);
                     }
                     if (!cityWest) {
-                        return new RailChunkInfo(RAILS_END_HERE, EAST, -3, 2);
+                        return new RailChunkInfo(RAILS_END_HERE, EAST, railwayLevel, 2);
                     }
                 }
-                return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 2);
+                return new RailChunkInfo(HORIZONTAL, BI, railwayLevel, 2);
             }
             return getStationType(key, provider, profile, r, 2,
                     randomRailChunkType.nextFloat() < .5f ? railwayParts.stationOpen() : railwayParts.stationOpenRoof());
@@ -173,13 +178,13 @@ public class Railway {
                         return RailChunkInfo.NOTHING;
                     }
                     if (!cityEast) {
-                        return new RailChunkInfo(RAILS_END_HERE, WEST, -3, 1);
+                        return new RailChunkInfo(RAILS_END_HERE, WEST, railwayLevel, 1);
                     }
                     if (!cityWest) {
-                        return new RailChunkInfo(RAILS_END_HERE, EAST, -3, 1);
+                        return new RailChunkInfo(RAILS_END_HERE, EAST, railwayLevel, 1);
                     }
                 }
-                return new RailChunkInfo(HORIZONTAL, BI, RAILWAY_LEVEL_OFFSET, 1);
+                return new RailChunkInfo(HORIZONTAL, BI, railwayLevel, 1);
             }
             return getStationType(key, provider, profile, r, 1,
                     randomRailChunkType.nextFloat() < .5f ? railwayParts.stationOpen() : railwayParts.stationOpenRoof());
@@ -217,7 +222,7 @@ public class Railway {
                         return RailChunkInfo.NOTHING;
                     }
                 }
-                return new RailChunkInfo(DOUBLE_BEND, EAST, RAILWAY_LEVEL_OFFSET, 1);
+                return new RailChunkInfo(DOUBLE_BEND, EAST, railwayLevel, 1);
             }
             if (mz == 0 && mx == 15) {
                 if (profile.RAILWAYS_CAN_END) {
@@ -228,7 +233,7 @@ public class Railway {
                         return RailChunkInfo.NOTHING;
                     }
                 }
-                return new RailChunkInfo(DOUBLE_BEND, WEST, RAILWAY_LEVEL_OFFSET, 1);
+                return new RailChunkInfo(DOUBLE_BEND, WEST, railwayLevel, 1);
             }
             if (mz == 10 && mx == 5) {
                 if (profile.RAILWAYS_CAN_END) {
@@ -245,7 +250,7 @@ public class Railway {
                         }
                     }
                 }
-                return new RailChunkInfo(THREE_SPLIT, EAST, RAILWAY_LEVEL_OFFSET, 3);
+                return new RailChunkInfo(THREE_SPLIT, EAST, railwayLevel, 3);
             }
             if (mz == 10 && mx == 15) {
                 if (profile.RAILWAYS_CAN_END) {
@@ -262,7 +267,7 @@ public class Railway {
                         }
                     }
                 }
-                return new RailChunkInfo(THREE_SPLIT, WEST, RAILWAY_LEVEL_OFFSET, 3);
+                return new RailChunkInfo(THREE_SPLIT, WEST, railwayLevel, 3);
             }
             return RailChunkInfo.NOTHING;
         }
@@ -274,7 +279,7 @@ public class Railway {
                     return RailChunkInfo.NOTHING;
                 }
             }
-            return new RailChunkInfo(VERTICAL, EAST, RAILWAY_LEVEL_OFFSET, 1);
+            return new RailChunkInfo(VERTICAL, EAST, railwayLevel, 1);
         }
         if (mx == 15) {
             if (profile.RAILWAYS_CAN_END) {
@@ -284,7 +289,7 @@ public class Railway {
                     return RailChunkInfo.NOTHING;
                 }
             }
-            return new RailChunkInfo(VERTICAL, WEST, RAILWAY_LEVEL_OFFSET, 1);
+            return new RailChunkInfo(VERTICAL, WEST, railwayLevel, 1);
         }
 
         return RailChunkInfo.NOTHING;
@@ -292,9 +297,10 @@ public class Railway {
 
     private static RailChunkInfo getStationType(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile, float r, int rails, List<String> part) {
         int cityLevel = BuildingInfo.getCityLevel(coord, provider);
-        if (cityLevel > 2 || !profile.RAILWAY_SURFACE_STATIONS_ENABLED) {
+        int railwayLevel = getRailwayLevel(profile);
+        if (cityLevel > 2 || cityLevel - railwayLevel > 8 || !profile.RAILWAY_SURFACE_STATIONS_ENABLED) {
             // We are too high here. We need an underground station
-            return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+            return new RailChunkInfo(STATION_UNDERGROUND, BI, railwayLevel, rails);
         }
         // If there is a highway exactly at this spot we cannot have a station. @todo? How to solve this
         int highwayX = Highway.getXHighwayLevel(coord, provider, profile);
@@ -302,20 +308,20 @@ public class Railway {
         if ((highwayX != -1 && cityLevel >= highwayX) || (highwayZ != -1 && cityLevel >= highwayZ)) {
             // @todo Problem! We cannot have a station here! At least we cannot get stairs to the top here
             // Because this is very rare we just generate an underground station because that looks reasonable
-            return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+            return new RailChunkInfo(STATION_UNDERGROUND, BI, railwayLevel, rails);
         } else {
             // Check if there is a highway directly adjacent (east/west) to the station. In that case we go to underground station mode
             highwayZ = Highway.getZHighwayLevel(coord.west(), provider, profile);
             if (highwayZ != -1 && cityLevel >= highwayZ) {
-                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+                return new RailChunkInfo(STATION_UNDERGROUND, BI, railwayLevel, rails);
             }
             highwayZ = Highway.getZHighwayLevel(coord.east(), provider, profile);
             if (highwayZ != -1 && cityLevel >= highwayZ) {
-                return new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+                return new RailChunkInfo(STATION_UNDERGROUND, BI, railwayLevel, rails);
             }
         }
 
-        return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, rails, part) : new RailChunkInfo(STATION_UNDERGROUND, BI, RAILWAY_LEVEL_OFFSET, rails);
+        return r < .5f ? new RailChunkInfo(STATION_SURFACE, BI, cityLevel, rails, part) : new RailChunkInfo(STATION_UNDERGROUND, BI, railwayLevel, rails);
     }
 
     public static RailChunkInfo getRailChunkType(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
@@ -344,6 +350,7 @@ public class Railway {
     }
 
     private static RailChunkInfo testAdjacentRailChunk(float r, RailChunkInfo adjacent, RailDirection direction, ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        int railwayLevel = getRailwayLevel(profile);
         switch (adjacent.getType()) {
             case NONE:
                 return RailChunkInfo.NOTHING;
@@ -355,29 +362,25 @@ public class Railway {
                     // We have a highway there so go down here by setting r to 1
                     r = 1;
                 }
-                if (r < .4f) {
+                // An extension leaves three chunks in which to descend before the fixed-height
+                // network. Each sloped part can descend at most two levels.
+                if (r < .4f && adjacent.getLevel() - railwayLevel <= 6) {
                     return new RailChunkInfo(STATION_EXTENSION_SURFACE, direction, adjacent.getLevel(), adjacent.getRails());
-                } else if ((adjacent.getLevel() & 1) == 0) {
-                    return new RailChunkInfo(GOING_DOWN_ONE_FROM_SURFACE, direction, adjacent.getLevel() - 1, adjacent.getRails());
                 } else {
-                    return new RailChunkInfo(GOING_DOWN_TWO_FROM_SURFACE, direction, adjacent.getLevel() - 2, adjacent.getRails());
+                    return startDescending(adjacent, direction, railwayLevel);
                 }
             case STATION_UNDERGROUND:
                 return r < .4f
                         ? new RailChunkInfo(STATION_EXTENSION_UNDERGROUND, direction, adjacent.getLevel(), adjacent.getRails())
                         : new RailChunkInfo(HORIZONTAL, direction, adjacent.getLevel(), adjacent.getRails());
             case STATION_EXTENSION_SURFACE:
-                if ((adjacent.getLevel() & 1) == 0) {
-                    return new RailChunkInfo(GOING_DOWN_ONE_FROM_SURFACE, direction, adjacent.getLevel() - 1, adjacent.getRails());
-                } else {
-                    return new RailChunkInfo(GOING_DOWN_TWO_FROM_SURFACE, direction, adjacent.getLevel() - 2, adjacent.getRails());
-                }
+                return startDescending(adjacent, direction, railwayLevel);
             case STATION_EXTENSION_UNDERGROUND:
                 return new RailChunkInfo(HORIZONTAL, direction, adjacent.getLevel(), adjacent.getRails());
             case GOING_DOWN_FURTHER:
             case GOING_DOWN_ONE_FROM_SURFACE:
             case GOING_DOWN_TWO_FROM_SURFACE:
-                if (adjacent.getLevel() == RAILWAY_LEVEL_OFFSET) {
+                if (adjacent.getLevel() == railwayLevel) {
                     return new RailChunkInfo(HORIZONTAL, direction, adjacent.getLevel(), adjacent.getRails());
                 } else {
                     return new RailChunkInfo(GOING_DOWN_FURTHER, direction, adjacent.getLevel() - 2, adjacent.getRails());
@@ -398,6 +401,15 @@ public class Railway {
                 return adjacent;
         }
         throw new RuntimeException("This is really impossible!");
+    }
+
+    private static RailChunkInfo startDescending(RailChunkInfo adjacent, RailDirection direction, int railwayLevel) {
+        int difference = adjacent.getLevel() - railwayLevel;
+        if ((difference & 1) == 1) {
+            return new RailChunkInfo(GOING_DOWN_ONE_FROM_SURFACE, direction, adjacent.getLevel() - 1, adjacent.getRails());
+        } else {
+            return new RailChunkInfo(GOING_DOWN_TWO_FROM_SURFACE, direction, adjacent.getLevel() - 2, adjacent.getRails());
+        }
     }
 
 //    public static void main(String[] args) {

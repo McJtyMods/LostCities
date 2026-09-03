@@ -87,6 +87,7 @@ public class LostCityProfile implements ILostCityProfile {
     public boolean RAILWAYS_ENABLED = true;
     public boolean RAILWAY_STATIONS_ENABLED = true;
     public boolean RAILWAY_SURFACE_STATIONS_ENABLED = true;
+    public int RAILWAY_LEVEL_OFFSET = 0;
 
     public boolean EXPLOSIONS_IN_CITIES_ONLY = true;
 
@@ -500,6 +501,8 @@ public class LostCityProfile implements ILostCityProfile {
                 "If true then railway stations are enabled");
         RAILWAY_SURFACE_STATIONS_ENABLED = cfg.getBoolean("railwaySurfaceStationsEnabled", LostCityProfile.CATEGORY_LOSTCITY, RAILWAY_SURFACE_STATIONS_ENABLED,
                 "If true then railway surface station are enabled, otherwise there'll only be underground stations.");
+        RAILWAY_LEVEL_OFFSET = cfg.getInt("railwayLevelOffset", LostCityProfile.CATEGORY_LOSTCITY, RAILWAY_LEVEL_OFFSET, -8, 2,
+                "Vertical offset of the underground railway in multiples of 6 blocks. 0 keeps the railway at its original level");
 
         MULTI_USE_CORNER = cfg.getBoolean("multiUseCorner", LostCityProfile.CATEGORY_LOSTCITY, MULTI_USE_CORNER,
                 "Determine whether the multibuilding should use surrounding average level, or just top left corner level.");
