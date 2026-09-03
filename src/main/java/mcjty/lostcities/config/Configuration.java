@@ -18,13 +18,15 @@ public class Configuration {
         private final T min;
         private final T max;
         private final Comparator<T> comparator;
+        private final List<T> allowedValues;
 
-        public Value(String comment, T value, T min, T max, @Nonnull Comparator<T> comparator) {
+        public Value(String comment, T value, T min, T max, @Nonnull Comparator<T> comparator, Collection<T> allowedValues) {
             this.comment = ComponentFactory.literal(comment);
             this.value = value;
             this.min = min;
             this.max = max;
             this.comparator = comparator;
+            this.allowedValues = allowedValues == null ? List.of() : List.copyOf(allowedValues);
         }
 
         public void set(T val) {
@@ -39,13 +41,29 @@ public class Configuration {
             return comment;
         }
 
+        public T getMin() {
+            return min;
+        }
+
+        public T getMax() {
+            return max;
+        }
+
+        public List<T> getAllowedValues() {
+            return allowedValues;
+        }
+
         // Return true if we had to change the value
         public boolean constrain() {
-            if (comparator.compare(value, min) < 0) {
+            if (!allowedValues.isEmpty() && !allowedValues.contains(value)) {
+                value = allowedValues.get(0);
+                return true;
+            }
+            if (min != null && comparator.compare(value, min) < 0) {
                 value = min;
                 return true;
             }
-            if (comparator.compare(value, max) > 0) {
+            if (max != null && comparator.compare(value, max) > 0) {
                 value = max;
                 return true;
             }
@@ -162,19 +180,19 @@ public class Configuration {
     }
 
     private <T> Category getValueCategory(String name, String category, T defaultValue, String description, T min, T max,
-                                          @Nonnull Comparator<T> comparator) {
+                                          @Nonnull Comparator<T> comparator, Collection<T> allowedValues) {
         Category cat = categoryMap.get(category);
         if (cat == null) {
             throw new IllegalStateException("Missing category: " + category);
         }
         if (!cat.valueMap.containsKey(name)) {
-            cat.valueMap.put(name, new Value<>(description, defaultValue, min, max, comparator));
+            cat.valueMap.put(name, new Value<>(description, defaultValue, min, max, comparator, allowedValues));
         }
         return cat;
     }
 
     public float getFloat(String name, String category, float defaultValue, float minValue, float maxValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description, minValue, maxValue, Float::compareTo);
+        Category cat = getValueCategory(name, category, defaultValue, description, minValue, maxValue, Float::compareTo, null);
         Object value = cat.valueMap.get(name).value;
         if (value instanceof Float) {
             return (Float) value;
@@ -186,7 +204,7 @@ public class Configuration {
     }
 
     public double getDouble(String name, String category, double defaultValue, double minValue, double maxValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description, minValue, maxValue, Double::compareTo);
+        Category cat = getValueCategory(name, category, defaultValue, description, minValue, maxValue, Double::compareTo, null);
         Object value = cat.valueMap.get(name).value;
         if (value instanceof Double) {
             return (Double) value;
@@ -198,12 +216,12 @@ public class Configuration {
     }
 
     public boolean getBoolean(String name, String category, boolean defaultValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0);
+        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0, null);
         return (Boolean) cat.valueMap.get(name).value;
     }
 
     public int getInt(String name, String category, int defaultValue, int minValue, int maxValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description, minValue, maxValue, Integer::compareTo);
+        Category cat = getValueCategory(name, category, defaultValue, description, minValue, maxValue, Integer::compareTo, null);
         Object value = cat.valueMap.get(name).value;
         if (value instanceof Float) {
             return ((Float) value).intValue();
@@ -215,18 +233,33 @@ public class Configuration {
     }
 
     public String getString(String name, String category, String defaultValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0);
+        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0, null);
         return (String) cat.valueMap.get(name).value;
     }
 
     public String getString(String name, String category, String defaultValue, String description, String[] strings) {
-        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0);
+        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0, Arrays.asList(strings));
         return (String) cat.valueMap.get(name).value;
     }
 
     public String[] getStringList(String name, String category, String[] defaultValue, String description) {
-        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0);
+        Category cat = getValueCategory(name, category, defaultValue, description, null, null, (o1, o2) -> 0, null);
         return (String[]) cat.valueMap.get(name).value;
+    }
+
+    /**
+     * Get all fully-qualified value names in a stable order. This is primarily useful for
+     * generic configuration editors which should automatically include newly defined values.
+     */
+    public List<String> getValueNames() {
+        List<String> names = new ArrayList<>();
+        for (Map.Entry<String, Category> categoryEntry : categoryMap.entrySet()) {
+            for (String name : categoryEntry.getValue().valueMap.keySet()) {
+                names.add(categoryEntry.getKey() + "." + name);
+            }
+        }
+        Collections.sort(names);
+        return names;
     }
 
     public boolean hasKey(String category, String name) {
