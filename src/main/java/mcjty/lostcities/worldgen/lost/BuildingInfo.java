@@ -556,7 +556,8 @@ public class BuildingInfo implements ILostChunkInfo {
                 b = false;  // No building directly above the underground station
             } else {
                 int maxh = info.getLevel();
-                b = cityLevel > maxh + 1;       // Allow a building if it is higher than the maximum railway + one
+                int partlevel = provider.getWorldStyle().getWorldSettings().railPartHeight6();
+                b = cityLevel >= maxh + partlevel;
                 // Later we will take care to make sure we don't have too many cellars
                 // Note that for easy of coding we still disallow multi-buildings above railways
             }
@@ -968,7 +969,7 @@ public class BuildingInfo implements ILostChunkInfo {
             int mincellars = Math.max(profile.BUILDING_MINCELLARS, buildingType.getMinCellars());
             int fb = mincellars + ((maxcellars <= 0) ? 0 : rand.nextInt(maxcellars + 1));
             boolean checkHighway = getMaxHighwayLevel() >= 0;
-            boolean checkRailway = avoidance != WorldSettings.RailwayAvoidance.BLOCK_RAILWAY && getRailInfo() != Railway.RailChunkInfo.NOTHING;
+            boolean checkRailway = avoidance != WorldSettings.RailwayAvoidance.BLOCK_RAILWAY && getRailInfo().getType() != RailChunkType.NONE;
             if (checkHighway || checkRailway) {
                 // If we are above a highway or railway we make sure we can't have too many cellars
                 int maxUnder;
@@ -1100,7 +1101,7 @@ public class BuildingInfo implements ILostChunkInfo {
         }
 
         if (rand.nextFloat() < profile.RAILWAY_DUNGEON_CHANCE) {
-            if (!hasBuilding || (Railway.RAILWAY_LEVEL_OFFSET < (cityLevel - cellars))) {
+            if (!hasBuilding || (Railway.getRailwayLevel(profile) < (cityLevel - cellars))) {
                 railDungeon = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), getCityStyle().getRandomRailDungeon(rand, this.coord));
             } else {
                 railDungeon = null;

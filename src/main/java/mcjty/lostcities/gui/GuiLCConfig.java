@@ -217,6 +217,7 @@ public class GuiLCConfig extends Screen {
         addFloat(left, "lostcity.highwayPerlinFactor").label("Perlin:"); nl();
         addInt(left, "lostcity.highwayDistanceMask").label("Distance mask:"); nl();
         addBool(left, "lostcity.railwaysEnabled").label("Railways:"); nl();
+        addInt(left, "lostcity.railwayLevelOffset").label("Rail offset:"); nl();
     }
 
     private void initCities(int left) {

@@ -19,9 +19,12 @@ public class Railways {
         if (info.railDungeon == null) {
             return;
         }
-        if (info.getZmin().getRailInfo().getType() == RailChunkType.HORIZONTAL ||
-                info.getZmax().getRailInfo().getType() == RailChunkType.HORIZONTAL) {
-            int height = info.groundLevel + Railway.RAILWAY_LEVEL_OFFSET * LostCityTerrainFeature.FLOORHEIGHT;
+        Railway.RailChunkInfo adjacentRail = info.getZmin().getRailInfo();
+        if (adjacentRail.getType() != RailChunkType.HORIZONTAL) {
+            adjacentRail = info.getZmax().getRailInfo();
+        }
+        if (adjacentRail.getType() == RailChunkType.HORIZONTAL) {
+            int height = info.groundLevel + adjacentRail.getLevel() * LostCityTerrainFeature.FLOORHEIGHT;
             feature.generatePart(info, info.railDungeon, Transform.ROTATE_NONE, 0, height, 0, LostCityTerrainFeature.HardAirSetting.AIR);
         }
     }
