@@ -27,6 +27,7 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.Biome;
@@ -203,7 +204,7 @@ public class LostCityTerrainFeature {
                 states = statesNeedingTodo;
                 if (states == null) {
                     Set<BlockState> newStates = new HashSet<>();
-                    for (Holder<Block> bh : Tools.getBlocksForTag(BlockTags.SAPLINGS)) {
+                    for (Holder<Block> bh : Tools.getBlocksForTag(BlockItemTags.SAPLINGS.block())) {
                         addStates(bh.value(), newStates);
                     }
                     for (Holder<Block> bh : Tools.getBlocksForTag(BlockTags.SMALL_FLOWERS)) {

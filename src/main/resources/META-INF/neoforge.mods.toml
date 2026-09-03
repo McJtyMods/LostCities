@@ -21,6 +21,6 @@ Generate cities all over the world
 [[dependencies.lostcities]]
     modId="neoforge"
     type="required"
-    versionRange="[26.1.2.0-beta,)"
+    versionRange="[26.2.0.75,)"
     ordering="NONE"
     side="BOTH"

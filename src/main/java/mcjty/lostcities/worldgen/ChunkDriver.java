@@ -2,6 +2,7 @@ package mcjty.lostcities.worldgen;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
@@ -20,9 +21,11 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
-import static net.minecraft.world.level.chunk.LevelChunkSection.*;
-
 public class ChunkDriver {
+
+    private static final int SECTION_WIDTH = SectionPos.SECTION_SIZE;
+    private static final int SECTION_HEIGHT = SectionPos.SECTION_SIZE;
+    private static final int SECTION_SIZE = SectionPos.SECTION_BLOCK_COUNT;
 
     private LevelAccessor region;
     private ChunkAccess primer;

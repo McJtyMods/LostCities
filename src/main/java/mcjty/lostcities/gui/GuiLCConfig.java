@@ -519,7 +519,7 @@ public class GuiLCConfig extends Screen {
 
     private void cancel() {
         refreshPreview();
-        Minecraft.getInstance().setScreen(parent);
+        Minecraft.getInstance().gui.setScreen(parent);
     }
 
     private void done() {
@@ -533,7 +533,7 @@ public class GuiLCConfig extends Screen {
             selectProfile(localSetup.getProfile(), null);
         }
 
-        Minecraft.getInstance().setScreen(parent);
+        Minecraft.getInstance().gui.setScreen(parent);
         LostCityFeature.globalDimensionInfoDirtyCounter++;
         Config.resetProfileCache();
     }

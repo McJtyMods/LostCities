@@ -1,3 +1,6 @@
+26.2-11.0.0:
+- Ported Lost Cities to Minecraft 26.2 on NeoForge
+
 26.1.2-10.0.3:
 - Fixed buttons on the Lost Cities world-customization screen rendering without backgrounds on Minecraft 26.1.2
 - Added a new railwayLevelOffset profile option to allow railways to be raised or lowered in 6-block increments, with stations and building cellars respecting the configured level

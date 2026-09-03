@@ -1,6 +1,6 @@
 # Development setup
 
-Lost Cities targets Minecraft 26.1.2 with NeoForge and Java 25. The Gradle
+Lost Cities targets Minecraft 26.2 with NeoForge and Java 25. The Gradle
 wrapper uses Gradle 9.2.1 and resolves a matching Java toolchain through the
 Foojay resolver, so a local Java 25 installation is optional when toolchain
 downloads are available.
@@ -19,7 +19,7 @@ Use the wrapper for build tasks:
 ```
 
 NeoGradle's centralized execution cache is disabled for this project. With the
-26.1 toolchain, a normal `build` can otherwise consume and retain an incomplete
+26.x toolchain, a normal `build` can otherwise consume and retain an incomplete
 NeoForm recompile output, causing large groups of unrelated Minecraft classes
 such as `BlockPos`, `Identifier`, `Level`, and `ProtoChunk` to disappear from
 the compilation classpath. Gradle's normal project-local up-to-date checks
@@ -28,7 +28,7 @@ remain enabled, but NeoForm intermediates are not shared between checkouts.
 The build continues to use the shared `gradletools.gradle` layout. Minecraft,
 NeoForge, dependency, run, access-transformer, jar, and publishing settings are
 defined there so sibling mods can reuse the same helper structure. This project
-uses NeoGradle 7.1.21 and no longer configures Parchment because Minecraft 26.1
+uses NeoGradle 7.1.38 and no longer configures Parchment because Minecraft 26.x
 ships unobfuscated names and official parameter names.
 
 Lost Cities' world-level caches use Minecraft's global `SavedDataStorage` with

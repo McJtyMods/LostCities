@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.DensityFunctions.Marker;
-import net.minecraft.world.level.levelgen.blending.Blender;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.jetbrains.annotations.NotNull;
 
@@ -180,11 +179,6 @@ public class NoiseChunkOpt implements DensityFunction.ContextProvider, DensityFu
         return this.cellStartBlockZ + this.inCellZ;
     }
 
-    @Override
-    public Blender getBlender() {
-        return Blender.empty();
-    }
-
     public @NotNull NoiseChunkOpt forIndex(int pArrayIndex) {
         int i = Math.floorMod(pArrayIndex, this.cellWidth);
         int j = Math.floorDiv(pArrayIndex, this.cellWidth);
@@ -297,6 +291,7 @@ public class NoiseChunkOpt implements DensityFunction.ContextProvider, DensityFu
                 case Cache2D -> new Cache2D(marker.wrapped());
                 case CacheOnce -> new CacheOnce(marker.wrapped());
                 case CacheAllInCell -> new CacheAllInCell(marker.wrapped());
+                case BlendDensity -> marker.wrapped();
             };
             return (DensityFunction) object;
         } else {

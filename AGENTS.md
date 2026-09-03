@@ -2,7 +2,7 @@
 
 ## Project overview
 
-Lost Cities is a Minecraft NeoForge 26.1.2 mod built with Java 25 and Gradle. Most behavior is split between Java world-generation code and data-driven JSON assets that describe buildings, city styles, palettes, parts, and related content.
+Lost Cities is a Minecraft NeoForge 26.2 mod built with Java 25 and Gradle. Most behavior is split between Java world-generation code and data-driven JSON assets that describe buildings, city styles, palettes, parts, and related content.
 
 ## Repository structure
 
