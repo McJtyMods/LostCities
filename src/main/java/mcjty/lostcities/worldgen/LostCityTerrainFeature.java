@@ -1966,7 +1966,7 @@ public class LostCityTerrainFeature {
         return b;
     }
 
-    private BlockState transformBlockState(Transform transform, BlockState b) {
+    public BlockState transformBlockState(Transform transform, BlockState b) {
         if (Tools.hasTag(b.getBlock(), LostTags.ROTATABLE_TAG)) {
             b = b.rotate(transform.getMcRotation());
         } else if (getRailStates().contains(b)) {

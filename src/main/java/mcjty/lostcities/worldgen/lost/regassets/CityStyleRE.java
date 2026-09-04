@@ -17,6 +17,8 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
                     Codec.STRING.optionalFieldOf("style").forGetter(l -> Optional.ofNullable(l.style)),
                     Codec.STRING.optionalFieldOf("inherit").forGetter(l -> Optional.ofNullable(l.inherit)),
                     Codec.STRING.listOf().optionalFieldOf("stuff_tags").forGetter(l -> Optional.ofNullable(l.stuffTags)),
+                    Codec.STRING.optionalFieldOf("bridgesupport").forGetter(l -> DataTools.toNullable(l.bridgeSupport)),
+                    Codec.STRING.optionalFieldOf("bridgesupportpart").forGetter(l -> Optional.ofNullable(l.bridgeSupportPart)),
                     CityProfileOverrides.CODEC.optionalFieldOf("profile_overrides").forGetter(l -> Optional.ofNullable(l.profileOverrides)),
                     GeneralSettings.CODEC.optionalFieldOf("generalblocks").forGetter(l -> Optional.ofNullable(l.generalSettings)),
                     BuildingSettings.CODEC.optionalFieldOf("buildingsettings").forGetter(l -> Optional.ofNullable(l.buildingSettings)),
@@ -35,6 +37,8 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
     private final String inherit;
 
     private final List<String> stuffTags;
+    private final Character bridgeSupport;
+    private final String bridgeSupportPart;
     private final CityProfileOverrides profileOverrides;
 
     private final GeneralSettings generalSettings;
@@ -52,6 +56,8 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
             Optional<String> style,
             Optional<String> inherit,
             Optional<List<String>> stuffTags,
+            Optional<String> bridgeSupport,
+            Optional<String> bridgeSupportPart,
             Optional<CityProfileOverrides> profileOverrides,
             Optional<GeneralSettings> generalSettings,
             Optional<BuildingSettings> buildingSettings,
@@ -65,6 +71,8 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
         this.style = style.orElse(null);
         this.inherit = inherit.orElse(null);
         this.stuffTags = stuffTags.orElse(null);
+        this.bridgeSupport = DataTools.getNullableChar(bridgeSupport);
+        this.bridgeSupportPart = bridgeSupportPart.map(String::intern).orElse(null);
         this.profileOverrides = profileOverrides.orElse(null);
         this.generalSettings = generalSettings.orElse(null);
         this.buildingSettings = buildingSettings.orElse(null);
@@ -83,6 +91,16 @@ public class CityStyleRE implements IAsset<CityStyleRE> {
     @Nullable
     public List<String> getStuffTags() {
         return stuffTags;
+    }
+
+    @Nullable
+    public Character getBridgeSupport() {
+        return bridgeSupport;
+    }
+
+    @Nullable
+    public String getBridgeSupportPart() {
+        return bridgeSupportPart;
     }
 
     public String getStyle() {

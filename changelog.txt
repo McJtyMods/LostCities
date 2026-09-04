@@ -1,4 +1,5 @@
 1.20-7.5.5:
+- Added world- and city-style bridge support settings and world-style highway support settings, including reusable vertical support parts while preserving legacy part metadata
 - Fixed numeric profile fields replacing temporary input while typing multi-digit values
 - Added separate north-south and east-west railway spacing profile options, with safe surface-station slopes and highway avoidance
 
