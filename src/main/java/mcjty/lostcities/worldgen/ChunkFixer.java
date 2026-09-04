@@ -7,8 +7,11 @@ import mcjty.lostcities.worldgen.lost.regassets.data.WorldSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 public class ChunkFixer {
 
@@ -42,10 +45,11 @@ public class ChunkFixer {
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < maxHeight; y++) {
                         if (random.nextFloat() < vineChance) {
-                            createVineStrip(world, random, bottom, state, new BlockPos(cx + 16, y, cz + z), new BlockPos(cx + 15, y, cz + z));
+                            createVineStrip(world, random, bottom, state, new BlockPos(cx + 16, y, cz + z));
                         }
                     }
                 }
+                removeUnsupportedVines(world, state.getBlock(), cx + 16, cz, cx + 16, cz + 14, bottom, maxHeight);
             }
         }
         if (info.getXmax().hasBuilding) {
@@ -56,10 +60,11 @@ public class ChunkFixer {
                 for (int z = 0; z < 15; z++) {
                     for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
                         if (random.nextFloat() < vineChance) {
-                            createVineStrip(world, random, bottom, state, new BlockPos(cx + 15, y, cz + z), new BlockPos(cx + 16, y, cz + z));
+                            createVineStrip(world, random, bottom, state, new BlockPos(cx + 15, y, cz + z));
                         }
                     }
                 }
+                removeUnsupportedVines(world, state.getBlock(), cx + 15, cz, cx + 15, cz + 14, bottom, adjacent.getMaxHeight());
             }
         }
 
@@ -71,10 +76,11 @@ public class ChunkFixer {
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < maxHeight; y++) {
                         if (random.nextFloat() < vineChance) {
-                            createVineStrip(world, random, bottom, state, new BlockPos(cx + x, y, cz + 16), new BlockPos(cx + x, y, cz + 15));
+                            createVineStrip(world, random, bottom, state, new BlockPos(cx + x, y, cz + 16));
                         }
                     }
                 }
+                removeUnsupportedVines(world, state.getBlock(), cx, cz + 16, cx + 14, cz + 16, bottom, maxHeight);
             }
         }
         if (info.getZmax().hasBuilding) {
@@ -85,19 +91,23 @@ public class ChunkFixer {
                 for (int x = 0; x < 15; x++) {
                     for (int y = bottom; y < (adjacent.getMaxHeight()); y++) {
                         if (random.nextFloat() < vineChance) {
-                            createVineStrip(world, random, bottom, state, new BlockPos(cx + x, y, cz + 15), new BlockPos(cx + x, y, cz + 16));
+                            createVineStrip(world, random, bottom, state, new BlockPos(cx + x, y, cz + 15));
                         }
                     }
                 }
+                removeUnsupportedVines(world, state.getBlock(), cx, cz + 15, cx + 14, cz + 15, bottom, adjacent.getMaxHeight());
             }
         }
     }
 
-    private static void createVineStrip(LevelAccessor world, RandomSource random, int bottom, BlockState state, BlockPos pos, BlockPos vineHolderPos) {
-        if (world.isEmptyBlock(vineHolderPos)) {
+    private static void createVineStrip(LevelAccessor world, RandomSource random, int bottom, BlockState state, BlockPos pos) {
+        if (!world.isEmptyBlock(pos)) {
             return;
         }
-        if (!world.isEmptyBlock(pos)) {
+        // A non-air neighbour is not necessarily a face that vines can attach to. In particular,
+        // foliage and partial blocks can pass the old test and leave a client-visible floating vine
+        // because worldgen uses no updates.
+        if (!state.canSurvive(world, pos)) {
             return;
         }
         world.setBlock(pos, state, 0);
@@ -106,8 +116,69 @@ public class ChunkFixer {
             if (!world.isEmptyBlock(pos)) {
                 return;
             }
+            if (!state.canSurvive(world, pos)) {
+                return;
+            }
             world.setBlock(pos, state, 0);
             pos = pos.below();
+        }
+    }
+
+    /**
+     * Remove invalid configured vines from a processed building boundary. Work from the top down
+     * so an orphaned hanging strip is removed completely in this pass.
+     */
+    private static void removeUnsupportedVines(LevelAccessor world, Block vineBlock,
+                                               int minX, int minZ, int maxX, int maxZ,
+                                               int bottom, int top) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int y = top - 1; y >= bottom; y--) {
+            for (int x = minX; x <= maxX; x++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    pos.set(x, y, z);
+                    BlockState existing = world.getBlockState(pos);
+                    if (existing.is(vineBlock) && !existing.canSurvive(world, pos)) {
+                        world.removeBlock(pos, false);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Validate both sides of this chunk's boundary after all Lost Cities changes have been
+     * committed. A city or transition chunk can remove the support of a vanilla vine stored in
+     * its neighbour. That neighbour may already have completed generation, and bulk block changes
+     * do not send cross-chunk shape updates at the FEATURES stage.
+     */
+    private static void removeUnsupportedBoundaryVines(ChunkCoord coord, LevelAccessor world) {
+        int cx = coord.chunkX() << 4;
+        int cz = coord.chunkZ() << 4;
+
+        for (int x = cx - 1; x <= cx + 16; x++) {
+            removeUnsupportedVinesInColumn(world, x, cz - 1);
+            removeUnsupportedVinesInColumn(world, x, cz);
+            removeUnsupportedVinesInColumn(world, x, cz + 15);
+            removeUnsupportedVinesInColumn(world, x, cz + 16);
+        }
+        for (int z = cz + 1; z <= cz + 14; z++) {
+            removeUnsupportedVinesInColumn(world, cx - 1, z);
+            removeUnsupportedVinesInColumn(world, cx, z);
+            removeUnsupportedVinesInColumn(world, cx + 15, z);
+            removeUnsupportedVinesInColumn(world, cx + 16, z);
+        }
+    }
+
+    private static void removeUnsupportedVinesInColumn(LevelAccessor world, int x, int z) {
+        int top = Math.min(world.getMaxBuildHeight() - 1,
+                world.getHeight(Heightmap.Types.WORLD_SURFACE, x, z));
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, top, z);
+        for (int y = top; y >= world.getMinBuildHeight(); y--) {
+            pos.setY(y);
+            BlockState existing = world.getBlockState(pos);
+            if (existing.getBlock() instanceof VineBlock && !existing.canSurvive(world, pos)) {
+                world.removeBlock(pos, false);
+            }
         }
     }
 
@@ -117,5 +188,6 @@ public class ChunkFixer {
         random.setSeed(info.getSeed() ^ (long) coord.chunkX() * 341873128712L ^ (long) coord.chunkZ() * 132897987541L);
         generateVines(coord, info.getWorld(), info, random);
         executePostTodo(coord, info);
+        removeUnsupportedBoundaryVines(coord, info.getWorld());
     }
 }

@@ -42,6 +42,7 @@ import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraftforge.common.MinecraftForge;
@@ -74,6 +75,7 @@ public class LostCityTerrainFeature {
     private final NoiseGeneratorPerlin leavesNoise;
     private final NoiseGeneratorPerlin ruinNoise;
     private final NoiseGeneratorPerlin bottomLayerNoise;    // Used in floating profile for the underside of buildings
+    private final NoiseGeneratorSimplex terrainTransitionNoise;
 
     private volatile BlockState[] randomLeafs;
     private volatile BlockState[] randomDirt;
@@ -93,6 +95,10 @@ public class LostCityTerrainFeature {
         this.leavesNoise = new NoiseGeneratorPerlin(rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);
         this.bottomLayerNoise = new NoiseGeneratorPerlin(rand, 4);
+        long transitionSeed = provider.getSeed()
+                ^ (long) provider.getType().location().hashCode() * 0x9e3779b97f4a7c15L
+                ^ 0x6a09e667f3bcc909L;
+        this.terrainTransitionNoise = new NoiseGeneratorSimplex(new LegacyRandomSource(transitionSeed));
 
         air = Blocks.AIR.defaultBlockState();
         hardAir = Blocks.STRUCTURE_VOID.defaultBlockState();
@@ -577,7 +583,9 @@ public class LostCityTerrainFeature {
      *
      * Every normal chunk is made to fit between the lower and the upper mesh by moving down
      * or up the top layer (6 thick) of the terrain. In a chunk these heights are interpolated
-     * (bilinear interpolation).
+     * (bilinear interpolation). World-coordinate coherent noise perturbs the interpolated mesh
+     * away from tightly constrained city edges. This breaks up long, regular contour lines while
+     * keeping the terrain flush with the city and continuous across chunk boundaries.
      */
     private void correctTerrainShape(WorldGenLevel level, ChunkCoord coord, ChunkHeightmap heightmap) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
@@ -637,13 +645,18 @@ public class LostCityTerrainFeature {
                 float minh1 = min10 + (min00 - min10) * factor;
                 for (int z = 0; z < 16; z++) {
                     float maxheight = maxh0 + (maxh1 - maxh0) * (15.0f - z) / 15.0f;
+                    float minheight = minh0 + (minh1 - minh0) * (15.0f - z) / 15.0f;
+                    float transitionFreedom = Math.max(0.0f, maxheight - minheight - 4.0f);
+                    float noiseStrength = Math.min(1.0f, transitionFreedom / 20.0f);
+                    float noiseOffset = getTerrainTransitionNoise(coord, x, z) * noiseStrength;
+                    maxheight += noiseOffset;
+                    minheight += noiseOffset;
                     if (maxheight > max) {
                         maxheight = max;
                     }
                     int maxTouchedY = moveDown(x, z, (int) maxheight, max);
 
                     if (maxTouchedY == Short.MIN_VALUE) {
-                        float minheight = minh0 + (minh1 - minh0) * (15.0f - z) / 15.0f;
                         if (minheight < min) {
                             minheight = min;
                         }
@@ -661,6 +674,14 @@ public class LostCityTerrainFeature {
         }
     }
 
+    private float getTerrainTransitionNoise(ChunkCoord coord, int x, int z) {
+        int worldX = (coord.chunkX() << 4) + x;
+        int worldZ = (coord.chunkZ() << 4) + z;
+        double broad = terrainTransitionNoise.getValue(worldX / 28.0, worldZ / 28.0) * 3.0;
+        double detail = terrainTransitionNoise.getValue((worldX + 10000) / 11.0, (worldZ - 10000) / 11.0);
+        return (float) (broad + detail);
+    }
+
     // Return true if state is air or liquid
     public static boolean isEmpty(BlockState state) {
         if (state.isAir()) {
@@ -675,12 +696,13 @@ public class LostCityTerrainFeature {
         return false;
     }
 
-    // Return true if state is Empty or Plant based - stops (most) funny tree/mushroom action on chunk borders
+    // Return true if state is empty, plant based, or climbable. Terrain correction must look
+    // through these blocks to find the actual surface instead of relocating them as ground.
     private static boolean isFoliageOrEmpty(BlockState state) {
         if (isEmpty(state)) {
             return true;
         }
-        return Tools.hasTag(state.getBlock(), LostTags.FOLIAGE_TAG);
+        return state.is(BlockTags.CLIMBABLE) || Tools.hasTag(state.getBlock(), LostTags.FOLIAGE_TAG);
     }
 
     // Return the new max height of the chunk in this column. Or Short.MIN_VALUE if nothing was done
@@ -715,15 +737,18 @@ public class LostCityTerrainFeature {
         return maxYTouched;
     }
 
-    private final BlockState[] buffer = new BlockState[6];
-
     // Return the new max height of the chunk in this column. Or Short.MIN_VALUE if nothing was done
     private int moveDown(int x, int z, int height, int maxBuildLimit) {
         int maxYTouched = Short.MIN_VALUE;       // Max Y that we touched
         int y = maxBuildLimit - 1;
         getDriver().current(x, y, z);
-        // We assume here we are not in a void chunk
-        while (isEmpty(getDriver().getBlock()) && getDriver().getY() > height) {
+        int highestFoliage = Short.MIN_VALUE;
+        // Find the real terrain surface. Remember the top of vegetation so it can be cleared
+        // together with the terrain instead of being left suspended at its original height.
+        while (isFoliageOrEmpty(getDriver().getBlock()) && getDriver().getY() > height) {
+            if (!isEmpty(getDriver().getBlock())) {
+                highestFoliage = Math.max(highestFoliage, getDriver().getY());
+            }
             getDriver().decY();
         }
 
@@ -731,12 +756,19 @@ public class LostCityTerrainFeature {
             return maxYTouched; // Nothing to do
         }
 
-        // We arrived at our first non-air block
+        // Preserve six layers starting at the actual terrain surface. The old implementation
+        // started at the highest non-air block, which copied jungle vines into the soil buffer
+        // and pasted them unsupported onto the lowered slope.
+        int terrainSurface = getDriver().getY();
+        BlockState[] buffer = new BlockState[6];
         int bufferIdx = 0;
+        for (int sourceY = terrainSurface; sourceY >= height && bufferIdx < buffer.length; sourceY--) {
+            buffer[bufferIdx++] = getDriver().getBlock(x, sourceY, z);
+        }
+
+        int clearFrom = highestFoliage == Short.MIN_VALUE ? terrainSurface : highestFoliage;
+        getDriver().current(x, clearFrom, z);
         while (getDriver().getY() >= height) {
-            if (bufferIdx < buffer.length) {
-                buffer[bufferIdx++] = getDriver().getBlock();
-            }
             getDriver().block(air);
             getDriver().decY();
         }
