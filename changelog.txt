@@ -1,3 +1,7 @@
+1.20-7.5.5:
+- Fixed numeric profile fields replacing temporary input while typing multi-digit values
+- Added separate north-south and east-west railway spacing profile options, with safe surface-station slopes and highway avoidance
+
 1.20-7.5.4:
 - Added a new railwayLevelOffset profile option to allow railways to be raised or lowered in 6-block increments, with stations and building cellars respecting the configured level
 - Add a new page to the world customization screen for editing every profile setting, with range and allowed-value validation

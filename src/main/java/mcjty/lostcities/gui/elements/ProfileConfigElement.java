@@ -289,8 +289,6 @@ public class ProfileConfigElement extends GuiElement {
             if (textEditor) {
                 if (result.applied() && !format(proposedValue).equals(format(value))) {
                     textField.setValue(format(value));
-                } else if (!result.applied()) {
-                    textField.setValue(format(value));
                 }
             } else {
                 choiceButton.setMessage(ComponentFactory.literal(format(value)));

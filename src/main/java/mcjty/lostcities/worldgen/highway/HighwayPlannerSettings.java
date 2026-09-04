@@ -13,7 +13,9 @@ public record HighwayPlannerSettings(
         int minimumRouteLength,
         float routeCityPenalty,
         int levelFromCitiesMode,
-        int networkLevel
+        int networkLevel,
+        int railwaySpacingNorthSouth,
+        int railwaySpacingEastWest
 ) {
     public HighwayPlannerSettings {
         if (planningCellSize < 32 || planningCellSize > 512) {
@@ -43,6 +45,12 @@ public record HighwayPlannerSettings(
         if (levelFromCitiesMode < 0 || levelFromCitiesMode > 4 || networkLevel < 0 || networkLevel > 32) {
             throw new IllegalArgumentException("Invalid highway level mode or fixed network level");
         }
+        if (railwaySpacingNorthSouth < LostCityProfile.MIN_RAILWAY_SPACING || railwaySpacingNorthSouth > LostCityProfile.MAX_RAILWAY_SPACING
+                || railwaySpacingEastWest < LostCityProfile.MIN_RAILWAY_SPACING || railwaySpacingEastWest > LostCityProfile.MAX_RAILWAY_SPACING
+                || (railwaySpacingNorthSouth & 1) != 0 || (railwaySpacingEastWest & 1) != 0) {
+            throw new IllegalArgumentException("Railway spacing must be an even number from " + LostCityProfile.MIN_RAILWAY_SPACING
+                    + " through " + LostCityProfile.MAX_RAILWAY_SPACING + " chunks");
+        }
     }
 
     public static HighwayPlannerSettings fromProfile(LostCityProfile profile) {
@@ -57,6 +65,8 @@ public record HighwayPlannerSettings(
                 profile.HIGHWAY_MINIMUM_ROUTE_LENGTH,
                 profile.HIGHWAY_ROUTE_CITY_PENALTY,
                 profile.HIGHWAY_LEVEL_FROM_CITIES_MODE,
-                profile.HIGHWAY_NETWORK_LEVEL);
+                profile.HIGHWAY_NETWORK_LEVEL,
+                profile.RAILWAY_SPACING_NORTH_SOUTH,
+                profile.RAILWAY_SPACING_EAST_WEST);
     }
 }

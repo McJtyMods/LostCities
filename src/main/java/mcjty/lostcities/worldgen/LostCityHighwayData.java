@@ -141,6 +141,8 @@ public class LostCityHighwayData extends SavedData {
         hash = hash(hash, settings.planningCellSize());
         hash = hash(hash, settings.hubSampleSpacing());
         hash = hash(hash, Float.floatToIntBits(settings.hubMinimumPotential()));
+        hash = hash(hash, settings.railwaySpacingNorthSouth());
+        hash = hash(hash, settings.railwaySpacingEastWest());
         hash = hash(hash, Double.doubleToLongBits(profile.CITY_CHANCE));
         hash = hash(hash, profile.CITY_MINRADIUS);
         hash = hash(hash, profile.CITY_MAXRADIUS);
