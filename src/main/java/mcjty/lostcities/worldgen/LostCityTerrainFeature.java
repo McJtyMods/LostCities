@@ -848,10 +848,9 @@ public class LostCityTerrainFeature {
             left = (chunk.chunkZ() / heightSampleSize) * heightSampleSize;
             constX = chunk.chunkX() < 0 ? -1 : 1;
             constZ = chunk.chunkZ() < 0 ? -1 : 1;
-            if (heightSampleSize > 2) {
-                int sampleOffset = heightSampleSize / 2;
-                sampler = new ChunkCoord(chunk.dimension(), top + (sampleOffset * constX), left + (sampleOffset * constZ));
-            }
+            // Every member must use the same sample, including sample size 2.
+            int sampleOffset = heightSampleSize / 2;
+            sampler = new ChunkCoord(chunk.dimension(), top + (sampleOffset * constX), left + (sampleOffset * constZ));
         } else {
             top = chunk.chunkX();
             left = chunk.chunkZ();
@@ -867,6 +866,13 @@ public class LostCityTerrainFeature {
                 for (int i = 0; i < heightSampleSize; i++) {
                     for (int j = 0; j < heightSampleSize; j++) {
                         ChunkCoord sampleKey = new ChunkCoord(chunk.dimension(), top + (i * constX), left + (j * constZ));
+                        // Keep the historical groups on both sides of zero, but let only
+                        // the positive-side group own the axis. Negative groups next to
+                        // an axis are one chunk narrower and must not overwrite it.
+                        if ((constX < 0 && sampleKey.chunkX() == 0)
+                                || (constZ < 0 && sampleKey.chunkZ() == 0)) {
+                            continue;
+                        }
                         cachedHeightmaps.put(sampleKey, new ChunkHeightmap(heightmap));
                     }
                 }
