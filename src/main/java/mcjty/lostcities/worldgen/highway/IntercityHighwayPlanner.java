@@ -358,12 +358,12 @@ public final class IntercityHighwayPlanner {
     }
 
     /**
-     * Subways occupy a fixed ten-chunk grid. Crossing one of those lines is safe because the
-     * railway is underground, but sharing its chunk line or crossing a surface-access station
-     * can make railway parts replace the highway. Keep parallel highway segments off railway
-     * corridors and vertical highways off the columns containing stations.
+     * Crossing an underground railway is safe, but sharing its chunk line or crossing a
+     * surface-access station can make railway parts replace the highway. Keep parallel highway
+     * segments off the configured railway corridors and vertical highways off the columns
+     * containing stations.
      */
-    private static boolean isRailwayClear(List<HighwaySegment> segments) {
+    private boolean isRailwayClear(List<HighwaySegment> segments) {
         for (HighwaySegment segment : segments) {
             if (segment.axis() == HighwayAxis.X && isHorizontalRailwayCorridor(segment.startZ())) {
                 return false;
@@ -375,27 +375,28 @@ public final class IntercityHighwayPlanner {
         return true;
     }
 
-    private static int moveHubXOffRailwayCorridor(int chunkX, int localX, int cellSize) {
+    private int moveHubXOffRailwayCorridor(int chunkX, int localX, int cellSize) {
         if (!isVerticalRailwayOrStationCorridor(chunkX)) {
             return chunkX;
         }
         return localX + 1 < cellSize ? Math.addExact(chunkX, 1) : Math.subtractExact(chunkX, 1);
     }
 
-    private static int moveHubZOffRailwayCorridor(int chunkZ, int localZ, int cellSize) {
+    private int moveHubZOffRailwayCorridor(int chunkZ, int localZ, int cellSize) {
         if (!isHorizontalRailwayCorridor(chunkZ)) {
             return chunkZ;
         }
         return localZ + 1 < cellSize ? Math.addExact(chunkZ, 1) : Math.subtractExact(chunkZ, 1);
     }
 
-    private static boolean isHorizontalRailwayCorridor(int chunkZ) {
-        return Math.floorMod(chunkZ + 1, 10) == 0;
+    private boolean isHorizontalRailwayCorridor(int chunkZ) {
+        return Math.floorMod(chunkZ + 1, settings.railwaySpacingNorthSouth()) == 0;
     }
 
-    private static boolean isVerticalRailwayOrStationCorridor(int chunkX) {
-        int gridX = Math.floorMod(chunkX + 1, 10);
-        return gridX == 5 || gridX == 0;
+    private boolean isVerticalRailwayOrStationCorridor(int chunkX) {
+        int spacing = settings.railwaySpacingEastWest();
+        int gridX = Math.floorMod(chunkX + 1, spacing);
+        return gridX == spacing / 2 || gridX == 0;
     }
 
     /** Builds canonical V1 geometry for an already accepted hub pair. */

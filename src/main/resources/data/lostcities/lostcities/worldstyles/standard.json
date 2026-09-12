@@ -1,5 +1,7 @@
 {
   "outsidestyle": "outside",
+  "bridgesupport": "v",
+  "highwaysupport": "v",
   "settings": {
     "railwayavoidance": "ignore",
     "railpartheight6": 1

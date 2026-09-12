@@ -23,7 +23,7 @@ public class Railway {
     }
 
     /*
-    Railway grid:
+    Default 10-chunk railway grid:
 
       .   .   .   .   s   .   s   .   .   .   .   .   .   .   .
 
@@ -98,7 +98,8 @@ public class Railway {
     }
 
     /**
-     * The station grid repeats every 9 chunks. There is never a station at every 18/18 multiple chunk
+     * The station grid repeats every two configured railway spacings. There is no station at the
+     * origin of each repeating cell, leaving room for the alternating north-south connections.
      */
     private static RailChunkInfo getRailChunkTypeInternal(ChunkCoord key, IDimensionInfo provider) {
         int chunkX = key.chunkX();
@@ -112,20 +113,23 @@ public class Railway {
         // @todo make all settings based on rand below configurable
         float r = randomRailChunkType.nextFloat();
 
-        int mx = Math.floorMod(chunkX + 1, 20);       // The +1 to avoid having them on highways
-        int mz = Math.floorMod(chunkZ + 1, 20);
-        if (mx == 0 && mz == 10) {
+        int spacingX = profile.RAILWAY_SPACING_EAST_WEST;
+        int spacingZ = profile.RAILWAY_SPACING_NORTH_SOUTH;
+        int halfSpacingX = spacingX / 2;
+        int mx = Math.floorMod(chunkX + 1, spacingX * 2);       // The +1 preserves the original grid origin
+        int mz = Math.floorMod(chunkZ + 1, spacingZ * 2);
+        if (mx == 0 && mz == spacingZ) {
             if (!BuildingInfo.isCityRaw(key, provider, profile)) {
                 // There is no city here. So no station. But we still need a railway. A station at this
                 // point will get a three line rail through it
                 if (profile.RAILWAYS_CAN_END) {
                     // Check if there are stations at either side
-                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(10, 0), provider, profile) ||
-                            BuildingInfo.isCityRaw(key.offset(10, - 10), provider, profile) ||
-                            BuildingInfo.isCityRaw(key.offset(10, 10), provider, profile);
-                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(10, 0), provider, profile) ||
-                            BuildingInfo.isCityRaw(key.offset(- 10, - 10), provider, profile) ||
-                            BuildingInfo.isCityRaw(key.offset(- 10, 10), provider, profile);
+                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(spacingX, 0), provider, profile) ||
+                            BuildingInfo.isCityRaw(key.offset(spacingX, -spacingZ), provider, profile) ||
+                            BuildingInfo.isCityRaw(key.offset(spacingX, spacingZ), provider, profile);
+                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(spacingX, 0), provider, profile) ||
+                            BuildingInfo.isCityRaw(key.offset(-spacingX, -spacingZ), provider, profile) ||
+                            BuildingInfo.isCityRaw(key.offset(-spacingX, spacingZ), provider, profile);
                     if (!cityEast && !cityWest) {
                         return RailChunkInfo.NOTHING;
                     }
@@ -141,16 +145,16 @@ public class Railway {
             return getStationType(key, provider, profile, r, 3,
                     randomRailChunkType.nextFloat() < .5f ? railwayParts.stationOpen() : railwayParts.stationOpenRoof());
         }
-        if (mx == 10 && mz == 0) {
+        if (mx == spacingX && mz == 0) {
             if (!BuildingInfo.isCityRaw(key, provider, profile)) {
                 // There is no city here. So no station either. But we still need a railway. A station at this
                 // point will get a two line rail through it
                 if (profile.RAILWAYS_CAN_END) {
                     // Check if there are stations at either side
-                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(10, -10), provider, profile) ||
-                            BuildingInfo.isCityRaw(key.offset(10, 10), provider, profile);
-                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-10, -10), provider, profile) ||
-                            BuildingInfo.isCityRaw(key.offset(- 10, 10), provider, profile);
+                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(spacingX, -spacingZ), provider, profile) ||
+                            BuildingInfo.isCityRaw(key.offset(spacingX, spacingZ), provider, profile);
+                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-spacingX, -spacingZ), provider, profile) ||
+                            BuildingInfo.isCityRaw(key.offset(-spacingX, spacingZ), provider, profile);
                     if (!cityEast && !cityWest) {
                         return RailChunkInfo.NOTHING;
                     }
@@ -166,14 +170,14 @@ public class Railway {
             return getStationType(key, provider, profile, r, 2,
                     randomRailChunkType.nextFloat() < .5f ? railwayParts.stationOpen() : railwayParts.stationOpenRoof());
         }
-        if (mx == 10 && mz == 10) {
+        if (mx == spacingX && mz == spacingZ) {
             if (!BuildingInfo.isCityRaw(key, provider, profile)) {
                 // There is no city here. So no station either. But we still need a railway. A station at this
                 // point will get a single line rail through it
                 if (profile.RAILWAYS_CAN_END) {
                     // Check if there are stations at either side
-                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(10, 0), provider, profile);
-                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-10, 0), provider, profile);
+                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(spacingX, 0), provider, profile);
+                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-spacingX, 0), provider, profile);
                     if (!cityEast && !cityWest) {
                         return RailChunkInfo.NOTHING;
                     }
@@ -193,9 +197,10 @@ public class Railway {
             return RailChunkInfo.NOTHING;
         }
 
-        if (mz == 0 || mz == 10) {
+        if (mz == 0 || mz == spacingZ) {
             // Handle the rail sections left or right of every station
-            if ((mx >= 16 && mz != 0) || (mx >= 6 && mx <= 9)) {
+            if ((mx >= spacingX + halfSpacingX + 1 && mz != 0)
+                    || (mx >= halfSpacingX + 1 && mx < spacingX)) {
                 ChunkCoord east = key.east();
                 RailChunkInfo adjacent = getRailChunkType(east, provider, profile);
                 RailDirection direction = adjacent.getDirection();
@@ -204,7 +209,8 @@ public class Railway {
                 }
                 return testAdjacentRailChunk(r, adjacent, direction, key.west(), provider, profile);
             }
-            if ((mx >= 1 && mx <= 4 && mz != 0) || (mx >= 11 && mx <= 14)) {
+            if ((mx >= 1 && mx < halfSpacingX && mz != 0)
+                    || (mx > spacingX && mx < spacingX + halfSpacingX)) {
                 ChunkCoord west = key.west();
                 RailChunkInfo adjacent = getRailChunkType(west, provider, profile);
                 RailDirection direction = adjacent.getDirection();
@@ -213,37 +219,37 @@ public class Railway {
                 }
                 return testAdjacentRailChunk(r, adjacent, direction, key.east(), provider, profile);
             }
-            if (mz == 0 && mx == 5) {
+            if (mz == 0 && mx == halfSpacingX) {
                 if (profile.RAILWAYS_CAN_END) {
-                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-5, -10), provider, profile) ||
-                            BuildingInfo.isCityRaw(key.offset(-5, 10), provider, profile);
-                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(5, 0), provider, profile);
+                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-halfSpacingX, -spacingZ), provider, profile) ||
+                            BuildingInfo.isCityRaw(key.offset(-halfSpacingX, spacingZ), provider, profile);
+                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(halfSpacingX, 0), provider, profile);
                     if (!cityEast && !cityWest) {
                         return RailChunkInfo.NOTHING;
                     }
                 }
                 return new RailChunkInfo(DOUBLE_BEND, EAST, railwayLevel, 1);
             }
-            if (mz == 0 && mx == 15) {
+            if (mz == 0 && mx == spacingX + halfSpacingX) {
                 if (profile.RAILWAYS_CAN_END) {
-                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(5, -10), provider, profile) ||
-                            BuildingInfo.isCityRaw(key.offset(5, 10), provider, profile);
-                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-5, 0), provider, profile);
+                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(halfSpacingX, -spacingZ), provider, profile) ||
+                            BuildingInfo.isCityRaw(key.offset(halfSpacingX, spacingZ), provider, profile);
+                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-halfSpacingX, 0), provider, profile);
                     if (!cityEast && !cityWest) {
                         return RailChunkInfo.NOTHING;
                     }
                 }
                 return new RailChunkInfo(DOUBLE_BEND, WEST, railwayLevel, 1);
             }
-            if (mz == 10 && mx == 5) {
+            if (mz == spacingZ && mx == halfSpacingX) {
                 if (profile.RAILWAYS_CAN_END) {
-                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(5, 0), provider, profile);
-                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-5, 0), provider, profile);
+                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(halfSpacingX, 0), provider, profile);
+                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-halfSpacingX, 0), provider, profile);
                     if (!cityEast && !cityWest) {
                         // Check the double bends
-                        RailChunkInfo typeNorth = getRailChunkType(key.offset(0, - 10), provider, profile);
+                        RailChunkInfo typeNorth = getRailChunkType(key.offset(0, -spacingZ), provider, profile);
                         if (typeNorth.getType() == NONE) {
-                            RailChunkInfo typeSouth = getRailChunkType(key.offset(0, 10), provider, profile);
+                            RailChunkInfo typeSouth = getRailChunkType(key.offset(0, spacingZ), provider, profile);
                             if (typeSouth.getType() == NONE) {
                                 return RailChunkInfo.NOTHING;
                             }
@@ -252,15 +258,15 @@ public class Railway {
                 }
                 return new RailChunkInfo(THREE_SPLIT, EAST, railwayLevel, 3);
             }
-            if (mz == 10 && mx == 15) {
+            if (mz == spacingZ && mx == spacingX + halfSpacingX) {
                 if (profile.RAILWAYS_CAN_END) {
-                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(5, 0), provider, profile);
-                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-5, 0), provider, profile);
+                    boolean cityEast = BuildingInfo.isCityRaw(key.offset(halfSpacingX, 0), provider, profile);
+                    boolean cityWest = BuildingInfo.isCityRaw(key.offset(-halfSpacingX, 0), provider, profile);
                     if (!cityEast && !cityWest) {
                         // Check the double bends
-                        RailChunkInfo typeNorth = getRailChunkType(key.offset(0, - 10), provider, profile);
+                        RailChunkInfo typeNorth = getRailChunkType(key.offset(0, -spacingZ), provider, profile);
                         if (typeNorth.getType() == NONE) {
-                            RailChunkInfo typeSouth = getRailChunkType(key.offset(0,10), provider, profile);
+                            RailChunkInfo typeSouth = getRailChunkType(key.offset(0, spacingZ), provider, profile);
                             if (typeSouth.getType() == NONE) {
                                 return RailChunkInfo.NOTHING;
                             }
@@ -271,20 +277,20 @@ public class Railway {
             }
             return RailChunkInfo.NOTHING;
         }
-        if (mx == 5) {
+        if (mx == halfSpacingX) {
             if (profile.RAILWAYS_CAN_END) {
-                RailChunkInfo typeNorth = getRailChunkType(key.offset(0, - (mz % 10)), provider, profile);
-                RailChunkInfo typeSouth = getRailChunkType(key.offset(0, - (mz % 10) + 10), provider, profile);
+                RailChunkInfo typeNorth = getRailChunkType(key.offset(0, -(mz % spacingZ)), provider, profile);
+                RailChunkInfo typeSouth = getRailChunkType(key.offset(0, -(mz % spacingZ) + spacingZ), provider, profile);
                 if (typeNorth.getType() == NONE || typeSouth.getType() == NONE) {
                     return RailChunkInfo.NOTHING;
                 }
             }
             return new RailChunkInfo(VERTICAL, EAST, railwayLevel, 1);
         }
-        if (mx == 15) {
+        if (mx == spacingX + halfSpacingX) {
             if (profile.RAILWAYS_CAN_END) {
-                RailChunkInfo typeNorth = getRailChunkType(key.offset(0, - (mz % 10)), provider, profile);
-                RailChunkInfo typeSouth = getRailChunkType(key.offset(0, - (mz % 10) + 10), provider, profile);
+                RailChunkInfo typeNorth = getRailChunkType(key.offset(0, -(mz % spacingZ)), provider, profile);
+                RailChunkInfo typeSouth = getRailChunkType(key.offset(0, -(mz % spacingZ) + spacingZ), provider, profile);
                 if (typeNorth.getType() == NONE || typeSouth.getType() == NONE) {
                     return RailChunkInfo.NOTHING;
                 }
@@ -298,7 +304,8 @@ public class Railway {
     private static RailChunkInfo getStationType(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile, float r, int rails, List<String> part) {
         int cityLevel = BuildingInfo.getCityLevel(coord, provider);
         int railwayLevel = getRailwayLevel(profile);
-        if (cityLevel > 2 || cityLevel - railwayLevel > 8 || !profile.RAILWAY_SURFACE_STATIONS_ENABLED) {
+        int maximumDescent = profile.RAILWAY_SPACING_EAST_WEST - 2;
+        if (cityLevel > 2 || cityLevel - railwayLevel > maximumDescent || !profile.RAILWAY_SURFACE_STATIONS_ENABLED) {
             // We are too high here. We need an underground station
             return new RailChunkInfo(STATION_UNDERGROUND, BI, railwayLevel, rails);
         }
@@ -362,9 +369,10 @@ public class Railway {
                     // We have a highway there so go down here by setting r to 1
                     r = 1;
                 }
-                // An extension leaves three chunks in which to descend before the fixed-height
-                // network. Each sloped part can descend at most two levels.
-                if (r < .4f && adjacent.getLevel() - railwayLevel <= 6) {
+                // An extension consumes one of the available approach chunks. Each remaining
+                // sloped part can descend at most two levels before the next north-south track.
+                int maximumDescentAfterExtension = profile.RAILWAY_SPACING_EAST_WEST - 4;
+                if (r < .4f && adjacent.getLevel() - railwayLevel <= maximumDescentAfterExtension) {
                     return new RailChunkInfo(STATION_EXTENSION_SURFACE, direction, adjacent.getLevel(), adjacent.getRails());
                 } else {
                     return startDescending(adjacent, direction, railwayLevel);

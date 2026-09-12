@@ -17,6 +17,15 @@ public interface ILostChunkInfo {
     boolean isCity();
 
     /**
+     * Return the city style for this chunk, even when isCity() is false.
+     * The style is resolved from surrounding city influences and the active profile,
+     * with the world-style fallback when no city influences this chunk. City streets
+     * use the neighboring chunks' majority style, as they do during generation.
+     * Use getName() on the returned asset for the city-style name.
+     */
+    ILostCityCityStyle getCityStyle();
+
+    /**
      * If this chunk hosts the center of a city then this will retrieve the city information
      * of that city.
      */

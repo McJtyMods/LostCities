@@ -1,5 +1,7 @@
 {
   "outsidestyle": "outside",
+  "bridgesupport": "v",
+  "highwaysupport": "v",
   "multisettings": {
     "areasize": 10,
     "minimum": 1,

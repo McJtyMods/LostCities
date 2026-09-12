@@ -1,3 +1,13 @@
+26.2-11.0.1:
+- Exposed the current chunk's city style through the API, including outside cities
+- Fixed overlapping terrain-height samples near coordinate axes and made size-2 sampling deterministic; floor-selection errors now identify the building and floor
+- Made steep terrain-to-city transitions less regular and removed floating vines left by terrain correction or invalid supports
+- Added world- and city-style bridge supports and world-style highway supports, including reusable vertical support parts and legacy metadata compatibility
+- Fixed numeric profile fields replacing temporary input while typing multi-digit values
+- Added separate north-south and east-west railway spacing options, with safe surface-station slopes and highway avoidance
+- Removed explosion cleanup that could leave chunk-sized gaps, especially in highways
+- Avoided villages and structures now keep a terrain-transition ring when flattening is disabled
+
 26.2-11.0.0:
 - Ported Lost Cities to Minecraft 26.2 on NeoForge
 
