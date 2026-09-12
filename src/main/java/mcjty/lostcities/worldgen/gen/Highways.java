@@ -95,15 +95,25 @@ public class Highways {
         }
 
         Character support = part.getMetaChar(ILostCities.META_SUPPORT);
-        if (info.profile.HIGHWAY_SUPPORTS && support != null) {
-            BlockState sup = info.getCompiledPalette().get(support);
-            if (sup == null) {
-                throw new RuntimeException("Cannot find support block '" + support + "' for highway part '" + part.getName() + "'!");
-            }
-            generateSupport(driver, sup, transform, highwayGroundLevel, 0, 15);
-            generateSupport(driver, sup, transform, highwayGroundLevel, 0, 0);
-            if (partType == PartType.BEND || partType == PartType.T_JUNCTION) {
-                generateSupport(driver, sup, transform, highwayGroundLevel, 15, 0);
+        String supportPartName = null;
+        if (support == null) {
+            support = info.provider.getWorldStyle().getHighwaySupport();
+            supportPartName = info.provider.getWorldStyle().getHighwaySupportPart();
+        }
+        if (info.profile.HIGHWAY_SUPPORTS) {
+            if (supportPartName != null) {
+                BuildingPart supportPart = AssetRegistries.PARTS.getOrThrow(info.provider.getWorld(), supportPartName);
+                Supports.generatePart(feature, info, supportPart, transform, highwayGroundLevel - 1);
+            } else if (support != null) {
+                BlockState sup = info.getCompiledPalette().get(support);
+                if (sup == null) {
+                    throw new RuntimeException("Cannot find support block '" + support + "' for highway part '" + part.getName() + "'!");
+                }
+                generateSupport(driver, sup, transform, highwayGroundLevel, 0, 15);
+                generateSupport(driver, sup, transform, highwayGroundLevel, 0, 0);
+                if (partType == PartType.BEND || partType == PartType.T_JUNCTION) {
+                    generateSupport(driver, sup, transform, highwayGroundLevel, 15, 0);
+                }
             }
         }
 

@@ -23,6 +23,9 @@ public class LostCityProfile implements ILostCityProfile {
     public static final String CATEGORY_CITIES = "cities";
     public static final String CATEGORY_CITY_SPHERES = "cityspheres";
     public static final String CATEGORY_CLIENT = "client";
+    public static final int MIN_RAILWAY_SPACING = 4;
+    public static final int MAX_RAILWAY_SPACING = 128;
+    public static final int DEFAULT_RAILWAY_SPACING = 10;
 
     private final String name;
     private final boolean isPublic;
@@ -88,6 +91,8 @@ public class LostCityProfile implements ILostCityProfile {
     public boolean RAILWAY_STATIONS_ENABLED = true;
     public boolean RAILWAY_SURFACE_STATIONS_ENABLED = true;
     public int RAILWAY_LEVEL_OFFSET = 0;
+    public int RAILWAY_SPACING_NORTH_SOUTH = DEFAULT_RAILWAY_SPACING;
+    public int RAILWAY_SPACING_EAST_WEST = DEFAULT_RAILWAY_SPACING;
 
     public boolean EXPLOSIONS_IN_CITIES_ONLY = true;
 
@@ -503,6 +508,16 @@ public class LostCityProfile implements ILostCityProfile {
                 "If true then railway surface station are enabled, otherwise there'll only be underground stations.");
         RAILWAY_LEVEL_OFFSET = cfg.getInt("railwayLevelOffset", LostCityProfile.CATEGORY_LOSTCITY, RAILWAY_LEVEL_OFFSET, -8, 2,
                 "Vertical offset of the underground railway in multiples of 6 blocks. 0 keeps the railway at its original level");
+        RAILWAY_SPACING_NORTH_SOUTH = cfg.getInt("railwaySpacingNorthSouth", LostCityProfile.CATEGORY_LOSTCITY, RAILWAY_SPACING_NORTH_SOUTH, MIN_RAILWAY_SPACING, MAX_RAILWAY_SPACING,
+                "North-south distance in chunks between east-west railway tracks. Must be an even number");
+        RAILWAY_SPACING_EAST_WEST = cfg.getInt("railwaySpacingEastWest", LostCityProfile.CATEGORY_LOSTCITY, RAILWAY_SPACING_EAST_WEST, MIN_RAILWAY_SPACING, MAX_RAILWAY_SPACING,
+                "East-west distance in chunks between north-south railway tracks. Must be an even number");
+        if (RAILWAY_SPACING_NORTH_SOUTH < MIN_RAILWAY_SPACING || RAILWAY_SPACING_NORTH_SOUTH > MAX_RAILWAY_SPACING
+                || RAILWAY_SPACING_EAST_WEST < MIN_RAILWAY_SPACING || RAILWAY_SPACING_EAST_WEST > MAX_RAILWAY_SPACING
+                || (RAILWAY_SPACING_NORTH_SOUTH & 1) != 0 || (RAILWAY_SPACING_EAST_WEST & 1) != 0) {
+            throw new IllegalArgumentException("Railway spacing must be an even number from " + MIN_RAILWAY_SPACING
+                    + " through " + MAX_RAILWAY_SPACING + " chunks");
+        }
 
         MULTI_USE_CORNER = cfg.getBoolean("multiUseCorner", LostCityProfile.CATEGORY_LOSTCITY, MULTI_USE_CORNER,
                 "Determine whether the multibuilding should use surrounding average level, or just top left corner level.");

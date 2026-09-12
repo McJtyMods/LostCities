@@ -28,7 +28,10 @@ import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.SpawnData;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -41,6 +44,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.RandomState;
@@ -74,6 +78,7 @@ public class LostCityTerrainFeature {
     private final NoiseGeneratorPerlin leavesNoise;
     private final NoiseGeneratorPerlin ruinNoise;
     private final NoiseGeneratorPerlin bottomLayerNoise;    // Used in floating profile for the underside of buildings
+    private final NoiseGeneratorSimplex terrainTransitionNoise;
 
     private volatile BlockState[] randomLeafs;
     private volatile BlockState[] randomDirt;
@@ -93,6 +98,10 @@ public class LostCityTerrainFeature {
         this.leavesNoise = new NoiseGeneratorPerlin(rand, 4);
         this.ruinNoise = new NoiseGeneratorPerlin(rand, 4);
         this.bottomLayerNoise = new NoiseGeneratorPerlin(rand, 4);
+        long transitionSeed = provider.getSeed()
+                ^ (long) provider.getType().identifier().hashCode() * 0x9e3779b97f4a7c15L
+                ^ 0x6a09e667f3bcc909L;
+        this.terrainTransitionNoise = new NoiseGeneratorSimplex(new LegacyRandomSource(transitionSeed));
 
         air = Blocks.AIR.defaultBlockState();
         hardAir = Blocks.STRUCTURE_VOID.defaultBlockState();
@@ -280,77 +289,76 @@ public class LostCityTerrainFeature {
             try {
                 getDriver().setPrimer(region, chunk);
 
-        ChunkHeightmap heightmap = getHeightmap(coord, provider.getWorld());
-        BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
+                ChunkHeightmap heightmap = getHeightmap(coord, provider.getWorld());
+                BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
 
-        // @todo this setup is not very clean
-        CityStyle cityStyle = info.getCityStyle();
-        GenerationContext.current().setStreet(cityStyle.getStreetBlock());//info.getCompiledPalette().get(cityStyle.getStreetBlock());
+                // @todo this setup is not very clean
+                CityStyle cityStyle = info.getCityStyle();
+                GenerationContext.current().setStreet(cityStyle.getStreetBlock());//info.getCompiledPalette().get(cityStyle.getStreetBlock());
 
-        boolean doCity = info.isCity || (info.outsideChunk && info.hasBuilding);
+                boolean doCity = info.isCity || (info.outsideChunk && info.hasBuilding);
 
-        // If this chunk has a building or street but we're in a floating profile and
-        // we happen to have a void chunk we detect that here and go back to normal chunk generation
-        // anyway
-        if (doCity && provider.getProfile().CITY_AVOID_VOID && provider.getProfile().isFloating()) {
-            boolean v = isVoid(2, 2) || isVoid(2, 14) || isVoid(14, 2) || isVoid(14, 14) || isVoid(8, 8);
-            doCity = !v;
-        }
+                // If this chunk has a building or street but we're in a floating profile and
+                // we happen to have a void chunk we detect that here and go back to normal chunk generation
+                // anyway
+                if (doCity && provider.getProfile().CITY_AVOID_VOID && provider.getProfile().isFloating()) {
+                    boolean v = isVoid(2, 2) || isVoid(2, 14) || isVoid(14, 2) || isVoid(14, 14) || isVoid(8, 8);
+                    doCity = !v;
+                }
 
-        if (doCity) {
-            doCityChunk(info, heightmap, chunk);
-        } else {
-            // We already have a prefilled core chunk (as generated from doCoreChunk)
-            doNormalChunk(info, heightmap);
-        }
+                if (doCity) {
+                    doCityChunk(info, heightmap, chunk);
+                } else {
+                    // We already have a prefilled core chunk (as generated from doCoreChunk)
+                    doNormalChunk(info, heightmap);
+                }
 
-        if (profile.isSpace() || profile.isSpheres()) {
-            if (CitySphere.isCitySphereCenter(coord, provider)) {
-                CitySphereSettings settings = provider.getWorldStyle().getCitysphereSettings();
-                if (settings != null && settings.getCenterpart() != null) {
-                    BuildingPart part = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), settings.getCenterpart());
-                    if (part != null) {
-                        int offset = settings.getCenterPartOffset();
-                        int partY = switch (settings.getCenterPartOrigin()) {
-                            case FIXED -> 0;
-                            case CENTER -> CitySphere.getCitySphere(coord, provider).getCenterPos().getY();
-                            case FIRSTFLOOR -> info.getCityGroundLevel();
-                            case GROUND -> info.groundLevel;
-                            case TOP -> getTopLevel(info);
-                        };
-                        partY += offset;
-                        generatePart(info, part, Transform.ROTATE_NONE, 0, partY, 0, HardAirSetting.WATERLEVEL);
+                if (profile.isSpace() || profile.isSpheres()) {
+                    if (CitySphere.isCitySphereCenter(coord, provider)) {
+                        CitySphereSettings settings = provider.getWorldStyle().getCitysphereSettings();
+                        if (settings != null && settings.getCenterpart() != null) {
+                            BuildingPart part = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), settings.getCenterpart());
+                            if (part != null) {
+                                int offset = settings.getCenterPartOffset();
+                                int partY = switch (settings.getCenterPartOrigin()) {
+                                    case FIXED -> 0;
+                                    case CENTER -> CitySphere.getCitySphere(coord, provider).getCenterPos().getY();
+                                    case FIRSTFLOOR -> info.getCityGroundLevel();
+                                    case GROUND -> info.groundLevel;
+                                    case TOP -> getTopLevel(info);
+                                };
+                                partY += offset;
+                                generatePart(info, part, Transform.ROTATE_NONE, 0, partY, 0, HardAirSetting.WATERLEVEL);
+                            }
+                        }
                     }
                 }
-            }
-        }
 
-        Railway.RailChunkInfo railInfo = info.getRailInfo();
-        if (railInfo.getType() != RailChunkType.NONE) {
-            Railways.generateRailways(this, info, railInfo, heightmap);
-        }
-        Railways.generateRailwayDungeons(this, info);
+                Railway.RailChunkInfo railInfo = info.getRailInfo();
+                if (railInfo.getType() != RailChunkType.NONE) {
+                    Railways.generateRailways(this, info, railInfo, heightmap);
+                }
+                Railways.generateRailwayDungeons(this, info);
 
 //        if (profile.isSpace()) {
 //            generateMonorails(info);
 //        }
 //
-        fixTorches(info);
+                fixTorches(info);
 
-        // We make a new random here because the primer for a normal chunk may have
-        // been cached and we want to be able to do the same when returning from a cached
-        // primer vs generating it here
-        GenerationContext.current().random().setSeed(chunkX * 257017164707L + chunkZ * 101754694003L);
+                // We make a new random here because the primer for a normal chunk may have
+                // been cached and we want to be able to do the same when returning from a cached
+                // primer vs generating it here
+                GenerationContext.current().random().setSeed(chunkX * 257017164707L + chunkZ * 101754694003L);
 
-        LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, getDriver().getPrimer());
-        LostCityEvent.PreExplosionEvent posted = NeoForge.EVENT_BUS.post(event);    // @todo 1.21 is this right?
-        if (!posted.isCanceled()) {
-            if (info.getDamageArea().hasExplosions()) {
-                breakBlocksForDamageNew(chunkX, chunkZ, info);
-                fixAfterExplosion(info);
-            }
-            generateDebris(info);
-        }
+                LostCityEvent.PreExplosionEvent event = new LostCityEvent.PreExplosionEvent(provider.getWorld(), LostCities.lostCitiesImp, chunkX, chunkZ, getDriver().getPrimer());
+                LostCityEvent.PreExplosionEvent posted = NeoForge.EVENT_BUS.post(event);    // @todo 1.21 is this right?
+                if (!posted.isCanceled()) {
+                    if (info.getDamageArea().hasExplosions()) {
+                        breakBlocksForDamageNew(chunkX, chunkZ, info);
+                    }
+                    generateDebris(info);
+                }
 
                 getDriver().actuallyGenerate(chunk);
             } finally {
@@ -579,7 +587,9 @@ public class LostCityTerrainFeature {
      *
      * Every normal chunk is made to fit between the lower and the upper mesh by moving down
      * or up the top layer (6 thick) of the terrain. In a chunk these heights are interpolated
-     * (bilinear interpolation).
+     * (bilinear interpolation). World-coordinate coherent noise perturbs the interpolated mesh
+     * away from tightly constrained city edges. This breaks up long, regular contour lines while
+     * keeping the terrain flush with the city and continuous across chunk boundaries.
      */
     private void correctTerrainShape(WorldGenLevel level, ChunkCoord coord, ChunkHeightmap heightmap) {
         BuildingInfo info = BuildingInfo.getBuildingInfo(coord, provider);
@@ -639,13 +649,18 @@ public class LostCityTerrainFeature {
                 float minh1 = min10 + (min00 - min10) * factor;
                 for (int z = 0; z < 16; z++) {
                     float maxheight = maxh0 + (maxh1 - maxh0) * (15.0f - z) / 15.0f;
+                    float minheight = minh0 + (minh1 - minh0) * (15.0f - z) / 15.0f;
+                    float transitionFreedom = Math.max(0.0f, maxheight - minheight - 4.0f);
+                    float noiseStrength = Math.min(1.0f, transitionFreedom / 20.0f);
+                    float noiseOffset = getTerrainTransitionNoise(coord, x, z) * noiseStrength;
+                    maxheight += noiseOffset;
+                    minheight += noiseOffset;
                     if (maxheight > max) {
                         maxheight = max;
                     }
                     int maxTouchedY = moveDown(x, z, (int) maxheight, max);
 
                     if (maxTouchedY == Short.MIN_VALUE) {
-                        float minheight = minh0 + (minh1 - minh0) * (15.0f - z) / 15.0f;
                         if (minheight < min) {
                             minheight = min;
                         }
@@ -663,6 +678,14 @@ public class LostCityTerrainFeature {
         }
     }
 
+    private float getTerrainTransitionNoise(ChunkCoord coord, int x, int z) {
+        int worldX = (coord.chunkX() << 4) + x;
+        int worldZ = (coord.chunkZ() << 4) + z;
+        double broad = terrainTransitionNoise.getValue(worldX / 28.0, worldZ / 28.0) * 3.0;
+        double detail = terrainTransitionNoise.getValue((worldX + 10000) / 11.0, (worldZ - 10000) / 11.0);
+        return (float) (broad + detail);
+    }
+
     // Return true if state is air or liquid
     public static boolean isEmpty(BlockState state) {
         if (state.isAir()) {
@@ -677,12 +700,13 @@ public class LostCityTerrainFeature {
         return false;
     }
 
-    // Return true if state is Empty or Plant based - stops (most) funny tree/mushroom action on chunk borders
+    // Return true if state is empty, plant based, or climbable. Terrain correction must look
+    // through these blocks to find the actual surface instead of relocating them as ground.
     private static boolean isFoliageOrEmpty(BlockState state) {
         if (isEmpty(state)) {
             return true;
         }
-        return Tools.hasTag(state.getBlock(), LostTags.FOLIAGE_TAG);
+        return state.is(BlockTags.CLIMBABLE) || Tools.hasTag(state.getBlock(), LostTags.FOLIAGE_TAG);
     }
 
     // Return the new max height of the chunk in this column. Or Short.MIN_VALUE if nothing was done
@@ -717,15 +741,18 @@ public class LostCityTerrainFeature {
         return maxYTouched;
     }
 
-    private final BlockState[] buffer = new BlockState[6];
-
     // Return the new max height of the chunk in this column. Or Short.MIN_VALUE if nothing was done
     private int moveDown(int x, int z, int height, int maxBuildLimit) {
         int maxYTouched = Short.MIN_VALUE;       // Max Y that we touched
-        int y = maxBuildLimit-1;
+        int y = maxBuildLimit - 1;
         getDriver().current(x, y, z);
-        // We assume here we are not in a void chunk
-        while (isEmpty(getDriver().getBlock()) && getDriver().getY() > height) {
+        int highestFoliage = Short.MIN_VALUE;
+        // Find the real terrain surface. Remember the top of vegetation so it can be cleared
+        // together with the terrain instead of being left suspended at its original height.
+        while (isFoliageOrEmpty(getDriver().getBlock()) && getDriver().getY() > height) {
+            if (!isEmpty(getDriver().getBlock())) {
+                highestFoliage = Math.max(highestFoliage, getDriver().getY());
+            }
             getDriver().decY();
         }
 
@@ -733,12 +760,19 @@ public class LostCityTerrainFeature {
             return maxYTouched; // Nothing to do
         }
 
-        // We arrived at our first non-air block
+        // Preserve six layers starting at the actual terrain surface. The old implementation
+        // started at the highest non-air block, which copied jungle vines into the soil buffer
+        // and pasted them unsupported onto the lowered slope.
+        int terrainSurface = getDriver().getY();
+        BlockState[] buffer = new BlockState[6];
         int bufferIdx = 0;
+        for (int sourceY = terrainSurface; sourceY >= height && bufferIdx < buffer.length; sourceY--) {
+            buffer[bufferIdx++] = getDriver().getBlock(x, sourceY, z);
+        }
+
+        int clearFrom = highestFoliage == Short.MIN_VALUE ? terrainSurface : highestFoliage;
+        getDriver().current(x, clearFrom, z);
         while (getDriver().getY() >= height) {
-            if (bufferIdx < buffer.length) {
-                buffer[bufferIdx++] = getDriver().getBlock();
-            }
             getDriver().block(air);
             getDriver().decY();
         }
@@ -818,10 +852,9 @@ public class LostCityTerrainFeature {
             left = (chunk.chunkZ() / heightSampleSize) * heightSampleSize;
             constX = chunk.chunkX() < 0 ? -1 : 1;
             constZ = chunk.chunkZ() < 0 ? -1 : 1;
-            if (heightSampleSize > 2) {
-                int sampleOffset = heightSampleSize / 2;
-                sampler = new ChunkCoord(chunk.dimension(), top + (sampleOffset * constX), left + (sampleOffset * constZ));
-            }
+            // Every member must use the same sample, including sample size 2.
+            int sampleOffset = heightSampleSize / 2;
+            sampler = new ChunkCoord(chunk.dimension(), top + (sampleOffset * constX), left + (sampleOffset * constZ));
         } else {
             top = chunk.chunkX();
             left = chunk.chunkZ();
@@ -837,6 +870,13 @@ public class LostCityTerrainFeature {
                 for (int i = 0; i < heightSampleSize; i++) {
                     for (int j = 0; j < heightSampleSize; j++) {
                         ChunkCoord sampleKey = new ChunkCoord(chunk.dimension(), top + (i * constX), left + (j * constZ));
+                        // Keep the historical groups on both sides of zero, but let only
+                        // the positive-side group own the axis. Negative groups next to
+                        // an axis are one chunk narrower and must not overwrite it.
+                        if ((constX < 0 && sampleKey.chunkX() == 0)
+                                || (constZ < 0 && sampleKey.chunkZ() == 0)) {
+                            continue;
+                        }
                         cachedHeightmaps.put(sampleKey, new ChunkHeightmap(heightmap));
                     }
                 }
@@ -960,60 +1000,6 @@ public class LostCityTerrainFeature {
                 };
 
                 generatePart(info, stairs, transform, 0, oy, 0, HardAirSetting.AIR);
-            }
-        }
-    }
-
-    private int countNotEmpty(int y, int max) {
-        int cnt = 0;
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                if (getDriver().getBlock(x, y, z) != air) {
-                    cnt++;
-                    if (cnt >= max) {
-                        return cnt;
-                    }
-                }
-            }
-        }
-        return cnt;
-    }
-
-    /// Fix floating blocks after an explosion
-    private void fixAfterExplosion(BuildingInfo info) {
-        if (info.profile.isCavern() && !info.hasBuilding) {
-            // In a cavern we only do this correction when there is a building
-            return;
-        }
-
-        int start = info.getDamageArea().getLowestExplosionHeight();
-        if (start == -1) {
-            // Nothing is affected
-            return;
-        }
-        int end = info.getDamageArea().getHighestExplosionHeight();
-
-        for (int y = start; y <= end; y++) {
-            int count = countNotEmpty(y, 20);
-            if (count < 16) {   // @todo configurable?
-                // (Almost) empty! That means everything above this can be deleted
-                // Except in a cavern, there we only delete the building
-                if (info.profile.isCavern()) {
-                    // We know we have a building
-                    int maxY = info.getCityGroundLevel() + info.getNumFloors() * FLOORHEIGHT;
-                    for (int x = 0; x < 16; x++) {
-                        for (int z = 0; z < 16; z++) {
-                            getDriver().setBlockRangeToAir(x, y + 1, z, maxY);
-                        }
-                    }
-                } else {
-                    for (int x = 0; x < 16; x++) {
-                        for (int z = 0; z < 16; z++) {
-                            getDriver().setBlockRangeToAir(x, y + 1, z, 256);  // @todo hardcoded height
-                        }
-                    }
-                }
-                break;
             }
         }
     }
@@ -1678,7 +1664,7 @@ public class LostCityTerrainFeature {
     }
 
     private void generateMinorStreetConnector(BuildingInfo info, BuildingInfo adjacent, StreetParts parts,
-                                               int height, Transform transform) {
+                                              int height, Transform transform) {
         if (BuildingInfo.hasRoadConnection(info, adjacent) && !adjacent.isPrimaryRoad()) {
             BuildingPart connector = AssetRegistries.PARTS.getOrWarn(provider.getWorld(), getRandomPart(parts.connector()));
             if (connector != null) {
@@ -1764,8 +1750,8 @@ public class LostCityTerrainFeature {
      * Otherwise they are replaced with air.
      */
     public int generatePart(BuildingInfo info, IBuildingPart part,
-                             Transform transform,
-                             int ox, int oy, int oz, HardAirSetting airWaterLevel) {
+                            Transform transform,
+                            int ox, int oy, int oz, HardAirSetting airWaterLevel) {
         if (profile.EDITMODE) {
             EditModeData.getData().addPartData(info.coord, oy, part.getName());
         }
@@ -1898,7 +1884,7 @@ public class LostCityTerrainFeature {
         if (b.getBlock() == Blocks.COMMAND_BLOCK) {
             info.addPostTodo(pos, () -> {
                 WorldGenLevel inWorld = info.provider.getWorld();
-                ((ServerChunkCache)inWorld.getChunkSource()).blockChanged(pos);
+                ((ServerChunkCache) inWorld.getChunkSource()).blockChanged(pos);
                 inWorld.scheduleTick(pos, b.getBlock(), 1);
             });
         }
@@ -1973,7 +1959,7 @@ public class LostCityTerrainFeature {
         return b;
     }
 
-    private BlockState transformBlockState(Transform transform, BlockState b) {
+    public BlockState transformBlockState(Transform transform, BlockState b) {
         if (Tools.hasTag(b.getBlock(), LostTags.ROTATABLE_TAG)) {
             b = b.rotate(transform.getMcRotation());
         } else if (getRailStates().contains(b)) {

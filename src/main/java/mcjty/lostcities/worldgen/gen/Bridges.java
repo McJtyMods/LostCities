@@ -6,6 +6,8 @@ import mcjty.lostcities.worldgen.ChunkDriver;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.Orientation;
+import mcjty.lostcities.worldgen.lost.Transform;
+import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
 import mcjty.lostcities.worldgen.lost.cityassets.BuildingPart;
 import mcjty.lostcities.worldgen.lost.cityassets.CompiledPalette;
 import mcjty.lostcities.worldgen.lost.cityassets.Palette;
@@ -63,20 +65,42 @@ public class Bridges {
         }
 
         Character support = bt.getMetaChar(ILostCities.META_SUPPORT);
-        if (info.profile.BRIDGE_SUPPORTS && support != null) {
-            BlockState sup = compiledPalette.get(support);
+        String supportPartName = null;
+        CompiledPalette supportPalette = compiledPalette;
+        if (support == null) {
+            Character citySupport = info.getCityStyle().getBridgeSupport();
+            support = citySupport == null ? info.provider.getWorldStyle().getBridgeSupport() : citySupport;
+            supportPartName = info.getCityStyle().getBridgeSupportPart();
+            // An explicit city support character also selects block supports for that city.
+            // Otherwise, an unset city support part falls back to the world support part.
+            if (supportPartName == null && citySupport == null) {
+                supportPartName = info.provider.getWorldStyle().getBridgeSupportPart();
+            }
+            supportPalette = info.getCompiledPalette();
+        }
+        if (info.profile.BRIDGE_SUPPORTS && (support != null || supportPartName != null)) {
+            BlockState sup = support == null ? null : supportPalette.get(support);
+            if (support != null && sup == null) {
+                throw new RuntimeException("Cannot find support block '" + support + "' for bridge part '" + bt.getName() + "'!");
+            }
             BuildingInfo minDir = orientation.getMinDir().get(info);
             BuildingInfo maxDir = orientation.getMaxDir().get(info);
             if (minDir.hasBridge(info.provider, orientation) != null && maxDir.hasBridge(info.provider, orientation) != null) {
                 // Needs support
-                for (int y = info.waterLevel - 10; y <= info.groundLevel; y++) {
-                    driver.current(7, y, 7).block(sup);
-                    driver.current(7, y, 8).block(sup);
-                    driver.current(8, y, 7).block(sup);
-                    driver.current(8, y, 8).block(sup);
+                if (supportPartName != null) {
+                    BuildingPart supportPart = AssetRegistries.PARTS.getOrThrow(info.provider.getWorld(), supportPartName);
+                    Transform transform = orientation == Orientation.X ? Transform.ROTATE_NONE : Transform.MIRROR_90_X;
+                    Supports.generatePart(feature, info, supportPart, transform, bridgeLevel - 1);
+                } else {
+                    for (int y = info.waterLevel - 10; y <= info.groundLevel; y++) {
+                        driver.current(7, y, 7).block(sup);
+                        driver.current(7, y, 8).block(sup);
+                        driver.current(8, y, 7).block(sup);
+                        driver.current(8, y, 8).block(sup);
+                    }
                 }
             }
-            if (minDir.hasBridge(info.provider, orientation) == null) {
+            if (sup != null && minDir.hasBridge(info.provider, orientation) == null) {
                 // Connection to the side section
                 if (orientation == Orientation.X) {
                     int x = 0;
@@ -92,7 +116,7 @@ public class Bridges {
                     }
                 }
             }
-            if (maxDir.hasBridge(info.provider, orientation) == null) {
+            if (sup != null && maxDir.hasBridge(info.provider, orientation) == null) {
                 // Connection to the side section
                 if (orientation == Orientation.X) {
                     int x = 15;

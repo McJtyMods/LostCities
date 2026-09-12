@@ -1,10 +1,10 @@
 {
   "values": [
-    "#minecraft:leaves",
     "#minecraft:flowers",
     "#minecraft:bamboo_blocks",
-    "#minecraft:logs",
     "#minecraft:coral_plants",
+    "#minecraft:logs",
+    "#minecraft:leaves",
     "#minecraft:saplings"
   ]
 }

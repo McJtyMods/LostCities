@@ -27,6 +27,10 @@ public class WorldStyle implements ILostCityAsset {
     private final CitySphereSettings citysphereSettings;
     private final ScatteredSettings scatteredSettings;
     @Nonnull private final PartSelector partSelector;
+    private final Character bridgeSupport;
+    private final Character highwaySupport;
+    private final String bridgeSupportPart;
+    private final String highwaySupportPart;
     private final List<Pair<Predicate<Holder<Biome>>, Pair<Float, String>>> cityStyleSelector = new ArrayList<>();
     private final List<Pair<Predicate<Holder<Biome>>, Float>> cityBiomeMultiplier = new ArrayList<>();
     @Nonnull private final MultiSettings multiSettings;
@@ -37,6 +41,10 @@ public class WorldStyle implements ILostCityAsset {
         this.citysphereSettings = object.getCitysphereSettings();
         this.scatteredSettings = object.getScatteredSettings();
         this.partSelector = object.getPartSelector();
+        this.bridgeSupport = object.getBridgeSupport();
+        this.highwaySupport = object.getHighwaySupport();
+        this.bridgeSupportPart = object.getBridgeSupportPart();
+        this.highwaySupportPart = object.getHighwaySupportPart();
         this.multiSettings = object.getMultiSettings();
         this.worldSettings = object.getWorldSettings();
         outsideStyle = object.getOutsideStyle();
@@ -71,6 +79,26 @@ public class WorldStyle implements ILostCityAsset {
     @Nonnull
     public PartSelector getPartSelector() {
         return partSelector;
+    }
+
+    @Nullable
+    public Character getBridgeSupport() {
+        return bridgeSupport;
+    }
+
+    @Nullable
+    public Character getHighwaySupport() {
+        return highwaySupport;
+    }
+
+    @Nullable
+    public String getBridgeSupportPart() {
+        return bridgeSupportPart;
+    }
+
+    @Nullable
+    public String getHighwaySupportPart() {
+        return highwaySupportPart;
     }
 
     public CitySphereSettings getCitysphereSettings() {
