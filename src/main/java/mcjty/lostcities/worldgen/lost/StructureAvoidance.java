@@ -69,9 +69,15 @@ public final class StructureAvoidance {
      * Check the complete footprint containing {@code coord}. A structure anywhere inside a
      * multibuilding footprint rejects the entire multibuilding, while DIRECT remains reserved for
      * a reference in {@code coord} itself so terrain flattening is only suppressed where needed.
+     * When terrain flattening is disabled for avoided structures, the adjacent chunks are also
+     * kept city-free so the normal terrain correction can use them as a transition ring.
      */
     public static Result check(ChunkCoord coord, MultiPos multiPos, WorldGenLevel level) {
-        boolean checkAdjacent = Config.AVOID_VILLAGES_ADJACENT.get() || Config.AVOID_STRUCTURES_ADJACENT.get();
+        boolean terrainTransition = Config.AVOID_FLATTENING.get()
+                && (Config.AVOID_VILLAGES.get() || Config.hasAvoidedStructures());
+        boolean checkAdjacent = terrainTransition
+                || Config.AVOID_VILLAGES_ADJACENT.get()
+                || Config.AVOID_STRUCTURES_ADJACENT.get();
         if (!checkAdjacent && !Config.AVOID_VILLAGES.get() && !Config.hasAvoidedStructures()) {
             return Result.NONE;
         }
@@ -88,14 +94,14 @@ public final class StructureAvoidance {
         if (multiPos.isMulti()) {
             FootprintKey key = new FootprintKey(coord.dimension(), minX, minZ, maxX, maxZ, margin);
             FootprintDecision decision = MULTIBUILDING_DECISIONS.computeIfAbsent(key,
-                    ignored -> resolveFootprint(region, minX, minZ, maxX, maxZ, margin));
+                    ignored -> resolveFootprint(region, minX, minZ, maxX, maxZ, margin, terrainTransition));
             if (!decision.avoidsCity()) {
                 return Result.NONE;
             }
             // The shared decision controls city avoidance. Resolve DIRECT locally so terrain
             // flattening is still suppressed if this chunk's references became available later.
             ChunkAccess current = getChunkWithStructureReferences(region, coord.chunkX(), coord.chunkZ());
-            return current != null && hasAvoidedStructure(region, current, true)
+            return current != null && hasAvoidedStructure(region, current, true, terrainTransition)
                     ? Result.DIRECT
                     : Result.ADJACENT;
         }
@@ -111,7 +117,7 @@ public final class StructureAvoidance {
                 }
                 boolean insideFootprint = chunkX >= minX && chunkX <= maxX
                         && chunkZ >= minZ && chunkZ <= maxZ;
-                if (hasAvoidedStructure(region, chunk, insideFootprint)) {
+                if (hasAvoidedStructure(region, chunk, insideFootprint, terrainTransition)) {
                     if (chunkX == coord.chunkX() && chunkZ == coord.chunkZ()) {
                         return Result.DIRECT;
                     }
@@ -134,7 +140,7 @@ public final class StructureAvoidance {
      * sufficient to reject the complete footprint.
      */
     private static FootprintDecision resolveFootprint(WorldGenRegion region, int minX, int minZ,
-                                                       int maxX, int maxZ, int margin) {
+                                                       int maxX, int maxZ, int margin, boolean terrainTransition) {
         for (int chunkX = minX - margin; chunkX <= maxX + margin; chunkX++) {
             for (int chunkZ = minZ - margin; chunkZ <= maxZ + margin; chunkZ++) {
                 ChunkAccess chunk = getChunkWithStructureReferences(region, chunkX, chunkZ);
@@ -143,7 +149,7 @@ public final class StructureAvoidance {
                 }
                 boolean insideFootprint = chunkX >= minX && chunkX <= maxX
                         && chunkZ >= minZ && chunkZ <= maxZ;
-                if (hasAvoidedStructure(region, chunk, insideFootprint)) {
+                if (hasAvoidedStructure(region, chunk, insideFootprint, terrainTransition)) {
                     return FootprintDecision.AVOID;
                 }
             }
@@ -158,7 +164,7 @@ public final class StructureAvoidance {
         return region.getChunk(chunkX, chunkZ, ChunkStatus.STRUCTURE_REFERENCES, false);
     }
 
-    private static boolean hasAvoidedStructure(WorldGenRegion region, ChunkAccess chunk, boolean insideFootprint) {
+    private static boolean hasAvoidedStructure(WorldGenRegion region, ChunkAccess chunk, boolean insideFootprint, boolean terrainTransition) {
         if (!chunk.hasAnyStructureReferences()) {
             return false;
         }
@@ -169,11 +175,12 @@ public final class StructureAvoidance {
                 continue;
             }
             Optional<ResourceKey<Structure>> key = structures.getResourceKey(entry.getKey());
-            if (Config.AVOID_VILLAGES.get() && (insideFootprint || Config.AVOID_VILLAGES_ADJACENT.get())
+            if (Config.AVOID_VILLAGES.get()
+                    && (insideFootprint || terrainTransition || Config.AVOID_VILLAGES_ADJACENT.get())
                     && key.map(k -> structures.getHolderOrThrow(k).is(StructureTags.VILLAGE)).orElse(false)) {
                 return true;
             }
-            if ((insideFootprint || Config.AVOID_STRUCTURES_ADJACENT.get())
+            if ((insideFootprint || terrainTransition || Config.AVOID_STRUCTURES_ADJACENT.get())
                     && key.map(k -> Config.isAvoidedStructure(k.location())).orElse(false)) {
                 return true;
             }

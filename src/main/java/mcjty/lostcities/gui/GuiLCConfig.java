@@ -221,6 +221,8 @@ public class GuiLCConfig extends Screen {
         addInt(left, "lostcity.highwayDistanceMask").label("Distance mask:"); nl();
         addBool(left, "lostcity.railwaysEnabled").label("Railways:"); nl();
         addInt(left, "lostcity.railwayLevelOffset").label("Rail offset:"); nl();
+        addInt(left, "lostcity.railwaySpacingNorthSouth").label("Rail N-S gap:"); nl();
+        addInt(left, "lostcity.railwaySpacingEastWest").label("Rail E-W gap:"); nl();
     }
 
     private void initCities(int left) {
@@ -295,14 +297,23 @@ public class GuiLCConfig extends Screen {
 
         Configuration configuration = profile.toConfiguration();
         Configuration.Value<Object> definition = configuration.getValue(attribute);
+        Object previousValue = definition.get();
         definition.set(value);
-        definition.constrain();
+        if (definition.constrain()) {
+            String error;
+            if (!definition.getAllowedValues().isEmpty()) {
+                error = "Value must be one of " + definition.getAllowedValues();
+            } else {
+                error = "Value must be between " + definition.getMin() + " and " + definition.getMax();
+            }
+            return new ConfigUpdateResult(false, previousValue, error);
+        }
 
         LostCityProfile candidate = new LostCityProfile("gui_validation", false);
         try {
             candidate.copyFromConfiguration(configuration);
         } catch (RuntimeException e) {
-            return new ConfigUpdateResult(false, profile.toConfiguration().get(attribute), e.getMessage());
+            return new ConfigUpdateResult(false, previousValue, e.getMessage());
         }
 
         profile.copyFromConfiguration(configuration);
