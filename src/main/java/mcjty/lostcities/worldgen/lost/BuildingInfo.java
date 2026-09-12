@@ -330,6 +330,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return buildingType;
     }
 
+    @Override
     public CityStyle getCityStyle() {
         return (CityStyle) getChunkCharacteristics(coord, provider).cityStyle;
     }

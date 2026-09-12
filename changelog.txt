@@ -1,4 +1,5 @@
 1.20-7.5.5:
+- Exposed the current chunk's city style through the API, including outside cities, so integrations can match styles away from city centers
 - Fixed overlapping terrain-height samples near coordinate axes that could break multibuilding generation, and made size-2 sampling deterministic; floor-selection errors now identify the failing building and floor
 - Made steep terrain-to-city transitions less regular and removed floating vines left by terrain correction or invalid supports
 - Added world- and city-style bridge support settings and world-style highway support settings, including reusable vertical support parts while preserving legacy part metadata
