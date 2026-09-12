@@ -44,6 +44,20 @@ public class LCBlockTags extends BlockTagsProvider {
             }
         });
 
+        // Keep the lighting tag reproducible alongside the other generated block tags.
+        tag(LostTags.LIGHTS_TAG).add(
+                Blocks.LAVA, Blocks.BROWN_MUSHROOM, Blocks.TORCH, Blocks.WALL_TORCH,
+                Blocks.FIRE, Blocks.SOUL_FIRE, Blocks.REDSTONE_TORCH, Blocks.REDSTONE_WALL_TORCH,
+                Blocks.SOUL_TORCH, Blocks.SOUL_WALL_TORCH, Blocks.GLOWSTONE, Blocks.NETHER_PORTAL,
+                Blocks.JACK_O_LANTERN, Blocks.ENCHANTING_TABLE, Blocks.BREWING_STAND, Blocks.LAVA_CAULDRON,
+                Blocks.END_PORTAL, Blocks.END_PORTAL_FRAME, Blocks.DRAGON_EGG, Blocks.ENDER_CHEST,
+                Blocks.BEACON, Blocks.LIGHT, Blocks.SEA_LANTERN, Blocks.END_ROD,
+                Blocks.END_GATEWAY, Blocks.MAGMA_BLOCK, Blocks.SEA_PICKLE, Blocks.CONDUIT,
+                Blocks.LANTERN, Blocks.SOUL_LANTERN, Blocks.CAMPFIRE, Blocks.SOUL_CAMPFIRE,
+                Blocks.SHROOMLIGHT, Blocks.CRYING_OBSIDIAN, Blocks.AMETHYST_CLUSTER, Blocks.LARGE_AMETHYST_BUD,
+                Blocks.MEDIUM_AMETHYST_BUD, Blocks.SMALL_AMETHYST_BUD, Blocks.SCULK_SENSOR, Blocks.CALIBRATED_SCULK_SENSOR,
+                Blocks.SCULK_CATALYST, Blocks.OCHRE_FROGLIGHT, Blocks.VERDANT_FROGLIGHT, Blocks.PEARLESCENT_FROGLIGHT);
+
         tag(LostTags.ROTATABLE_TAG)
                 .addTag(net.minecraft.tags.BlockTags.STAIRS)
                 .addTag(net.minecraft.tags.BlockTags.DOORS);

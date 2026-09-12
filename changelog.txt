@@ -1,4 +1,5 @@
 1.21-8.4.4:
+- Fixed block tags using the obsolete directory on Minecraft 1.21, preventing stairs and doors from rotating with generated parts
 - Exposed the current chunk's city style through the API, including outside cities
 - Fixed overlapping terrain-height samples near coordinate axes and made size-2 sampling deterministic; floor-selection errors now identify the building and floor
 - Made steep terrain-to-city transitions less regular and removed floating vines left by terrain correction or invalid supports
