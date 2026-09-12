@@ -48,3 +48,18 @@ Listeners cancel `PRE_GEN_CITY_CHUNK` or `PRE_EXPLOSION` by calling
 `setCanceled(true)` on the event. Fabric has no NeoForge IMC equivalent;
 integrations can access `LostCities.lostCitiesImp` directly after mod
 initialization.
+
+## Shared generation updates
+
+26.2-11.0.1-fabric incorporates NeoForge commit
+`860bdaf9c4cf41eb00c3d7e2dc9cad34b594563a`, retaining Fabric event callbacks
+and the Fabric tag provider. `ILostChunkInfo.getCityStyle()` exposes the resolved
+city style both inside and outside cities, including the neighboring majority
+style for city streets and the world-style fallback outside city influences.
+
+The update makes terrain-height sampling deterministic near coordinate axes,
+varies steep city-edge terrain transitions, removes unsupported vines, and
+removes explosion cleanup that could carve chunk-sized gaps. Avoided structures
+retain a city-free transition ring when flattening is disabled. Railway spacing
+and support asset configuration are documented in [profile options](profile_options.md)
+and [support assets](support_assets.md).

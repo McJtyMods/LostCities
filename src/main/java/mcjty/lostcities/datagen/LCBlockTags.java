@@ -43,6 +43,20 @@ public class LCBlockTags extends FabricTagsProvider.BlockTagsProvider {
             }
         });
 
+        // Keep the lighting tag reproducible alongside the other generated block tags.
+        builder(LostTags.LIGHTS_TAG).add(
+                Blocks.LAVA.builtInRegistryHolder().key(), Blocks.BROWN_MUSHROOM.builtInRegistryHolder().key(), Blocks.TORCH.builtInRegistryHolder().key(), Blocks.WALL_TORCH.builtInRegistryHolder().key(),
+                Blocks.FIRE.builtInRegistryHolder().key(), Blocks.SOUL_FIRE.builtInRegistryHolder().key(), Blocks.REDSTONE_TORCH.builtInRegistryHolder().key(), Blocks.REDSTONE_WALL_TORCH.builtInRegistryHolder().key(),
+                Blocks.SOUL_TORCH.builtInRegistryHolder().key(), Blocks.SOUL_WALL_TORCH.builtInRegistryHolder().key(), Blocks.GLOWSTONE.builtInRegistryHolder().key(), Blocks.NETHER_PORTAL.builtInRegistryHolder().key(),
+                Blocks.JACK_O_LANTERN.builtInRegistryHolder().key(), Blocks.ENCHANTING_TABLE.builtInRegistryHolder().key(), Blocks.BREWING_STAND.builtInRegistryHolder().key(), Blocks.LAVA_CAULDRON.builtInRegistryHolder().key(),
+                Blocks.END_PORTAL.builtInRegistryHolder().key(), Blocks.END_PORTAL_FRAME.builtInRegistryHolder().key(), Blocks.DRAGON_EGG.builtInRegistryHolder().key(), Blocks.ENDER_CHEST.builtInRegistryHolder().key(),
+                Blocks.BEACON.builtInRegistryHolder().key(), Blocks.LIGHT.builtInRegistryHolder().key(), Blocks.SEA_LANTERN.builtInRegistryHolder().key(), Blocks.END_ROD.builtInRegistryHolder().key(),
+                Blocks.END_GATEWAY.builtInRegistryHolder().key(), Blocks.MAGMA_BLOCK.builtInRegistryHolder().key(), Blocks.SEA_PICKLE.builtInRegistryHolder().key(), Blocks.CONDUIT.builtInRegistryHolder().key(),
+                Blocks.LANTERN.builtInRegistryHolder().key(), Blocks.SOUL_LANTERN.builtInRegistryHolder().key(), Blocks.CAMPFIRE.builtInRegistryHolder().key(), Blocks.SOUL_CAMPFIRE.builtInRegistryHolder().key(),
+                Blocks.SHROOMLIGHT.builtInRegistryHolder().key(), Blocks.CRYING_OBSIDIAN.builtInRegistryHolder().key(), Blocks.AMETHYST_CLUSTER.builtInRegistryHolder().key(), Blocks.LARGE_AMETHYST_BUD.builtInRegistryHolder().key(),
+                Blocks.MEDIUM_AMETHYST_BUD.builtInRegistryHolder().key(), Blocks.SMALL_AMETHYST_BUD.builtInRegistryHolder().key(), Blocks.SCULK_SENSOR.builtInRegistryHolder().key(), Blocks.CALIBRATED_SCULK_SENSOR.builtInRegistryHolder().key(),
+                Blocks.SCULK_CATALYST.builtInRegistryHolder().key(), Blocks.OCHRE_FROGLIGHT.builtInRegistryHolder().key(), Blocks.VERDANT_FROGLIGHT.builtInRegistryHolder().key(), Blocks.PEARLESCENT_FROGLIGHT.builtInRegistryHolder().key());
+
         builder(LostTags.ROTATABLE_TAG).addOptionalTag(BlockTags.STAIRS).addOptionalTag(BlockTags.DOORS);
         builder(LostTags.NOT_BREAKABLE_TAG).add(
                 Blocks.BEDROCK.builtInRegistryHolder().key(),
