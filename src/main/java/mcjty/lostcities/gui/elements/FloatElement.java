@@ -1,10 +1,10 @@
 package mcjty.lostcities.gui.elements;
 
-import mcjty.lostcities.config.Configuration;
 import mcjty.lostcities.gui.GuiLCConfig;
 import mcjty.lostcities.varia.ComponentFactory;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 
 public class FloatElement extends GuiElement {
 
@@ -29,24 +29,13 @@ public class FloatElement extends GuiElement {
 //            }
         };
         field.setResponder(s -> {
-            gui.getLocalSetup().get().ifPresent(profile -> {
-                Configuration configuration = profile.toConfiguration();
-
-                float value = 0;
-                try {
-                    value = Float.parseFloat(s);
-                } catch (NumberFormatException e) {
-                    return;
-                }
-                Configuration.Value val = configuration.getValue(attribute);
-                val.set(value);
-                if (val.constrain()) {
-                    // It was constraint to min/max. Restore the field
-                    setValue(val.get());
-                }
-                profile.copyFromConfiguration(configuration);
-                gui.refreshPreview();
-            });
+            float value;
+            try {
+                value = Float.parseFloat(s);
+            } catch (NumberFormatException e) {
+                return;
+            }
+            showValidation(gui.updateProfileValue(attribute, value).error());
         });
         gui.addWidget(field);
     }
@@ -91,6 +80,11 @@ public class FloatElement extends GuiElement {
         } else if (result instanceof Integer) {
             field.setValue(Integer.toString((Integer)result));
         }
+    }
+
+    private void showValidation(String error) {
+        field.setTextColor(error == null ? 0xffe0e0e0 : 0xffff5555);
+        field.setTooltip(error == null ? null : Tooltip.create(ComponentFactory.literal("Invalid value: " + error)));
     }
 
     @Override

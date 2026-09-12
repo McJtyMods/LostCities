@@ -1,3 +1,14 @@
+26.1.2-10.0.4:
+- Fixed block tags using the obsolete directory on Minecraft 26.1.2, preventing stairs and doors from rotating with generated parts
+- Exposed the current chunk's city style through the API, including outside cities
+- Fixed overlapping terrain-height samples near coordinate axes and made size-2 sampling deterministic; floor-selection errors now identify the building and floor
+- Made steep terrain-to-city transitions less regular and removed floating vines left by terrain correction or invalid supports
+- Added world- and city-style bridge supports and world-style highway supports, including reusable vertical support parts and legacy metadata compatibility
+- Fixed numeric profile fields replacing temporary input while typing multi-digit values
+- Added separate north-south and east-west railway spacing options, with safe surface-station slopes and highway avoidance
+- Removed explosion cleanup that could leave chunk-sized gaps, especially in highways
+- Avoided villages and structures now keep a terrain-transition ring when flattening is disabled
+
 26.1.2-10.0.3:
 - Fixed buttons on the Lost Cities world-customization screen rendering without backgrounds on Minecraft 26.1.2
 - Added a new railwayLevelOffset profile option to allow railways to be raised or lowered in 6-block increments, with stations and building cellars respecting the configured level

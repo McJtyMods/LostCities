@@ -326,6 +326,7 @@ public class BuildingInfo implements ILostChunkInfo {
         return buildingType;
     }
 
+    @Override
     public CityStyle getCityStyle() {
         return (CityStyle) getChunkCharacteristics(coord, provider).cityStyle;
     }
@@ -1053,7 +1054,11 @@ public class BuildingInfo implements ILostChunkInfo {
             };
             String randomPart = building.getRandomPart(rand, conditionContext);
             if (randomPart == null) {
-                throw new RuntimeException("Misconfiguration! Floor were generated for a building where no part condition matches!");
+                throw new RuntimeException("Misconfiguration! No part condition matches for building " + building.getId()
+                        + " at " + coord + ", floor=" + (i - cellars) + ", floors=" + floors
+                        + ", cellars=" + cellars + ", cityLevel=" + cityLevel + ", belowPart=" + belowPart
+                        + ", multiBuilding=" + (multiBuilding == null ? "<none>" : multiBuilding.getId())
+                        + ", multiPosition=" + multiBuildingPos);
             }
             belowPart = randomPart;
             floorTypes[i] = AssetRegistries.PARTS.getOrThrow(provider.getWorld(), randomPart);

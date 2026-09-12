@@ -78,6 +78,10 @@ public class CityStyle implements ILostCityCityStyle {
     private Character leavesBlock;
     private Character rubbleDirtBlock;
 
+    // Bridge support settings
+    private Character bridgeSupport;
+    private String bridgeSupportPart;
+
     private Float explosionChance;
     private String style;
     private final String inherit;
@@ -93,6 +97,8 @@ public class CityStyle implements ILostCityCityStyle {
             stuffTags.addAll(object.getStuffTags());
         }
         explosionChance = object.getExplosionChance();
+        bridgeSupport = object.getBridgeSupport();
+        bridgeSupportPart = object.getBridgeSupportPart();
         object.getProfileOverrides().ifPresent(overrides -> openLotParkChance = overrides.openLotParkChance());
         object.getBuildingSettings().ifPresent(s -> {
             buildingChance = s.getBuildingChance();
@@ -268,6 +274,14 @@ public class CityStyle implements ILostCityCityStyle {
 
     public Character getRubbleDirtBlock() {
         return rubbleDirtBlock;
+    }
+
+    public Character getBridgeSupport() {
+        return bridgeSupport;
+    }
+
+    public String getBridgeSupportPart() {
+        return bridgeSupportPart;
     }
 
     @Override
@@ -447,6 +461,12 @@ public class CityStyle implements ILostCityCityStyle {
                 }
                 if (sphereGlassBlock == null) {
                     sphereGlassBlock = inheritFrom.sphereGlassBlock;
+                }
+                if (bridgeSupport == null) {
+                    bridgeSupport = inheritFrom.bridgeSupport;
+                }
+                if (bridgeSupportPart == null) {
+                    bridgeSupportPart = inheritFrom.bridgeSupportPart;
                 }
             }
             initialized = true;
