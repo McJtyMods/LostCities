@@ -30,12 +30,17 @@ public final class ApproximateCityPotential implements CityPotential {
     private final double spawnMultiplier2;
     private final CityRarityMap rarityMap;
     private final Modifier modifier;
+    private final float maximumBiomeMultiplier;
 
     public ApproximateCityPotential(long seed, LostCityProfile profile) {
         this(seed, profile, (chunkX, chunkZ, potential) -> potential);
     }
 
     public ApproximateCityPotential(long seed, LostCityProfile profile, Modifier modifier) {
+        this(seed, profile, modifier, Float.NaN);
+    }
+
+    public ApproximateCityPotential(long seed, LostCityProfile profile, Modifier modifier, float maximumBiomeMultiplier) {
         cityChance = profile.CITY_CHANCE;
         cityMinRadius = profile.CITY_MINRADIUS;
         cityMaxRadius = profile.CITY_MAXRADIUS;
@@ -47,10 +52,33 @@ public final class ApproximateCityPotential implements CityPotential {
                 ? new CityRarityMap(seed, profile.CITY_PERLIN_SCALE, profile.CITY_PERLIN_OFFSET, profile.CITY_PERLIN_INNERSCALE)
                 : null;
         this.modifier = modifier;
+        this.maximumBiomeMultiplier = maximumBiomeMultiplier;
     }
 
     @Override
     public float getPotential(int chunkX, int chunkZ) {
+        return applyModifier(chunkX, chunkZ, getUnmodifiedPotential(chunkX, chunkZ));
+    }
+
+    @Override
+    public int getScoreWithUpperBound(int chunkX, int chunkZ, int requiredScore) {
+        float factor = getUnmodifiedPotential(chunkX, chunkZ);
+        if (factor > 0.0001f && Float.isFinite(factor)
+                && Float.isFinite(maximumBiomeMultiplier) && maximumBiomeMultiplier >= 1.0f) {
+            float upper = Math.nextUp(factor * maximumBiomeMultiplier);
+            if (CityPotential.score(upper) < requiredScore) {
+                return -1;
+            }
+        }
+        return CityPotential.score(applyModifier(chunkX, chunkZ, factor));
+    }
+
+    private float applyModifier(int chunkX, int chunkZ, float factor) {
+        factor = modifier.modify(chunkX, chunkZ, factor);
+        return Math.min(Math.max(factor, 0.0f), 1.0f);
+    }
+
+    private float getUnmodifiedPotential(int chunkX, int chunkZ) {
         float factor = cityChance < 0 ? rarityMap.getCityFactor(chunkX, chunkZ) : getCenterOverlap(chunkX, chunkZ);
         if (spawnDistance2 > 0) {
             double blockX = (double) chunkX * 16.0;
@@ -67,8 +95,7 @@ public final class ApproximateCityPotential implements CityPotential {
             }
             factor *= (float) multiplier;
         }
-        factor = modifier.modify(chunkX, chunkZ, factor);
-        return Math.min(Math.max(factor, 0.0f), 1.0f);
+        return factor;
     }
 
     private float getCenterOverlap(int chunkX, int chunkZ) {

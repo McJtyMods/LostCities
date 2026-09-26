@@ -12,8 +12,8 @@ import mcjty.lostcities.varia.CustomTeleporter;
 import mcjty.lostcities.varia.WorldTools;
 import mcjty.lostcities.worldgen.GlobalTodo;
 import mcjty.lostcities.worldgen.IDimensionInfo;
-import mcjty.lostcities.worldgen.LostCityWorldGenData;
 import mcjty.lostcities.worldgen.LostCityFeature;
+import mcjty.lostcities.worldgen.LostCityWorldGenData;
 import mcjty.lostcities.worldgen.gen.Scattered;
 import mcjty.lostcities.worldgen.lost.*;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
@@ -58,7 +58,6 @@ import java.util.function.Predicate;
 import static mcjty.lostcities.setup.Registration.LOSTCITY;
 
 public class ForgeEventHandlers {
-
     private final Map<ResourceKey<Level>, BlockPos> spawnPositions = new HashMap<>();
 
     @SubscribeEvent
@@ -210,11 +209,13 @@ public class ForgeEventHandlers {
             } else if (profile.FORCE_SPAWN_BUILDINGS.length > 0 || profile.FORCE_SPAWN_PARTS.length > 0) {
                 Set<String> buildings = Set.of(profile.FORCE_SPAWN_BUILDINGS);
                 Set<String> parts = Set.of(profile.FORCE_SPAWN_PARTS);
-                isSuitableChunk = isSuitableChunk.and(coord -> isForcedBuildingSpawnChunk(dimensionInfo, profile, buildings, parts, coord));
+                SpawnBuildingPrefilter prefilter = SpawnBuildingPrefilter.create(dimensionInfo, profile, buildings);
+                isSuitableChunk = isSuitableChunk.and(coord -> isForcedBuildingSpawnChunk(dimensionInfo, profile, buildings, parts, prefilter, coord));
                 needsCheck = true;
             } else if (profile.FORCE_SPAWN_IN_BUILDING) {
                 Set<String> empty = Set.of();
-                isSuitableChunk = isSuitableChunk.and(coord -> isForcedBuildingSpawnChunk(dimensionInfo, profile, empty, empty, coord));
+                SpawnBuildingPrefilter prefilter = SpawnBuildingPrefilter.create(dimensionInfo, profile, empty);
+                isSuitableChunk = isSuitableChunk.and(coord -> isForcedBuildingSpawnChunk(dimensionInfo, profile, empty, empty, prefilter, coord));
                 needsCheck = true;
             }
 
@@ -225,22 +226,26 @@ public class ForgeEventHandlers {
             switch (profile.LANDSCAPE_TYPE) {
                 case DEFAULT, SPHERES -> {
                     if (needsCheck) {
-                        BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
-                        serverLevel.setDefaultSpawnPos(pos, 0.0f);
-                        event.getSettings().setSpawn(pos, 0.0f);
-                        spawnPositions.put(serverLevel.dimension(), pos);
-                        event.setCanceled(true);
+                        setSpawnPoint(event, serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
                     }
                 }
-                case FLOATING, SPACE, CAVERN, CAVERNSPHERES -> {
-                    BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
-                    serverLevel.setDefaultSpawnPos(pos, 0.0f);
-                    event.getSettings().setSpawn(pos, 0.0f);
-                    spawnPositions.put(serverLevel.dimension(), pos);
-                    event.setCanceled(true);
-                }
+                case FLOATING, SPACE, CAVERN, CAVERNSPHERES -> setSpawnPoint(event, serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
             }
         }
+    }
+
+    private void setSpawnPoint(
+            LevelEvent.CreateSpawnPosition event,
+            ServerLevel serverLevel,
+            IDimensionInfo dimensionInfo,
+            Predicate<BlockPos> isSuitable,
+            Predicate<ChunkCoord> isSuitableChunk
+    ) {
+        BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
+        event.getSettings().setSpawn(pos, 0.0f);
+        serverLevel.setDefaultSpawnPos(pos, 0.0f);
+        spawnPositions.put(serverLevel.dimension(), pos);
+        event.setCanceled(true);
     }
 
     private boolean isOutsideBuilding(IDimensionInfo provider, ChunkCoord coord) {
@@ -248,7 +253,16 @@ public class ForgeEventHandlers {
         return !(info.isCity() && info.hasBuilding);
     }
 
-    private boolean isForcedBuildingSpawnChunk(IDimensionInfo dimensionInfo, LostCityProfile profile, Set<String> buildings, Set<String> parts, ChunkCoord coord) {
+    private boolean isForcedBuildingSpawnChunk(IDimensionInfo dimensionInfo, LostCityProfile profile, Set<String> buildings,
+                                               Set<String> parts, SpawnBuildingPrefilter prefilter, ChunkCoord coord) {
+        SpawnBuildingPrefilter.Result preliminary = prefilter.test(coord);
+        if (preliminary == SpawnBuildingPrefilter.Result.NOT_CITY) {
+            return false;
+        }
+        if (preliminary == SpawnBuildingPrefilter.Result.STYLE_MISMATCH) {
+            return false;
+        }
+
         LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristics(coord, dimensionInfo);
         if (!buildings.isEmpty() && (characteristics.buildingType == null
                 || !buildings.contains(characteristics.buildingType.getId().toString()))) {
@@ -356,6 +370,7 @@ public class ForgeEventHandlers {
 
     private BlockPos findSafeSpawnPointInChunk(Level world, IDimensionInfo provider, @Nonnull Predicate<BlockPos> isSuitable,
                                                @Nonnull Predicate<ChunkCoord> isSuitableChunk, int chunkX, int chunkZ) {
+
         ChunkCoord coord = new ChunkCoord(provider.getType(), chunkX, chunkZ);
         if (!isSuitableChunk.test(coord)) {
             return null;

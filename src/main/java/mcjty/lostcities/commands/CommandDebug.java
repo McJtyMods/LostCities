@@ -9,15 +9,12 @@ import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
+import mcjty.lostcities.worldgen.highway.*;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import mcjty.lostcities.worldgen.lost.CitySphere;
 import mcjty.lostcities.worldgen.lost.Highway;
 import mcjty.lostcities.worldgen.lost.Railway;
 import mcjty.lostcities.worldgen.lost.Orientation;
-import mcjty.lostcities.worldgen.highway.HighwayInfo;
-import mcjty.lostcities.worldgen.highway.HighwayRoute;
-import mcjty.lostcities.worldgen.highway.HubKey;
-import mcjty.lostcities.worldgen.highway.IntercityHighwayPlanner;
 import mcjty.lostcities.worldgen.street.HierarchicalBridgePlanner;
 import mcjty.lostcities.worldgen.street.PlannedBridgeInfo;
 import mcjty.lostcities.worldgen.street.PlannedStreetInfo;
@@ -152,5 +149,8 @@ public class CommandDebug implements Command<CommandSourceStack> {
         }
         System.out.println("highwayCurrentChunkOnRoute = " + highwayInfo.hasHighway());
         System.out.println("highwayPlannerCacheStats = " + planner.getCacheStats());
+
+        HighwayPlanningService service = dimInfo.getHighwayPlanningService();
+        System.out.println("highwayPlannerService = " + service.getParallelismStats());
     }
 }

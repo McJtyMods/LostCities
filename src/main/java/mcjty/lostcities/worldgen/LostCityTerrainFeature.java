@@ -51,7 +51,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -84,6 +86,7 @@ public class LostCityTerrainFeature {
     public final IDimensionInfo provider;
     public final LostCityProfile profile;
     private final TimedCache<ChunkCoord, ChunkHeightmap> cachedHeightmaps = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
+    private final ConcurrentMap<ChunkCoord, CompletableFuture<ChunkHeightmap>> pendingHeightmapSamples = new ConcurrentHashMap<>();
     private final Statistics statistics = new Statistics();
     private final Map<Block, BlockEntityType> typeCache = new ConcurrentHashMap<>();
 
@@ -855,32 +858,65 @@ public class LostCityTerrainFeature {
             top = chunk.chunkX();
             left = chunk.chunkZ();
         }
-        synchronized (this) {
-            ChunkHeightmap cached = cachedHeightmaps.get(chunk);
-            if (cached != null) {
-                return cached;
+        ChunkHeightmap cached = cachedHeightmaps.get(chunk);
+        if (cached != null) {
+            return cached;
+        }
+
+        CompletableFuture<ChunkHeightmap> created = new CompletableFuture<>();
+        CompletableFuture<ChunkHeightmap> inFlight = pendingHeightmapSamples.putIfAbsent(sampler, created);
+        if (inFlight != null) {
+            return takePublishedHeightmap(chunk, inFlight.join());
+        }
+
+        try {
+            ChunkHeightmap published = cachedHeightmaps.get(chunk);
+            if (published != null) {
+                created.complete(published);
+                return published;
             }
             ChunkHeightmap heightmap = new ChunkHeightmap(profile.LANDSCAPE_TYPE, profile.GROUNDLEVEL);
             generateHeightmap(sampler.chunkX(), sampler.chunkZ(), world, heightmap);
-            if (heightSampleSize > 1) {
-                for (int i = 0; i < heightSampleSize; i++) {
-                    for (int j = 0; j < heightSampleSize; j++) {
-                        ChunkCoord sampleKey = new ChunkCoord(chunk.dimension(), top + (i * constX), left + (j * constZ));
-                        // Keep the historical groups on both sides of zero, but let only
-                        // the positive-side group own the axis. Negative groups next to
-                        // an axis are one chunk narrower and must not overwrite it.
-                        if ((constX < 0 && sampleKey.chunkX() == 0)
-                                || (constZ < 0 && sampleKey.chunkZ() == 0)) {
-                            continue;
-                        }
-                        cachedHeightmaps.put(sampleKey, new ChunkHeightmap(heightmap));
-                    }
-                }
-            } else {
-                cachedHeightmaps.put(chunk, heightmap);
-            }
+            publishHeightmapSample(chunk, heightmap, heightSampleSize, top, left, constX, constZ);
+            created.complete(heightmap);
             return heightmap;
+        } catch (Throwable e) {
+            created.completeExceptionally(e);
+            throw e;
+        } finally {
+            pendingHeightmapSamples.remove(sampler, created);
         }
+    }
+
+    private void publishHeightmapSample(ChunkCoord chunk, ChunkHeightmap heightmap, int heightSampleSize,
+                                        int top, int left, int constX, int constZ) {
+        if (heightSampleSize <= 1) {
+            cachedHeightmaps.put(chunk, heightmap);
+            return;
+        }
+        for (int i = 0; i < heightSampleSize; i++) {
+            for (int j = 0; j < heightSampleSize; j++) {
+                ChunkCoord sampleKey = new ChunkCoord(chunk.dimension(), top + (i * constX), left + (j * constZ));
+                // Keep the historical groups on both sides of zero, but let only
+                // the positive-side group own the axis. Negative groups next to
+                // an axis are one chunk narrower and must not overwrite it.
+                if ((constX < 0 && sampleKey.chunkX() == 0)
+                        || (constZ < 0 && sampleKey.chunkZ() == 0)) {
+                    continue;
+                }
+                cachedHeightmaps.put(sampleKey, new ChunkHeightmap(heightmap));
+            }
+        }
+    }
+
+    private ChunkHeightmap takePublishedHeightmap(ChunkCoord chunk, ChunkHeightmap sample) {
+        ChunkHeightmap published = cachedHeightmaps.get(chunk);
+        if (published != null) {
+            return published;
+        }
+        ChunkHeightmap copy = new ChunkHeightmap(sample);
+        cachedHeightmaps.put(chunk, copy);
+        return copy;
     }
 
     private void generateHeightmap(int chunkX, int chunkZ, WorldGenLevel region, ChunkHeightmap heightmap) {

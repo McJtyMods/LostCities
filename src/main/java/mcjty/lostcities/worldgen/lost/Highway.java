@@ -6,6 +6,7 @@ import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.varia.PerlinNoiseGenerator14;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.highway.HighwayInfo;
+import mcjty.lostcities.worldgen.plan.ChunkPlanner;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
@@ -32,16 +33,7 @@ public class Highway {
     }
 
     public static boolean hasHighway(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
-        if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
-            return getHighwayInfo(coord, provider, profile).hasHighway();
-        }
-        if (getXHighwayLevel(coord, provider, profile) >= 0) {
-            return true;
-        }
-        if (getZHighwayLevel(coord, provider, profile) >= 0) {
-            return true;
-        }
-        return false;
+        return getHighwayInfo(coord, provider, profile).hasHighway();
     }
 
     /**
@@ -49,12 +41,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getXHighwayLevel(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
-        if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
-            return getHighwayInfo(coord, provider, profile).xLevel();
-        }
-        HighwayNoise noise = getNoise(provider);
-        return getHighwayLevel(provider, profile, Highway.X_HIGHWAY_LEVEL_CACHE,
-                cp -> hasXHighway(cp, profile, noise.x()), Orientation.X, coord);
+        return getHighwayInfo(coord, provider, profile).xLevel();
     }
 
     /**
@@ -62,12 +49,7 @@ public class Highway {
      * Returns 0 or 1 if there is a highway (at that city level) going through this chunk.
      */
     public static int getZHighwayLevel(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
-        if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
-            return getHighwayInfo(coord, provider, profile).zLevel();
-        }
-        HighwayNoise noise = getNoise(provider);
-        return getHighwayLevel(provider, profile, Highway.Z_HIGHWAY_LEVEL_CACHE,
-                cp -> hasZHighway(cp, profile, noise.z()), Orientation.Z, coord);
+        return getHighwayInfo(coord, provider, profile).zLevel();
     }
 
     /**
@@ -76,6 +58,10 @@ public class Highway {
      * this class rather than depending directly on a planner implementation.
      */
     public static HighwayInfo getHighwayInfo(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        return ChunkPlanner.highway(coord, provider, profile);
+    }
+
+    public static HighwayInfo computeHighwayInfo(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
         if (provider.getHighwayGenerationMode() == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
             // Preserve the existing hard city-sphere exclusion without making
             // it part of canonical hub/route planning.
@@ -83,7 +69,8 @@ public class Highway {
                     && CitySphere.intersectsWithCitySphere(coord, provider)) {
                 return HighwayInfo.NONE;
             }
-            return provider.getHighwayPlanner().getHighwayInfo(coord.chunkX(), coord.chunkZ());
+            return provider.getHighwayPlanningService()
+                    .getHighwayInfo(coord.chunkX(), coord.chunkZ());
         }
         HighwayNoise noise = getNoise(provider);
         int xLevel = getHighwayLevel(provider, profile, Highway.X_HIGHWAY_LEVEL_CACHE,
