@@ -1,15 +1,11 @@
 package mcjty.lostcities.worldgen.highway;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
 
 /**
@@ -29,7 +25,7 @@ public final class IntercityHighwayPlanner {
     private static final long CONNECTION_RANK_SALT = 0x34ce791b582da6f0L;
     private static final long CONNECTION_ACCEPT_SALT = 0x72b514e90c63dfa8L;
     private static final long ROUTE_SHAPE_SALT = 0x19e8c347a65d2bf0L;
-    private static final int POTENTIAL_SCALE = 1_000_000;
+    private static final int POTENTIAL_SCALE = CityPotential.SCORE_SCALE;
     private static final int ROUTE_PENALTY_SAMPLE_SPACING = 8;
     private static final int ENDPOINT_PENALTY_DISCOUNT = 16;
 
@@ -143,14 +139,10 @@ public final class IntercityHighwayPlanner {
 
     public HighwayInfo getHighwayInfo(int chunkX, int chunkZ) {
         ChunkKey key = new ChunkKey(chunkX, chunkZ);
-        HighwayInfo cached = chunkCache.get(key);
-        if (cached != null) {
-            return cached;
-        }
-        HighwayInfo calculated = calculateHighwayInfo(chunkX, chunkZ);
-        chunkCache.put(key, calculated);
-        uncachedChunkQueries.incrementAndGet();
-        return calculated;
+        return chunkCache.computeIfAbsent(key, ignored -> {
+            uncachedChunkQueries.incrementAndGet();
+            return calculateHighwayInfo(chunkX, chunkZ);
+        });
     }
 
     public CacheStats getCacheStats() {
@@ -169,6 +161,7 @@ public final class IntercityHighwayPlanner {
     private Optional<HighwayHub> calculateHub(HubKey cell) {
         int size = settings.planningCellSize();
         int spacing = settings.hubSampleSpacing();
+        int minimum = Math.round(settings.hubMinimumPotential() * POTENTIAL_SCALE);
         int startX = Math.toIntExact((long) cell.planningCellX() * size);
         int startZ = Math.toIntExact((long) cell.planningCellZ() * size);
         int offsetX = floorModHash(hash(HUB_POSITION_SALT, cell.planningCellX(), cell.planningCellZ(), 0), spacing);
@@ -179,9 +172,16 @@ public final class IntercityHighwayPlanner {
             for (int localZ = offsetZ; localZ < size; localZ += spacing) {
                 int chunkX = moveHubXOffRailwayCorridor(Math.addExact(startX, localX), localX, size);
                 int chunkZ = moveHubZOffRailwayCorridor(Math.addExact(startZ, localZ), localZ, size);
-                int potentialScore = potentialScore(chunkX, chunkZ);
                 long tie = hash(HUB_SAMPLE_SALT, chunkX, chunkZ,
                         floorModHash(hash(HUB_STRENGTH_SALT, cell.planningCellX(), cell.planningCellZ(), 0), Integer.MAX_VALUE));
+                boolean hasQualifyingBest = best != null && best.potentialScore() >= minimum;
+                int requiredScore = hasQualifyingBest
+                        ? best.potentialScore() + (Long.compareUnsigned(tie, bestTie) < 0 ? 0 : 1)
+                        : minimum;
+                int potentialScore = cityPotential.getScoreWithUpperBound(chunkX, chunkZ, requiredScore);
+                if (potentialScore < 0) {
+                    continue;
+                }
                 if (best == null || potentialScore > best.potentialScore()
                         || potentialScore == best.potentialScore() && Long.compareUnsigned(tie, bestTie) < 0) {
                     best = new HighwayHub(cell, chunkX, chunkZ, potentialScore, 0);
@@ -189,7 +189,6 @@ public final class IntercityHighwayPlanner {
                 }
             }
         }
-        int minimum = Math.round(settings.hubMinimumPotential() * POTENTIAL_SCALE);
         if (best == null || best.potentialScore() < minimum) {
             return Optional.empty();
         }
@@ -471,8 +470,7 @@ public final class IntercityHighwayPlanner {
     }
 
     private int potentialScore(int chunkX, int chunkZ) {
-        float potential = Math.min(Math.max(cityPotential.getPotential(chunkX, chunkZ), 0.0f), 1.0f);
-        return Math.round(potential * POTENTIAL_SCALE);
+        return CityPotential.score(cityPotential.getPotential(chunkX, chunkZ));
     }
 
     private Comparator<ConnectionCandidate> candidateComparator() {
@@ -573,61 +571,73 @@ public final class IntercityHighwayPlanner {
 
     private static final class BoundedCache<K, V> {
         private final int maximumSize;
-        private final LinkedHashMap<K, V> values;
-        private long hits;
-        private long misses;
+        private final ConcurrentHashMap<K, CompletableFuture<V>> values = new ConcurrentHashMap<>();
+        private final AtomicBoolean trimming = new AtomicBoolean();
+        private final LongAdder hits = new LongAdder();
+        private final LongAdder misses = new LongAdder();
 
         private BoundedCache(int maximumSize) {
             this.maximumSize = maximumSize;
-            values = new LinkedHashMap<>(16, .75f, true);
         }
 
-        synchronized V get(K key) {
-            V value = values.get(key);
-            if (value == null) {
-                misses++;
-            } else {
-                hits++;
+        V computeIfAbsent(K key, Function<K, V> factory) {
+            CompletableFuture<V> existing = values.get(key);
+            if (existing == null) {
+                CompletableFuture<V> created = new CompletableFuture<>();
+                existing = values.putIfAbsent(key, created);
+                if (existing == null) {
+                    misses.increment();
+                    V value;
+                    try {
+                        value = factory.apply(key);
+                    } catch (Throwable e) {
+                        values.remove(key, created);
+                        created.completeExceptionally(e);
+                        throw e;
+                    }
+                    created.complete(value);
+                    trim();
+                    return value;
+                }
             }
-            return value;
+            hits.increment();
+            return existing.join();
         }
 
-        synchronized void put(K key, V value) {
-            values.put(key, value);
-            trim();
-        }
-
-        synchronized V computeIfAbsent(K key, Function<K, V> factory) {
-            V value = values.get(key);
-            if (value != null) {
-                hits++;
-                return value;
-            }
-            misses++;
-            value = factory.apply(key);
-            values.put(key, value);
-            trim();
-            return value;
-        }
-
-        synchronized void clear() {
+        void clear() {
             values.clear();
-            hits = 0;
-            misses = 0;
+            hits.reset();
+            misses.reset();
         }
 
-        synchronized long hits() {
-            return hits;
+        long hits() {
+            return hits.sum();
         }
 
-        synchronized long misses() {
-            return misses;
+        long misses() {
+            return misses.sum();
         }
 
         private void trim() {
-            while (values.size() > maximumSize) {
-                K eldest = values.keySet().iterator().next();
-                values.remove(eldest);
+            if (values.size() <= maximumSize || !trimming.compareAndSet(false, true)) {
+                return;
+            }
+            boolean retry;
+            try {
+                Iterator<Map.Entry<K, CompletableFuture<V>>> iterator = values.entrySet().iterator();
+                while (values.size() > maximumSize && iterator.hasNext()) {
+                    Map.Entry<K, CompletableFuture<V>> entry = iterator.next();
+                    CompletableFuture<V> future = entry.getValue();
+                    if (future.isDone()) {
+                        values.remove(entry.getKey(), future);
+                    }
+                }
+            } finally {
+                trimming.set(false);
+                retry = values.size() > maximumSize && values.values().stream().anyMatch(CompletableFuture::isDone);
+            }
+            if (retry) {
+                trim();
             }
         }
     }

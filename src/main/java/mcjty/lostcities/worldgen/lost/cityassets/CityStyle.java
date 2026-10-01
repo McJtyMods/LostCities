@@ -553,6 +553,19 @@ public class CityStyle implements ILostCityCityStyle {
         return getRandomFromList(random, buildingSelector, pos);
     }
 
+    public boolean maySelectBuilding(Set<String> buildingIds) {
+        for (ObjectSelector selector : buildingSelector) {
+            try {
+                if (buildingIds.contains(DataTools.fromName(selector.value()).toString())) {
+                    return true;
+                }
+            } catch (RuntimeException exception) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getRandomMultiBuilding(Random random, ChunkCoord pos) {
         return getRandomFromList(random, multiBuildingSelector, pos);
     }

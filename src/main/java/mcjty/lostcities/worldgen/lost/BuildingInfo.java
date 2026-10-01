@@ -5,7 +5,10 @@ import mcjty.lostcities.api.*;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.StreetGenerationMode;
 import mcjty.lostcities.setup.Config;
-import mcjty.lostcities.varia.*;
+import mcjty.lostcities.varia.ChunkCoord;
+import mcjty.lostcities.varia.Counter;
+import mcjty.lostcities.varia.QualityRandom;
+import mcjty.lostcities.varia.Tools;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
@@ -14,7 +17,15 @@ import mcjty.lostcities.worldgen.lost.regassets.data.CitySphereSettings;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedBuilding;
 import mcjty.lostcities.worldgen.lost.regassets.data.PredefinedStreet;
 import mcjty.lostcities.worldgen.lost.regassets.data.WorldSettings;
-import mcjty.lostcities.worldgen.street.*;
+import mcjty.lostcities.worldgen.highway.HighwayInfo;
+import mcjty.lostcities.worldgen.plan.ChunkPlanner;
+import mcjty.lostcities.worldgen.plan.Staged;
+import mcjty.lostcities.worldgen.street.PlannedRoadType;
+import mcjty.lostcities.worldgen.street.PlannedStreetInfo;
+import mcjty.lostcities.worldgen.street.RoadDirection;
+import mcjty.lostcities.worldgen.street.EffectiveStreetResolver;
+import mcjty.lostcities.worldgen.street.HierarchicalBridgePlanner;
+import mcjty.lostcities.worldgen.street.PlannedBridgeInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -147,13 +158,10 @@ public class BuildingInfo implements ILostChunkInfo {
         }
     }
 
-    // BuildingInfo cache
-    private static final TimedCache<ChunkCoord, BuildingInfo> BUILDING_INFO_MAP = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
-    private static final TimedCache<ChunkCoord, LostChunkCharacteristics> CITY_INFO_MAP = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
-    private static final TimedCache<ChunkCoord, Integer> CITY_LEVEL_CACHE = new TimedCache<>(Config.CACHE_CLEANUP_SECONDS::get);
     private static final Map<ResourceKey<Level>, Object> MEMOIZATION_LOCKS = new ConcurrentHashMap<>();
 
     private final Object memoizationLock;
+    private final Object instanceLock = new Object();
     private final StructureAvoidance.Result structureAvoidance;
 
     public void addTorchTodo(BlockPos index) {
@@ -191,7 +199,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public CompiledPalette getCompiledPalette() {
         CompiledPalette result = compiledPalette;
         if (result == null) {
-            synchronized (memoizationLock) {
+            synchronized (instanceLock) {
                 result = compiledPalette;
                 if (result == null) {
                     result = new CompiledPalette(palette);
@@ -211,7 +219,7 @@ public class BuildingInfo implements ILostChunkInfo {
     public DamageArea getDamageArea() {
         DamageArea result = damageArea;
         if (result == null) {
-            synchronized (memoizationLock) {
+            synchronized (instanceLock) {
                 result = damageArea;
                 if (result == null) {
                     result = new DamageArea(coord.chunkX(), coord.chunkZ(), provider, this);
@@ -357,16 +365,10 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static LostChunkCharacteristics getChunkCharacteristics(ChunkCoord coord, IDimensionInfo provider) {
-        synchronized (getDimensionLock(coord.dimension())) {
-            return getChunkCharacteristicsLocked(coord, provider);
-        }
+        return ChunkPlanner.characteristics(coord, provider);
     }
 
-    private static LostChunkCharacteristics getChunkCharacteristicsLocked(ChunkCoord coord, IDimensionInfo provider) {
-        LostChunkCharacteristics cached = CITY_INFO_MAP.get(coord);
-        if (cached != null) {
-            return cached;
-        }
+    public static Staged<LostChunkCharacteristics> computeChunkCharacteristics(ChunkCoord coord, IDimensionInfo provider) {
         int chunkX = coord.chunkX();
         int chunkZ = coord.chunkZ();
         LostCityProfile profile = getProfile(coord, provider);
@@ -482,10 +484,7 @@ public class BuildingInfo implements ILostChunkInfo {
         // Building information is sometimes requested speculatively for chunks outside the part
         // of the active WorldGenRegion that has structure references. Do not let such a provisional
         // city decision become the permanent cached result for that chunk.
-        if (structureAvoidance.isKnown()) {
-            CITY_INFO_MAP.put(coord, characteristics);
-        }
-        return characteristics;
+        return new Staged<>(characteristics, structureAvoidance.isKnown());
     }
 
     /**
@@ -691,24 +690,17 @@ public class BuildingInfo implements ILostChunkInfo {
     }
 
     public static void cleanCache() {
-        BUILDING_INFO_MAP.clear();
-        CITY_INFO_MAP.clear();
-        CITY_LEVEL_CACHE.clear();
+        ChunkPlanner.clear();
         StructureAvoidance.cleanCache();
     }
 
     public static BuildingInfo getBuildingInfo(ChunkCoord key, IDimensionInfo provider) {
-        synchronized (getDimensionLock(key.dimension())) {
-            BuildingInfo info = BUILDING_INFO_MAP.get(key);
-            if (info != null) {
-                return info;
-            }
-            info = new BuildingInfo(key, provider);
-            if (info.structureAvoidance.isKnown()) {
-                BUILDING_INFO_MAP.put(key, info);
-            }
-            return info;
-        }
+        return ChunkPlanner.buildingInfo(key, provider);
+    }
+
+    public static Staged<BuildingInfo> computeBuildingInfo(ChunkCoord key, IDimensionInfo provider) {
+        BuildingInfo info = new BuildingInfo(key, provider);
+        return new Staged<>(info, info.structureAvoidance.isKnown());
     }
 
     private static Object getDimensionLock(ResourceKey<Level> dimension) {
@@ -893,8 +885,9 @@ public class BuildingInfo implements ILostChunkInfo {
             ruinHeight = topleft.ruinHeight;
         } else {
             PredefinedBuilding predefinedBuilding = City.getPredefinedBuildingAtTopLeft(provider.getWorld(), key);
-            highwayXLevel = Highway.getXHighwayLevel(key, provider, profile);
-            highwayZLevel = Highway.getZHighwayLevel(key, provider, profile);
+            HighwayInfo highwayInfo = Highway.getHighwayInfo(key, provider, profile);
+            highwayXLevel = highwayInfo.xLevel();
+            highwayZLevel = highwayInfo.zLevel();
 
             if (provider.getStreetGenerationMode() == StreetGenerationMode.LEGACY) {
                 // Keep this block byte-for-byte equivalent in random consumption:
@@ -1220,46 +1213,23 @@ public class BuildingInfo implements ILostChunkInfo {
      * This function uses its own cache.
      */
     public static int getCityLevel(ChunkCoord key, IDimensionInfo provider) {
-        synchronized (getDimensionLock(key.dimension())) {
-            return getCityLevelLocked(key, provider);
-        }
-    }
-
-    private static int getCityLevelLocked(ChunkCoord key, IDimensionInfo provider) {
-        if (provider.getWorld() != null) {  // In LC preview we don't want to use the cache as the config isn't loaded yet
-            Integer cached = CITY_LEVEL_CACHE.get(key);
-            if (cached != null) {
-                return cached;
-            }
-        }
-        int result;
-        if ((provider.getProfile().isSpace() || provider.getProfile().isVoidSpheres())) {
-            result = getCityLevelSpace(key, provider);
-        } else if (provider.getProfile().isFloating()) {
-            result = getCityLevelFloating(key, provider);
-        } else if (provider.getProfile().isCavern()) {
-            result =  getCityLevelCavern(key, provider);
-        } else {
-            result = getCityLevelNormal(key, provider, provider.getProfile());
-        }
-        if (provider.getWorld() != null) {
-            CITY_LEVEL_CACHE.put(key, result);
-        }
-        return result;
+        return ChunkPlanner.cityLevel(key, provider);
     }
 
     public static int getCityLevelGui(ChunkCoord key, IDimensionInfo provider) {
-        int result;
+        return computeCityLevel(key, provider);
+    }
+
+    public static int computeCityLevel(ChunkCoord key, IDimensionInfo provider) {
         if ((provider.getProfile().isSpace() || provider.getProfile().isVoidSpheres())) {
-            result = getCityLevelSpace(key, provider);
+            return getCityLevelSpace(key, provider);
         } else if (provider.getProfile().isFloating()) {
-            result = getCityLevelFloating(key, provider);
+            return getCityLevelFloating(key, provider);
         } else if (provider.getProfile().isCavern()) {
-            result =  getCityLevelCavern(key, provider);
+            return getCityLevelCavern(key, provider);
         } else {
-            result = getCityLevelNormal(key, provider, provider.getProfile());
+            return getCityLevelNormal(key, provider, provider.getProfile());
         }
-        return result;
     }
 
     private static int getCityLevelCavern(ChunkCoord coord, IDimensionInfo provider) {
