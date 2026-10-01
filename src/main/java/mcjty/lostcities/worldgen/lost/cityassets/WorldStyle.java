@@ -134,6 +134,18 @@ public class WorldStyle implements ILostCityAsset {
         return 1.0f;
     }
 
+    public float getMaximumCityChanceMultiplier() {
+        float maximum = 1.0f;
+        for (Pair<Predicate<Holder<Biome>>, Float> pair : cityBiomeMultiplier) {
+            float multiplier = pair.getRight();
+            if (!Float.isFinite(multiplier)) {
+                return Float.POSITIVE_INFINITY;
+            }
+            maximum = Math.max(maximum, multiplier);
+        }
+        return maximum;
+    }
+
     public String getRandomCityStyle(IDimensionInfo provider, ChunkCoord coord, Random random) {
         Holder<Biome> biome = BiomeInfo.getBiomeInfo(provider, coord).getMainBiome();
         List<Pair<Float, String>> ct = new ArrayList<>();
