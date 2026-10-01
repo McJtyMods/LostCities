@@ -4,6 +4,7 @@ import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.HighwayGenerationMode;
 import mcjty.lostcities.config.StreetGenerationMode;
 import mcjty.lostcities.varia.ChunkCoord;
+import mcjty.lostcities.worldgen.highway.HighwayPlanningService;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import mcjty.lostcities.worldgen.highway.IntercityHighwayPlanner;
 import mcjty.lostcities.worldgen.street.HierarchicalStreetPlanner;
@@ -38,6 +39,8 @@ public interface IDimensionInfo {
 
     IntercityHighwayPlanner getHighwayPlanner();
 
+    HighwayPlanningService getHighwayPlanningService();
+
     HierarchicalStreetPlanner getStreetPlanner();
 
     Random getRandom();
@@ -54,4 +57,7 @@ public interface IDimensionInfo {
 
     @Nullable
     ResourceKey<Level> dimension();
+
+    default void shutdown() {
+    }
 }

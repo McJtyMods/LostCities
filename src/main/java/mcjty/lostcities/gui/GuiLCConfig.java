@@ -341,29 +341,33 @@ public class GuiLCConfig extends Screen {
     private void renderPreviewTransports(GuiGraphics graphics, LostCityProfile profile) {
         renderPreviewMap(graphics, profile, true);
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
-        for (int z = 0; z < NullDimensionInfo.PREVIEW_HEIGHT; z++) {
-            for (int x = 0; x < NullDimensionInfo.PREVIEW_WIDTH; x++) {
-                int sx = x * 3 + this.width - 190;
-                int sz = z * 3 + 32;
-                int color = 0;
-                ChunkCoord c = new ChunkCoord(diminfo.dimension(), x, z);
-                Railway.RailChunkInfo type = Railway.getRailChunkType(c, diminfo, profile);
-                if (type.getType() != RailChunkType.NONE) {
-                    color = 0x99992222;
-                }
-                int levelX = Highway.getXHighwayLevel(c, diminfo, profile);
-                int levelZ = Highway.getZHighwayLevel(c, diminfo, profile);
-                if (levelX >= 0 || levelZ >= 0) {
-                    if (color == 0) {
-                        color = 0x99ffffff;
-                    } else {
-                        color = 0x99777777;
+        try {
+            for (int z = 0; z < NullDimensionInfo.PREVIEW_HEIGHT; z++) {
+                for (int x = 0; x < NullDimensionInfo.PREVIEW_WIDTH; x++) {
+                    int sx = x * 3 + this.width - 190;
+                    int sz = z * 3 + 32;
+                    int color = 0;
+                    ChunkCoord c = new ChunkCoord(diminfo.dimension(), x, z);
+                    Railway.RailChunkInfo type = Railway.getRailChunkType(c, diminfo, profile);
+                    if (type.getType() != RailChunkType.NONE) {
+                        color = 0x99992222;
+                    }
+                    int levelX = Highway.getXHighwayLevel(c, diminfo, profile);
+                    int levelZ = Highway.getZHighwayLevel(c, diminfo, profile);
+                    if (levelX >= 0 || levelZ >= 0) {
+                        if (color == 0) {
+                            color = 0x99ffffff;
+                        } else {
+                            color = 0x99777777;
+                        }
+                    }
+                    if (color != 0) {
+                        graphics.fill(sx, sz, sx + 3, sz + 3, color);
                     }
                 }
-                if (color != 0) {
-                    graphics.fill(sx, sz, sx + 3, sz + 3, color);
-                }
             }
+        } finally {
+            diminfo.shutdown();
         }
     }
 
@@ -463,32 +467,36 @@ public class GuiLCConfig extends Screen {
 
     private void renderPreviewMap(GuiGraphics graphics, LostCityProfile profile, boolean soft) {
         NullDimensionInfo diminfo = new NullDimensionInfo(profile, seed);
-        for (int z = 0; z < NullDimensionInfo.PREVIEW_HEIGHT; z++) {
-            for (int x = 0; x < NullDimensionInfo.PREVIEW_WIDTH; x++) {
-                int sx = x * 3 + this.width - 190;
-                int sz = z * 3 + 32;
-                char b = diminfo.getBiomeChar(x, z);
-                int color = switch (b) {
-                    case 'p' -> 0x005500;
-                    case '-' -> 0x000066;
-                    case '=' -> 0x000066;
-                    case '#' -> 0x447744;
-                    case '+' -> 0x335533;
-                    case '*' -> 0xcccc55;
-                    case 'd' -> 0xcccc55;
-                    default -> 0x005500;
-                };
-                graphics.fill(sx, sz, sx + 3, sz + 3, 0xff000000 + soften(color, soft));
-                ChunkCoord coord = new ChunkCoord(diminfo.dimension(), x, z);
-                LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristicsGui(coord, diminfo);
-                if (characteristics.isCity) {
-                    color = 0x995555;
-                    if (BuildingInfo.hasBuildingGui(x, z, diminfo, characteristics)) {
-                        color = 0xffffff;
+        try {
+            for (int z = 0; z < NullDimensionInfo.PREVIEW_HEIGHT; z++) {
+                for (int x = 0; x < NullDimensionInfo.PREVIEW_WIDTH; x++) {
+                    int sx = x * 3 + this.width - 190;
+                    int sz = z * 3 + 32;
+                    char b = diminfo.getBiomeChar(x, z);
+                    int color = switch (b) {
+                        case 'p' -> 0x005500;
+                        case '-' -> 0x000066;
+                        case '=' -> 0x000066;
+                        case '#' -> 0x447744;
+                        case '+' -> 0x335533;
+                        case '*' -> 0xcccc55;
+                        case 'd' -> 0xcccc55;
+                        default -> 0x005500;
+                    };
+                    graphics.fill(sx, sz, sx + 3, sz + 3, 0xff000000 + soften(color, soft));
+                    ChunkCoord coord = new ChunkCoord(diminfo.dimension(), x, z);
+                    LostChunkCharacteristics characteristics = BuildingInfo.getChunkCharacteristicsGui(coord, diminfo);
+                    if (characteristics.isCity) {
+                        color = 0x995555;
+                        if (BuildingInfo.hasBuildingGui(x, z, diminfo, characteristics)) {
+                            color = 0xffffff;
+                        }
+                        graphics.fill(sx, sz, sx + 2, sz + 2, 0xff000000 + soften(color, soft));
                     }
-                    graphics.fill(sx, sz, sx + 2, sz + 2, 0xff000000 + soften(color, soft));
                 }
             }
+        } finally {
+            diminfo.shutdown();     // a preview dimension is built per frame and owns a thread pool
         }
     }
 
