@@ -2,6 +2,7 @@ package mcjty.lostcities.varia;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
@@ -11,6 +12,7 @@ public class TimedCache<K, V> {
     private static class Entry<V> {
         private final V value;
         private volatile long lastAccess;
+        private final AtomicInteger activeUsers = new AtomicInteger();
 
         private Entry(V value, long lastAccess) {
             this.value = value;
@@ -74,6 +76,32 @@ public class TimedCache<K, V> {
         return entry == null ? null : entry.value;
     }
 
+    public <R> R withPinnedValue(K key, Function<K, V> supplier, Function<V, R> action) {
+        long now = System.currentTimeMillis();
+        Entry<V> entry = cache.compute(key, (k, current) -> {
+            if (current == null || isExpired(current, now) && current.activeUsers.get() == 0) {
+                V value = supplier.apply(k);
+                current = value == null ? null : new Entry<>(value, now);
+            }
+            if (current != null) {
+                current.lastAccess = now;
+                current.activeUsers.incrementAndGet();
+            }
+            return current;
+        });
+        if (entry == null) {
+            maybeCleanup(now);
+            return null;
+        }
+        try {
+            return action.apply(entry.value);
+        } finally {
+            entry.lastAccess = System.currentTimeMillis();
+            entry.activeUsers.decrementAndGet();
+            maybeCleanup(entry.lastAccess);
+        }
+    }
+
     private boolean isExpired(Entry<V> entry, long now) {
         return now - entry.lastAccess >= getTtlMillis();
     }
@@ -89,14 +117,12 @@ public class TimedCache<K, V> {
     private void cleanup(long now) {
         long ttlMillis = getTtlMillis();
         if (ttlMillis <= 0) {
-            cache.clear();
+            cache.forEach((key, ignored) -> cache.computeIfPresent(key,
+                    (k, entry) -> entry.activeUsers.get() == 0 ? null : entry));
             return;
         }
-        cache.forEach((key, entry) -> {
-            if (now - entry.lastAccess >= ttlMillis) {
-                cache.remove(key, entry);
-            }
-        });
+        cache.forEach((key, ignored) -> cache.computeIfPresent(key, (k, entry) ->
+                now - entry.lastAccess >= ttlMillis && entry.activeUsers.get() == 0 ? null : entry));
     }
 
     private long getCleanupIntervalMillis() {

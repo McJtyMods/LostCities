@@ -7,13 +7,11 @@ import mcjty.lostcities.varia.ChunkCoord;
 import mcjty.lostcities.worldgen.ChunkHeightmap;
 import mcjty.lostcities.worldgen.IDimensionInfo;
 import mcjty.lostcities.worldgen.LostCityTerrainFeature;
+import mcjty.lostcities.worldgen.highway.*;
 import mcjty.lostcities.worldgen.lost.cityassets.WorldStyle;
 import mcjty.lostcities.worldgen.lost.regassets.WorldStyleRE;
 import mcjty.lostcities.worldgen.street.HierarchicalStreetPlanner;
 import mcjty.lostcities.worldgen.street.StreetPlannerSettings;
-import mcjty.lostcities.worldgen.highway.ApproximateCityPotential;
-import mcjty.lostcities.worldgen.highway.HighwayPlannerSettings;
-import mcjty.lostcities.worldgen.highway.IntercityHighwayPlanner;
 import mcjty.lostcities.worldgen.lost.BuildingInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -101,6 +99,7 @@ public class NullDimensionInfo implements IDimensionInfo {
     private final WorldStyle style;
     private final HierarchicalStreetPlanner streetPlanner;
     private final IntercityHighwayPlanner highwayPlanner;
+    private final HighwayPlanningService highwayPlanningService;
     private final Random random;
     private final long seed;
 
@@ -125,13 +124,15 @@ public class NullDimensionInfo implements IDimensionInfo {
         ));
         this.seed = seed;
         streetPlanner = new HierarchicalStreetPlanner(seed, Level.OVERWORLD.identifier().toString(), StreetPlannerSettings.fromProfile(profile));
-        highwayPlanner = profile.HIGHWAY_GENERATION_MODE == HighwayGenerationMode.INTERCITY_NETWORK_V1
-                ? new IntercityHighwayPlanner(seed, Level.OVERWORLD.identifier().toString(),
+        if (profile.HIGHWAY_GENERATION_MODE == HighwayGenerationMode.INTERCITY_NETWORK_V1) {
+            highwayPlanner = new IntercityHighwayPlanner(seed, Level.OVERWORLD.identifier().toString(),
                     HighwayPlannerSettings.fromProfile(profile), new ApproximateCityPotential(seed, profile),
-                    (chunkX, chunkZ) -> BuildingInfo.getCityLevelGui(
-                            new ChunkCoord(Level.OVERWORLD, chunkX, chunkZ), this),
-                    mcjty.lostcities.worldgen.highway.HighwayHubPersistence.NONE)
-                : null;
+                    new HighwayCityLevelSource(this), HighwayHubPersistence.NONE);
+            highwayPlanningService = new HighwayPlanningService(highwayPlanner);
+        } else {
+            highwayPlanner = null;
+            highwayPlanningService = null;
+        }
         random = new Random(seed);
         RandomSource randomSource = new LegacyRandomSource(seed);
         feature = new LostCityTerrainFeature(this, profile, randomSource);
@@ -197,6 +198,14 @@ public class NullDimensionInfo implements IDimensionInfo {
             throw new IllegalStateException("The inter-city highway planner is unavailable in LEGACY mode");
         }
         return highwayPlanner;
+    }
+
+    @Override
+    public HighwayPlanningService getHighwayPlanningService() {
+        if (highwayPlanningService == null) {
+            throw new IllegalStateException("The inter-city highway planner service is unavailable in LEGACY mode");
+        }
+        return highwayPlanningService;
     }
 
     @Override
@@ -285,5 +294,12 @@ public class NullDimensionInfo implements IDimensionInfo {
     @Override
     public ResourceKey<Level> dimension() {
         return getType();
+    }
+
+    @Override
+    public void shutdown() {
+        if (highwayPlanningService != null) {
+            highwayPlanningService.close();
+        }
     }
 }
