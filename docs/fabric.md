@@ -63,3 +63,35 @@ removes explosion cleanup that could carve chunk-sized gaps. Avoided structures
 retain a city-free transition ring when flattening is disabled. Railway spacing
 and support asset configuration are documented in [profile options](profile_options.md)
 and [support assets](support_assets.md).
+
+
+26.2-11.0.2-fabric incorporates NeoForge commit
+`024cc76e67cb0331a4b606131f95ff08e5007979`. Chunk planning now caches separate
+highway, characteristics, and building stages per chunk, keeping active plans
+pinned during cache eviction. Provisional structure-avoidance decisions remain
+uncached. City levels use a shared cache, while terrain-height requests share
+in-flight work by sample group and allow unrelated samples to run concurrently.
+
+Inter-city highway planning owns a worker pool per dimension. It schedules hubs
+through route and reciprocal-neighbor dependencies, skips terrain samples for
+impossible hubs, and bounds completed planning futures while retaining active
+work. Dimension cleanup and configuration previews close their planning pools.
+Explosion placement reads neighboring chunk characteristics instead of full
+building plans to avoid recursive generation deadlocks.
+
+Forced-building spawn searches use the existing Fabric new-world spawn mixin
+and reject impossible raw city chunks and city styles before full planning.
+Sphere profiles and characteristics listeners bypass these checks; requested
+buildings that appear in multi-buildings bypass only the city-style check.
+`LostCityEvents.hasCharacteristicsListeners()` tracks Fabric callback registration
+through the event's invoker factory, allowing integration callbacks to override
+city and building decisions without being rejected by the spawn prefilter.
+Profile settings, asset formats, and saved generation-mode selection are unchanged.
+
+For visual verification, create a new world using `INTERCITY_NETWORK_V1`,
+explore several cities and connecting highways, and inspect ruined buildings
+near chunk boundaries. Create another world with `forceSpawnBuildings` set to
+a known building in its city style and confirm the spawn matches. Open the
+Cities configuration screen and switch between map and transport previews,
+then leave and reopen a world to check dimension cleanup. Also inspect an
+existing world that retains `LEGACY` generation.

@@ -217,6 +217,7 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
         LostCities.lostCitiesImp.cleanUp();
         ForgeEventHandlers.cleanUp();
         AssetRegistries.reset();
+        dimensionInfo.values().forEach(IDimensionInfo::shutdown);
         dimensionInfo.clear();
         dimensionInfoDirtyCounter = globalDimensionInfoDirtyCounter;
     }

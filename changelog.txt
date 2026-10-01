@@ -1,3 +1,14 @@
+26.2-11.0.2-fabric:
+- Kept active chunk and highway planning work pinned during cache eviction, and bounded completed highway-planning futures to prevent duplicate work and long-session cache growth
+- Forced-building spawn searches now reject impossible city chunks and city styles before full building planning, reducing new-world spawn delays
+- Inter-city highway planning now schedules only hubs reached by route and reciprocal-neighbor dependencies, avoiding fixed-area prewarming and synchronous cold hub scans during route selection
+- Inter-city highway planning now skips terrain samples that cannot qualify as a hub, reducing work when exploring new areas
+- Terrain-height sampling no longer blocks all world-generation workers on a single lock, allowing unrelated samples to run concurrently
+- Chunk planning is now tracked per chunk instead of per dimension, so large inter-city highway plans no longer stall planning everywhere else
+- Inter-city highway planning now reuses the shared city-level cache instead of recalculating terrain heights for every hub
+- Inter-city highway hubs and routes are now planned across several threads to speed up generation in new areas
+- Fixed a potential generation deadlock when calculating explosion damage near neighboring chunks
+
 26.2-11.0.1-fabric:
 - Exposed the current chunk's city style through the API, including outside cities
 - Fixed overlapping terrain-height samples near coordinate axes and made size-2 sampling deterministic; floor-selection errors now identify the building and floor
