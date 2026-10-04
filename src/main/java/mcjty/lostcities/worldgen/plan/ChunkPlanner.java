@@ -27,6 +27,7 @@ public final class ChunkPlanner {
         if (provider.getWorld() == null) {
             return BuildingInfo.computeCityLevel(coord, provider);
         }
+
         Integer cached = CITY_LEVELS.get(coord);
         if (cached != null) {
             return cached;
@@ -37,16 +38,28 @@ public final class ChunkPlanner {
     }
 
     public static HighwayInfo highway(ChunkCoord coord, IDimensionInfo provider, LostCityProfile profile) {
+        if (provider.getWorld() == null) {
+            return Highway.computeHighwayInfo(coord, provider, profile);
+        }
+
         return PLANS.withPinnedValue(coord, key -> new ChunkPlan(),
                 plan -> plan.highway(() -> Highway.computeHighwayInfo(coord, provider, profile)));
     }
 
     public static LostChunkCharacteristics characteristics(ChunkCoord coord, IDimensionInfo provider) {
+        if (provider.getWorld() == null) {
+            return BuildingInfo.computeChunkCharacteristics(coord, provider).value();
+        }
+
         return PLANS.withPinnedValue(coord, key -> new ChunkPlan(),
                 plan -> plan.characteristics(() -> BuildingInfo.computeChunkCharacteristics(coord, provider)));
     }
 
     public static BuildingInfo buildingInfo(ChunkCoord coord, IDimensionInfo provider) {
+        if (provider.getWorld() == null) {
+            return BuildingInfo.computeBuildingInfo(coord, provider).value();
+        }
+
         return PLANS.withPinnedValue(coord, key -> new ChunkPlan(),
                 plan -> plan.buildingInfo(() -> BuildingInfo.computeBuildingInfo(coord, provider)));
     }
