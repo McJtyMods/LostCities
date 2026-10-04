@@ -51,6 +51,19 @@ initialization.
 
 ## Shared generation updates
 
+26.2-11.0.3-fabric incorporates the preview fix from NeoForge commit
+`96a6f0624e39c66ba19393a857596ba312af71ab`. Providers without a world, including
+the world-creation previews, compute highway, characteristics, and building
+plans directly instead of accessing the shared chunk-plan cache. City-level
+previews already bypass their cache. This avoids reading the server-only
+`cacheCleanupSeconds` setting before a world exists, which also applies to
+Fabric's Forge Config API Port integration. World-generation caching remains
+unchanged.
+
+For visual verification, open Create World, then More → Cities → Customize
+and select Transport before loading any world. Change profiles and transport
+settings and confirm the preview updates without crashing.
+
 26.2-11.0.1-fabric incorporates NeoForge commit
 `860bdaf9c4cf41eb00c3d7e2dc9cad34b594563a`, retaining Fabric event callbacks
 and the Fabric tag provider. `ILostChunkInfo.getCityStyle()` exposes the resolved
