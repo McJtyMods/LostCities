@@ -1,3 +1,6 @@
+26.2-11.0.3:
+- Fixed the Transport preview crashing when customizing cities before creating a world
+
 26.2-11.0.2:
 - Kept active chunk and highway planning work pinned during cache eviction, and bounded completed highway-planning futures to prevent duplicate work and long-session cache growth
 - Forced-building spawn searches now reject impossible city chunks and city styles before full building planning, reducing new-world spawn delays
