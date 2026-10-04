@@ -1,4 +1,4 @@
-1.20-<>:
+1.20-7.5.7:
 - Fixed the Transport preview crashing when customising cities before creating a world
 
 1.20-7.5.6:
