@@ -22,6 +22,7 @@ public class Config {
     public static final boolean DEBUG = false;
 
     public static ModConfigSpec.ConfigValue<String> SPECIAL_BED_BLOCK;// = "minecraft:diamond_block";
+    public static ModConfigSpec.BooleanValue DIMENSION_ENABLED;
 
     private static final String[] DEFAULT_DIMENSION_PROFILES = new String[] {
             "lostcities:lostcity=biosphere",
@@ -181,6 +182,10 @@ public class Config {
         SPECIAL_BED_BLOCK = SERVER_BUILDER
                 .comment("Block to put underneath a bed so that it qualifies as a teleporter bed")
                 .define("specialBedBlock", "minecraft:diamond_block");
+
+        DIMENSION_ENABLED = SERVER_BUILDER
+                .comment("If true, the Lost City dimension (ID 111) is enabled. Players can teleport by sleeping in a bed placed on two diamond blocks surrounded by six skulls. If false, the dimension is disabled and teleportation is blocked")
+                .define("dimensionEnabled", true);
 
         SELECTED_PROFILE = SERVER_BUILDER.define("selectedProfile", "");
         SELECTED_CUSTOM_JSON = SERVER_BUILDER.define("selectedCustomJson", "");
