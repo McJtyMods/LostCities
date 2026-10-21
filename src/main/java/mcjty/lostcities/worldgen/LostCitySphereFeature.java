@@ -1,25 +1,29 @@
 package mcjty.lostcities.worldgen;
 
+import com.mojang.serialization.MapCodec;
 import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.worldgen.gen.Spheres;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
-public class LostCitySphereFeature extends Feature<NoneFeatureConfiguration> {
+public class LostCitySphereFeature implements Feature {
 
-    public LostCitySphereFeature() {
-        super(NoneFeatureConfiguration.CODEC);
+    public static final MapCodec<LostCitySphereFeature> CODEC = MapCodec.unit(Registration.LOSTCITY_SPHERE_FEATURE);
+
+    @Override
+    public MapCodec<LostCitySphereFeature> codec() {
+        return CODEC;
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-        WorldGenLevel level = context.level();
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
         if (level instanceof WorldGenRegion region) {
             LostCityFeature lostCityFeature = Registration.LOSTCITY_FEATURE.get();
             return lostCityFeature.runWithDimensionInfo(level, diminfo -> {

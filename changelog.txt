@@ -1,3 +1,6 @@
+26.3-12.0.0-fabric:
+- Port to Minecraft 26.3 with Fabric
+
 26.2-11.0.3-fabric:
 - Fixed the Transport preview crashing when customizing cities before creating a world
 

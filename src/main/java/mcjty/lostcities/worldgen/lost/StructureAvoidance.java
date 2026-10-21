@@ -164,7 +164,7 @@ public final class StructureAvoidance {
     }
 
     private static boolean hasAvoidedStructure(WorldGenRegion region, ChunkAccess chunk, boolean insideFootprint, boolean terrainTransition) {
-        if (!chunk.hasAnyStructureReferences()) {
+        if (chunk.getAllReferences().isEmpty()) {
             return false;
         }
 

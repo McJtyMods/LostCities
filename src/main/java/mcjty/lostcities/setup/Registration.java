@@ -22,10 +22,12 @@ public class Registration {
     public static final Supplier<LostCitySphereFeature> LOSTCITY_SPHERE_FEATURE = () -> lostCitySphereFeature;
 
     public static void init() {
-        lostCityFeature = Registry.register(BuiltInRegistries.FEATURE,
-                Identifier.fromNamespaceAndPath(LostCities.MODID, "lostcity"), new LostCityFeature());
-        lostCitySphereFeature = Registry.register(BuiltInRegistries.FEATURE,
-                Identifier.fromNamespaceAndPath(LostCities.MODID, "spheres"), new LostCitySphereFeature());
+        lostCityFeature = new LostCityFeature();
+        lostCitySphereFeature = new LostCitySphereFeature();
+        Registry.register(BuiltInRegistries.FEATURE_TYPE,
+                Identifier.fromNamespaceAndPath(LostCities.MODID, "lostcity"), LostCityFeature.CODEC);
+        Registry.register(BuiltInRegistries.FEATURE_TYPE,
+                Identifier.fromNamespaceAndPath(LostCities.MODID, "spheres"), LostCitySphereFeature.CODEC);
     }
 
     public static final Identifier LOSTCITY = Identifier.fromNamespaceAndPath(LostCities.MODID, "lostcity");
