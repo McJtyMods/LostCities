@@ -23,7 +23,6 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
@@ -198,8 +197,8 @@ public class DefaultDimensionInfo implements IDimensionInfo {
         if (chunkProvider instanceof ServerChunkCache) {
             ChunkGenerator generator = ((ServerChunkCache) chunkProvider).getGenerator();
             BiomeSource biomeProvider = generator.getBiomeSource();
-            Climate.Sampler sampler = ((ServerChunkCache) chunkProvider).randomState().sampler();
-            return biomeProvider.getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2, sampler);
+            return biomeProvider.createUncachedResolver(((ServerChunkCache) chunkProvider).randomState())
+                    .getNoiseBiome(pos.getX() >> 2, pos.getY() >> 2, pos.getZ() >> 2);
         }
         return biomeRegistry.getOrThrow(Biomes.PLAINS);
     }

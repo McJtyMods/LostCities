@@ -3,6 +3,7 @@
     {
       "name": "lostcities:raildungeonchest",
       "rolls": {
+        "type": "minecraft:uniform",
         "min": 2,
         "max": 4
       },
@@ -10,10 +11,11 @@
         {
           "type": "item",
           "name": "minecraft:diamond_axe",
-          "functions": [
+          "modifier": [
             {
-              "function": "set_count",
+              "type": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 0,
                 "max": 1
               }
@@ -24,10 +26,11 @@
         {
           "type": "item",
           "name": "minecraft:gold_ingot",
-          "functions": [
+          "modifier": [
             {
-              "function": "set_count",
+              "type": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 1,
                 "max": 5
               }
@@ -38,10 +41,11 @@
         {
           "type": "item",
           "name": "minecraft:iron_ingot",
-          "functions": [
+          "modifier": [
             {
-              "function": "set_count",
+              "type": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 3,
                 "max": 10
               }
@@ -52,10 +56,11 @@
         {
           "type": "item",
           "name": "minecraft:diamond",
-          "functions": [
+          "modifier": [
             {
-              "function": "set_count",
+              "type": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 2,
                 "max": 9
               }
@@ -66,10 +71,11 @@
         {
           "type": "item",
           "name": "minecraft:emerald",
-          "functions": [
+          "modifier": [
             {
-              "function": "set_count",
+              "type": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 2,
                 "max": 5
               }

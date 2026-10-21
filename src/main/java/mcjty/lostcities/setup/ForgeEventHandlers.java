@@ -422,7 +422,7 @@ public class ForgeEventHandlers {
         if (!(state.getBlock() instanceof BedBlock)) {
             return false;
         }
-        Direction direction = state.getBedDirection(world, pos);
+        Direction direction = state.getValue(BedBlock.FACING);
         Block b1 = world.getBlockState(pos.below()).getBlock();
         Block b2 = world.getBlockState(pos.relative(direction.getOpposite()).below()).getBlock();
         Block b = BuiltInRegistries.BLOCK.getValue(Identifier.parse(Config.SPECIAL_BED_BLOCK.get()));

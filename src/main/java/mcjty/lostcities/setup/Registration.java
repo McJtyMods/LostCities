@@ -1,6 +1,7 @@
 package mcjty.lostcities.setup;
 
 
+import com.google.common.base.Suppliers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
 
 public class Registration {
 
-    public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(Registries.FEATURE, LostCities.MODID);
+    public static final DeferredRegister<MapCodec<? extends Feature>> FEATURES = DeferredRegister.create(Registries.FEATURE_TYPE, LostCities.MODID);
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, LostCities.MODID);
 
     private static final MapCodec<Boolean> BOOLEAN_CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -40,8 +41,10 @@ public class Registration {
         ATTACHMENT_TYPES.register(bus);
     }
 
-    public static final DeferredHolder<Feature<?>, LostCityFeature> LOSTCITY_FEATURE = FEATURES.register("lostcity", LostCityFeature::new);
-    public static final DeferredHolder<Feature<?>, LostCitySphereFeature> LOSTCITY_SPHERE_FEATURE = FEATURES.register("spheres", LostCitySphereFeature::new);
+    public static final Supplier<LostCityFeature> LOSTCITY_FEATURE = Suppliers.memoize(LostCityFeature::new);
+    private static final DeferredHolder<MapCodec<? extends Feature>, MapCodec<LostCityFeature>> LOSTCITY_FEATURE_TYPE = FEATURES.register("lostcity", () -> LostCityFeature.CODEC);
+    public static final Supplier<LostCitySphereFeature> LOSTCITY_SPHERE_FEATURE = Suppliers.memoize(LostCitySphereFeature::new);
+    private static final DeferredHolder<MapCodec<? extends Feature>, MapCodec<LostCitySphereFeature>> LOSTCITY_SPHERE_FEATURE_TYPE = FEATURES.register("spheres", () -> LostCitySphereFeature.CODEC);
 
     public static final Identifier LOSTCITY = Identifier.fromNamespaceAndPath(LostCities.MODID, "lostcity");
 

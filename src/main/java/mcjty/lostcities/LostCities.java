@@ -45,8 +45,8 @@ public class LostCities {
         dir.mkdirs();
 
         container.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_CONFIG, "lostcities/client.toml");
-        container.registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG, "lostcities/common.toml");
-        container.registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
+        container.registerConfig(ModConfig.Type.LOCAL, Config.COMMON_CONFIG, "lostcities/common.toml");
+        container.registerConfig(ModConfig.Type.SYNCED, Config.SERVER_CONFIG, "lostcities-server.toml");
 
         setup.preInit();
         bus.addListener(setup::init);

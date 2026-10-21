@@ -1,21 +1,24 @@
 package mcjty.lostcities.worldgen;
 
+import com.mojang.serialization.MapCodec;
 import mcjty.lostcities.LostCities;
 import mcjty.lostcities.config.LostCityProfile;
 import mcjty.lostcities.config.ProfileSetup;
 import mcjty.lostcities.setup.Config;
 import mcjty.lostcities.setup.ForgeEventHandlers;
+import mcjty.lostcities.setup.Registration;
 import mcjty.lostcities.worldgen.lost.cityassets.AssetRegistries;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.neoforged.neoforge.common.Tags;
 
 import javax.annotation.Nullable;
@@ -25,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
+public class LostCityFeature implements Feature {
 
     /**
      * On dedicated servers the dimensionInfo cache is no problem. The server starts only once
@@ -41,13 +44,15 @@ public class LostCityFeature extends Feature<NoneFeatureConfiguration> {
     public static volatile int globalDimensionInfoDirtyCounter = 0;
     private int dimensionInfoDirtyCounter = -1;
 
-    public LostCityFeature() {
-        super(NoneFeatureConfiguration.CODEC);
+    public static final MapCodec<LostCityFeature> CODEC = MapCodec.unit(Registration.LOSTCITY_FEATURE);
+
+    @Override
+    public MapCodec<LostCityFeature> codec() {
+        return CODEC;
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-        WorldGenLevel level = context.level();
+    public boolean place(WorldGenLevel level, ChunkGenerator chunkGenerator, RandomSource random, BlockPos origin) {
         if (level instanceof WorldGenRegion region) {
             return runWithDimensionInfo(level, diminfo -> {
                 ChunkPos center = region.getCenter();
