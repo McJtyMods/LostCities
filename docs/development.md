@@ -18,6 +18,13 @@ criteria file with:
 ./gradlew updateDaemonJvm
 ```
 
+When included in the Fabric MultiWorkSpace, the workspace root controls the
+Gradle daemon JVM. The mod configures `updateDaemonJvm` only when built
+standalone, because Gradle creates that task only on the root project. The mod
+ID, access widener path, and mixin configuration path in `fabric.mod.json` are
+literal values so Loom can read them before resource expansion during workspace
+configuration.
+
 Use the wrapper for normal checks:
 
 ```bash

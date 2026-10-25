@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "${mod_id}",
+  "id": "lostcities",
   "version": "${version}",
   "name": "${mod_name}",
   "description": "Generate cities all over the world",
@@ -12,13 +12,13 @@
   },
   "license": "MIT",
   "environment": "*",
-  "accessWidener": "META-INF/${mod_id}.accesswidener",
+  "accessWidener": "META-INF/lostcities.accesswidener",
   "entrypoints": {
     "main": ["mcjty.lostcities.LostCities"],
     "client": ["mcjty.lostcities.setup.ClientSetup"],
     "fabric-datagen": ["mcjty.lostcities.datagen.DataGenerators"]
   },
-  "mixins": ["${mod_id}.mixins.json"],
+  "mixins": ["lostcities.mixins.json"],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": "*",
