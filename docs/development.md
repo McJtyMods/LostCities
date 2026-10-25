@@ -1,7 +1,7 @@
 # Development setup
 
-Lost Cities targets Minecraft 26.2 with Fabric Loader and Java 25. The Gradle
-wrapper uses Gradle 9.5.1. Its checked-in
+Lost Cities targets Minecraft 26.3 with Fabric Loader and Java 25. The Gradle
+wrapper uses Gradle 9.6.0. Its checked-in
 `gradle/gradle-daemon-jvm.properties` requires Java 25 for the Gradle daemon,
 even when the wrapper is launched from a Java 17 shell. Gradle detects a local
 Java 25 installation or provisions one through the Foojay resolver, then uses
@@ -17,6 +17,13 @@ criteria file with:
 ```bash
 ./gradlew updateDaemonJvm
 ```
+
+When included in `Multi_fabric`, Lost Cities configures `updateDaemonJvm`
+only if the task exists; Gradle creates it on the root project. To check
+the combined workspace configuration, run `./gradlew help` from `Multi_fabric`
+with Java 25. The access-widener path in `fabric.mod.json` uses the literal
+`META-INF/lostcities.accesswidener` because Loom reads it before resource
+placeholders are expanded.
 
 Use the wrapper for normal checks:
 

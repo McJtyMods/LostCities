@@ -18,7 +18,8 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(Integer.parseInt(java_version))
 
-tasks.named('updateDaemonJvm') {
+// Gradle creates this task only when this mod is the root project.
+tasks.matching { it.name == 'updateDaemonJvm' }.configureEach {
     languageVersion = JavaLanguageVersion.of(Integer.parseInt(java_version))
 }
 

@@ -12,7 +12,7 @@
   },
   "license": "MIT",
   "environment": "*",
-  "accessWidener": "META-INF/${mod_id}.accesswidener",
+  "accessWidener": "META-INF/lostcities.accesswidener",
   "entrypoints": {
     "main": ["mcjty.lostcities.LostCities"],
     "client": ["mcjty.lostcities.setup.ClientSetup"],
