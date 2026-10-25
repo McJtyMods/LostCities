@@ -25,6 +25,10 @@ ID, access widener path, and mixin configuration path in `fabric.mod.json` are
 literal values so Loom can read them before resource expansion during workspace
 configuration.
 
+Build and publishing helpers are loaded directly from MultiWorkSpace's remote
+`26.2_fabric/gradletools.gradle`, both standalone and in the workspace. Do not
+keep a local copy in this mod checkout.
+
 Use the wrapper for normal checks:
 
 ```bash

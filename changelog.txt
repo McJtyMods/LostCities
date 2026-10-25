@@ -1,4 +1,5 @@
 26.2-11.0.3-fabric:
+- Build and publishing settings now use the shared remote Fabric 26.2 script
 - Fixed the Transport preview crashing when customizing cities before creating a world
 
 26.2-11.0.2-fabric:
