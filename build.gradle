@@ -7,7 +7,14 @@ plugins {
     id 'com.hypherionmc.modutils.modpublisher' version '2.2.1'
 }
 
-apply from: 'gradletools.gradle'
+def sharedTools = [rootProject.file('gradletools.gradle'),
+                   file('../Multi_fabric/gradletools.gradle'),
+                   file('../gradletools.gradle')].find { it.isFile() }
+if (sharedTools != null) {
+    apply from: sharedTools
+} else {
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkSpace/26.3_fabric/gradletools.gradle'
+}
 
 group = "com.github.mcjty"
 version = project.version

@@ -1,6 +1,6 @@
 26.3-12.0.0-fabric:
 - Port to Minecraft 26.3 with Fabric
-- Fixed Gradle configuration in the combined Fabric workspace
+- Fixed Gradle configuration in the combined Fabric workspace and removed the need for a local gradletools.gradle
 
 26.2-11.0.3-fabric:
 - Fixed the Transport preview crashing when customizing cities before creating a world

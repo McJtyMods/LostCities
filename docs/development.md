@@ -67,3 +67,7 @@ publishMod` instead.
 Lost Cities' world-level caches use Minecraft's global `SavedDataStorage` with
 namespaced `SavedDataType` identifiers. New saved data is written below the
 world data directory in the `lostcities` namespace.
+
+Shared publishing helpers come from the integrated workspace, sibling
+`../Multi_fabric/gradletools.gradle`, nested parent, or the remote
+`26.3_fabric` script. No local `gradletools.gradle` copy is required.
