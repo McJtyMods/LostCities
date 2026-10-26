@@ -19,12 +19,14 @@ plugins {
 
 apply plugin: 'com.hypherionmc.modutils.modpublisher'
 
-if (project.file('../gradletools.gradle').exists()) {
-    apply from: '../gradletools.gradle'
-} else if (project.file('gradletools.gradle').exists()) {
-    apply from: 'gradletools.gradle'
+// Share the 26.3 build tools in both integrated and standalone checkouts.
+def sharedTools = [rootProject.file('gradletools.gradle'),
+                   file('../Multi_neo/gradletools.gradle'),
+                   file('../gradletools.gradle')].find { it.isFile() }
+if (sharedTools != null) {
+    apply from: sharedTools
 } else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/1.21_neo/gradletools.gradle'
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.3_neo/gradletools.gradle'
 }
 
 group = "com.github.mcjty"

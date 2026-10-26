@@ -1,5 +1,6 @@
 26.3-12.0.0:
 - Port to 26.3/NeoForge
+- Fixed the shared build script lookup so standalone and Multi_neo builds use Minecraft 26.3 dependencies
 
 26.2-11.0.3:
 - Fixed the Transport preview crashing when customizing cities before creating a world
