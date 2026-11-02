@@ -1,3 +1,6 @@
+1.20-<>:
+- Fixed a memory leak where chunk building data was never released. Long sessions or wide structure searches could fill the heap with gigabytes of city data
+
 1.20-7.5.7:
 - Fixed the Transport preview crashing when customising cities before creating a world
 
