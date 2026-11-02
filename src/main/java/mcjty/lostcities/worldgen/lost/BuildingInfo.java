@@ -42,6 +42,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -101,10 +102,12 @@ public class BuildingInfo implements ILostChunkInfo {
     public final Block doorBlock;
 
     // Transient info that is calculated on demand
-    private volatile BuildingInfo xmin;   // @todo remove
-    private volatile BuildingInfo xmax;   // @todo remove
-    private volatile BuildingInfo zmin;   // @todo remove
-    private volatile BuildingInfo zmax;   // @todo remove
+    // Weak on purpose: strong links chained every BuildingInfo ever computed into one reachable grid,
+    // so ChunkPlanner's cache eviction never freed anything. A cleared link just asks the planner again.
+    private volatile WeakReference<BuildingInfo> xmin;
+    private volatile WeakReference<BuildingInfo> xmax;
+    private volatile WeakReference<BuildingInfo> zmin;
+    private volatile WeakReference<BuildingInfo> zmax;
     private volatile DamageArea damageArea;
     private Palette palette = null;
     private volatile CompiledPalette compiledPalette;
@@ -245,38 +248,43 @@ public class BuildingInfo implements ILostChunkInfo {
         palette = style.getRandomPalette(provider, rand);
     }
 
+    @Nullable
+    private static BuildingInfo deref(@Nullable WeakReference<BuildingInfo> ref) {
+        return ref == null ? null : ref.get();
+    }
+
     public BuildingInfo getXmin() {
-        BuildingInfo info = xmin;
+        BuildingInfo info = deref(xmin);
         if (info == null) {
             info = getBuildingInfo(coord.west(), provider);
-            xmin = info;
+            xmin = new WeakReference<>(info);
         }
         return info;
     }
 
     public BuildingInfo getXmax() {
-        BuildingInfo info = xmax;
+        BuildingInfo info = deref(xmax);
         if (info == null) {
             info = getBuildingInfo(coord.east(), provider);
-            xmax = info;
+            xmax = new WeakReference<>(info);
         }
         return info;
     }
 
     public BuildingInfo getZmin() {
-        BuildingInfo info = zmin;
+        BuildingInfo info = deref(zmin);
         if (info == null) {
             info = getBuildingInfo(coord.north(), provider);
-            zmin = info;
+            zmin = new WeakReference<>(info);
         }
         return info;
     }
 
     public BuildingInfo getZmax() {
-        BuildingInfo info = zmax;
+        BuildingInfo info = deref(zmax);
         if (info == null) {
             info = getBuildingInfo(coord.south(), provider);
-            zmax = info;
+            zmax = new WeakReference<>(info);
         }
         return info;
     }
