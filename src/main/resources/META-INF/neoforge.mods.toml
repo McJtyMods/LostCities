@@ -10,6 +10,9 @@ authors="McJty"
 [[accessTransformers]]
 file="META-INF/accesstransformer.cfg"
 
+[[mixins]]
+config="lostcities.mixins.json"
+
 [[mods]]
 modId="lostcities"
 version="${file.jarVersion}"

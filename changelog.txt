@@ -1,3 +1,7 @@
+26.3-12.0.1:
+- Made the biosphere_caves profile available in the world creation menu.
+- Fixed players spawning on the bedrock roof in cavern worlds. When the configured search fails, Lost Cities finds a safe spot nearby or builds an underground shelter.
+
 26.3-12.0.0:
 - Port to 26.3/NeoForge
 - Fixed the shared build script lookup so standalone and Multi_neo builds use Minecraft 26.3 dependencies
