@@ -1,3 +1,7 @@
+26.3-12.0.1-fabric:
+- Made the biosphere_caves profile available in the world creation menu.
+- Fixed players spawning on the bedrock roof in cavern worlds. When the configured search fails, Lost Cities finds a safe spot nearby or builds an underground shelter.
+
 26.3-12.0.0-fabric:
 - Port to Minecraft 26.3 with Fabric
 - Fixed Gradle configuration in the combined Fabric workspace and removed the need for a local gradletools.gradle
