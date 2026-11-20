@@ -14,17 +14,19 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.1.21'
+    id 'net.neoforged.gradle.userdev' version '7.1.38'
 }
 
 apply plugin: 'com.hypherionmc.modutils.modpublisher'
 
-if (project.file('../gradletools.gradle').exists()) {
-    apply from: '../gradletools.gradle'
-} else if (project.file('gradletools.gradle').exists()) {
-    apply from: 'gradletools.gradle'
+def sharedTools = [rootProject != project ? rootProject.file('gradletools.gradle') : null,
+                   file('../Multi_neo/gradletools.gradle'),
+                   file('../gradletools.gradle'),
+                   file('gradletools.gradle')].find { it?.isFile() }
+if (sharedTools != null) {
+    apply from: sharedTools
 } else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/1.21_neo/gradletools.gradle'
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.1.2_neo/gradletools.gradle'
 }
 
 group = "com.github.mcjty"
