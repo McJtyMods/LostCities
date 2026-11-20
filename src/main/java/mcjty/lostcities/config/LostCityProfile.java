@@ -345,7 +345,7 @@ public class LostCityProfile implements ILostCityProfile {
         FORCE_SPAWN_PARTS = cfg.getStringList("forceSpawnParts", LostCityProfile.CATEGORY_LOSTCITY, FORCE_SPAWN_PARTS, "A list of parts that the player will spawn in if FORCE_SPAWN_IN_BUILDING is true. If this is empty then any part will do. This can be used in combination with 'forceSpawnBuildings'");
         SPAWN_CHECK_RADIUS = cfg.getInt("spawnCheckRadius", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_CHECK_RADIUS, 1, 100000, "The start radius to check for a valid spawn location. The search spirals outward from world center and expands by spawnRadiusIncrease if it couldn't find a valid spot");
         SPAWN_RADIUS_INCREASE = cfg.getInt("spawnRadiusIncrease", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_RADIUS_INCREASE, 1, 100000, "The radius increase to use if the spawn check radius is not large enough to find a valid spawn location");
-        SPAWN_CHECK_ATTEMPTS = cfg.getInt("spawnCheckAttempts", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_CHECK_ATTEMPTS, 1, 1000000, "The number of chunks to check while looking for a valid spawn location. If this is not enough then this will error");
+        SPAWN_CHECK_ATTEMPTS = cfg.getInt("spawnCheckAttempts", LostCityProfile.CATEGORY_LOSTCITY, SPAWN_CHECK_ATTEMPTS, 1, 1000000, "The number of chunks to check for a spawn matching the profile rules. Cavern profiles look for a safe alternative if this search runs out");
 
         SCATTERED_CHANCE_MULTIPLIER = cfg.getFloat("scatteredChanceMultiplier", LostCityProfile.CATEGORY_LOSTCITY, SCATTERED_CHANCE_MULTIPLIER, 0.0f, 100.0f, "Multiplier for the chance a scattered building will generate. With 0 all scattered buildings are disabled");
 

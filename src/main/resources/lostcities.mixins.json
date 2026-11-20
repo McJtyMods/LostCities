@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "package": "mcjty.lostcities.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["PlayerListMixin"],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,3 +1,7 @@
+1.21-8.4.7:
+- Made the biosphere_caves profile available in the world creation menu.
+- Fixed players spawning on the bedrock roof in cavern worlds. When the configured search fails, Lost Cities finds a safe spot nearby or builds an underground shelter.
+
 1.21-8.4.6:
 - Fixed the Transport preview crashing when customizing cities before creating a world
 
