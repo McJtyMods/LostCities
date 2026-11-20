@@ -50,6 +50,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -81,20 +83,65 @@ public class ForgeEventHandlers {
         ServerLevel level = serverPlayer.serverLevel();
         ResourceKey<Level> dimKey = level.dimension();
 
-        if (spawnPositions.containsKey(dimKey)) {
-            BlockPos correctPos = spawnPositions.get(dimKey);
-            BlockPos currentWorldSpawn = level.getSharedSpawnPos();
+        BlockPos correctPos = spawnPositions.remove(dimKey);
+        if (correctPos != null && !level.getSharedSpawnPos().equals(correctPos)) {
+            level.setDefaultSpawnPos(correctPos, 0.0f);
 
-            if (!currentWorldSpawn.equals(correctPos)) {
-                level.setDefaultSpawnPos(correctPos, 0.0f);
+            if (level.getLevelData() instanceof ServerLevelData data) {
+                data.setSpawn(correctPos, 0.0f);
+            }
+            serverPlayer.teleportTo(level, correctPos.getX() + 0.5, correctPos.getY(), correctPos.getZ() + 0.5, serverPlayer.getYRot(), serverPlayer.getXRot());
+        }
+    }
 
-                if (level.getLevelData() instanceof ServerLevelData data) {
-                    data.setSpawn(correctPos, 0.0f);
-                }
-                serverPlayer.teleportTo(level, correctPos.getX() + 0.5, correctPos.getY(), correctPos.getZ() + 0.5, serverPlayer.getYRot(), serverPlayer.getXRot());
-                spawnPositions.remove(dimKey);
+    @SubscribeEvent
+    public void onPlayerLoad(PlayerEvent.LoadFromFile event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        ServerLevel level = player.serverLevel();
+        // The integrated server can store its owner's player data in level.dat.
+        if (level.getServer().isSingleplayerOwner(player.getGameProfile())
+                && level.getServer().getWorldData().getLoadedPlayerTag() != null) {
+            return;
+        }
+        if (new File(event.getPlayerDirectory(), event.getPlayerUUID() + ".dat").isFile()) {
+            return;
+        }
+        BlockPos spawn = getCavernWorldSpawn(level);
+        if (spawn != null) {
+            // Vanilla has already picked a surface position. The login packets
+            // have yet to be sent, so use the exact underground world spawn.
+            player.moveTo(spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, player.getYRot(), player.getXRot());
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player && player.getRespawnPosition() == null) {
+            ServerLevel level = player.serverLevel();
+            BlockPos spawn = getCavernWorldSpawn(level);
+            if (spawn != null) {
+                player.teleportTo(level, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5, player.getYRot(), player.getXRot());
             }
         }
+    }
+
+    @Nullable
+    private BlockPos getCavernWorldSpawn(ServerLevel level) {
+        if (!level.dimension().equals(Level.OVERWORLD)) {
+            return null;
+        }
+        IDimensionInfo info = Registration.LOSTCITY_FEATURE.get().getDimensionInfo(level);
+        if (info == null || !info.getProfile().isCavern()) {
+            return null;
+        }
+        BlockPos spawn = level.getSharedSpawnPos();
+        if (!CavernSpawn.isSafe(level, spawn)) {
+            spawn = CavernSpawn.findAlternative(level, info.getProfile(), spawn);
+            level.setDefaultSpawnPos(spawn, level.getSharedSpawnAngle());
+        }
+        return spawn;
     }
 
     @SubscribeEvent
@@ -107,6 +154,7 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onServerStarting(ServerAboutToStartEvent event) {
+        spawnPositions.clear();
         cleanUp();
     }
 
@@ -242,9 +290,18 @@ public class ForgeEventHandlers {
             Predicate<ChunkCoord> isSuitableChunk
     ) {
         BlockPos pos = findSafeSpawnPoint(serverLevel, dimensionInfo, isSuitable, isSuitableChunk);
+        boolean cavern = dimensionInfo.getProfile().isCavern();
+        if (pos == null) {
+            if (!cavern) {
+                throw new IllegalStateException("Can't find a valid spawn position!");
+            }
+            pos = CavernSpawn.findAlternative(serverLevel, dimensionInfo.getProfile(), BlockPos.ZERO);
+        }
         event.getSettings().setSpawn(pos, 0.0f);
         serverLevel.setDefaultSpawnPos(pos, 0.0f);
-        spawnPositions.put(serverLevel.dimension(), pos);
+        if (!cavern) {
+            spawnPositions.put(serverLevel.dimension(), pos);
+        }
         event.setCanceled(true);
     }
 
@@ -296,6 +353,7 @@ public class ForgeEventHandlers {
         return (int) ((radius * pct) * (radius * pct));
     }
 
+    @Nullable
     private BlockPos findSafeSpawnPoint(Level world, IDimensionInfo provider, @Nonnull Predicate<BlockPos> isSuitable,
                                     @Nonnull Predicate<ChunkCoord> isSuitableChunk) {
         LostCityProfile profile = provider.getProfile();
@@ -312,9 +370,8 @@ public class ForgeEventHandlers {
                     if (pos != null) {
                         return pos;
                     }
-                    if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
-                        LostCities.setup.getLogger().error("Can't find a valid spawn position!");
-                        throw new RuntimeException("Can't find a valid spawn position!");
+                    if (checkedChunks >= profile.SPAWN_CHECK_ATTEMPTS) {
+                        return null;
                     }
                 } else {
                     for (int x = -currentChunkRadius ; x <= currentChunkRadius ; x++) {
@@ -323,9 +380,8 @@ public class ForgeEventHandlers {
                         if (pos != null) {
                             return pos;
                         }
-                        if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
-                            LostCities.setup.getLogger().error("Can't find a valid spawn position!");
-                            throw new RuntimeException("Can't find a valid spawn position!");
+                        if (checkedChunks >= profile.SPAWN_CHECK_ATTEMPTS) {
+                            return null;
                         }
                     }
                     for (int z = -currentChunkRadius + 1 ; z <= currentChunkRadius ; z++) {
@@ -334,9 +390,8 @@ public class ForgeEventHandlers {
                         if (pos != null) {
                             return pos;
                         }
-                        if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
-                            LostCities.setup.getLogger().error("Can't find a valid spawn position!");
-                            throw new RuntimeException("Can't find a valid spawn position!");
+                        if (checkedChunks >= profile.SPAWN_CHECK_ATTEMPTS) {
+                            return null;
                         }
                     }
                     for (int x = currentChunkRadius - 1 ; x >= -currentChunkRadius ; x--) {
@@ -345,9 +400,8 @@ public class ForgeEventHandlers {
                         if (pos != null) {
                             return pos;
                         }
-                        if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
-                            LostCities.setup.getLogger().error("Can't find a valid spawn position!");
-                            throw new RuntimeException("Can't find a valid spawn position!");
+                        if (checkedChunks >= profile.SPAWN_CHECK_ATTEMPTS) {
+                            return null;
                         }
                     }
                     for (int z = currentChunkRadius - 1 ; z > -currentChunkRadius ; z--) {
@@ -356,9 +410,8 @@ public class ForgeEventHandlers {
                         if (pos != null) {
                             return pos;
                         }
-                        if (checkedChunks > profile.SPAWN_CHECK_ATTEMPTS) {
-                            LostCities.setup.getLogger().error("Can't find a valid spawn position!");
-                            throw new RuntimeException("Can't find a valid spawn position!");
+                        if (checkedChunks >= profile.SPAWN_CHECK_ATTEMPTS) {
+                            return null;
                         }
                     }
                 }
@@ -404,6 +457,9 @@ public class ForgeEventHandlers {
 
         ChunkCoord coord = new ChunkCoord(provider.getType(), x >> 4, z >> 4);
         LostCityProfile profile = BuildingInfo.getProfile(coord, provider);
+        if (provider.getProfile().isCavern()) {
+            return CavernSpawn.findInColumn(world, x, z, profile.GROUNDLEVEL - 5, false);
+        }
         for (int y = profile.GROUNDLEVEL-5 ; y < 125 ; y++) {
             BlockPos pos = new BlockPos(x, y, z);
             if (isValidStandingPosition(world, pos)) {

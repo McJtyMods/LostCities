@@ -168,7 +168,7 @@ public class ProfileSetup {
 //        profile.GENERATE_LIGHTING = true;
 //        standardProfiles.put(profile.getName(), profile);
 
-        profile = new LostCityProfile("biosphere_caves", false);
+        profile = new LostCityProfile("biosphere_caves", true);
         profile.setDescription("Spheres in large caverns");
         profile.setWarning("Use this in combination with the Lost Worlds 'cavespheres' world type");
         profile.setIconFile("textures/gui/icon_cavespheres.png");
