@@ -1,3 +1,6 @@
+26.3-12.0.2-fabric:
+- Fixed cities failing to generate in Lost Worlds Caves with the cavern profile.
+
 26.3-12.0.1-fabric:
 - Made the biosphere_caves profile available in the world creation menu.
 - Fixed players spawning on the bedrock roof in cavern worlds. When the configured search fails, Lost Cities finds a safe spot nearby or builds an underground shelter.
