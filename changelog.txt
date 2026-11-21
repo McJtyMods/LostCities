@@ -1,3 +1,6 @@
+1.20-7.5.9:
+- Fixed cities failing to generate in Lost Worlds Caves with the cavern profile.
+
 1.20-7.5.8:
 - The 'biosphere_caves' profile was private but this is required for the Lost Worlds mod
 - Fixed cavern players spawning on the bedrock roof. If the configured spawn search fails, Lost Cities looks for a safe spot nearby or builds a small underground shelter.

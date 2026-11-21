@@ -47,6 +47,7 @@ public class ProfileSetup {
         profile.GENERATE_LIGHTING = true;
         profile.RAILWAYS_ENABLED = false;
         profile.GROUNDLEVEL = 40;
+        profile.CITY_MINHEIGHT = profile.GROUNDLEVEL;
         profile.SEALEVEL = 32;
         profile.CITY_LEVEL0_HEIGHT = 40+4;
         profile.CITY_LEVEL1_HEIGHT = 40+12;
