@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -51,7 +52,9 @@ public class ClientEventHandlers {
     @SubscribeEvent
     public void onGuiDraw(ScreenEvent.Render event) {
         if (event.getScreen() instanceof CreateWorldScreen screen && lostCitiesButton != null) {
-            lostCitiesButton.visible = screen.tabManager.getCurrentTab() instanceof CreateWorldScreen.MoreTab;
+            // No 'Cities' button if the overworld can't get a profile anyway
+            lostCitiesButton.visible = screen.tabManager.getCurrentTab() instanceof CreateWorldScreen.MoreTab
+                    && !Config.isDimensionWithoutCities(Level.OVERWORLD);
             if (lostCitiesButton.visible) {
                 event.getGuiGraphics().blit(txt, screen.width - 100, 60, 70, 70, 256, 256, 256, 256, 256, 256);
             }
