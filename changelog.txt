@@ -1,3 +1,6 @@
+1.20-7.5.10:
+- New common config option 'dimensionsWithoutCities': dimensions listed there never get a city profile, whatever 'dimensionsWithProfiles', 'selectedProfile', the 'Cities' button when creating a world or another mod say. Add 'minecraft:overworld' to keep cities in their own dimension; the 'Cities' button is then hidden.
+
 1.20-7.5.9:
 - Fixed cities failing to generate in Lost Worlds Caves with the cavern profile.
 

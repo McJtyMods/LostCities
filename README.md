@@ -6,5 +6,6 @@ Developer documentation:
 - [City generation](https://mcjty.eu/docs/mods/lost-cities/city_generation)
 - [Profile options](https://mcjty.eu/docs/mods/lost-cities/profile_options)
 - [Cavern spawn behavior](docs/profile_options.md#cavern-spawn)
+- [Which dimensions get cities](docs/dimension_profiles.md)
 - [World-generation thread safety](https://mcjty.eu/docs/mods/lost-cities/thread_safety)
 - [Changelog](changelog.txt)

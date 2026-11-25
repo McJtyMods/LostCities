@@ -27,6 +27,8 @@ public class Config {
     };
     private static final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSION_PROFILES;
     private static Map<ResourceKey<Level>, String> dimensionProfileCache = null;
+    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> DIMENSIONS_WITHOUT_CITIES;
+    private static Set<ResourceKey<Level>> dimensionsWithoutCitiesCache = null;
 
     // Profile as selected by the client
     public static String profileFromClient = null;
@@ -58,17 +60,42 @@ public class Config {
         profileFromClient = null;
         jsonFromClient = null;
         dimensionProfileCache = null;
+        dimensionsWithoutCitiesCache = null;
     }
 
     public static void resetProfileCache() {
         dimensionProfileCache = null;
+        dimensionsWithoutCitiesCache = null;
+    }
+
+    /**
+     * True if the given dimension is listed in 'dimensionsWithoutCities' and may never get a profile
+     */
+    public static boolean isDimensionWithoutCities(ResourceKey<Level> type) {
+        if (dimensionsWithoutCitiesCache == null) {
+            Set<ResourceKey<Level>> set = new HashSet<>();
+            for (String s : DIMENSIONS_WITHOUT_CITIES.get()) {
+                set.add(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(s)));
+            }
+            dimensionsWithoutCitiesCache = set;
+        }
+        return dimensionsWithoutCitiesCache.contains(type);
+    }
+
+    // Every profile goes through here so that dimensions in 'dimensionsWithoutCities' never get one
+    private static void putProfile(ResourceKey<Level> type, String profile) {
+        if (isDimensionWithoutCities(type)) {
+            LostCities.getLogger().info("Not using profile {} for dimension {} because it is in 'dimensionsWithoutCities'", profile, type.location());
+            return;
+        }
+        dimensionProfileCache.put(type, profile);
     }
 
     // @todo BAD
     public static void registerLostCityDimension(ResourceKey<Level> type, String profile) {
         String profileForDimension = getProfileForDimension(type);
         if (profileForDimension == null) {
-            dimensionProfileCache.put(type, profile);
+            putProfile(type, profile);
         }
     }
 
@@ -84,7 +111,7 @@ public class Config {
                     String profileName = split[1];
                     LostCityProfile profile = ProfileSetup.STANDARD_PROFILES.get(profileName);
                     if (profile != null) {
-                        dimensionProfileCache.put(dimensionType, profileName);
+                        putProfile(dimensionType, profileName);
                     } else {
                         LostCities.getLogger().error("Cannot find profile: {} for dimension {}!", profileName, split[0]);
                     }
@@ -106,7 +133,7 @@ public class Config {
                 }
             }
             if (!selectedProfile.isEmpty()) {
-                dimensionProfileCache.put(Level.OVERWORLD, selectedProfile);
+                putProfile(Level.OVERWORLD, selectedProfile);
                 String json = Config.SELECTED_CUSTOM_JSON.get();
                 if (json != null && !json.isEmpty()) {
                     LostCityProfile profile = new LostCityProfile("customized", json);
@@ -120,7 +147,7 @@ public class Config {
             String profile = getProfileForDimension(Level.OVERWORLD);
             if (profile != null && !profile.isEmpty()) {
                 if (ProfileSetup.STANDARD_PROFILES.get(profile).GENERATE_NETHER) {
-                    dimensionProfileCache.put(Level.NETHER, "cavern");
+                    putProfile(Level.NETHER, "cavern");
                 }
             }
         }
@@ -158,6 +185,9 @@ public class Config {
         DIMENSION_PROFILES = COMMON_BUILDER
                 .comment("A list of dimensions with associated city generation profiles (format <dimensionid>=<profilename>")
                 .defineList("dimensionsWithProfiles", Lists.newArrayList(Config.DEFAULT_DIMENSION_PROFILES), s -> s instanceof String);
+        DIMENSIONS_WITHOUT_CITIES = COMMON_BUILDER
+                .comment("A list of dimensions that never get a city generation profile, even if 'dimensionsWithProfiles', 'selectedProfile', the 'Cities' button when creating a world or another mod would give them one (for example 'minecraft:overworld' to keep cities in their own dimension). If the overworld is listed the 'Cities' button is hidden")
+                .defineList("dimensionsWithoutCities", Collections.emptyList(), s -> s instanceof String);
 
         OPTIMIZED_HEIGHTMAP = COMMON_BUILDER
                 .comment("If true then a different heightmap generation algorithm is used which should be slightly more efficient. Be careful with this as it might not be 100% compatible with some other terrain generation mods!")
